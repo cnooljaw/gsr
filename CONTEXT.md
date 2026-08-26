@@ -25,3 +25,7 @@
 - **Admission**：Mailbox 或出站队列对消息的本地接受动作。Send 返回 nil 只说明 admission 成功，不说明目标 Handler 已执行或业务操作已成功。
 - **NodeSender**：Cluster 为一个远端 Node 唯一管理的 outbound 发送者，合并并发建连并负责自动重连，但不自动重放结果不确定的业务请求。
 - **ConnectionAgent**：Cluster 为一条 inbound socket 创建的接收适配器，负责解码远端帧、投递本地 Service 并沿原连接返回结果。
+- **RuntimeState**：Runtime 的生命周期状态。公开顺序为 `Created → Starting → Running → Stopping → Stopped`；`Starting` 表示 Runtime-owned Core 组件正在启动。
+- **Lifecycle Coordinator**：Runtime 内部按固定 start/stop 计划编排 Core 组件的生命周期；它不拥有组件资源，也不是可无限注册的业务插件容器。
+- **Quiesce**：关闭流程中停止新 admission、入站和重连的阶段；它不等同于已经等待所有已接受任务完成。
+- **ShutdownTimeout**：Runtime 关闭全部 Core 组件共享的内部时间预算；调用方传入的 `Close` context 只控制该调用者等待多久。

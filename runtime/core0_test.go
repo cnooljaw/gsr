@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"math"
+	"strings"
 	"testing"
 	"time"
 )
@@ -152,6 +153,210 @@ func TestRuntimeStartAndCloseLifecycle(t *testing.T) {
 	}
 }
 
+// 验证生命周期协调器严格按声明的启动和关闭顺序调用组件。
+func TestLifecycleCoordinatorUsesExplicitOrder(t *testing.T) {
+	events := make([]string, 0, 6)
+	scheduler := &lifecycleProbe{name: "scheduler", events: &events}
+	timers := &lifecycleProbe{name: "timers", events: &events}
+	services := &lifecycleProbe{name: "services", events: &events}
+	coordinator := newLifecycleCoordinator(lifecyclePlan{
+		startOrder: []lifecycleComponent{scheduler, timers, services},
+		stopOrder:  []lifecycleComponent{timers, services, scheduler},
+	})
+
+	if err := coordinator.start(context.Background()); err != nil {
+		t.Fatalf("coordinator start returned error: %v", err)
+	}
+	if err := coordinator.stop(context.Background()); err != nil {
+		t.Fatalf("coordinator stop returned error: %v", err)
+	}
+
+	want := []string{
+		"start scheduler",
+		"start timers",
+		"start services",
+		"stop timers",
+		"stop services",
+		"stop scheduler",
+	}
+	if !slicesEqual(events, want) {
+		t.Fatalf("lifecycle events = %v, want %v", events, want)
+	}
+}
+
+// 验证组件启动失败时只回滚已经成功启动的组件，并保留原始错误。
+func TestLifecycleCoordinatorRollsBackStartedComponents(t *testing.T) {
+	startErr := errors.New("timers failed to start")
+	events := make([]string, 0, 3)
+	scheduler := &lifecycleProbe{name: "scheduler", events: &events}
+	timers := &lifecycleProbe{
+		name:   "timers",
+		events: &events,
+		startFn: func(context.Context) error {
+			return startErr
+		},
+	}
+	services := &lifecycleProbe{name: "services", events: &events}
+	coordinator := newLifecycleCoordinator(lifecyclePlan{
+		startOrder: []lifecycleComponent{scheduler, timers, services},
+		stopOrder:  []lifecycleComponent{timers, services, scheduler},
+	})
+
+	if err := coordinator.start(context.Background()); !errors.Is(err, startErr) {
+		t.Fatalf("start error = %v, want %v", err, startErr)
+	}
+	if err := coordinator.stop(context.Background()); err != nil {
+		t.Fatalf("stop after rollback returned error: %v", err)
+	}
+
+	want := []string{"start scheduler", "start timers", "stop scheduler"}
+	if !slicesEqual(events, want) {
+		t.Fatalf("lifecycle events = %v, want %v", events, want)
+	}
+}
+
+// 验证 Runtime 启动失败后进入终态，且 Close 不会再次执行清理流程。
+func TestRuntimeStartFailureRollsBackAndStops(t *testing.T) {
+	startErr := errors.New("scheduler failed to start")
+	events := make([]string, 0, 2)
+	scheduler := &lifecycleProbe{
+		name:   "scheduler",
+		events: &events,
+		startFn: func(context.Context) error {
+			return startErr
+		},
+	}
+	runtime, err := NewRuntime(Config{})
+	if err != nil {
+		t.Fatalf("NewRuntime returned error: %v", err)
+	}
+	runtime.lifecycle = newLifecycleCoordinator(lifecyclePlan{
+		startOrder: []lifecycleComponent{scheduler},
+		stopOrder:  []lifecycleComponent{scheduler},
+	})
+
+	if err := runtime.Start(); !errors.Is(err, startErr) {
+		t.Fatalf("Start error = %v, want %v", err, startErr)
+	}
+	if got := runtime.State(); got != RuntimeStopped {
+		t.Fatalf("state after failed Start = %v, want %v", got, RuntimeStopped)
+	}
+	if err := runtime.Close(context.Background()); !errors.Is(err, startErr) {
+		t.Fatalf("Close after failed Start = %v, want %v", err, startErr)
+	}
+
+	want := []string{"start scheduler"}
+	if !slicesEqual(events, want) {
+		t.Fatalf("lifecycle events = %v, want %v", events, want)
+	}
+}
+
+// 验证 Close 会使用 Runtime 的统一 shutdown deadline，而不是无限等待组件。
+func TestRuntimeCloseUsesShutdownTimeout(t *testing.T) {
+	stopStarted := make(chan struct{})
+	scheduler := &lifecycleProbe{
+		name: "scheduler",
+		stopFn: func(ctx context.Context) error {
+			close(stopStarted)
+			<-ctx.Done()
+			return ctx.Err()
+		},
+	}
+	runtime, err := NewRuntime(Config{ShutdownTimeout: 10 * time.Millisecond})
+	if err != nil {
+		t.Fatalf("NewRuntime returned error: %v", err)
+	}
+	runtime.lifecycle = newLifecycleCoordinator(lifecyclePlan{
+		startOrder: []lifecycleComponent{scheduler},
+		stopOrder:  []lifecycleComponent{scheduler},
+	})
+	if err := runtime.Start(); err != nil {
+		t.Fatalf("Start returned error: %v", err)
+	}
+
+	if err := runtime.Close(context.Background()); !errors.Is(err, context.DeadlineExceeded) {
+		t.Fatalf("Close error = %v, want context deadline exceeded", err)
+	}
+	select {
+	case <-stopStarted:
+	default:
+		t.Fatal("shutdown component was not called")
+	}
+	if got := runtime.State(); got != RuntimeStopped {
+		t.Fatalf("state after timed shutdown = %v, want %v", got, RuntimeStopped)
+	}
+}
+
+// 验证组件关闭失败时，协调器仍会继续关闭后续组件并返回原始错误。
+func TestLifecycleCoordinatorContinuesAfterStopFailure(t *testing.T) {
+	stopErr := errors.New("timers failed to stop")
+	events := make([]string, 0, 4)
+	timers := &lifecycleProbe{
+		name:   "timers",
+		events: &events,
+		stopFn: func(context.Context) error {
+			return stopErr
+		},
+	}
+	scheduler := &lifecycleProbe{name: "scheduler", events: &events}
+	coordinator := newLifecycleCoordinator(lifecyclePlan{
+		startOrder: []lifecycleComponent{timers, scheduler},
+		stopOrder:  []lifecycleComponent{timers, scheduler},
+	})
+	if err := coordinator.start(context.Background()); err != nil {
+		t.Fatalf("coordinator start returned error: %v", err)
+	}
+
+	if err := coordinator.stop(context.Background()); !errors.Is(err, stopErr) {
+		t.Fatalf("coordinator stop error = %v, want %v", err, stopErr)
+	}
+
+	want := []string{
+		"start timers",
+		"start scheduler",
+		"stop timers",
+		"stop scheduler",
+	}
+	if !slicesEqual(events, want) {
+		t.Fatalf("lifecycle events = %v, want %v", events, want)
+	}
+}
+
+// 验证组件关闭 panic 会被转换成错误，并不会阻止后续组件释放资源。
+func TestLifecycleCoordinatorRecoversStopPanic(t *testing.T) {
+	events := make([]string, 0, 4)
+	timers := &lifecycleProbe{
+		name:   "timers",
+		events: &events,
+		stopFn: func(context.Context) error {
+			panic("timer stop panic")
+		},
+	}
+	scheduler := &lifecycleProbe{name: "scheduler", events: &events}
+	coordinator := newLifecycleCoordinator(lifecyclePlan{
+		startOrder: []lifecycleComponent{timers, scheduler},
+		stopOrder:  []lifecycleComponent{timers, scheduler},
+	})
+	if err := coordinator.start(context.Background()); err != nil {
+		t.Fatalf("coordinator start returned error: %v", err)
+	}
+
+	err := coordinator.stop(context.Background())
+	if err == nil || !strings.Contains(err.Error(), "timer stop panic") {
+		t.Fatalf("coordinator stop error = %v, want panic detail", err)
+	}
+
+	want := []string{
+		"start timers",
+		"start scheduler",
+		"stop timers",
+		"stop scheduler",
+	}
+	if !slicesEqual(events, want) {
+		t.Fatalf("lifecycle events = %v, want %v", events, want)
+	}
+}
+
 // 验证未启动的 Runtime 也能安全关闭并进入 Stopped 状态。
 func TestRuntimeCloseFromCreatedIsIdempotent(t *testing.T) {
 	runtime, err := NewRuntime(Config{})
@@ -176,10 +381,24 @@ func TestRuntimeCloseWaiterCanStopWaitingWithoutCancellingClose(t *testing.T) {
 
 	closeStarted := make(chan struct{})
 	releaseClose := make(chan struct{})
-	runtime.closeFn = func() error {
-		close(closeStarted)
-		<-releaseClose
-		return nil
+	scheduler := &lifecycleProbe{
+		name: "scheduler",
+		stopFn: func(ctx context.Context) error {
+			close(closeStarted)
+			select {
+			case <-releaseClose:
+				return nil
+			case <-ctx.Done():
+				return ctx.Err()
+			}
+		},
+	}
+	runtime.lifecycle = newLifecycleCoordinator(lifecyclePlan{
+		startOrder: []lifecycleComponent{scheduler},
+		stopOrder:  []lifecycleComponent{scheduler},
+	})
+	if err := runtime.Start(); err != nil {
+		t.Fatalf("Start returned error: %v", err)
 	}
 
 	firstClose := make(chan error, 1)
@@ -209,4 +428,160 @@ func TestRuntimeCloseWaiterCanStopWaitingWithoutCancellingClose(t *testing.T) {
 	if got := runtime.State(); got != RuntimeStopped {
 		t.Fatalf("final state = %v, want %v", got, RuntimeStopped)
 	}
+}
+
+// 验证 Close 遇到正在启动的组件时，会等待启动完成后再进入关闭流程。
+func TestRuntimeCloseWaitsForStartToFinish(t *testing.T) {
+	startStarted := make(chan struct{})
+	releaseStart := make(chan struct{})
+	scheduler := &lifecycleProbe{
+		name: "scheduler",
+		startFn: func(ctx context.Context) error {
+			close(startStarted)
+			select {
+			case <-releaseStart:
+				return nil
+			case <-ctx.Done():
+				return ctx.Err()
+			}
+		},
+	}
+	runtime, err := NewRuntime(Config{})
+	if err != nil {
+		t.Fatalf("NewRuntime returned error: %v", err)
+	}
+	runtime.lifecycle = newLifecycleCoordinator(lifecyclePlan{
+		startOrder: []lifecycleComponent{scheduler},
+		stopOrder:  []lifecycleComponent{scheduler},
+	})
+
+	startResult := make(chan error, 1)
+	go func() { startResult <- runtime.Start() }()
+	select {
+	case <-startStarted:
+	case <-time.After(time.Second):
+		t.Fatal("start workflow did not start")
+	}
+	if got := runtime.State(); got != RuntimeStarting {
+		t.Fatalf("state during Start = %v, want %v", got, RuntimeStarting)
+	}
+
+	closeResult := make(chan error, 1)
+	go func() { closeResult <- runtime.Close(context.Background()) }()
+	select {
+	case err := <-closeResult:
+		t.Fatalf("Close returned before Start finished: %v", err)
+	case <-time.After(10 * time.Millisecond):
+	}
+
+	close(releaseStart)
+	if err := <-startResult; err != nil {
+		t.Fatalf("Start returned error: %v", err)
+	}
+	if err := <-closeResult; err != nil {
+		t.Fatalf("Close returned error: %v", err)
+	}
+	if got := runtime.State(); got != RuntimeStopped {
+		t.Fatalf("final state = %v, want %v", got, RuntimeStopped)
+	}
+}
+
+// 验证启动期间取消 Close 等待后，Runtime 仍会在启动完成后继续关闭。
+func TestRuntimeCloseDuringStartKeepsShutdownQueued(t *testing.T) {
+	startStarted := make(chan struct{})
+	releaseStart := make(chan struct{})
+	stopCalled := make(chan struct{})
+	scheduler := &lifecycleProbe{
+		name: "scheduler",
+		startFn: func(context.Context) error {
+			close(startStarted)
+			<-releaseStart
+			return nil
+		},
+		stopFn: func(context.Context) error {
+			close(stopCalled)
+			return nil
+		},
+	}
+	runtime, err := NewRuntime(Config{})
+	if err != nil {
+		t.Fatalf("NewRuntime returned error: %v", err)
+	}
+	runtime.lifecycle = newLifecycleCoordinator(lifecyclePlan{
+		startOrder: []lifecycleComponent{scheduler},
+		stopOrder:  []lifecycleComponent{scheduler},
+	})
+
+	startResult := make(chan error, 1)
+	go func() { startResult <- runtime.Start() }()
+	select {
+	case <-startStarted:
+	case <-time.After(time.Second):
+		t.Fatal("start workflow did not start")
+	}
+
+	waiterContext, cancel := context.WithCancel(context.Background())
+	cancel()
+	if err := runtime.Close(waiterContext); !errors.Is(err, context.Canceled) {
+		t.Fatalf("cancelled Close error = %v, want context.Canceled", err)
+	}
+
+	close(releaseStart)
+	if err := <-startResult; err != nil {
+		t.Fatalf("Start returned error: %v", err)
+	}
+	select {
+	case <-stopCalled:
+	case <-time.After(time.Second):
+		t.Fatal("queued shutdown did not start")
+	}
+	if err := runtime.Close(context.Background()); err != nil {
+		t.Fatalf("final Close returned error: %v", err)
+	}
+	if got := runtime.State(); got != RuntimeStopped {
+		t.Fatalf("final state = %v, want %v", got, RuntimeStopped)
+	}
+}
+
+type lifecycleProbe struct {
+	name    string
+	events  *[]string
+	startFn func(context.Context) error
+	stopFn  func(context.Context) error
+}
+
+func (probe *lifecycleProbe) lifecycleName() string {
+	return probe.name
+}
+
+func (probe *lifecycleProbe) start(ctx context.Context) error {
+	if probe.events != nil {
+		*probe.events = append(*probe.events, "start "+probe.name)
+	}
+	if probe.startFn != nil {
+		return probe.startFn(ctx)
+	}
+	return nil
+}
+
+func (probe *lifecycleProbe) stop(ctx context.Context) error {
+	if probe.events != nil {
+		*probe.events = append(*probe.events, "stop "+probe.name)
+	}
+	if probe.stopFn != nil {
+		return probe.stopFn(ctx)
+	}
+	return nil
+}
+
+func slicesEqual(left, right []string) bool {
+	if len(left) != len(right) {
+		return false
+	}
+	for index := range left {
+		if left[index] != right[index] {
+			return false
+		}
+	}
+	return true
 }

@@ -11,6 +11,8 @@ type RuntimeState uint8
 const (
 	// RuntimeCreated is a constructed Runtime that has not started.
 	RuntimeCreated RuntimeState = iota
+	// RuntimeStarting is starting its Runtime-owned components.
+	RuntimeStarting
 	// RuntimeRunning accepts Runtime work.
 	RuntimeRunning
 	// RuntimeStopping rejects new work and is waiting for shutdown.
@@ -24,6 +26,8 @@ func (state RuntimeState) String() string {
 	switch state {
 	case RuntimeCreated:
 		return "Created"
+	case RuntimeStarting:
+		return "Starting"
 	case RuntimeRunning:
 		return "Running"
 	case RuntimeStopping:
@@ -43,9 +47,11 @@ type Runtime struct {
 
 	mu          sync.Mutex
 	state       RuntimeState
+	startDone   chan struct{}
+	closeQueued bool
 	closeDone   chan struct{}
 	closeResult error
-	closeFn     func() error
+	lifecycle   *lifecycleCoordinator
 
 	serviceIDs *idAllocator
 	sessionIDs *idAllocator
@@ -64,8 +70,9 @@ func NewRuntime(config Config) (*Runtime, error) {
 	return &Runtime{
 		config:     normalized,
 		state:      RuntimeCreated,
+		startDone:  make(chan struct{}),
 		closeDone:  make(chan struct{}),
-		closeFn:    func() error { return nil },
+		lifecycle:  newCoreLifecycleCoordinator(),
 		serviceIDs: newIDAllocator(1),
 		sessionIDs: newIDAllocator(1),
 		timerIDs:   newIDAllocator(1),
@@ -86,22 +93,53 @@ func (runtime *Runtime) State() RuntimeState {
 	return runtime.state
 }
 
-// Start transitions a Runtime from Created to Running.
+// Start starts Runtime-owned components and transitions from Created to
+// Running. A failed startup rolls back successful components and permanently
+// stops the Runtime.
 func (runtime *Runtime) Start() error {
 	runtime.mu.Lock()
-	defer runtime.mu.Unlock()
-
 	switch runtime.state {
 	case RuntimeCreated:
-		runtime.state = RuntimeRunning
+		runtime.state = RuntimeStarting
+		runtime.mu.Unlock()
+
+		err := runtime.lifecycle.start(context.Background())
+
+		shouldClose := false
+		runtime.mu.Lock()
+		close(runtime.startDone)
+		if err != nil {
+			runtime.closeResult = err
+			runtime.state = RuntimeStopped
+			close(runtime.closeDone)
+			runtime.mu.Unlock()
+			return err
+		}
+		if runtime.closeQueued {
+			runtime.state = RuntimeStopping
+			shouldClose = true
+		} else {
+			runtime.state = RuntimeRunning
+		}
+		runtime.mu.Unlock()
+		if shouldClose {
+			go runtime.finishClose()
+		}
 		return nil
+	case RuntimeStarting:
+		runtime.mu.Unlock()
+		return ErrRuntimeAlreadyStarted
 	case RuntimeRunning:
+		runtime.mu.Unlock()
 		return ErrRuntimeAlreadyStarted
 	case RuntimeStopping:
+		runtime.mu.Unlock()
 		return ErrRuntimeStopping
 	case RuntimeStopped:
+		runtime.mu.Unlock()
 		return ErrRuntimeStopped
 	default:
+		runtime.mu.Unlock()
 		return ErrRuntimeStopped
 	}
 }
@@ -116,35 +154,45 @@ func (runtime *Runtime) Close(ctx context.Context) error {
 		ctx = context.Background()
 	}
 
-	runtime.mu.Lock()
-	switch runtime.state {
-	case RuntimeStopped:
-		result := runtime.closeResult
-		runtime.mu.Unlock()
-		return result
-	case RuntimeStopping:
-		done := runtime.closeDone
-		runtime.mu.Unlock()
-		return runtime.waitForClose(ctx, done)
-	case RuntimeCreated, RuntimeRunning:
-		runtime.state = RuntimeStopping
-		done := runtime.closeDone
-		closeFn := runtime.closeFn
-		runtime.mu.Unlock()
+	for {
+		runtime.mu.Lock()
+		switch runtime.state {
+		case RuntimeStopped:
+			result := runtime.closeResult
+			runtime.mu.Unlock()
+			return result
+		case RuntimeStarting:
+			runtime.closeQueued = true
+			startDone := runtime.startDone
+			runtime.mu.Unlock()
+			select {
+			case <-startDone:
+				continue
+			case <-ctx.Done():
+				return ctx.Err()
+			}
+		case RuntimeStopping:
+			done := runtime.closeDone
+			runtime.mu.Unlock()
+			return runtime.waitForClose(ctx, done)
+		case RuntimeCreated, RuntimeRunning:
+			runtime.state = RuntimeStopping
+			done := runtime.closeDone
+			runtime.mu.Unlock()
 
-		go runtime.finishClose(closeFn)
-		return runtime.waitForClose(ctx, done)
-	default:
-		runtime.mu.Unlock()
-		return ErrRuntimeStopped
+			go runtime.finishClose()
+			return runtime.waitForClose(ctx, done)
+		default:
+			runtime.mu.Unlock()
+			return ErrRuntimeStopped
+		}
 	}
 }
 
-func (runtime *Runtime) finishClose(closeFn func() error) {
-	var result error
-	if closeFn != nil {
-		result = closeFn()
-	}
+func (runtime *Runtime) finishClose() {
+	shutdownContext, cancel := context.WithTimeout(context.Background(), runtime.config.ShutdownTimeout)
+	defer cancel()
+	result := runtime.lifecycle.stop(shutdownContext)
 
 	runtime.mu.Lock()
 	runtime.closeResult = result

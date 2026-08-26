@@ -41,6 +41,7 @@
 ## Runtime 硬边界
 
 - Core 只包含 `Runtime`、`Service`、`ServiceID`、`Command`、`Mailbox`、`Scheduler` 和 `Timer`；Cluster、Discovery、Snapshot、Diagnostic、AI Runner 建立在 Core 之上。
+- Runtime 使用固定、显式的 Core 组件生命周期计划；不得把后续 Service、Scheduler、Timer 或其它组件的清理逻辑不断追加到单一 `closeFn`。
 - 核心术语使用 `Runtime`、`Service`、`ServiceID`、`Command`、`Send`、`Call`、`Reply`、`Timer`；不要混用 `ServiceRef`、`Actor`、`Spawn`、`Ask`、`Tell` 或 Skynet `PTYPE`。
 - `ServiceID` 固定为 Runtime 局部的 `uint64` 临时地址，不包含 Node、Epoch 或 Generation，不持久化或跨 Runtime 重启使用。
 - 同一 Runtime 生命周期内已经发放的 ServiceID 不复用；Service 重建必须获得新 ID。

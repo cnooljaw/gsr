@@ -48,6 +48,8 @@ Close
 
 Skynet 的接口形状是 API 设计的重要参照，但 GSR 的具体契约由 Go 的类型系统、错误模型、消息所有权和生命周期约束决定。
 
+完整的术语、实现机制和有意不照搬项见 [GSR 与 Skynet 概念对照表](SKYNET-COMPARISON.md)。
+
 - 不使用 `Actor`、`Spawn`、`Ask`、`Tell` 替代 GSR 术语。
 - 不向业务 API 暴露 Skynet `PTYPE`、Mailbox、Session table、Scheduler queue 或 Transport frame。
 - 不用一个不断增长的 `RuntimeContext` 承载 Cluster、Discovery、数据库、配置和其它外层能力。
@@ -395,7 +397,7 @@ Mailbox 必须有明确且可配置的有限容量，admission 不得无限阻�
 Core 生命周期保持为：
 
 ```text
-Created → Running → Stopping → Stopped
+Created → Starting → Running → Stopping → Stopped
 ```
 
 第一版 Service 接口固定为：
@@ -410,9 +412,21 @@ type Service interface {
 
 Service 不提供额外 `Close` 钩子；本地资源释放属于 `OnStop`。`Close` 是 Runtime 级操作，负责停止全部 Service 和 Runtime 自有并发资源。
 
+### 10.1 Runtime 组件生命周期
+
+Runtime 不使用一个不断增长的 `closeFn` 承载所有清理逻辑。Runtime 内部维护固定、可审计的 Core 生命周期计划；组件拥有自己的资源和 goroutine，协调器只负责按明确顺序调用组件。
+
+- Core 组件计划只覆盖本地 Admission、Service 管理、Timer、PendingCall、Scheduler、Registry 等能力；Cluster、Transport、NodeSender 和 ConnectionAgent 由 Core 之外的 Node/Host 生命周期协调器负责。
+- 启动按显式 `startOrder` 执行；某个组件启动失败时，只逆序回滚已经成功启动的组件，Runtime 不允许从部分启动状态重试。
+- 关闭的线性化点是 Runtime 进入 `Stopping` 并关闭全局 admission。随后依次停止 Timer、结束 PendingCall、停止 Service、等待 Scheduler/runner，最后释放 Core 资源。
+- 同一组件只由自己的 owner 释放；组件关闭错误继续收集并合并，不能因为一个组件失败就跳过后续组件。
+- `Close` 调用方的 context 只限制当前调用者的等待；Runtime 使用 `ShutdownTimeout` 作为统一的内部关闭预算。Go 无法强杀 Handler 或 `OnStop`，残留任务必须继续被追踪，不能伪报已完成。
+- 如果 `Close` 在 `Starting` 期间被调用，Runtime 会记住关闭意图；即使该调用者提前取消等待，启动成功后仍自动进入关闭流程。
+- Cluster 外层先停止入站和新的出站 admission，再调用 Core `Close`；Core 完成后，外层再关闭 Transport 和连接 goroutine。
+
 启动期自身消息和无法强杀任务的语义见 [ADR 0007](adr/0007-command-context-call-and-timeout-stop.md)。
 
-- Runtime `Start` 完成基础设施启动后进入 Running；`CreateService` 允许在 Running 阶段动态调用。
+- Runtime `Start` 先进入 `Starting`，完成生命周期计划中的基础设施启动并打开 admission 后才进入 `Running`；`CreateService` 只允许在 Running 阶段动态调用。
 - `CreateService` 分配 ID 后运行 `OnStart`，只在启动成功后向调用方返回 ServiceID；启动失败的 ID 作废且不复用。
 - `OnStart` 可以使用 ServiceContext 发起 Send、Call 和 After，但当前 Service 在 OnStart 成功前不接受普通业务消息，也不应发布到 Registry/Discovery。
 - `OnStart` 向自身 Send 返回 `ErrServiceStarting`，向自身 Call 返回 `ErrCallCycle`。`After` 可以登记，但其 Command 最早只能在 Service 进入 Running 后参与普通 Mailbox admission；OnStart 失败时必须取消这些 Timer。

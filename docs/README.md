@@ -13,8 +13,10 @@
 7. [ADR 0005](adr/0005-cluster-wire-and-connections.md)：Cluster wire、codec、NodeSender、ConnectionAgent 和重连策略的裁决。
 8. [ADR 0006](adr/0006-runtime-ids-and-reply-errors.md)：uint64 运行期 ID 与结构化 Reply error 的裁决。
 9. [ADR 0007](adr/0007-command-context-call-and-timeout-stop.md)：CommandContext、Call 最大等待时间、启动期自身消息和无法强杀任务的裁决。
-10. [实现路线图](IMPLEMENTATION-PLAN.md)：Core、Cluster、参考实现使用方式、纵向切片和每阶段验证范围。
-11. [开发、审查与提交工作流](DEVELOPMENT-WORKFLOW.md)：单人单分支下的修改、测试、diff 审查和提交授权边界。
-12. [Go 编码规范](GO-CODE-STYLE.md)：代码结构、错误、并发、接口、配置和评审门禁。
+10. [ADR 0008](adr/0008-runtime-component-lifecycle.md)：Runtime 组件生命周期、启动回滚与 Core/Cluster 关闭顺序的裁决。
+11. [GSR 与 Skynet 概念对照表](SKYNET-COMPARISON.md)：本项目术语、Skynet 对应机制及有意不照搬的边界。
+12. [实现路线图](IMPLEMENTATION-PLAN.md)：Core、Cluster、参考实现使用方式、纵向切片和每阶段验证范围。
+13. [开发、审查与提交工作流](DEVELOPMENT-WORKFLOW.md)：单人单分支下的修改、测试、diff 审查和提交授权边界。
+14. [Go 编码规范](GO-CODE-STYLE.md)：代码结构、错误、并发、接口、配置和评审门禁。
 
 后续出现需要长期保留的重大架构取舍时，新增 ADR 或 RFC，并从这里建立索引。

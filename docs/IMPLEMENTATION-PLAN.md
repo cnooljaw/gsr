@@ -11,6 +11,8 @@ Phase 0  契约闭合
   ↓
 Core 0   基础类型与 Runtime 骨架
   ↓
+Core 0.5 Runtime 组件生命周期骨架
+  ↓
 Core 1   本地 Send 与 Service 生命周期
   ↓
 Core 2   Timer
@@ -51,7 +53,7 @@ Cluster 0–4
 - `ErrIDExhausted`。
 - `ErrorClass`、`ErrorCode`、`StatusError`。
 - Runtime Config 默认值与完整校验，包括有限且大于零的 `MaxCallWait`、Mailbox 容量和 shutdown deadline。
-- Runtime 的 Created、Running、Stopping、Stopped 状态骨架。
+- Runtime 的 Created、Starting、Running、Stopping、Stopped 状态骨架。
 - 空 Runtime 的 `Start`、幂等 `Close` 和并发等待结果。
 
 验收：
@@ -63,6 +65,39 @@ Cluster 0–4
 - 并发 Close 只执行一次，等待者可以因自己的 context 提前返回，但不取消已经开始的关闭流程。
 
 非目标：Service、goroutine、Mailbox、Timer 和 Cluster。
+
+## Core 0.5：Runtime 组件生命周期骨架
+
+状态：已完成基础协调器切片。当前 Core 尚无实际 Service、Timer 或 Scheduler 组件，因此默认生命周期计划为空；后续组件必须通过固定计划接入，不得恢复单一 `closeFn`。
+
+实现：
+
+- Runtime 的 `Created → Starting → Running → Stopping → Stopped` 状态。
+- 内部 Lifecycle Coordinator 和显式 `startOrder`/`stopOrder`。
+- 组件启动失败时逆序回滚已成功启动的组件；部分启动失败后 Runtime 不允许重试。
+- `Close` 使用 Runtime `ShutdownTimeout` 生成统一内部关闭 context；调用方 context 只控制自己的等待。
+- `Close` 在 `Starting` 期间记录关闭意图；调用方提前取消等待不会取消启动完成后的关闭流程。
+- 生命周期组件 panic 转换为 Runtime 生命周期错误，后续组件继续执行并聚合关闭错误。
+
+关闭计划（组件进入实现后逐项填入）：
+
+```text
+Runtime admission
+  → Timer 投递
+  → PendingCall completion
+  → Service admission / OnStop
+  → Scheduler / runner wait
+  → Core Registry 和资源释放
+```
+
+Cluster、Transport、NodeSender 和 ConnectionAgent 不加入 Core 计划。外层 Node/Host 先停止入站和新的出站 admission，再关闭 Core；Core 完成后再释放网络连接和 I/O goroutine。
+
+验收：
+
+- 启动和关闭严格按计划顺序执行，而不是隐式反向或注册顺序。
+- 启动失败只回滚已经成功启动的组件，失败组件的局部清理由其 owner 负责。
+- 同一关闭计划只执行一次；并发等待者可以提前结束等待，但不取消关闭流程。
+- 关闭预算到期时返回稳定可判定错误，组件状态和残留任务仍可观测。
 
 ## Core 1：本地 Send 与 Service 生命周期
 
@@ -88,6 +123,7 @@ Start
 - Service registry 和不可复用 ServiceID。
 - 有界 Mailbox 和非无限阻塞 admission。
 - per-Service runner；Scheduler 负责 runner 创建、panic recovery、停止、等待和观测，不引入全局 ReadyQueue 或固定 worker pool。
+- 将 Service 管理和 Scheduler 按 Core 组件生命周期计划接入 Runtime；不得在 `Close` 中追加匿名清理逻辑。
 - 唯一的本地 Message 和 LocalDispatcher。
 - `Self`、`Send`、`CreateService`、`Stop`、Runtime `Close`。
 - Starting、Running、Stopping、Stopped 的接受边界。
