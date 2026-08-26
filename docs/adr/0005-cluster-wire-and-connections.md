@@ -10,7 +10,7 @@ GSR Cluster 需要保持 Skynet 风格的简洁调用面，同时明确 Go 的�
 
 ## Decision
 
-- ClusterEnvelope 显式包含协议版本、request/response/error frame kind、ClusterSessionID、Target ServiceID、CommandID，以及 payload 或结构化 ErrorClass/ErrorCode/Message。
+- ClusterEnvelope 显式包含协议版本、request/response/error frame kind、ClusterSessionID、Target ServiceID、CommandID，以及 payload 或结构化 ErrorClass/ErrorCode/Message。wire 直接编码 `StatusError` 的三个字段，不在 Core 另设重复的 ErrorStatus 类型。
 - 默认动态值集合包含 nil、bool、整数、浮点数、string、`[]byte`、list 和 string-key map；领域 struct 通过启动阶段注册的 Command codec 转换。
 - 不编码任意 pointer、func、chan、unsafe pointer、循环引用或进程内资源句柄。
 - codec 与 Command 在启动阶段注册；重复注册是 programmer error，panic 并阻止启动。

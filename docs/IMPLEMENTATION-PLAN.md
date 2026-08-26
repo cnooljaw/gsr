@@ -42,12 +42,14 @@ Cluster 0–4
 
 ## Core 0：基础类型与 Runtime 骨架
 
+状态：已完成基础切片。`runtime` package 已提供类型、ID 分配、结构化错误、配置校验和空 Runtime 生命周期；Service、Mailbox、Timer、Cluster 仍未进入实现。
+
 实现：
 
 - `ServiceID`、`SessionID`、`TimerID`、`CommandID`。
 - 可注入临界状态的 uint64 单调 ID 分配器。
 - `ErrIDExhausted`。
-- `ErrorClass`、`ErrorCode`、`ErrorStatus`、`StatusError`。
+- `ErrorClass`、`ErrorCode`、`StatusError`。
 - Runtime Config 默认值与完整校验，包括有限且大于零的 `MaxCallWait`、Mailbox 容量和 shutdown deadline。
 - Runtime 的 Created、Running、Stopping、Stopped 状态骨架。
 - 空 Runtime 的 `Start`、幂等 `Close` 和并发等待结果。
@@ -141,7 +143,7 @@ Start
 - 调用方 context 与 Runtime `MaxCallWait` 的 deadline 合并。
 - self Call 拒绝。
 - caller Stop、target Stop、Runtime Close、timeout 和 admission 失败的 PendingCall 清理。
-- Domain/Runtime ErrorStatus；未知 Handler error 和 panic 的安全转换。
+- Domain/Runtime StatusError；未知 Handler error 和 panic 的安全转换。
 
 验收：
 
@@ -151,7 +153,7 @@ Start
 - self Call 返回 `ErrCallCycle`；跨 Service 环形 Call 依靠有限 timeout 退出。
 - admission 失败、timeout、双方 Stop 和 Runtime Close 都恰好清理一次 PendingCall。
 - 未知、重复和迟到 completion 不会完成其它 Session，并产生受控诊断。
-- Send 的 Handler error 只进入诊断；Call 的 Handler error 返回稳定 ErrorStatus。
+- Send 的 Handler error 只进入诊断；Call 的 Handler error 返回稳定 StatusError。
 - 未分类 error 转为 `runtime.handler_failed`，panic 转为 `runtime.service_panicked`；原始文本和 stack 不进入 Reply。
 
 非目标：手工 Reply、异步 Reply、无限 Call、全局调用环检测和自动 retry。
@@ -189,7 +191,7 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 
 - `NodeID`、`ClusterSessionID`、`ClusterEnvelope`。
 - 显式 Request、Response、Error frame。
-- ErrorStatus wire 表达。
+- `StatusError` 的 Class/Code/Message wire 表达。
 - 默认值 codec、Command codec registry 和启动期重复注册 panic。
 - 帧长、容器深度和 payload 上限。
 - InMemoryTransport 连接两个 Runtime，本地路径不执行 Cluster 编码。

@@ -16,7 +16,7 @@ Domain Error 还必须在本地和 Cluster Call 之间保持可判定语义。�
 - 零值保留；SessionID/ClusterSessionID 的零值表示 Send，其余零值无效。
 - 每种 ID 在 owner 生命周期内从 1 单调分配，不扫描、不回绕、不复用；到达 MaxUint64 后永久返回 `ErrIDExhausted`。
 - Runtime 或 Cluster 实例重启后可以从 1 重新开始，因为旧对象和连接已经全部失效。
-- Reply error 使用 ErrorStatus，包含 ErrorClass、ErrorCode 和安全 Message。第一版 ErrorClass 为 Domain 或 Runtime，ErrorCode 使用稳定字符串。
+- Reply error 使用 `StatusError`，直接包含 ErrorClass、ErrorCode 和安全 Message；wire 只编码这三个字段，不在 Core 另设重复的 ErrorStatus 类型。第一版 ErrorClass 为 Domain 或 Runtime，ErrorCode 使用稳定字符串。
 - StatusError 按 Class + Code 实现 `errors.Is`；Message 不参与程序判断。
 - 未分类 Handler error 对外转换为 `runtime.handler_failed`，panic 转换为 `runtime.service_panicked`；原始错误、panic value 和 stack 只保留在本地诊断。
 - 第一版不提供任意 error details；需要结构化业务信息时使用 typed result。

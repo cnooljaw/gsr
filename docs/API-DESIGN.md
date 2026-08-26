@@ -282,7 +282,7 @@ FrameKind: Request / Response / Error
 ClusterSessionID
 Target ServiceID
 CommandID
-Payload or ErrorStatus
+Payload or ErrorClass/ErrorCode/Message
 ```
 
 Error frame 实际携带 `ErrorClass + ErrorCode + Message`；Message 只用于安全展示或诊断，不能参与程序分支。
@@ -358,16 +358,16 @@ func (client *BattleClient) StartBattle(
 Call 的本地 completion 与 Cluster Error frame 使用同一套逻辑错误状态：
 
 ```go
-type ErrorClass uint8
+type ErrorClass string
 
 const (
-	ErrorClassDomain ErrorClass = iota + 1
-	ErrorClassRuntime
+	ErrorClassDomain  ErrorClass = "domain"
+	ErrorClassRuntime ErrorClass = "runtime"
 )
 
 type ErrorCode string
 
-type ErrorStatus struct {
+type StatusError struct {
 	Class   ErrorClass
 	Code    ErrorCode
 	Message string
@@ -375,7 +375,7 @@ type ErrorStatus struct {
 ```
 
 - Domain code 使用稳定、可读的 `{domain}.{reason}`，例如 `room.full`；GSR 保留 `runtime.` 前缀。
-- `StatusError` 包装 ErrorStatus，并按 Class + Code 实现 `errors.Is`；本地和 Cluster 解码后的 typed client 使用同一种判断方式。
+- `StatusError` 同时承载本地 error 和可传输的稳定状态，不再额外包装一个重复的 `ErrorStatus`；它按 Class + Code 实现 `errors.Is`，本地和 Cluster 解码后的 typed client 使用同一种判断方式。
 - Message 是经过审查的安全文本，只用于日志或展示，禁止比较字符串决定业务分支。
 - Handler 返回未实现 GSR 状态契约的普通 error 时，Runtime 在本地记录原始 error，并向调用方返回 `runtime.handler_failed`。
 - Handler panic 对调用方返回 `runtime.service_panicked`；panic value 和 stack 只进入本地诊断，不进入 Reply 或 wire。
