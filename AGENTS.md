@@ -1,0 +1,99 @@
+# AGENTS.md
+
+本文件是 Agent 进入 `gsr` 项目后的工作入口，只记录必须遵守的规则和文档索引。长期设计结论写入 `docs/`，不要只保留在聊天记录中。
+
+## 项目定位
+
+- `gsr` 是一个重新设计和实现的 Go 游戏服务器 Service Runtime。
+- 借鉴 Skynet 的 Service、消息、生命周期和简洁 API 思想，但使用 Go 的类型系统、显式错误和明确依赖边界。
+- `../GameServiceRuntime` 与 `../skynet` 仅为只读参考目录，不是本项目的历史兼容目标，不在其中修改文件。
+- 不因参考实现已有某个接口、命名或内部结构，就默认本项目必须兼容；是否采用由当前文档、测试和实际需求决定。
+
+## 文档优先级
+
+1. `AGENTS.md`：工作规则与文档入口。
+2. `CONTEXT.md`：稳定术语及其准确含义。
+3. `docs/API-DESIGN.md`：公开 API、Runtime 边界和 Skynet 风格原则。
+4. `docs/adr/`：难以逆转的设计裁决及其取舍。
+5. `docs/GO-CODE-STYLE.md`：Go 编码规则与评审标准。
+6. 测试：已经落地的行为契约。
+7. 实现：在文档未覆盖处提供当前行为证据，但不能替代设计裁决。
+
+代码、测试和文档冲突时，不静默选择其中一份。先确认预期行为，更新作为契约的文档和测试，再修改实现。
+
+## 工作原则
+
+- 先完成最小、可验证的纵向切片，不提前建设尚无调用者的通用框架。
+- 修改范围必须能够追溯到当前任务；不顺手重构无关代码。
+- 公开 API 或架构边界发生变化时，同步更新 `docs/API-DESIGN.md`。
+- 新增或修改 Go 代码必须遵守 `docs/GO-CODE-STYLE.md`。
+- 形成稳定的新设计结论时写入相关文档；较大的取舍可新增 ADR 或 RFC，不把 `AGENTS.md` 扩写成架构百科。
+- 默认不为旧参考项目提供兼容层、迁移别名或废弃 API，除非用户明确提出兼容需求。
+
+## 设计裁决流程
+
+- 遇到会改变公开 API、运行语义、状态所有权、生命周期、Cluster 协议或长期兼容面的待裁决问题时，先阅读 `../skynet` 中对应实现，不只凭印象描述 Skynet。
+- 汇报时依次说明：Skynet 的实际做法、它依赖的 Lua/C 运行机制、GSR/Go 中可直接沿用与不宜照搬的部分、推荐方案及代价。
+- 推荐提出后由用户最终裁决；用户裁决前不得把推荐方案写成 Accepted ADR，也不得据此实施难以逆转的代码。
+- 用户裁决后同步更新 API 文档、CONTEXT 和必要 ADR，再以测试锁定行为。
+- 普通局部实现细节无需逐项上升为裁决；只有影响外部可观察契约或重要架构边界时才执行上述流程。
+
+## Runtime 硬边界
+
+- Core 只包含 `Runtime`、`Service`、`ServiceID`、`Command`、`Mailbox`、`Scheduler` 和 `Timer`；Cluster、Discovery、Snapshot、Diagnostic、AI Runner 建立在 Core 之上。
+- 核心术语使用 `Runtime`、`Service`、`ServiceID`、`Command`、`Send`、`Call`、`Reply`、`Timer`；不要混用 `ServiceRef`、`Actor`、`Spawn`、`Ask`、`Tell` 或 Skynet `PTYPE`。
+- `ServiceID` 固定为 Runtime 局部的 `uint64` 临时地址，不包含 Node、Epoch 或 Generation，不持久化或跨 Runtime 重启使用。
+- 同一 Runtime 生命周期内已经发放的 ServiceID 不复用；Service 重建必须获得新 ID。
+- ServiceID、SessionID、TimerID 和 ClusterSessionID 都使用 uint64 单调分配；零值保留，耗尽后返回 `ErrIDExhausted`，不得回绕、扫描或复用活跃/历史 ID。
+- 每份可变业务状态必须有唯一 Service owner；外部只能通过 ServiceID 和 Command 请求状态变化。
+- Service 之间不得持有彼此的实现指针，不得绕过 Mailbox 直接修改其他 Service 状态。
+- 本地 `Send` 与 `Call` 使用同一个未编码 Message、Dispatcher、Mailbox 和 Scheduler 路径，只通过 `SessionID == 0` 或 `SessionID > 0` 区分是否等待 Reply。
+- Reply 通过 Runtime 的 PendingCall completion 路径返回，不作为业务 Command 进入调用方 Mailbox；ClusterEnvelope 必须显式区分 request、response 和 error frame。
+- Reply error 使用稳定的 ErrorClass、ErrorCode 和安全 Message；程序分支只依赖 Class/Code，不比较 Message。未知 Handler error 不透传内部文本或 stack。
+- Send/Call 的 Source 必须由 Runtime 自动设置为当前发起 Service 的 ServiceID，业务代码不得伪造。
+- Cluster 内部入口显式接收 source；业务 API 使用预先绑定当前 ServiceID 的 per-Service client，并调用 `Send(node, serviceID, ...)` / `Call(node, serviceID, ...)`。禁止用全局变量或 goroutine-local 推断当前 Service。
+- 未编码的 Message 不得成为共享可变状态的通道：引用型 Args 必须是消息独占快照，成功 admission 后发送方不得修改，且不得发送 Service 状态的内部引用。
+- Service 内 Call 采用 run-to-completion：等待期间同一 Service 不处理下一条消息，Reply 只恢复当前 Handler；Call 必须有有限超时并谨慎使用，self Call 直接拒绝。
+- 第一版每个 Running Service 使用一个 Runtime-owned runner goroutine 串行消费 Mailbox；Handler 通过返回值由 Runtime 自动完成 Reply，业务不得手工或异步 Reply。
+- Mailbox 与 Cluster 出站队列必须有界且 admission 非无限阻塞；满载返回稳定 Runtime Error，不自动无限扩容。
+- Cluster Send 返回 nil 只表示本地 Cluster 边界接受或入队，不代表远端执行或持久化成功。
+- ClusterEnvelope、NodeID、连接和编码不得进入 Core 本地 Message 或 ServiceID。
+- Cluster 每个远端 Node 只有一个 outbound NodeSender，并为每条 inbound socket 建立独立 ConnectionAgent；断线自动重连，但不自动重放业务请求。
+- Cluster codec/Command 在启动阶段注册，重复注册 panic；wire 输入必须设置帧长、集合深度和 payload 上限。
+- 能安全确认帧边界的未知版本、未知 Command 和解码失败帧丢弃并限频诊断；非法长度、越界、认证失败或无法恢复帧边界时关闭连接。
+- Timer 只投递 Command，不通过回调直接修改业务状态。
+- 第一版 Timer 只有一次性 After 和 CancelTimer；Timer 不拥有更高 admission 优先级。
+- Service 和业务层不得直接启动 goroutine，也不得引入公共 `Runtime.Go` 或 `Fork` 作为逃生口。
+- 只有调度器、Transport/连接适配器、固定上限的外部 worker 等明确并发 owner 可以启动 goroutine；owner 必须负责取消、关闭、等待、并发上限、panic 和错误归属。
+- Core Runtime 统一提供调度、本地路由、生命周期、panic recovery 和基础观测机制；远端路由属于 Cluster，timeout、retry、幂等及补偿策略由拥有操作语义的模块决定。
+
+## Go 与验证
+
+- 优先使用标准库；新增第三方依赖前说明它解决的具体问题和不采用标准库的理由。
+- 新增行为先建立可失败的测试，再完成最小实现；纯文档修改不要求补测试。
+- 开发循环默认执行最小相关验证，不在每次小修改后重复运行全仓测试、`vet` 和 race 测试。
+- 验证按层推进：先格式化/编译受影响 package，再运行相关测试，然后运行受影响 package 全部测试；功能切片完成后才运行 `go test ./...` 和 `go vet ./...`。
+- 涉及并发、生命周期或共享状态时，在切片收尾运行 `go test -race ./...`；普通文档、命名或纯业务规则修改不机械运行 race。
+- 相关测试默认控制在 2 分钟内，受影响 package 验证默认控制在 5 分钟内。超过预算时先缩小范围并定位慢点，不通过反复延长 timeout 掩盖死锁、泄漏或错误分层。
+- 同一个命令超时或无进展后不得盲目连续重试；先检查具体测试、goroutine、外部依赖和正常耗时基线，再决定继续、拆分或报告阻塞。
+- 保留 Go 构建和测试缓存；只有排查缓存、随机性或 flaky test 时才使用 `-count=1`，不得习惯性清理 test cache。
+- 独立且不争抢同一重资源的检查可以并行；全仓测试和全仓 race 测试默认不同时运行。
+- 如果仓库尚未具备某项命令的运行条件，明确说明未验证项，不伪造成功结论。
+- 导出符号提供有契约价值的 Go doc；测试优先验证可观察行为，不依赖无必要的私有实现细节。
+
+## Git
+
+- 不修改或丢弃用户已有的无关改动。
+- 不使用破坏性命令清理工作区。
+- 提交信息尽量使用中文，描述本次可验证的行为或设计变化。
+
+### 单人开发与提交门禁
+
+- 默认在当前分支工作，不主动创建、切换或合并分支；只有用户明确要求时才进行分支操作。
+- Agent 的默认工作循环是：修改 → 最小相关验证 → 汇报变更和验证结果。默认不执行 `git add`、`git commit`、`git push` 或合并。
+- Agent 完成修改后，必须把工作树留给用户审查。用户可以在 VS Code 或 Codex Review 中查看 diff，并决定是否需要修正。
+- 用户要求修正时，继续修改并重新验证，仍然不提交；可以重复“审查 → 修正 → 验证”循环。
+- 只有用户明确说“commit/提交”后，Agent 才能整理本次任务所属文件、暂存、复核暂存 diff 并创建提交。若存在归属不明或用户自己的改动，先停下确认，不替用户决定。
+- 用户只说“审查/审核/看看 diff”不等于授权提交；“提交”默认指本地 `git commit`，推送远端必须另行明确说明。
+- 创建提交前必须至少检查 `git status --short`、`git diff --check` 和 `git diff --cached --check`；提交后汇报提交 hash、提交内容和工作树状态。
+- 具体命令和角色边界见 [`docs/DEVELOPMENT-WORKFLOW.md`](docs/DEVELOPMENT-WORKFLOW.md)。
