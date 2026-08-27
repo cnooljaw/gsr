@@ -6,7 +6,7 @@ Accepted
 
 ## Context
 
-GSR 需要同时保持 Core 简单和未来 Cluster 可扩展。一个候选方案是让 Core ServiceRef 从第一天携带 Node、Epoch、ServiceID 和 Generation；另一个方案遵循 Skynet，把 Service 地址限制在当前 Runtime，并由 Cluster 单独携带节点与传输上下文。
+GSR 需要同时保持 Core 简单和未来 Cluster 可扩展。一个候选方案是让 Core 地址类型从第一天携带 Node、Epoch、ServiceID 和 Generation；另一个方案遵循 Skynet，把 Service 地址限制在当前 Runtime，并由 Cluster 单独携带节点与传输上下文。
 
 将全局身份加入 Core 会提前引入节点重启、发现、重建和 fencing 语义，并使本地 Runtime 依赖尚未实现的 Cluster 概念。Skynet 的现代 Cluster API 使用 `cluster.call(node, address, ...)` 和 `cluster.send(node, address, ...)`，远端收到网络消息后再调用目标节点的本地 Service 地址。
 

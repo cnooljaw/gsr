@@ -15,6 +15,8 @@
 - **Run-to-completion**：一个 Handler（包括其中的 Call 等待）结束前，同一 Service 不执行下一条消息；等待期间其它 Service 仍可运行。
 - **MaxCallWait**：Runtime 对一次本地 Call 施加的最大等待时间。调用方必须提供 `context.Context`，其 deadline 可以缩短实际等待，但不能延长或取消 Runtime 上限。
 - **Service Runner**：由 Runtime 为每个 Running Service 管理的 goroutine，串行消费该 Service 的 Mailbox；其生命周期和 recovery 属于 Scheduler，不属于业务。
+- **Service 组装**：`Runtime.Start()` 只启动 Runtime-owned 基础设施；应用层构造 `Service` 实例，并在 Runtime Running 后通过 `CreateService(ctx, service) (ServiceID, error)` 逐个交给 Runtime 管理，不使用工厂或 Bootstrap Service。
+- **OnStart 失败**：只回滚当前 Service，Runtime 保持 Running，可以继续创建其它 Service；失败实例不发布 ServiceID，且该 ID 永不复用。Runtime 至多调用一次 `OnStop` 为部分初始化资源清理。
 - **ClusterEnvelope**：Cluster/Transport 使用的可编码网络载体，显式区分 request、response 和 error frame。远端 relay 解码请求后创建新的本地 Message；本地投递不创建或编码 ClusterEnvelope。
 - **ClusterClient**：初始化时绑定一个 Source ServiceID 的 per-Service 窄 client；业务使用 `Send(node, target, ...)` / `Call(node, target, ...)`，不能覆盖 Source。
 - **Redirect / Relay**：仅供 Runtime 或明确受信任的 Adapter/Transport 使用的消息转发能力。它转发 Runtime-owned Message 或 relay token，不接受业务任意指定的 Source；首版只考虑单向转发，不转移 Call 的 PendingCall/Session。
@@ -28,7 +30,8 @@
 - **NodeSender**：Cluster 为一个远端 Node 唯一管理的 outbound 发送者，合并并发建连并负责自动重连，但不自动重放结果不确定的业务请求。
 - **ConnectionAgent**：Cluster 为一条 inbound socket 创建的接收适配器，负责解码远端帧、投递本地 Service 并沿原连接返回结果。
 - **Timer owner**：登记 Timer 的 Service/Runtime owner。它用于校验取消权限和表达 Timer 创建者；Timer 到期消息的 Source 不使用 owner 的 ServiceID，而固定为零值。
-- **RuntimeState**：Runtime 的生命周期状态。公开顺序为 `Created → Starting → Running → Stopping → Stopped`；`Starting` 表示 Runtime-owned Core 组件正在启动。
+- **RuntimeState**：Runtime 的生命周期状态。公开顺序为 `Created → Starting → Running → Stopping → Stopped → Closed`；`Starting` 表示 Runtime-owned Core 组件正在启动，`Stopped` 表示停止流程完成，`Closed` 表示 Runtime-owned 资源已最终释放。
 - **Lifecycle Coordinator**：Runtime 内部按固定 start/stop 计划编排 Core 组件的生命周期；它不拥有组件资源，也不是可无限注册的业务插件容器。
 - **Quiesce**：关闭流程中停止新 admission、入站和重连的阶段；它不等同于已经等待所有已接受任务完成。
-- **ShutdownTimeout**：Runtime 关闭全部 Core 组件共享的内部时间预算；调用方传入的 `Close` context 只控制该调用者等待多久。
+- **Stop / Close**：`Runtime.Stop(ctx)` 负责关闭 admission 并有序停止全部 Core 组件，`Runtime.Close()` 负责 Stop 完成后的最终资源释放；二者幂等，Stop 后不得再次 Start。`Close()` 使用 `ShutdownTimeout`，没有调用方 context。
+- **ShutdownTimeout**：Runtime 关闭全部 Core 组件共享的内部时间预算。Go 无法强杀不响应取消的 Handler、OnStart 或 OnStop；超时后的残留任务和资源状态必须继续可观测。

@@ -13,10 +13,10 @@ Service 内同步 Call 必须等待返回，同时保持同一 Service 不重入
 - 每个 Running Service 由 Runtime 管理一个 runner goroutine，串行消费 Mailbox；业务不能管理或访问 runner。
 - Call 只阻塞当前 Service runner，不影响其它 Service。
 - Handler 通过 `(any, error)` 返回结果，由 Runtime 根据 SessionID 自动完成 Reply。
-- Runtime Running 后允许动态 CreateService。ID 在 OnStart 前分配，只有 OnStart 成功后才返回和发布；失败 ID 作废且不复用。
-- OnStart 可以使用 ServiceContext，但当前 Service 在成功前不接受普通业务消息。
+- Runtime Running 后允许动态 `CreateService(ctx context.Context, service Service) (ServiceID, error)`；Service 由应用层传入实例，不提供工厂或 Bootstrap Service。ID 在 OnStart 前分配，只有 OnStart 成功后才返回和发布；失败 ID 作废且不复用。
+- `OnStart(ctx, serviceContext)` 接收 CreateService 的协作取消 context；当前 Service 在成功前不接受普通业务消息。OnStart 失败只回滚当前 Service，Runtime 仍可继续创建其它 Service，并至多调用一次 OnStop 清理部分初始化资源。
 - Stop 立即拒绝新 admission、取消 Timer 和 outgoing PendingCall；当前 Handler 在 shutdown deadline 内结束，排队 Send 丢弃并诊断，排队 Call 返回 `ErrServiceStopping`。
-- Stop/Close 幂等且等待完成，OnStop 最多执行一次。Handler panic 停止当前 Service，并使相关 Call 返回 `ErrServicePanicked`。
+- Runtime `Stop(ctx)` 负责整个 Runtime 的有序停止，`Close()` 负责最终资源释放；两者幂等，Stop 后不得再次 Start，OnStop 最多执行一次。Handler panic 停止当前 Service，并使相关 Call 返回 `ErrServicePanicked`。
 - 第一版只提供一次性 After 和 CancelTimer；Timer 使用普通 Mailbox admission，不保证同一时刻到期顺序。到期 Command 的 Source 固定为 `ServiceID(0)`，Timer owner 单独记录创建者。
 
 ## Consequences

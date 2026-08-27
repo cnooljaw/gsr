@@ -44,7 +44,7 @@ Close
 | `skynet.newservice()` | `Runtime.CreateService()` | 使用 Go Service 接口和显式启动错误。 |
 | `skynet.dispatch()` | `Service.Handle()` | Source 通过只读 `CommandContext` 提供；普通消息由 Runtime 填入，Timer 消息可为零值。 |
 | `skynet.ret()/response()` | Handler 返回值 | GSR 不暴露手工或异步 Reply API。 |
-| `skynet.exit()/kill()` | `Runtime.Stop()/Close()` | 使用幂等、可等待且有 deadline 的生命周期操作。 |
+| `skynet.exit()/kill()` | `Runtime.Stop(ctx)` / `Runtime.Close()` | `Stop` 负责可等待的有序停止，`Close` 负责最终释放；两者幂等且不允许重启。 |
 
 Skynet 的接口形状是 API 设计的重要参照，但 GSR 的具体契约由 Go 的类型系统、错误模型、消息所有权和生命周期约束决定。
 
@@ -75,7 +75,7 @@ type ClusterSessionID uint64
 - ServiceID 不持久化到数据库、Snapshot、长期配置或跨重启缓存。
 - 稳定逻辑身份使用 `ServiceName` 或领域 ID，并由 Core 之外的 Registry/Discovery 解析。
 
-不要再定义只包装 `ServiceID` 的 `ServiceRef`。除非未来出现当前模型无法表达的真实需求，否则不把全局网络身份提前加入 Core。
+Core 地址只使用 `ServiceID`，不再定义额外的地址包装类型；稳定逻辑身份使用 `ServiceName` 或领域 ID，并由 Core 之外的 Registry/Discovery 解析。
 
 所有运行期 ID 统一遵守：
 
@@ -413,20 +413,44 @@ Mailbox 必须有明确且可配置的有限容量，admission 不得无限阻�
 Core 生命周期保持为：
 
 ```text
-Created → Starting → Running → Stopping → Stopped
+Created → Starting → Running → Stopping → Stopped → Closed
 ```
+
+Runtime 的组装边界固定为：
+
+- `Runtime.Start()` 只启动 Runtime-owned 基础设施，不隐式创建 Bootstrap Service。
+- 应用层负责构造 `Service` 实例；Runtime 不接收工厂，也不负责业务依赖注入。
+- Runtime 进入 `Running` 后，应用层逐个调用：
+
+  ```go
+  func (r *Runtime) CreateService(ctx context.Context, service Service) (ServiceID, error)
+  ```
+
+- `CreateService` 成功后，Service 的生命周期由 Runtime 接管；调用方不得再直接调用该实例的生命周期或并发修改其状态。`ServiceName` 到 ServiceID 的解析属于 Core 外层 Registry/Discovery。
+- `CreateService` 只允许在 `Running` 阶段调用。OnStart 失败只回滚当前 Service，Runtime 仍保持 `Running`，应用层可以继续创建其它 Service。
 
 第一版 Service 接口固定为：
 
 ```go
 type Service interface {
-	OnStart(ServiceContext) error
+	OnStart(context.Context, ServiceContext) error
 	Handle(CommandContext, CommandID, ...any) (any, error)
 	OnStop(context.Context) error
 }
+
+func (r *Runtime) Stop(ctx context.Context) error
+func (r *Runtime) Close() error
 ```
 
-Service 不提供额外 `Close` 钩子；本地资源释放属于 `OnStop`。`Close` 是 Runtime 级操作，负责停止全部 Service 和 Runtime 自有并发资源。
+Service 不提供额外 `Close` 钩子；本地资源释放属于 `OnStop`。`Runtime.Stop` 是整个 Runtime 的有序停止操作，`Runtime.Close` 是最终资源释放操作；单个 Service 的停止若需要公开，使用 `StopService` 命名，不复用 Runtime `Stop`。
+
+`CreateService` 的 `ctx` 是启动操作的协作取消信号，并原样传给 `OnStart`。Go 无法强杀忽略取消的 `OnStart`：Runtime 必须等待它真实返回，只有返回成功才发布 ServiceID。OnStart 已开始执行但失败时，已分配的 ID 作废且永不复用；Runtime 至多调用该 Service 的 `OnStop` 一次，为部分初始化资源提供清理机会，`OnStop` 必须能够处理未完整启动的实例。
+
+`Stop(ctx)` 进入 `Stopping` 后关闭全局 admission，按固定计划停止 Timer、PendingCall、Service 和 Scheduler/runner；同一 Runtime 只启动一套停止流程，调用方 context 只控制当前调用者的等待，不因单个等待者取消而重复或逆转停止。Stop 完成后 Runtime 不允许再次 Start。
+
+`Close()` 无调用方 context，且幂等。它负责在 Stop 完成后释放 Runtime-owned 资源；如果 Runtime 尚未停止，Close 使用 `ShutdownTimeout` 启动或等待 Stop。残留 Handler/OnStop 不能被强杀，也不能在仍被使用时强行释放共享资源；未完成任务和错误必须继续保持可观测，只有最终资源安全释放后才进入 `Closed`。
+
+状态边界固定为：`Start` 只允许 `Created → Starting → Running`；`Stop` 可从 `Created`、`Starting` 或 `Running` 发起（Starting 期间记录停止意图），并在 `Stopping` 完成后进入 `Stopped`；`Close` 可从任意状态发起，最终在资源安全释放后进入 `Closed`。`Stopped` 和 `Closed` 都拒绝新的 Service admission，`Closed` 还拒绝所有 Runtime 操作；`Stopped`/`Closed` 均不可再次 `Start`。
 
 ### 10.1 Runtime 组件生命周期
 
@@ -436,14 +460,15 @@ Runtime 不使用一个不断增长的 `closeFn` 承载所有清理逻辑。Runt
 - 启动按显式 `startOrder` 执行；某个组件启动失败时，只逆序回滚已经成功启动的组件，Runtime 不允许从部分启动状态重试。
 - 关闭的线性化点是 Runtime 进入 `Stopping` 并关闭全局 admission。随后依次停止 Timer、结束 PendingCall、停止 Service、等待 Scheduler/runner，最后释放 Core 资源。
 - 同一组件只由自己的 owner 释放；组件关闭错误继续收集并合并，不能因为一个组件失败就跳过后续组件。
-- `Close` 调用方的 context 只限制当前调用者的等待；Runtime 使用 `ShutdownTimeout` 作为统一的内部关闭预算。Go 无法强杀 Handler 或 `OnStop`，残留任务必须继续被追踪，不能伪报已完成。
-- 如果 `Close` 在 `Starting` 期间被调用，Runtime 会记住关闭意图；即使该调用者提前取消等待，启动成功后仍自动进入关闭流程。
-- Cluster 外层先停止入站和新的出站 admission，再调用 Core `Close`；Core 完成后，外层再关闭 Transport 和连接 goroutine。
+- Runtime 使用 `ShutdownTimeout` 作为 Core 组件共享的内部关闭预算；Go 无法强杀 Handler 或 `OnStop`，残留任务必须继续被追踪，不能伪报已完成。
+- 如果 `Stop` 或 `Close` 在 `Starting` 期间到达，Runtime 会记住停止意图；即使该调用者提前取消等待，启动成功后仍自动进入停止流程。
+- Cluster 外层先停止入站和新的出站 admission，再调用 Core `Stop`/`Close`；Core 完成后，外层再关闭 Transport 和连接 goroutine。
 
 启动期自身消息和无法强杀任务的语义见 [ADR 0007](adr/0007-command-context-call-and-timeout-stop.md)。
 
-- Runtime `Start` 先进入 `Starting`，完成生命周期计划中的基础设施启动并打开 admission 后才进入 `Running`；`CreateService` 只允许在 Running 阶段动态调用。
-- `CreateService` 分配 ID 后运行 `OnStart`，只在启动成功后向调用方返回 ServiceID；启动失败的 ID 作废且不复用。
+- Runtime `Start` 先进入 `Starting`，完成生命周期计划中的基础设施启动并打开 admission 后才进入 `Running`；应用层随后通过 `CreateService(ctx, service)` 动态组装 Service。
+- `CreateService` 分配 ID 后运行 `OnStart(ctx, serviceContext)`，只在启动成功后向调用方返回并发布 ServiceID；启动失败只回滚当前 Service，ID 作废且不复用，Runtime 仍保持 `Running`。
+- OnStart 失败时 Runtime 至多调用一次 `OnStop` 做部分初始化清理；OnStop 的清理 context 有限且不保证能够强杀业务代码。
 - `OnStart` 可以使用 ServiceContext 发起 Send、Call 和 After，但当前 Service 在 OnStart 成功前不接受普通业务消息，也不应发布到 Registry/Discovery。
 - `OnStart` 向自身 Send 返回 `ErrServiceStarting`，向自身 Call 返回 `ErrCallCycle`。`After` 可以登记，但其 Command 最早只能在 Service 进入 Running 后参与普通 Mailbox admission；OnStart 失败时必须取消这些 Timer。
 - 进入 `Stopping` 后立即拒绝新消息、取消 Timer，并结束该 Service 发起的 PendingCall。
@@ -474,8 +499,10 @@ Runtime 不使用一个不断增长的 `closeFn` 承载所有清理逻辑。Runt
 - 进入 `Stopping` 后拒绝新消息；已经接受的消息遵守唯一、明确的停止策略。
 - Service 进入 `Stopped` 后，Timer 不再向它投递 Command。
 - After 只触发一次；CancelTimer、Stop 和触发完成之间的竞争最多产生一次成功 admission。
-- CreateService 可以在 Running 阶段成功；OnStart 失败不会发布 ServiceID，且该 ID 永不复用。
+- CreateService 可以在 Running 阶段成功；OnStart 失败只回滚当前 Service，Runtime 仍可创建其它 Service；失败实例不发布 ServiceID，且该 ID 永不复用。
+- `CreateService` 的 context 会传给 OnStart；取消是协作信号，不会强杀或绕过 OnStart 的真实返回。
 - Stop 拒绝新 admission、处理当前 Handler、丢弃排队 Send、完成排队 Call，并保证 OnStop 最多执行一次。
+- Runtime `Stop(ctx)` 与 `Close()` 的两阶段行为、Closed 终态和无重启约束必须有并发及重复调用测试。
 - Handler 或 OnStop 超过 shutdown deadline 后，Service 退出普通寻址且残留 runner 保持可观测；Runtime 不宣称已强杀任务。
 - Service 停止和重建后，旧 ServiceID 不能命中新 Service。
 - 异步结果只能通过 Command 返回 Mailbox；领域测试负责证明旧 Revision 不会覆盖新状态。

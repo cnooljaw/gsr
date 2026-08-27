@@ -32,7 +32,12 @@ Cluster 0–4
 
 已经冻结：
 
-- Core 只使用 Runtime 局部 `ServiceID`，不使用 `ServiceRef`。
+- Core 和外层地址都只使用 Runtime 局部 `ServiceID`；不定义额外的地址包装类型。稳定逻辑身份由 Core 外层的 Registry/Discovery 管理。
+- Runtime 不提供 Bootstrap Service；`Runtime.Start()` 只启动基础设施，应用层在 Running 后逐个创建 Service 实例。
+- `CreateService` 固定为 `CreateService(ctx context.Context, service Service) (ServiceID, error)`；Service 由业务层构造，Runtime 接管其生命周期。
+- `Service.OnStart` 固定接收 `context.Context` 和 `ServiceContext`；CreateService 的 context 是协作取消信号，并传给 OnStart。
+- OnStart 失败只回滚当前 Service，Runtime 保持 Running，可以继续创建其它 Service；失败 ID 不发布且永不复用，并由 Runtime 至多调用一次 OnStop 做部分初始化清理。
+- Runtime 生命周期固定为 `Created → Starting → Running → Stopping → Stopped → Closed`；`Stop(ctx)` 负责有序停止，`Close()` 负责最终资源释放，Stop 后不得再次 Start。
 - Core admission 复制 `Args` 外层切片；引用型参数由 typed client 按消息类型构造快照。
 - Handler 使用只读 `CommandContext.Source()` 获取 Runtime 填入的来源；普通 Send/Call 为当前本地 Service，Timer Command 为 `ServiceID(0)`。
 - 业务 API 不接收任意 source 参数；Redirect/Relay 只作为明确受信任的 Runtime/Adapter 能力转发 Runtime-owned Message，首版不进入 `ServiceContext`，也不转移 Call 的 PendingCall/Session。
@@ -45,7 +50,7 @@ Cluster 0–4
 
 ## Core 0：基础类型与 Runtime 骨架
 
-状态：已完成基础切片。`runtime` package 已提供类型、ID 分配、结构化错误、配置校验和空 Runtime 生命周期；Service、Mailbox、Timer、Cluster 仍未进入实现。
+状态：已完成基础切片。`runtime` package 已提供类型、ID 分配、结构化错误、配置校验和空 Runtime 生命周期；Service、Mailbox、Timer、Cluster 仍未进入实现。本轮契约已将后续公开生命周期收口为 `Stop(ctx)` + `Close()`；当前 Core 0 代码中的旧 `Close(ctx)` 仅作为待迁移实现，不是最终 API。
 
 实现：
 
@@ -54,8 +59,8 @@ Cluster 0–4
 - `ErrIDExhausted`。
 - `ErrorClass`、`ErrorCode`、`StatusError`。
 - Runtime Config 默认值与完整校验，包括有限且大于零的 `MaxCallWait`、Mailbox 容量和 shutdown deadline。
-- Runtime 的 Created、Starting、Running、Stopping、Stopped 状态骨架。
-- 空 Runtime 的 `Start`、幂等 `Close` 和并发等待结果。
+- Runtime 的 Created、Starting、Running、Stopping、Stopped、Closed 状态骨架。
+- 空 Runtime 的 `Start`、幂等 `Stop(ctx)`、`Close()` 和并发等待结果。
 
 验收：
 
@@ -63,7 +68,7 @@ Cluster 0–4
 - 从 `math.MaxUint64-1` 直接验证最后一个 ID 和永久耗尽，不执行长循环。
 - `StatusError` 按 Class 和 Code 支持 `errors.Is`，Message 不参与判断。
 - 重复 Start 返回稳定生命周期错误。
-- 并发 Close 只执行一次，等待者可以因自己的 context 提前返回，但不取消已经开始的关闭流程。
+- 并发 Stop/Close 只执行一套生命周期流程；等待者可以因自己的 context 提前返回，但不取消已经开始的停止流程。
 
 非目标：Service、goroutine、Mailbox、Timer 和 Cluster。
 
@@ -73,11 +78,12 @@ Cluster 0–4
 
 实现：
 
-- Runtime 的 `Created → Starting → Running → Stopping → Stopped` 状态。
+- Runtime 的 `Created → Starting → Running → Stopping → Stopped → Closed` 状态。
 - 内部 Lifecycle Coordinator 和显式 `startOrder`/`stopOrder`。
 - 组件启动失败时逆序回滚已成功启动的组件；部分启动失败后 Runtime 不允许重试。
-- `Close` 使用 Runtime `ShutdownTimeout` 生成统一内部关闭 context；调用方 context 只控制自己的等待。
-- `Close` 在 `Starting` 期间记录关闭意图；调用方提前取消等待不会取消启动完成后的关闭流程。
+- `Stop(ctx)` 进入 `Stopping` 并关闭全局 admission；`Close()` 使用 Runtime `ShutdownTimeout` 启动或等待 Stop，再释放已安全可释放的 Core 资源。
+- `Stop`/`Close` 在 `Starting` 期间记录停止意图；调用方提前取消等待不会取消启动完成后的停止流程。
+- `Stopped` 表示停止流程完成，`Closed` 表示 Runtime-owned 资源最终释放；两者都拒绝新的 admission，且不得再次 Start。
 - 生命周期组件 panic 转换为 Runtime 生命周期错误，后续组件继续执行并聚合关闭错误。
 
 关闭计划（组件进入实现后逐项填入）：
@@ -121,13 +127,15 @@ Start
 实现：
 
 - `Service`、`ServiceContext`、`CommandContext`。
+- `Runtime.CreateService(ctx context.Context, service Service) (ServiceID, error)`；Service 由应用层传入实例，不提供工厂或 Bootstrap Service。
 - Service registry 和不可复用 ServiceID。
 - 有界 Mailbox 和非无限阻塞 admission。
 - per-Service runner；Scheduler 负责 runner 创建、panic recovery、停止、等待和观测，不引入全局 ReadyQueue 或固定 worker pool。
 - 将 Service 管理和 Scheduler 按 Core 组件生命周期计划接入 Runtime；不得在 `Close` 中追加匿名清理逻辑。
 - 唯一的本地 Message 和 LocalDispatcher。
-- `Self`、`Send`、`CreateService`、`Stop`、Runtime `Close`。
-- Starting、Running、Stopping、Stopped 的接受边界。
+- `Self`、`Send`、`CreateService`、Runtime `Stop`、Runtime `Close`。
+- `OnStart(context.Context, ServiceContext)` 的协作取消和 Service 组装边界。
+- Starting、Running、Stopping、Stopped、Closed 的接受边界。
 - 排队 Send 丢弃与结构化诊断。
 - Handler 和 OnStop 超时后的残留 runner 追踪。
 
@@ -138,10 +146,11 @@ Start
 - Mailbox 按成功 admission 顺序 FIFO；多个并发发送者不承诺调用时刻的全局顺序。
 - Mailbox 满时快速返回 `ErrMailboxFull`，不扩容、不无限等待。
 - Runtime 只复制 `Args` 外层切片；typed client 的引用型 request 快照在各 client 自己的测试中验证。
-- OnStart 失败的 ID 不发布、不复用，并清理启动期 Timer 等已取得的 Runtime 资源。
+- OnStart 失败只回滚当前 Service，Runtime 仍保持 Running；ID 不发布、不复用，并由 Runtime 至多调用一次 OnStop 清理部分初始化资源和启动期 Timer。
+- CreateService 的 ctx 取消不会强杀 OnStart；Runtime 等待 OnStart 真实返回，只有成功返回才发布 ServiceID。
 - OnStart 的 self Send、self Call 和 After 遵守 ADR 0007。
 - Stop 与 Send 竞争只有一个 admission 结果：进入 Stopping 前成功入队，或进入 Stopping 后稳定拒绝。
-- Stop/Close 幂等，OnStop 最多执行一次；超时 Handler 与 OnStop 不并发。
+- Stop/Close 幂等，OnStop 最多执行一次；超时 Handler 与 OnStop 不并发；Stop 后不得再次 Start，Close 最终进入 Closed。
 - Handler panic 只停止当前 Service，panic 和 stack 只进入本地诊断。
 - Service 重建获得新 ID，旧 ID 永远不能命中新 Service。
 
@@ -290,7 +299,7 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 
 不带入旧实现形状：
 
-- `ServiceRef`、Node 嵌入 Core 地址和兼容别名。
+- 额外地址包装类型、Node 嵌入 Core 地址和兼容别名。
 - 固定 worker、ReadyQueue 和 permit 调度结构。
 - 手工 `Reply()`、异步 Reply 和旧 Service 四钩子接口。
 - `Payload` 兼容字段、可组合 Cluster codec 和公开远端解析。
