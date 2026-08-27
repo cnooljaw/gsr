@@ -6,7 +6,7 @@
 
 - 本项目设计文档和实现路线图。
 - 本地只读参考目录 `../skynet`，当前基线为 commit `2251550`。
-- 重点源码：`skynet-src/skynet_start.c`、`skynet_server.c`、`skynet_mq.c`、`skynet_timer.c`、`lualib/skynet.lua`、`lualib/skynet/cluster.lua`、`service/clusterd.lua`、`service/clustersender.lua`、`service/clusteragent.lua`。
+- 重点源码：`skynet-src/skynet_start.c`、`skynet_server.c`、`skynet_mq.c`、`skynet_timer.c`、`lualib/skynet.lua`、`lualib-src/lua-skynet.c`、`lualib/skynet/cluster.lua`、`service/gate.lua`、`service/multicastd.lua`、`service/cdummy.lua`、`service/cslave.lua`、`examples/simplemonitor.lua`、`service/clusterd.lua`、`service/clustersender.lua`、`service/clusteragent.lua`、`service/clusterproxy.lua`。
 
 关系栏使用以下含义：
 
@@ -39,8 +39,9 @@ Skynet 的关闭顺序可概括为：timer 线程停止时间/socket 事件并�
 | `Message`：`Source`、`Target`、`Session`、`Command`、`Args` | Core 1/3 计划 | `skynet_message`：`source`、`session`、`data`、`sz` | 直接对应 | GSR 本地 Message 不做 wire 编码；Skynet 常规路径把 Lua 参数 pack 成 buffer，并把类型编码进 `sz` 高位。 |
 | `Command` / `CommandID` | Core 1 计划 | `PTYPE_*`、`skynet.register_protocol()`、protocol id 和 Lua command string | 借鉴后重构 | GSR Core 不暴露 `PTYPE`；Command codec 在边界注册，CommandID 不承担网络帧格式。 |
 | `LocalDispatcher` | Core 1 计划 | `skynet_context_message_dispatch()`、`skynet.dispatch()` | 直接对应 | GSR 本地 dispatcher 只处理本地 Message；Skynet callback 还要处理 protocol type、解包和 session。 |
-| `Handler.Handle(CommandContext, CommandID, ...any)` | Core 1 计划 | `skynet.dispatch(typename, func)`，回调参数通常为 `session, source, ...` | 借鉴后重构 | GSR 用 Go Handler 和只读 `CommandContext.Source()`；Source 由 Runtime 写入，业务不能伪造。 |
-| `CommandContext.Source()` | Core 1 计划 | dispatch callback 的 `source` 参数、`skynet.context()` | 直接对应但约束更强 | Skynet 允许底层 send/redirect 传递不同 source；GSR 业务 API 不允许覆盖 Source，且上下文不能保存给异步任务。 |
+| `Handler.Handle(CommandContext, CommandID, ...any)` | Core 1 计划 | `skynet.dispatch(typename, func)`，回调参数通常为 `session, source, ...` | 借鉴后重构 | GSR 用 Go Handler 和只读 `CommandContext.Source()`；Source 由 Runtime 写入，Timer 可为零值，业务不能伪造。 |
+| `CommandContext.Source()` | Core 1 计划 | dispatch callback 的 `source` 参数、`skynet.context()` | 借鉴后重构 | 普通 Send/Call 的 Source 由 Runtime 写入当前 Service；Timer Command 使用 `ServiceID(0)`；受控 Redirect 才能按固定策略保留已有 Source，业务 API 不允许覆盖或传入任意值。 |
+| 受控 `Redirect` / `Relay` | Core/Adapter 后续 | `skynet.redirect(dest, source, typename, ...)` | 借鉴后重构 | Skynet 的 redirect 同时承担 buffer ownership、fan-out、Harbor 控制 relay 和事件 provenance。GSR 不提供任意 source 的业务 API；首版只考虑受信任 Runtime/Adapter 的单向 Runtime-owned Message 转发，不转移 Call session/PendingCall。 |
 | `Args []any` 的消息快照 | Core 1 计划 | `skynet.pack()`、C 层 `_filter_args()`；`PTYPE_TAG_DONTCOPY` 是不复制逃生口 | 借鉴后重构 | GSR 只隔离 `Args` 外层；map/slice/pointer 的复制深度由 typed client 负责，Core 不做通用深拷贝。 |
 | `Mailbox` | Core 1 计划 | 每个 context 的 `message_queue`，以及全局 MQ | 直接对应但策略不同 | Skynet 队列满时动态扩容；GSR Mailbox 有界，admission 失败返回稳定 Runtime Error，不无限阻塞或扩容。 |
 | `Scheduler` | Core 1 计划 | worker threads、global MQ、`skynet_context_message_dispatch()` 的 weight 和 monitor | 借鉴后重构 | GSR 第一版每个 Running Service 一个 Runtime-owned runner，Scheduler 负责创建、停止、等待和 recovery，不暴露全局队列。 |
@@ -53,6 +54,20 @@ Skynet 的关闭顺序可概括为：timer 线程停止时间/socket 事件并�
 | `SessionID uint64` | Core 0/3 计划 | context 内 session、`c.genid()`、`session_id_coroutine` 表 | 借鉴后重构 | GSR 零值表示 Send，非零表示 Call，并在 owner 生命周期内单调递增、耗尽即失败；Skynet 的 session 需要处理较小整数空间的回绕冲突。 |
 | Handler 返回 `(any, error)` 自动完成 Reply | Core 3 计划 | `skynet.ret()`、`skynet.retpack()`、`skynet.response()`、`PTYPE_RESPONSE` | 有意不照搬 | GSR 不提供手工或异步 Reply API；Runtime 根据 SessionID 恰好完成一次成功结果或结构化错误。 |
 | `ErrorClass`、`ErrorCode`、`StatusError` | Core 0/3 计划 | `PTYPE_ERROR`，通常是空 payload 或 Lua error 文本 | GSR 新增约束 | GSR 程序分支只看 Class/Code，Message 只用于安全诊断；未知 Handler error/panic 不透传内部 stack。 |
+
+### Skynet `redirect` 的实际用途
+
+本地 Skynet 示例显示，`redirect` 不是单一的“把业务请求换个目标”API，而是底层消息转发/所有权工具：
+
+| 本地示例 | 实际行为 | 对 GSR 的启示 |
+| --- | --- | --- |
+| `service/gate.lua` | 把仍由 gate 持有的 socket buffer 直接交给 agent；source 取 `c.client`，为零时由底层回退为 gate context，重点是 buffer ownership 而不是伪造来源。 | 零拷贝和缓冲区转移留在 Transport/ConnectionAgent 私有层，不能把共享可变指针带入 Core。 |
+| `service/multicastd.lua` | 将同一发布消息扇出到订阅者，并保留发布者 source；依赖 C/Lua 引用计数和消息生命周期。 | 多播属于外层功能；GSR 对每个目标分别做有界 admission，受信任 relay 才能保留已有 Source。 |
+| `service/cdummy.lua`、`service/cslave.lua` | 将 Harbor 注册/查询控制消息送到 `harbor_service`，source 表示相关句柄或登记者。 | 基础设施 relay 可有独立 source 策略，但不向业务开放任意 source 参数。 |
+| `examples/simplemonitor.lua` | 将已退出服务的地址作为事件通知中的 source，source 更像事件主体而非即时发送者。 | 生命周期事件使用显式 typed 参数或诊断 metadata，不把事件主体伪装成业务 Source。 |
+| `service/clusterproxy.lua` | 普通请求/响应使用 `send`、`rawcall` 和 session bridge，没有用 `redirect` 转移 Call。 | GSR 的 Call 代理发起新的下游 Call；首版 Redirect 不转移 PendingCall、Session 或 Reply 所有权。 |
+
+Skynet 的这些行为还依赖 `skynet_message.source/session`、PTYPE、Lua coroutine、C 层 buffer ownership 和 session 表。GSR 只提炼“受控转发”和“消息所有权”的目的，不照搬一个可任意填写 source 的公共方法。
 
 两条本地路径的核心关系是：
 
@@ -67,7 +82,7 @@ GSR 只用 `SessionID == 0` 或 `SessionID > 0` 区分 Send/Call；Skynet 还把
 
 | GSR 概念/API | GSR 阶段 | Skynet 对应概念 | 关系 | 关键区别 |
 | --- | --- | --- | --- | --- |
-| `After(duration, command, args...)` | Core 2 计划 | `skynet.timeout(ti, func)` 和 C `skynet_timer.c` | 借鉴后重构 | Skynet 到期后恢复一个 Lua callback coroutine；GSR Timer 只向目标 Mailbox 投递普通 Command。 |
+| `After(duration, command, args...)` | Core 2 计划 | `skynet.timeout(ti, func)` 和 C `skynet_timer.c` | 借鉴后重构 | Skynet 到期后恢复一个 Lua callback coroutine；GSR Timer 只向目标 Mailbox 投递普通 Command，Source 固定为 `ServiceID(0)`，创建者由 Timer owner 表达。 |
 | `CancelTimer(TimerID)` | Core 2 计划 | 没有同等的 TimerID 取消 API；通常通过 coroutine/session 状态、`skynet.killthread()` 等方式停止等待 | GSR 新增约束 | GSR Timer 是拥有者可识别的资源，取消与触发竞争最多产生一次结果；不暴露通用协程杀线程语义。 |
 | `TimerID uint64` | Core 0/2 计划 | timeout 使用的 session 和 `sleep_session`/`session_id_coroutine` 映射 | 借鉴后重构 | GSR TimerID 与 SessionID 分离，零值无效、单调分配；Timer 不拥有高于普通 Message 的 admission 优先级。 |
 | Service 内 Call 等待 | Core 3 计划 | `skynet.call()` → `coroutine.yield("SUSPEND")` → response/error 恢复 | 直接对应但执行模型不同 | GSR 挂起当前 Service runner；Skynet 挂起当前 Lua coroutine，允许同一 service 的其它 coroutine 继续推进。 |
@@ -85,7 +100,7 @@ GSR 只用 `SessionID == 0` 或 `SessionID > 0` 区分 Send/Call；Skynet 还把
 | `ClusterSessionID` | Cluster 计划 | cluster sender 的 session、`cluster.unpackresponse()` 返回的关联号 | 直接对应但独立 | GSR ClusterSessionID 与 Core SessionID 分属不同 owner，不要求数值相同；零值仍表示 Send。 |
 | `NodeSender` | Cluster 计划 | `clusterd.lua` 的 `node_sender[node]` + `clustersender.lua` | 直接对应 | 每个远端 Node 一个 outbound sender，合并并发建连；断线自动重连，但不自动重放结果不确定的业务请求。 |
 | `ConnectionAgent` | Cluster 计划 | `clusterd.lua` 为每条 inbound fd 创建的 `clusteragent` | 直接对应 | 每条入站 socket 独立 agent；响应沿原连接返回，不与同一 Node 的 outbound sender 混成一个所有者。 |
-| 远端 Service 地址 | Cluster 计划 | 远端 handle、`@name`、`cluster.proxy(node, name)` | 有意不照搬 | GSR 的 ServiceID 永远是本地临时地址；远端稳定身份使用 NodeID + ServiceName/Discovery，具体实例解析留在 Cluster。 |
+| 远端 Service 地址 | Cluster 计划 | 远端 handle、`@name`、`cluster.proxy(node, name)` | 有意不照搬 | GSR 的 ServiceID 永远是本地临时地址；远端稳定身份使用 NodeID + ServiceName/Discovery，具体实例解析留在 Cluster；不引入 Epoch/Lease/Generation，也不由 Runtime 判断业务资源所有权、一致性或过期。 |
 | 断线、重连和重放 | Cluster 计划 | `socketchannel` 的 reconnect/changehost、`clusterd` sender 重建 | 借鉴后重构 | GSR 重连只恢复未来通信，不宣称 exactly-once，也不自动重放业务 Call/Send；幂等、RequestID 和补偿属于业务。 |
 | Cluster 关闭顺序 | Cluster 计划 | socket close/free、cluster sender/agent service 退出、Harbor release | 借鉴后重构 | 外层 Node/Host 先停止入站和新的出站 admission，再 `Runtime.Close`；Core 完成后再关闭 Transport 和连接 goroutine。 |
 
@@ -98,6 +113,7 @@ GSR 只用 `SessionID == 0` 或 `SessionID > 0` 区分 Send/Call；Skynet 还把
 | `skynet.ret()` / `skynet.response()` | `Reply()` 公共 API | GSR Handler 返回值自动完成 Reply，不允许异步或重复回复。 |
 | `skynet.fork()` | 公共 `Runtime.Go()` | GSR 不给业务逃生式 goroutine 入口；明确并发 owner 才能创建并负责回收。 |
 | `skynet.timeout()` | 定时器回调 | GSR `After` 只投递 Command；状态变化仍必须在 Service Handler 中发生。 |
+| `skynet.redirect()` | 任意业务 Service 都能指定 source 的公共转发 API | GSR 只在明确受信任的 Runtime/Adapter relay 中转发 Runtime-owned Message；普通业务用 Send/Call，Call 代理发起新的下游 Call。 |
 | `skynet.send()` 返回成功 | 远端业务已执行 | GSR 和 Cluster 都只承诺本地 admission；远端执行和持久化需要 Call 或业务协议确认。 |
 | `PTYPE_*` | GSR 的 CommandID 或错误码 | PTYPE 是 Skynet 的消息类型/协议层标记；GSR Core 用 CommandID，wire 层另有 codec 和 Envelope。 |
 | 远端 handle `@name`/Harbor 位 | 全局 ServiceID | GSR ServiceID 不携带 Node；使用 NodeID、ServiceName 和 ClusterSessionID 分层表达远端请求。 |

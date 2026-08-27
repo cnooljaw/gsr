@@ -14,7 +14,8 @@ GSR 使用每 Service 一个 runner，并已经选择 run-to-completion、Handle
 
 ## Decision
 
-- Runtime 为每条 Message 创建 `CommandContext`。它组合当前 Service 的 Core 能力并提供只读 `Source() ServiceID`；Source 由 Runtime 填入，业务不能覆盖。
+- Runtime 为每条 Message 创建 `CommandContext`。它组合当前 Service 的 Core 能力并提供只读 `Source() ServiceID`；普通 Send/Call 的 Source 由 Runtime 填入当前发起 Service，Timer Command 的 Source 固定为 `ServiceID(0)`，业务不能覆盖。
+- 只有明确受信任的 Runtime/Adapter relay 可以转发已有 Runtime-owned Message；业务 API 不接收任意 source 参数，Call 的 PendingCall/Session 不通过 Redirect 转移。
 - `CommandContext` 只在当前 Handler 返回前有效，不得保存或交给异步任务；它不提供 `Reply()`。
 - Handler 继续通过 `(any, error)` 返回值完成一次自动 Reply。Send 的返回值只进入诊断，不创建 Reply。
 - `ServiceContext.Call` 接收非 nil `context.Context`。Runtime Config 提供有限且大于零的 `MaxCallWait`，实际 deadline 取调用方 deadline 与 Runtime 上限中更早者。

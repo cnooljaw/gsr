@@ -34,13 +34,14 @@ Cluster 0–4
 
 - Core 只使用 Runtime 局部 `ServiceID`，不使用 `ServiceRef`。
 - Core admission 复制 `Args` 外层切片；引用型参数由 typed client 按消息类型构造快照。
-- Handler 使用只读 `CommandContext.Source()` 获取 Runtime 填入的当前本地来源。
+- Handler 使用只读 `CommandContext.Source()` 获取 Runtime 填入的来源；普通 Send/Call 为当前本地 Service，Timer Command 为 `ServiceID(0)`。
+- 业务 API 不接收任意 source 参数；Redirect/Relay 只作为明确受信任的 Runtime/Adapter 能力转发 Runtime-owned Message，首版不进入 `ServiceContext`，也不转移 Call 的 PendingCall/Session。
 - Handler 通过返回值自动 Reply，不公开 `Reply()` 或异步 response API。
 - Call 使用 run-to-completion，并受 Runtime `MaxCallWait` 和调用方 context 中更早的 deadline 限制。
 - 第一版每个 Running Service 使用一个 Runtime-owned runner goroutine。
 - OnStart 的 self Send 返回 `ErrServiceStarting`，self Call 返回 `ErrCallCycle`；启动期 Timer 最早在 Running 后 admission。
 - Go 不能强杀 Handler 或 OnStop；超时任务从业务寻址中隔离，但必须追踪到真实返回。
-- Cluster、NodeID、ClusterEnvelope、连接和编码不进入 Core。
+- Cluster、NodeID、ClusterEnvelope、连接和编码不进入 Core；不引入 Epoch/Lease/Generation，Runtime/Cluster 不判断业务资源的所有权、一致性或过期。
 
 ## Core 0：基础类型与 Runtime 骨架
 
@@ -132,7 +133,7 @@ Start
 
 验收：
 
-- Service A Send 到 B，B 的 `CommandContext.Source()` 等于 A，业务不能覆盖 Source。
+- Service A 普通 Send 到 B 时，B 的 `CommandContext.Source()` 等于 A；Timer Command 的 Source 为零值；业务不能覆盖 Source，受控 Redirect 只能按固定 relay 策略转发已有消息。
 - 同一 Service Handler 永不并发；不同 Service 可以并行。
 - Mailbox 按成功 admission 顺序 FIFO；多个并发发送者不承诺调用时刻的全局顺序。
 - Mailbox 满时快速返回 `ErrMailboxFull`，不扩容、不无限等待。
@@ -159,7 +160,7 @@ Start
 
 验收：
 
-- After 最多触发一次，只通过 Command 影响 Service 状态。
+- After 最多触发一次，只通过 Command 影响 Service 状态；到期 Command 的 Source 为 `ServiceID(0)`，创建者由 Timer owner 表达。
 - 只有创建 Timer 的 Service 可以取消；未知、已取消或已触发 Timer 返回 false。
 - CancelTimer、Stop 和触发竞争最多产生一次成功 admission。
 - 同时到期 Timer 不承诺彼此顺序，也没有高于普通 Message 的 admission 优先级。
@@ -192,7 +193,7 @@ Start
 - Send 的 Handler error 只进入诊断；Call 的 Handler error 返回稳定 StatusError。
 - 未分类 error 转为 `runtime.handler_failed`，panic 转为 `runtime.service_panicked`；原始文本和 stack 不进入 Reply。
 
-非目标：手工 Reply、异步 Reply、无限 Call、全局调用环检测和自动 retry。
+非目标：手工 Reply、异步 Reply、无限 Call、全局调用环检测、自动 retry，以及 Redirect 的 Call session/PendingCall 转移。
 
 ## Core 4：故障、观测与规模收尾
 
@@ -228,6 +229,7 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 - `NodeID`、`ClusterSessionID`、`ClusterEnvelope`。
 - 显式 Request、Response、Error frame。
 - `StatusError` 的 Class/Code/Message wire 表达。
+- 远端地址只使用 NodeID 与 ServiceName/Discovery 或当前远端临时 ServiceID；Runtime 只负责路由、投递和连接恢复，不负责业务所有权、一致性或过期判断。
 - 默认值 codec、Command codec registry 和启动期重复注册 panic。
 - 帧长、容器深度和 payload 上限。
 - InMemoryTransport 连接两个 Runtime，本地路径不执行 Cluster 编码。
@@ -237,6 +239,7 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 - 每个远端 Node 唯一 outbound `NodeSender`。
 - 有界出站队列和并发建连合并。
 - 初始化时绑定 Source ServiceID 的 per-Service ClusterClient。
+- 普通远程 Send/Call 不暴露 source 参数；只有明确的基础设施 relay 才能转发 Runtime-owned Message，且不转移 Call session/PendingCall。
 - 无路由、已知断连、编码失败、队列满和关闭错误。
 - Send 返回 nil 只表示本地 Cluster admission 成功。
 

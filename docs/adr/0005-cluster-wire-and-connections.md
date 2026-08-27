@@ -19,10 +19,11 @@ GSR Cluster 需要保持 Skynet 风格的简洁调用面，同时明确 Go 的�
 - 每个远端 Node 只有一个 outbound NodeSender，并发建连请求合并；每条 inbound socket 使用独立 ConnectionAgent，响应沿原连接返回。
 - 断线后 NodeSender 自动重连，但不自动重放已经失败或执行结果不确定的业务请求。
 - NodeID/token 握手可配置；可信内网可以关闭，开启后使用 NodeID 加共享 token 的简单校验。
+- 远端目标使用 NodeID 与 ServiceName/Discovery 或当前远端 Runtime 的临时 ServiceID 分层表达；不引入 Epoch、Lease 或 Generation。Runtime/Cluster 只负责路由、投递和连接恢复，不判断业务资源的唯一所有权、一致性或过期。
 
 ## Consequences
 
 - 业务 API 保持 `Send(node, target, ...)` / `Call(node, target, ...)`，连接和 source 路由细节由绑定后的 ClusterClient 隐藏。
 - 方向性连接避免额外的“双连接胜负”协议；同一节点可以各自拥有一条 outbound，并各自接受对方的 inbound。
 - 丢弃完整但不支持的 Call 请求会使调用方等待超时，因此必须可观测；协议升级应优先在握手阶段阻止长期不兼容连接。
-- 自动重连只恢复未来通信，不提供 exactly-once；RequestID、幂等和补偿仍由业务负责。
+- 自动重连只恢复未来通信，不提供 exactly-once；RequestID、幂等、补偿、资源 fencing 和业务过期判断仍由拥有操作语义的业务/外层模块负责。

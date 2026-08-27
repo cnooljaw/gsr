@@ -17,7 +17,7 @@ Service 内同步 Call 必须等待返回，同时保持同一 Service 不重入
 - OnStart 可以使用 ServiceContext，但当前 Service 在成功前不接受普通业务消息。
 - Stop 立即拒绝新 admission、取消 Timer 和 outgoing PendingCall；当前 Handler 在 shutdown deadline 内结束，排队 Send 丢弃并诊断，排队 Call 返回 `ErrServiceStopping`。
 - Stop/Close 幂等且等待完成，OnStop 最多执行一次。Handler panic 停止当前 Service，并使相关 Call 返回 `ErrServicePanicked`。
-- 第一版只提供一次性 After 和 CancelTimer；Timer 使用普通 Mailbox admission，不保证同一时刻到期顺序。
+- 第一版只提供一次性 After 和 CancelTimer；Timer 使用普通 Mailbox admission，不保证同一时刻到期顺序。到期 Command 的 Source 固定为 `ServiceID(0)`，Timer owner 单独记录创建者。
 
 ## Consequences
 

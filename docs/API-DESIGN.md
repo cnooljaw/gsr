@@ -38,11 +38,11 @@ Close
 | --- | --- | --- |
 | `skynet.start()` | `Runtime.Start()` 与 `Service.OnStart()` | Runtime 启动基础设施，Service 启动失败显式返回 error。 |
 | `skynet.self()` | `ServiceContext.Self()` | 返回 Runtime 局部 `ServiceID`。 |
-| `skynet.send()` | `ServiceContext.Send()` | Source 由当前 Service 自动绑定；admission 有界。 |
+| `skynet.send()` | `ServiceContext.Send()` | 普通消息的 Source 由 Runtime 绑定当前 Service；admission 有界。 |
 | `skynet.call()` | `ServiceContext.Call(ctx, ...)` | 保持 run-to-completion，并强制受 Runtime 最大等待时间约束。 |
-| `skynet.timeout()` | `ServiceContext.After()` | Timer 只投递 Command，不执行业务回调。 |
+| `skynet.timeout()` | `ServiceContext.After()` | Timer 只投递 Command，不执行业务回调；Timer 消息的 Source 固定为零值。 |
 | `skynet.newservice()` | `Runtime.CreateService()` | 使用 Go Service 接口和显式启动错误。 |
-| `skynet.dispatch()` | `Service.Handle()` | Source 通过只读 `CommandContext` 提供。 |
+| `skynet.dispatch()` | `Service.Handle()` | Source 通过只读 `CommandContext` 提供；普通消息由 Runtime 填入，Timer 消息可为零值。 |
 | `skynet.ret()/response()` | Handler 返回值 | GSR 不暴露手工或异步 Reply API。 |
 | `skynet.exit()/kill()` | `Runtime.Stop()/Close()` | 使用幂等、可等待且有 deadline 的生命周期操作。 |
 
@@ -191,24 +191,39 @@ type Handler interface {
 }
 ```
 
-- `Source()` 由 Runtime 从当前 Message 填入，业务只能读取，不能覆盖或伪造。
+- `Source()` 由 Runtime 从当前 Message 填入，业务只能读取，不能覆盖或伪造。普通 Send/Call 的值是当前发起 Service；Timer 投递的值是 `ServiceID(0)`。
 - `CommandContext` 只在当前 Handler 返回前有效，不得保存到 Service 字段或交给异步任务。
 - SessionID 为零时，Runtime 不创建 Reply；Handler 返回的非 nil error 进入结构化诊断。
 - SessionID 非零时，Runtime 把 Handler 的返回值或错误转换为一次 Reply completion。
 - Handler 返回后不能异步 Reply；Runtime 负责防止重复 completion，并清理 PendingCall。
 - typed client 负责把 `any` 结果转换为明确的领域结果类型。
 
-Source、Call 上限和自动 Reply 的完整取舍见 [ADR 0007](adr/0007-command-context-call-and-timeout-stop.md)。
+Source、Call 上限和自动 Reply 的完整取舍见 [ADR 0007](adr/0007-command-context-call-and-timeout-stop.md)；受控 Redirect/Relay 见 [ADR 0009](adr/0009-controlled-redirect-and-source.md)。
 
 ## 5. Source 语义
 
-- Service 发起 Send 或 Call 时，`Message.Source` 必须是当前 Service 的 `ServiceID`。
-- 业务调用者不能伪造 Source。
-- 普通 Send/Call 必须从受 Runtime 管理的 Service 上下文发起。
-- 外部连接、网关和 Cluster relay 要进入 Core 时，应先由对应的本地 Adapter Service 发起投递；`Source` 是该次本地投递的发起 ServiceID。
-- 跨节点原始来源、连接、trace 和认证信息属于 ClusterEnvelope/Transport metadata，不得塞入 Core Message 或 `ServiceID`。
+- 普通 Service 发起 Send 或 Call 时，Runtime 创建的 `Message.Source` 是当前发起 Service 的 `ServiceID`。
+- `After` 到期后由 Runtime 创建普通 Command，但其 `Message.Source` 固定为 `ServiceID(0)`；Timer 的创建者由 Timer owner 记录，不能用 Source 冒充创建者。Handler 必须允许 `CommandContext.Source()` 为零值。
+- 业务调用者不能传入、覆盖或伪造 Source。`ServiceContext` 和 typed client 均不暴露任意 source 参数。
+- 外部连接、网关和 Cluster relay 若要进入 Core，优先由 Adapter Service 发起普通投递；跨节点原始来源、连接、trace 和认证信息属于 ClusterEnvelope/Transport metadata，不得塞入 Core Message 或 `ServiceID`。
+- Runtime 可以向受信任的 Runtime-owned adapter 提供受控的 Redirect/Relay 能力。该能力转发已有的 Runtime-owned Message 或 relay token，由 Runtime 写入目标和 admission 状态；它不能接收业务任意给出的 ServiceID 作为 Source。是否保留原 Source 只能由该受信任能力的固定策略决定。
 
-这里的 Source 表示“当前本地消息跳的发起者”，不是全局可寻址身份。Cluster 转发时，远端目标看到的是远端本地 relay/adapter 发起的本地投递；端到端请求由 Cluster session 和传输上下文关联。
+这里的 Source 不是可由业务填写的身份字段，而是 Runtime 写入的本地消息来源。普通消息表示当前本地发起者；受控 Redirect 可以在同一 Runtime 内保留已有消息的原始 Source，以支持透明代理或基础设施 relay。跨节点的原始来源仍由 Cluster session 和传输上下文关联，不能把远端 ServiceID 直接当成本地 Source。
+
+### 5.1 Redirect / Relay 边界
+
+Redirect 不是普通业务 Service API，也不是 `Call` 的另一种写法。首版只在存在明确基础设施调用者时提供内部或 Adapter-owned 能力：
+
+| 场景 | GSR 处理方式 |
+| --- | --- |
+| 普通 Send/Call | 创建新 Message，Source 由 Runtime 设为当前 Service。 |
+| Timer 到期 | 创建新 Message，Source 固定为 `ServiceID(0)`，Timer owner 单独记录创建者。 |
+| 一次性基础设施转发 | 受信任 relay 转发 Runtime-owned Message；可按固定策略保留原 Source，但业务不能指定任意 Source。 |
+| 普通请求/响应代理 | 由代理向下游发起新的 Call（Call-through），结果沿代理的 PendingCall 返回；不转移原 PendingCall、Session 或 Reply 所有权。 |
+| 多播/广播 | 外层功能为每个目标分别进行有界 admission；不把 fan-out 隐藏成 Core 的无限转发。 |
+| 生命周期事件 | 事件主体作为显式 typed 参数或外层诊断 metadata 传递，不把“被观察对象”伪装成业务 Source。 |
+
+Redirect 首版不承诺 Call 的 session 转移、自动 Reply、重试或 exactly-once。Transport 的零拷贝/缓冲区所有权转移也只能由 Transport/ConnectionAgent 私有实现处理，不能把共享可变指针暴露给 Core Message。
 
 ## 6. Local 与 Cluster
 
@@ -239,7 +254,7 @@ clusterClient.Call(node, serviceID, command, args...)
 Go 没有可靠的“当前 Service”隐式上下文。Cluster 内部采用显式 Source 的实现入口，但只向业务暴露预先绑定当前 ServiceID 的窄 client：
 
 ```go
-// Cluster 内部入口，不向业务包暴露。
+// Cluster 内部入口，不向业务包暴露；source 由绑定 client 或受信任 relay 提供。
 sendFrom(source, node, target, command, args...)
 callFrom(source, node, target, command, args...)
 
@@ -247,7 +262,7 @@ callFrom(source, node, target, command, args...)
 clusterClient := cluster.Bind(serviceContext.Self(), dispatcher)
 ```
 
-禁止使用包级全局变量、goroutine-local 或调用栈猜测来寻找“当前 ServiceID”。绑定后的 client 不允许业务覆盖 Source。
+禁止使用包级全局变量、goroutine-local 或调用栈猜测来寻找“当前 ServiceID”。绑定后的 client 不允许业务覆盖 Source；只有明确受信任的 Cluster/Adapter relay 才能使用受控转发能力。
 
 执行路径：
 
@@ -270,7 +285,8 @@ origin Service
 - 远端 relay 把 ClusterEnvelope 解码为新的本地 Message，再通过 LocalDispatcher 投递。
 - ClusterSessionID 由 ClusterSender/ClusterAgent 管理，不要求与本地 Core SessionID 相同。
 - 本地消息不创建 ClusterEnvelope，也不为了统一表象执行远程序列化。
-- 数字形式的远端 ServiceID 只在当前远端 Runtime/连接生命周期内有效；断线重连后必须通过外层名称或 Discovery 重新解析。
+- 数字形式的远端 ServiceID 只在当前远端 Runtime 生命周期内有效；断线、重连或 Runtime 重启后必须通过外层名称或 Discovery 重新解析。
+- GSR 不把 Epoch、Lease 或 Generation 加入 ServiceID/远端地址，也不由 Runtime 判断业务资源的唯一所有权、一致性或过期。Runtime 只负责路由、投递和连接恢复；资源 fencing、幂等、RequestID、补偿和业务过期判断由拥有该语义的业务/外层模块负责。
 - `clusterClient.Send` 返回 `error`。返回 nil 只表示请求已被本地 Cluster 边界接受或入队，不表示远端 Handler 已执行，更不表示持久化成功。
 - 无路由、已知断连、编码失败、出站队列满或关闭必须返回 Runtime Error；需要确认业务结果时使用 Call，并为有歧义的网络失败设计 RequestID 与幂等。
 
@@ -318,7 +334,7 @@ type ServiceContext interface {
 ```
 
 - `Self()` 返回当前 ServiceID。
-- `Send`、`Call` 和 `After` 由 Runtime 自动使用 `Self()` 作为 Source。
+- 普通 `Send` 和 `Call` 由 Runtime 自动使用 `Self()` 作为 Source；`After` 触发的 Command 使用 `ServiceID(0)`，创建者由 Timer owner 表达。
 - `Call` 的 context 只能取消或收紧本次等待；实际等待永远不超过 Runtime `MaxCallWait`。
 - Cluster、Discovery 和业务 Repository 通过单独的窄 client 注入，不加入 ServiceContext。
 - Cluster client 在 Service 初始化阶段以 `Self()` 绑定 Source；其公开 Send/Call 不再要求业务重复传 source。
@@ -447,7 +463,7 @@ Runtime 不使用一个不断增长的 `closeFn` 承载所有清理逻辑。Runt
 - 同一个 Service 的 Handler 永不并发，不同 Service 可以并发。
 - 每个 Running Service 只有一个 Runtime-owned runner；Call 阻塞一个 Service 时不会阻塞其它 Service。
 - Mailbox 按消息成功完成 admission 的顺序执行 FIFO；不把多个并发发送者的调用时刻定义成全局顺序。
-- `Message.Source` 等于当前发起 Service 的 ServiceID，业务参数不能覆盖它。
+- 普通 Send/Call 的 `Message.Source` 等于当前发起 Service 的 ServiceID，Timer Command 的 Source 等于 `ServiceID(0)`；业务参数不能覆盖它，受控 Redirect 也只能按固定 relay 策略转发 Runtime-owned Message。
 - Send 产生零 SessionID，Call 产生非零 SessionID，两者进入同一个 Dispatcher 和 Mailbox。
 - 各类 uint64 ID 到达上限后返回 ErrIDExhausted，不能回绕命中仍活跃或历史对象。
 - Reply 不进入调用方 Mailbox；它通过 SessionID 恰好完成一个 PendingCall，重复或未知 Reply 被拒绝并记录诊断。
@@ -473,14 +489,14 @@ Runtime 不使用一个不断增长的 `closeFn` 承载所有清理逻辑。Runt
 
 1. 是否仍然只使用最小 Core 概念？
 2. ServiceID 是否保持 Runtime 局部、临时且不可持久化？
-3. Source 是否由当前发起 Service 自动设置？
+3. 普通 Send/Call 的 Source 是否由当前发起 Service 自动设置，Timer 是否固定为零值，受控 Redirect 是否没有暴露任意 source 入口？
 4. 本地 Send 与 Call 请求是否只通过 SessionID 区分，并共用同一 Message/Dispatcher 路径；Reply 是否只完成 PendingCall 而不进入业务 Mailbox？
 5. Cluster 的 NodeID 是否停留在 Cluster 层？
 6. Core Message 与 ClusterEnvelope 是否保持分离，本地消息是否完全避免远程序列化？
 7. 引用型 Args 是否为 Message 独占快照，发送方是否可能在 admission 后继续修改？
 8. Call 等待时是否保持 Service 独占执行权，并具备超时、停止和 pending 清理路径？
 9. Mailbox 与出站队列是否有界，Send 返回 nil 是否只代表本地接受？
-10. Cluster Source 是否由 per-Service client 绑定，而不是全局隐式状态或业务参数？
+10. Cluster 普通请求的 Source 是否由 per-Service client 绑定，Redirect 是否只使用受信任的 Runtime-owned relay，而不是全局隐式状态或业务参数？
 11. 调用者是否被迫了解 Mailbox、Session、路由或清理顺序？
 12. 谁拥有状态、goroutine、Timer 和关闭责任？
 13. timeout、retry、幂等与补偿由谁决定？

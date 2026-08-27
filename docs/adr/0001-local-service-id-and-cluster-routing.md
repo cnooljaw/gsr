@@ -18,7 +18,9 @@ GSR 需要同时保持 Core 简单和未来 Cluster 可扩展。一个候选方�
 - ServiceID 不持久化，也不能跨 Runtime 重启继续使用。
 - Core 使用未编码的本地 Message，承载 Source ServiceID、Target ServiceID、SessionID、CommandID 和参数。
 - 本地 Send 与 Call 共用同一个 Message、Dispatcher、Mailbox 和 Scheduler 路径；只通过 SessionID 是否为零区分是否等待 Reply。
-- Send/Call 的 Source 由 Runtime 自动设置为当前发起 Service 的 ServiceID，业务调用者不能伪造。
+- 普通 Send/Call 的 Source 由 Runtime 自动设置为当前发起 Service 的 ServiceID；Timer Command 使用 `ServiceID(0)`；业务调用者不能传入或伪造 Source。
+- Runtime/Cluster 不把 Epoch、Lease 或 Generation 加入 ServiceID/远端地址，也不负责判断业务资源的唯一所有权、一致性或过期；这些语义由业务或外层模块负责。
+- 受信任的 Runtime/Adapter relay 可以转发 Runtime-owned Message，并按固定策略保留已有 Source；该能力不向普通业务 API 暴露任意 source 参数。
 - Cluster 内部使用显式 source 的 `sendFrom` / `callFrom` 入口；业务使用初始化时绑定当前 ServiceID 的 per-Service client，因此公开调用仍是 `Send(node, serviceID, ...)` 和 `Call(node, serviceID, ...)`。
 - 不使用全局变量、goroutine-local 或调用栈推断当前 ServiceID。
 - Cluster 使用独立的可编码 ClusterEnvelope；NodeID、连接、编码和远端会话不进入 Core Message 或 ServiceID。
@@ -31,7 +33,7 @@ GSR 需要同时保持 Core 简单和未来 Cluster 可扩展。一个候选方�
 - Core 可以在没有 Cluster 的情况下独立实现和测试。
 - 本地 Message 不进行网络序列化；ClusterEnvelope 可以独立选择编码和 Transport。
 - 公开身份模型保持为一个简单标量，不需要提前设计 NodeEpoch 和 ServiceGeneration。
-- Cluster 内部的数据流仍能显式审计 Source，业务调用方则不需要重复传参或获得伪造 Source 的能力。
+- Cluster 内部的数据流仍能显式审计 Source，业务调用方则不需要重复传参或获得伪造 Source 的能力；跨节点原始来源保留在 Cluster/Transport metadata。
 - 数字形式的远端 ServiceID 是临时地址；节点断线、Runtime 重启或重新连接后必须重新解析。
-- 旧 ServiceID 在同一 Runtime 生命周期内不会命中新建 Service；同一 Service 实例内部的迟到异步结果仍需领域 Revision、OperationID 或 RequestID fencing。
+- 旧 ServiceID 在同一 Runtime 生命周期内不会命中新建 Service；同一 Service 实例内部的迟到异步结果仍需领域 Revision、OperationID 或 RequestID fencing，Runtime 不替业务做 fencing 或过期判断。
 - 如果未来出现“跨 Runtime 重启持久引用具体 Service 实例”的真实需求，应在 Cluster/Discovery 层新增身份协议并建立新的 ADR，而不是静默改变 ServiceID 语义。

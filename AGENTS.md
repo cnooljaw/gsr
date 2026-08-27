@@ -51,8 +51,8 @@
 - 本地 `Send` 与 `Call` 使用同一个未编码 Message、Dispatcher、Mailbox 和 Scheduler 路径，只通过 `SessionID == 0` 或 `SessionID > 0` 区分是否等待 Reply。
 - Reply 通过 Runtime 的 PendingCall completion 路径返回，不作为业务 Command 进入调用方 Mailbox；ClusterEnvelope 必须显式区分 request、response 和 error frame。
 - Reply error 使用稳定的 ErrorClass、ErrorCode 和安全 Message；程序分支只依赖 Class/Code，不比较 Message。未知 Handler error 不透传内部文本或 stack。
-- Send/Call 的 Source 必须由 Runtime 自动设置为当前发起 Service 的 ServiceID，业务代码不得伪造。
-- Cluster 内部入口显式接收 source；业务 API 使用预先绑定当前 ServiceID 的 per-Service client，并调用 `Send(node, serviceID, ...)` / `Call(node, serviceID, ...)`。禁止用全局变量或 goroutine-local 推断当前 Service。
+- 普通 Send/Call 的 Source 必须由 Runtime 自动设置为当前发起 Service 的 ServiceID；Timer 投递使用 Source == 0；受控 Redirect 只能转发 Runtime-owned Message，业务代码不得传入或伪造任意 Source。
+- Cluster 内部入口显式接收 source；普通业务 API 使用预先绑定当前 ServiceID 的 per-Service client，并调用 `Send(node, serviceID, ...)` / `Call(node, serviceID, ...)`；受信任 relay 只能转发 Runtime-owned Message。禁止用全局变量或 goroutine-local 推断当前 Service。
 - 未编码的 Message 不得成为共享可变状态的通道：引用型 Args 必须是消息独占快照，成功 admission 后发送方不得修改，且不得发送 Service 状态的内部引用。
 - Service 内 Call 采用 run-to-completion：等待期间同一 Service 不处理下一条消息，Reply 只恢复当前 Handler；Call 必须有有限超时并谨慎使用，self Call 直接拒绝。
 - 第一版每个 Running Service 使用一个 Runtime-owned runner goroutine 串行消费 Mailbox；Handler 通过返回值由 Runtime 自动完成 Reply，业务不得手工或异步 Reply。
@@ -66,7 +66,7 @@
 - 第一版 Timer 只有一次性 After 和 CancelTimer；Timer 不拥有更高 admission 优先级。
 - Service 和业务层不得直接启动 goroutine，也不得引入公共 `Runtime.Go` 或 `Fork` 作为逃生口。
 - 只有调度器、Transport/连接适配器、固定上限的外部 worker 等明确并发 owner 可以启动 goroutine；owner 必须负责取消、关闭、等待、并发上限、panic 和错误归属。
-- Core Runtime 统一提供调度、本地路由、生命周期、panic recovery 和基础观测机制；远端路由属于 Cluster，timeout、retry、幂等及补偿策略由拥有操作语义的模块决定。
+- Core Runtime 统一提供调度、本地路由、生命周期、panic recovery 和基础观测机制；远端路由属于 Cluster。timeout、retry、幂等、补偿以及业务资源的所有权、一致性和过期判断由拥有操作语义的业务/外层模块决定，Runtime 只负责投递和连接恢复。
 
 ## Go 与验证
 
