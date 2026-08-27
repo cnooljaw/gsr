@@ -264,6 +264,17 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 - 非法长度、越界、认证失败或无法恢复帧边界时关闭连接。
 - 双节点集成、race、关闭和连接泄漏门禁。
 
+## Core 之外的能力候选：反向代理与网关
+
+状态：已记录，暂不进入 Core v0.1，也不提前实现通用网关框架。
+
+- L4/TCP 网关属于 Transport/ConnectionAgent 层的字节转发能力，不进入 Core Message，也不使用业务 Redirect。
+- L7/HTTP 反向代理属于 Core 之外的 Adapter/业务能力：解析并限制请求后，以 typed request 调用本地或远端 Service，使用新的 Call-through 获取 typed response，再由连接 owner 写回客户端。
+- 普通 HTTP 请求/响应不使用 Redirect 转移 Call 的 Session 或 PendingCall；Redirect 只保留给受信任的单向基础设施 relay。
+- 外部客户端身份、连接信息、RequestID 和 TraceID 使用显式请求字段或 Transport metadata，不伪装成 Core Source；后端看到的普通 Source 是 Gateway ServiceID。
+- 路由解析、HTTP 状态映射、timeout、retry、幂等和客户端断开后的迟到结果处理由网关拥有；Runtime 只负责消息投递和连接恢复。
+- 第一版网关若需要并发，优先使用多个 Gateway shard；高并发的 Send + Result Command 方案另行评估，不为此改变 Core 的 run-to-completion 语义。
+
 ## 旧参考项目的使用方式
 
 `../GameServiceRuntime` 与 `../skynet` 始终只读。
