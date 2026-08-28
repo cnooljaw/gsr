@@ -37,9 +37,10 @@ Skynet 的关闭顺序可概括为：timer 线程停止时间/socket 事件并�
 | GSR 概念/API | GSR 阶段 | Skynet 对应概念 | 关系 | 关键区别 |
 | --- | --- | --- | --- | --- |
 | `Message`：`Source`、`Target`、`Session`、`Command`、`Args` | Core 1/3 计划 | `skynet_message`：`source`、`session`、`data`、`sz` | 直接对应 | GSR 本地 Message 不做 wire 编码；Skynet 常规路径把 Lua 参数 pack 成 buffer，并把类型编码进 `sz` 高位。 |
-| `Command` / `CommandID` | Core 1 计划 | `PTYPE_*`、`skynet.register_protocol()`、protocol id 和 Lua command string | 借鉴后重构 | GSR Core 不暴露 `PTYPE`；Command codec 在边界注册，CommandID 不承担网络帧格式。 |
+| `Command` / `CommandID uint32` | Core 1 计划 | `PTYPE_*`、`skynet.register_protocol()`、protocol id 和 Lua command string | 借鉴后重构 | GSR Core 不暴露 `PTYPE`；CommandID 使用 32 位静态命令字段，与协议保持同宽，Command codec 在边界注册。 |
 | `LocalDispatcher` | Core 1 计划 | `skynet_context_message_dispatch()`、`skynet.dispatch()` | 直接对应 | GSR 本地 dispatcher 只处理本地 Message；Skynet callback 还要处理 protocol type、解包和 session。 |
-| `Handler.Handle(CommandContext, CommandID, ...any)` | Core 1 计划 | `skynet.dispatch(typename, func)`，回调参数通常为 `session, source, ...` | 借鉴后重构 | GSR 用 Go Handler 和只读 `CommandContext.Source()`；Source 由 Runtime 写入，Timer 可为零值，业务不能伪造。 |
+| `Handler.Handle(CommandContext, CommandID, ...any)` | Core 1 计划 | `skynet.dispatch(typename, func)`，回调参数通常为 `session, source, ...` | 借鉴后重构 | GSR 用 Go Handler 和只读 `CommandContext.Source()`；Source 由 Runtime 写入，Timer 可为零值，业务不能伪造。普通 Service 可选择嵌入不可变 `CommandDispatcher`。 |
+| `CommandDispatcher`（每 Service、不可变、可选） | Core 1 计划 | Service 内 `CMD[cmd]` 表配合 `skynet.dispatch()` | 借鉴后重构 | GSR 在构造期校验并复制 `CommandID -> typed Handler` 表，运行期不注册、不预检查；Dispatcher 返回结果/error，不调用手工 Reply。直接实现 `Handle` 仍是扩展口。 |
 | `CommandContext.Source()` | Core 1 计划 | dispatch callback 的 `source` 参数、`skynet.context()` | 借鉴后重构 | 普通 Send/Call 的 Source 由 Runtime 写入当前 Service；Timer Command 使用 `ServiceID(0)`；受控 Redirect 才能按固定策略保留已有 Source，业务 API 不允许覆盖或传入任意值。 |
 | 受控 `Redirect` / `Relay` | Core/Adapter 后续 | `skynet.redirect(dest, source, typename, ...)` | 借鉴后重构 | Skynet 的 redirect 同时承担 buffer ownership、fan-out、Harbor 控制 relay 和事件 provenance。GSR 不提供任意 source 的业务 API；首版只考虑受信任 Runtime/Adapter 的单向 Runtime-owned Message 转发，不转移 Call session/PendingCall。 |
 | `Args []any` 的消息快照 | Core 1 计划 | `skynet.pack()`、C 层 `_filter_args()`；`PTYPE_TAG_DONTCOPY` 是不复制逃生口 | 借鉴后重构 | GSR 只隔离 `Args` 外层；map/slice/pointer 的复制深度由 typed client 负责，Core 不做通用深拷贝。 |
@@ -109,7 +110,7 @@ GSR 只用 `SessionID == 0` 或 `SessionID > 0` 区分 Send/Call；Skynet 还把
 | 看到的 Skynet API/机制 | 不要直接翻译成 | 在 GSR 中应理解为 |
 | --- | --- | --- |
 | `skynet.start()` | “启动整个 Runtime” | 一个 Lua service 注册初始化回调；GSR 由 `Runtime.Start()` 启动基础设施，再由 `Service.OnStart()` 启动业务。 |
-| `skynet.dispatch()` | “注册一个全局函数” | 为 protocol 设置 dispatch handler；GSR 是带只读 Source 的 Service Handler。 |
+| `skynet.dispatch()` | “注册一个全局函数” | 为 protocol 设置 dispatch handler；GSR 是带只读 Source 的 Service Handler，普通业务可在其内部嵌入 per-Service `CommandDispatcher`。 |
 | `skynet.ret()` / `skynet.response()` | `Reply()` 公共 API | GSR Handler 返回值自动完成 Reply，不允许异步或重复回复。 |
 | `skynet.fork()` | 公共 `Runtime.Go()` | GSR 不给业务逃生式 goroutine 入口；明确并发 owner 才能创建并负责回收。 |
 | `skynet.timeout()` | 定时器回调 | GSR `After` 只投递 Command；状态变化仍必须在 Service Handler 中发生。 |

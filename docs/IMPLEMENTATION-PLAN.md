@@ -42,6 +42,8 @@ Cluster 0–4
 - Handler 使用只读 `CommandContext.Source()` 获取 Runtime 填入的来源；普通 Send/Call 为当前本地 Service，Timer Command 为 `ServiceID(0)`。
 - 业务 API 不接收任意 source 参数；Redirect/Relay 只作为明确受信任的 Runtime/Adapter 能力转发 Runtime-owned Message，首版不进入 `ServiceContext`，也不转移 Call 的 PendingCall/Session。
 - Handler 通过返回值自动 Reply，不公开 `Reply()` 或异步 response API。
+- `Service.Handle` 是 Runtime 唯一业务入口；Core 提供可选的每 Service 不可变 `CommandDispatcher`，不提供 Runtime 命令注册表或 per-Service 命令预检查。
+- `CommandDispatcher` 构造时复制并校验 `CommandID -> typed Handler` 表，运行时固定检查参数数量/类型；未知命令仍进入 Handler，命令错误使用稳定 ErrorClass/ErrorCode。
 - Call 使用 run-to-completion，并受 Runtime `MaxCallWait` 和调用方 context 中更早的 deadline 限制。
 - 第一版每个 Running Service 使用一个 Runtime-owned runner goroutine。
 - OnStart 的 self Send 返回 `ErrServiceStarting`，self Call 返回 `ErrCallCycle`；启动期 Timer 最早在 Running 后 admission。
@@ -55,6 +57,7 @@ Cluster 0–4
 实现：
 
 - `ServiceID`、`SessionID`、`TimerID`、`CommandID`。
+- `CommandID` 固定为 `uint32`，与协议命令字段同宽；CommandID 由业务/协议包静态维护，Runtime 不分配。
 - 可注入临界状态的 uint64 单调 ID 分配器。
 - `ErrIDExhausted`。
 - `ErrorClass`、`ErrorCode`、`StatusError`。
@@ -133,11 +136,14 @@ Start
 - per-Service runner；Scheduler 负责 runner 创建、panic recovery、停止、等待和观测，不引入全局 ReadyQueue 或固定 worker pool。
 - 将 Service 管理和 Scheduler 按 Core 组件生命周期计划接入 Runtime；不得在 `Close` 中追加匿名清理逻辑。
 - 唯一的本地 Message 和 LocalDispatcher。
+- 可选的 per-Service `CommandDispatcher`、typed Handler 参数绑定和构造期命令表校验；不实现全局 `RegisterCommand` 或 Runtime 命令白名单。
 - `Self`、`Send`、`CreateService`、Runtime `Stop`、Runtime `Close`。
 - `OnStart(context.Context, ServiceContext)` 的协作取消和 Service 组装边界。
 - Starting、Running、Stopping、Stopped、Closed 的接受边界。
 - 排队 Send 丢弃与结构化诊断。
 - Handler 和 OnStop 超时后的残留 runner 追踪。
+- Dispatcher 对非法 Handler 签名、参数数量/类型错误和未知命令的稳定错误行为。
+- Dispatcher 构造输入复制、直接实现 `Service.Handle` 的 escape hatch，以及 Send/Call 由 Runtime 统一完成 Reply 的边界。
 
 验收：
 
@@ -304,6 +310,8 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 - 手工 `Reply()`、异步 Reply 和旧 Service 四钩子接口。
 - `Payload` 兼容字段、可组合 Cluster codec 和公开远端解析。
 - Cluster、Discovery、Snapshot、Supervisor、Runner 或业务类型进入 Core。
+
+有意吸收旧项目的 Command 设计：每个 Service 的不可变 typed `CommandDispatcher`、构造期签名校验，以及未知命令进入 Handler 的行为；但按新契约改为 Handler 返回值自动 Reply，不保留旧 Dispatcher 的 `CommandContext.Reply()` 调用。
 
 从 Skynet 优先参考其实际 API 和运行模型：
 

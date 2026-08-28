@@ -42,7 +42,7 @@ Close
 | `skynet.call()` | `ServiceContext.Call(ctx, ...)` | 保持 run-to-completion，并强制受 Runtime 最大等待时间约束。 |
 | `skynet.timeout()` | `ServiceContext.After()` | Timer 只投递 Command，不执行业务回调；Timer 消息的 Source 固定为零值。 |
 | `skynet.newservice()` | `Runtime.CreateService()` | 使用 Go Service 接口和显式启动错误。 |
-| `skynet.dispatch()` | `Service.Handle()` | Source 通过只读 `CommandContext` 提供；普通消息由 Runtime 填入，Timer 消息可为零值。 |
+| `skynet.dispatch()` | `Service.Handle()`，可选嵌入 `CommandDispatcher` | Runtime 只调用一个 Service.Handle 入口；不可变的 per-Service typed dispatcher 负责参数绑定，普通消息的 Source 由 Runtime 填入，Timer 消息可为零值。 |
 | `skynet.ret()/response()` | Handler 返回值 | GSR 不暴露手工或异步 Reply API。 |
 | `skynet.exit()/kill()` | `Runtime.Stop(ctx)` / `Runtime.Close()` | `Stop` 负责可等待的有序停止，`Close` 负责最终释放；两者幂等且不允许重启。 |
 
@@ -63,7 +63,10 @@ type ServiceID        uint64
 type SessionID        uint64
 type TimerID          uint64
 type ClusterSessionID uint64
+type CommandID        uint32
 ```
+
+`CommandID` 是协议兼容的静态命令字段，不属于 Runtime 运行期分配器；业务/协议包维护其常量或生成代码。其余四类 ID 按各自 owner 生命周期单调分配。
 
 `ServiceID` 的契约是：
 
@@ -199,6 +202,61 @@ type Handler interface {
 - typed client 负责把 `any` 结果转换为明确的领域结果类型。
 
 Source、Call 上限和自动 Reply 的完整取舍见 [ADR 0007](adr/0007-command-context-call-and-timeout-stop.md)；受控 Redirect/Relay 见 [ADR 0009](adr/0009-controlled-redirect-and-source.md)。
+
+### 4.4 标准 CommandDispatcher（可选）
+
+`Service.Handle` 仍是 Runtime 唯一调用的业务入口。为了避免普通 Service 重复编写 `switch`、`[]any` 参数数量检查和类型断言，Core 提供一个可选的、每 Service 独立且不可变的标准 `CommandDispatcher`：
+
+```go
+type CommandHandlers map[CommandID]any
+
+func NewCommandDispatcher(CommandHandlers) (*CommandDispatcher, error)
+func MustCommandDispatcher(CommandHandlers) *CommandDispatcher
+
+func (d *CommandDispatcher) Handle(
+	CommandContext,
+	CommandID,
+	...any,
+) (any, error)
+```
+
+业务 Service 可以在构造时嵌入该 dispatcher：
+
+```go
+type GreeterService struct {
+	*CommandDispatcher
+}
+
+func NewGreeterService() *GreeterService {
+	service := &GreeterService{}
+	service.CommandDispatcher = MustCommandDispatcher(CommandHandlers{
+		cmdGreet: service.greet,
+	})
+	return service
+}
+
+func (service *GreeterService) greet(
+	_ CommandContext,
+	name string,
+) (string, error) {
+	return "hello " + name, nil
+}
+```
+
+标准 typed Handler 只允许以下两类固定签名：
+
+```go
+func(CommandContext, A, B, ...) error
+func(CommandContext, A, B, ...) (R, error)
+```
+
+`NewCommandDispatcher` 在构造阶段校验 Handler 签名、复制命令表并准备参数绑定；运行阶段检查参数数量和类型。第一版可以使用反射完成绑定，但不得在每条消息上重新解析 Handler 签名。非法签名返回稳定的 `ErrInvalidCommandHandler`，参数不匹配返回 `ErrInvalidCommandArguments`，未知命令返回 `ErrUnknownCommand`。这些错误的程序身份只依赖 ErrorClass/ErrorCode，Message 只用于安全诊断。
+
+`CommandHandlers` 只是构造输入，不是 Runtime Registry。运行期不提供 `Register`、`Unregister` 或 per-Service 命令预检查；未知 Command 仍作为普通 Message 进入目标 Mailbox，由 dispatcher 或 Service.Handle 自己返回 `ErrUnknownCommand`。Timer 也不预检查命令。
+
+Dispatcher 只返回 `(any, error)`，不调用 `CommandContext.Reply()`。Runtime 根据 Message 的 SessionID 自动完成 Reply：Send 丢弃返回值，Call 获取返回值或结构化错误。需要 Decorator、动态模块组合或特殊入口的 Service 可以直接实现 `Handle`，不强制使用 dispatcher。
+
+CommandID 由业务/协议包维护静态常量或生成代码；Runtime 不分配 CommandID，也不从命令表推断 Service 能力。一个 CommandID 的参数数量和类型在其对应的 typed Handler 中固定，外层 `Send/Call(...args)` 的 variadic 只表示消息装配便利，不表示 Handler 可以使用 Go variadic 签名。
 
 ## 5. Source 语义
 
@@ -384,6 +442,12 @@ const (
 )
 
 type ErrorCode string
+
+const (
+	ErrorCodeUnknownCommand          ErrorCode = "runtime.unknown_command"
+	ErrorCodeInvalidCommandHandler   ErrorCode = "runtime.invalid_command_handler"
+	ErrorCodeInvalidCommandArguments ErrorCode = "runtime.invalid_command_arguments"
+)
 
 type StatusError struct {
 	Class   ErrorClass

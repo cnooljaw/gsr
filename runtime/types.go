@@ -11,8 +11,8 @@ type SessionID uint64
 // TimerID identifies a Timer owned by a Service.
 type TimerID uint64
 
-// CommandID identifies a command handled by a Service.
-type CommandID uint64
+// CommandID identifies a command handled by a Service and matches the 32-bit wire command field.
+type CommandID uint32
 
 // idAllocator issues monotonically increasing, non-zero uint64 values.
 //
