@@ -139,17 +139,17 @@ func TestRuntimeStartAndCloseLifecycle(t *testing.T) {
 	if err := runtime.Start(); !errors.Is(err, ErrRuntimeAlreadyStarted) {
 		t.Fatalf("second Start error = %v, want ErrRuntimeAlreadyStarted", err)
 	}
-	if err := runtime.Close(context.Background()); err != nil {
+	if err := runtime.Close(); err != nil {
 		t.Fatalf("Close returned error: %v", err)
 	}
-	if got := runtime.State(); got != RuntimeStopped {
-		t.Fatalf("state after Close = %v, want %v", got, RuntimeStopped)
+	if got := runtime.State(); got != RuntimeClosed {
+		t.Fatalf("state after Close = %v, want %v", got, RuntimeClosed)
 	}
-	if err := runtime.Close(context.Background()); err != nil {
+	if err := runtime.Close(); err != nil {
 		t.Fatalf("idempotent Close returned error: %v", err)
 	}
-	if err := runtime.Start(); !errors.Is(err, ErrRuntimeStopped) {
-		t.Fatalf("Start after Close error = %v, want ErrRuntimeStopped", err)
+	if err := runtime.Start(); !errors.Is(err, ErrRuntimeClosed) {
+		t.Fatalf("Start after Close error = %v, want ErrRuntimeClosed", err)
 	}
 }
 
@@ -241,8 +241,11 @@ func TestRuntimeStartFailureRollsBackAndStops(t *testing.T) {
 	if got := runtime.State(); got != RuntimeStopped {
 		t.Fatalf("state after failed Start = %v, want %v", got, RuntimeStopped)
 	}
-	if err := runtime.Close(context.Background()); !errors.Is(err, startErr) {
+	if err := runtime.Close(); !errors.Is(err, startErr) {
 		t.Fatalf("Close after failed Start = %v, want %v", err, startErr)
+	}
+	if got := runtime.State(); got != RuntimeClosed {
+		t.Fatalf("state after Close = %v, want %v", got, RuntimeClosed)
 	}
 
 	want := []string{"start scheduler"}
@@ -274,7 +277,7 @@ func TestRuntimeCloseUsesShutdownTimeout(t *testing.T) {
 		t.Fatalf("Start returned error: %v", err)
 	}
 
-	if err := runtime.Close(context.Background()); !errors.Is(err, context.DeadlineExceeded) {
+	if err := runtime.Close(); !errors.Is(err, context.DeadlineExceeded) {
 		t.Fatalf("Close error = %v, want context deadline exceeded", err)
 	}
 	select {
@@ -282,8 +285,16 @@ func TestRuntimeCloseUsesShutdownTimeout(t *testing.T) {
 	default:
 		t.Fatal("shutdown component was not called")
 	}
-	if got := runtime.State(); got != RuntimeStopped {
-		t.Fatalf("state after timed shutdown = %v, want %v", got, RuntimeStopped)
+	select {
+	case <-runtime.stopDone:
+	case <-time.After(time.Second):
+		t.Fatal("timed shutdown workflow did not finish")
+	}
+	if err := runtime.Close(); !errors.Is(err, context.DeadlineExceeded) {
+		t.Fatalf("final Close error = %v, want context deadline exceeded", err)
+	}
+	if got := runtime.State(); got != RuntimeClosed {
+		t.Fatalf("state after timed shutdown = %v, want %v", got, RuntimeClosed)
 	}
 }
 
@@ -357,23 +368,23 @@ func TestLifecycleCoordinatorRecoversStopPanic(t *testing.T) {
 	}
 }
 
-// 验证未启动的 Runtime 也能安全关闭并进入 Stopped 状态。
+// 验证未启动的 Runtime 也能安全关闭并进入 Closed 状态。
 func TestRuntimeCloseFromCreatedIsIdempotent(t *testing.T) {
 	runtime, err := NewRuntime(Config{})
 	if err != nil {
 		t.Fatalf("NewRuntime returned error: %v", err)
 	}
 
-	if err := runtime.Close(context.Background()); err != nil {
+	if err := runtime.Close(); err != nil {
 		t.Fatalf("Close from Created returned error: %v", err)
 	}
-	if got := runtime.State(); got != RuntimeStopped {
-		t.Fatalf("state after Close from Created = %v, want %v", got, RuntimeStopped)
+	if got := runtime.State(); got != RuntimeClosed {
+		t.Fatalf("state after Close from Created = %v, want %v", got, RuntimeClosed)
 	}
 }
 
-// 验证一个 Close 等待者取消时，不会取消已经开始的关闭流程。
-func TestRuntimeCloseWaiterCanStopWaitingWithoutCancellingClose(t *testing.T) {
+// 验证并发 Close 调用只等待同一套关闭流程且最终都观察到相同结果。
+func TestRuntimeConcurrentCloseWaitsForSingleWorkflow(t *testing.T) {
 	runtime, err := NewRuntime(Config{})
 	if err != nil {
 		t.Fatalf("NewRuntime returned error: %v", err)
@@ -403,7 +414,7 @@ func TestRuntimeCloseWaiterCanStopWaitingWithoutCancellingClose(t *testing.T) {
 
 	firstClose := make(chan error, 1)
 	go func() {
-		firstClose <- runtime.Close(context.Background())
+		firstClose <- runtime.Close()
 	}()
 
 	select {
@@ -412,18 +423,84 @@ func TestRuntimeCloseWaiterCanStopWaitingWithoutCancellingClose(t *testing.T) {
 		t.Fatal("close workflow did not start")
 	}
 
-	waiterContext, cancel := context.WithCancel(context.Background())
-	cancel()
-	if err := runtime.Close(waiterContext); !errors.Is(err, context.Canceled) {
-		t.Fatalf("cancelled waiter error = %v, want context.Canceled", err)
+	secondClose := make(chan error, 1)
+	go func() {
+		secondClose <- runtime.Close()
+	}()
+	select {
+	case err := <-secondClose:
+		t.Fatalf("second Close returned before workflow finished: %v", err)
+	case <-time.After(10 * time.Millisecond):
 	}
 	if got := runtime.State(); got != RuntimeStopping {
-		t.Fatalf("state after cancelled waiter = %v, want %v", got, RuntimeStopping)
+		t.Fatalf("state while closes wait = %v, want %v", got, RuntimeStopping)
 	}
 
 	close(releaseClose)
 	if err := <-firstClose; err != nil {
 		t.Fatalf("first Close returned error: %v", err)
+	}
+	if err := <-secondClose; err != nil {
+		t.Fatalf("second Close returned error: %v", err)
+	}
+	if got := runtime.State(); got != RuntimeClosed {
+		t.Fatalf("final state = %v, want %v", got, RuntimeClosed)
+	}
+}
+
+// 验证 Stop 等待者取消只影响当前调用，不会取消 Runtime 已拥有的停止流程。
+func TestRuntimeStopWaiterCancellationDoesNotCancelWorkflow(t *testing.T) {
+	runtime, err := NewRuntime(Config{})
+	if err != nil {
+		t.Fatalf("NewRuntime returned error: %v", err)
+	}
+
+	stopStarted := make(chan struct{})
+	releaseStop := make(chan struct{})
+	scheduler := &lifecycleProbe{
+		name: "scheduler",
+		stopFn: func(ctx context.Context) error {
+			close(stopStarted)
+			select {
+			case <-releaseStop:
+				return nil
+			case <-ctx.Done():
+				return ctx.Err()
+			}
+		},
+	}
+	runtime.lifecycle = newLifecycleCoordinator(lifecyclePlan{
+		startOrder: []lifecycleComponent{scheduler},
+		stopOrder:  []lifecycleComponent{scheduler},
+	})
+	if err := runtime.Start(); err != nil {
+		t.Fatalf("Start returned error: %v", err)
+	}
+
+	stopContext, cancel := context.WithCancel(context.Background())
+	cancel()
+	if err := runtime.Stop(stopContext); !errors.Is(err, context.Canceled) {
+		t.Fatalf("cancelled Stop error = %v, want context.Canceled", err)
+	}
+	select {
+	case <-stopStarted:
+	case <-time.After(time.Second):
+		t.Fatal("stop workflow did not start")
+	}
+	if got := runtime.State(); got != RuntimeStopping {
+		t.Fatalf("state after cancelled Stop = %v, want %v", got, RuntimeStopping)
+	}
+
+	secondStop := make(chan error, 1)
+	go func() { secondStop <- runtime.Stop(context.Background()) }()
+	select {
+	case err := <-secondStop:
+		t.Fatalf("second Stop returned before release: %v", err)
+	case <-time.After(10 * time.Millisecond):
+	}
+	close(releaseStop)
+	if err := <-secondStop; err != nil {
+		t.Fatalf("second Stop returned error: %v", err)
 	}
 	if got := runtime.State(); got != RuntimeStopped {
 		t.Fatalf("final state = %v, want %v", got, RuntimeStopped)
@@ -467,7 +544,7 @@ func TestRuntimeCloseWaitsForStartToFinish(t *testing.T) {
 	}
 
 	closeResult := make(chan error, 1)
-	go func() { closeResult <- runtime.Close(context.Background()) }()
+	go func() { closeResult <- runtime.Close() }()
 	select {
 	case err := <-closeResult:
 		t.Fatalf("Close returned before Start finished: %v", err)
@@ -481,12 +558,12 @@ func TestRuntimeCloseWaitsForStartToFinish(t *testing.T) {
 	if err := <-closeResult; err != nil {
 		t.Fatalf("Close returned error: %v", err)
 	}
-	if got := runtime.State(); got != RuntimeStopped {
-		t.Fatalf("final state = %v, want %v", got, RuntimeStopped)
+	if got := runtime.State(); got != RuntimeClosed {
+		t.Fatalf("final state = %v, want %v", got, RuntimeClosed)
 	}
 }
 
-// 验证启动期间取消 Close 等待后，Runtime 仍会在启动完成后继续关闭。
+// 验证启动期间调用 Close 会排队停止意图，并在启动完成后继续关闭。
 func TestRuntimeCloseDuringStartKeepsShutdownQueued(t *testing.T) {
 	startStarted := make(chan struct{})
 	releaseStart := make(chan struct{})
@@ -520,10 +597,12 @@ func TestRuntimeCloseDuringStartKeepsShutdownQueued(t *testing.T) {
 		t.Fatal("start workflow did not start")
 	}
 
-	waiterContext, cancel := context.WithCancel(context.Background())
-	cancel()
-	if err := runtime.Close(waiterContext); !errors.Is(err, context.Canceled) {
-		t.Fatalf("cancelled Close error = %v, want context.Canceled", err)
+	closeResult := make(chan error, 1)
+	go func() { closeResult <- runtime.Close() }()
+	select {
+	case err := <-closeResult:
+		t.Fatalf("Close returned before Start finished: %v", err)
+	case <-time.After(10 * time.Millisecond):
 	}
 
 	close(releaseStart)
@@ -535,11 +614,11 @@ func TestRuntimeCloseDuringStartKeepsShutdownQueued(t *testing.T) {
 	case <-time.After(time.Second):
 		t.Fatal("queued shutdown did not start")
 	}
-	if err := runtime.Close(context.Background()); err != nil {
-		t.Fatalf("final Close returned error: %v", err)
+	if err := <-closeResult; err != nil {
+		t.Fatalf("Close returned error: %v", err)
 	}
-	if got := runtime.State(); got != RuntimeStopped {
-		t.Fatalf("final state = %v, want %v", got, RuntimeStopped)
+	if got := runtime.State(); got != RuntimeClosed {
+		t.Fatalf("final state = %v, want %v", got, RuntimeClosed)
 	}
 }
 

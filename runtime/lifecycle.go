@@ -47,10 +47,13 @@ func newLifecycleCoordinator(plan lifecyclePlan) *lifecycleCoordinator {
 }
 
 // newCoreLifecycleCoordinator assembles the current Core lifecycle plan.
-// Core 0 has no runtime-owned components yet; later Core slices add their
-// concrete owners here and update the corresponding order tests.
-func newCoreLifecycleCoordinator() *lifecycleCoordinator {
-	return newLifecycleCoordinator(lifecyclePlan{})
+// Components are supplied explicitly so each Core slice can make ownership
+// and shutdown order visible without introducing a dynamic plugin registry.
+func newCoreLifecycleCoordinator(components ...lifecycleComponent) *lifecycleCoordinator {
+	return newLifecycleCoordinator(lifecyclePlan{
+		startOrder: append([]lifecycleComponent(nil), components...),
+		stopOrder:  append([]lifecycleComponent(nil), components...),
+	})
 }
 
 func validateLifecyclePlan(plan lifecyclePlan) {

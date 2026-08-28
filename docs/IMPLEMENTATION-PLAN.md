@@ -52,7 +52,7 @@ Cluster 0–4
 
 ## Core 0：基础类型与 Runtime 骨架
 
-状态：已完成基础切片。`runtime` package 已提供类型、ID 分配、结构化错误、配置校验和空 Runtime 生命周期；Service、Mailbox、Timer、Cluster 仍未进入实现。本轮契约已将后续公开生命周期收口为 `Stop(ctx)` + `Close()`；当前 Core 0 代码中的旧 `Close(ctx)` 仅作为待迁移实现，不是最终 API。
+状态：基础切片已完成。`runtime` package 提供类型、ID 分配、结构化错误、配置校验和 Runtime 生命周期；Service、Mailbox、Timer、Cluster 分别在后续 Core/Cluster 切片实现。本轮公开生命周期已收口为 `Stop(ctx)` + `Close()`。
 
 实现：
 
@@ -77,7 +77,7 @@ Cluster 0–4
 
 ## Core 0.5：Runtime 组件生命周期骨架
 
-状态：已完成基础协调器切片。当前 Core 尚无实际 Service、Timer 或 Scheduler 组件，因此默认生命周期计划为空；后续组件必须通过固定计划接入，不得恢复单一 `closeFn`。
+状态：基础协调器已完成，Core 1 已将 Service admission 和 Scheduler 以固定组件接入；Timer、PendingCall 等后续组件仍须按计划显式加入，不得恢复单一 `closeFn`。
 
 实现：
 
@@ -111,6 +111,8 @@ Cluster、Transport、NodeSender 和 ConnectionAgent 不加入 Core 计划。外
 
 ## Core 1：本地 Send 与 Service 生命周期
 
+状态：实现中。本轮已落地 Service、Mailbox、LocalDispatcher、per-Service runner、Scheduler、Source 绑定和生命周期接入；Call、Timer 及完整观测仍按后续切片推进。
+
 实现第一条完整运行链：
 
 ```text
@@ -138,6 +140,7 @@ Start
 - 唯一的本地 Message 和 LocalDispatcher。
 - 可选的 per-Service `CommandDispatcher`、typed Handler 参数绑定和构造期命令表校验；不实现全局 `RegisterCommand` 或 Runtime 命令白名单。
 - `Self`、`Send`、`CreateService`、Runtime `Stop`、Runtime `Close`。
+- Runtime-owned adapter 可使用 `Runtime.Send` 注入 `Source == ServiceID(0)` 的本地消息；普通 Service 使用绑定自身 ID 的 `ServiceContext.Send`。
 - `OnStart(context.Context, ServiceContext)` 的协作取消和 Service 组装边界。
 - Starting、Running、Stopping、Stopped、Closed 的接受边界。
 - 排队 Send 丢弃与结构化诊断。
@@ -336,7 +339,7 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 4. 运行受影响 package 的格式、编译、测试和 vet。
 5. Core 0 收尾后运行全仓 test/vet；其代码不包含并发 owner 时不机械运行 race。
 6. 以中文提交一份可验证切片，例如“实现 Core 基础类型与 Runtime 生命周期骨架”。
-7. 下一提交再进入 Core 1，不在 Core 0 预建 Mailbox、runner、Timer 或 Cluster 抽象。
+7. Core 1 完成后再进入 Timer/Call；每个切片只保留已经有测试和调用者的能力，不预建 Cluster 抽象。
 
 ## 通用阶段门禁
 

@@ -1,5 +1,7 @@
 package runtime
 
+import "fmt"
+
 // ErrorClass identifies the stable owner of an error.
 type ErrorClass string
 
@@ -14,11 +16,23 @@ const (
 type ErrorCode string
 
 const (
-	ErrorCodeIDExhausted           ErrorCode = "runtime.id_exhausted"
-	ErrorCodeInvalidConfig         ErrorCode = "runtime.invalid_config"
-	ErrorCodeRuntimeAlreadyStarted ErrorCode = "runtime.already_started"
-	ErrorCodeRuntimeStopping       ErrorCode = "runtime.stopping"
-	ErrorCodeRuntimeStopped        ErrorCode = "runtime.stopped"
+	ErrorCodeIDExhausted             ErrorCode = "runtime.id_exhausted"
+	ErrorCodeInvalidConfig           ErrorCode = "runtime.invalid_config"
+	ErrorCodeRuntimeAlreadyStarted   ErrorCode = "runtime.already_started"
+	ErrorCodeRuntimeNotRunning       ErrorCode = "runtime.not_running"
+	ErrorCodeRuntimeStopping         ErrorCode = "runtime.stopping"
+	ErrorCodeRuntimeStopped          ErrorCode = "runtime.stopped"
+	ErrorCodeRuntimeClosed           ErrorCode = "runtime.closed"
+	ErrorCodeInvalidService          ErrorCode = "runtime.invalid_service"
+	ErrorCodeServiceNotFound         ErrorCode = "runtime.service_not_found"
+	ErrorCodeServiceStarting         ErrorCode = "runtime.service_starting"
+	ErrorCodeServiceStopping         ErrorCode = "runtime.service_stopping"
+	ErrorCodeServiceClosed           ErrorCode = "runtime.service_closed"
+	ErrorCodeServicePanicked         ErrorCode = "runtime.service_panicked"
+	ErrorCodeMailboxFull             ErrorCode = "runtime.mailbox_full"
+	ErrorCodeUnknownCommand          ErrorCode = "runtime.unknown_command"
+	ErrorCodeInvalidCommandHandler   ErrorCode = "runtime.invalid_command_handler"
+	ErrorCodeInvalidCommandArguments ErrorCode = "runtime.invalid_command_arguments"
 )
 
 // StatusError is the single structured error/status shape used by Core. It
@@ -30,6 +44,10 @@ type StatusError struct {
 	Class   ErrorClass
 	Code    ErrorCode
 	Message string
+}
+
+func wrapStatusError(base error, format string, args ...any) error {
+	return fmt.Errorf("%w: %s", base, fmt.Sprintf(format, args...))
 }
 
 // NewStatusError constructs a structured error.
@@ -82,6 +100,12 @@ var (
 		ErrorCodeRuntimeAlreadyStarted,
 		"runtime is already started",
 	)
+	// ErrRuntimeNotRunning means an operation was attempted before Start.
+	ErrRuntimeNotRunning error = NewStatusError(
+		ErrorClassRuntime,
+		ErrorCodeRuntimeNotRunning,
+		"runtime is not running",
+	)
 	// ErrRuntimeStopping means an operation raced with Runtime shutdown.
 	ErrRuntimeStopping error = NewStatusError(
 		ErrorClassRuntime,
@@ -93,5 +117,71 @@ var (
 		ErrorClassRuntime,
 		ErrorCodeRuntimeStopped,
 		"runtime is stopped",
+	)
+	// ErrRuntimeClosed means an operation targeted a permanently closed Runtime.
+	ErrRuntimeClosed error = NewStatusError(
+		ErrorClassRuntime,
+		ErrorCodeRuntimeClosed,
+		"runtime is closed",
+	)
+	// ErrInvalidService means CreateService received a nil Service.
+	ErrInvalidService error = NewStatusError(
+		ErrorClassRuntime,
+		ErrorCodeInvalidService,
+		"service is invalid",
+	)
+	// ErrServiceNotFound means a ServiceID is not currently registered.
+	ErrServiceNotFound error = NewStatusError(
+		ErrorClassRuntime,
+		ErrorCodeServiceNotFound,
+		"service is not found",
+	)
+	// ErrServiceStarting means a Service is not ready to receive ordinary messages.
+	ErrServiceStarting error = NewStatusError(
+		ErrorClassRuntime,
+		ErrorCodeServiceStarting,
+		"service is starting",
+	)
+	// ErrServiceStopping means a Service has stopped accepting new messages.
+	ErrServiceStopping error = NewStatusError(
+		ErrorClassRuntime,
+		ErrorCodeServiceStopping,
+		"service is stopping",
+	)
+	// ErrServiceClosed means a ServiceID refers to a stopped Service.
+	ErrServiceClosed error = NewStatusError(
+		ErrorClassRuntime,
+		ErrorCodeServiceClosed,
+		"service is closed",
+	)
+	// ErrServicePanicked means a Service lifecycle or Handler function panicked.
+	ErrServicePanicked error = NewStatusError(
+		ErrorClassRuntime,
+		ErrorCodeServicePanicked,
+		"service panicked",
+	)
+	// ErrMailboxFull means a bounded Service mailbox rejected admission.
+	ErrMailboxFull error = NewStatusError(
+		ErrorClassRuntime,
+		ErrorCodeMailboxFull,
+		"service mailbox is full",
+	)
+	// ErrUnknownCommand means a Service has no Handler for a CommandID.
+	ErrUnknownCommand error = NewStatusError(
+		ErrorClassRuntime,
+		ErrorCodeUnknownCommand,
+		"command is unknown",
+	)
+	// ErrInvalidCommandHandler means a typed command Handler has an unsupported signature.
+	ErrInvalidCommandHandler error = NewStatusError(
+		ErrorClassRuntime,
+		ErrorCodeInvalidCommandHandler,
+		"command Handler signature is invalid",
+	)
+	// ErrInvalidCommandArguments means a Command's arguments do not match its Handler.
+	ErrInvalidCommandArguments error = NewStatusError(
+		ErrorClassRuntime,
+		ErrorCodeInvalidCommandArguments,
+		"command arguments are invalid",
 	)
 )

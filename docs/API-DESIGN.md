@@ -502,11 +502,16 @@ type Service interface {
 	OnStop(context.Context) error
 }
 
+// Runtime-owned adapters may inject a local message with Source == 0.
+func (r *Runtime) Send(target ServiceID, command CommandID, args ...any) error
+
 func (r *Runtime) Stop(ctx context.Context) error
 func (r *Runtime) Close() error
 ```
 
 Service 不提供额外 `Close` 钩子；本地资源释放属于 `OnStop`。`Runtime.Stop` 是整个 Runtime 的有序停止操作，`Runtime.Close` 是最终资源释放操作；单个 Service 的停止若需要公开，使用 `StopService` 命名，不复用 Runtime `Stop`。
+
+`Runtime.Send` 只供 Runtime-owned adapter 或宿主注入本地消息，消息的 `Source` 固定为 `ServiceID(0)`；普通 Service 应使用绑定当前 ServiceID 的 `ServiceContext.Send`。
 
 `CreateService` 的 `ctx` 是启动操作的协作取消信号，并原样传给 `OnStart`。Go 无法强杀忽略取消的 `OnStart`：Runtime 必须等待它真实返回，只有返回成功才发布 ServiceID。OnStart 已开始执行但失败时，已分配的 ID 作废且永不复用；Runtime 至多调用该 Service 的 `OnStop` 一次，为部分初始化资源提供清理机会，`OnStop` 必须能够处理未完整启动的实例。
 
