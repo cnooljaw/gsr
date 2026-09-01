@@ -263,6 +263,7 @@ CommandID 由业务/协议包维护静态常量或生成代码；Runtime 不分�
 - 普通 Service 发起 Send 或 Call 时，Runtime 创建的 `Message.Source` 是当前发起 Service 的 `ServiceID`。
 - `After` 到期后由 Runtime 创建普通 Command，但其 `Message.Source` 固定为 `ServiceID(0)`；Timer 的创建者由 Timer owner 记录，不能用 Source 冒充创建者。Handler 必须允许 `CommandContext.Source()` 为零值。
 - 业务调用者不能传入、覆盖或伪造 Source。`ServiceContext` 和 typed client 均不暴露任意 source 参数。
+- Core 内部对普通 Service、Runtime-owned 注入和 Timer 使用不同的显式投递入口；`nil` 不是 `Source == 0` 的业务语义。
 - 外部连接、网关和 Cluster relay 若要进入 Core，优先由 Adapter Service 发起普通投递；跨节点原始来源、连接、trace 和认证信息属于 ClusterEnvelope/Transport metadata，不得塞入 Core Message 或 `ServiceID`。
 - Runtime 可以向受信任的 Runtime-owned adapter 提供受控的 Redirect/Relay 能力。该能力转发已有的 Runtime-owned Message 或 relay token，由 Runtime 写入目标和 admission 状态；它不能接收业务任意给出的 ServiceID 作为 Source。是否保留原 Source 只能由该受信任能力的固定策略决定。
 
@@ -398,7 +399,9 @@ type ServiceContext interface {
 - Cluster client 在 Service 初始化阶段以 `Self()` 绑定 Source；其公开 Send/Call 不再要求业务重复传 source。
 - `context.Context` 只负责 deadline、cancellation 和请求范围信息，不替代 ServiceContext。
 - 第一版 Timer 只有一次性 `After`；不提供 ticker。Timer 使用单调时间计算期限，同一时刻到期不承诺彼此顺序，也不高于普通消息 admission。
+- `After` 从调用时开始计时；若 Service 仍处于 `Starting`，到期事件先保留，进入 `Running` 后按普通 Mailbox admission 立即尝试一次。
 - TimerID 只允许创建它的 Service 取消；取消已触发、已取消或未知 TimerID 返回 false。
+- Core2 当前允许每个已 arm Timer 使用一个 Runtime-owned 等待 goroutine；这不是公开契约，规模不足时只替换内部 Timer engine，不改变 owner、admission 和 Source 语义。
 
 ## 8. Typed Client
 

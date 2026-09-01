@@ -57,6 +57,7 @@ type Runtime struct {
 	closeResult error
 	lifecycle   *lifecycleCoordinator
 	dispatcher  *localDispatcher
+	timers      *timerManager
 	scheduler   *scheduler
 
 	serviceIDs *idAllocator
@@ -74,6 +75,10 @@ type Runtime struct {
 // Zero-valued configuration fields receive DefaultConfig values. Negative
 // values and other invalid values return ErrInvalidConfig.
 func NewRuntime(config Config) (*Runtime, error) {
+	return newRuntimeWithClock(config, realClock{})
+}
+
+func newRuntimeWithClock(config Config, clock runtimeClock) (*Runtime, error) {
 	normalized, err := config.normalized()
 	if err != nil {
 		return nil, err
@@ -89,8 +94,10 @@ func NewRuntime(config Config) (*Runtime, error) {
 		services:   make(map[ServiceID]*serviceInstance),
 	}
 	runtime.dispatcher = &localDispatcher{runtime: runtime}
+	runtime.timers = newTimerManager(runtime, clock)
 	runtime.scheduler = newScheduler(runtime)
 	runtime.lifecycle = newCoreLifecycleCoordinator(
+		runtime.timers,
 		&serviceLifecycle{runtime: runtime},
 		runtime.scheduler,
 	)

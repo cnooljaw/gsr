@@ -111,7 +111,7 @@ Cluster、Transport、NodeSender 和 ConnectionAgent 不加入 Core 计划。外
 
 ## Core 1：本地 Send 与 Service 生命周期
 
-状态：实现中。本轮已落地 Service、Mailbox、LocalDispatcher、per-Service runner、Scheduler、Source 绑定和生命周期接入；Call、Timer 及完整观测仍按后续切片推进。
+状态：已完成当前切片。本轮已落地 Service、Mailbox、LocalDispatcher、per-Service runner、Scheduler、Source 绑定和生命周期接入；Call 和完整观测按后续切片推进。
 
 实现第一条完整运行链：
 
@@ -151,6 +151,7 @@ Start
 验收：
 
 - Service A 普通 Send 到 B 时，B 的 `CommandContext.Source()` 等于 A；Timer Command 的 Source 为零值；业务不能覆盖 Source，受控 Redirect 只能按固定 relay 策略转发已有消息。
+- Core 内部的 Service、Runtime-owned 和 Timer 投递走不同的显式入口，不以 `nil` 约定 `Source == 0`；后续 Redirect 只能转发 Runtime-owned Message。
 - 同一 Service Handler 永不并发；不同 Service 可以并行。
 - Mailbox 按成功 admission 顺序 FIFO；多个并发发送者不承诺调用时刻的全局顺序。
 - Mailbox 满时快速返回 `ErrMailboxFull`，不扩容、不无限等待。
@@ -167,6 +168,8 @@ Start
 
 ## Core 2：Timer
 
+状态：已完成当前切片。已落地一次性 After/CancelTimer、FakeClock seam、owner 清理、普通 Mailbox admission 和基础 Timer 诊断计数；Ticker、周期任务和完整 Inspection 仍不在本切片。
+
 实现：
 
 - Runtime 内部 Clock seam 和 FakeClock。
@@ -175,10 +178,12 @@ Start
 - Timer 到期后构造普通 Message，使用与 Send 相同的 Mailbox admission。
 - Service Stop、OnStart 失败和 Runtime Close 的 Timer 清理。
 - Timer admission 失败的结构化诊断和基础指标。
+- 当前实现为每个已 arm Timer 管理一个 Runtime-owned 等待 goroutine；Core4 基准不足时再替换为集中 Timer loop/heap，保持公开语义不变。
 
 验收：
 
 - After 最多触发一次，只通过 Command 影响 Service 状态；到期 Command 的 Source 为 `ServiceID(0)`，创建者由 Timer owner 表达。
+- `After` 从调用时开始计时；OnStart 期间到期的 Timer 在 Service 进入 Running 后立即按普通 Mailbox admission 尝试一次。
 - 只有创建 Timer 的 Service 可以取消；未知、已取消或已触发 Timer 返回 false。
 - CancelTimer、Stop 和触发竞争最多产生一次成功 admission。
 - 同时到期 Timer 不承诺彼此顺序，也没有高于普通 Message 的 admission 优先级。
@@ -339,7 +344,7 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 4. 运行受影响 package 的格式、编译、测试和 vet。
 5. Core 0 收尾后运行全仓 test/vet；其代码不包含并发 owner 时不机械运行 race。
 6. 以中文提交一份可验证切片，例如“实现 Core 基础类型与 Runtime 生命周期骨架”。
-7. Core 1 完成后再进入 Timer/Call；每个切片只保留已经有测试和调用者的能力，不预建 Cluster 抽象。
+7. Core 1 完成后进入 Timer，再进入 Call；每个切片只保留已经有测试和调用者的能力，不预建 Cluster 抽象。
 
 ## 通用阶段门禁
 

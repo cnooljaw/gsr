@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"sync"
+	"time"
 )
 
 // Service owns mutable state behind one Runtime-local ServiceID.
@@ -18,11 +19,13 @@ type Service interface {
 
 // ServiceContext exposes the Core capabilities available to a Service.
 //
-// Core 1 intentionally exposes only Self and Send. Call, Timer and their
-// associated methods are added by later slices rather than placeholder APIs.
+// Core 2 exposes local identity, Send and one-shot Timer operations. Call is
+// added by a later slice rather than as a placeholder API.
 type ServiceContext interface {
 	Self() ServiceID
 	Send(ServiceID, CommandID, ...any) error
+	After(time.Duration, CommandID, ...any) (TimerID, error)
+	CancelTimer(TimerID) bool
 }
 
 // CommandContext describes the Service and source of the Message being handled.
@@ -109,6 +112,7 @@ func (instance *serviceInstance) requestStopWithCancel(ctx context.Context, canc
 	}
 	instance.mailbox.stop()
 	instance.mu.Unlock()
+	instance.runtime.cancelTimersFor(instance)
 	if cancelAfterUnlock != nil {
 		cancelAfterUnlock()
 	}
@@ -186,6 +190,14 @@ func (context *serviceContext) Self() ServiceID {
 
 func (context *serviceContext) Send(target ServiceID, command CommandID, args ...any) error {
 	return context.runtime.sendFrom(context.instance, target, command, args...)
+}
+
+func (context *serviceContext) After(duration time.Duration, command CommandID, args ...any) (TimerID, error) {
+	return context.runtime.after(context.instance, duration, command, args...)
+}
+
+func (context *serviceContext) CancelTimer(id TimerID) bool {
+	return context.runtime.cancelTimer(context.instance, id)
 }
 
 type commandContext struct {

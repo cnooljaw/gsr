@@ -23,5 +23,6 @@ Service 内同步 Call 必须等待返回，同时保持同一 Service 不重入
 
 - 单线程语义可以直接映射到 Go 执行模型，第一版不需要自制协程调度器。
 - 大量空闲 Service 会消耗 goroutine stack 和调度元数据，必须用规模基准验证；若成本不可接受，再以新的 ADR 替换实现策略。
+- Core2 初版允许每个已 arm Timer 使用一个 Runtime-owned 等待 goroutine；若 1K/10K/100K Timer 基准显示成本不可接受，只替换内部 Timer engine（例如集中 loop + heap），不改变 `After`、owner、admission 或 Source 契约。
 - Stop 不排空全部 Send，关闭时间可预测，但未处理的 fire-and-forget 工作只通过诊断可见。
 - OnStart 中的 Call 可能形成启动依赖环，服务装配必须保持单向依赖并设置超时。

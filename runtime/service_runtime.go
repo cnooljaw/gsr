@@ -185,6 +185,7 @@ func (runtime *Runtime) CreateService(ctx context.Context, service Service) (Ser
 	runtime.servicesMu.Lock()
 	instance.setRunning()
 	runtime.services[id] = instance
+	runtime.timers.armOwner(instance)
 	spawnErr := runtime.scheduler.spawn(instance)
 	if spawnErr != nil {
 		delete(runtime.services, id)
@@ -201,17 +202,56 @@ func (runtime *Runtime) CreateService(ctx context.Context, service Service) (Ser
 // Service code normally uses ServiceContext.Send so Runtime can record the
 // sending ServiceID.
 func (runtime *Runtime) Send(target ServiceID, command CommandID, args ...any) error {
-	return runtime.sendFrom(nil, target, command, args...)
+	if runtime.dispatcher == nil {
+		return ErrRuntimeClosed
+	}
+	return runtime.dispatcher.dispatchRuntimeOwned(target, command, args...)
 }
 
 func (runtime *Runtime) sendFrom(source *serviceInstance, target ServiceID, command CommandID, args ...any) error {
 	if runtime.dispatcher == nil {
 		return ErrRuntimeClosed
 	}
-	return runtime.dispatcher.dispatch(source, target, command, args...)
+	return runtime.dispatcher.dispatchFromService(source, target, command, args...)
 }
 
-func (dispatcher *localDispatcher) dispatch(source *serviceInstance, target ServiceID, command CommandID, args ...any) error {
+func (dispatcher *localDispatcher) dispatchFromService(source *serviceInstance, target ServiceID, command CommandID, args ...any) error {
+	if source == nil || source.runtime != dispatcher.runtime {
+		return ErrInvalidService
+	}
+	if err := serviceSourceAdmissionError(source, target); err != nil {
+		return err
+	}
+	return dispatcher.enqueue(Message{
+		Source:  source.id,
+		Target:  target,
+		Session: 0,
+		Command: command,
+		Args:    append([]any(nil), args...),
+	})
+}
+
+func (dispatcher *localDispatcher) dispatchRuntimeOwned(target ServiceID, command CommandID, args ...any) error {
+	return dispatcher.enqueue(Message{
+		Source:  ServiceID(0),
+		Target:  target,
+		Session: 0,
+		Command: command,
+		Args:    append([]any(nil), args...),
+	})
+}
+
+func (dispatcher *localDispatcher) dispatchTimer(target ServiceID, command CommandID, args ...any) error {
+	return dispatcher.enqueue(Message{
+		Source:  ServiceID(0),
+		Target:  target,
+		Session: 0,
+		Command: command,
+		Args:    append([]any(nil), args...),
+	})
+}
+
+func (dispatcher *localDispatcher) enqueue(message Message) error {
 	runtime := dispatcher.runtime
 	runtime.mu.Lock()
 	if runtime.state != RuntimeRunning {
@@ -221,21 +261,8 @@ func (dispatcher *localDispatcher) dispatch(source *serviceInstance, target Serv
 	}
 	runtime.mu.Unlock()
 
-	if source != nil {
-		switch state := source.currentState(); state {
-		case serviceStarting:
-			if target == source.id {
-				return ErrServiceStarting
-			}
-		case serviceStopping:
-			return ErrServiceStopping
-		case serviceStopped, serviceFailed:
-			return ErrServiceClosed
-		}
-	}
-
 	runtime.servicesMu.RLock()
-	targetInstance := runtime.services[target]
+	targetInstance := runtime.services[message.Target]
 	if targetInstance == nil {
 		runtime.servicesMu.RUnlock()
 		return ErrServiceNotFound
@@ -246,17 +273,21 @@ func (dispatcher *localDispatcher) dispatch(source *serviceInstance, target Serv
 		return targetErr
 	}
 
-	sourceID := ServiceID(0)
-	if source != nil {
-		sourceID = source.id
+	return targetInstance.mailbox.enqueue(message)
+}
+
+func serviceSourceAdmissionError(source *serviceInstance, target ServiceID) error {
+	switch state := source.currentState(); state {
+	case serviceStarting:
+		if target == source.id {
+			return ErrServiceStarting
+		}
+	case serviceStopping:
+		return ErrServiceStopping
+	case serviceStopped, serviceFailed:
+		return ErrServiceClosed
 	}
-	return targetInstance.mailbox.enqueue(Message{
-		Source:  sourceID,
-		Target:  target,
-		Session: 0,
-		Command: command,
-		Args:    append([]any(nil), args...),
-	})
+	return nil
 }
 
 func (runtime *Runtime) runtimeAdmissionErrorLocked() error {
@@ -360,6 +391,9 @@ func (runtime *Runtime) resourcesReleased() bool {
 		return false
 	}
 	if runtime.scheduler != nil && runtime.scheduler.hasRunners() {
+		return false
+	}
+	if runtime.timers != nil && runtime.timers.hasTimers() {
 		return false
 	}
 	runtime.servicesMu.RLock()
