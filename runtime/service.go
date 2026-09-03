@@ -51,7 +51,8 @@ const (
 	ServiceStateStopping
 	// ServiceStateStopped means the Service runner and OnStop have completed.
 	ServiceStateStopped
-	// ServiceStateFailed means the Service stopped because of a runtime failure.
+	// ServiceStateFailed is reserved for an externally classified failed
+	// Service; the first Runtime does not transition into it automatically.
 	ServiceStateFailed
 )
 

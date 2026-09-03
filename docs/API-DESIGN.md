@@ -554,7 +554,7 @@ Runtime 不使用一个不断增长的 `closeFn` 承载所有清理逻辑。Runt
 - Runtime 不得在超时 Handler 尚未返回时并发调用 `OnStop`。Handler 后续返回后，runner 仍至多调用一次 `OnStop`，并传入已经取消的 shutdown context；若 `OnStop` 也不返回，任务继续保持可观测。
 - 超时不表示业务 goroutine 已终止，也不得导致旧 ServiceID 复用。重复 Stop 返回或等待已保存的同一停止结果，不启动第二套停止流程。
 - Handler panic 由 Runtime runner 边界 recovery，当前 Service 转入停止流程；相关 Call 以 `ErrServicePanicked` 完成，panic 与 stack 只进入本地诊断。
-- `Failed`、`Quarantined`、`Degraded` 等作为停止原因或外层监督状态，不加入第一版 Core 状态机。
+- `Failed`、`Quarantined`、`Degraded` 等作为停止原因或外层监督状态，不加入第一版 Core 状态机；公开 `ServiceStateFailed` 仅为 Inspection/外层监督预留，Runtime 不会自动转换到它。
 - Timer 在 Service 停止后不得继续投递。
 
 ### 10.2 Runtime Inspection
