@@ -13,7 +13,7 @@ GSR Cluster 需要保持 Skynet 风格的简洁调用面，同时明确 Go 的�
 - ClusterEnvelope 显式包含 request/response/error frame kind、ClusterSessionID、Target ServiceID/ServiceName、CommandID，以及 payload 或结构化 ErrorClass/ErrorCode/Message。它是逻辑消息值，不携带业务或 wire version；wire 直接编码 `StatusError` 的三个字段，不在 Core 另设重复的 ErrorStatus 类型。
 - 默认 `ValueCodec` 只接受 nil、bool、整数、有限浮点数、string、`[]byte`、list 和 string-key map；解码使用 `int64`、`uint64`、`float64`、`[]any` 和 `map[string]any` 等规范 Go 类型，并限制嵌套深度与 payload 大小。领域 struct 通过启动阶段注册的 Command codec 转换。
 - 不编码任意 pointer、func、chan、unsafe pointer、循环引用或进程内资源句柄。
-- codec 与 Command 在启动阶段注册；重复注册是 programmer error，panic 并阻止启动。
+- Command codec 在启动阶段通过不可变 registry 注册；重复 CommandID、零 CommandID 或 nil codec 是 programmer error，构造失败（静态配置可使用 Must 形式 panic），运行期不允许覆盖。
 - 未来 Transport/Codec framing 或连接握手负责 wire version；在完整且边界可信时，未知 framing version、未知 Command 和解码失败帧被丢弃，并记录限频诊断和指标。
 - 非法长度、超过上限、无法恢复帧边界或认证失败时关闭连接。
 - 每个远端 Node 只有一个 outbound NodeSender，并发建连请求合并；每条 inbound socket 使用独立 ConnectionAgent，响应沿原连接返回。
