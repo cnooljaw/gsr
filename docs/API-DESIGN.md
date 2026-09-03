@@ -450,6 +450,10 @@ const (
 	ErrorCodeUnknownCommand          ErrorCode = "runtime.unknown_command"
 	ErrorCodeInvalidCommandHandler   ErrorCode = "runtime.invalid_command_handler"
 	ErrorCodeInvalidCommandArguments ErrorCode = "runtime.invalid_command_arguments"
+	ErrorCodeInvalidCallContext      ErrorCode = "runtime.invalid_call_context"
+	ErrorCodeCallCycle               ErrorCode = "runtime.call_cycle"
+	ErrorCodeCallTimeout             ErrorCode = "runtime.call_timeout"
+	ErrorCodeHandlerFailed           ErrorCode = "runtime.handler_failed"
 )
 
 type StatusError struct {

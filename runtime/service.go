@@ -19,11 +19,13 @@ type Service interface {
 
 // ServiceContext exposes the Core capabilities available to a Service.
 //
-// Core 2 exposes local identity, Send and one-shot Timer operations. Call is
-// added by a later slice rather than as a placeholder API.
+// Core 3 exposes local identity, Send, bounded Call and one-shot Timer
+// operations. Call waits for the target Handler's return value without
+// re-entering the caller Service runner.
 type ServiceContext interface {
 	Self() ServiceID
 	Send(ServiceID, CommandID, ...any) error
+	Call(context.Context, ServiceID, CommandID, ...any) (any, error)
 	After(time.Duration, CommandID, ...any) (TimerID, error)
 	CancelTimer(TimerID) bool
 }
@@ -113,6 +115,7 @@ func (instance *serviceInstance) requestStopWithCancel(ctx context.Context, canc
 	instance.mailbox.stop()
 	instance.mu.Unlock()
 	instance.runtime.cancelTimersFor(instance)
+	instance.runtime.failPendingCallsFor(instance)
 	if cancelAfterUnlock != nil {
 		cancelAfterUnlock()
 	}
@@ -125,7 +128,7 @@ func (instance *serviceInstance) run() {
 		if !ok {
 			break
 		}
-		if err := instance.runtime.executeMessage(instance, message); err != nil {
+		if _, err := instance.runtime.executeMessage(instance, message); err != nil {
 			instance.runtime.recordHandlerError(instance, message, err)
 			if err == ErrServicePanicked || isStatusCode(err, ErrorCodeServicePanicked) {
 				failureContext, cancel := instance.runtime.failureContext()
@@ -192,6 +195,10 @@ func (context *serviceContext) Send(target ServiceID, command CommandID, args ..
 	return context.runtime.sendFrom(context.instance, target, command, args...)
 }
 
+func (context *serviceContext) Call(callContext context.Context, target ServiceID, command CommandID, args ...any) (any, error) {
+	return context.runtime.call(context.instance, callContext, target, command, args...)
+}
+
 func (context *serviceContext) After(duration time.Duration, command CommandID, args ...any) (TimerID, error) {
 	return context.runtime.after(context.instance, duration, command, args...)
 }
@@ -209,23 +216,24 @@ func (context *commandContext) Source() ServiceID {
 	return context.source
 }
 
-func (runtime *Runtime) executeMessage(instance *serviceInstance, message Message) (err error) {
+func (runtime *Runtime) executeMessage(instance *serviceInstance, message Message) (result any, err error) {
 	defer func() {
 		if recovered := recover(); recovered != nil {
 			err = wrapStatusError(ErrServicePanicked, "service Handler panicked: %v", recovered)
 		}
+		runtime.completeMessage(message, result, err)
 	}()
 
-	_, err = instance.service.Handle(&commandContext{
+	result, err = instance.service.Handle(&commandContext{
 		serviceContext: instance.context,
 		source:         message.Source,
 	}, message.Command, message.Args...)
-	return err
+	return result, err
 }
 
 func (runtime *Runtime) recordHandlerError(_ *serviceInstance, _ Message, _ error) {
-	// Core 1 keeps Handler errors observable through the caller-facing Call
-	// path added later; Send has no completion channel yet.
+	// Send has no completion channel; Core4 Inspection will expose this
+	// diagnostic without changing the fire-and-forget admission contract.
 }
 
 func (runtime *Runtime) failureContext() (context.Context, context.CancelFunc) {

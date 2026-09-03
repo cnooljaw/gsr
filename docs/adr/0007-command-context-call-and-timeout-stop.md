@@ -20,6 +20,8 @@ GSR 使用每 Service 一个 runner，并已经选择 run-to-completion、Handle
 - Handler 继续通过 `(any, error)` 返回值完成一次自动 Reply。Send 的返回值只进入诊断，不创建 Reply。
 - `ServiceContext.Call` 接收非 nil `context.Context`。Runtime Config 提供有限且大于零的 `MaxCallWait`，实际 deadline 取调用方 deadline 与 Runtime 上限中更早者。
 - 调用方可以取消或缩短等待，不能请求超过 `MaxCallWait` 的等待，也不能创建无限 PendingCall。
+- nil context 返回 `runtime.invalid_call_context`；自身调用返回 `runtime.call_cycle`；Runtime 上限到期返回 `runtime.call_timeout`（同时兼容 `context.DeadlineExceeded`）。
+- 未分类 Handler error 对 Call 返回 `runtime.handler_failed`；已分类 `StatusError` 保留 Class/Code，panic 只返回 `runtime.service_panicked`，不把原始文本带入 Reply。
 - `Runtime.CreateService(ctx context.Context, service Service) (ServiceID, error)` 接收业务层构造的 Service 实例；`ctx` 原样传给 `OnStart(ctx, serviceContext)`，作为协作取消信号。Runtime 不提供 Bootstrap Service 或 Service 工厂。
 - `OnStart` 向自身 Send 返回 `ErrServiceStarting`，向自身 Call 返回 `ErrCallCycle`。OnStart 可以登记 After，但 Timer 最早只能在 Service 进入 Running 后 admission；启动失败时取消。
 - OnStart 失败只回滚当前 Service，Runtime 仍保持 Running，可以继续创建其它 Service。失败前分配的 ServiceID 不发布且永不复用；Runtime 至多调用一次 `OnStop` 清理部分初始化资源，OnStop 必须容忍未完整启动的实例。
@@ -28,6 +30,7 @@ GSR 使用每 Service 一个 runner，并已经选择 run-to-completion、Handle
 - Handler 在 deadline 后仍未返回时，Stop 返回稳定超时错误并让旧 ServiceID 退出普通本地寻址；runner 任务继续被 Runtime 追踪到真实返回，不复用旧 ID，也不声称已经强杀业务代码。
 - Runtime 不与超时 Handler 并发执行 `OnStop`。Handler 后续返回后，runner 至多调用一次 `OnStop`，其 shutdown context 已取消；如果 `OnStop` 仍不返回，继续作为残留任务被 Inspection 观测。
 - 重复 Stop 复用同一个停止流程和已保存结果，不并发启动第二次 Handler 清理或 `OnStop`。
+- PendingCall 是显式 Runtime 生命周期组件，停止时先于 Service admission 完成所有等待；它与 Timer、Service、Scheduler 的顺序由 Lifecycle Coordinator 固定编排，而不是追加到匿名关闭函数。
 - Core admission 只复制 `Args` 外层切片。引用型参数的复制深度和传值语义由具体 typed client 保证，Core 不做通用递归深拷贝。
 
 ## Consequences

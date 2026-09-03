@@ -216,6 +216,14 @@ func (runtime *Runtime) sendFrom(source *serviceInstance, target ServiceID, comm
 }
 
 func (dispatcher *localDispatcher) dispatchFromService(source *serviceInstance, target ServiceID, command CommandID, args ...any) error {
+	return dispatcher.dispatchFromServiceWithSession(source, target, command, args, 0)
+}
+
+func (dispatcher *localDispatcher) dispatchCallFromService(source *serviceInstance, target ServiceID, command CommandID, args []any, session SessionID) error {
+	return dispatcher.dispatchFromServiceWithSession(source, target, command, args, session)
+}
+
+func (dispatcher *localDispatcher) dispatchFromServiceWithSession(source *serviceInstance, target ServiceID, command CommandID, args []any, session SessionID) error {
 	if source == nil || source.runtime != dispatcher.runtime {
 		return ErrInvalidService
 	}
@@ -225,7 +233,7 @@ func (dispatcher *localDispatcher) dispatchFromService(source *serviceInstance, 
 	return dispatcher.enqueue(Message{
 		Source:  source.id,
 		Target:  target,
-		Session: 0,
+		Session: session,
 		Command: command,
 		Args:    append([]any(nil), args...),
 	})
@@ -394,6 +402,9 @@ func (runtime *Runtime) resourcesReleased() bool {
 		return false
 	}
 	if runtime.timers != nil && runtime.timers.hasTimers() {
+		return false
+	}
+	if runtime.pendingCalls != nil && runtime.pendingCalls.hasPending() {
 		return false
 	}
 	runtime.servicesMu.RLock()

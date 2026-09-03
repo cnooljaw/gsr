@@ -47,18 +47,19 @@ func (state RuntimeState) String() string {
 type Runtime struct {
 	config Config
 
-	mu          sync.Mutex
-	state       RuntimeState
-	startDone   chan struct{}
-	stopDone    chan struct{}
-	stopQueued  bool
-	stopStarted bool
-	stopResult  error
-	closeResult error
-	lifecycle   *lifecycleCoordinator
-	dispatcher  *localDispatcher
-	timers      *timerManager
-	scheduler   *scheduler
+	mu           sync.Mutex
+	state        RuntimeState
+	startDone    chan struct{}
+	stopDone     chan struct{}
+	stopQueued   bool
+	stopStarted  bool
+	stopResult   error
+	closeResult  error
+	lifecycle    *lifecycleCoordinator
+	dispatcher   *localDispatcher
+	timers       *timerManager
+	pendingCalls *pendingCallManager
+	scheduler    *scheduler
 
 	serviceIDs *idAllocator
 	sessionIDs *idAllocator
@@ -95,9 +96,11 @@ func newRuntimeWithClock(config Config, clock runtimeClock) (*Runtime, error) {
 	}
 	runtime.dispatcher = &localDispatcher{runtime: runtime}
 	runtime.timers = newTimerManager(runtime, clock)
+	runtime.pendingCalls = newPendingCallManager(runtime)
 	runtime.scheduler = newScheduler(runtime)
 	runtime.lifecycle = newCoreLifecycleCoordinator(
 		runtime.timers,
+		runtime.pendingCalls,
 		&serviceLifecycle{runtime: runtime},
 		runtime.scheduler,
 	)

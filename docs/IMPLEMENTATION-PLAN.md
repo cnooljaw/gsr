@@ -77,7 +77,7 @@ Cluster 0–4
 
 ## Core 0.5：Runtime 组件生命周期骨架
 
-状态：基础协调器已完成，Core 1 已将 Service admission 和 Scheduler 以固定组件接入；Timer、PendingCall 等后续组件仍须按计划显式加入，不得恢复单一 `closeFn`。
+状态：基础协调器已完成，Core 1 已将 Service admission 和 Scheduler 以固定组件接入；Timer 与 PendingCall 已按计划作为独立组件加入，不得恢复单一 `closeFn`。
 
 实现：
 
@@ -194,6 +194,8 @@ Start
 
 ## Core 3：Call、PendingCall 与自动 Reply
 
+状态：已完成当前切片。已落地本地 `Call`、SessionID/PendingCall completion、Runtime 最大等待、调用方 cancellation、停止清理和安全错误转换；Redirect 的 Call session 转移与 Cluster Call 仍不在本切片。
+
 实现：
 
 - SessionID 分配和 PendingCall registry。
@@ -204,6 +206,8 @@ Start
 - self Call 拒绝。
 - caller Stop、target Stop、Runtime Close、timeout 和 admission 失败的 PendingCall 清理。
 - Domain/Runtime StatusError；未知 Handler error 和 panic 的安全转换。
+
+当前实现把 `PendingCall` 作为 Runtime-owned 生命周期组件，关闭顺序位于 Timer 之后、Service admission 之前；`Call` 使用同一 Runtime clock 观察 `MaxCallWait`，以便 FakeClock 在测试中确定性推进超时。
 
 验收：
 

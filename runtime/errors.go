@@ -33,6 +33,10 @@ const (
 	ErrorCodeUnknownCommand          ErrorCode = "runtime.unknown_command"
 	ErrorCodeInvalidCommandHandler   ErrorCode = "runtime.invalid_command_handler"
 	ErrorCodeInvalidCommandArguments ErrorCode = "runtime.invalid_command_arguments"
+	ErrorCodeInvalidCallContext      ErrorCode = "runtime.invalid_call_context"
+	ErrorCodeCallCycle               ErrorCode = "runtime.call_cycle"
+	ErrorCodeCallTimeout             ErrorCode = "runtime.call_timeout"
+	ErrorCodeHandlerFailed           ErrorCode = "runtime.handler_failed"
 )
 
 // StatusError is the single structured error/status shape used by Core. It
@@ -183,5 +187,29 @@ var (
 		ErrorClassRuntime,
 		ErrorCodeInvalidCommandArguments,
 		"command arguments are invalid",
+	)
+	// ErrInvalidCallContext means Call received a nil context.Context.
+	ErrInvalidCallContext error = NewStatusError(
+		ErrorClassRuntime,
+		ErrorCodeInvalidCallContext,
+		"call context is invalid",
+	)
+	// ErrCallCycle means a Service attempted to Call itself.
+	ErrCallCycle error = NewStatusError(
+		ErrorClassRuntime,
+		ErrorCodeCallCycle,
+		"self call is not allowed",
+	)
+	// ErrCallTimeout means Runtime MaxCallWait elapsed before Reply completion.
+	ErrCallTimeout error = NewStatusError(
+		ErrorClassRuntime,
+		ErrorCodeCallTimeout,
+		"call timed out",
+	)
+	// ErrHandlerFailed means a Handler returned an unclassified error.
+	ErrHandlerFailed error = NewStatusError(
+		ErrorClassRuntime,
+		ErrorCodeHandlerFailed,
+		"service Handler failed",
 	)
 )

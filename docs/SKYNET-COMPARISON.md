@@ -50,10 +50,10 @@ Skynet 的关闭顺序可概括为：timer 线程停止时间/socket 事件并�
 | 同一 Service 的 run-to-completion | Core 1/3 计划 | 一个 context 的 message queue 通常由一个 worker dispatch；但 `skynet.call()` 会 yield，服务仍可运行其它 coroutine/message | 有意不照搬 | GSR 当前 Handler 内 Call 等待时保留该 Service 执行权，不处理下一条消息；其它 Service 仍可运行。 |
 | `Self()` | Core 1 计划 | `skynet.self()` / `c.addresscommand("REG")` | 直接对应 | GSR 返回当前 Runtime 的 ServiceID；不返回可编码的全局或远端地址。 |
 | `Send(target, command, args...)` | Core 1 计划 | `skynet.send()`、`skynet.rawsend()` | 直接对应但边界更窄 | GSR 使用 `SessionID == 0`，返回值只代表本地 admission；Core Send 不直接理解 Node、Transport 或 `PTYPE`。 |
-| `Call(ctx, target, command, args...)` | Core 3 计划 | `skynet.call()`、`skynet.rawcall()` | 直接对应但语义更严格 | GSR 必须受 `MaxCallWait` 和调用方 context 的更早 deadline 约束，拒绝 self Call；Skynet 普通 `call` 本身没有统一最大等待时间。 |
-| `PendingCall` | Core 3 计划 | `session_id_coroutine`、`watching_session`、等待中的 Lua coroutine | 直接对应 | GSR 用独立 PendingCall completion 路径恢复原 Handler；Reply 不作为业务 Command 投递回 Mailbox。 |
+| `Call(ctx, target, command, args...)` | Core 3 已完成 | `skynet.call()`、`skynet.rawcall()` | 直接对应但语义更严格 | GSR 必须受 `MaxCallWait` 和调用方 context 的更早 deadline 约束，拒绝 self Call；Skynet 普通 `call` 本身没有统一最大等待时间。 |
+| `PendingCall` | Core 3 已完成 | `session_id_coroutine`、`watching_session`、等待中的 Lua coroutine | 直接对应 | GSR 用独立 PendingCall completion 路径恢复原 Handler；Reply 不作为业务 Command 投递回 Mailbox。 |
 | `SessionID uint64` | Core 0/3 计划 | context 内 session、`c.genid()`、`session_id_coroutine` 表 | 借鉴后重构 | GSR 零值表示 Send，非零表示 Call，并在 owner 生命周期内单调递增、耗尽即失败；Skynet 的 session 需要处理较小整数空间的回绕冲突。 |
-| Handler 返回 `(any, error)` 自动完成 Reply | Core 3 计划 | `skynet.ret()`、`skynet.retpack()`、`skynet.response()`、`PTYPE_RESPONSE` | 有意不照搬 | GSR 不提供手工或异步 Reply API；Runtime 根据 SessionID 恰好完成一次成功结果或结构化错误。 |
+| Handler 返回 `(any, error)` 自动完成 Reply | Core 3 已完成 | `skynet.ret()`、`skynet.retpack()`、`skynet.response()`、`PTYPE_RESPONSE` | 有意不照搬 | GSR 不提供手工或异步 Reply API；Runtime 根据 SessionID 恰好完成一次成功结果或结构化错误。 |
 | `ErrorClass`、`ErrorCode`、`StatusError` | Core 0/3 计划 | `PTYPE_ERROR`，通常是空 payload 或 Lua error 文本 | GSR 新增约束 | GSR 程序分支只看 Class/Code，Message 只用于安全诊断；未知 Handler error/panic 不透传内部 stack。 |
 
 ### Skynet `redirect` 的实际用途
@@ -86,7 +86,7 @@ GSR 只用 `SessionID == 0` 或 `SessionID > 0` 区分 Send/Call；Skynet 还把
 | `After(duration, command, args...)` | Core 2 计划 | `skynet.timeout(ti, func)` 和 C `skynet_timer.c` | 借鉴后重构 | Skynet 到期后恢复一个 Lua callback coroutine；GSR Timer 只向目标 Mailbox 投递普通 Command，Source 固定为 `ServiceID(0)`，创建者由 Timer owner 表达。 |
 | `CancelTimer(TimerID)` | Core 2 计划 | 没有同等的 TimerID 取消 API；通常通过 coroutine/session 状态、`skynet.killthread()` 等方式停止等待 | GSR 新增约束 | GSR Timer 是拥有者可识别的资源，取消与触发竞争最多产生一次结果；不暴露通用协程杀线程语义。 |
 | `TimerID uint64` | Core 0/2 计划 | timeout 使用的 session 和 `sleep_session`/`session_id_coroutine` 映射 | 借鉴后重构 | GSR TimerID 与 SessionID 分离，零值无效、单调分配；Timer 不拥有高于普通 Message 的 admission 优先级。 |
-| Service 内 Call 等待 | Core 3 计划 | `skynet.call()` → `coroutine.yield("SUSPEND")` → response/error 恢复 | 直接对应但执行模型不同 | GSR 挂起当前 Service runner；Skynet 挂起当前 Lua coroutine，允许同一 service 的其它 coroutine 继续推进。 |
+| Service 内 Call 等待 | Core 3 已完成 | `skynet.call()` → `coroutine.yield("SUSPEND")` → response/error 恢复 | 直接对应但执行模型不同 | GSR 挂起当前 Service runner；Skynet 挂起当前 Lua coroutine，允许同一 service 的其它 coroutine 继续推进。 |
 | 业务异步任务 | Core 4 计划 | `skynet.fork()`、`skynet.sleep()`、`skynet.wait()`、`skynet.wakeup()` | 有意不照搬 | GSR 业务不能直接启动 goroutine，也没有公共 `Runtime.Go/Fork`；并发必须由明确 owner 管理取消、上限、panic 和等待。 |
 | Result Command + `Revision`/`OperationID` fencing | Core 4/业务层 | Lua coroutine 继续执行或由 session 关联结果 | GSR 新增约束 | GSR 外部异步结果必须回到 Mailbox，由 Service 自己校验领域版本；Core 不用共享可变引用绕过 owner。 |
 
