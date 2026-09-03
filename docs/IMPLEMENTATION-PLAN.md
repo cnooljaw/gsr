@@ -236,6 +236,8 @@ Start
 
 第一轮本地 Call round-trip 基线（同一环境，`go test ./runtime -run '^$' -bench '^BenchmarkRuntimeCallRoundTrip$' -benchtime=100ms -benchmem`）：约 1.53 μs/op、584 B/op、10 allocs/op；计时覆盖 caller Mailbox admission、Call Pending、target Handler 和 completion，不包含 Cluster 编解码或网络延迟。另有 100 个并发 PendingCall 的 Stop 清理门禁测试。
 
+Timer 压力门禁已覆盖 10,000 个 Timer 的半数取消、半数到期和普通 Mailbox admission；测试等待 `Fired` 与 `Admitted` 同时收敛，明确接受 Inspection 的点时快照可能短暂看到中间状态。
+
 实现唯一只读 Inspection，至少包含：
 
 - Runtime 状态。

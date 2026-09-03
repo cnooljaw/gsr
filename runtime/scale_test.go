@@ -209,6 +209,39 @@ func TestRuntimeScale10000TimersReportsBaseline(t *testing.T) {
 	}
 }
 
+// 验证 10,000 个 Timer 的取消与触发竞争保持一次性计数，并通过普通 Mailbox admission。
+func TestRuntimeScaleTimersCancelAndFire(t *testing.T) {
+	clock := newFakeClock()
+	const timerCount = 10000
+	runtime := newTimerTestRuntime(t, clock, Config{MailboxCapacity: timerCount})
+	service := &timerRecordingService{events: make(chan timerEvent, timerCount)}
+	if _, err := runtime.CreateService(context.Background(), service); err != nil {
+		t.Fatalf("CreateService() error = %v", err)
+	}
+	timerIDs := make([]TimerID, 0, timerCount)
+	for timerIndex := 0; timerIndex < timerCount; timerIndex++ {
+		timerID, err := service.context.After(time.Second, timerTestCommand, timerIndex)
+		if err != nil {
+			t.Fatalf("After(%d) error = %v", timerIndex, err)
+		}
+		timerIDs = append(timerIDs, timerID)
+	}
+	for timerIndex := 0; timerIndex < timerCount; timerIndex += 2 {
+		if !service.context.CancelTimer(timerIDs[timerIndex]) {
+			t.Fatalf("CancelTimer(%d) returned false", timerIndex)
+		}
+	}
+	clock.Advance(time.Second)
+	const expectedCancelled = timerCount / 2
+	const expectedFired = timerCount - expectedCancelled
+	inspection := waitRuntimeInspection(t, runtime, func(value RuntimeInspection) bool {
+		return value.TimerCount == 0 && value.Metrics.TimersFired == expectedFired && value.Metrics.TimersAdmitted == expectedFired
+	})
+	if inspection.Metrics.TimersCreated != timerCount || inspection.Metrics.TimersCancelled != expectedCancelled || inspection.Metrics.TimersFired != expectedFired || inspection.Metrics.TimersAdmitted != expectedFired || inspection.Metrics.TimerAdmissionRejected != 0 {
+		t.Fatalf("Timer lifecycle inspection = %#v, want %d cancelled and %d admitted fires", inspection, expectedCancelled, expectedFired)
+	}
+}
+
 // BenchmarkRuntimeCreateTimers10000 measures the current one-waiter-per-Timer
 // implementation at the requested 10,000-Timer scale.
 func BenchmarkRuntimeCreateTimers10000(b *testing.B) {
