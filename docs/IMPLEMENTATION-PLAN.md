@@ -238,6 +238,8 @@ Start
 
 Timer 压力门禁已覆盖 10,000 个 Timer 的半数取消、半数到期和普通 Mailbox admission；测试等待 `Fired` 与 `Admitted` 同时收敛，明确接受 Inspection 的点时快照可能短暂看到中间状态。
 
+关闭收敛门禁已覆盖同一 Runtime 同时存在 PendingCall、Timer 和运行中 Handler 的场景：Stop 先清理等待状态，再等待 Handler 真实返回；Close 完成后 Inspection 必须只报告 `Closed` 和零 Core 残留资源。
+
 实现唯一只读 Inspection，至少包含：
 
 - Runtime 状态。

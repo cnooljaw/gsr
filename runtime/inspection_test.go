@@ -200,6 +200,57 @@ func TestRuntimeInspectReturnsIndependentSnapshots(t *testing.T) {
 	}
 }
 
+// 验证包含 Timer 和 PendingCall 的 Runtime 关闭后进入 Closed，并且 Inspection 不再报告 Core 残留资源。
+func TestRuntimeInspectReportsClosedResourceQuiescence(t *testing.T) {
+	clock := newFakeClock()
+	runtime := newTimerTestRuntime(t, clock, Config{})
+	target := newBlockingCallTargetService()
+	targetID, err := runtime.CreateService(context.Background(), target)
+	if err != nil {
+		t.Fatalf("CreateService(target) error = %v", err)
+	}
+	caller := &callService{target: targetID, outcomes: make(chan callOutcome, 1)}
+	callerID, err := runtime.CreateService(context.Background(), caller)
+	if err != nil {
+		t.Fatalf("CreateService(caller) error = %v", err)
+	}
+	if err := runtime.Send(callerID, callTestCommand); err != nil {
+		t.Fatalf("Send(call) error = %v", err)
+	}
+	waitSignal(t, target.entered)
+	timerService := &timerRecordingService{events: make(chan timerEvent, 1)}
+	if _, err := runtime.CreateService(context.Background(), timerService); err != nil {
+		t.Fatalf("CreateService(timer) error = %v", err)
+	}
+	if _, err := timerService.context.After(time.Hour, timerTestCommand); err != nil {
+		t.Fatalf("After() error = %v", err)
+	}
+	inspection := waitRuntimeInspection(t, runtime, func(value RuntimeInspection) bool {
+		return value.PendingCallCount == 1 && value.TimerCount == 1
+	})
+	if inspection.PendingCallCount != 1 || inspection.TimerCount != 1 {
+		t.Fatalf("active resource inspection = %#v, want one PendingCall and Timer", inspection)
+	}
+	stopResult := make(chan error, 1)
+	go func() {
+		stopResult <- runtime.Stop(context.Background())
+	}()
+	if outcome := waitCallOutcome(t, caller.outcomes); !errors.Is(outcome.err, ErrRuntimeStopping) {
+		t.Fatalf("Call during Stop error = %v, want ErrRuntimeStopping", outcome.err)
+	}
+	target.releaseNow()
+	if err := <-stopResult; err != nil {
+		t.Fatalf("Stop() error = %v", err)
+	}
+	if err := runtime.Close(); err != nil {
+		t.Fatalf("Close() error = %v", err)
+	}
+	inspection = runtime.Inspect()
+	if inspection.State != RuntimeClosed || len(inspection.Services) != 0 || inspection.PendingCallCount != 0 || inspection.TimerCount != 0 || inspection.Metrics.TimersCancelled != 1 {
+		t.Fatalf("closed resource inspection = %#v, want Closed with no residual resources", inspection)
+	}
+}
+
 // 验证 Handler error、panic 和 shutdown deadline 都进入只读故障计数或 Service 快照。
 func TestRuntimeInspectReportsFailureCountersAndDeadline(t *testing.T) {
 	runtime := newCallTestRuntime(t, Config{ShutdownTimeout: 10 * time.Millisecond})
