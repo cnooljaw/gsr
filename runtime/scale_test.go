@@ -2,6 +2,7 @@ package runtime
 
 import (
 	"context"
+	"errors"
 	stdruntime "runtime"
 	"testing"
 	"time"
@@ -91,6 +92,89 @@ func BenchmarkRuntimeSendHotService(b *testing.B) {
 	}
 }
 
+// 验证 100 个并发 PendingCall 在 Runtime Stop 时全部完成清理，并等待目标 Handler 真实返回。
+func TestRuntimeScalePendingCallsAreCleanedOnStop(t *testing.T) {
+	runtime := newCallTestRuntime(t, Config{})
+	target := newBlockingCallTargetService()
+	targetID, err := runtime.CreateService(context.Background(), target)
+	if err != nil {
+		t.Fatalf("CreateService(target) error = %v", err)
+	}
+	const callerCount = 100
+	callers := make([]*callService, 0, callerCount)
+	for callerIndex := 0; callerIndex < callerCount; callerIndex++ {
+		caller := &callService{target: targetID, outcomes: make(chan callOutcome, 1)}
+		callerID, err := runtime.CreateService(context.Background(), caller)
+		if err != nil {
+			t.Fatalf("CreateService(caller %d) error = %v", callerIndex, err)
+		}
+		if err := runtime.Send(callerID, callTestCommand); err != nil {
+			t.Fatalf("Send(caller %d) error = %v", callerIndex, err)
+		}
+		callers = append(callers, caller)
+	}
+	waitSignal(t, target.entered)
+	inspection := waitRuntimeInspection(t, runtime, func(value RuntimeInspection) bool {
+		return value.PendingCallCount == callerCount
+	})
+	if inspection.PendingCallCount != callerCount {
+		t.Fatalf("PendingCallCount before Stop = %d, want %d", inspection.PendingCallCount, callerCount)
+	}
+	stopResult := make(chan error, 1)
+	go func() {
+		stopResult <- runtime.Stop(context.Background())
+	}()
+	for callerIndex, caller := range callers {
+		if outcome := waitCallOutcome(t, caller.outcomes); !errors.Is(outcome.err, ErrRuntimeStopping) {
+			t.Fatalf("caller %d outcome error = %v, want ErrRuntimeStopping", callerIndex, outcome.err)
+		}
+	}
+	inspection = waitRuntimeInspection(t, runtime, func(value RuntimeInspection) bool {
+		return value.PendingCallCount == 0
+	})
+	if inspection.PendingCallCount != 0 {
+		t.Fatalf("PendingCallCount during Stop = %d, want 0", inspection.PendingCallCount)
+	}
+	target.releaseNow()
+	if err := <-stopResult; err != nil {
+		t.Fatalf("Stop() error = %v", err)
+	}
+}
+
+// BenchmarkRuntimeCallRoundTrip measures a local Call from admission through Handler completion.
+func BenchmarkRuntimeCallRoundTrip(b *testing.B) {
+	runtime, err := NewRuntime(Config{MailboxCapacity: b.N + 1})
+	if err != nil {
+		b.Fatalf("NewRuntime() error = %v", err)
+	}
+	if err := runtime.Start(); err != nil {
+		b.Fatalf("Start() error = %v", err)
+	}
+	targetID, err := runtime.CreateService(context.Background(), benchmarkService{})
+	if err != nil {
+		b.Fatalf("CreateService(target) error = %v", err)
+	}
+	caller := &callBenchmarkService{target: targetID, results: make(chan error, 1)}
+	callerID, err := runtime.CreateService(context.Background(), caller)
+	if err != nil {
+		b.Fatalf("CreateService(caller) error = %v", err)
+	}
+	b.ReportAllocs()
+	b.ResetTimer()
+	for messageIndex := 0; messageIndex < b.N; messageIndex++ {
+		if err := runtime.Send(callerID, scaleCallCommand); err != nil {
+			b.Fatalf("Send(%d) error = %v", messageIndex, err)
+		}
+		if err := <-caller.results; err != nil {
+			b.Fatalf("Call(%d) error = %v", messageIndex, err)
+		}
+	}
+	b.StopTimer()
+	if err := runtime.Close(); err != nil {
+		b.Fatalf("Close() error = %v", err)
+	}
+}
+
 // 验证 10,000 个未触发 Timer 可以完成登记、观测和关闭，记录当前 Timer 等待 goroutine 基线。
 func TestRuntimeScale10000TimersReportsBaseline(t *testing.T) {
 	clock := newFakeClock()
@@ -154,6 +238,26 @@ func BenchmarkRuntimeCreateTimers10000(b *testing.B) {
 }
 
 const scaleSendCommand CommandID = 0x04000401
+const scaleCallCommand CommandID = 0x04000402
+
+type callBenchmarkService struct {
+	target  ServiceID
+	results chan error
+}
+
+func (*callBenchmarkService) OnStart(context.Context, ServiceContext) error {
+	return nil
+}
+
+func (service *callBenchmarkService) Handle(commandContext CommandContext, _ CommandID, _ ...any) (any, error) {
+	_, err := commandContext.Call(context.Background(), service.target, scaleCallCommand)
+	service.results <- err
+	return nil, nil
+}
+
+func (*callBenchmarkService) OnStop(context.Context) error {
+	return nil
+}
 
 func benchmarkRuntimeCreateServices(b *testing.B, serviceCount int) {
 	b.ReportAllocs()

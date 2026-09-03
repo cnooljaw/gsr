@@ -234,6 +234,8 @@ Start
 
 第一轮 Hot Service Send 基线（同一环境，`go test ./runtime -run '^$' -bench '^BenchmarkRuntimeSendHotService$' -benchtime=100ms -benchmem`）：约 166 ns/op、211 B/op、3 allocs/op；Mailbox 容量按 benchmark 请求数设置，Handler 使用空实现，计时只覆盖本地 Send admission，不代表业务处理吞吐。
 
+第一轮本地 Call round-trip 基线（同一环境，`go test ./runtime -run '^$' -bench '^BenchmarkRuntimeCallRoundTrip$' -benchtime=100ms -benchmem`）：约 1.53 μs/op、584 B/op、10 allocs/op；计时覆盖 caller Mailbox admission、Call Pending、target Handler 和 completion，不包含 Cluster 编解码或网络延迟。另有 100 个并发 PendingCall 的 Stop 清理门禁测试。
+
 实现唯一只读 Inspection，至少包含：
 
 - Runtime 状态。
