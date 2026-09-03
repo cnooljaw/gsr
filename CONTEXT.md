@@ -20,7 +20,9 @@
 - **Service Runner**：由 Runtime 为每个 Running Service 管理的 goroutine，串行消费该 Service 的 Mailbox；其生命周期和 recovery 属于 Scheduler，不属于业务。
 - **Service 组装**：`Runtime.Start()` 只启动 Runtime-owned 基础设施；应用层构造 `Service` 实例，并在 Runtime Running 后通过 `CreateService(ctx, service) (ServiceID, error)` 逐个交给 Runtime 管理，不使用工厂或 Bootstrap Service。
 - **OnStart 失败**：只回滚当前 Service，Runtime 保持 Running，可以继续创建其它 Service；失败实例不发布 ServiceID，且该 ID 永不复用。Runtime 至多调用一次 `OnStop` 为部分初始化资源清理。
-- **ClusterEnvelope**：Cluster/Transport 使用的可编码网络载体，显式区分 request、response 和 error frame。远端 relay 解码请求后创建新的本地 Message；本地投递不创建或编码 ClusterEnvelope。
+- **ClusterEnvelope**：Cluster/Transport 使用的可编码网络载体，显式区分 request、response 和 error frame；不携带业务或 wire version。远端 relay 解码请求后创建新的本地 Message；本地投递不创建或编码 ClusterEnvelope。
+- **FrameKind**：ClusterEnvelope 的显式方向标签，第一版只有 Request、Response 和 Error；不能只凭 Session 是否为零推断 frame 方向。
+- **ServiceTarget**：ClusterEnvelope 的远端目标值；必须且只能填写当前远端 Runtime 的临时 ServiceID 或由外层解析的 ServiceName。它不把 NodeID、Epoch、Lease 或 Generation 编进 Core 地址。
 - **ClusterClient**：初始化时绑定一个 Source ServiceID 的 per-Service 窄 client；业务使用 `Send(node, target, ...)` / `Call(node, target, ...)`，不能覆盖 Source。
 - **Redirect / Relay**：仅供 Runtime 或明确受信任的 Adapter/Transport 使用的消息转发能力。它转发 Runtime-owned Message 或 relay token，不接受业务任意指定的 Source；首版只考虑单向转发，不转移 Call 的 PendingCall/Session。
 - **ClusterSessionID**：`uint64` 形式的 Cluster 请求关联号；零表示 Send，非零表示 Call。它由 Cluster 管理、在当前实例内单调分配且不回绕复用，不要求与 Core SessionID 相同。
@@ -32,6 +34,7 @@
 - **Admission**：Mailbox 或出站队列对消息的本地接受动作。Send 返回 nil 只说明 admission 成功，不说明目标 Handler 已执行或业务操作已成功。
 - **NodeSender**：Cluster 为一个远端 Node 唯一管理的 outbound 发送者，合并并发建连并负责自动重连，但不自动重放结果不确定的业务请求。
 - **ConnectionAgent**：Cluster 为一条 inbound socket 创建的接收适配器，负责解码远端帧、投递本地 Service 并沿原连接返回结果。
+- **InMemoryTransport**：Cluster 0 提供的同步、确定性进程内 Transport；它在接收边界 Clone Envelope，供测试和后续 sender/agent 使用，不代表生产 TCP、重连或远端执行语义。
 - **Timer owner**：登记 Timer 的 Service/Runtime owner。它用于校验取消权限和表达 Timer 创建者；Timer 到期消息的 Source 不使用 owner 的 ServiceID，而固定为零值。
 - **RuntimeState**：Runtime 的生命周期状态。公开顺序为 `Created → Starting → Running → Stopping → Stopped → Closed`；`Starting` 表示 Runtime-owned Core 组件正在启动，`Stopped` 表示停止流程完成，`Closed` 表示 Runtime-owned 资源已最终释放。
 - **Lifecycle Coordinator**：Runtime 内部按固定 start/stop 计划编排 Core 组件的生命周期；它不拥有组件资源，也不是可无限注册的业务插件容器。

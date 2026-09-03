@@ -349,15 +349,41 @@ origin Service
 - `clusterClient.Send` 返回 `error`。返回 nil 只表示请求已被本地 Cluster 边界接受或入队，不表示远端 Handler 已执行，更不表示持久化成功。
 - 无路由、已知断连、编码失败、出站队列满或关闭必须返回 Runtime Error；需要确认业务结果时使用 Call，并为有歧义的网络失败设计 RequestID 与幂等。
 
+Cluster 0 先提供独立于 Runtime 的值边界和可替换 Transport：
+
+```go
+type ServiceTarget struct {
+	ServiceID   runtime.ServiceID
+	ServiceName ServiceName
+}
+
+type ClusterEnvelope struct {
+	Kind    FrameKind
+	Session ClusterSessionID
+	Target  ServiceTarget
+	Command runtime.CommandID
+	Payload []byte
+	Error   *runtime.StatusError
+}
+
+type Transport interface {
+	Register(NodeID, Receiver) error
+	Unregister(NodeID) error
+	Send(from NodeID, to NodeID, envelope ClusterEnvelope) error
+	Close() error
+}
+```
+
+`ClusterEnvelope.Validate()` 在 Transport admission 前检查 frame kind、目标、Command、Session 和 Error/Payload 组合；`Clone()` 复制 `Payload` 与 `StatusError`，避免接收方修改发送方持有的可变值。当前 `InMemoryTransport` 是同步、确定性的进程内测试边界，具有有限 payload 上限和最终 `Close` 状态；它不承诺 TCP、重连、出站队列或远端 Handler 已执行。`ClusterEnvelope` 不携带 wire version；未来兼容由 Codec framing 或连接握手负责。生产 `NodeSender`、`ConnectionAgent`、codec 和 framing 在后续 Cluster 切片实现。
+
 ### 6.3 Cluster wire 与连接模型
 
 ClusterEnvelope 至少编码以下逻辑字段：
 
 ```text
-ProtocolVersion
 FrameKind: Request / Response / Error
 ClusterSessionID
-Target ServiceID
+Target ServiceID or ServiceName
 CommandID
 Payload or ErrorClass/ErrorCode/Message
 ```
@@ -367,7 +393,7 @@ Error frame 实际携带 `ErrorClass + ErrorCode + Message`；Message 只用于�
 - 默认 codec 支持 nil、bool、有符号/无符号整数、浮点数、string、`[]byte`，以及由这些值递归组成的 list 和 string-key map。
 - 领域 struct 通过启动阶段注册的 Command codec 转换；不直接编码任意 pointer、func、chan、unsafe pointer、循环引用或进程内资源句柄。
 - codec 与 Command 在启动阶段注册；重复注册属于 programmer error，允许 panic 并阻止 Runtime/Cluster 启动。
-- 能够确认完整帧边界的未知版本、未知 Command 或 payload 解码失败帧直接丢弃，并记录限频诊断与指标。
+- 能够确认完整帧边界的未知 framing version、未知 Command 或 payload 解码失败帧直接丢弃，并记录限频诊断与指标。
 - 非法长度、超过最大帧、无法确认下一帧边界或认证失败不能安全丢弃，必须关闭该连接。
 
 连接组织参考 Skynet：

@@ -269,13 +269,17 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 
 ### Cluster 0：协议与内存传输
 
+状态：已完成第一条基础子切片。`cluster` package 已提供 `NodeID`、`ClusterSessionID`、`FrameKind`、`ServiceTarget`、`ClusterEnvelope` 的值类型与结构校验，以及确定性的 `InMemoryTransport`；codec、Command registry、NodeSender、ConnectionAgent 和 TCP framing 仍按后续切片推进。
+
 - `NodeID`、`ClusterSessionID`、`ClusterEnvelope`。
 - 显式 Request、Response、Error frame。
 - `StatusError` 的 Class/Code/Message wire 表达。
 - 远端地址只使用 NodeID 与 ServiceName/Discovery 或当前远端临时 ServiceID；Runtime 只负责路由、投递和连接恢复，不负责业务所有权、一致性或过期判断。
+- `ClusterEnvelope.Validate` 在进入任意 Transport 前检查 frame kind、Session、目标和结构化错误；`Clone` 在 admission 边界隔离 payload 与错误值。
 - 默认值 codec、Command codec registry 和启动期重复注册 panic。
 - 帧长、容器深度和 payload 上限。
-- InMemoryTransport 连接两个 Runtime，本地路径不执行 Cluster 编码。
+- `InMemoryTransport` 以同步回调连接两个节点，作为测试和后续 sender/agent 的可替换边界；本地路径不执行 Cluster 编码。
+- `ClusterEnvelope` 不携带业务或 wire version；未来版本兼容由 Transport/Codec 的 framing 或连接握手单独负责。
 
 ### Cluster 1：远程 Send
 
@@ -303,7 +307,7 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 ### Cluster 4：故障与资源收尾
 
 - FaultTransport 注入半写入、断线、重复响应、损坏帧和出站队列满。
-- 边界可信的未知版本、未知 Command 和解码失败帧丢弃并限频诊断。
+- 边界可信的未知 framing version、未知 Command 和解码失败帧丢弃并限频诊断。
 - 非法长度、越界、认证失败或无法恢复帧边界时关闭连接。
 - 双节点集成、race、关闭和连接泄漏门禁。
 

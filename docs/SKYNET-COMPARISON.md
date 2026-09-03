@@ -95,11 +95,12 @@ GSR 只用 `SessionID == 0` 或 `SessionID > 0` 区分 Send/Call；Skynet 还把
 
 | GSR 概念/API | GSR 阶段 | Skynet 对应概念 | 关系 | 关键区别 |
 | --- | --- | --- | --- | --- |
-| Cluster（Core 之外） | Cluster 0–4 计划 | Harbor、`skynet.cluster`、`clusterd`、`clusterproxy`、`clustersender`、`clusteragent` | 直接对应架构方向 | GSR 明确禁止 NodeID、Envelope、Transport 进入 Core Message 或 ServiceID；Skynet 通过远端 handle/Harbor 和服务组合完成路由。 |
-| `NodeID` | Cluster 计划 | `cluster.call(node, address, ...)` 的 node 名称、Harbor 编号 | 直接对应 | GSR NodeID 是独立路由维度，不能从 ServiceID 推断；远端目标必须由 Cluster 层解析。 |
+| Cluster（Core 之外） | Cluster 0 基础子切片已完成，1–4 计划 | Harbor、`skynet.cluster`、`clusterd`、`clusterproxy`、`clustersender`、`clusteragent` | 直接对应架构方向 | GSR 先锁定 Envelope/Transport 值边界，再逐步接入 sender、agent 和 TCP；明确禁止 NodeID、Envelope、Transport 进入 Core Message 或 ServiceID。 |
+| `NodeID` | Cluster 0 | `cluster.call(node, address, ...)` 的 node 名称、Harbor 编号 | 直接对应 | GSR NodeID 是独立路由维度，不能从 ServiceID 推断；远端目标必须由 Cluster 层解析。 |
 | `ClusterClient`（绑定 Source ServiceID） | Cluster 计划 | `cluster.call()`、`cluster.send()`，以及按 node 缓存 sender | 借鉴后重构 | GSR 使用初始化时绑定 Source 的 per-Service client；禁止全局变量、goroutine-local 或调用栈推断当前 Service。 |
-| `ClusterEnvelope` | Cluster 计划 | `cluster.packrequest/packresponse`、`PTYPE_HARBOR`、socket channel 帧 | 借鉴后重构 | GSR Envelope 显式区分 request/response/error、版本、ClusterSessionID、Target、Command 和结构化错误；本地 Message 不变成网络包。 |
-| `ClusterSessionID` | Cluster 计划 | cluster sender 的 session、`cluster.unpackresponse()` 返回的关联号 | 直接对应但独立 | GSR ClusterSessionID 与 Core SessionID 分属不同 owner，不要求数值相同；零值仍表示 Send。 |
+| `ClusterEnvelope` | Cluster 0 | `cluster.packrequest/packresponse`、`PTYPE_HARBOR`、socket channel 帧 | 借鉴后重构 | GSR Envelope 显式区分 request/response/error、ClusterSessionID、ServiceTarget、Command 和结构化错误；本地 Message 不变成网络包，并在 Transport admission 前校验和 Clone。版本兼容留给未来 framing/握手。 |
+| `ClusterSessionID` | Cluster 0 | cluster sender 的 session、`cluster.unpackresponse()` 返回的关联号 | 直接对应但独立 | GSR ClusterSessionID 与 Core SessionID 分属不同 owner，不要求数值相同；零值仍表示 Send。 |
+| `InMemoryTransport` | Cluster 0 | Skynet 的 socket channel 测试替身/节点间连接 | 借鉴后重构 | GSR 提供同步、可确定的进程内 Transport 作为测试边界；它不模拟 TCP、重连、队列或远端执行成功，生产 sender/agent 仍在后续切片实现。 |
 | `NodeSender` | Cluster 计划 | `clusterd.lua` 的 `node_sender[node]` + `clustersender.lua` | 直接对应 | 每个远端 Node 一个 outbound sender，合并并发建连；断线自动重连，但不自动重放结果不确定的业务请求。 |
 | `ConnectionAgent` | Cluster 计划 | `clusterd.lua` 为每条 inbound fd 创建的 `clusteragent` | 直接对应 | 每条入站 socket 独立 agent；响应沿原连接返回，不与同一 Node 的 outbound sender 混成一个所有者。 |
 | 远端 Service 地址 | Cluster 计划 | 远端 handle、`@name`、`cluster.proxy(node, name)` | 有意不照搬 | GSR 的 ServiceID 永远是本地临时地址；远端稳定身份使用 NodeID + ServiceName/Discovery，具体实例解析留在 Cluster；不引入 Epoch/Lease/Generation，也不由 Runtime 判断业务资源所有权、一致性或过期。 |
