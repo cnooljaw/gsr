@@ -60,6 +60,7 @@ type Runtime struct {
 	timers       *timerManager
 	pendingCalls *pendingCallManager
 	scheduler    *scheduler
+	metrics      runtimeMetrics
 
 	serviceIDs *idAllocator
 	sessionIDs *idAllocator
@@ -295,6 +296,7 @@ func (runtime *Runtime) finishStop() {
 	shutdownContext, cancel := context.WithTimeout(context.Background(), runtime.config.ShutdownTimeout)
 	defer cancel()
 	result := runtime.lifecycle.stop(shutdownContext)
+	runtime.recordStopResult(result)
 
 	runtime.mu.Lock()
 	runtime.stopResult = result

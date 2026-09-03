@@ -138,6 +138,16 @@ func (scheduler *scheduler) hasRunners() bool {
 	return len(scheduler.runners) > 0
 }
 
+func (scheduler *scheduler) runnerTracked(id ServiceID) bool {
+	if scheduler == nil {
+		return false
+	}
+	scheduler.mu.Lock()
+	defer scheduler.mu.Unlock()
+	_, exists := scheduler.runners[id]
+	return exists
+}
+
 // CreateService admits one already-constructed Service after Runtime.Start.
 // The ServiceID is consumed even when OnStart fails and is never reused.
 func (runtime *Runtime) CreateService(ctx context.Context, service Service) (ServiceID, error) {
@@ -259,8 +269,13 @@ func (dispatcher *localDispatcher) dispatchTimer(target ServiceID, command Comma
 	})
 }
 
-func (dispatcher *localDispatcher) enqueue(message Message) error {
+func (dispatcher *localDispatcher) enqueue(message Message) (err error) {
 	runtime := dispatcher.runtime
+	defer func() {
+		if err != nil {
+			runtime.recordAdmissionRejected()
+		}
+	}()
 	runtime.mu.Lock()
 	if runtime.state != RuntimeRunning {
 		err := runtime.runtimeAdmissionErrorLocked()

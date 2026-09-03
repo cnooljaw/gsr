@@ -557,6 +557,36 @@ Runtime 不使用一个不断增长的 `closeFn` 承载所有清理逻辑。Runt
 - `Failed`、`Quarantined`、`Degraded` 等作为停止原因或外层监督状态，不加入第一版 Core 状态机。
 - Timer 在 Service 停止后不得继续投递。
 
+### 10.2 Runtime Inspection
+
+Core 提供唯一的只读 `Runtime.Inspect() RuntimeInspection` 快照入口，供诊断、测试和关闭门禁使用。快照只包含值，不暴露 Service、Mailbox、runner 或 PendingCall 的内部指针；并发操作可能只反映在快照的一部分。
+
+```go
+type RuntimeInspection struct {
+	State            RuntimeState
+	Services         []ServiceInspection
+	PendingCallCount int
+	TimerCount       int
+	Metrics          RuntimeMetricsSnapshot
+}
+
+type ServiceInspection struct {
+	ID                       ServiceID
+	State                    ServiceState
+	MailboxDepth             int
+	MailboxCapacity          int
+	RunnerActive             bool
+	RunnerCompleted          bool
+	ShutdownDeadlineExceeded bool
+}
+
+func (r *Runtime) Inspect() RuntimeInspection
+```
+
+`Services` 按 ServiceID 升序返回。`RunnerActive`、`RunnerCompleted` 和 `ShutdownDeadlineExceeded` 分别表达 runner 当前是否仍被 Scheduler 追踪、是否真实完成，以及关闭 context 是否已经超过 deadline；超时不代表 Go Handler 或 `OnStop` 被强杀。
+
+`RuntimeMetricsSnapshot` 至少包含 admission rejected、Handler error、panic、Call timeout、Timer 创建/取消/触发/投递失败和 Stop timeout 计数。计数是 Runtime 生命周期内单调累计值，Inspect 不会重置它们。
+
 ## 11. Core 不变量测试
 
 实现 Runtime 前先用测试锁死：

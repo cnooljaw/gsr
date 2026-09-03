@@ -39,6 +39,40 @@ type CommandContext interface {
 	Source() ServiceID
 }
 
+// ServiceState is the observable lifecycle state of a registered Service.
+type ServiceState uint8
+
+const (
+	// ServiceStateStarting means OnStart has not finished publishing the Service.
+	ServiceStateStarting ServiceState = iota
+	// ServiceStateRunning means the Service accepts ordinary messages.
+	ServiceStateRunning
+	// ServiceStateStopping means the Service rejects new messages and is draining its runner.
+	ServiceStateStopping
+	// ServiceStateStopped means the Service runner and OnStop have completed.
+	ServiceStateStopped
+	// ServiceStateFailed means the Service stopped because of a runtime failure.
+	ServiceStateFailed
+)
+
+// String returns the stable display name of a ServiceState.
+func (state ServiceState) String() string {
+	switch state {
+	case ServiceStateStarting:
+		return "Starting"
+	case ServiceStateRunning:
+		return "Running"
+	case ServiceStateStopping:
+		return "Stopping"
+	case ServiceStateStopped:
+		return "Stopped"
+	case ServiceStateFailed:
+		return "Failed"
+	default:
+		return "Unknown"
+	}
+}
+
 type serviceState uint8
 
 const (
@@ -58,13 +92,14 @@ type serviceInstance struct {
 	context *serviceContext
 	done    chan struct{}
 
-	mu              sync.Mutex
-	state           serviceState
-	stopRequested   bool
-	stopContext     context.Context
-	stopCancel      context.CancelFunc
-	stopResult      error
-	onStopCompleted bool
+	mu                   sync.Mutex
+	state                serviceState
+	stopRequested        bool
+	stopContext          context.Context
+	stopCancel           context.CancelFunc
+	stopResult           error
+	stopDeadlineExceeded bool
+	onStopCompleted      bool
 }
 
 func newServiceInstance(runtime *Runtime, id ServiceID, service Service) *serviceInstance {
@@ -149,6 +184,9 @@ func (instance *serviceInstance) finishStop() {
 	instance.onStopCompleted = true
 	stopContext := instance.stopContext
 	stopCancel := instance.stopCancel
+	if contextDeadlineExceeded(stopContext) {
+		instance.stopDeadlineExceeded = true
+	}
 	instance.mu.Unlock()
 
 	if stopContext == nil {
@@ -162,9 +200,26 @@ func (instance *serviceInstance) finishStop() {
 	}
 
 	instance.mu.Lock()
+	if contextDeadlineExceeded(stopContext) {
+		instance.stopDeadlineExceeded = true
+	}
 	instance.stopResult = onStopErr
 	instance.state = serviceStopped
 	instance.mu.Unlock()
+}
+
+func (instance *serviceInstance) deadlineExceeded() bool {
+	instance.mu.Lock()
+	if contextDeadlineExceeded(instance.stopContext) {
+		instance.stopDeadlineExceeded = true
+	}
+	exceeded := instance.stopDeadlineExceeded
+	instance.mu.Unlock()
+	return exceeded
+}
+
+func contextDeadlineExceeded(ctx context.Context) bool {
+	return ctx != nil && errors.Is(ctx.Err(), context.DeadlineExceeded)
 }
 
 func (instance *serviceInstance) result() error {
@@ -231,9 +286,10 @@ func (runtime *Runtime) executeMessage(instance *serviceInstance, message Messag
 	return result, err
 }
 
-func (runtime *Runtime) recordHandlerError(_ *serviceInstance, _ Message, _ error) {
-	// Send has no completion channel; Core4 Inspection will expose this
-	// diagnostic without changing the fire-and-forget admission contract.
+func (runtime *Runtime) recordHandlerError(_ *serviceInstance, _ Message, err error) {
+	// Send has no completion channel; Inspection exposes this diagnostic
+	// without changing the fire-and-forget admission contract.
+	runtime.recordHandlerMetric(err)
 }
 
 func (runtime *Runtime) failureContext() (context.Context, context.CancelFunc) {

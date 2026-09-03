@@ -37,4 +37,6 @@
 - **Lifecycle Coordinator**：Runtime 内部按固定 start/stop 计划编排 Core 组件的生命周期；它不拥有组件资源，也不是可无限注册的业务插件容器。
 - **Quiesce**：关闭流程中停止新 admission、入站和重连的阶段；它不等同于已经等待所有已接受任务完成。
 - **Stop / Close**：`Runtime.Stop(ctx)` 负责关闭 admission 并有序停止全部 Core 组件，`Runtime.Close()` 负责 Stop 完成后的最终资源释放；二者幂等，Stop 后不得再次 Start。`Close()` 使用 `ShutdownTimeout`，没有调用方 context。
+- **RuntimeInspection**：`Runtime.Inspect()` 返回的只读值快照，包含 Runtime 状态、Service/ mailbox/runner 状态、PendingCall/Timer 数量和基础故障计数；它不暴露 Runtime-owned 内部对象。
+- **ServiceInspection**：RuntimeInspection 中一个 Service 的值快照，包含 ServiceID、生命周期状态、Mailbox 深度、runner 完成状态和 shutdown deadline 是否已超过。
 - **ShutdownTimeout**：Runtime 关闭全部 Core 组件共享的内部时间预算。Go 无法强杀不响应取消的 Handler、OnStart 或 OnStop；超时后的残留任务和资源状态必须继续可观测。

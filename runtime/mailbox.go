@@ -76,6 +76,12 @@ func (mailbox *mailbox) stop() {
 	mailbox.signal()
 }
 
+func (mailbox *mailbox) snapshot() (depth, capacity int) {
+	mailbox.mu.Lock()
+	defer mailbox.mu.Unlock()
+	return len(mailbox.queue), mailbox.capacity
+}
+
 func (mailbox *mailbox) signal() {
 	select {
 	case mailbox.wake <- struct{}{}:

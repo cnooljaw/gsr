@@ -20,6 +20,7 @@
 | GSR 概念 | GSR 阶段 | Skynet 对应概念 | 关系 | 关键区别 |
 | --- | --- | --- | --- | --- |
 | `Runtime`、`Start`、`Stop`、`Close` | Core 0.5 | 一个 Skynet node：`skynet_start()`、全局 `G_NODE`、worker/timer/socket/monitor 线程 | 借鉴后重构 | Skynet 主要是进程级全局运行时；GSR 是可创建、可测试、可明确关闭的 Go 对象。`Stop(ctx)` 有序停止，`Close()` 最终释放且不允许重启。 |
+| `Runtime.Inspect()` 只读快照 | Core 4 已完成子切片 | `skynet.stat()`、monitor/service 状态和 C 层队列/线程诊断 | 借鉴后重构 | GSR 返回不暴露内部指针的值快照，按 ServiceID 排序并包含 runner、Mailbox、PendingCall、Timer 和故障计数；Skynet 的统计分散在全局 node、service 和 monitor。 |
 | `RuntimeState`：`Created → Starting → Running → Stopping → Stopped → Closed` | Core 0.5 | 没有同等的公开状态机；启动和退出分散在 `skynet_start.c`、`skynet.start()`、`skynet.exit()` | GSR 新增约束 | GSR 用状态决定 admission 边界，并把“停止完成”和“资源最终释放”分开；Skynet 更依赖命令、句柄和协程状态。 |
 | Lifecycle Coordinator、固定 `startOrder`/`stopOrder` | Core 0.5 | `skynet_start.c` 中的固定初始化、`thread_timer` 退出 socket/唤醒 worker、主线程 join、最后 `harbor_exit`/`socket_free` | 借鉴后重构 | GSR 把顺序和回滚集中成可测试的内部计划；组件自己拥有资源，Cluster 不进入 Core 计划。 |
 | `ShutdownTimeout` | Core 0.5 | Skynet 主退出路径主要 join 线程，没有 GSR 同等的统一 Runtime deadline | GSR 新增约束 | GSR 的内部关闭预算用于 `Close()` 触发的停止；`Stop(ctx)` 的调用方 context 只控制当前等待。Go 不能强杀不响应取消的 Handler/`OnStop`。 |

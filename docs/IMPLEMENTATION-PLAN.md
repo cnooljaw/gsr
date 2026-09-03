@@ -224,6 +224,10 @@ Start
 
 ## Core 4：故障、观测与规模收尾
 
+状态：只读 Inspection 子切片已完成。`Runtime.Inspect()` 已提供确定排序的 Service 快照、Mailbox/runner/deadline 状态、PendingCall/Timer 数量和基础故障计数；规模基准、完整故障分类和 runner/Timer 引擎收尾仍待后续切片。
+
+第一轮 1,000 Service 基线（2026-09-03，Darwin arm64 / Apple M2，`go test ./runtime -run '^$' -bench '^BenchmarkRuntimeCreateServices1000$' -benchtime=1x -benchmem`）：创建与关闭约 1.25 ms，约 1.20 MB、8,093 allocs/op；基线测试观测到 runner goroutine 增量约 1,000、创建后 HeapAlloc 约 1.40 MB。该数据只用于当前机器上的趋势比较，不是跨平台 SLA；是否替换 per-Service runner 仍以目标环境的规模数据和压力模型为准。
+
 实现唯一只读 Inspection，至少包含：
 
 - Runtime 状态。

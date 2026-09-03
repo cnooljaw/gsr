@@ -361,6 +361,15 @@ func (manager *timerManager) hasTimers() bool {
 	return len(manager.timers) > 0 || manager.workers > 0
 }
 
+func (manager *timerManager) count() int {
+	if manager == nil {
+		return 0
+	}
+	manager.mu.Lock()
+	defer manager.mu.Unlock()
+	return len(manager.timers)
+}
+
 func (manager *timerManager) metricsSnapshot() timerMetricsSnapshot {
 	return manager.metrics.snapshot()
 }

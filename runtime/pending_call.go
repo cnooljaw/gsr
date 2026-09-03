@@ -190,6 +190,15 @@ func (manager *pendingCallManager) hasPending() bool {
 	return len(manager.pending) > 0
 }
 
+func (manager *pendingCallManager) count() int {
+	if manager == nil {
+		return 0
+	}
+	manager.mu.Lock()
+	defer manager.mu.Unlock()
+	return len(manager.pending)
+}
+
 func (runtime *Runtime) failPendingCallsFor(instance *serviceInstance) {
 	if runtime == nil || runtime.pendingCalls == nil || instance == nil {
 		return

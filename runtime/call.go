@@ -86,6 +86,7 @@ func (runtime *Runtime) call(
 	case <-maxTimer.C():
 		timeoutErr := callTimeoutError()
 		if runtime.pendingCalls.cancel(pending.session, timeoutErr) {
+			runtime.recordCallTimeout()
 			return nil, timeoutErr
 		}
 		result := <-pending.done
