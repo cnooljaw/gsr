@@ -23,6 +23,7 @@
 - **ClusterEnvelope**：Cluster/Transport 使用的可编码网络载体，显式区分 request、response 和 error frame；不携带业务或 wire version。远端 relay 解码请求后创建新的本地 Message；本地投递不创建或编码 ClusterEnvelope。
 - **FrameKind**：ClusterEnvelope 的显式方向标签，第一版只有 Request、Response 和 Error；不能只凭 Session 是否为零推断 frame 方向。
 - **ServiceTarget**：ClusterEnvelope 的远端目标值；必须且只能填写当前远端 Runtime 的临时 ServiceID 或由外层解析的 ServiceName。它不把 NodeID、Epoch、Lease 或 Generation 编进 Core 地址。
+- **ValueCodec**：Cluster 0 的默认值编码器，只接受 nil、bool、整数、有限浮点数、string、`[]byte`、list 和 string-key map；解码将整数规范化为 `int64`/`uint64`，浮点数规范化为 `float64`，并执行深度与 payload 上限。
 - **ClusterClient**：初始化时绑定一个 Source ServiceID 的 per-Service 窄 client；业务使用 `Send(node, target, ...)` / `Call(node, target, ...)`，不能覆盖 Source。
 - **Redirect / Relay**：仅供 Runtime 或明确受信任的 Adapter/Transport 使用的消息转发能力。它转发 Runtime-owned Message 或 relay token，不接受业务任意指定的 Source；首版只考虑单向转发，不转移 Call 的 PendingCall/Session。
 - **ClusterSessionID**：`uint64` 形式的 Cluster 请求关联号；零表示 Send，非零表示 Call。它由 Cluster 管理、在当前实例内单调分配且不回绕复用，不要求与 Core SessionID 相同。

@@ -100,6 +100,7 @@ GSR 只用 `SessionID == 0` 或 `SessionID > 0` 区分 Send/Call；Skynet 还把
 | `ClusterClient`（绑定 Source ServiceID） | Cluster 计划 | `cluster.call()`、`cluster.send()`，以及按 node 缓存 sender | 借鉴后重构 | GSR 使用初始化时绑定 Source 的 per-Service client；禁止全局变量、goroutine-local 或调用栈推断当前 Service。 |
 | `ClusterEnvelope` | Cluster 0 | `cluster.packrequest/packresponse`、`PTYPE_HARBOR`、socket channel 帧 | 借鉴后重构 | GSR Envelope 显式区分 request/response/error、ClusterSessionID、ServiceTarget、Command 和结构化错误；本地 Message 不变成网络包，并在 Transport admission 前校验和 Clone。版本兼容留给未来 framing/握手。 |
 | `ClusterSessionID` | Cluster 0 | cluster sender 的 session、`cluster.unpackresponse()` 返回的关联号 | 直接对应但独立 | GSR ClusterSessionID 与 Core SessionID 分属不同 owner，不要求数值相同；零值仍表示 Send。 |
+| `ValueCodec` | Cluster 0 | `skynet.pack()` / `skynet.unpack()` | 借鉴后重构 | GSR 只允许有限、可边界检查的值集合，并将数字解码为规范 Go 类型；不编码任意 pointer、函数、句柄或循环引用。Command-specific struct 交给注册的 Command codec。 |
 | `InMemoryTransport` | Cluster 0 | Skynet 的 socket channel 测试替身/节点间连接 | 借鉴后重构 | GSR 提供同步、可确定的进程内 Transport 作为测试边界；它不模拟 TCP、重连、队列或远端执行成功，生产 sender/agent 仍在后续切片实现。 |
 | `NodeSender` | Cluster 计划 | `clusterd.lua` 的 `node_sender[node]` + `clustersender.lua` | 直接对应 | 每个远端 Node 一个 outbound sender，合并并发建连；断线自动重连，但不自动重放结果不确定的业务请求。 |
 | `ConnectionAgent` | Cluster 计划 | `clusterd.lua` 为每条 inbound fd 创建的 `clusteragent` | 直接对应 | 每条入站 socket 独立 agent；响应沿原连接返回，不与同一 Node 的 outbound sender 混成一个所有者。 |

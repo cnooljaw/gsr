@@ -269,14 +269,15 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 
 ### Cluster 0：协议与内存传输
 
-状态：已完成第一条基础子切片。`cluster` package 已提供 `NodeID`、`ClusterSessionID`、`FrameKind`、`ServiceTarget`、`ClusterEnvelope` 的值类型与结构校验，以及确定性的 `InMemoryTransport`；codec、Command registry、NodeSender、ConnectionAgent 和 TCP framing 仍按后续切片推进。
+状态：已完成第一条基础子切片。`cluster` package 已提供 `NodeID`、`ClusterSessionID`、`FrameKind`、`ServiceTarget`、`ClusterEnvelope` 的值类型与结构校验、受限的 `ValueCodec`，以及确定性的 `InMemoryTransport`；Command codec registry、NodeSender、ConnectionAgent 和 TCP framing 仍按后续切片推进。
 
 - `NodeID`、`ClusterSessionID`、`ClusterEnvelope`。
 - 显式 Request、Response、Error frame。
 - `StatusError` 的 Class/Code/Message wire 表达。
 - 远端地址只使用 NodeID 与 ServiceName/Discovery 或当前远端临时 ServiceID；Runtime 只负责路由、投递和连接恢复，不负责业务所有权、一致性或过期判断。
 - `ClusterEnvelope.Validate` 在进入任意 Transport 前检查 frame kind、Session、目标和结构化错误；`Clone` 在 admission 边界隔离 payload 与错误值。
-- 默认值 codec、Command codec registry 和启动期重复注册 panic。
+- 默认 `ValueCodec` 只支持 nil、bool、规范化整数/浮点、string、`[]byte`、list 和 string-key map；解码分别得到 `int64`、`uint64`、`float64`，并限制嵌套深度与 payload 大小。
+- Command codec registry 和启动期重复注册 panic。
 - 帧长、容器深度和 payload 上限。
 - `InMemoryTransport` 以同步回调连接两个节点，作为测试和后续 sender/agent 的可替换边界；本地路径不执行 Cluster 编码。
 - `ClusterEnvelope` 不携带业务或 wire version；未来版本兼容由 Transport/Codec 的 framing 或连接握手单独负责。
