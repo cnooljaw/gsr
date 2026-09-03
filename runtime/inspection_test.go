@@ -106,6 +106,100 @@ func TestRuntimeInspectReportsPendingCallAndTimerMetrics(t *testing.T) {
 	target.releaseNow()
 }
 
+// 验证 Runtime Stop 会先完成 PendingCall，再等待阻塞 Handler 真实返回并反映清理结果。
+func TestRuntimeInspectReportsPendingCallCleanupOnStop(t *testing.T) {
+	runtime := newCallTestRuntime(t, Config{})
+	target := newBlockingCallTargetService()
+	targetID, err := runtime.CreateService(context.Background(), target)
+	if err != nil {
+		t.Fatalf("CreateService(target) error = %v", err)
+	}
+	caller := &callService{target: targetID, outcomes: make(chan callOutcome, 1)}
+	callerID, err := runtime.CreateService(context.Background(), caller)
+	if err != nil {
+		t.Fatalf("CreateService(caller) error = %v", err)
+	}
+	if err := runtime.Send(callerID, callTestCommand); err != nil {
+		t.Fatalf("Send(call) error = %v", err)
+	}
+	waitSignal(t, target.entered)
+	if inspection := waitRuntimeInspection(t, runtime, func(value RuntimeInspection) bool {
+		return value.PendingCallCount == 1
+	}); inspection.PendingCallCount != 1 {
+		t.Fatalf("PendingCallCount before Stop = %d, want 1", inspection.PendingCallCount)
+	}
+	stopResult := make(chan error, 1)
+	go func() {
+		stopResult <- runtime.Stop(context.Background())
+	}()
+	if outcome := waitCallOutcome(t, caller.outcomes); !errors.Is(outcome.err, ErrRuntimeStopping) {
+		t.Fatalf("Call during Stop error = %v, want ErrRuntimeStopping", outcome.err)
+	}
+	inspection := waitRuntimeInspection(t, runtime, func(value RuntimeInspection) bool {
+		return value.PendingCallCount == 0
+	})
+	if inspection.PendingCallCount != 0 {
+		t.Fatalf("PendingCallCount during Stop = %d, want 0", inspection.PendingCallCount)
+	}
+	target.releaseNow()
+	if err := <-stopResult; err != nil {
+		t.Fatalf("Stop() error = %v", err)
+	}
+	if inspection := runtime.Inspect(); inspection.State != RuntimeStopped || inspection.PendingCallCount != 0 {
+		t.Fatalf("post-Stop inspection = %#v, want Stopped with no PendingCall", inspection)
+	}
+}
+
+// 验证 Timer 投递失败会被公开 Inspection 计数且不会自动重试或残留活动 Timer。
+func TestRuntimeInspectReportsTimerAdmissionFailure(t *testing.T) {
+	clock := newFakeClock()
+	runtime := newTimerTestRuntime(t, clock, Config{MailboxCapacity: 1})
+	service := newBlockingTimerService()
+	serviceID, err := runtime.CreateService(context.Background(), service)
+	if err != nil {
+		t.Fatalf("CreateService() error = %v", err)
+	}
+	if err := runtime.Send(serviceID, timerTestCommand, "running"); err != nil {
+		t.Fatalf("Send(running) error = %v", err)
+	}
+	waitSignal(t, service.started)
+	if err := runtime.Send(serviceID, timerTestCommand, "queued"); err != nil {
+		t.Fatalf("Send(queued) error = %v", err)
+	}
+	if _, err := service.context.After(0, timerTestCommand, "timer"); err != nil {
+		t.Fatalf("After() error = %v", err)
+	}
+	clock.Advance(0)
+	inspection := waitRuntimeInspection(t, runtime, func(value RuntimeInspection) bool {
+		return value.Metrics.TimerAdmissionRejected == 1
+	})
+	if inspection.TimerCount != 0 || inspection.Metrics.TimersFired != 1 || inspection.Metrics.TimersAdmitted != 0 || inspection.Metrics.TimerAdmissionRejected != 1 {
+		t.Fatalf("timer failure inspection = %#v, want one rejected fire and no active timer", inspection)
+	}
+	close(service.release)
+}
+
+// 验证调用方修改 RuntimeInspection 返回值不会改变下一次快照中的 Runtime 状态。
+func TestRuntimeInspectReturnsIndependentSnapshots(t *testing.T) {
+	runtime := newCallTestRuntime(t, Config{})
+	service := &callTargetService{}
+	serviceID, err := runtime.CreateService(context.Background(), service)
+	if err != nil {
+		t.Fatalf("CreateService() error = %v", err)
+	}
+	inspection := runtime.Inspect()
+	if len(inspection.Services) != 1 || inspection.Services[0].ID != serviceID {
+		t.Fatalf("initial inspection = %#v, want one Service %d", inspection, serviceID)
+	}
+	inspection.Services[0].ID = 999
+	inspection.Services[0].State = ServiceStateStopped
+	inspection.Services = nil
+	next := runtime.Inspect()
+	if len(next.Services) != 1 || next.Services[0].ID != serviceID || next.Services[0].State != ServiceStateRunning {
+		t.Fatalf("next inspection = %#v, want an independent running snapshot", next)
+	}
+}
+
 // 验证 Handler error、panic 和 shutdown deadline 都进入只读故障计数或 Service 快照。
 func TestRuntimeInspectReportsFailureCountersAndDeadline(t *testing.T) {
 	runtime := newCallTestRuntime(t, Config{ShutdownTimeout: 10 * time.Millisecond})
