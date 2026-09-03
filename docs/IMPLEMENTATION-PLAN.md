@@ -232,6 +232,8 @@ Start
 
 第一轮 10,000 Timer 基线（同一环境，`go test ./runtime -run '^$' -bench '^BenchmarkRuntimeCreateTimers10000$' -benchtime=1x -benchmem`）：创建与关闭约 22.1 ms，约 12.57 MB、120,073 allocs/op；基线测试观测到等待 goroutine 增量约 10,000，登记约 11.9 ms、关闭约 10.9 ms。此次切片把运行中 `After` 的 arm 从扫描 owner 全集改为直接 arm，避免 O(n²) 登记；当前仍保留一 Timer 一等待 goroutine，集中 Timer loop 需更大目标规模数据再裁决。
 
+第一轮 Hot Service Send 基线（同一环境，`go test ./runtime -run '^$' -bench '^BenchmarkRuntimeSendHotService$' -benchtime=100ms -benchmem`）：约 166 ns/op、211 B/op、3 allocs/op；Mailbox 容量按 benchmark 请求数设置，Handler 使用空实现，计时只覆盖本地 Send admission，不代表业务处理吞吐。
+
 实现唯一只读 Inspection，至少包含：
 
 - Runtime 状态。

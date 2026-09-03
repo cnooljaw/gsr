@@ -64,6 +64,33 @@ func BenchmarkRuntimeCreateServices10000(b *testing.B) {
 	benchmarkRuntimeCreateServices(b, 10000)
 }
 
+// BenchmarkRuntimeSendHotService measures bounded Send admission into one hot
+// Service while its Runtime-owned runner consumes the same mailbox.
+func BenchmarkRuntimeSendHotService(b *testing.B) {
+	runtime, err := NewRuntime(Config{MailboxCapacity: b.N + 1})
+	if err != nil {
+		b.Fatalf("NewRuntime() error = %v", err)
+	}
+	if err := runtime.Start(); err != nil {
+		b.Fatalf("Start() error = %v", err)
+	}
+	serviceID, err := runtime.CreateService(context.Background(), benchmarkService{})
+	if err != nil {
+		b.Fatalf("CreateService() error = %v", err)
+	}
+	b.ReportAllocs()
+	b.ResetTimer()
+	for messageIndex := 0; messageIndex < b.N; messageIndex++ {
+		if err := runtime.Send(serviceID, scaleSendCommand, messageIndex); err != nil {
+			b.Fatalf("Send(%d) error = %v", messageIndex, err)
+		}
+	}
+	b.StopTimer()
+	if err := runtime.Close(); err != nil {
+		b.Fatalf("Close() error = %v", err)
+	}
+}
+
 // 验证 10,000 个未触发 Timer 可以完成登记、观测和关闭，记录当前 Timer 等待 goroutine 基线。
 func TestRuntimeScale10000TimersReportsBaseline(t *testing.T) {
 	clock := newFakeClock()
@@ -125,6 +152,8 @@ func BenchmarkRuntimeCreateTimers10000(b *testing.B) {
 		}
 	}
 }
+
+const scaleSendCommand CommandID = 0x04000401
 
 func benchmarkRuntimeCreateServices(b *testing.B, serviceCount int) {
 	b.ReportAllocs()
