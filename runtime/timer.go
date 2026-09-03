@@ -230,7 +230,7 @@ func (manager *timerManager) after(owner *serviceInstance, duration time.Duratio
 	manager.mu.Unlock()
 
 	if owner.currentState() == serviceRunning {
-		manager.armOwner(owner)
+		manager.armEntry(entry)
 	}
 	return id, nil
 }
@@ -294,10 +294,7 @@ func (manager *timerManager) armOwner(owner *serviceInstance) {
 		if entry.owner != owner || entry.state != timerScheduled || entry.armed {
 			continue
 		}
-		entry.armed = true
-		entry.timer = manager.clock.NewTimer(entry.deadline.Sub(manager.clock.Now()))
-		manager.wg.Add(1)
-		manager.workers++
+		manager.armEntryLocked(entry)
 		entries = append(entries, entry)
 	}
 	manager.mu.Unlock()
@@ -305,6 +302,26 @@ func (manager *timerManager) armOwner(owner *serviceInstance) {
 	for _, entry := range entries {
 		go manager.waitForExpiry(entry)
 	}
+}
+
+func (manager *timerManager) armEntry(entry *timerEntry) {
+	// Timers created after publication are armed directly; scanning the whole
+	// owner set is reserved for the OnStart-to-Running publication boundary.
+	manager.mu.Lock()
+	if manager.stopping || entry == nil || entry.state != timerScheduled || entry.armed {
+		manager.mu.Unlock()
+		return
+	}
+	manager.armEntryLocked(entry)
+	manager.mu.Unlock()
+	go manager.waitForExpiry(entry)
+}
+
+func (manager *timerManager) armEntryLocked(entry *timerEntry) {
+	entry.armed = true
+	entry.timer = manager.clock.NewTimer(entry.deadline.Sub(manager.clock.Now()))
+	manager.wg.Add(1)
+	manager.workers++
 }
 
 func (manager *timerManager) waitForExpiry(entry *timerEntry) {

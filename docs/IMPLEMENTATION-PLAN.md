@@ -224,9 +224,13 @@ Start
 
 ## Core 4：故障、观测与规模收尾
 
-状态：只读 Inspection 子切片已完成。`Runtime.Inspect()` 已提供确定排序的 Service 快照、Mailbox/runner/deadline 状态、PendingCall/Timer 数量和基础故障计数；规模基准、完整故障分类和 runner/Timer 引擎收尾仍待后续切片。
+状态：只读 Inspection 子切片和 1K/10K 空闲 Service 基线已完成。`Runtime.Inspect()` 已提供确定排序的 Service 快照、Mailbox/runner/deadline 状态、PendingCall/Timer 数量和基础故障计数；完整故障分类和 runner/Timer 引擎收尾仍待后续切片。
 
 第一轮 1,000 Service 基线（2026-09-03，Darwin arm64 / Apple M2，`go test ./runtime -run '^$' -bench '^BenchmarkRuntimeCreateServices1000$' -benchtime=1x -benchmem`）：创建与关闭约 1.25 ms，约 1.20 MB、8,093 allocs/op；基线测试观测到 runner goroutine 增量约 1,000、创建后 HeapAlloc 约 1.40 MB。该数据只用于当前机器上的趋势比较，不是跨平台 SLA；是否替换 per-Service runner 仍以目标环境的规模数据和压力模型为准。
+
+第二轮 10,000 Service 基线（同一环境，`go test ./runtime -run '^$' -bench '^BenchmarkRuntimeCreateServices10000$' -benchtime=1x -benchmem`）：创建与关闭约 23 ms，约 11.28 MB、79,016 allocs/op；基线测试观测到 runner goroutine 增量约 10,000、创建后 HeapAlloc 约 11.66 MB，创建约 15.2 ms、关闭约 7.7 ms。该数据只用于当前机器上的趋势比较，不是跨平台 SLA；目前没有数据证明需要替换 per-Service runner。
+
+第一轮 10,000 Timer 基线（同一环境，`go test ./runtime -run '^$' -bench '^BenchmarkRuntimeCreateTimers10000$' -benchtime=1x -benchmem`）：创建与关闭约 22.1 ms，约 12.57 MB、120,073 allocs/op；基线测试观测到等待 goroutine 增量约 10,000，登记约 11.9 ms、关闭约 10.9 ms。此次切片把运行中 `After` 的 arm 从扫描 owner 全集改为直接 arm，避免 O(n²) 登记；当前仍保留一 Timer 一等待 goroutine，集中 Timer loop 需更大目标规模数据再裁决。
 
 实现唯一只读 Inspection，至少包含：
 
@@ -249,7 +253,7 @@ Core v0.1 门禁：
 - Core 公开 API、CONTEXT 和 ADR 一致。
 - `go test ./...`、`go vet ./...` 和 `go test -race ./...` 通过。
 - Stop 后不存在未登记 runner、Timer 或 PendingCall；故意阻塞的业务任务必须作为已知残留被 Inspection 准确报告。
-- per-Service runner 的规模数据已记录。只有数据证明成本不可接受时，才新增 ADR 讨论固定 worker pool 或 continuation。
+- per-Service runner 的 1K/10K 规模数据已记录。只有数据证明成本不可接受时，才新增 ADR 讨论固定 worker pool 或 continuation。
 
 ## Cluster 后续路线
 
