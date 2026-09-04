@@ -26,6 +26,7 @@
 - **ValueCodec**：Cluster 0 的默认值编码器，只接受 nil、bool、整数、有限浮点数、string、`[]byte`、list 和 string-key map；解码将整数规范化为 `int64`/`uint64`，浮点数规范化为 `float64`，并执行深度与 payload 上限。
 - **CommandCodec**：一个 Command 的 payload 编解码能力，既可以使用默认 `ValueCodec`，也可以由业务提供 typed 实现；它只负责值与字节之间的转换，不负责路由、Service 能力或 Source。
 - **CommandCodecRegistry**：启动期创建并冻结的 `CommandID -> CommandCodec` 表；构造后只查找，不允许运行期注册、覆盖或删除，重复 CommandID 是配置错误。
+- **FrameCodec**：Cluster 0 的长度前缀 frame 编解码器；使用四字节大端 body length，`MaxFrame` 包含前缀，只处理一个完整 frame，不负责 stream I/O、版本协商或连接生命周期。
 - **ClusterClient**：初始化时绑定一个 Source ServiceID 的 per-Service 窄 client；业务使用 `Send(node, target, ...)` / `Call(node, target, ...)`，不能覆盖 Source。
 - **Redirect / Relay**：仅供 Runtime 或明确受信任的 Adapter/Transport 使用的消息转发能力。它转发 Runtime-owned Message 或 relay token，不接受业务任意指定的 Source；首版只考虑单向转发，不转移 Call 的 PendingCall/Session。
 - **ClusterSessionID**：`uint64` 形式的 Cluster 请求关联号；零表示 Send，非零表示 Call。它由 Cluster 管理、在当前实例内单调分配且不回绕复用，不要求与 Core SessionID 相同。

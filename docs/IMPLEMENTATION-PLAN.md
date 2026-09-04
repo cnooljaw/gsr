@@ -269,7 +269,7 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 
 ### Cluster 0：协议与内存传输
 
-状态：已完成第一条基础子切片。`cluster` package 已提供 `NodeID`、`ClusterSessionID`、`FrameKind`、`ServiceTarget`、`ClusterEnvelope` 的值类型与结构校验、受限的 `ValueCodec`、启动期不可变的 Command codec registry，以及确定性的 `InMemoryTransport`；NodeSender、ConnectionAgent 和 TCP framing 仍按后续切片推进。
+状态：已完成第一条基础子切片。`cluster` package 已提供 `NodeID`、`ClusterSessionID`、`FrameKind`、`ServiceTarget`、`ClusterEnvelope` 的值类型与结构校验、受限的 `ValueCodec`、启动期不可变的 Command codec registry、长度前缀 `FrameCodec`，以及确定性的 `InMemoryTransport`；NodeSender、ConnectionAgent 和 TCP stream I/O 仍按后续切片推进。
 
 - `NodeID`、`ClusterSessionID`、`ClusterEnvelope`。
 - 显式 Request、Response、Error frame。
@@ -281,6 +281,7 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 - 帧长、容器深度和 payload 上限。
 - `InMemoryTransport` 以同步回调连接两个节点，作为测试和后续 sender/agent 的可替换边界；本地路径不执行 Cluster 编码。
 - `ClusterEnvelope` 不携带业务或 wire version；未来版本兼容由 Transport/Codec 的 framing 或连接握手单独负责。
+- `FrameCodec` 使用四字节大端 body length，`MaxFrame` 包含长度前缀；只解析一个完整 frame，不负责 stream I/O 或版本协商。
 
 ### Cluster 1：远程 Send
 

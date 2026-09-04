@@ -395,6 +395,14 @@ type CommandCodecEntry struct {
 func NewCommandCodecRegistry(entries []CommandCodecEntry) (*CommandCodecRegistry, error)
 func MustCommandCodecRegistry(entries []CommandCodecEntry) *CommandCodecRegistry
 func (registry *CommandCodecRegistry) Lookup(command runtime.CommandID) (CommandCodec, error)
+
+type FrameCodecConfig struct {
+	MaxFrame int
+}
+
+func NewFrameCodec(config FrameCodecConfig) (*FrameCodec, error)
+func (codec *FrameCodec) Encode(envelope ClusterEnvelope) ([]byte, error)
+func (codec *FrameCodec) Decode(frame []byte) (ClusterEnvelope, error)
 ```
 
 `ClusterEnvelope.Validate()` 在 Transport admission 前检查 frame kind、目标、Command、Session 和 Error/Payload 组合；`Clone()` 复制 `Payload` 与 `StatusError`，避免接收方修改发送方持有的可变值。当前 `InMemoryTransport` 是同步、确定性的进程内测试边界，具有有限 payload 上限和最终 `Close` 状态；它不承诺 TCP、重连、出站队列或远端 Handler 已执行。`ClusterEnvelope` 不携带 wire version；未来兼容由 Codec framing 或连接握手负责。生产 `NodeSender`、`ConnectionAgent`、codec 和 framing 在后续 Cluster 切片实现。
@@ -402,6 +410,8 @@ func (registry *CommandCodecRegistry) Lookup(command runtime.CommandID) (Command
 默认 `ValueCodec` 的解码结果使用稳定的规范类型：有符号整数为 `int64`，无符号整数为 `uint64`，浮点数为 `float64`；复合值为 `[]any` 和 `map[string]any`。它拒绝 pointer、func、chan、struct、复杂数、`uintptr`、非有限浮点和非 string map key。Command-specific struct 由后续启动期注册的 Command codec 负责，不由默认值 Codec 猜测。
 
 `CommandCodecRegistry` 在启动期接收一份 entries 列表，校验非零 `CommandID`、非 nil codec 和重复注册后复制成不可变表。它不提供运行期 `Register`/`Unregister`，也不从 codec 推断 Service 能力；未知 Command 由调用方通过稳定的 `ErrCommandCodecNotFound` 处理。
+
+`FrameCodec` 为每个逻辑 Envelope 添加四字节大端 body length，长度上限 `MaxFrame` 包含这四个字节。`Decode` 只接受一个边界完整、没有尾随数据的 frame；读取部分帧、拼接多个 frame 和连接关闭由未来 Transport/ConnectionAgent 负责。Envelope 仍不携带 version，版本协商留在 framing 或连接握手。
 
 ### 6.3 Cluster wire 与连接模型
 
