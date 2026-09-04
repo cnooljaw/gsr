@@ -269,7 +269,7 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 
 ### Cluster 0：协议与内存传输
 
-状态：已完成第一条基础子切片。`cluster` package 已提供 `NodeID`、`ClusterSessionID`、`FrameKind`、`ServiceTarget`、`ClusterEnvelope` 的值类型与结构校验、受限的 `ValueCodec`、启动期不可变的 Command codec registry、长度前缀 `FrameCodec`，以及确定性的 `InMemoryTransport`；NodeSender、ConnectionAgent 和 TCP stream I/O 仍按后续切片推进。
+状态：Cluster 0 已完成，Cluster 1 正在推进。`cluster` package 已提供 `NodeID`、`ClusterSessionID`、`FrameKind`、`ServiceTarget`、`ClusterEnvelope` 的值类型与结构校验、受限的 `ValueCodec`、启动期不可变的 Command codec registry、长度前缀 `FrameCodec`，以及确定性的 `InMemoryTransport`。Cluster 1 已新增 `NodeSender` 的基础出站 admission；ConnectionAgent、TCP stream I/O、连接合并和自动重连仍按后续子切片推进。
 
 - `NodeID`、`ClusterSessionID`、`ClusterEnvelope`。
 - 显式 Request、Response、Error frame。
@@ -285,12 +285,15 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 
 ### Cluster 1：远程 Send
 
-- 每个远端 Node 唯一 outbound `NodeSender`。
-- 有界出站队列和并发建连合并。
+- 状态：进行中（基础子切片已完成）。
+- 每个远端 Node 唯一 outbound `NodeSender`，使用固定容量队列和单一 owner worker。
+- `Send` 在本地 Clone 后执行非阻塞 admission；队列满返回 `ErrOutboundQueueFull`，nil 只代表本地 Cluster admission 成功。
+- admission 后的 Transport error/panic 和关闭丢弃进入有界、非阻塞的 `Failures()` stream；慢消费者不阻塞 sender，溢出由 `DroppedFailureCount()` 计数，事件不携带业务 payload。
+- Send 不返回远端 Handler 结果；A 记录自己的 admission/传输诊断，B 记录自己的 Handler error。需要远端处理结果时使用 Call。
+- 当前 NodeSender 直接调用注入的 Transport；并发建连合并、TCP stream 和自动重连留在后续 Connection/Transport 子切片。
 - 初始化时绑定 Source ServiceID 的 per-Service ClusterClient。
 - 普通远程 Send/Call 不暴露 source 参数；只有明确的基础设施 relay 才能转发 Runtime-owned Message，且不转移 Call session/PendingCall。
-- 无路由、已知断连、编码失败、队列满和关闭错误。
-- Send 返回 nil 只表示本地 Cluster admission 成功。
+- admission 前的无本地路由/sender、编码失败、队列满和关闭错误由 `Send` 立即返回；admission 后的节点不可达、断线及网络/I/O 错误进入 NodeSender 诊断 stream。
 
 ### Cluster 2：远程 Call
 

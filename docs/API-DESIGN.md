@@ -347,7 +347,8 @@ origin Service
 - 数字形式的远端 ServiceID 只在当前远端 Runtime 生命周期内有效；断线、重连或 Runtime 重启后必须通过外层名称或 Discovery 重新解析。
 - GSR 不把 Epoch、Lease 或 Generation 加入 ServiceID/远端地址，也不由 Runtime 判断业务资源的唯一所有权、一致性或过期。Runtime 只负责路由、投递和连接恢复；资源 fencing、幂等、RequestID、补偿和业务过期判断由拥有该语义的业务/外层模块负责。
 - `clusterClient.Send` 返回 `error`。返回 nil 只表示请求已被本地 Cluster 边界接受或入队，不表示远端 Handler 已执行，更不表示持久化成功。
-- 无路由、已知断连、编码失败、出站队列满或关闭必须返回 Runtime Error；需要确认业务结果时使用 Call，并为有歧义的网络失败设计 RequestID 与幂等。
+- 本地没有可用路由/sender、编码或参数校验失败、出站队列满以及 Cluster 边界已关闭，都发生在 admission 前，必须由 `Send` 立即返回稳定错误。
+- admission 成功后的节点不可达、断线、网络或 I/O 错误不能追溯修改 `Send` 的 nil 返回；它们由 NodeSender 发布本地基础设施诊断。需要确认远端处理结果时使用 Call，并为有歧义的网络失败设计 RequestID 与幂等。
 
 Cluster 0 先提供独立于 Runtime 的值边界和可替换 Transport：
 
@@ -372,6 +373,29 @@ type Transport interface {
 	Send(from NodeID, to NodeID, envelope ClusterEnvelope) error
 	Close() error
 }
+
+type DeliveryFailure struct {
+	LocalNode  NodeID
+	RemoteNode NodeID
+	Kind       FrameKind
+	Session    ClusterSessionID
+	Target     ServiceTarget
+	Command    runtime.CommandID
+	Err        error
+}
+
+type NodeSenderConfig struct {
+	LocalNode     NodeID
+	RemoteNode    NodeID
+	Transport     Transport
+	QueueCapacity int
+}
+
+func NewNodeSender(config NodeSenderConfig) (*NodeSender, error)
+func (sender *NodeSender) Send(envelope ClusterEnvelope) error
+func (sender *NodeSender) Failures() <-chan DeliveryFailure
+func (sender *NodeSender) DroppedFailureCount() uint64
+func (sender *NodeSender) Close(ctx context.Context) error
 
 type ValueCodecConfig struct {
 	MaxDepth   int
@@ -405,7 +429,21 @@ func (codec *FrameCodec) Encode(envelope ClusterEnvelope) ([]byte, error)
 func (codec *FrameCodec) Decode(frame []byte) (ClusterEnvelope, error)
 ```
 
-`ClusterEnvelope.Validate()` 在 Transport admission 前检查 frame kind、目标、Command、Session 和 Error/Payload 组合；`Clone()` 复制 `Payload` 与 `StatusError`，避免接收方修改发送方持有的可变值。当前 `InMemoryTransport` 是同步、确定性的进程内测试边界，具有有限 payload 上限和最终 `Close` 状态；它不承诺 TCP、重连、出站队列或远端 Handler 已执行。`ClusterEnvelope` 不携带 wire version；未来兼容由 Codec framing 或连接握手负责。生产 `NodeSender`、`ConnectionAgent`、codec 和 framing 在后续 Cluster 切片实现。
+`ClusterEnvelope.Validate()` 在 Transport admission 前检查 frame kind、目标、Command、Session 和 Error/Payload 组合；`Clone()` 复制 `Payload` 与 `StatusError`，避免接收方修改发送方持有的可变值。当前 `InMemoryTransport` 是同步、确定性的进程内测试边界，具有有限 payload 上限和最终 `Close` 状态；它不承诺 TCP、重连、出站队列或远端 Handler 已执行。`ClusterEnvelope` 不携带 wire version；未来兼容由 Codec framing 或连接握手负责。
+
+当前 Cluster 1 基础子切片提供 `NodeSender`，把一个本地节点到一个远端节点的出站 admission 收口到单一 owner：
+
+- `QueueCapacity == 0` 使用默认容量 1024；其它值必须大于零。队列满时 `Send` 立即返回 `ErrOutboundQueueFull`，不无限阻塞或扩容。
+- `Send` 先校验并 Clone Envelope，再以 FIFO 顺序交给唯一 worker；返回 nil 只表示本地队列 admission 成功，不表示远端执行成功。
+- `Transport.Send` 的错误或 panic 发生在 admission 后时，NodeSender 向有界的 `Failures()` stream 非阻塞发布一条基础设施事件；慢消费者不会阻塞发送 worker，stream 满时丢弃事件并由 `DroppedFailureCount()` 累计。
+- `Close(ctx)` 先停止 admission；队列中尚未开始发送的 Envelope 以 `ErrNodeSenderClosed` 报告并丢弃，已经进入 `Transport.Send` 的调用允许自然返回。`ctx` 只控制调用方等待，不强杀 transport goroutine；超时后可以再次调用 `Close` 等待同一 worker。
+- 当前 sender 直接调用注入的 `Transport`，尚未实现 TCP stream、连接合并和自动重连；这些仍属于后续 Connection/Transport 子切片，不能由 `Send` 的 nil 返回暗示。
+
+`DeliveryFailure` 只包含 LocalNode、RemoteNode、frame kind、Session、Target、Command 和底层 error，不复制或暴露业务 payload，也不用于自动重放。Cluster diagnostics owner 可以消费它写一条网络/I/O 诊断记录；如果消费能力不足，丢弃计数仍然可观测。它是 best-effort 基础设施诊断，不是不能丢失的业务审计日志。
+
+失败归属依赖稳定 error identity，不解析错误字符串：`Send` 直接返回的错误表示 A 侧未完成本地 admission；`DeliveryFailure` 表示 admission 后的 Transport 投递失败。当前 `InMemoryTransport` 用 `ErrNodeNotFound` 表示目标节点当前没有 receiver，用 `ErrTransportClosed` 表示本地 Transport 已关闭。未来 TCP Transport 也必须提供可通过 `errors.Is`/`errors.As` 判断的稳定错误；网络分区、拒绝连接或握手失败只能记录为“远端当前不可达”及其安全原因，不能据此断言 B 的进程一定没有启动。
+
+远程 Send 坚持“A 管 A、B 管 B”：A 在本地 Cluster admission 成功后继续运行；B 收到后独立执行并在 B 侧记录自己的 Handler error。A 不通过 Send 获得 B 的 Handler 结果。只有需要返回值或远端处理错误时才使用 Call；Call 的 response/error 和 PendingCall 留在后续 Cluster 切片。
 
 默认 `ValueCodec` 的解码结果使用稳定的规范类型：有符号整数为 `int64`，无符号整数为 `uint64`，浮点数为 `float64`；复合值为 `[]any` 和 `map[string]any`。它拒绝 pointer、func、chan、struct、复杂数、`uintptr`、非有限浮点和非 string map key。Command-specific struct 由后续启动期注册的 Command codec 负责，不由默认值 Codec 猜测。
 

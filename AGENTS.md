@@ -57,7 +57,7 @@
 - Service 内 Call 采用 run-to-completion：等待期间同一 Service 不处理下一条消息，Reply 只恢复当前 Handler；Call 必须有有限超时并谨慎使用，self Call 直接拒绝。
 - 第一版每个 Running Service 使用一个 Runtime-owned runner goroutine 串行消费 Mailbox；Handler 通过返回值由 Runtime 自动完成 Reply，业务不得手工或异步 Reply。
 - Mailbox 与 Cluster 出站队列必须有界且 admission 非无限阻塞；满载返回稳定 Runtime Error，不自动无限扩容。
-- Cluster Send 返回 nil 只表示本地 Cluster 边界接受或入队，不代表远端执行或持久化成功。
+- Cluster Send 在 admission 前失败时立即返回错误；返回 nil 只表示本地 Cluster 边界接受或入队。admission 后的传输失败只进入 A 侧基础设施诊断，B 侧 Handler error 归 B，不通过 Send 返回 A；需要远端结果时使用 Call。
 - ClusterEnvelope、NodeID、连接和编码不得进入 Core 本地 Message 或 ServiceID。
 - Cluster 每个远端 Node 只有一个 outbound NodeSender，并为每条 inbound socket 建立独立 ConnectionAgent；断线自动重连，但不自动重放业务请求。
 - Cluster codec/Command 在启动阶段注册，重复注册 panic；wire 输入必须设置帧长、集合深度和 payload 上限。
