@@ -291,7 +291,7 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 - admission 后的 Transport error/panic 和关闭丢弃进入有界、非阻塞的 `Failures()` stream；慢消费者不阻塞 sender，溢出由 `DroppedFailureCount()` 计数，事件不携带业务 payload。
 - Send 不返回远端 Handler 结果；A 记录自己的 admission/传输诊断，B 记录自己的 Handler error。需要远端处理结果时使用 Call。
 - 当前 NodeSender 直接调用注入的 Transport；并发建连合并、TCP stream 和自动重连留在后续 Connection/Transport 子切片。
-- 初始化时绑定 Source ServiceID 的 per-Service ClusterClient。
+- 已实现初始化绑定 Source ServiceID、NodeSenderResolver 和 CommandCodecRegistry 的 per-Service ClusterClient；当前只负责参数编码与远程 Send admission，不拥有 sender/连接。
 - 普通远程 Send/Call 不暴露 source 参数；只有明确的基础设施 relay 才能转发 Runtime-owned Message，且不转移 Call session/PendingCall。
 - admission 前的无本地路由/sender、编码失败、队列满和关闭错误由 `Send` 立即返回；admission 后的节点不可达、断线及网络/I/O 错误进入 NodeSender 诊断 stream。
 

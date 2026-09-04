@@ -138,7 +138,7 @@ func (sender *NodeSender) Close(ctx context.Context) error {
 		return nil
 	}
 	if ctx == nil {
-		return fmt.Errorf("%w: context is nil", ErrInvalidNodeSenderConfig)
+		ctx = context.Background()
 	}
 	sender.closeOnce.Do(func() {
 		sender.mu.Lock()

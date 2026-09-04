@@ -97,7 +97,7 @@ GSR 只用 `SessionID == 0` 或 `SessionID > 0` 区分 Send/Call；Skynet 还把
 | --- | --- | --- | --- | --- |
 | Cluster（Core 之外） | Cluster 0 基础子切片已完成，1–4 计划 | Harbor、`skynet.cluster`、`clusterd`、`clusterproxy`、`clustersender`、`clusteragent` | 直接对应架构方向 | GSR 先锁定 Envelope/Transport 值边界，再逐步接入 sender、agent 和 TCP；明确禁止 NodeID、Envelope、Transport 进入 Core Message 或 ServiceID。 |
 | `NodeID` | Cluster 0 | `cluster.call(node, address, ...)` 的 node 名称、Harbor 编号 | 直接对应 | GSR NodeID 是独立路由维度，不能从 ServiceID 推断；远端目标必须由 Cluster 层解析。 |
-| `ClusterClient`（绑定 Source ServiceID） | Cluster 计划 | `cluster.call()`、`cluster.send()`，以及按 node 缓存 sender | 借鉴后重构 | GSR 使用初始化时绑定 Source 的 per-Service client；禁止全局变量、goroutine-local 或调用栈推断当前 Service。 |
+| `ClusterClient`（绑定 Source ServiceID） | Cluster 1 基础子切片已完成 | `cluster.call()`、`cluster.send()`，以及按 node 缓存 sender | 借鉴后重构 | GSR 使用初始化时绑定 Source、resolver 和 codec registry 的 per-Service client；当前先实现 Send，禁止全局变量、goroutine-local 或调用栈推断当前 Service，Call 留在后续切片。 |
 | `ClusterEnvelope` | Cluster 0 | `cluster.packrequest/packresponse`、`PTYPE_HARBOR`、socket channel 帧 | 借鉴后重构 | GSR Envelope 显式区分 request/response/error、ClusterSessionID、ServiceTarget、Command 和结构化错误；本地 Message 不变成网络包，并在 Transport admission 前校验和 Clone。版本兼容留给未来 framing/握手。 |
 | `ClusterSessionID` | Cluster 0 | cluster sender 的 session、`cluster.unpackresponse()` 返回的关联号 | 直接对应但独立 | GSR ClusterSessionID 与 Core SessionID 分属不同 owner，不要求数值相同；零值仍表示 Send。 |
 | `ValueCodec` | Cluster 0 | `skynet.pack()` / `skynet.unpack()` | 借鉴后重构 | GSR 只允许有限、可边界检查的值集合，并将数字解码为规范 Go 类型；不编码任意 pointer、函数、句柄或循环引用。Command-specific struct 交给注册的 Command codec。 |

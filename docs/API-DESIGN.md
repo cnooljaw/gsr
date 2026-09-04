@@ -306,8 +306,8 @@ Service.Send(target ServiceID, command, args...)
 业务 API 采用 Skynet 风格，不显式传 Source：
 
 ```go
-clusterClient.Send(node, serviceID, command, args...)
-clusterClient.Call(node, serviceID, command, args...)
+clusterClient.Send(node, ServiceTarget{ServiceID: serviceID}, command, args...)
+clusterClient.Call(ctx, node, ServiceTarget{ServiceID: serviceID}, command, args...)
 ```
 
 Go 没有可靠的“当前 Service”隐式上下文。Cluster 内部采用显式 Source 的实现入口，但只向业务暴露预先绑定当前 ServiceID 的窄 client：
@@ -318,7 +318,11 @@ sendFrom(source, node, target, command, args...)
 callFrom(source, node, target, command, args...)
 
 // Service 初始化时绑定一次 source，业务调用时无需重复传入。
-clusterClient := cluster.Bind(serviceContext.Self(), dispatcher)
+clusterClient, err := cluster.NewClusterClient(cluster.ClusterClientConfig{
+	Source:  serviceContext.Self(),
+	Senders: senderResolver,
+	Codecs:  commandCodecs,
+})
 ```
 
 禁止使用包级全局变量、goroutine-local 或调用栈猜测来寻找“当前 ServiceID”。绑定后的 client 不允许业务覆盖 Source；只有明确受信任的 Cluster/Adapter relay 才能使用受控转发能力。
@@ -373,6 +377,24 @@ type Transport interface {
 	Send(from NodeID, to NodeID, envelope ClusterEnvelope) error
 	Close() error
 }
+
+type OutboundSender interface {
+	Send(ClusterEnvelope) error
+}
+
+type NodeSenderResolver interface {
+	ResolveNodeSender(NodeID) (OutboundSender, error)
+}
+
+type ClusterClientConfig struct {
+	Source  runtime.ServiceID
+	Senders NodeSenderResolver
+	Codecs  *CommandCodecRegistry
+}
+
+func NewClusterClient(config ClusterClientConfig) (*ClusterClient, error)
+func (client *ClusterClient) Source() runtime.ServiceID
+func (client *ClusterClient) Send(node NodeID, target ServiceTarget, command runtime.CommandID, args ...any) error
 
 type DeliveryFailure struct {
 	LocalNode  NodeID
@@ -438,6 +460,13 @@ func (codec *FrameCodec) Decode(frame []byte) (ClusterEnvelope, error)
 - `Transport.Send` 的错误或 panic 发生在 admission 后时，NodeSender 向有界的 `Failures()` stream 非阻塞发布一条基础设施事件；慢消费者不会阻塞发送 worker，stream 满时丢弃事件并由 `DroppedFailureCount()` 累计。
 - `Close(ctx)` 先停止 admission；队列中尚未开始发送的 Envelope 以 `ErrNodeSenderClosed` 报告并丢弃，已经进入 `Transport.Send` 的调用允许自然返回。`ctx` 只控制调用方等待，不强杀 transport goroutine；超时后可以再次调用 `Close` 等待同一 worker。
 - 当前 sender 直接调用注入的 `Transport`，尚未实现 TCP stream、连接合并和自动重连；这些仍属于后续 Connection/Transport 子切片，不能由 `Send` 的 nil 返回暗示。
+
+Cluster 1 同时提供 source-bound `ClusterClient` 的单向 `Send`：
+
+- 构造时必须绑定非零 Source、`NodeSenderResolver` 和启动期冻结的 `CommandCodecRegistry`；resolver 负责返回每个远端 Node 的唯一 sender，client 不拥有 sender 或连接。
+- `Send` 校验 Node/Target/Command，通过对应 CommandCodec 将 `args` 作为一个参数列表编码，再交给 sender admission；编码或本地 sender 错误直接返回，sender 的 nil 仍只表示本地 admission。
+- Source 只用于绑定调用者能力和后续本地 Call/PendingCall 归属，不是业务可覆盖的 Envelope 字段；ClusterEnvelope 不携带任意 Core Source，远端 adapter 按本地策略创建 Message Source。
+- 当前 client 只实现远程 Send；Call、ClusterSessionID 分配和 response/error completion 留在 Cluster 2。
 
 `DeliveryFailure` 只包含 LocalNode、RemoteNode、frame kind、Session、Target、Command 和底层 error，不复制或暴露业务 payload，也不用于自动重放。Cluster diagnostics owner 可以消费它写一条网络/I/O 诊断记录；如果消费能力不足，丢弃计数仍然可观测。它是 best-effort 基础设施诊断，不是不能丢失的业务审计日志。
 
