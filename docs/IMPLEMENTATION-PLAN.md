@@ -291,18 +291,19 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 - admission 后的 Transport error/panic 和关闭丢弃进入有界、非阻塞的 `Failures()` stream；慢消费者不阻塞 sender，溢出由 `DroppedFailureCount()` 计数，事件不携带业务 payload。
 - Send 不返回远端 Handler 结果；A 记录自己的 admission/传输诊断，B 记录自己的 Handler error。需要远端处理结果时使用 Call。
 - 当前 NodeSender 直接调用注入的 Transport；并发建连合并、TCP stream 和自动重连留在后续 Connection/Transport 子切片。
-- 已实现初始化绑定 Source ServiceID、NodeSenderResolver 和 CommandCodecRegistry 的 per-Service ClusterClient；当前只负责参数编码与远程 Send admission，不拥有 sender/连接。
+- 已实现初始化绑定 Source ServiceID、NodeSenderResolver、CommandCodecRegistry、共享 ClusterCallRegistry 和有限 MaxCallWait 的 per-Service ClusterClient；client 不拥有 sender/连接。
 - 普通远程 Send/Call 不暴露 source 参数；只有明确的基础设施 relay 才能转发 Runtime-owned Message，且不转移 Call session/PendingCall。
 - admission 前的无本地路由/sender、编码失败、队列满和关闭错误由 `Send` 立即返回；admission 后的节点不可达、断线及网络/I/O 错误进入 NodeSender 诊断 stream。
 
 ### Cluster 2：远程 Call
 
-- 状态：基础 PendingCall registry 已完成，Client.Call 和网络 completion 尚未接入。
+- 状态：基础远程 Call 本地等待切片已完成，ConnectionAgent 和真实网络 response 路由尚未接入。
 - Cluster-owned PendingCall 表保存 `Session → Source、RemoteNode、Target、Command`，Source 只在发起节点本地使用。
 - ClusterSessionID 在当前 Cluster 实例内单调分配，耗尽返回 `runtime.ErrIDExhausted`，不回绕或复用。
 - Response/Error 只完成匹配的 RemoteNode/Target/Command；未知、迟到、重复或错路由 frame 被拒绝并进入诊断。
 - 取消、timeout、节点/Cluster 关闭都恰好清理一次 PendingCall。
-- 待实现：Client.Call 与 Response/Error frame 的网络 completion。
+- 已实现：共享 `ClusterCallRegistry` 的 Session 分配与 `Complete` 入口，以及 `Client.Call` 的请求编码、有限等待、caller cancellation、Response/Error 解码。
+- 待实现：ConnectionAgent 与 Response/Error frame 的真实网络 completion。
 - 待实现：断线、timeout 以及未知、重复和迟到 response 的连接级诊断。
 - 待实现：Domain Error 经 Cluster 往返后保持 Class/Code 和 `errors.Is` 语义。
 

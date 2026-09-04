@@ -319,9 +319,11 @@ callFrom(source, node, target, command, args...)
 
 // Service 初始化时绑定一次 source，业务调用时无需重复传入。
 clusterClient, err := cluster.NewClusterClient(cluster.ClusterClientConfig{
-	Source:  serviceContext.Self(),
-	Senders: senderResolver,
-	Codecs:  commandCodecs,
+	Source:       serviceContext.Self(),
+	Senders:      senderResolver,
+	Codecs:       commandCodecs,
+	PendingCalls: clusterCallRegistry,
+	MaxCallWait:  5 * time.Second,
 })
 ```
 
@@ -387,14 +389,24 @@ type NodeSenderResolver interface {
 }
 
 type ClusterClientConfig struct {
-	Source  runtime.ServiceID
-	Senders NodeSenderResolver
-	Codecs  *CommandCodecRegistry
+	Source       runtime.ServiceID
+	Senders      NodeSenderResolver
+	Codecs       *CommandCodecRegistry
+	PendingCalls *ClusterCallRegistry
+	MaxCallWait  time.Duration
 }
+
+type ClusterCallRegistry struct{}
 
 func NewClusterClient(config ClusterClientConfig) (*ClusterClient, error)
 func (client *ClusterClient) Source() runtime.ServiceID
 func (client *ClusterClient) Send(node NodeID, target ServiceTarget, command runtime.CommandID, args ...any) error
+func (client *ClusterClient) Call(ctx context.Context, node NodeID, target ServiceTarget, command runtime.CommandID, args ...any) (any, error)
+
+func NewClusterCallRegistry() *ClusterCallRegistry
+func (registry *ClusterCallRegistry) Complete(from NodeID, envelope ClusterEnvelope) error
+func (registry *ClusterCallRegistry) Close() error
+func (registry *ClusterCallRegistry) PendingCount() int
 
 type DeliveryFailure struct {
 	LocalNode  NodeID
@@ -466,21 +478,21 @@ Cluster 1 同时提供 source-bound `ClusterClient` 的单向 `Send`：
 - 构造时必须绑定非零 Source、`NodeSenderResolver` 和启动期冻结的 `CommandCodecRegistry`；resolver 负责返回每个远端 Node 的唯一 sender，client 不拥有 sender 或连接。
 - `Send` 校验 Node/Target/Command，通过对应 CommandCodec 将 `args` 作为一个参数列表编码，再交给 sender admission；编码或本地 sender 错误直接返回，sender 的 nil 仍只表示本地 admission。
 - Source 只用于绑定调用者能力和后续本地 Call/PendingCall 归属，不是业务可覆盖的 Envelope 字段；ClusterEnvelope 不携带任意 Core Source，远端 adapter 按本地策略创建 Message Source。
-- 当前 client 只实现远程 Send；Call、ClusterSessionID 分配和 response/error completion 留在 Cluster 2。
+- `ClusterClient` 需要共享的 `ClusterCallRegistry` 和正数 `MaxCallWait` 配置；所有绑定同一 Cluster 的 client 复用这个 registry，当前 `Send` 仍只确认本地 admission。
 
 `DeliveryFailure` 只包含 LocalNode、RemoteNode、frame kind、Session、Target、Command 和底层 error，不复制或暴露业务 payload，也不用于自动重放。Cluster diagnostics owner 可以消费它写一条网络/I/O 诊断记录；如果消费能力不足，丢弃计数仍然可观测。它是 best-effort 基础设施诊断，不是不能丢失的业务审计日志。
 
-Cluster 2 的远程 Call 使用 Cluster-owned `ClusterPendingCall` 表：
+Cluster 2 的远程 Call 使用 Cluster-owned `ClusterCallRegistry` 和内部 `ClusterPendingCall` 表：
 
 - 发起 Call 时由 Cluster 单调分配非零 `ClusterSessionID`，本地记录 `Session → Source A、RemoteNode、Target、Command` 以及等待完成句柄；`Source A` 只留在 A 的 Cluster 内部。
 - wire request 只携带 `Session + Target + Command + Payload`；B 返回同一 `Session` 的 Response 或 Error，A 再按 Session 找回原 PendingCall 并恢复调用方 runner。
 - completion 必须来自登记的 RemoteNode，且 Target/Command 与原请求一致；未知、迟到、重复或错路由的 frame 不得完成其它 Session，只进入受控诊断。
 - cancellation、timeout、相关节点关闭和 Cluster 关闭都只完成并清理一次 PendingCall；不存在自动重放或 Session 转移。
-- 当前切片只实现 PendingCall 的注册、匹配完成、取消和关闭；`ClusterClient.Call`、ConnectionAgent 和网络 response 路由留在后续子切片。
+- 当前切片已实现 `ClusterClient.Call` 的请求编码、共享 Session 注册、本地有限等待、caller cancellation、Response/Error 解码和 `ClusterCallRegistry.Complete`；ConnectionAgent、真实网络 response 路由、节点断线批量失败仍留在后续子切片。
 
 失败归属依赖稳定 error identity，不解析错误字符串：`Send` 直接返回的错误表示 A 侧未完成本地 admission；`DeliveryFailure` 表示 admission 后的 Transport 投递失败。当前 `InMemoryTransport` 用 `ErrNodeNotFound` 表示目标节点当前没有 receiver，用 `ErrTransportClosed` 表示本地 Transport 已关闭。未来 TCP Transport 也必须提供可通过 `errors.Is`/`errors.As` 判断的稳定错误；网络分区、拒绝连接或握手失败只能记录为“远端当前不可达”及其安全原因，不能据此断言 B 的进程一定没有启动。
 
-远程 Send 坚持“A 管 A、B 管 B”：A 在本地 Cluster admission 成功后继续运行；B 收到后独立执行并在 B 侧记录自己的 Handler error。A 不通过 Send 获得 B 的 Handler 结果。只有需要返回值或远端处理错误时才使用 Call；Call 的 response/error 和 PendingCall 留在后续 Cluster 切片。
+远程 Send 坚持“A 管 A、B 管 B”：A 在本地 Cluster admission 成功后继续运行；B 收到后独立执行并在 B 侧记录自己的 Handler error。A 不通过 Send 获得 B 的 Handler 结果。需要返回值或远端处理错误时使用 Call；Call 的 response/error 由共享 `ClusterCallRegistry` 完成，真实网络 response 路由仍属于后续 ConnectionAgent 切片。
 
 默认 `ValueCodec` 的解码结果使用稳定的规范类型：有符号整数为 `int64`，无符号整数为 `uint64`，浮点数为 `float64`；复合值为 `[]any` 和 `map[string]any`。它拒绝 pointer、func、chan、struct、复杂数、`uintptr`、非有限浮点和非 string map key。Command-specific struct 由后续启动期注册的 Command codec 负责，不由默认值 Codec 猜测。
 

@@ -23,6 +23,7 @@ GSR Cluster 需要保持 Skynet 风格的简洁调用面，同时明确 Go 的�
 - 远程 Send 不返回远端 Handler 结果：A 节点负责自己的 admission 和传输诊断，B 节点负责自己的 Handler 执行与错误记录。需要远端返回值或处理错误时使用 Call。
 - 失败诊断保留 Transport 的稳定 error identity：当前内存 Transport 的 `ErrNodeNotFound` 表示目标 receiver 不可用，`ErrTransportClosed` 表示本地 Transport 已关闭；未来网络 Transport 不通过字符串猜测原因，也不把一般连接错误断言为“远端进程未启动”。
 - Cluster Call 的 PendingCall 只在发起节点保存 Source、远端 Node、Target 和 Command；wire 不携带 Core Source。Response/Error 必须匹配登记的 Session、RemoteNode、Target 和 Command，未知、迟到、重复或错路由 frame 不得完成其它等待。
+- 同一 Cluster 使用一个共享 `ClusterCallRegistry` 管理全部 source-bound `ClusterClient` 的 Session 分配和 completion；每个 client 只绑定自己的 Source。`Call` 的等待必须受正数 `MaxCallWait` 约束，调用方 context 只能取消或缩短等待。
 - 当前 NodeSender 只编排注入的 Transport 调用；TCP stream、并发建连合并和自动重连属于后续 Connection/Transport 子切片，在此基础行为上扩展。
 - NodeID/token 握手可配置；可信内网可以关闭，开启后使用 NodeID 加共享 token 的简单校验。
 - 远端目标使用 NodeID 与 ServiceName/Discovery 或当前远端 Runtime 的临时 ServiceID 分层表达；不引入 Epoch、Lease 或 Generation。Runtime/Cluster 只负责路由、投递和连接恢复，不判断业务资源的唯一所有权、一致性或过期。

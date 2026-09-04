@@ -26,6 +26,75 @@ type clusterCallResult struct {
 	err     error
 }
 
+// ClusterCallRegistry is the Cluster-owned completion boundary shared by all
+// source-bound ClusterClient instances in one Cluster.
+//
+// It keeps session allocation and pending-call ownership out of individual
+// Service clients. A transport or ConnectionAgent completes a response with
+// Complete; business code does not access pending-call records directly. Use
+// NewClusterCallRegistry; the zero value is not an open registry.
+type ClusterCallRegistry struct {
+	pending *clusterPendingCalls
+}
+
+var (
+	// ErrInvalidClusterCallRegistry means a call registry receiver is invalid.
+	ErrInvalidClusterCallRegistry = errors.New("cluster: invalid call registry")
+)
+
+// NewClusterCallRegistry creates an open Cluster-wide pending-call owner.
+func NewClusterCallRegistry() *ClusterCallRegistry {
+	return &ClusterCallRegistry{pending: newClusterPendingCalls()}
+}
+
+func (registry *ClusterCallRegistry) valid() bool {
+	return registry != nil && registry.pending != nil
+}
+
+// Complete matches one remote Response or Error to its pending call.
+//
+// The from NodeID is supplied by the transport rather than read from the
+// envelope. A mismatch or unknown session is rejected without completing any
+// other call.
+func (registry *ClusterCallRegistry) Complete(from NodeID, envelope ClusterEnvelope) error {
+	if !registry.valid() {
+		return ErrInvalidClusterCallRegistry
+	}
+	return registry.pending.complete(from, envelope)
+}
+
+// Close completes all remaining calls with ErrClusterCallClosed and prevents
+// new sessions from being registered.
+func (registry *ClusterCallRegistry) Close() error {
+	if !registry.valid() {
+		return ErrInvalidClusterCallRegistry
+	}
+	return registry.pending.close(nil)
+}
+
+// PendingCount reports the number of calls that are still waiting for a
+// response. It is intended for lifecycle and diagnostic checks.
+func (registry *ClusterCallRegistry) PendingCount() int {
+	if !registry.valid() {
+		return 0
+	}
+	return registry.pending.pendingCount()
+}
+
+func (registry *ClusterCallRegistry) begin(source runtime.ServiceID, node NodeID, target ServiceTarget, command runtime.CommandID) (*clusterPendingCall, error) {
+	if !registry.valid() {
+		return nil, ErrInvalidClusterCallRegistry
+	}
+	return registry.pending.begin(source, node, target, command)
+}
+
+func (registry *ClusterCallRegistry) cancel(session ClusterSessionID, err error) bool {
+	if !registry.valid() {
+		return false
+	}
+	return registry.pending.cancel(session, err)
+}
+
 type clusterPendingCall struct {
 	session ClusterSessionID
 	source  runtime.ServiceID
