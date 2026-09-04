@@ -297,10 +297,14 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 
 ### Cluster 2：远程 Call
 
-- Cluster PendingCall 和 ClusterSessionID。
-- Response/Error frame completion。
-- 断线、timeout、未知、重复和迟到 response。
-- Domain Error 经 Cluster 往返后保持 Class/Code 和 `errors.Is` 语义。
+- 状态：基础 PendingCall registry 已完成，Client.Call 和网络 completion 尚未接入。
+- Cluster-owned PendingCall 表保存 `Session → Source、RemoteNode、Target、Command`，Source 只在发起节点本地使用。
+- ClusterSessionID 在当前 Cluster 实例内单调分配，耗尽返回 `runtime.ErrIDExhausted`，不回绕或复用。
+- Response/Error 只完成匹配的 RemoteNode/Target/Command；未知、迟到、重复或错路由 frame 被拒绝并进入诊断。
+- 取消、timeout、节点/Cluster 关闭都恰好清理一次 PendingCall。
+- 待实现：Client.Call 与 Response/Error frame 的网络 completion。
+- 待实现：断线、timeout 以及未知、重复和迟到 response 的连接级诊断。
+- 待实现：Domain Error 经 Cluster 往返后保持 Class/Code 和 `errors.Is` 语义。
 
 ### Cluster 3：TCP 与连接 owner
 

@@ -470,6 +470,14 @@ Cluster 1 同时提供 source-bound `ClusterClient` 的单向 `Send`：
 
 `DeliveryFailure` 只包含 LocalNode、RemoteNode、frame kind、Session、Target、Command 和底层 error，不复制或暴露业务 payload，也不用于自动重放。Cluster diagnostics owner 可以消费它写一条网络/I/O 诊断记录；如果消费能力不足，丢弃计数仍然可观测。它是 best-effort 基础设施诊断，不是不能丢失的业务审计日志。
 
+Cluster 2 的远程 Call 使用 Cluster-owned `ClusterPendingCall` 表：
+
+- 发起 Call 时由 Cluster 单调分配非零 `ClusterSessionID`，本地记录 `Session → Source A、RemoteNode、Target、Command` 以及等待完成句柄；`Source A` 只留在 A 的 Cluster 内部。
+- wire request 只携带 `Session + Target + Command + Payload`；B 返回同一 `Session` 的 Response 或 Error，A 再按 Session 找回原 PendingCall 并恢复调用方 runner。
+- completion 必须来自登记的 RemoteNode，且 Target/Command 与原请求一致；未知、迟到、重复或错路由的 frame 不得完成其它 Session，只进入受控诊断。
+- cancellation、timeout、相关节点关闭和 Cluster 关闭都只完成并清理一次 PendingCall；不存在自动重放或 Session 转移。
+- 当前切片只实现 PendingCall 的注册、匹配完成、取消和关闭；`ClusterClient.Call`、ConnectionAgent 和网络 response 路由留在后续子切片。
+
 失败归属依赖稳定 error identity，不解析错误字符串：`Send` 直接返回的错误表示 A 侧未完成本地 admission；`DeliveryFailure` 表示 admission 后的 Transport 投递失败。当前 `InMemoryTransport` 用 `ErrNodeNotFound` 表示目标节点当前没有 receiver，用 `ErrTransportClosed` 表示本地 Transport 已关闭。未来 TCP Transport 也必须提供可通过 `errors.Is`/`errors.As` 判断的稳定错误；网络分区、拒绝连接或握手失败只能记录为“远端当前不可达”及其安全原因，不能据此断言 B 的进程一定没有启动。
 
 远程 Send 坚持“A 管 A、B 管 B”：A 在本地 Cluster admission 成功后继续运行；B 收到后独立执行并在 B 侧记录自己的 Handler error。A 不通过 Send 获得 B 的 Handler 结果。只有需要返回值或远端处理错误时才使用 Call；Call 的 response/error 和 PendingCall 留在后续 Cluster 切片。
