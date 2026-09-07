@@ -305,7 +305,9 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 - 已实现：共享 `ClusterCallRegistry` 的 Session 分配与 `Complete` 入口，以及 `Client.Call` 的请求编码、有限等待、caller cancellation、Response/Error 解码。
 - 待实现：外层 Connection owner 与 Response/Error frame 的真实网络 stream completion。
 - 待实现：断线、timeout 以及未知、重复和迟到 response 的连接级诊断。
-- 待实现：Domain Error 经 Cluster 往返后保持 Class/Code 和 `errors.Is` 语义。
+- 已验证：`cluster/roundtrip_test.go` 通过公开 API 组装双节点内存链路，连接 ClusterClient、NodeSender、ConnectionAgent 和 ClusterCallRegistry；请求与回复均经过完整 FrameCodec 编解码。覆盖成功返回、Domain Error 的 Class/Code、安全 Message 和 `errors.Is`，以及未知错误/panic 的安全转换。
+- 已验证：Send 的 B 侧 Handler error 由接收适配器本地记录、不产生回复；随后同一链路可继续 Call。目标节点未注册时，Send 入队成功后的失败在 A 侧保留节点、目标、命令和 `ErrNodeNotFound` 原因。
+- 门禁范围：InMemoryTransport 同步调用接收器，测试使用逻辑 Handler，没有组装两个 Core Runtime 或真实 socket；不能据此证明慢 Handler 不阻塞同节点后续投递。TCP 调度、连接关闭和 Service 并发隔离仍需在真实 owner 接入时验证。
 
 ### Cluster 3：TCP 与连接 owner
 
