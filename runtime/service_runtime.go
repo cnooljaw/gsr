@@ -249,10 +249,18 @@ func (dispatcher *localDispatcher) dispatchFromServiceWithSession(source *servic
 }
 
 func (dispatcher *localDispatcher) dispatchRuntimeOwned(target ServiceID, command CommandID, args ...any) error {
+	return dispatcher.dispatchRuntimeOwnedWithSession(target, command, args, 0)
+}
+
+func (dispatcher *localDispatcher) dispatchCallRuntimeOwned(target ServiceID, command CommandID, args []any, session SessionID) error {
+	return dispatcher.dispatchRuntimeOwnedWithSession(target, command, args, session)
+}
+
+func (dispatcher *localDispatcher) dispatchRuntimeOwnedWithSession(target ServiceID, command CommandID, args []any, session SessionID) error {
 	return dispatcher.enqueue(Message{
 		Source:  ServiceID(0),
 		Target:  target,
-		Session: 0,
+		Session: session,
 		Command: command,
 		Args:    append([]any(nil), args...),
 	})

@@ -52,6 +52,7 @@
 - Reply 通过 Runtime 的 PendingCall completion 路径返回，不作为业务 Command 进入调用方 Mailbox；ClusterEnvelope 必须显式区分 request、response 和 error frame。
 - Reply error 使用稳定的 ErrorClass、ErrorCode 和安全 Message；程序分支只依赖 Class/Code，不比较 Message。未知 Handler error 不透传内部文本或 stack。
 - 普通 Send/Call 的 Source 必须由 Runtime 自动设置为当前发起 Service 的 ServiceID；Timer 投递使用 Source == 0；受控 Redirect 只能转发 Runtime-owned Message，业务代码不得传入或伪造任意 Source。
+- 宿主或受信任基础设施通过 Runtime.Send/Runtime.Call 显式注入本地消息，Source 固定为零；Runtime.Call 复用有界 Mailbox、有限等待和 PendingCall，不创建 goroutine。业务 Service 只获得 ServiceContext，不能借用基础设施入口绕过自身来源与执行约束。
 - Cluster 内部入口显式接收 source；普通业务 API 使用预先绑定当前 ServiceID 的 per-Service client，并调用 `Send(node, serviceID, ...)` / `Call(node, serviceID, ...)`；受信任 relay 只能转发 Runtime-owned Message。禁止用全局变量或 goroutine-local 推断当前 Service。
 - 未编码的 Message 不得成为共享可变状态的通道：引用型 Args 必须是消息独占快照，成功 admission 后发送方不得修改，且不得发送 Service 状态的内部引用。
 - Service 内 Call 采用 run-to-completion：等待期间同一 Service 不处理下一条消息，Reply 只恢复当前 Handler；Call 必须有有限超时并谨慎使用，self Call 直接拒绝。

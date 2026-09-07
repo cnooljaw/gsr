@@ -677,8 +677,9 @@ type Service interface {
 	OnStop(context.Context) error
 }
 
-// Runtime-owned adapters may inject a local message with Source == 0.
+// 宿主或受信任基础设施通过显式入口注入本地消息，Source 固定为零。
 func (r *Runtime) Send(target ServiceID, command CommandID, args ...any) error
+func (r *Runtime) Call(ctx context.Context, target ServiceID, command CommandID, args ...any) (any, error)
 
 func (r *Runtime) Stop(ctx context.Context) error
 func (r *Runtime) Close() error
@@ -686,7 +687,11 @@ func (r *Runtime) Close() error
 
 Service 不提供额外 `Close` 钩子；本地资源释放属于 `OnStop`。`Runtime.Stop` 是整个 Runtime 的有序停止操作，`Runtime.Close` 是最终资源释放操作；单个 Service 的停止若需要公开，使用 `StopService` 命名，不复用 Runtime `Stop`。
 
-`Runtime.Send` 只供 Runtime-owned adapter 或宿主注入本地消息，消息的 `Source` 固定为 `ServiceID(0)`；普通 Service 应使用绑定当前 ServiceID 的 `ServiceContext.Send`。
+`Runtime.Send` / `Runtime.Call` 属于 **Infrastructure API**，只供受信任基础设施或宿主注入本地消息，消息的 `Source` 固定为 `ServiceID(0)`；普通 Service 使用绑定当前 ServiceID 的 `ServiceContext.Send` / `ServiceContext.Call`。组装时业务只获得 ServiceContext，基础设施持有 Runtime。
+
+业务跨节点调用使用绑定当前 Service 的 `ClusterClient.Call`；目标节点 Cluster 内部通过 `Runtime.Call` 将远端请求落地成本地调用。两者是同一调用链的不同层，不是业务可二选一的跨节点 API。
+
+`Runtime.Call` 创建独立的本地 Session，复用 Dispatcher、Mailbox、Service runner 和 PendingCall，不绕过 Handler，也不把 ClusterSessionID 带入 Core。最大等待时间为 Runtime 的 MaxCallWait，调用方 context 只能缩短；nil context 返回 ErrInvalidCallContext，nil Runtime 返回 ErrRuntimeClosed。Runtime 停止时统一完成剩余等待。它不创建 goroutine；外层网络组件负责并发上限、取消和等待。内部通过独立命名的基础设施入口分派，不以 nil Service 选择来源语义。
 
 `CreateService` 的 `ctx` 是启动操作的协作取消信号，并原样传给 `OnStart`。Go 无法强杀忽略取消的 `OnStart`：Runtime 必须等待它真实返回，只有返回成功才发布 ServiceID。OnStart 已开始执行但失败时，已分配的 ID 作废且永不复用；Runtime 至多调用该 Service 的 `OnStop` 一次，为部分初始化资源提供清理机会，`OnStop` 必须能够处理未完整启动的实例。
 

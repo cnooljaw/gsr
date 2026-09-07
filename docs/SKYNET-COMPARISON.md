@@ -37,6 +37,7 @@ Skynet 的关闭顺序可概括为：timer 线程停止时间/socket 事件并�
 
 | GSR 概念/API | GSR 阶段 | Skynet 对应概念 | 关系 | 关键区别 |
 | --- | --- | --- | --- | --- |
+| `Runtime.Call(ctx, target, command, args...)` | 已实现 | `clusteragent.lua` 通过 `skynet.rawcall` 发起本地调用 | 借鉴后重构 | Skynet agent 是 Service，依赖 Lua coroutine 等待；GSR 宿主/基础设施使用 Source 为零的显式入口，经普通 Mailbox 和本地 PendingCall 完成，等待受 MaxCallWait 限制。普通业务仍使用 ServiceContext.Call。 |
 | `Message`：`Source`、`Target`、`Session`、`Command`、`Args` | Core 1/3 计划 | `skynet_message`：`source`、`session`、`data`、`sz` | 直接对应 | GSR 本地 Message 不做 wire 编码；Skynet 常规路径把 Lua 参数 pack 成 buffer，并把类型编码进 `sz` 高位。 |
 | `Command` / `CommandID uint32` | Core 1 计划 | `PTYPE_*`、`skynet.register_protocol()`、protocol id 和 Lua command string | 借鉴后重构 | GSR Core 不暴露 `PTYPE`；CommandID 使用 32 位静态命令字段，与协议保持同宽，Command codec 在边界注册。 |
 | `LocalDispatcher` | Core 1 计划 | `skynet_context_message_dispatch()`、`skynet.dispatch()` | 直接对应 | GSR 本地 dispatcher 只处理本地 Message；Skynet callback 还要处理 protocol type、解包和 session。 |

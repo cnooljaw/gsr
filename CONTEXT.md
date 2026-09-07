@@ -8,12 +8,13 @@
 - **SessionID**：`uint64` 形式的 Core 本地请求关联号；零表示 Send、不需要 Reply，非零表示 Call、等待一次 Reply。它只负责关联，在当前 Runtime 内单调分配且不回绕复用。
 - **TimerID**：`uint64` 形式的 Runtime 局部 Timer 标识，只在当前 Runtime 生命周期内有效；零值无效，已发放的 ID 不回绕复用。
 - **CommandID**：`uint32` 形式的业务命令标识，与协议字段保持同宽以兼容现有命令值；由业务/协议包维护静态常量或生成代码。Runtime 不分配、不回收，也不从它推断 Service 能力。一个 CommandID 对应的 typed Handler 参数数量和类型固定。
-- **Source**：由 Runtime 写入本地 Message 的来源字段。普通 Send/Call 使用当前发起 ServiceID；Timer 触发的 Command 使用 `ServiceID(0)`，创建者由 Timer owner 表达；受控 Redirect 可以按固定 relay 策略保留已有 Message 的原始 Source，但业务不能传入或伪造任意值。跨节点原始来源由 ClusterSessionID 和传输上下文关联，不把节点身份编码进 ServiceID。
+- **Source**：由 Runtime 写入本地 Message 的来源字段。普通 Service Send/Call 使用当前发起 ServiceID；宿主/基础设施通过 Runtime.Send/Runtime.Call 注入的消息使用 `ServiceID(0)`；Timer 触发的 Command 也使用零值，创建者由 Timer owner 表达。受控 Redirect 可以按固定 relay 策略保留已有 Message 的原始 Source，但业务不能传入或伪造任意值。跨节点原始来源由 ClusterSessionID 和传输上下文关联，不把节点身份编码进 ServiceID。
 - **Message**：Core 内存中的本地消息对象，包含 Source、Target、Session、Command 和 Args；它不进行 wire 编码，Send 与 Call 共用该结构。
 - **CommandDispatcher**：可选的每 Service 标准分发器。它在构造时复制并校验 `CommandID -> typed Handler` 表，运行时只负责固定参数的数量/类型绑定和调用；它不是 Runtime Registry，也不接受运行期注册。
 - **CommandHandlers**：`CommandDispatcher` 的构造输入。命令表属于单个 Service，构造完成后不可变；非法 Handler 签名、参数不匹配和未知命令分别使用稳定的 Runtime Error 表达。
 - **Message Ownership**：消息成功被 Runtime 接受后，Message 独占自己的 `Args` 外层切片。`any` 内部的 map、slice、pointer 等引用数据必须由 typed client 按具体消息类型复制成消息专用快照；发送方不得在 admission 后继续修改，也不得把 Service 拥有的可变状态引用作为参数发送。
-- **CommandContext**：Runtime 为每次 Handler 调用创建的只读消息上下文，提供当前 Service 的 Core 能力以及由 Runtime 填入的 `Source()`；Source 可能为 `ServiceID(0)`（Timer）；业务不能覆盖 Source，也不能通过它手工或异步 Reply。
+- **CommandContext**：Runtime 为每次 Handler 调用创建的只读消息上下文，提供当前 Service 的 Core 能力以及由 Runtime 填入的 `Source()`；Source 可能为 `ServiceID(0)`（Timer 或宿主/基础设施注入）；业务不能覆盖 Source，也不能通过它手工或异步 Reply。
+- **Runtime.Call**：宿主或受信任基础设施的本地 Call 入口，Source 固定为零；使用独立本地 Session、普通 Mailbox 和有限等待，不创建 goroutine。普通 Service 仍通过 ServiceContext.Call 发起调用。
 - **PendingCall**：Runtime 内部以非零 SessionID 索引的一次等待。Reply 通过 completion 路径完成它，不进入调用方 Mailbox 或业务 Handler。
 - **ClusterPendingCall**：Cluster 内部以非零 ClusterSessionID 索引的一次远程等待，保存本地 Source、远端 Node、Target 和 Command；Response/Error 只完成匹配记录，Source 不进入 wire。
 - **Run-to-completion**：一个 Handler（包括其中的 Call 等待）结束前，同一 Service 不执行下一条消息；等待期间其它 Service 仍可运行。

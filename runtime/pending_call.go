@@ -14,9 +14,10 @@ type callResult struct {
 
 type pendingCall struct {
 	session SessionID
-	caller  *serviceInstance
-	target  ServiceID
-	done    chan callResult
+	// caller 仅记录 Service 生命周期归属；基础设施调用没有所属 Service。
+	caller *serviceInstance
+	target ServiceID
+	done   chan callResult
 }
 
 // pendingCallManager 管理 Runtime 本地 SessionID 表。
@@ -47,6 +48,11 @@ func (*pendingCallManager) lifecycleName() string {
 
 func (*pendingCallManager) start(context.Context) error {
 	return nil
+}
+
+// beginRuntimeOwned 登记不归属于 Service 的基础设施等待；不参与来源分派。
+func (manager *pendingCallManager) beginRuntimeOwned(target ServiceID) (*pendingCall, error) {
+	return manager.begin(nil, target)
 }
 
 func (manager *pendingCallManager) begin(caller *serviceInstance, target ServiceID) (*pendingCall, error) {
