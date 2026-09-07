@@ -106,7 +106,7 @@ GSR 只用 `SessionID == 0` 或 `SessionID > 0` 区分 Send/Call；Skynet 还把
 | `FrameCodec` | Cluster 0 | `lua-cluster.c` 的 `fill_header`、socket channel 帧 | 借鉴后重构 | GSR 先用四字节大端长度前缀界定一个完整 frame；Envelope 不携带 version，stream I/O、握手和重连由后续 Transport/ConnectionAgent 负责。 |
 | `InMemoryTransport` | Cluster 0 | Skynet 的 socket channel 测试替身/节点间连接 | 借鉴后重构 | GSR 提供同步、可确定的进程内 Transport 作为测试边界；它不模拟 TCP、重连、队列或远端执行成功，生产 sender/agent 仍在后续切片实现。 |
 | `NodeSender` | Cluster 1 基础子切片已完成 | `clusterd.lua` 的 `node_sender[node]` + `clustersender.lua` | 直接对应但分阶段实现 | GSR 每个远端 Node 一个 sender，当前以固定有界队列和单一 worker 完成本地 admission/顺序投递；底层失败进入非阻塞诊断 stream，不在 worker 中运行外部 callback。连接合并、TCP stream 和自动重连仍在后续子切片，不自动重放结果不确定的业务请求。 |
-| `ConnectionAgent` | Cluster 计划 | `clusterd.lua` 为每条 inbound fd 创建的 `clusteragent` | 直接对应 | 每条入站 socket 独立 agent；响应沿原连接返回，不与同一 Node 的 outbound sender 混成一个所有者。 |
+| `ConnectionAgent` | Cluster 2 基础逻辑切片已完成，TCP owner 待实现 | `clusterd.lua` 为每条 inbound fd 创建的 `clusteragent` | 直接对应 | GSR `Handle` 只接收已解码 Request、调用窄的本地适配器并沿所属 writer 回写 Call Response/Error；每条入站 socket 仍由外层独立 agent 管理，不与同一 Node 的 outbound sender 混成一个所有者。 |
 | 远端 Service 地址 | Cluster 计划 | 远端 handle、`@name`、`cluster.proxy(node, name)` | 有意不照搬 | GSR 的 ServiceID 永远是本地临时地址；远端稳定身份使用 NodeID + ServiceName/Discovery，具体实例解析留在 Cluster；不引入 Epoch/Lease/Generation，也不由 Runtime 判断业务资源所有权、一致性或过期。 |
 | 断线、重连和重放 | Cluster 计划 | `socketchannel` 的 reconnect/changehost、`clusterd` sender 重建 | 借鉴后重构 | GSR 重连只恢复未来通信，不宣称 exactly-once，也不自动重放业务 Call/Send；幂等、RequestID 和补偿属于业务。 |
 | Cluster 关闭顺序 | Cluster 计划 | socket close/free、cluster sender/agent service 退出、Harbor release | 借鉴后重构 | 外层 Node/Host 先停止入站和新的出站 admission，再 `Runtime.Close`；Core 完成后再关闭 Transport 和连接 goroutine。 |

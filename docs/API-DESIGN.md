@@ -408,6 +408,17 @@ func (registry *ClusterCallRegistry) Complete(from NodeID, envelope ClusterEnvel
 func (registry *ClusterCallRegistry) Close() error
 func (registry *ClusterCallRegistry) PendingCount() int
 
+type RequestHandler func(context.Context, NodeID, ClusterEnvelope) ([]byte, error)
+type ResponseWriter func(ClusterEnvelope) error
+
+type ConnectionAgentConfig struct {
+	Handler RequestHandler
+	Write   ResponseWriter
+}
+
+func NewConnectionAgent(config ConnectionAgentConfig) (*ConnectionAgent, error)
+func (agent *ConnectionAgent) Handle(ctx context.Context, from NodeID, request ClusterEnvelope) error
+
 type DeliveryFailure struct {
 	LocalNode  NodeID
 	RemoteNode NodeID
@@ -488,11 +499,18 @@ Cluster 2 的远程 Call 使用 Cluster-owned `ClusterCallRegistry` 和内部 `C
 - wire request 只携带 `Session + Target + Command + Payload`；B 返回同一 `Session` 的 Response 或 Error，A 再按 Session 找回原 PendingCall 并恢复调用方 runner。
 - completion 必须来自登记的 RemoteNode，且 Target/Command 与原请求一致；未知、迟到、重复或错路由的 frame 不得完成其它 Session，只进入受控诊断。
 - cancellation、timeout、相关节点关闭和 Cluster 关闭都只完成并清理一次 PendingCall；不存在自动重放或 Session 转移。
-- 当前切片已实现 `ClusterClient.Call` 的请求编码、共享 Session 注册、本地有限等待、caller cancellation、Response/Error 解码和 `ClusterCallRegistry.Complete`；ConnectionAgent、真实网络 response 路由、节点断线批量失败仍留在后续子切片。
+- 当前切片已实现 `ClusterClient.Call` 的请求编码、共享 Session 注册、本地有限等待、caller cancellation、Response/Error 解码和 `ClusterCallRegistry.Complete`；逻辑 `ConnectionAgent.Handle` 也已实现，真实网络 stream、response 路由和节点断线批量失败仍留在后续子切片。
+
+`ConnectionAgent` 是每条入站连接的逻辑接收适配器：
+
+- `Handle` 只接受已解码的 `FrameRequest`，把 `from NodeID` 和 Request 快照交给注入的 `RequestHandler`；它不构造 Core Message，也不解析 Service 实现。
+- `Session == 0` 的 Send 不写回 Response；接收节点的 Runtime/Adapter 负责记录自己的 Handler error。
+- `Session > 0` 的 Call 沿注入的 `ResponseWriter` 写回同一 Session、Target、Command 的 Response 或结构化 Error。Handler 的未知 error/panic 转成安全的 Runtime StatusError。
+- Agent 不拥有 socket、FrameCodec、连接 goroutine 或重连状态；这些由外层 Connection owner 管理。Writer 错误/ panic 返回基础设施错误，不伪装成远端业务结果。
 
 失败归属依赖稳定 error identity，不解析错误字符串：`Send` 直接返回的错误表示 A 侧未完成本地 admission；`DeliveryFailure` 表示 admission 后的 Transport 投递失败。当前 `InMemoryTransport` 用 `ErrNodeNotFound` 表示目标节点当前没有 receiver，用 `ErrTransportClosed` 表示本地 Transport 已关闭。未来 TCP Transport 也必须提供可通过 `errors.Is`/`errors.As` 判断的稳定错误；网络分区、拒绝连接或握手失败只能记录为“远端当前不可达”及其安全原因，不能据此断言 B 的进程一定没有启动。
 
-远程 Send 坚持“A 管 A、B 管 B”：A 在本地 Cluster admission 成功后继续运行；B 收到后独立执行并在 B 侧记录自己的 Handler error。A 不通过 Send 获得 B 的 Handler 结果。需要返回值或远端处理错误时使用 Call；Call 的 response/error 由共享 `ClusterCallRegistry` 完成，真实网络 response 路由仍属于后续 ConnectionAgent 切片。
+远程 Send 坚持“A 管 A、B 管 B”：A 在本地 Cluster admission 成功后继续运行；B 收到后独立执行并在 B 侧记录自己的 Handler error。A 不通过 Send 获得 B 的 Handler 结果。需要返回值或远端处理错误时使用 Call；Call 的 response/error 由共享 `ClusterCallRegistry` 完成，真实网络 stream 和连接 owner 仍属于后续切片。
 
 默认 `ValueCodec` 的解码结果使用稳定的规范类型：有符号整数为 `int64`，无符号整数为 `uint64`，浮点数为 `float64`；复合值为 `[]any` 和 `map[string]any`。它拒绝 pointer、func、chan、struct、复杂数、`uintptr`、非有限浮点和非 string map key。Command-specific struct 由后续启动期注册的 Command codec 负责，不由默认值 Codec 猜测。
 

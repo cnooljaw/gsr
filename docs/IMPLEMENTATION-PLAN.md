@@ -269,7 +269,7 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 
 ### Cluster 0：协议与内存传输
 
-状态：Cluster 0 已完成，Cluster 1 正在推进。`cluster` package 已提供 `NodeID`、`ClusterSessionID`、`FrameKind`、`ServiceTarget`、`ClusterEnvelope` 的值类型与结构校验、受限的 `ValueCodec`、启动期不可变的 Command codec registry、长度前缀 `FrameCodec`，以及确定性的 `InMemoryTransport`。Cluster 1 已新增 `NodeSender` 的基础出站 admission；ConnectionAgent、TCP stream I/O、连接合并和自动重连仍按后续子切片推进。
+状态：Cluster 0 已完成，Cluster 1 正在推进。`cluster` package 已提供 `NodeID`、`ClusterSessionID`、`FrameKind`、`ServiceTarget`、`ClusterEnvelope` 的值类型与结构校验、受限的 `ValueCodec`、启动期不可变的 Command codec registry、长度前缀 `FrameCodec`，以及确定性的 `InMemoryTransport`。Cluster 1 已新增 `NodeSender` 的基础出站 admission；逻辑 `ConnectionAgent` 已具备，TCP stream I/O、连接合并和自动重连仍按后续子切片推进。
 
 - `NodeID`、`ClusterSessionID`、`ClusterEnvelope`。
 - 显式 Request、Response、Error frame。
@@ -297,18 +297,19 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 
 ### Cluster 2：远程 Call
 
-- 状态：基础远程 Call 本地等待切片已完成，ConnectionAgent 和真实网络 response 路由尚未接入。
+- 状态：基础远程 Call 本地等待和逻辑 ConnectionAgent 切片已完成，真实网络 response 路由尚未接入。
 - Cluster-owned PendingCall 表保存 `Session → Source、RemoteNode、Target、Command`，Source 只在发起节点本地使用。
 - ClusterSessionID 在当前 Cluster 实例内单调分配，耗尽返回 `runtime.ErrIDExhausted`，不回绕或复用。
 - Response/Error 只完成匹配的 RemoteNode/Target/Command；未知、迟到、重复或错路由 frame 被拒绝并进入诊断。
 - 取消、timeout、节点/Cluster 关闭都恰好清理一次 PendingCall。
 - 已实现：共享 `ClusterCallRegistry` 的 Session 分配与 `Complete` 入口，以及 `Client.Call` 的请求编码、有限等待、caller cancellation、Response/Error 解码。
-- 待实现：ConnectionAgent 与 Response/Error frame 的真实网络 completion。
+- 待实现：外层 Connection owner 与 Response/Error frame 的真实网络 stream completion。
 - 待实现：断线、timeout 以及未知、重复和迟到 response 的连接级诊断。
 - 待实现：Domain Error 经 Cluster 往返后保持 Class/Code 和 `errors.Is` 语义。
 
 ### Cluster 3：TCP 与连接 owner
 
+- 状态：逻辑 ConnectionAgent 已完成，TCP/stream owner 尚未实现。
 - 长度前缀 framing。
 - 每条 inbound socket 一个 ConnectionAgent，响应沿原连接返回。
 - 可选 NodeID/shared-token 握手。
