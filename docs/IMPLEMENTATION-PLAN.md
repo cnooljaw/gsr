@@ -318,6 +318,7 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 - 状态：逻辑 ConnectionAgent、内部单连接 I/O 封装和出站连接响应读循环已完成；TCP Transport 的入站请求循环、建连与重连管理尚未实现。
 - 已裁决并实现基础设施 Runtime.Call：Source 固定为零，经普通 Mailbox 执行，复用有限等待与停止收尾；ServiceContext.Call 仍绑定真实 Service。取舍见 [Cluster 入站 Call 方案](RFC-CLUSTER-INBOUND-CALL.md)。
 - 已用 ConnectionAgent 测试适配器接通真实 Runtime，覆盖成功/领域错误回复、零 Source，以及本地 Session 与 ClusterSession 分离；网络入站并发管理和正式适配器组装仍待接入。
+- 已实现内部 localRequestAdapter：查找 Command codec、解码参数列表、按 ID 或外层名称解析目标，再经 Runtime.Send/Call 执行；未知 Command/坏载荷仅返回接收侧诊断错误，不产生响应。Send 接纳错误归接收侧，Call 执行错误沿 ConnectionAgent 回包，写回故障保留 I/O 错误链。该适配器尚未接入网络入站读循环，不管理并发或连接生命周期。
 - 已实现内部 stream framing 函数：按长度前缀读取单帧，分配前检查上限；覆盖逐字节拆包、连续帧、截断和完整坏帧后的边界保持。写入失败或短写直接返回，不重放。
 - stream 解码错误带有内部“完整帧已消费”标记，并保留原错误链，供连接层识别边界；非法长度、截断和 I/O 错误不携带该标记。标记不替代认证、越界等必须关闭连接的检查。
 - 已通过 `net.Pipe` 验证 ConnectionAgent 原连接请求/回复、关闭解除读写等待，以及连接 deadline 的超时错误传播；尚未覆盖真实 TCP、连接重建或双 Runtime 调度。
