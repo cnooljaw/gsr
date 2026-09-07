@@ -311,11 +311,12 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 
 ### Cluster 3：TCP 与连接 owner
 
-- 状态：逻辑 ConnectionAgent 已完成，TCP/stream owner 尚未实现。
+- 状态：逻辑 ConnectionAgent 和内部单连接 I/O 封装已完成，TCP Transport 的读循环、建连与重连管理尚未实现。
 - 已实现内部 stream framing 函数：按长度前缀读取单帧，分配前检查上限；覆盖逐字节拆包、连续帧、截断和完整坏帧后的边界保持。写入失败或短写直接返回，不重放。
 - stream 解码错误带有内部“完整帧已消费”标记，并保留原错误链，供连接层识别边界；非法长度、截断和 I/O 错误不携带该标记。标记不替代认证、越界等必须关闭连接的检查。
 - 已通过 `net.Pipe` 验证 ConnectionAgent 原连接请求/回复、关闭解除读写等待，以及连接 deadline 的超时错误传播；尚未覆盖真实 TCP、连接重建或双 Runtime 调度。
-- 当前 stream 函数只处理 `io.Reader` / `io.Writer`，尚未接入生产连接；deadline、串行写、关闭、坏帧处置和诊断由后续连接 owner 负责。
+- 内部 `streamConnection` 接管一个已建立的 `net.Conn`：串行写帧、设置有限单次写 deadline、幂等关闭。I/O 写失败和边界不完整的读取失败关闭连接；编码失败不关闭，完整坏帧交给上层执行丢弃/诊断或更严格的安全检查。
+- `streamConnection` 不启动 goroutine、不建连或重连；写 timeout 不包含等待串行锁的时间。后续 Transport 必须限制并发写调用数量、拥有唯一读循环并负责关闭后等待退出，尚未接入生产连接。
 - 长度前缀 framing。
 - 每条 inbound socket 一个 ConnectionAgent，响应沿原连接返回。
 - 可选 NodeID/shared-token 握手。

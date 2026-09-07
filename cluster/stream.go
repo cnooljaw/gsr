@@ -63,6 +63,10 @@ func (codec *FrameCodec) writeFrame(writer io.Writer, envelope ClusterEnvelope) 
 	if err != nil {
 		return err
 	}
+	return writeFrameBytes(writer, frame)
+}
+
+func writeFrameBytes(writer io.Writer, frame []byte) error {
 	written, err := writer.Write(frame)
 	if err != nil {
 		return fmt.Errorf("write cluster frame: %w", err)
