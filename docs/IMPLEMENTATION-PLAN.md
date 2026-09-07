@@ -312,6 +312,8 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 ### Cluster 3：TCP 与连接 owner
 
 - 状态：逻辑 ConnectionAgent 已完成，TCP/stream owner 尚未实现。
+- 已实现内部 stream framing 函数：按长度前缀读取单帧，分配前检查上限；覆盖逐字节拆包、连续帧、截断和完整坏帧后的边界保持。写入失败或短写直接返回，不重放。
+- 当前 stream 函数只处理 `io.Reader` / `io.Writer`，尚未接入生产连接；deadline、串行写、关闭、坏帧处置和诊断由后续连接 owner 负责。
 - 长度前缀 framing。
 - 每条 inbound socket 一个 ConnectionAgent，响应沿原连接返回。
 - 可选 NodeID/shared-token 握手。
