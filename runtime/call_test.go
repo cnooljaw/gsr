@@ -108,7 +108,7 @@ func TestCallHonorsRuntimeMaxWait(t *testing.T) {
 	target.releaseNow()
 }
 
-// 验证调用方 context 可以提前取消 Call，且迟到的目标 completion 不会再次完成它。
+// 验证调用方 context 可以提前取消 Call，且迟到的目标完成结果不会再次完成它。
 func TestCallHonorsCallerCancellation(t *testing.T) {
 	runtime := newCallTestRuntime(t, Config{})
 	target := newBlockingCallTargetService()
@@ -137,7 +137,7 @@ func TestCallHonorsCallerCancellation(t *testing.T) {
 	target.releaseNow()
 }
 
-// 验证 Call admission 遇到有界 Mailbox 满载时立即失败并删除刚分配的 Session。
+// 验证 Call 接纳遇到有界 Mailbox 满载时立即失败并删除刚分配的 Session。
 func TestCallAdmissionFailureCleansPending(t *testing.T) {
 	runtime := newCallTestRuntime(t, Config{MailboxCapacity: 1})
 	target := newBlockingCallTargetService()
@@ -195,7 +195,7 @@ func TestCallNormalizesUnknownHandlerError(t *testing.T) {
 	}
 }
 
-// 验证已分类 Handler error 保持稳定代码，而 panic completion 隐藏 panic 文本并停止目标 Service。
+// 验证已分类的 Handler 错误保持稳定错误码，而 panic 完成结果隐藏 panic 文本并停止目标 Service。
 func TestCallPreservesStatusAndPanicErrors(t *testing.T) {
 	runtime := newCallTestRuntime(t, Config{})
 	unknown := &callTargetService{handlerErr: ErrUnknownCommand}
@@ -311,7 +311,7 @@ func TestCallKeepsServiceRunToCompletion(t *testing.T) {
 	waitSignal(t, caller.secondHandled)
 }
 
-// 验证超时或取消后的迟到 completion 只被丢弃，不会影响后来分配的其它 Session。
+// 验证超时或取消后的迟到完成结果只被丢弃，不会影响后来分配的其它 Session。
 func TestPendingCallLateCompletionCannotCrossSessions(t *testing.T) {
 	runtime := &Runtime{sessionIDs: newIDAllocator(1)}
 	manager := newPendingCallManager(runtime)

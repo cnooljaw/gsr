@@ -133,7 +133,7 @@ func TestTimerDeadlineStartsDuringOnStart(t *testing.T) {
 	}
 }
 
-// 验证 Timer 只能由 owner 取消，且取消成功后不会再次触发消息。
+// 验证 Timer 只能由所属 Service 取消，且取消成功后不会再次触发消息。
 func TestTimerCancelRequiresOwnerAndIsOneShot(t *testing.T) {
 	clock := newFakeClock()
 	runtime := newTimerTestRuntime(t, clock, Config{})
@@ -167,7 +167,7 @@ func TestTimerCancelRequiresOwnerAndIsOneShot(t *testing.T) {
 	}
 }
 
-// 验证 OnStart 失败和 Service 停止都会取消 owner 的未完成 Timer。
+// 验证 OnStart 失败和 Service 停止都会取消该 Service 所属的未完成 Timer。
 func TestTimerOwnerCleanupCancelsTimers(t *testing.T) {
 	clock := newFakeClock()
 	runtime := newTimerTestRuntime(t, clock, Config{})
@@ -202,7 +202,7 @@ func TestTimerOwnerCleanupCancelsTimers(t *testing.T) {
 	}
 }
 
-// 验证 Timer 到期使用与 Send 相同的有界 Mailbox admission，失败后不自动重试。
+// 验证 Timer 到期使用与 Send 相同的有界 Mailbox 接纳路径，失败后不自动重试。
 func TestTimerAdmissionFailureIsNotRetried(t *testing.T) {
 	clock := newFakeClock()
 	runtime := newTimerTestRuntime(t, clock, Config{MailboxCapacity: 1})
@@ -246,7 +246,7 @@ func TestTimerAdmissionFailureIsNotRetried(t *testing.T) {
 	}
 }
 
-// 验证 CancelTimer 与到期竞争时最多产生一次成功状态转换和一次消息 admission。
+// 验证 CancelTimer 与到期竞争时最多产生一次成功状态转换和一次消息接纳。
 func TestTimerCancelAndExpiryRaceIsAtMostOnce(t *testing.T) {
 	clock := newFakeClock()
 	runtime := newTimerTestRuntime(t, clock, Config{})

@@ -76,7 +76,7 @@ func TestServiceOnStartCannotSendToItself(t *testing.T) {
 	}
 }
 
-// 验证本地 Mailbox 按成功 admission 顺序串行处理，并在容量耗尽时快速拒绝。
+// 验证本地 Mailbox 按成功接纳顺序串行处理，并在容量耗尽时快速拒绝。
 func TestServiceMailboxIsSerialAndBounded(t *testing.T) {
 	runtimeInstance := newRunningRuntime(t, runtime.Config{MailboxCapacity: 1})
 	service := newSerialService()
@@ -108,7 +108,7 @@ func TestServiceMailboxIsSerialAndBounded(t *testing.T) {
 	}
 }
 
-// 验证 Runtime 只复制 Args 外层切片，消息 admission 后不会受到发送方替换参数槽位的影响。
+// 验证 Runtime 只复制 Args 外层切片，消息接纳后不会受到发送方替换参数槽位的影响。
 func TestRuntimeSendCopiesArgumentSlice(t *testing.T) {
 	runtimeInstance := newRunningRuntime(t, runtime.Config{})
 	service := newArgumentSnapshotService()
@@ -156,7 +156,7 @@ func TestHandlerPanicStopsOnlyCurrentService(t *testing.T) {
 	waitClosed(t, healthyService.handled)
 }
 
-// 验证 Stop 结束 Service admission，Close 完成第二阶段并永久禁止再次 Start。
+// 验证 Stop 停止接纳 Service，Close 完成第二阶段并永久禁止再次 Start。
 func TestRuntimeStopThenCloseHasTwoLifecycleStages(t *testing.T) {
 	runtimeInstance := newRunningRuntime(t, runtime.Config{})
 	service := &lifecycleTestService{stopped: make(chan struct{})}
@@ -186,7 +186,7 @@ func TestRuntimeStopThenCloseHasTwoLifecycleStages(t *testing.T) {
 	}
 }
 
-// 验证 shutdown deadline 到期时保留 Stopped 与残留 runner，待其真实返回后才进入 Closed。
+// 验证停止截止时间到期时保留 Stopped 与残留 runner，待其真实返回后才进入 Closed。
 func TestRuntimeCloseWaitsForResidualRunner(t *testing.T) {
 	runtimeInstance := newRunningRuntimeWithoutCleanup(t, runtime.Config{ShutdownTimeout: 10 * time.Millisecond})
 	service := newBlockingService()
@@ -233,7 +233,7 @@ func TestRuntimeCloseWaitsForResidualRunner(t *testing.T) {
 	}
 }
 
-// 验证 CreateService 只能在 Runtime Running 阶段执行，并拒绝 typed-nil Service。
+// 验证 CreateService 只能在 Runtime 的 Running 阶段执行，并拒绝持有类型化 nil 的 Service 接口值。
 func TestCreateServiceAdmissionStates(t *testing.T) {
 	runtimeInstance, err := runtime.NewRuntime(runtime.Config{})
 	if err != nil {

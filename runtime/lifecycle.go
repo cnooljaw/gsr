@@ -7,27 +7,25 @@ import (
 	"sync"
 )
 
-// lifecycleComponent is an internal Runtime-owned component contract.
+// lifecycleComponent 是 Runtime 所管理组件的内部契约。
 //
-// The coordinator calls components in the explicit order supplied by the
-// lifecycle plan. Components own their resources; the coordinator only
-// sequences their start and stop operations.
+// 协调器按生命周期计划的显式顺序调用组件。
+// 各组件管理自身资源，协调器只安排启动与停止的顺序。
 type lifecycleComponent interface {
 	lifecycleName() string
-	// start and stop own the component's admission, goroutines and resources;
-	// the coordinator only orders these operations.
+	// start 和 stop 负责组件的接纳边界、goroutine 与资源；协调器只安排操作顺序。
 	start(context.Context) error
 	stop(context.Context) error
 }
 
-// lifecyclePlan keeps startup and shutdown order visible at the assembly
-// boundary. Every startup component must appear in both orders.
+// lifecyclePlan 在组装处明确展示启动与停止顺序。
+// 每个启动组件都必须出现在这两份顺序表中。
 type lifecyclePlan struct {
 	startOrder []lifecycleComponent
 	stopOrder  []lifecycleComponent
 }
 
-// lifecycleCoordinator sequences Runtime-owned components.
+// lifecycleCoordinator 协调 Runtime 所管理组件的执行顺序。
 type lifecycleCoordinator struct {
 	plan lifecyclePlan
 
@@ -46,9 +44,9 @@ func newLifecycleCoordinator(plan lifecyclePlan) *lifecycleCoordinator {
 	}
 }
 
-// newCoreLifecycleCoordinator assembles the current Core lifecycle plan.
-// Components are supplied explicitly so each Core slice can make ownership
-// and shutdown order visible without introducing a dynamic plugin registry.
+// newCoreLifecycleCoordinator 组装当前 Core 生命周期计划。
+// 显式传入组件，让每个 Core 切片的资源归属与关闭顺序清晰可见，
+// 无需引入动态插件注册表。
 func newCoreLifecycleCoordinator(components ...lifecycleComponent) *lifecycleCoordinator {
 	return newLifecycleCoordinator(lifecyclePlan{
 		startOrder: append([]lifecycleComponent(nil), components...),

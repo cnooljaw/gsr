@@ -32,7 +32,7 @@ func TestClusterPendingCallsRegisterSourceAndSession(t *testing.T) {
 	registry.cancel(second.session, context.Canceled)
 }
 
-// 验证成功 Response 只完成匹配 PendingCall 一次，并隔离响应 payload。
+// 验证成功 Response 只完成匹配 PendingCall 一次，并隔离响应载荷。
 func TestClusterPendingCallsCompleteResponseOnce(t *testing.T) {
 	registry := newClusterPendingCalls()
 	pending, err := registry.begin(runtime.ServiceID(11), "node-b", ServiceTarget{ServiceID: 7}, clusterTestCommand)
@@ -65,7 +65,7 @@ func TestClusterPendingCallsCompleteResponseOnce(t *testing.T) {
 	}
 }
 
-// 验证 Error frame 只把结构化远端错误交给原 PendingCall，不产生业务 payload。
+// 验证 Error 帧只把结构化远端错误交给原 PendingCall，不产生业务载荷。
 func TestClusterPendingCallsCompleteRemoteError(t *testing.T) {
 	registry := newClusterPendingCalls()
 	pending, err := registry.begin(runtime.ServiceID(11), "node-b", ServiceTarget{ServiceID: 7}, clusterTestCommand)

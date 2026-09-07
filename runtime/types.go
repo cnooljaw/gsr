@@ -2,22 +2,21 @@ package runtime
 
 import "sync/atomic"
 
-// ServiceID identifies a Service within one Runtime lifetime.
+// ServiceID 在单个 Runtime 生命周期内标识一个 Service。
 type ServiceID uint64
 
-// SessionID correlates a Call with its one Reply completion.
+// SessionID 将一次 Call 与其唯一的 Reply 完成结果关联。
 type SessionID uint64
 
-// TimerID identifies a Timer owned by a Service.
+// TimerID 标识归属于某个 Service 的 Timer。
 type TimerID uint64
 
-// CommandID identifies a command handled by a Service and matches the 32-bit wire command field.
+// CommandID 标识 Service 处理的命令，与线协议的 32 位命令字段一致。
 type CommandID uint32
 
-// idAllocator issues monotonically increasing, non-zero uint64 values.
+// idAllocator 分配单调递增的非零 uint64 标识。
 //
-// A zero next value is the permanent exhausted state. The allocator never
-// scans, reuses or wraps an issued value.
+// next 为零表示永久耗尽；分配器不会扫描、复用或回绕已发放的标识。
 type idAllocator struct {
 	nextValue atomic.Uint64
 }

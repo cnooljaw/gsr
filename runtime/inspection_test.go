@@ -61,7 +61,7 @@ func TestRuntimeInspectReportsServiceSnapshot(t *testing.T) {
 	first.releaseNow()
 }
 
-// 验证 Inspect 能观察 PendingCall、Call timeout 和 Timer 的活动计数。
+// 验证 Inspect 能观察 PendingCall、Call 超时和 Timer 的活动计数。
 func TestRuntimeInspectReportsPendingCallAndTimerMetrics(t *testing.T) {
 	clock := newFakeClock()
 	runtime := newTimerTestRuntime(t, clock, Config{MaxCallWait: time.Second})
@@ -251,7 +251,7 @@ func TestRuntimeInspectReportsClosedResourceQuiescence(t *testing.T) {
 	}
 }
 
-// 验证 Handler error、panic 和 shutdown deadline 都进入只读故障计数或 Service 快照。
+// 验证 Handler 错误、panic 和停止截止时间到期都进入只读故障计数或 Service 快照。
 func TestRuntimeInspectReportsFailureCountersAndDeadline(t *testing.T) {
 	runtime := newCallTestRuntime(t, Config{ShutdownTimeout: 10 * time.Millisecond})
 	failing := &callTargetService{handlerErr: errors.New("internal")}

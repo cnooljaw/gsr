@@ -9,7 +9,7 @@ import (
 	runtime "github.com/cnooljaw/gsr/runtime"
 )
 
-// 验证 source-bound ClusterClient 能编码参数并按目标 NodeSender 投递 Request。
+// 验证绑定来源身份的 ClusterClient 能编码参数并按目标 NodeSender 投递 Request。
 func TestClusterClientSendsEncodedRequest(t *testing.T) {
 	valueCodec, err := NewValueCodec(ValueCodecConfig{})
 	if err != nil {
@@ -75,7 +75,7 @@ func TestClusterClientSendsEncodedRequest(t *testing.T) {
 	}
 }
 
-// 验证 ClusterClient 在构造阶段拒绝零 Source、缺失 resolver 或 codec registry。
+// 验证 ClusterClient 在构造阶段拒绝零 Source、缺失解析器或编解码器注册表。
 func TestNewClusterClientRejectsInvalidConfig(t *testing.T) {
 	valueCodec, err := NewValueCodec(ValueCodecConfig{})
 	if err != nil {
@@ -144,7 +144,7 @@ func TestClusterClientRejectsInvalidSend(t *testing.T) {
 	}
 }
 
-// 验证 ClusterClient 编码失败和 sender admission 失败都继续向调用方返回稳定错误。
+// 验证 ClusterClient 编码失败和发送器接纳失败都向调用方返回稳定错误。
 func TestClusterClientPropagatesLocalErrors(t *testing.T) {
 	valueCodec, err := NewValueCodec(ValueCodecConfig{})
 	if err != nil {
@@ -224,7 +224,7 @@ func TestClusterClientCallReturnsDecodedResponse(t *testing.T) {
 	}
 }
 
-// 验证远端 Error frame 会沿 Call 返回结构化 StatusError，而不是伪造业务 payload。
+// 验证远端 Error 帧会沿 Call 返回结构化 StatusError，而不是伪造业务载荷。
 func TestClusterClientCallReturnsRemoteError(t *testing.T) {
 	calls := NewClusterCallRegistry()
 	wantErr := runtime.NewStatusError(runtime.ErrorClassDomain, runtime.ErrorCode("room.full"), "room is full")

@@ -45,7 +45,7 @@ func TestInMemoryTransportDeliversClonedEnvelope(t *testing.T) {
 	}
 }
 
-// 验证 InMemoryTransport 对节点、Envelope 和 payload 上限返回可判定错误。
+// 验证 InMemoryTransport 对节点、Envelope 和载荷上限返回可判定错误。
 func TestInMemoryTransportRejectsInvalidOrOversizedSend(t *testing.T) {
 	transport, err := NewInMemoryTransport(InMemoryTransportConfig{MaxPayload: 4})
 	if err != nil {

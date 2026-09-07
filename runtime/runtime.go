@@ -5,25 +5,25 @@ import (
 	"sync"
 )
 
-// RuntimeState is the lifecycle state of a Runtime.
+// RuntimeState 表示 Runtime 的生命周期状态。
 type RuntimeState uint8
 
 const (
-	// RuntimeCreated is a constructed Runtime that has not started.
+	// RuntimeCreated 表示 Runtime 已构造但尚未启动。
 	RuntimeCreated RuntimeState = iota
-	// RuntimeStarting is starting its Runtime-owned components.
+	// RuntimeStarting 表示正在启动 Runtime 所管理的组件。
 	RuntimeStarting
-	// RuntimeRunning accepts Runtime work.
+	// RuntimeRunning 表示 Runtime 正在接纳工作。
 	RuntimeRunning
-	// RuntimeStopping rejects new work and is waiting for shutdown.
+	// RuntimeStopping 表示拒绝新工作并等待停止完成。
 	RuntimeStopping
-	// RuntimeStopped has completed its orderly stop workflow.
+	// RuntimeStopped 表示有序停止流程已完成。
 	RuntimeStopped
-	// RuntimeClosed has released Runtime-owned resources and cannot restart.
+	// RuntimeClosed 表示 Runtime 资源已释放，且不能重新启动。
 	RuntimeClosed
 )
 
-// String returns the stable display name of a RuntimeState.
+// String 返回 RuntimeState 的稳定显示名称。
 func (state RuntimeState) String() string {
 	switch state {
 	case RuntimeCreated:
@@ -43,7 +43,7 @@ func (state RuntimeState) String() string {
 	}
 }
 
-// Runtime owns Core configuration, Service admission and lifecycle.
+// Runtime 管理 Core 配置、Service 接纳与生命周期。
 type Runtime struct {
 	config Config
 
@@ -72,10 +72,10 @@ type Runtime struct {
 	creatingCount int
 }
 
-// NewRuntime constructs a Runtime in the Created state.
+// NewRuntime 构造处于 Created 状态的 Runtime。
 //
-// Zero-valued configuration fields receive DefaultConfig values. Negative
-// values and other invalid values return ErrInvalidConfig.
+// 零值配置字段使用 DefaultConfig 中的默认值。
+// 负值及其它无效值返回 ErrInvalidConfig。
 func NewRuntime(config Config) (*Runtime, error) {
 	return newRuntimeWithClock(config, realClock{})
 }
@@ -108,22 +108,22 @@ func newRuntimeWithClock(config Config, clock runtimeClock) (*Runtime, error) {
 	return runtime, nil
 }
 
-// Config returns the immutable Runtime configuration.
+// Config 返回不可变的 Runtime 配置。
 func (runtime *Runtime) Config() Config {
 	runtime.mu.Lock()
 	defer runtime.mu.Unlock()
 	return runtime.config
 }
 
-// State returns the current Runtime lifecycle state.
+// State 返回 Runtime 当前的生命周期状态。
 func (runtime *Runtime) State() RuntimeState {
 	runtime.mu.Lock()
 	defer runtime.mu.Unlock()
 	return runtime.state
 }
 
-// Start starts Runtime-owned components and transitions from Created to Running.
-// A failed startup rolls back successful components and permanently stops the Runtime.
+// Start 启动 Runtime 所管理的组件，将状态从 Created 转为 Running。
+// 启动失败会回滚已成功启动的组件，并永久停止该 Runtime。
 func (runtime *Runtime) Start() error {
 	runtime.mu.Lock()
 	switch runtime.state {
@@ -174,9 +174,9 @@ func (runtime *Runtime) startStateError() error {
 	}
 }
 
-// Stop closes Runtime admission and runs one orderly stop workflow.
-// The caller's context controls only this call's wait; it never cancels a
-// stop workflow already owned by another caller.
+// Stop 关闭 Runtime 接纳入口，并执行一次有序停止流程。
+// 调用方 context 只控制本次调用的等待，
+// 不会取消已由其它调用方发起的停止流程。
 func (runtime *Runtime) Stop(ctx context.Context) error {
 	if ctx == nil {
 		ctx = context.Background()
@@ -223,10 +223,10 @@ func (runtime *Runtime) Stop(ctx context.Context) error {
 	}
 }
 
-// Close performs the final, idempotent Runtime resource release.
+// Close 幂等地执行 Runtime 的最终资源释放。
 //
-// Close has no caller context. It uses ShutdownTimeout for the internal stop
-// wait and never restarts a Runtime after Stop or Close.
+// Close 不接收调用方 context，内部停止等待使用 ShutdownTimeout。
+// Runtime 在 Stop 或 Close 后都不能重新启动。
 func (runtime *Runtime) Close() error {
 	shutdownContext, cancel := context.WithTimeout(context.Background(), runtime.config.ShutdownTimeout)
 	defer cancel()

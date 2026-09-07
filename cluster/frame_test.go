@@ -104,7 +104,7 @@ func TestFrameCodecRejectsMalformedFrames(t *testing.T) {
 	}
 }
 
-// 验证 FrameCodec 对完整帧大小和 payload 大小执行有限边界检查。
+// 验证 FrameCodec 对完整帧大小和载荷大小执行有限边界检查。
 func TestFrameCodecEnforcesFrameLimit(t *testing.T) {
 	codec, err := NewFrameCodec(FrameCodecConfig{MaxFrame: 64})
 	if err != nil {

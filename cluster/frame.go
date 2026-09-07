@@ -11,30 +11,28 @@ import (
 
 const frameHeaderSize = 4
 
-// FrameCodecConfig configures the length-prefixed Cluster frame codec.
+// FrameCodecConfig 配置带长度前缀的 Cluster 帧编解码器。
 type FrameCodecConfig struct {
-	// MaxFrame bounds the complete frame, including its four-byte length prefix.
-	// Zero uses the default limit.
+	// MaxFrame 限制完整帧大小，包含四字节长度前缀；零值使用默认上限。
 	MaxFrame int
 }
 
 var (
-	// ErrInvalidFrameConfig means a FrameCodec configuration is invalid.
+	// ErrInvalidFrameConfig 表示 FrameCodec 配置无效。
 	ErrInvalidFrameConfig = errors.New("cluster: invalid frame config")
-	// ErrMalformedFrame means a frame is truncated, has trailing bytes, or has invalid fields.
+	// ErrMalformedFrame 表示帧被截断、存在尾随字节或字段无效。
 	ErrMalformedFrame = errors.New("cluster: malformed frame")
-	// ErrFrameTooLarge means a frame exceeds its configured length limit.
+	// ErrFrameTooLarge 表示帧超出配置的长度上限。
 	ErrFrameTooLarge = errors.New("cluster: frame too large")
 )
 
-// FrameCodec encodes and decodes one complete length-prefixed Cluster frame.
-// It does not negotiate versions or perform stream I/O; those responsibilities
-// belong to a future Transport/connection owner.
+// FrameCodec 编解码一个带长度前缀的完整 Cluster 帧。
+// 它不进行版本协商或字节流 I/O，这些职责由后续 Transport 或连接管理组件承担。
 type FrameCodec struct {
 	maxFrame int
 }
 
-// NewFrameCodec constructs a bounded length-prefixed frame codec.
+// NewFrameCodec 构造带长度上限和长度前缀的帧编解码器。
 func NewFrameCodec(config FrameCodecConfig) (*FrameCodec, error) {
 	if config.MaxFrame == 0 {
 		config.MaxFrame = defaultMaxPayload
@@ -45,7 +43,7 @@ func NewFrameCodec(config FrameCodecConfig) (*FrameCodec, error) {
 	return &FrameCodec{maxFrame: config.MaxFrame}, nil
 }
 
-// Encode validates an envelope and returns one complete length-prefixed frame.
+// Encode 校验消息封包并返回带长度前缀的完整帧。
 func (codec *FrameCodec) Encode(envelope ClusterEnvelope) ([]byte, error) {
 	if codec == nil {
 		return nil, fmt.Errorf("%w: codec is nil", ErrInvalidFrameConfig)
@@ -90,7 +88,7 @@ func (codec *FrameCodec) Encode(envelope ClusterEnvelope) ([]byte, error) {
 	return frame, nil
 }
 
-// Decode validates and decodes one complete length-prefixed frame.
+// Decode 校验并解码一个带长度前缀的完整帧。
 func (codec *FrameCodec) Decode(frame []byte) (ClusterEnvelope, error) {
 	if codec == nil {
 		return ClusterEnvelope{}, fmt.Errorf("%w: codec is nil", ErrInvalidFrameConfig)

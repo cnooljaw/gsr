@@ -9,7 +9,7 @@ import (
 
 const registryTestCommand runtime.CommandID = 0x05000102
 
-// 验证 Command codec registry 能查找已注册 codec，并隔离启动 entries 的后续修改。
+// 验证命令编解码器注册表能查找已注册的编解码器，并隔离启动注册项的后续修改。
 func TestCommandCodecRegistryLooksUpImmutableEntries(t *testing.T) {
 	codec, err := NewValueCodec(ValueCodecConfig{})
 	if err != nil {
@@ -39,7 +39,7 @@ func TestCommandCodecRegistryLooksUpImmutableEntries(t *testing.T) {
 	}
 }
 
-// 验证 registry 拒绝零 CommandID、nil codec 和重复注册，避免启动后覆盖协议定义。
+// 验证注册表拒绝零 CommandID、nil 编解码器和重复注册，避免启动后覆盖协议定义。
 func TestCommandCodecRegistryRejectsInvalidEntries(t *testing.T) {
 	codec, err := NewValueCodec(ValueCodecConfig{})
 	if err != nil {
@@ -79,7 +79,7 @@ func TestCommandCodecRegistryRejectsInvalidEntries(t *testing.T) {
 	}
 }
 
-// 验证未知命令和无效 registry 查找返回稳定错误，而不是 nil codec 或 panic。
+// 验证未知命令和无效注册表查找返回稳定错误，而不是 nil 编解码器或 panic。
 func TestCommandCodecRegistryLookupErrors(t *testing.T) {
 	registry, err := NewCommandCodecRegistry(nil)
 	if err != nil {

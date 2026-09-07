@@ -7,9 +7,8 @@ import (
 	"io"
 )
 
-// completeFrameError records that the entire bounded frame was consumed before
-// decoding failed. It proves stream alignment, not that the input is acceptable;
-// authentication and protocol policy can still require closing the connection.
+// completeFrameError 表示解码失败前已消费整个有长度上限的完整帧。
+// 它只证明字节流仍然对齐，不表示输入可接受；认证和协议规则仍可能要求关闭连接。
 type completeFrameError struct {
 	err error
 }
@@ -22,9 +21,8 @@ func (err *completeFrameError) Unwrap() error {
 	return err.err
 }
 
-// readFrame reads exactly one bounded frame. The connection owner supplies
-// deadlines/cancellation and decides whether an error requires closing the stream.
-// No goroutine or connection is owned here.
+// readFrame 精确读取一个有长度上限的帧。连接管理组件负责截止时间与取消，
+// 并判断错误是否需要关闭字节流；此处不管理 goroutine 或连接。
 func (codec *FrameCodec) readFrame(reader io.Reader) (ClusterEnvelope, error) {
 	if codec == nil || codec.maxFrame <= frameHeaderSize {
 		return ClusterEnvelope{}, ErrInvalidFrameConfig
@@ -43,7 +41,7 @@ func (codec *FrameCodec) readFrame(reader io.Reader) (ClusterEnvelope, error) {
 	frame := make([]byte, frameHeaderSize+int(bodyLength))
 	copy(frame, header[:])
 	if _, err := io.ReadFull(reader, frame[frameHeaderSize:]); err != nil {
-		// EOF after a complete header is still a truncated frame, not clean shutdown.
+		// 完整帧头之后遇到 EOF 仍表示帧被截断，而不是正常流结束。
 		if errors.Is(err, io.EOF) {
 			err = io.ErrUnexpectedEOF
 		}
@@ -56,8 +54,8 @@ func (codec *FrameCodec) readFrame(reader io.Reader) (ClusterEnvelope, error) {
 	return envelope, nil
 }
 
-// writeFrame requires the connection owner to serialize writes. Partial failures
-// are returned without replay; some bytes may already have reached the peer.
+// writeFrame 要求连接管理组件串行执行写入。
+// 部分写入失败直接返回，不重放，因为部分字节可能已经到达对端。
 func (codec *FrameCodec) writeFrame(writer io.Writer, envelope ClusterEnvelope) error {
 	frame, err := codec.Encode(envelope)
 	if err != nil {

@@ -10,14 +10,14 @@ var (
 	errorType          = reflect.TypeOf((*error)(nil)).Elem()
 )
 
-// CommandHandlers maps stable CommandIDs to typed Service execution functions.
-// The map is copied when NewCommandDispatcher returns.
+// CommandHandlers 将稳定的 CommandID 映射到强类型 Service 执行函数。
+// NewCommandDispatcher 返回前会复制此映射表。
 type CommandHandlers map[CommandID]any
 
-// CommandDispatcher is an immutable per-Service command table.
+// CommandDispatcher 是每个 Service 的不可变命令表。
 //
-// It is optional: a Service can embed it to get fixed argument validation, or
-// implement Handle directly for custom dispatch and composition.
+// 这是可选能力：Service 可以嵌入它以获得固定的参数校验，
+// 也可以直接实现 Handle，自定义分派与组合方式。
 type CommandDispatcher struct {
 	handlers map[CommandID]compiledCommandHandler
 }
@@ -28,7 +28,7 @@ type compiledCommandHandler struct {
 	result   bool
 }
 
-// NewCommandDispatcher validates and compiles one Service's command handlers.
+// NewCommandDispatcher 校验并编译一个 Service 的命令处理函数表。
 func NewCommandDispatcher(handlers CommandHandlers) (*CommandDispatcher, error) {
 	compiled := make(map[CommandID]compiledCommandHandler, len(handlers))
 	for command, handler := range handlers {
@@ -44,8 +44,8 @@ func NewCommandDispatcher(handlers CommandHandlers) (*CommandDispatcher, error) 
 	return &CommandDispatcher{handlers: compiled}, nil
 }
 
-// MustCommandDispatcher compiles a static handler table or panics when its
-// programmer-defined signatures are invalid.
+// MustCommandDispatcher 编译静态处理函数表；
+// 程序员定义的函数签名无效时触发 panic。
 func MustCommandDispatcher(handlers CommandHandlers) *CommandDispatcher {
 	dispatcher, err := NewCommandDispatcher(handlers)
 	if err != nil {
@@ -54,7 +54,7 @@ func MustCommandDispatcher(handlers CommandHandlers) *CommandDispatcher {
 	return dispatcher
 }
 
-// Handle dispatches a CommandID to its registered typed execution function.
+// Handle 将 CommandID 分派给已注册的强类型执行函数。
 func (dispatcher *CommandDispatcher) Handle(context CommandContext, command CommandID, args ...any) (any, error) {
 	if dispatcher == nil {
 		return nil, ErrInvalidCommandHandler

@@ -8,12 +8,12 @@ import (
 
 const defaultMaxPayload = 4 << 20
 
-// Receiver handles one envelope delivered to a registered node. The envelope
-// is a transport-owned value snapshot and may be modified by the receiver.
+// Receiver 处理投递给已注册节点的消息封包。
+// 封包是由 Transport 持有的值快照，接收器可以修改它。
 type Receiver func(from NodeID, envelope ClusterEnvelope)
 
-// Transport moves ClusterEnvelope values between nodes. It deliberately does
-// not expose Core Service, Mailbox, Session or connection implementation details.
+// Transport 在节点间传递 ClusterEnvelope 值，
+// 不暴露 Core Service、Mailbox、Session 或连接实现细节。
 type Transport interface {
 	Register(NodeID, Receiver) error
 	Unregister(NodeID) error
@@ -21,9 +21,9 @@ type Transport interface {
 	Close() error
 }
 
-// InMemoryTransportConfig configures the deterministic in-process transport.
+// InMemoryTransportConfig 配置确定性的进程内传输。
 type InMemoryTransportConfig struct {
-	// MaxPayload bounds the envelope payload accepted by Send. Zero uses the default.
+	// MaxPayload 限制 Send 接受的封包载荷大小，零值使用默认上限。
 	MaxPayload int
 }
 
@@ -38,20 +38,20 @@ func (config InMemoryTransportConfig) normalized() (InMemoryTransportConfig, err
 }
 
 var (
-	// ErrInvalidTransportConfig means an in-memory transport configuration is invalid.
+	// ErrInvalidTransportConfig 表示内存传输配置无效。
 	ErrInvalidTransportConfig = errors.New("cluster: invalid transport config")
-	// ErrInvalidNode means a node ID or receiver is invalid.
+	// ErrInvalidNode 表示节点 ID 或接收器无效。
 	ErrInvalidNode = errors.New("cluster: invalid node")
-	// ErrDuplicateNode means a node already has a receiver in this transport.
+	// ErrDuplicateNode 表示节点已在此 Transport 中注册接收器。
 	ErrDuplicateNode = errors.New("cluster: duplicate node")
-	// ErrNodeNotFound means no receiver is registered for a destination node.
+	// ErrNodeNotFound 表示目标节点尚未注册接收器。
 	ErrNodeNotFound = errors.New("cluster: node not found")
-	// ErrTransportClosed means the transport has stopped accepting operations.
+	// ErrTransportClosed 表示 Transport 已停止接纳操作。
 	ErrTransportClosed = errors.New("cluster: transport is closed")
 )
 
-// InMemoryTransport synchronously delivers cloned envelopes between registered
-// nodes. It is a deterministic test seam, not a production network transport.
+// InMemoryTransport 在已注册节点间同步投递复制后的消息封包。
+// 它是用于确定性测试的替换边界，不是生产网络传输实现。
 type InMemoryTransport struct {
 	mu         sync.RWMutex
 	maxPayload int
@@ -59,7 +59,7 @@ type InMemoryTransport struct {
 	receivers  map[NodeID]Receiver
 }
 
-// NewInMemoryTransport constructs a deterministic in-process transport.
+// NewInMemoryTransport 构造确定性的进程内传输。
 func NewInMemoryTransport(config InMemoryTransportConfig) (*InMemoryTransport, error) {
 	normalized, err := config.normalized()
 	if err != nil {
@@ -71,7 +71,7 @@ func NewInMemoryTransport(config InMemoryTransportConfig) (*InMemoryTransport, e
 	}, nil
 }
 
-// Register attaches one receiver to a local NodeID.
+// Register 为本地 NodeID 注册接收器。
 func (transport *InMemoryTransport) Register(node NodeID, receiver Receiver) error {
 	if transport == nil || node == "" || receiver == nil {
 		return ErrInvalidNode
@@ -88,7 +88,7 @@ func (transport *InMemoryTransport) Register(node NodeID, receiver Receiver) err
 	return nil
 }
 
-// Unregister removes a node receiver. It is idempotent for an existing open transport.
+// Unregister 移除节点接收器；对尚未关闭的 Transport，此操作幂等。
 func (transport *InMemoryTransport) Unregister(node NodeID) error {
 	if transport == nil || node == "" {
 		return ErrInvalidNode
@@ -102,7 +102,7 @@ func (transport *InMemoryTransport) Unregister(node NodeID) error {
 	return nil
 }
 
-// Send validates and synchronously delivers a cloned envelope to the destination node.
+// Send 校验消息封包，并将其副本同步投递给目标节点。
 func (transport *InMemoryTransport) Send(from NodeID, to NodeID, envelope ClusterEnvelope) error {
 	if transport == nil {
 		return ErrTransportClosed
@@ -131,7 +131,7 @@ func (transport *InMemoryTransport) Send(from NodeID, to NodeID, envelope Cluste
 	return nil
 }
 
-// Close prevents future registration and delivery, and is idempotent.
+// Close 阻止后续注册与投递，此操作幂等。
 func (transport *InMemoryTransport) Close() error {
 	if transport == nil {
 		return nil

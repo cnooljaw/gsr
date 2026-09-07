@@ -5,9 +5,8 @@ import (
 	"sync"
 )
 
-// callResult is the single completion value delivered to one waiting Call.
-// The channel is buffered so completion never needs the caller runner to be
-// scheduled at the exact moment a Handler returns.
+// callResult 是交给等待中 Call 的唯一完成结果。
+// 结果 channel 带缓冲，因此 Handler 返回时无需调用方 runner 恰好被调度。
 type callResult struct {
 	value any
 	err   error
@@ -20,8 +19,8 @@ type pendingCall struct {
 	done    chan callResult
 }
 
-// pendingCallManager owns the Runtime-local SessionID table. It never invokes
-// business code; it only removes a pending entry and publishes one result.
+// pendingCallManager 管理 Runtime 本地 SessionID 表。
+// 它不调用业务代码，只移除等待项并发布一次结果。
 type pendingCallManager struct {
 	runtime *Runtime
 

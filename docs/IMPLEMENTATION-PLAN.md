@@ -303,6 +303,8 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 - Response/Error 只完成匹配的 RemoteNode/Target/Command；未知、迟到、重复或错路由 frame 被拒绝并进入诊断。
 - 取消、timeout、节点/Cluster 关闭都恰好清理一次 PendingCall。
 - 已实现：共享 `ClusterCallRegistry` 的 Session 分配与 `Complete` 入口，以及 `Client.Call` 的请求编码、有限等待、caller cancellation、Response/Error 解码。
+- 已实现内部 `failNode` 收尾入口：按目标节点清理当前等待并保留底层错误原因；与回复、取消竞争时只完成一次，不影响其它节点，也不永久关闭 registry。已验证它能恢复等待中的 ClusterClient.Call。
+- 接线约束：TCP owner 必须在旧连接等待清理完成后再开放替代连接请求；该入口只按 NodeID 匹配，不能用于并行新旧连接的迟到清理。当前尚未自动接入 socket 断线事件。
 - 待实现：外层 Connection owner 与 Response/Error frame 的真实网络 stream completion。
 - 待实现：断线、timeout 以及未知、重复和迟到 response 的连接级诊断。
 - 已验证：`cluster/roundtrip_test.go` 通过公开 API 组装双节点内存链路，连接 ClusterClient、NodeSender、ConnectionAgent 和 ClusterCallRegistry；请求与回复均经过完整 FrameCodec 编解码。覆盖成功返回、Domain Error 的 Class/Code、安全 Message 和 `errors.Is`，以及未知错误/panic 的安全转换。

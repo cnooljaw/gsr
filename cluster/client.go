@@ -10,20 +10,19 @@ import (
 	runtime "github.com/cnooljaw/gsr/runtime"
 )
 
-// OutboundSender is the minimum capability a ClusterClient needs to admit a
-// request. NodeSender is the standard implementation.
+// OutboundSender 是 ClusterClient 接纳请求所需的最小能力，
+// 标准实现为 NodeSender。
 type OutboundSender interface {
 	Send(ClusterEnvelope) error
 }
 
-// NodeSenderResolver supplies the unique outbound sender for a remote node.
-// Sender ownership, connection creation and reconnection remain outside the
-// per-Service ClusterClient.
+// NodeSenderResolver 提供远端节点唯一的出站发送器。
+// 发送器的资源管理、建连和重连均由每 Service 的 ClusterClient 之外的组件负责。
 type NodeSenderResolver interface {
 	ResolveNodeSender(NodeID) (OutboundSender, error)
 }
 
-// ClusterClientConfig binds a per-Service source to Cluster infrastructure.
+// ClusterClientConfig 将当前 Service 的来源身份绑定到 Cluster 基础设施。
 type ClusterClientConfig struct {
 	Source       runtime.ServiceID
 	Senders      NodeSenderResolver
@@ -33,15 +32,14 @@ type ClusterClientConfig struct {
 }
 
 var (
-	// ErrInvalidClusterClientConfig means a ClusterClient dependency is invalid.
+	// ErrInvalidClusterClientConfig 表示 ClusterClient 的依赖无效。
 	ErrInvalidClusterClientConfig = errors.New("cluster: invalid client config")
-	// ErrNodeSenderUnavailable means a resolver did not provide a sender.
+	// ErrNodeSenderUnavailable 表示解析器未提供发送器。
 	ErrNodeSenderUnavailable = errors.New("cluster: node sender unavailable")
 )
 
-// ClusterClient is a narrow, source-bound client for remote Cluster requests.
-// Sender ownership, response completion and remote execution stay in the
-// Cluster layer.
+// ClusterClient 是绑定来源身份、只提供少量远端请求能力的 Cluster 客户端。
+// 发送器管理、响应完成和远端执行仍由 Cluster 层负责。
 type ClusterClient struct {
 	source       runtime.ServiceID
 	senders      NodeSenderResolver
@@ -50,7 +48,7 @@ type ClusterClient struct {
 	maxCallWait  time.Duration
 }
 
-// NewClusterClient validates and constructs one source-bound client.
+// NewClusterClient 校验并构造绑定来源身份的客户端。
 func NewClusterClient(config ClusterClientConfig) (*ClusterClient, error) {
 	if config.Source == 0 || isNilNodeSenderResolver(config.Senders) || config.Codecs == nil || !config.PendingCalls.valid() || config.MaxCallWait <= 0 {
 		return nil, fmt.Errorf("%w: Source, Senders, Codecs, PendingCalls, and positive MaxCallWait are required", ErrInvalidClusterClientConfig)
@@ -64,8 +62,8 @@ func NewClusterClient(config ClusterClientConfig) (*ClusterClient, error) {
 	}, nil
 }
 
-// Source returns the Runtime ServiceID captured when this client was bound.
-// It is read-only and cannot be replaced for an individual request.
+// Source 返回客户端绑定时记录的 Runtime ServiceID。
+// 此值只读，不能为单次请求替换。
 func (client *ClusterClient) Source() runtime.ServiceID {
 	if client == nil {
 		return 0
@@ -73,8 +71,8 @@ func (client *ClusterClient) Source() runtime.ServiceID {
 	return client.source
 }
 
-// Send encodes args as one command argument list and admits a request to the
-// resolved remote NodeSender. A nil error confirms local admission only.
+// Send 将 args 编码为命令参数列表，并交给解析出的远端 NodeSender 接纳。
+// 返回 nil 仅表示本地接纳成功。
 func (client *ClusterClient) Send(node NodeID, target ServiceTarget, command runtime.CommandID, args ...any) error {
 	_, sender, payload, err := client.prepareRequest(node, target, command, args...)
 	if err != nil {
@@ -88,12 +86,11 @@ func (client *ClusterClient) Send(node NodeID, target ServiceTarget, command run
 	})
 }
 
-// Call sends one remote request and waits for its Response or Error.
+// Call 发送远端请求并等待对应的 Response 或 Error。
 //
-// The effective wait is bounded by MaxCallWait and may be shortened by ctx.
-// A nil ctx is rejected, and a successful return means only that the matching
-// remote response was received and decoded; remote business errors are
-// returned as runtime.StatusError values.
+// 有效等待时间不超过 MaxCallWait，ctx 可以要求更短的等待。
+// 不接受 nil ctx；成功返回只表示已收到并解码匹配的远端响应，
+// 远端业务错误以 runtime.StatusError 返回。
 func (client *ClusterClient) Call(ctx context.Context, node NodeID, target ServiceTarget, command runtime.CommandID, args ...any) (any, error) {
 	if ctx == nil {
 		return nil, runtime.ErrInvalidCallContext

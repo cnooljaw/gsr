@@ -11,17 +11,17 @@ const (
 	defaultShutdownTimeout = 5 * time.Second
 )
 
-// Config configures the Core Runtime.
+// Config 定义 Core Runtime 的配置。
 type Config struct {
-	// MaxCallWait is the maximum duration of a local Call.
+	// MaxCallWait 是本地 Call 的最长等待时间。
 	MaxCallWait time.Duration
-	// MailboxCapacity bounds each Service mailbox.
+	// MailboxCapacity 限制每个 Service Mailbox 的容量。
 	MailboxCapacity int
-	// ShutdownTimeout bounds Runtime-owned shutdown work.
+	// ShutdownTimeout 限制 Runtime 停止工作的等待时间。
 	ShutdownTimeout time.Duration
 }
 
-// DefaultConfig returns the valid default Runtime configuration.
+// DefaultConfig 返回有效的 Runtime 默认配置。
 func DefaultConfig() Config {
 	return Config{
 		MaxCallWait:     defaultMaxCallWait,
@@ -30,7 +30,7 @@ func DefaultConfig() Config {
 	}
 }
 
-// Validate checks a fully populated Runtime configuration.
+// Validate 检查已填充完整的 Runtime 配置。
 func (config Config) Validate() error {
 	switch {
 	case config.MaxCallWait <= 0:

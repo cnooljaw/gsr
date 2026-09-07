@@ -14,34 +14,33 @@ const (
 	maxCodecDepth        = 128
 )
 
-// ValueCodecConfig configures the default value codec.
+// ValueCodecConfig 配置默认值编解码器。
 type ValueCodecConfig struct {
-	// MaxDepth bounds nested lists and maps. Zero uses the default.
+	// MaxDepth 限制列表与映射的嵌套深度，零值使用默认上限。
 	MaxDepth int
-	// MaxPayload bounds encoded and decoded payload bytes. Zero uses the default.
+	// MaxPayload 限制编码与解码的载荷字节数，零值使用默认上限。
 	MaxPayload int
 }
 
 var (
-	// ErrInvalidCodecConfig means a ValueCodec configuration is invalid.
+	// ErrInvalidCodecConfig 表示 ValueCodec 配置无效。
 	ErrInvalidCodecConfig = errors.New("cluster: invalid codec config")
-	// ErrUnsupportedValue means a value is outside the default codec's supported set.
+	// ErrUnsupportedValue 表示值不在默认编解码器支持的范围内。
 	ErrUnsupportedValue = errors.New("cluster: unsupported value")
-	// ErrMalformedPayload means encoded bytes do not form one complete value.
+	// ErrMalformedPayload 表示编码字节无法组成一个完整的值。
 	ErrMalformedPayload = errors.New("cluster: malformed payload")
-	// ErrMaxDepthExceeded means a value exceeds the configured collection depth.
+	// ErrMaxDepthExceeded 表示值超出配置的集合嵌套深度。
 	ErrMaxDepthExceeded = errors.New("cluster: maximum value depth exceeded")
 )
 
-// ValueCodec encodes the small, deterministic value set shared by Cluster
-// commands. Decoding normalizes signed integers to int64, unsigned integers
-// to uint64, and floating-point values to float64.
+// ValueCodec 编码 Cluster 命令共享的有限、确定性值集合。
+// 解码时，有符号整数统一为 int64，无符号整数统一为 uint64，浮点数统一为 float64。
 type ValueCodec struct {
 	maxDepth   int
 	maxPayload int
 }
 
-// NewValueCodec constructs a value codec with bounded input and output.
+// NewValueCodec 构造输入与输出均有上限的值编解码器。
 func NewValueCodec(config ValueCodecConfig) (*ValueCodec, error) {
 	if config.MaxDepth == 0 {
 		config.MaxDepth = defaultMaxCodecDepth
@@ -61,7 +60,7 @@ func NewValueCodec(config ValueCodecConfig) (*ValueCodec, error) {
 	}, nil
 }
 
-// Encode converts one supported value into a deterministic binary payload.
+// Encode 将一个受支持的值转换为确定性的二进制载荷。
 func (codec *ValueCodec) Encode(value any) ([]byte, error) {
 	if codec == nil {
 		return nil, fmt.Errorf("%w: codec is nil", ErrInvalidCodecConfig)
@@ -76,7 +75,7 @@ func (codec *ValueCodec) Encode(value any) ([]byte, error) {
 	return encoder.data, nil
 }
 
-// Decode converts one complete binary payload into the codec's canonical Go values.
+// Decode 将一个完整二进制载荷转换为编解码器约定的规范 Go 值。
 func (codec *ValueCodec) Decode(payload []byte) (any, error) {
 	if codec == nil {
 		return nil, fmt.Errorf("%w: codec is nil", ErrInvalidCodecConfig)

@@ -1,5 +1,4 @@
-// Package cluster contains the transport and routing layer built on top of
-// the local runtime Core.
+// Package cluster 提供建立在本地 Runtime Core 之上的传输与路由层。
 package cluster
 
 import (
@@ -9,29 +8,29 @@ import (
 	runtime "github.com/cnooljaw/gsr/runtime"
 )
 
-// NodeID selects a remote Runtime node. It is not encoded into a Core ServiceID.
+// NodeID 标识目标远端 Runtime 节点，不编码进 Core ServiceID。
 type NodeID string
 
-// ServiceName is a stable logical Service name resolved outside the Core.
+// ServiceName 是稳定的 Service 逻辑名称，由 Core 之外的组件解析。
 type ServiceName string
 
-// ClusterSessionID correlates one remote Call with its response or error.
-// Zero identifies a one-way Send and does not require a response.
+// ClusterSessionID 将一次远端 Call 与其响应或错误关联。
+// 零值表示单向 Send，不需要响应。
 type ClusterSessionID uint64
 
-// FrameKind identifies the direction and meaning of a ClusterEnvelope.
+// FrameKind 标识 ClusterEnvelope 的方向与含义。
 type FrameKind uint8
 
 const (
-	// FrameRequest carries a remote Send or Call request.
+	// FrameRequest 携带远端 Send 或 Call 请求。
 	FrameRequest FrameKind = iota + 1
-	// FrameResponse carries a successful remote Call result.
+	// FrameResponse 携带远端 Call 的成功结果。
 	FrameResponse
-	// FrameError carries a structured remote Call or delivery error.
+	// FrameError 携带结构化的远端 Call 或投递错误。
 	FrameError
 )
 
-// String returns the stable display name of a FrameKind.
+// String 返回 FrameKind 的稳定显示名称。
 func (kind FrameKind) String() string {
 	switch kind {
 	case FrameRequest:
@@ -45,17 +44,17 @@ func (kind FrameKind) String() string {
 	}
 }
 
-// ServiceTarget identifies a remote Service by its temporary local ID or its
-// stable logical name. Exactly one field must be set.
+// ServiceTarget 通过远端 Service 的本地临时 ID 或稳定逻辑名称标识目标。
+// 两个字段必须且只能设置一个。
 type ServiceTarget struct {
 	ServiceID   runtime.ServiceID
 	ServiceName ServiceName
 }
 
-// ClusterEnvelope is the value boundary between Cluster and a transport.
+// ClusterEnvelope 是 Cluster 与 Transport 之间的值边界。
 //
-// The transport supplies the source and destination NodeID. The envelope does
-// not carry a Core Message pointer, NodeID, or an arbitrary source identity.
+// 来源与目标 NodeID 由 Transport 提供。
+// 消息封包不携带 Core Message 指针、NodeID 或任意指定的来源身份。
 type ClusterEnvelope struct {
 	Kind    FrameKind
 	Session ClusterSessionID
@@ -66,13 +65,13 @@ type ClusterEnvelope struct {
 }
 
 var (
-	// ErrInvalidEnvelope means an envelope violates the Cluster frame contract.
+	// ErrInvalidEnvelope 表示消息封包违反 Cluster 帧契约。
 	ErrInvalidEnvelope = errors.New("cluster: invalid envelope")
-	// ErrPayloadTooLarge means a transport payload exceeds its configured limit.
+	// ErrPayloadTooLarge 表示传输载荷超出配置上限。
 	ErrPayloadTooLarge = errors.New("cluster: payload too large")
 )
 
-// Validate checks the structural contract shared by all transports.
+// Validate 检查所有 Transport 共享的结构契约。
 func (envelope ClusterEnvelope) Validate() error {
 	if envelope.Kind != FrameRequest && envelope.Kind != FrameResponse && envelope.Kind != FrameError {
 		return fmt.Errorf("%w: unknown frame kind %d", ErrInvalidEnvelope, envelope.Kind)
@@ -126,8 +125,7 @@ func validateStatusError(status *runtime.StatusError) error {
 	return nil
 }
 
-// Clone returns an envelope whose mutable payload and error value are owned by
-// the returned value. It is used at transport admission boundaries.
+// Clone 返回独占可变载荷与错误值的消息封包副本，用于 Transport 接纳边界。
 func (envelope ClusterEnvelope) Clone() ClusterEnvelope {
 	clone := envelope
 	clone.Payload = append([]byte(nil), envelope.Payload...)

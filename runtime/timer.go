@@ -7,8 +7,8 @@ import (
 	"time"
 )
 
-// runtimeClock is the small clock seam owned by Core. Production uses the
-// monotonic clock behind time.Timer; tests can provide a deterministic clock.
+// runtimeClock 是 Core 管理的窄时钟接口。
+// 生产环境使用 time.Timer 背后的单调时钟，测试可提供确定性时钟。
 type runtimeClock interface {
 	Now() time.Time
 	NewTimer(time.Duration) runtimeTimer
@@ -62,8 +62,8 @@ type timerEntry struct {
 	state  timerState
 }
 
-// timerMetrics is kept with the Timer owner so Core4 Inspection can expose a
-// consistent snapshot without making the scheduling path depend on metrics.
+// timerMetrics 由 Timer 管理组件持有，让 Core4 Inspection 能提供一致的快照，
+// 同时避免调度路径依赖指标模块。
 type timerMetrics struct {
 	created           atomic.Uint64
 	cancelled         atomic.Uint64
@@ -96,8 +96,8 @@ func (metrics *timerMetrics) snapshot() timerMetricsSnapshot {
 	}
 }
 
-// timerManager owns one-shot timers and only creates ordinary local Messages
-// when a timer expires. It never invokes a business callback directly.
+// timerManager 管理一次性 Timer，到期时只创建普通本地 Message，
+// 不会直接调用业务回调。
 type timerManager struct {
 	runtime *Runtime
 	clock   runtimeClock
@@ -305,8 +305,8 @@ func (manager *timerManager) armOwner(owner *serviceInstance) {
 }
 
 func (manager *timerManager) armEntry(entry *timerEntry) {
-	// Timers created after publication are armed directly; scanning the whole
-	// owner set is reserved for the OnStart-to-Running publication boundary.
+	// Service 发布后创建的 Timer 直接启用；仅在 OnStart 转入 Running 的发布边界，
+	// 才扫描该 Service 所属的全部 Timer。
 	manager.mu.Lock()
 	if manager.stopping || entry == nil || entry.state != timerScheduled || entry.armed {
 		manager.mu.Unlock()
@@ -361,8 +361,8 @@ func (manager *timerManager) fire(entry *timerEntry) {
 }
 
 func (manager *timerManager) recordAdmissionFailure(entry *timerEntry, err error) {
-	// Timer has no caller to which an expiry error can be returned, so retain
-	// the latest structured failure for the future Inspection owner path.
+	// Timer 没有可接收到期错误的调用方，因此保留最近一次结构化失败，
+	// 供后续 Inspection 观测路径读取。
 	manager.mu.Lock()
 	manager.lastFailure = &timerAdmissionFailure{
 		TimerID: entry.id,

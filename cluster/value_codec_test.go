@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-// 验证默认值 Codec 能往返支持的标量、字节串、列表和 string-key map。
+// 验证默认值 Codec 能往返支持的标量、字节串、列表和字符串键映射。
 func TestValueCodecRoundTripsSupportedValues(t *testing.T) {
 	codec, err := NewValueCodec(ValueCodecConfig{})
 	if err != nil {
@@ -67,7 +67,7 @@ func TestValueCodecRoundTripsSupportedValues(t *testing.T) {
 	}
 }
 
-// 验证 map 的编码顺序稳定，避免相同值生成不同 payload 影响缓存和诊断。
+// 验证 map 的编码顺序稳定，避免相同值生成不同载荷影响缓存和诊断。
 func TestValueCodecMapEncodingIsDeterministic(t *testing.T) {
 	codec, err := NewValueCodec(ValueCodecConfig{})
 	if err != nil {
@@ -122,7 +122,7 @@ func TestValueCodecRejectsUnsupportedValues(t *testing.T) {
 	}
 }
 
-// 验证 Codec 的最大嵌套深度和 payload 上限在编码、解码两侧都生效。
+// 验证 Codec 的最大嵌套深度和载荷上限在编码、解码两侧都生效。
 func TestValueCodecEnforcesDepthAndPayloadLimits(t *testing.T) {
 	depthCodec, err := NewValueCodec(ValueCodecConfig{MaxDepth: 1})
 	if err != nil {

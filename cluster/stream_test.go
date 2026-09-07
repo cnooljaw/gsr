@@ -98,7 +98,7 @@ func TestStreamPreservesBoundaryAfterMalformedBody(t *testing.T) {
 	}
 }
 
-// 验证写入错误和无错误短写被交回连接 owner，失败后不重放帧或剩余字节。
+// 验证写入错误和无错误短写被交回连接管理组件，失败后不重放帧或剩余字节。
 func TestStreamReportsWriteFailureWithoutReplay(t *testing.T) {
 	codec, err := NewFrameCodec(FrameCodecConfig{})
 	if err != nil {
@@ -126,7 +126,7 @@ type streamFailWriter struct {
 	calls int
 }
 
-// 验证未构造的 codec 在读取流之前失败，避免无效上限导致不受限分配。
+// 验证未构造的编解码器在读取流之前失败，避免无效上限导致不受限分配。
 func TestStreamRejectsUninitializedCodec(t *testing.T) {
 	for _, codec := range []*FrameCodec{nil, {}} {
 		if _, err := codec.readFrame(nil); !errors.Is(err, ErrInvalidFrameConfig) {
@@ -194,7 +194,7 @@ func TestStreamConnectionAgentRoundTrip(t *testing.T) {
 	}
 }
 
-// 验证连接 owner 关闭连接后，等待帧读取或对端消费的写入都能退出。
+// 验证连接管理组件关闭连接后，等待帧读取或对端消费的写入都能退出。
 func TestStreamCloseUnblocksIO(t *testing.T) {
 	codec, err := NewFrameCodec(FrameCodecConfig{})
 	if err != nil {
@@ -232,7 +232,7 @@ func TestStreamCloseUnblocksIO(t *testing.T) {
 	}
 }
 
-// 验证连接 owner 设置的 deadline 能终止帧读写，并保留可判断的超时原因。
+// 验证连接管理组件设置的截止时间能终止帧读写，并保留可判断的超时原因。
 func TestStreamHonorsConnectionDeadline(t *testing.T) {
 	codec, err := NewFrameCodec(FrameCodecConfig{})
 	if err != nil {

@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-// 验证 NodeSender 按单一 owner 顺序投递已 admission 的 Envelope。
+// 验证 NodeSender 由单一管理组件顺序投递已接纳的 Envelope。
 func TestNodeSenderDeliversAdmittedEnvelopesInOrder(t *testing.T) {
 	transport, err := NewInMemoryTransport(InMemoryTransportConfig{})
 	if err != nil {
@@ -91,7 +91,7 @@ func TestNodeSenderRejectsFullQueueWithoutBlocking(t *testing.T) {
 	closeSender(t, sender)
 }
 
-// 验证 Send admission 会复制 Envelope，发送方后续修改不会影响 worker 的输入快照。
+// 验证 Send 接纳时会复制 Envelope，发送方后续修改不会影响发送任务的输入快照。
 func TestNodeSenderClonesEnvelopeOnAdmission(t *testing.T) {
 	started := make(chan struct{})
 	release := make(chan struct{})
@@ -134,7 +134,7 @@ func TestNodeSenderClonesEnvelopeOnAdmission(t *testing.T) {
 	closeSender(t, sender)
 }
 
-// 验证 admission 后的传输失败以不含业务 payload 的基础设施事件对外可见。
+// 验证接纳后的传输失败以不含业务载荷的基础设施事件对外可见。
 func TestNodeSenderReportsPostAdmissionTransportFailure(t *testing.T) {
 	wantErr := errors.New("dial failed")
 	transport := &senderTestTransport{
@@ -219,7 +219,7 @@ func TestNodeSenderReportsUnavailableRemoteAndContinues(t *testing.T) {
 	closeSender(t, sender)
 }
 
-// 验证 Transport panic 被 sender owner 转成可观察的投递失败，而不会杀死进程。
+// 验证 Transport 的 panic 被发送器管理组件转成可观察的投递失败，而不会杀死进程。
 func TestNodeSenderReportsTransportPanic(t *testing.T) {
 	transport := &senderTestTransport{
 		send: func(NodeID, NodeID, ClusterEnvelope) error {
@@ -345,7 +345,7 @@ func TestNodeSenderReportsQueuedMessagesOnClose(t *testing.T) {
 	}
 }
 
-// 验证 NodeSender 关闭后拒绝新 admission，重复关闭可安全等待同一 worker。
+// 验证 NodeSender 关闭后拒绝新接纳，重复关闭可安全等待同一发送任务退出。
 func TestNodeSenderCloseIsFinal(t *testing.T) {
 	transport, err := NewInMemoryTransport(InMemoryTransportConfig{})
 	if err != nil {

@@ -8,43 +8,40 @@ import (
 	runtime "github.com/cnooljaw/gsr/runtime"
 )
 
-// RequestHandler is the narrow adapter from a Cluster request to the local
-// Runtime/Service dispatch path. The returned bytes must already be encoded
-// with the command's response codec.
+// RequestHandler 将 Cluster 请求适配到本地 Runtime/Service 分派路径。
+// 返回的字节必须已通过该命令的响应编解码器编码。
 type RequestHandler func(context.Context, NodeID, ClusterEnvelope) ([]byte, error)
 
-// ResponseWriter writes one response on the inbound connection that owns the
-// agent. A TCP connection owner can bind this to its framed writer.
+// ResponseWriter 通过 agent 所属的入站连接写回一个响应。
+// TCP 连接管理组件可以将它绑定到自身的帧写入函数。
 type ResponseWriter func(ClusterEnvelope) error
 
-// ConnectionAgentConfig supplies one inbound connection's dispatch and write
-// capabilities. The agent itself owns neither a socket nor a goroutine.
+// ConnectionAgentConfig 提供单条入站连接的分派与写入能力。
+// agent 自身不管理 socket 或 goroutine。
 type ConnectionAgentConfig struct {
 	Handler RequestHandler
 	Write   ResponseWriter
 }
 
 var (
-	// ErrInvalidConnectionAgentConfig means an agent dependency is invalid.
+	// ErrInvalidConnectionAgentConfig 表示 agent 的依赖无效。
 	ErrInvalidConnectionAgentConfig = errors.New("cluster: invalid connection agent config")
-	// ErrInvalidConnectionAgentRequest means an inbound request violates the
-	// logical Cluster request boundary.
+	// ErrInvalidConnectionAgentRequest 表示入站请求违反 Cluster 逻辑请求边界。
 	ErrInvalidConnectionAgentRequest = errors.New("cluster: invalid connection agent request")
-	// ErrConnectionAgentWrite means an agent could not write a Call response.
+	// ErrConnectionAgentWrite 表示 agent 无法写回 Call 响应。
 	ErrConnectionAgentWrite = errors.New("cluster: connection agent write failed")
 )
 
 var errConnectionAgentHandlerPanicked = errors.New("cluster: connection agent handler panicked")
 
-// ConnectionAgent handles logical requests received on one inbound
-// connection. It keeps remote NodeID metadata at the Cluster boundary and
-// never constructs or mutates a Core Message itself.
+// ConnectionAgent 处理单条入站连接收到的逻辑请求。
+// 远端 NodeID 元数据保留在 Cluster 边界，agent 自身不构造或修改 Core Message。
 type ConnectionAgent struct {
 	handler RequestHandler
 	write   ResponseWriter
 }
 
-// NewConnectionAgent validates and constructs one inbound connection agent.
+// NewConnectionAgent 校验并构造一个入站连接 agent。
 func NewConnectionAgent(config ConnectionAgentConfig) (*ConnectionAgent, error) {
 	if config.Handler == nil || config.Write == nil {
 		return nil, fmt.Errorf("%w: Handler and Write are required", ErrInvalidConnectionAgentConfig)
@@ -55,9 +52,9 @@ func NewConnectionAgent(config ConnectionAgentConfig) (*ConnectionAgent, error) 
 	}, nil
 }
 
-// Handle validates one inbound Request and dispatches it through the local
-// adapter. A Send (Session == 0) never writes a response; a Call writes one
-// Response or structured Error with the original Session, Target and Command.
+// Handle 校验入站 Request 并通过本地适配器分派。
+// Send（Session == 0）不写回响应；Call 使用原始 Session、Target 和 Command
+// 写回一个 Response 或结构化 Error。
 func (agent *ConnectionAgent) Handle(ctx context.Context, from NodeID, request ClusterEnvelope) error {
 	if agent == nil || agent.handler == nil || agent.write == nil {
 		return ErrInvalidConnectionAgentConfig
@@ -80,8 +77,7 @@ func (agent *ConnectionAgent) Handle(ctx context.Context, from NodeID, request C
 
 	payload, handlerErr := invokeConnectionAgentHandler(agent.handler, ctx, from, request.Clone())
 	if request.Session == 0 {
-		// Send owns no response path. The local Runtime/adapter is responsible
-		// for recording a Handler error on the receiving node.
+		// Send 没有响应路径，由接收节点的本地 Runtime/适配器记录 Handler 错误。
 		return nil
 	}
 	response := ClusterEnvelope{

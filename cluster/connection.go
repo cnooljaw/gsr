@@ -8,9 +8,9 @@ import (
 	"time"
 )
 
-// streamConnection owns one socket, not a reader loop or reconnect policy.
-// One reader may call read; infrastructure writers are serialized. The outer
-// Transport must bound writer concurrency and wait for its own I/O goroutines.
+// streamConnection 管理一个 socket，不管理读循环或重连策略。
+// read 只允许一个读取方调用；基础设施的写入调用串行执行。
+// 外层 Transport 必须限制并发写入方数量，并等待其 I/O goroutine 退出。
 type streamConnection struct {
 	socket       net.Conn
 	codec        *FrameCodec
@@ -21,8 +21,8 @@ type streamConnection struct {
 	closeErr     error
 }
 
-// Ownership transfers only on successful construction. writeTimeout bounds each
-// socket write, not time waiting for the writer lock or remote Handler execution.
+// 只有构造成功才转移 socket 管理权。writeTimeout 限制每次 socket 写入耗时，
+// 不包含等待写锁或远端 Handler 执行的时间。
 func newStreamConnection(socket net.Conn, codec *FrameCodec, writeTimeout time.Duration) (*streamConnection, error) {
 	if socket == nil || codec == nil || codec.maxFrame <= frameHeaderSize || writeTimeout <= 0 {
 		return nil, errors.New("cluster: socket, initialized frame codec and positive write timeout are required")
@@ -60,8 +60,8 @@ func (connection *streamConnection) write(envelope ClusterEnvelope) error {
 	return nil
 }
 
-// close deliberately does not acquire writeMu: closing the socket must unblock
-// an in-flight write before waiting writers can observe the closed state.
+// close 不获取 writeMu：必须先关闭 socket 解除正在进行的写入阻塞，
+// 等待写锁的调用方才能继续并观察到已关闭状态。
 func (connection *streamConnection) close() error {
 	connection.closeOnce.Do(func() {
 		connection.closed.Store(true)

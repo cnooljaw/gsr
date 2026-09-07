@@ -8,12 +8,12 @@ import (
 	"time"
 )
 
-// 验证 1,000 个空闲 Service 可以完整创建和关闭，并记录 per-Service runner 的第一轮基线。
+// 验证 1,000 个空闲 Service 可以完整创建和关闭，并记录每 Service 独立 runner 的第一轮基线。
 func TestRuntimeScale1000ServicesReportsBaseline(t *testing.T) {
 	runRuntimeScaleBaseline(t, 1000)
 }
 
-// 验证 10,000 个空闲 Service 可以完整创建和关闭，并记录 per-Service runner 的规模趋势。
+// 验证 10,000 个空闲 Service 可以完整创建和关闭，并记录每 Service 独立 runner 的规模趋势。
 func TestRuntimeScale10000ServicesReportsBaseline(t *testing.T) {
 	runRuntimeScaleBaseline(t, 10000)
 }
@@ -53,20 +53,18 @@ func runRuntimeScaleBaseline(t *testing.T, serviceCount int) {
 	}
 }
 
-// BenchmarkRuntimeCreateServices1000 measures the first per-Service runner
-// implementation at the requested 1,000-Service scale.
+// BenchmarkRuntimeCreateServices1000 测量第一版每 Service 独立 runner 实现在 1,000 个 Service 规模下的表现。
 func BenchmarkRuntimeCreateServices1000(b *testing.B) {
 	benchmarkRuntimeCreateServices(b, 1000)
 }
 
-// BenchmarkRuntimeCreateServices10000 measures the first per-Service runner
-// implementation at the requested 10,000-Service scale.
+// BenchmarkRuntimeCreateServices10000 测量第一版每 Service 独立 runner 实现在 10,000 个 Service 规模下的表现。
 func BenchmarkRuntimeCreateServices10000(b *testing.B) {
 	benchmarkRuntimeCreateServices(b, 10000)
 }
 
-// BenchmarkRuntimeSendHotService measures bounded Send admission into one hot
-// Service while its Runtime-owned runner consumes the same mailbox.
+// BenchmarkRuntimeSendHotService 测量向单个热点 Service 执行有界 Send 接纳的性能，
+// 同时由 Runtime 管理的 runner 消费同一 Mailbox。
 func BenchmarkRuntimeSendHotService(b *testing.B) {
 	runtime, err := NewRuntime(Config{MailboxCapacity: b.N + 1})
 	if err != nil {
@@ -141,7 +139,7 @@ func TestRuntimeScalePendingCallsAreCleanedOnStop(t *testing.T) {
 	}
 }
 
-// BenchmarkRuntimeCallRoundTrip measures a local Call from admission through Handler completion.
+// BenchmarkRuntimeCallRoundTrip 测量本地 Call 从接纳到 Handler 完成的往返性能。
 func BenchmarkRuntimeCallRoundTrip(b *testing.B) {
 	runtime, err := NewRuntime(Config{MailboxCapacity: b.N + 1})
 	if err != nil {
@@ -209,7 +207,7 @@ func TestRuntimeScale10000TimersReportsBaseline(t *testing.T) {
 	}
 }
 
-// 验证 10,000 个 Timer 的取消与触发竞争保持一次性计数，并通过普通 Mailbox admission。
+// 验证 10,000 个 Timer 的取消与触发竞争保持一次性计数，并通过普通 Mailbox 接纳路径。
 func TestRuntimeScaleTimersCancelAndFire(t *testing.T) {
 	clock := newFakeClock()
 	const timerCount = 10000
@@ -242,8 +240,7 @@ func TestRuntimeScaleTimersCancelAndFire(t *testing.T) {
 	}
 }
 
-// BenchmarkRuntimeCreateTimers10000 measures the current one-waiter-per-Timer
-// implementation at the requested 10,000-Timer scale.
+// BenchmarkRuntimeCreateTimers10000 测量当前每 Timer 一个等待者的实现在 10,000 个 Timer 规模下的表现。
 func BenchmarkRuntimeCreateTimers10000(b *testing.B) {
 	b.ReportAllocs()
 	for iteration := 0; iteration < b.N; iteration++ {

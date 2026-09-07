@@ -7,21 +7,20 @@ import (
 	"time"
 )
 
-// Service owns mutable state behind one Runtime-local ServiceID.
+// Service 通过 Runtime 本地的 ServiceID 对外提供入口，并独占其可变状态。
 //
-// OnStart and OnStop are lifecycle hooks owned by Runtime. Handle is the only
-// business entry Runtime invokes for an admitted Message.
+// OnStart 和 OnStop 是由 Runtime 管理的生命周期钩子。
+// 对已接纳的 Message，Handle 是 Runtime 调用的唯一业务入口。
 type Service interface {
 	OnStart(context.Context, ServiceContext) error
 	Handle(CommandContext, CommandID, ...any) (any, error)
 	OnStop(context.Context) error
 }
 
-// ServiceContext exposes the Core capabilities available to a Service.
+// ServiceContext 提供当前 Service 可使用的 Core 能力。
 //
-// Core 3 exposes local identity, Send, bounded Call and one-shot Timer
-// operations. Call waits for the target Handler's return value without
-// re-entering the caller Service runner.
+// Core 3 提供本地身份、Send、有等待上限的 Call 和一次性 Timer 操作。
+// Call 等待目标 Handler 的返回值，期间不会重入调用方 Service 的 runner。
 type ServiceContext interface {
 	Self() ServiceID
 	Send(ServiceID, CommandID, ...any) error
@@ -30,33 +29,33 @@ type ServiceContext interface {
 	CancelTimer(TimerID) bool
 }
 
-// CommandContext describes the Service and source of the Message being handled.
+// CommandContext 描述当前处理消息的 Service 及消息来源。
 //
-// The context is valid only until Handle returns. It deliberately has no
-// Reply method; Runtime completes Call results from Handle's return values.
+// 此上下文仅在 Handle 返回前有效，不提供 Reply 方法；
+// Runtime 使用 Handle 的返回值完成 Call。
 type CommandContext interface {
 	ServiceContext
 	Source() ServiceID
 }
 
-// ServiceState is the observable lifecycle state of a registered Service.
+// ServiceState 是已注册 Service 对外可观测的生命周期状态。
 type ServiceState uint8
 
 const (
-	// ServiceStateStarting means OnStart has not finished publishing the Service.
+	// ServiceStateStarting 表示 OnStart 尚未完成 Service 的发布。
 	ServiceStateStarting ServiceState = iota
-	// ServiceStateRunning means the Service accepts ordinary messages.
+	// ServiceStateRunning 表示 Service 接收普通消息。
 	ServiceStateRunning
-	// ServiceStateStopping means the Service rejects new messages and is draining its runner.
+	// ServiceStateStopping 表示 Service 拒绝新消息，正在收尾并等待 runner 退出。
 	ServiceStateStopping
-	// ServiceStateStopped means the Service runner and OnStop have completed.
+	// ServiceStateStopped 表示 Service runner 和 OnStop 均已完成。
 	ServiceStateStopped
-	// ServiceStateFailed is reserved for an externally classified failed
-	// Service; the first Runtime does not transition into it automatically.
+	// ServiceStateFailed 为外部判定失败的 Service 预留；
+	// 第一版 Runtime 不会自动转入此状态。
 	ServiceStateFailed
 )
 
-// String returns the stable display name of a ServiceState.
+// String 返回 ServiceState 的稳定显示名称。
 func (state ServiceState) String() string {
 	switch state {
 	case ServiceStateStarting:
@@ -288,8 +287,8 @@ func (runtime *Runtime) executeMessage(instance *serviceInstance, message Messag
 }
 
 func (runtime *Runtime) recordHandlerError(_ *serviceInstance, _ Message, err error) {
-	// Send has no completion channel; Inspection exposes this diagnostic
-	// without changing the fire-and-forget admission contract.
+	// Send 没有完成结果通道；Inspection 展示此诊断，
+	// 但不改变单向投递的接纳契约。
 	runtime.recordHandlerMetric(err)
 }
 

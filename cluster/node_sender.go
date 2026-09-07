@@ -16,8 +16,8 @@ const (
 	defaultFailureQueueCapacity  = 256
 )
 
-// DeliveryFailure describes an infrastructure failure after local admission.
-// It contains routing metadata only and deliberately excludes business payload.
+// DeliveryFailure 描述本地接纳后的基础设施失败。
+// 仅包含路由元数据，不携带业务载荷。
 type DeliveryFailure struct {
 	LocalNode  NodeID
 	RemoteNode NodeID
@@ -28,7 +28,7 @@ type DeliveryFailure struct {
 	Err        error
 }
 
-// NodeSenderConfig configures one outbound sender for one remote NodeID.
+// NodeSenderConfig 配置对应单个远端 NodeID 的出站发送器。
 type NodeSenderConfig struct {
 	LocalNode     NodeID
 	RemoteNode    NodeID
@@ -37,18 +37,18 @@ type NodeSenderConfig struct {
 }
 
 var (
-	// ErrInvalidNodeSenderConfig means a NodeSender configuration is invalid.
+	// ErrInvalidNodeSenderConfig 表示 NodeSender 配置无效。
 	ErrInvalidNodeSenderConfig = errors.New("cluster: invalid node sender config")
-	// ErrNodeSenderClosed means a NodeSender no longer accepts new messages.
+	// ErrNodeSenderClosed 表示 NodeSender 已停止接纳新消息。
 	ErrNodeSenderClosed = errors.New("cluster: node sender is closed")
-	// ErrOutboundQueueFull means the bounded sender queue rejected admission.
+	// ErrOutboundQueueFull 表示有界发送队列拒绝消息入队。
 	ErrOutboundQueueFull = errors.New("cluster: outbound queue is full")
-	// ErrTransportPanicked means the transport panicked while sending an envelope.
+	// ErrTransportPanicked 表示 Transport 在发送消息封包时发生 panic。
 	ErrTransportPanicked = errors.New("cluster: transport panicked")
 )
 
-// NodeSender is the single outbound owner for one local-to-remote node pair.
-// It admits cloned envelopes into a bounded queue and delivers them serially.
+// NodeSender 是本地节点到某个远端节点的唯一出站管理组件。
+// 它将复制后的消息封包接纳到有界队列，并串行投递。
 type NodeSender struct {
 	localNode       NodeID
 	remoteNode      NodeID
@@ -63,7 +63,7 @@ type NodeSender struct {
 	droppedFailures atomic.Uint64
 }
 
-// NewNodeSender constructs and starts one bounded outbound sender worker.
+// NewNodeSender 构造并启动一个使用有界队列的出站发送 worker。
 func NewNodeSender(config NodeSenderConfig) (*NodeSender, error) {
 	if config.LocalNode == "" || config.RemoteNode == "" || isNilTransport(config.Transport) {
 		return nil, fmt.Errorf("%w: local node, remote node, and Transport are required", ErrInvalidNodeSenderConfig)
@@ -87,9 +87,9 @@ func NewNodeSender(config NodeSenderConfig) (*NodeSender, error) {
 	return sender, nil
 }
 
-// Send admits a cloned envelope into the bounded outbound queue.
-// A nil error confirms local admission only. Later infrastructure failures are
-// published through Failures without invoking business code.
+// Send 将复制后的消息封包接纳到有界出站队列。
+// 返回 nil 仅表示本地接纳成功；后续基础设施失败通过 Failures 发布，
+// 不调用业务代码。
 func (sender *NodeSender) Send(envelope ClusterEnvelope) error {
 	if sender == nil {
 		return ErrNodeSenderClosed
@@ -112,8 +112,8 @@ func (sender *NodeSender) Send(envelope ClusterEnvelope) error {
 	}
 }
 
-// Failures returns the bounded stream of post-admission infrastructure
-// failures. A slow consumer cannot block the sender; excess events are dropped.
+// Failures 返回接纳后基础设施失败的有界事件流。
+// 慢消费者不会阻塞发送器，超出容量的事件会被丢弃。
 func (sender *NodeSender) Failures() <-chan DeliveryFailure {
 	if sender == nil {
 		return nil
@@ -121,8 +121,8 @@ func (sender *NodeSender) Failures() <-chan DeliveryFailure {
 	return sender.failures
 }
 
-// DroppedFailureCount returns the number of diagnostic events discarded
-// because the bounded failure stream was full. A nil sender reports zero.
+// DroppedFailureCount 返回因有界失败事件流已满而丢弃的诊断事件数。
+// nil 发送器返回零。
 func (sender *NodeSender) DroppedFailureCount() uint64 {
 	if sender == nil {
 		return 0
@@ -130,9 +130,8 @@ func (sender *NodeSender) DroppedFailureCount() uint64 {
 	return sender.droppedFailures.Load()
 }
 
-// Close stops admission, reports queued envelopes as failed, and waits for the
-// current transport call until ctx expires. A canceled ctx does not cancel the
-// worker; a later Close call may continue waiting for it.
+// Close 停止接纳，将队列中的消息报告为失败，并等待当前 Transport 调用结束，
+// 最多等到 ctx 到期。取消 ctx 不会取消 worker；后续 Close 调用可继续等待它退出。
 func (sender *NodeSender) Close(ctx context.Context) error {
 	if sender == nil {
 		return nil

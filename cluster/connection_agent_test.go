@@ -56,7 +56,7 @@ func TestConnectionAgentDispatchesCallResponse(t *testing.T) {
 	}
 }
 
-// 验证 Call Handler 的结构化错误会变成同一 Session 的 Error frame。
+// 验证 Call Handler 的结构化错误会变成同一 Session 的 Error 帧。
 func TestConnectionAgentDispatchesStructuredError(t *testing.T) {
 	wantErr := runtime.NewStatusError(runtime.ErrorClassDomain, runtime.ErrorCode("room.full"), "room is full")
 	written := make(chan ClusterEnvelope, 1)
@@ -120,7 +120,7 @@ func TestConnectionAgentSuppressesSendError(t *testing.T) {
 	}
 }
 
-// 验证 Handler panic 会转成安全的 ServicePanicked Error frame，而不是传播到连接 owner。
+// 验证 Handler 的 panic 会转成安全的 ServicePanicked 错误帧，而不是传播到连接管理组件。
 func TestConnectionAgentRecoversHandlerPanic(t *testing.T) {
 	written := make(chan ClusterEnvelope, 1)
 	agent, err := NewConnectionAgent(ConnectionAgentConfig{
@@ -157,7 +157,7 @@ func TestConnectionAgentRecoversHandlerPanic(t *testing.T) {
 	}
 }
 
-// 验证 Agent 在构造和请求边界拒绝缺失依赖、空来源、错误 frame 和 nil context。
+// 验证 Agent 在构造和请求边界拒绝缺失依赖、空来源、错误帧和 nil context。
 func TestConnectionAgentRejectsInvalidConfigAndRequest(t *testing.T) {
 	validHandler := func(context.Context, NodeID, ClusterEnvelope) ([]byte, error) { return nil, nil }
 	validWriter := func(ClusterEnvelope) error { return nil }

@@ -2,7 +2,7 @@ package runtime
 
 import "sync"
 
-// Message is the unencoded local value delivered through a Service mailbox.
+// Message 是通过 Service Mailbox 投递的未编码本地消息值。
 type Message struct {
 	Source  ServiceID
 	Target  ServiceID
@@ -11,10 +11,10 @@ type Message struct {
 	Args    []any
 }
 
-// mailbox is a bounded FIFO queue with a separate wake-up signal.
+// mailbox 是带有独立唤醒信号的有界 FIFO 队列。
 //
-// A mutex protects both the admission boundary and queue contents. The wake
-// channel is never closed, which avoids a send/stop race on a shared channel.
+// 互斥锁同时保护接纳边界与队列内容。唤醒 channel 永不关闭，
+// 避免在共享 channel 上发生发送与停止的竞争。
 type mailbox struct {
 	mu        sync.Mutex
 	capacity  int

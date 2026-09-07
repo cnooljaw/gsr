@@ -7,8 +7,8 @@ import (
 	"sync/atomic"
 )
 
-// ServiceInspection is a read-only point-in-time view of one registered
-// Service. It contains values only; it does not expose the Service or runner.
+// ServiceInspection 是某个已注册 Service 在观测时刻的只读视图。
+// 仅包含值，不暴露 Service 实例或 runner。
 type ServiceInspection struct {
 	ID                       ServiceID
 	State                    ServiceState
@@ -19,7 +19,7 @@ type ServiceInspection struct {
 	ShutdownDeadlineExceeded bool
 }
 
-// RuntimeMetricsSnapshot contains Runtime-owned counters observed by Inspect.
+// RuntimeMetricsSnapshot 包含 Inspect 观测到的 Runtime 计数器值。
 type RuntimeMetricsSnapshot struct {
 	AdmissionRejected      uint64
 	HandlerErrors          uint64
@@ -33,8 +33,8 @@ type RuntimeMetricsSnapshot struct {
 	StopTimeouts           uint64
 }
 
-// RuntimeInspection is a read-only point-in-time view of Core Runtime state.
-// Services are sorted by ServiceID for deterministic inspection output.
+// RuntimeInspection 是 Core Runtime 状态在观测时刻的只读视图。
+// Services 按 ServiceID 排序，以保证观测输出顺序确定。
 type RuntimeInspection struct {
 	State            RuntimeState
 	Services         []ServiceInspection
@@ -66,8 +66,8 @@ func (metrics *runtimeMetrics) snapshot(timers timerMetricsSnapshot) RuntimeMetr
 	}
 }
 
-// Inspect returns a value snapshot without exposing mutable Runtime-owned
-// state. A concurrent operation may be reflected in only part of the result.
+// Inspect 返回值快照，不暴露 Runtime 的可变状态。
+// 并发操作可能只体现在结果的部分字段中。
 func (runtime *Runtime) Inspect() RuntimeInspection {
 	if runtime == nil {
 		return RuntimeInspection{}

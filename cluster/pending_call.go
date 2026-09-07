@@ -9,15 +9,15 @@ import (
 )
 
 var (
-	// ErrClusterCallClosed means the Cluster pending-call owner has stopped.
+	// ErrClusterCallClosed 表示 Cluster 的待完成调用管理组件已停止。
 	ErrClusterCallClosed = errors.New("cluster: pending calls are closed")
-	// ErrClusterSessionNotFound means a response does not match a pending call.
+	// ErrClusterSessionNotFound 表示响应未匹配到待完成调用。
 	ErrClusterSessionNotFound = errors.New("cluster: session not found")
-	// ErrClusterResponseMismatch means a response does not match its request route.
+	// ErrClusterResponseMismatch 表示响应与请求路由不匹配。
 	ErrClusterResponseMismatch = errors.New("cluster: response does not match request")
-	// ErrInvalidClusterCall means a pending-call registration is invalid.
+	// ErrInvalidClusterCall 表示待完成调用的注册信息无效。
 	ErrInvalidClusterCall = errors.New("cluster: invalid call")
-	// ErrInvalidClusterResponse means a completion frame is not a valid response.
+	// ErrInvalidClusterResponse 表示用于完成调用的帧不是有效响应。
 	ErrInvalidClusterResponse = errors.New("cluster: invalid response")
 )
 
@@ -26,23 +26,22 @@ type clusterCallResult struct {
 	err     error
 }
 
-// ClusterCallRegistry is the Cluster-owned completion boundary shared by all
-// source-bound ClusterClient instances in one Cluster.
+// ClusterCallRegistry 是由 Cluster 管理的调用完成边界，
+// 供同一 Cluster 中所有绑定来源身份的 ClusterClient 实例共享。
 //
-// It keeps session allocation and pending-call ownership out of individual
-// Service clients. A transport or ConnectionAgent completes a response with
-// Complete; business code does not access pending-call records directly. Use
-// NewClusterCallRegistry; the zero value is not an open registry.
+// Session 分配和待完成调用由此统一管理，不归各 Service 客户端所有。
+// Transport 或 ConnectionAgent 通过 Complete 完成响应，业务代码不直接访问等待记录。
+// 必须通过 NewClusterCallRegistry 构造；零值不是可用的注册表。
 type ClusterCallRegistry struct {
 	pending *clusterPendingCalls
 }
 
 var (
-	// ErrInvalidClusterCallRegistry means a call registry receiver is invalid.
+	// ErrInvalidClusterCallRegistry 表示调用注册表接收者无效。
 	ErrInvalidClusterCallRegistry = errors.New("cluster: invalid call registry")
 )
 
-// NewClusterCallRegistry creates an open Cluster-wide pending-call owner.
+// NewClusterCallRegistry 创建可用的 Cluster 级待完成调用管理组件。
 func NewClusterCallRegistry() *ClusterCallRegistry {
 	return &ClusterCallRegistry{pending: newClusterPendingCalls()}
 }
@@ -51,11 +50,10 @@ func (registry *ClusterCallRegistry) valid() bool {
 	return registry != nil && registry.pending != nil
 }
 
-// Complete matches one remote Response or Error to its pending call.
+// Complete 将一个远端 Response 或 Error 匹配到对应的待完成调用。
 //
-// The from NodeID is supplied by the transport rather than read from the
-// envelope. A mismatch or unknown session is rejected without completing any
-// other call.
+// from NodeID 由 Transport 提供，不从消息封包读取。
+// 不匹配或未知的 Session 会被拒绝，不会完成其它调用。
 func (registry *ClusterCallRegistry) Complete(from NodeID, envelope ClusterEnvelope) error {
 	if !registry.valid() {
 		return ErrInvalidClusterCallRegistry
@@ -63,8 +61,7 @@ func (registry *ClusterCallRegistry) Complete(from NodeID, envelope ClusterEnvel
 	return registry.pending.complete(from, envelope)
 }
 
-// Close completes all remaining calls with ErrClusterCallClosed and prevents
-// new sessions from being registered.
+// Close 使用 ErrClusterCallClosed 完成所有剩余调用，并阻止注册新 Session。
 func (registry *ClusterCallRegistry) Close() error {
 	if !registry.valid() {
 		return ErrInvalidClusterCallRegistry
@@ -72,8 +69,7 @@ func (registry *ClusterCallRegistry) Close() error {
 	return registry.pending.close(nil)
 }
 
-// PendingCount reports the number of calls that are still waiting for a
-// response. It is intended for lifecycle and diagnostic checks.
+// PendingCount 返回仍在等待响应的调用数，用于生命周期检查与诊断。
 func (registry *ClusterCallRegistry) PendingCount() int {
 	if !registry.valid() {
 		return 0
@@ -95,6 +91,22 @@ func (registry *ClusterCallRegistry) cancel(session ClusterSessionID, err error)
 	return registry.pending.cancel(session, err)
 }
 
+// failNode 完成该节点当前的待完成调用，但不关闭注册表。
+// 后续 NodeSender/Transport 管理组件必须先清理旧连接，再接纳替代连接上的调用；
+// 仅靠 NodeID 无法区分新旧连接。此操作不进行业务重试。
+func (registry *ClusterCallRegistry) failNode(node NodeID, cause error) (int, error) {
+	if !registry.valid() {
+		return 0, ErrInvalidClusterCallRegistry
+	}
+	if node == "" {
+		return 0, ErrInvalidNode
+	}
+	if cause == nil {
+		return 0, fmt.Errorf("%w: node failure requires a cause", ErrInvalidClusterCall)
+	}
+	return registry.pending.failNode(node, cause), nil
+}
+
 type clusterPendingCall struct {
 	session ClusterSessionID
 	source  runtime.ServiceID
@@ -104,9 +116,8 @@ type clusterPendingCall struct {
 	done    chan clusterCallResult
 }
 
-// clusterPendingCalls owns ClusterSessionID allocation and response completion
-// for one Cluster instance. It does not perform network I/O or wake Runtime
-// runners directly; the caller owns that integration.
+// clusterPendingCalls 管理单个 Cluster 实例的 ClusterSessionID 分配与响应完成。
+// 它不执行网络 I/O，也不直接唤醒 Runtime runner；这些接线由调用方负责。
 type clusterPendingCalls struct {
 	mu      sync.Mutex
 	next    ClusterSessionID
@@ -230,6 +241,22 @@ func (registry *clusterPendingCalls) close(err error) error {
 		finishClusterPendingCall(call, clusterCallResult{err: err})
 	}
 	return nil
+}
+
+func (registry *clusterPendingCalls) failNode(node NodeID, cause error) int {
+	registry.mu.Lock()
+	var failed []*clusterPendingCall
+	for session, call := range registry.pending {
+		if call.node == node {
+			delete(registry.pending, session)
+			failed = append(failed, call)
+		}
+	}
+	registry.mu.Unlock()
+	for _, call := range failed {
+		finishClusterPendingCall(call, clusterCallResult{err: cause})
+	}
+	return len(failed)
 }
 
 func (registry *clusterPendingCalls) pendingCount() int {

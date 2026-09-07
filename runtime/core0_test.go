@@ -254,7 +254,7 @@ func TestRuntimeStartFailureRollsBackAndStops(t *testing.T) {
 	}
 }
 
-// 验证 Close 会使用 Runtime 的统一 shutdown deadline，而不是无限等待组件。
+// 验证 Close 会使用 Runtime 统一的停止截止时间，而不是无限等待组件。
 func TestRuntimeCloseUsesShutdownTimeout(t *testing.T) {
 	stopStarted := make(chan struct{})
 	scheduler := &lifecycleProbe{

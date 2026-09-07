@@ -142,7 +142,7 @@ func TestCommandContextDoesNotExposeManualReply(t *testing.T) {
 	}
 }
 
-// 验证 Runtime 不会在 Mailbox admission 前预检查命令，而是把未知命令交给 Service.Handle。
+// 验证 Runtime 不会在 Mailbox 接纳前预检查命令，而是把未知命令交给 Service.Handle。
 func TestRuntimeDeliversUnknownCommandWithoutPreflight(t *testing.T) {
 	runtimeInstance, err := runtime.NewRuntime(runtime.Config{})
 	if err != nil {

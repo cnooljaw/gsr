@@ -7,14 +7,14 @@ import (
 	"sync"
 )
 
-// serviceLifecycle owns Service admission in the Runtime lifecycle plan.
+// serviceLifecycle 在 Runtime 生命周期计划中负责 Service 的接纳管理。
 type serviceLifecycle struct {
 	runtime *Runtime
 }
 
-// localDispatcher is the Runtime-owned local routing boundary. It knows the
-// current Service registry but does not inspect CommandID capabilities; every
-// admitted Message reaches the target Handler.
+// localDispatcher 是由 Runtime 管理的本地路由边界。
+// 它查询当前 Service 注册表，但不检查 CommandID 支持情况；
+// 每条已接纳的 Message 都交给目标 Handler。
 type localDispatcher struct {
 	runtime *Runtime
 }
@@ -31,8 +31,8 @@ func (component *serviceLifecycle) stop(ctx context.Context) error {
 	return component.runtime.requestStopServices(ctx)
 }
 
-// scheduler owns runner goroutines and their wait lifecycle. It deliberately
-// has no global ready queue; each Service keeps its own FIFO Mailbox.
+// scheduler 管理 runner goroutine 及其等待退出的生命周期。
+// 不设全局就绪队列，每个 Service 持有自己的 FIFO Mailbox。
 type scheduler struct {
 	runtime *Runtime
 
@@ -148,8 +148,8 @@ func (scheduler *scheduler) runnerTracked(id ServiceID) bool {
 	return exists
 }
 
-// CreateService admits one already-constructed Service after Runtime.Start.
-// The ServiceID is consumed even when OnStart fails and is never reused.
+// CreateService 在 Runtime.Start 后接纳一个已构造的 Service 实例。
+// 即使 OnStart 失败，已分配的 ServiceID 也会被消耗且永不复用。
 func (runtime *Runtime) CreateService(ctx context.Context, service Service) (ServiceID, error) {
 	if serviceValueIsNil(service) {
 		return 0, ErrInvalidService
@@ -208,9 +208,8 @@ func (runtime *Runtime) CreateService(ctx context.Context, service Service) (Ser
 	return id, nil
 }
 
-// Send admits a message from Runtime-owned infrastructure with Source zero.
-// Service code normally uses ServiceContext.Send so Runtime can record the
-// sending ServiceID.
+// Send 接纳 Runtime 基础设施发出的消息，Source 为零。
+// Service 代码通常使用 ServiceContext.Send，由 Runtime 记录发送方 ServiceID。
 func (runtime *Runtime) Send(target ServiceID, command CommandID, args ...any) error {
 	if runtime.dispatcher == nil {
 		return ErrRuntimeClosed
