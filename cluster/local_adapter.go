@@ -2,6 +2,7 @@ package cluster
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/cnooljaw/gsr/runtime"
@@ -44,19 +45,20 @@ func (adapter *localRequestAdapter) handle(ctx context.Context, from NodeID, req
 		return runtime.ErrInvalidCommandArguments
 	}
 	var localErr error
+	var encodingErr error
+	target := request.Target.ServiceID
+	if request.Target.ServiceName != "" {
+		if adapter.resolve == nil {
+			localErr = runtime.ErrServiceNotFound
+		} else {
+			target, localErr = adapter.resolve(request.Target.ServiceName)
+		}
+	}
 	agent := ConnectionAgent{
 		write: write,
 		handler: func(callCtx context.Context, _ NodeID, envelope ClusterEnvelope) ([]byte, error) {
-			target := envelope.Target.ServiceID
-			if envelope.Target.ServiceName != "" {
-				if adapter.resolve == nil {
-					localErr = runtime.ErrServiceNotFound
-					return nil, localErr
-				}
-				target, localErr = adapter.resolve(envelope.Target.ServiceName)
-				if localErr != nil {
-					return nil, localErr
-				}
+			if localErr != nil {
+				return nil, localErr
 			}
 			if envelope.Session == 0 {
 				localErr = adapter.runtime.Send(target, envelope.Command, args...)
@@ -66,14 +68,27 @@ func (adapter *localRequestAdapter) handle(ctx context.Context, from NodeID, req
 			if err != nil {
 				return nil, err
 			}
-			return codec.Encode(value)
+			payload, err := encodeLocalResponse(codec, value)
+			encodingErr = err
+			return payload, err
 		},
 	}
 	if err := agent.Handle(ctx, from, request); err != nil {
-		return err
+		return errors.Join(err, encodingErr)
 	}
 	if request.Session == 0 {
 		return localErr
 	}
-	return nil
+	return encodingErr
+}
+
+// encodeLocalResponse 将编码扩展的 panic 转为安全错误，同时供回包和本地诊断使用。
+func encodeLocalResponse(codec CommandCodec, value any) (payload []byte, err error) {
+	defer func() {
+		if recover() != nil {
+			payload = nil
+			err = errInboundRequestPanicked
+		}
+	}()
+	return codec.Encode(value)
 }

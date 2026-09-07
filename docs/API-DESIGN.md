@@ -520,6 +520,10 @@ Cluster 2 的远程 Call 使用 Cluster-owned `ClusterCallRegistry` 和内部 `C
 
 ### 6.3 Cluster wire 与连接模型
 
+入站连接采用一个读循环和数量有上限的 Call 等待任务。Send 在读循环中只完成本地接纳；Call 交给连接组件管理的任务，经 Runtime.Call 等待。每连接 Call 名额满载时暂停读取（包括后续 Send），不建立无界队列。响应通过同一连接串行写入，允许不同 Call 按完成顺序回包。
+
+同连接 Send 保持接纳顺序；混合 Send/Call 不保证 wire 到达顺序等于本地执行顺序，目标 Service 仍按 Mailbox 成功接纳顺序串行执行。外层负责节点级连接数上限、任务取消与等待；关闭时取消基础设施 Call，但不能强杀目标 Handler。codec 与名称解析器必须并发安全且不执行无限阻塞 I/O。完整方案见 [入站并发方案](RFC-CLUSTER-INBOUND-CONCURRENCY.md)。
+
 ClusterEnvelope 至少编码以下逻辑字段：
 
 ```text

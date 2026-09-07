@@ -10,6 +10,7 @@ import (
 
 // CommandCodec 在 Command 载荷与字节之间进行编解码。
 // 可以使用默认 ValueCodec，也可以提供命令专用的强类型实现。
+// 同一注册实例可能被多个连接和 Call 并发调用，实现必须并发安全且避免无限阻塞。
 type CommandCodec interface {
 	Encode(value any) ([]byte, error)
 	Decode(payload []byte) (any, error)
