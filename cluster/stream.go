@@ -7,6 +7,21 @@ import (
 	"io"
 )
 
+// completeFrameError records that the entire bounded frame was consumed before
+// decoding failed. It proves stream alignment, not that the input is acceptable;
+// authentication and protocol policy can still require closing the connection.
+type completeFrameError struct {
+	err error
+}
+
+func (err *completeFrameError) Error() string {
+	return "decode complete cluster frame: " + err.err.Error()
+}
+
+func (err *completeFrameError) Unwrap() error {
+	return err.err
+}
+
 // readFrame reads exactly one bounded frame. The connection owner supplies
 // deadlines/cancellation and decides whether an error requires closing the stream.
 // No goroutine or connection is owned here.
@@ -34,7 +49,11 @@ func (codec *FrameCodec) readFrame(reader io.Reader) (ClusterEnvelope, error) {
 		}
 		return ClusterEnvelope{}, fmt.Errorf("read cluster frame body: %w", err)
 	}
-	return codec.Decode(frame)
+	envelope, err := codec.Decode(frame)
+	if err != nil {
+		return ClusterEnvelope{}, &completeFrameError{err: err}
+	}
+	return envelope, nil
 }
 
 // writeFrame requires the connection owner to serialize writes. Partial failures

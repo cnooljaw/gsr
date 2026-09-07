@@ -2,11 +2,15 @@ package cluster
 
 import (
 	"bytes"
+	"context"
 	"encoding/binary"
 	"errors"
 	"io"
+	"net"
+	"os"
 	"testing"
 	"testing/iotest"
+	"time"
 )
 
 // 验证连续帧即使逐字节到达也能分别读取，正常流结束返回 EOF。
@@ -54,8 +58,13 @@ func TestStreamRejectsTruncationAndInvalidLength(t *testing.T) {
 	}
 	for _, testCase := range cases {
 		t.Run(testCase.name, func(t *testing.T) {
-			if _, err := codec.readFrame(bytes.NewReader(testCase.input)); !errors.Is(err, testCase.want) {
+			_, err := codec.readFrame(bytes.NewReader(testCase.input))
+			if !errors.Is(err, testCase.want) {
 				t.Fatalf("readFrame error = %v, want %v", err, testCase.want)
+			}
+			var complete *completeFrameError
+			if errors.As(err, &complete) {
+				t.Fatal("invalid length or truncation marked as a complete frame")
 			}
 		})
 	}
@@ -76,8 +85,13 @@ func TestStreamPreservesBoundaryAfterMalformedBody(t *testing.T) {
 	binary.BigEndian.PutUint32(bad, 1)
 	bad[4] = 255
 	reader := bytes.NewReader(append(bad, valid...))
-	if _, err := codec.readFrame(reader); !errors.Is(err, ErrMalformedFrame) {
+	_, err = codec.readFrame(reader)
+	if !errors.Is(err, ErrMalformedFrame) {
 		t.Fatalf("bad frame = %v", err)
+	}
+	var complete *completeFrameError
+	if !errors.As(err, &complete) {
+		t.Fatal("missing complete frame boundary marker")
 	}
 	if got, err := codec.readFrame(reader); err != nil || got.Target != request.Target {
 		t.Fatalf("next frame = %+v, %v", got, err)
@@ -124,4 +138,122 @@ func TestStreamRejectsUninitializedCodec(t *testing.T) {
 func (writer *streamFailWriter) Write(_ []byte) (int, error) {
 	writer.calls++
 	return 1, writer.err
+}
+
+// 验证 ConnectionAgent 通过双向字节流在原连接返回同一 Session 的回复。
+func TestStreamConnectionAgentRoundTrip(t *testing.T) {
+	codec, err := NewFrameCodec(FrameCodecConfig{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	client, server := net.Pipe()
+	defer client.Close()
+	defer server.Close()
+	for _, conn := range []net.Conn{client, server} {
+		if err := conn.SetDeadline(time.Now().Add(time.Second)); err != nil {
+			t.Fatal(err)
+		}
+	}
+	agent, err := NewConnectionAgent(ConnectionAgentConfig{
+		Handler: func(_ context.Context, _ NodeID, request ClusterEnvelope) ([]byte, error) {
+			return request.Payload, nil
+		},
+		Write: func(response ClusterEnvelope) error {
+			return codec.writeFrame(server, response)
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	done := make(chan error, 1)
+	go func() {
+		request, err := codec.readFrame(server)
+		if err == nil {
+			err = agent.Handle(context.Background(), "node-a", request)
+		}
+		done <- err
+	}()
+	defer func() {
+		client.Close()
+		server.Close()
+		if err := <-done; err != nil {
+			t.Errorf("server exchange: %v", err)
+		}
+	}()
+	request := ClusterEnvelope{Kind: FrameRequest, Session: 42, Target: ServiceTarget{ServiceID: 7}, Command: 1, Payload: []byte("hello")}
+	if err := codec.writeFrame(client, request); err != nil {
+		t.Fatal(err)
+	}
+	response, err := codec.readFrame(client)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if response.Kind != FrameResponse || response.Session != request.Session || response.Target != request.Target ||
+		response.Command != request.Command || !bytes.Equal(response.Payload, request.Payload) {
+		t.Fatalf("unexpected response: %+v", response)
+	}
+}
+
+// 验证连接 owner 关闭连接后，等待帧读取或对端消费的写入都能退出。
+func TestStreamCloseUnblocksIO(t *testing.T) {
+	codec, err := NewFrameCodec(FrameCodecConfig{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, operation := range []string{"read", "write"} {
+		t.Run(operation, func(t *testing.T) {
+			local, peer := net.Pipe()
+			defer peer.Close()
+			defer local.Close()
+			started := make(chan struct{})
+			done := make(chan error, 1)
+			go func() {
+				close(started)
+				if operation == "read" {
+					_, err := codec.readFrame(local)
+					done <- err
+					return
+				}
+				done <- codec.writeFrame(local, ClusterEnvelope{Kind: FrameRequest, Target: ServiceTarget{ServiceID: 7}, Command: 1})
+			}()
+			<-started
+			if err := local.Close(); err != nil {
+				t.Error(err)
+			}
+			select {
+			case err := <-done:
+				if !errors.Is(err, io.ErrClosedPipe) {
+					t.Fatalf("I/O error = %v, want closed pipe", err)
+				}
+			case <-time.After(time.Second):
+				t.Fatal("I/O did not exit after close")
+			}
+		})
+	}
+}
+
+// 验证连接 owner 设置的 deadline 能终止帧读写，并保留可判断的超时原因。
+func TestStreamHonorsConnectionDeadline(t *testing.T) {
+	codec, err := NewFrameCodec(FrameCodecConfig{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	local, peer := net.Pipe()
+	defer local.Close()
+	defer peer.Close()
+	if err := local.SetDeadline(time.Now().Add(-time.Second)); err != nil {
+		t.Fatal(err)
+	}
+	_, err = codec.readFrame(local)
+	if !errors.Is(err, os.ErrDeadlineExceeded) {
+		t.Fatalf("read error = %v, want deadline exceeded", err)
+	}
+	var complete *completeFrameError
+	if errors.As(err, &complete) {
+		t.Fatal("read timeout marked as a complete frame")
+	}
+	err = codec.writeFrame(local, ClusterEnvelope{Kind: FrameRequest, Target: ServiceTarget{ServiceID: 7}, Command: 1})
+	if !errors.Is(err, os.ErrDeadlineExceeded) {
+		t.Fatalf("write error = %v, want deadline exceeded", err)
+	}
 }
