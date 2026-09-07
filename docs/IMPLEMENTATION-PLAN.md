@@ -305,7 +305,9 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 - 已实现：共享 `ClusterCallRegistry` 的 Session 分配与 `Complete` 入口，以及 `Client.Call` 的请求编码、有限等待、caller cancellation、Response/Error 解码。
 - 已实现内部 `failNode` 收尾入口：按目标节点清理当前等待并保留底层错误原因；与回复、取消竞争时只完成一次，不影响其它节点，也不永久关闭 registry。已验证它能恢复等待中的 ClusterClient.Call。
 - 接线约束：TCP owner 必须在旧连接等待清理完成后再开放替代连接请求；该入口只按 NodeID 匹配，不能用于并行新旧连接的迟到清理。当前尚未自动接入 socket 断线事件。
-- 待实现：外层 Connection owner 与 Response/Error frame 的真实网络 stream completion。
+- 已接通内部响应读循环：通过 streamConnection 读取 Response/Error 并完成 PendingCall；流终止时执行 failNode。已用 net.Pipe 验证成功/业务错误回复、远端断线、主动关闭和非法帧长的收尾。
+- 异常响应与完整坏帧通过调用方持有的非阻塞诊断通道报告；无消费者或通道满载时丢弃，循环返回丢弃计数。此通道只含节点、Session 和错误，不携带业务载荷。
+- 待实现：TCP Transport 启动/等待读循环、确认远端身份、连接替换与生产诊断消费；内部读循环尚未接入真实 TCP。
 - 待实现：断线、timeout 以及未知、重复和迟到 response 的连接级诊断。
 - 已验证：`cluster/roundtrip_test.go` 通过公开 API 组装双节点内存链路，连接 ClusterClient、NodeSender、ConnectionAgent 和 ClusterCallRegistry；请求与回复均经过完整 FrameCodec 编解码。覆盖成功返回、Domain Error 的 Class/Code、安全 Message 和 `errors.Is`，以及未知错误/panic 的安全转换。
 - 已验证：Send 的 B 侧 Handler error 由接收适配器本地记录、不产生回复；随后同一链路可继续 Call。目标节点未注册时，Send 入队成功后的失败在 A 侧保留节点、目标、命令和 `ErrNodeNotFound` 原因。
@@ -313,7 +315,7 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 
 ### Cluster 3：TCP 与连接 owner
 
-- 状态：逻辑 ConnectionAgent 和内部单连接 I/O 封装已完成，TCP Transport 的读循环、建连与重连管理尚未实现。
+- 状态：逻辑 ConnectionAgent、内部单连接 I/O 封装和出站连接响应读循环已完成；TCP Transport 的入站请求循环、建连与重连管理尚未实现。
 - 已实现内部 stream framing 函数：按长度前缀读取单帧，分配前检查上限；覆盖逐字节拆包、连续帧、截断和完整坏帧后的边界保持。写入失败或短写直接返回，不重放。
 - stream 解码错误带有内部“完整帧已消费”标记，并保留原错误链，供连接层识别边界；非法长度、截断和 I/O 错误不携带该标记。标记不替代认证、越界等必须关闭连接的检查。
 - 已通过 `net.Pipe` 验证 ConnectionAgent 原连接请求/回复、关闭解除读写等待，以及连接 deadline 的超时错误传播；尚未覆盖真实 TCP、连接重建或双 Runtime 调度。
