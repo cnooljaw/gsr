@@ -7,6 +7,7 @@ import (
 	"net"
 	"reflect"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -66,7 +67,7 @@ func TestTCPClusterDisconnectCompletesCall(t *testing.T) {
 	case <-time.After(time.Second):
 		t.Fatal("remote Handler did not start")
 	}
-	if err := link.server.close(); err != nil {
+	if err := link.connection(t).close(); err != nil {
 		t.Fatal(err)
 	}
 	select {
@@ -79,6 +80,63 @@ func TestTCPClusterDisconnectCompletesCall(t *testing.T) {
 	}
 	if link.calls.PendingCount() != 0 {
 		t.Fatalf("pending count = %d", link.calls.PendingCount())
+	}
+}
+
+// 验证慢 Call 断线失败后，新 Call 通过按需重连执行，旧请求不会重放。
+func TestTCPClusterReconnectAfterInterruptedCall(t *testing.T) {
+	link := newTCPClusterTestLink(t)
+	blocked := &tcpCountingService{inboundRecordingService: &inboundRecordingService{
+		entered: make(chan struct{}), release: make(chan struct{}),
+	}}
+	var releaseOnce sync.Once
+	release := func() { releaseOnce.Do(func() { close(blocked.release) }) }
+	defer release()
+	id, err := link.adapter.runtime.CreateService(context.Background(), blocked)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	outcome := make(chan error, 1)
+	go func() {
+		_, err := link.client.Call(ctx, "node-b", ServiceTarget{ServiceID: id}, clusterTestCommand, "block")
+		outcome <- err
+	}()
+	select {
+	case <-blocked.entered:
+	case <-ctx.Done():
+		t.Fatal("remote Handler did not start")
+	}
+	old := link.connection(t)
+	if err := old.close(); err != nil {
+		t.Fatal(err)
+	}
+	select {
+	case err := <-outcome:
+		if !errors.Is(err, io.EOF) {
+			t.Fatalf("interrupted Call = %v", err)
+		}
+	case <-ctx.Done():
+		t.Fatal("interrupted Call did not finish")
+	}
+	value, err := link.client.Call(ctx, "node-b", ServiceTarget{ServiceID: link.target}, clusterTestCommand, "reconnected")
+	if err != nil || !reflect.DeepEqual(value, []any{"reconnected"}) {
+		t.Fatalf("new Call = %#v, %v", value, err)
+	}
+	if link.connection(t) == old {
+		t.Fatal("new request reused closed connection")
+	}
+	release()
+	// 用同一 Service 的后续消息作为串行屏障，确认原 Handler 已完成且没有重复执行。
+	if _, err := link.client.Call(ctx, "node-b", ServiceTarget{ServiceID: id}, clusterTestCommand, "check"); err != nil {
+		t.Fatal(err)
+	}
+	if blocked.invocations.Load() != 2 {
+		t.Fatalf("Handler executions = %d, want original plus check", blocked.invocations.Load())
+	}
+	if link.calls.PendingCount() != 0 {
+		t.Fatal("pending Call leaked after reconnect")
 	}
 }
 
@@ -128,9 +186,6 @@ func TestTCPClusterSlowCallDoesNotBlockOtherService(t *testing.T) {
 func TestTCPClusterDirectionalConnectionsAreIndependent(t *testing.T) {
 	toB := newTCPClusterTestLinkTo(t, "node-b")
 	toA := newTCPClusterTestLinkTo(t, "node-a")
-	if toB.server.socket == toA.server.socket {
-		t.Fatal("opposite directions share a socket")
-	}
 	for _, call := range []struct {
 		link *tcpClusterTestLink
 		node NodeID
@@ -143,7 +198,7 @@ func TestTCPClusterDirectionalConnectionsAreIndependent(t *testing.T) {
 			t.Fatalf("Call(%s) = %#v, %v", call.node, value, err)
 		}
 	}
-	if err := toB.server.close(); err != nil {
+	if err := toB.connection(t).close(); err != nil {
 		t.Fatal(err)
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
@@ -159,8 +214,22 @@ type tcpClusterTestLink struct {
 	calls       *ClusterCallRegistry
 	adapter     *localRequestAdapter
 	target      runtime.ServiceID
-	server      *streamConnection
-	diagnostics chan responseReadFailure
+	listener    *tcpListener
+	diagnostics <-chan responseReadFailure
+}
+
+// connection 只用于故障注入，业务验证仍通过 ClusterClient 进行。
+func (link *tcpClusterTestLink) connection(t *testing.T) *streamConnection {
+	t.Helper()
+	link.listener.mu.Lock()
+	defer link.listener.mu.Unlock()
+	for connection := range link.listener.connections {
+		if !connection.closed.Load() {
+			return connection
+		}
+	}
+	t.Fatal("no live inbound connection")
+	return nil
 }
 
 func newTCPClusterTestLink(t *testing.T) *tcpClusterTestLink {
@@ -168,7 +237,7 @@ func newTCPClusterTestLink(t *testing.T) *tcpClusterTestLink {
 	return newTCPClusterTestLinkTo(t, "node-b")
 }
 
-// 每条测试链路只配置出站目标，不注册调用方；接收端 writer 绑定同一 socket。
+// 测试仅提供静态目标和生命周期组装，拨号、接纳、回复与恢复使用真实内部 owner。
 func newTCPClusterTestLinkTo(t *testing.T, remoteNode NodeID) *tcpClusterTestLink {
 	t.Helper()
 	adapter, target, _ := newLocalAdapterTest(t)
@@ -176,73 +245,43 @@ func newTCPClusterTestLinkTo(t *testing.T, remoteNode NodeID) *tcpClusterTestLin
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer listener.Close()
-	if err := listener.SetDeadline(time.Now().Add(2 * time.Second)); err != nil {
-		t.Fatal(err)
-	}
-	socket, err := net.DialTimeout("tcp4", listener.Addr().String(), time.Second)
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(func() { socket.Close() })
-	accepted, err := listener.AcceptTCP()
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(func() { accepted.Close() })
+	t.Cleanup(func() { listener.Close() })
 	frames, err := NewFrameCodec(FrameCodecConfig{})
 	if err != nil {
 		t.Fatal(err)
 	}
-	outbound, err := newStreamConnection(socket, frames, time.Second)
-	if err != nil {
-		t.Fatal(err)
-	}
-	inbound, err := newStreamConnection(accepted, frames, time.Second)
-	if err != nil {
-		t.Fatal(err)
-	}
-	owner, err := newInboundConnection(inbound, adapter, 2, newInboundDiagnostics())
+	inbound, err := newTCPListener(tcpListenerConfig{
+		listener: listener, codec: frames, adapter: adapter,
+		maxConnections: 4, maxCalls: 2, writeTimeout: time.Second,
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
 	calls := NewClusterCallRegistry()
-	sending, err := newOutboundConnection(outbound, calls, remoteNode)
+	t.Cleanup(func() { calls.Close() })
+	outbound, err := newOutboundPeer(outboundPeerConfig{
+		node: remoteNode, address: listener.Addr().String(), codec: frames, calls: calls,
+		dialTimeout: time.Second, writeTimeout: time.Second,
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
-	diagnostics := make(chan responseReadFailure, 16)
+	t.Cleanup(func() { outbound.close() })
 	ctx, cancel := context.WithCancel(context.Background())
 	inboundDone := make(chan error, 1)
-	responseDone := make(chan error, 1)
-	go func() {
-		err := owner.serve(ctx)
-		close(owner.diagnostics.failures)
-		inboundDone <- err
-	}()
-	go func() {
-		_, err := outbound.receiveResponses(sending.calls, diagnostics)
-		responseDone <- err
-	}()
+	go func() { inboundDone <- inbound.serve(ctx) }()
 	t.Cleanup(func() {
 		cancel()
-		outbound.close()
-		inbound.close()
-		for _, done := range []<-chan error{inboundDone, responseDone} {
-			select {
-			case err := <-done:
-				if !errors.Is(err, context.Canceled) && !errors.Is(err, io.EOF) && !errors.Is(err, net.ErrClosed) {
-					t.Errorf("TCP loop exit: %v", err)
-				}
-			case <-time.After(2 * time.Second):
-				t.Error("TCP loop did not exit")
+		select {
+		case err := <-inboundDone:
+			if !errors.Is(err, context.Canceled) {
+				t.Errorf("listener exit: %v", err)
 			}
-		}
-		if err := calls.Close(); err != nil {
-			t.Error(err)
+		case <-time.After(2 * time.Second):
+			t.Error("listener did not stop")
 		}
 	})
-	sender, err := NewNodeSender(NodeSenderConfig{RemoteNode: remoteNode, Transport: &tcpTestTransport{connection: sending, target: remoteNode}})
+	sender, err := NewNodeSender(NodeSenderConfig{RemoteNode: remoteNode, Transport: outbound})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -254,28 +293,31 @@ func newTCPClusterTestLinkTo(t *testing.T, remoteNode NodeID) *tcpClusterTestLin
 			t.Error(err)
 		}
 	})
-	client, err := NewClusterClient(ClusterClientConfig{Source: 11, Senders: clientSenderResolver{sender: sender}, Codecs: adapter.codecs, PendingCalls: calls, MaxCallWait: 5 * time.Second})
+	client, err := NewClusterClient(ClusterClientConfig{
+		Source: 11, Senders: clientSenderResolver{sender: sender}, Codecs: adapter.codecs,
+		PendingCalls: calls, MaxCallWait: 5 * time.Second,
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
-	return &tcpClusterTestLink{client: client, calls: calls, adapter: adapter, target: target, server: inbound, diagnostics: diagnostics}
-}
-
-// tcpTestTransport 只连接测试已建立的单条 TCP 连接，不提供生产建连、认证或重连能力。
-type tcpTestTransport struct {
-	connection *outboundConnection
-	target     NodeID
-}
-
-func (transport *tcpTestTransport) Send(to NodeID, request ClusterEnvelope) error {
-	if to != transport.target {
-		return ErrInvalidNode
+	return &tcpClusterTestLink{
+		client: client, calls: calls, adapter: adapter, target: target,
+		listener: inbound, diagnostics: outbound.diagnostics,
 	}
-	return transport.connection.write(request)
 }
 
 type tcpErrorService struct {
 	err error
+}
+
+type tcpCountingService struct {
+	*inboundRecordingService
+	invocations atomic.Int32
+}
+
+func (service *tcpCountingService) Handle(ctx runtime.CommandContext, command runtime.CommandID, args ...any) (any, error) {
+	service.invocations.Add(1)
+	return service.inboundRecordingService.Handle(ctx, command, args...)
 }
 
 func (*tcpErrorService) OnStart(context.Context, runtime.ServiceContext) error {

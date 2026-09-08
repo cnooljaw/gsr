@@ -321,7 +321,7 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 - 已实现内部 localRequestAdapter：查找 Command codec、解码参数列表、按 ID 或外层名称解析目标，再经 Runtime.Send/Call 执行；未知 Command/坏载荷仅返回接收侧诊断错误，不产生响应。Send 接纳错误归接收侧，Call 执行错误沿 ConnectionAgent 回包，写回故障保留 I/O 错误链。该适配器尚未接入网络入站读循环，不管理并发或连接生命周期。
 - 入站并发方案已获确认并实现为内部 inboundConnection：单读循环、显式 Call 名额上限、满载暂停读取、顺序 Send、有界非阻塞诊断；详见 [入站并发方案](RFC-CLUSTER-INBOUND-CONCURRENCY.md)。关闭取消基础设施等待并等待连接任务退出，不强杀目标 Handler。
 - 已用 net.Pipe 验证慢 Call 隔离、满载背压、连续 Send 顺序、满载时取消、诊断溢出、codec/名称解析 panic 和重复启动拒绝。响应编码失败也返回接收侧诊断；这些测试不等于真实 TCP 或节点级资源上限验证。
-- 已新增真实 TCP 回环集成门禁 `tcp_integration_test.go`：连接 ClusterClient、NodeSender、帧编解码、入站连接、本地 Runtime 和响应读循环，验证 Send/Call、领域错误、同连接慢 Call 隔离和断线完成等待。A 不配置 NodeID 或监听，B 接受匿名入站并沿原连接回复；使用测试专用 Transport 及预先配置的目标路由，生产 listener、认证、连接数量限制与重连仍未实现。
+- 真实 TCP 回环集成门禁 `tcp_integration_test.go` 已改用内部 `outboundPeer` 与 `tcpListener`，删除预建 socket 和测试专用 Transport，连接 ClusterClient、NodeSender、帧编解码、入站连接、目标 Runtime 和响应读循环。覆盖 Send/Call、领域错误、慢 Call 隔离、断线完成等待和下一 Call 按需恢复；通过 Handler 执行计数验证旧请求不重放。A 不配置 NodeID 或监听，B 接受匿名入站并沿原连接回复。夹具仍负责静态目标与生命周期组装，不代表公开 TCP API、生产认证或路由管理已完成。
 - 已实现内部 stream framing 函数：按长度前缀读取单帧，分配前检查上限；覆盖逐字节拆包、连续帧、截断和完整坏帧后的边界保持。写入失败或短写直接返回，不重放。
 - stream 解码错误带有内部“完整帧已消费”标记，并保留原错误链，供连接层识别边界；非法长度、截断和 I/O 错误不携带该标记。标记不替代认证、越界等必须关闭连接的检查。
 - 已通过 `net.Pipe` 验证 ConnectionAgent 原连接请求/回复、关闭解除读写等待，以及连接 deadline 的超时错误传播；尚未覆盖真实 TCP、连接重建或双 Runtime 调度。
