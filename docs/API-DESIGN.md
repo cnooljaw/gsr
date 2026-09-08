@@ -515,6 +515,12 @@ Cluster 2 的远程 Call 使用 Cluster-owned `ClusterCallRegistry` 和内部 `C
 
 ### 6.3 Cluster wire 与连接模型
 
+入站诊断由 listener 创建的 `inboundDiagnostics` 统一承接：所有连接直接非阻塞上报到一个固定容量队列，共享丢弃计数，不创建每连接诊断缓冲或转发 goroutine，也不执行外部 callback。单连接仅借用出口，不能关闭；listener 等全部生产者退出后才关闭通道。共享容量意味着噪声连接可能挤占其它连接的诊断，事件仍是 best-effort，不承诺审计可靠性。
+
+内部 `tcpListener` 接管一个已经建立的 TCP listener，显式配置正数连接上限、每连接 Call 上限及写 timeout。连接满额时立即关闭新接入 socket，不为其创建处理任务或用户态等待队列；已接纳连接不受影响。诊断以远端地址和 Session 定位，有界、非阻塞，满载计数可观测，不依赖 NodeID。
+
+listener 的 context 取消或 Accept 失败时，组件关闭监听及所有已接纳 socket，取消连接内基础设施等待，并等待全部连接处理任务退出；不自动重新监听，不强杀 Handler。当前连接上限属于单个 listener owner，公开 open API、多 listener 的节点总配额与生产诊断消费仍待外层组装；此组件不拥有出站连接或 Runtime 生命周期。
+
 入站连接采用一个读循环和数量有上限的 Call 等待任务。Send 在读循环中只完成本地接纳；Call 交给连接组件管理的任务，经 Runtime.Call 等待。每连接 Call 名额满载时暂停读取（包括后续 Send），不建立无界队列。响应通过同一连接串行写入，允许不同 Call 按完成顺序回包。
 
 同连接 Send 保持接纳顺序；混合 Send/Call 不保证 wire 到达顺序等于本地执行顺序，目标 Service 仍按 Mailbox 成功接纳顺序串行执行。外层负责节点级连接数上限、任务取消与等待；关闭时取消基础设施 Call，但不能强杀目标 Handler。codec 与名称解析器必须并发安全且不执行无限阻塞 I/O。完整方案见 [入站并发方案](RFC-CLUSTER-INBOUND-CONCURRENCY.md)。

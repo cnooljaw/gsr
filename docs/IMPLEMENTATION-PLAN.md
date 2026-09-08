@@ -315,7 +315,7 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 
 ### Cluster 3：TCP 与连接 owner
 
-- 状态：逻辑 ConnectionAgent、内部单连接 I/O 封装、出站响应读循环和有界并发入站请求循环已完成；真实 TCP Transport 的建连、连接总数限制与重连管理尚未实现。
+- 状态：逻辑 ConnectionAgent、内部单连接 I/O 封装、出站响应读循环、有界并发入站请求循环和单 listener 入站连接 owner 已完成；生产公开组装 API、出站建连与重连管理尚未实现。
 - 已裁决并实现基础设施 Runtime.Call：Source 固定为零，经普通 Mailbox 执行，复用有限等待与停止收尾；ServiceContext.Call 仍绑定真实 Service。取舍见 [Cluster 入站 Call 方案](RFC-CLUSTER-INBOUND-CALL.md)。
 - 已用 ConnectionAgent 测试适配器接通真实 Runtime，覆盖成功/领域错误回复、零 Source，以及本地 Session 与 ClusterSession 分离；网络入站并发管理和正式适配器组装仍待接入。
 - 已实现内部 localRequestAdapter：查找 Command codec、解码参数列表、按 ID 或外层名称解析目标，再经 Runtime.Send/Call 执行；未知 Command/坏载荷仅返回接收侧诊断错误，不产生响应。Send 接纳错误归接收侧，Call 执行错误沿 ConnectionAgent 回包，写回故障保留 I/O 错误链。该适配器尚未接入网络入站读循环，不管理并发或连接生命周期。
@@ -331,6 +331,10 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 - 每条 inbound socket 一个 ConnectionAgent，响应沿原连接返回。
 - 已确认并清理出站调用与监听身份：删除 LocalNode、入站来源 NodeID；主动 Send/Call 只需目标，open 只决定是否接受新调用。Transport 仅要求 Send(to, envelope)，内存往返测试通过绑定 writer 回复，不注册调用方或反向 Send。见 [连接身份方案](RFC-CLUSTER-CONNECTION-IDENTITY.md)。认证协议另行裁决，不与调用方的可寻址身份绑定。
 - 已用真实 TCP 测试夹具验证两个方向分别建立独立连接，关闭 A→B 后 B→A 仍能主动 Call；此门禁验证连接组织，不代表生产节点管理器或公开 open API 已实现。
+- 已实现内部 tcpListener：接管一个 TCP listener，限制已接纳连接总数；满额时关闭新 socket，不启动连接任务、不建立用户态等待队列，诊断有界非阻塞。每条已接纳连接使用独立 inboundConnection，来源诊断只附连接远端地址与 Session，不添加 NodeID。
+- tcpListener 的取消或 Accept 失败会关闭监听和全部已接纳连接、取消基础设施 Call 并等待全部连接处理任务退出；不会强杀目标 Handler。已验证满额隔离、坏帧隔离、慢 Call 期间关闭、空闲 Accept 取消、诊断满载计数与非法配置/重复启动。
+- 已统一入站诊断出口：listener 与全部连接共享一个有界队列和丢弃计数，删除每连接的 256 容量缓冲与转发 goroutine。单连接退出不关闭出口，listener 在全部生产者退出后关闭；保留解除 Accept/Read 阻塞所需的取消监视机制。
+- 当前连接上限属于单 listener owner。公开 open API、多个 listener 共享的节点总配额及生产诊断消费尚未组装，不能据此宣称完整 TCP Transport 已完成。
 - NodeSender 自动重连，但不自动重放已经失败或结果不确定的请求。
 
 ### Cluster 4：故障与资源收尾

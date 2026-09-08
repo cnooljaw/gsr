@@ -19,6 +19,7 @@ GSR Cluster 需要保持 Skynet 风格的简洁调用面，同时明确 Go 的�
 - 非法长度、超过上限、无法恢复帧边界或认证失败时关闭连接。
 - 每个远端 Node 只有一个 outbound NodeSender，并发建连请求合并；每条 inbound socket 使用独立 ConnectionAgent，响应沿原连接返回。
 - 入站连接组件拥有单读循环和有上限的 Call 等待任务；Send 在读循环中顺序接纳，Call 名额满载时暂停后续读取，不建立无界等待队列。混合 Send/Call 只保证本地 Mailbox 接纳顺序；连接关闭取消基础设施等待并等待任务退出，不强杀 Handler。节点级连接数上限由外层 TCP Transport 负责。
+- 入站诊断使用 listener 持有的单一有界非阻塞出口，所有连接直接上报并共享丢弃计数；不运行外部 callback，不建立每连接诊断缓冲或转发任务。只有组装 owner 在全部生产者退出后关闭出口，单连接不关闭它。共享容量不提供逐连接诊断公平性。
 - 断线后 NodeSender 自动重连，但不自动重放已经失败或执行结果不确定的业务请求。
 - NodeSender 的基础出站实现使用固定容量队列和单一 owner worker；`Send` 先 Clone Envelope 并执行非阻塞 admission，队列满返回稳定错误，nil 只表示本地 admission 成功。admission 后的 Transport error/panic 和关闭丢弃进入有界、非阻塞的失败 stream；NodeSender 不在唯一 worker 中运行外部 callback，stream 溢出通过计数暴露，当前 Transport 调用不被强杀。
 - 远程 Send 不返回远端 Handler 结果：A 节点负责自己的 admission 和传输诊断，B 节点负责自己的 Handler 执行与错误记录。需要远端返回值或处理错误时使用 Call。

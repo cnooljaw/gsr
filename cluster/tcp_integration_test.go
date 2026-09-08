@@ -202,7 +202,7 @@ func newTCPClusterTestLinkTo(t *testing.T, remoteNode NodeID) *tcpClusterTestLin
 	if err != nil {
 		t.Fatal(err)
 	}
-	owner, err := newInboundConnection(inbound, adapter, 2)
+	owner, err := newInboundConnection(inbound, adapter, 2, newInboundDiagnostics())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -211,7 +211,11 @@ func newTCPClusterTestLinkTo(t *testing.T, remoteNode NodeID) *tcpClusterTestLin
 	ctx, cancel := context.WithCancel(context.Background())
 	inboundDone := make(chan error, 1)
 	responseDone := make(chan error, 1)
-	go func() { inboundDone <- owner.serve(ctx) }()
+	go func() {
+		err := owner.serve(ctx)
+		close(owner.diagnostics.failures)
+		inboundDone <- err
+	}()
 	go func() {
 		_, err := outbound.receiveResponses(remoteNode, calls, diagnostics)
 		responseDone <- err

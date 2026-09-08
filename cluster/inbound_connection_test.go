@@ -43,7 +43,7 @@ func TestInboundConnectionIsolatesSlowCall(t *testing.T) {
 	if _, err := adapter.runtime.Call(context.Background(), fastID, clusterTestCommand); err != nil {
 		t.Fatal(err)
 	}
-	for failure := range owner.failures {
+	for failure := range owner.diagnostics.failures {
 		if !errors.Is(failure.err, ErrConnectionAgentWrite) && !errors.Is(failure.err, context.Canceled) {
 			t.Errorf("unexpected diagnostic: %v", failure.err)
 		}
@@ -135,7 +135,7 @@ func TestInboundConnectionRecoversAdapterPanics(t *testing.T) {
 	cancel()
 	<-done
 	count := 0
-	for failure := range owner.failures {
+	for failure := range owner.diagnostics.failures {
 		if !errors.Is(failure.err, errInboundRequestPanicked) {
 			t.Errorf("panic diagnostic = %v", failure.err)
 		}
@@ -162,8 +162,8 @@ func TestInboundConnectionDropsExcessDiagnostics(t *testing.T) {
 	}
 	cancel()
 	<-done
-	if owner.dropped.Load() != 3 {
-		t.Fatalf("dropped = %d", owner.dropped.Load())
+	if owner.diagnostics.dropped.Load() != 3 {
+		t.Fatalf("dropped = %d", owner.diagnostics.dropped.Load())
 	}
 }
 
@@ -196,11 +196,11 @@ func TestInboundConnectionRejectsInvalidLifecycle(t *testing.T) {
 	adapter, _, _ := newLocalAdapterTest(t)
 	connection, _, _ := newTestStreamConnection(t)
 	for _, limit := range []int{0, -1} {
-		if _, err := newInboundConnection(connection, adapter, limit); !errors.Is(err, errInvalidInboundConnection) {
+		if _, err := newInboundConnection(connection, adapter, limit, newInboundDiagnostics()); !errors.Is(err, errInvalidInboundConnection) {
 			t.Fatalf("invalid limit = %v", err)
 		}
 	}
-	owner, err := newInboundConnection(connection, adapter, 1)
+	owner, err := newInboundConnection(connection, adapter, 1, newInboundDiagnostics())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -217,10 +217,62 @@ func TestInboundConnectionRejectsInvalidLifecycle(t *testing.T) {
 	}
 }
 
+// 验证一条连接退出后不会关闭共享出口，另一条连接仍能上报带连接信息的诊断。
+func TestInboundConnectionKeepsSharedDiagnosticsOpen(t *testing.T) {
+	adapter, id, _ := newLocalAdapterTest(t)
+	diagnostics := newInboundDiagnostics()
+	first, _, _ := newTestStreamConnection(t)
+	firstOwner, err := newInboundConnection(first, adapter, 1, diagnostics)
+	if err != nil {
+		t.Fatal(err)
+	}
+	firstCtx, firstCancel := context.WithCancel(context.Background())
+	firstCancel()
+	if err := firstOwner.serve(firstCtx); !errors.Is(err, context.Canceled) {
+		t.Fatalf("first exit = %v", err)
+	}
+	select {
+	case _, open := <-diagnostics.failures:
+		if !open {
+			t.Fatal("connection closed shared diagnostics")
+		}
+	default:
+	}
+	second, peer, frames := newTestStreamConnection(t)
+	secondOwner, err := newInboundConnection(second, adapter, 1, diagnostics)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	done := make(chan error, 1)
+	go func() { done <- secondOwner.serve(ctx) }()
+	defer func() {
+		cancel()
+		second.close()
+		select {
+		case <-done:
+			close(diagnostics.failures)
+		case <-time.After(time.Second):
+			t.Error("second connection did not exit")
+		}
+	}()
+	if err := frames.writeFrame(peer, ClusterEnvelope{Kind: FrameRequest, Session: 7, Target: ServiceTarget{ServiceID: id}, Command: clusterTestCommand + 1}); err != nil {
+		t.Fatal(err)
+	}
+	select {
+	case failure := <-diagnostics.failures:
+		if failure.remoteAddress != peer.LocalAddr().String() || failure.session != 7 || !errors.Is(failure.err, ErrCommandCodecNotFound) {
+			t.Fatalf("second connection diagnostic = %+v", failure)
+		}
+	case <-time.After(time.Second):
+		t.Fatal("missing second connection diagnostic")
+	}
+}
+
 func startInboundTest(t *testing.T, adapter *localRequestAdapter, limit int) (*inboundConnection, net.Conn, *FrameCodec, context.CancelFunc, <-chan struct{}) {
 	t.Helper()
 	connection, peer, codec := newTestStreamConnection(t)
-	owner, err := newInboundConnection(connection, adapter, limit)
+	owner, err := newInboundConnection(connection, adapter, limit, newInboundDiagnostics())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -228,6 +280,8 @@ func startInboundTest(t *testing.T, adapter *localRequestAdapter, limit int) (*i
 	done := make(chan struct{})
 	go func() {
 		defer close(done)
+		// 测试组装方持有出口，单连接返回后才关闭它。
+		defer close(owner.diagnostics.failures)
 		if err := owner.serve(ctx); !errors.Is(err, context.Canceled) && !errors.Is(err, io.EOF) && !errors.Is(err, io.ErrClosedPipe) {
 			t.Errorf("inbound loop exited unexpectedly: %v", err)
 		}
