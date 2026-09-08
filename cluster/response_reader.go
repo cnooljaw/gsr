@@ -15,17 +15,14 @@ type responseReadFailure struct {
 // receiveResponses 在绑定目标 NodeID 的出站连接上同步读取响应，直到连接结束。
 // node 来自本地目标路由，不表示已通过握手认证；不要求本地拥有 NodeID。
 // 外层 Transport 负责启动且仅启动一个读循环，通过 close 取消，并等待返回；
-// 返回前完成该节点旧连接的等待清理，之后才能开放替代连接上的请求。
+// 返回前只清理此连接的等待，不影响排队请求或其它连接。
 // diagnostics 由调用方管理，必须保持打开直到本函数返回；建议使用有界缓冲。
 // nil 或满载通道不会阻塞读取，返回值记录丢弃的诊断数；终止错误直接返回。
-func (connection *streamConnection) receiveResponses(node NodeID, calls *ClusterCallRegistry, diagnostics chan<- responseReadFailure) (uint64, error) {
+func (connection *streamConnection) receiveResponses(calls *connectionCalls, diagnostics chan<- responseReadFailure) (uint64, error) {
 	if connection == nil {
 		return 0, net.ErrClosed
 	}
-	if node == "" {
-		return 0, ErrInvalidNode
-	}
-	if !calls.valid() {
+	if calls == nil || calls.registry == nil {
 		return 0, ErrInvalidClusterCallRegistry
 	}
 	var dropped uint64
@@ -34,16 +31,16 @@ func (connection *streamConnection) receiveResponses(node NodeID, calls *Cluster
 		if err != nil {
 			var complete *completeFrameError
 			if !errors.As(err, &complete) {
-				_, cleanupErr := calls.failNode(node, err)
-				return dropped, errors.Join(err, cleanupErr)
+				calls.fail(err)
+				return dropped, err
 			}
 		} else {
-			err = calls.Complete(node, envelope)
+			err = calls.complete(envelope)
 		}
 		if err == nil {
 			continue
 		}
-		failure := responseReadFailure{node: node, session: envelope.Session, err: err}
+		failure := responseReadFailure{node: calls.node, session: envelope.Session, err: err}
 		select {
 		case diagnostics <- failure:
 		default:

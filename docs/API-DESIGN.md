@@ -515,6 +515,8 @@ Cluster 2 的远程 Call 使用 Cluster-owned `ClusterCallRegistry` 和内部 `C
 
 ### 6.3 Cluster wire 与连接模型
 
+出站 Call 在排队前登记有限等待，在具体连接取得写入权后、尝试 socket 写入前原子绑定该连接的内部等待 owner。已经取消/超时的未绑定请求不再发包；绑定是发送尝试的开始，之后的取消不保证撤销远端执行。断线只完成该连接绑定的 Call，不清理同节点尚在排队或绑定到其它连接的等待。网络回复还须匹配连接 owner；内存/逻辑适配的 `Complete(remoteNode, response)` 仅能完成未绑定网络连接的等待，不能绕过连接归属校验。重连创建新内部 owner，不增加 Epoch 或 wire 字段、不重放已尝试发送的请求；原 deadline 不重置。详见 [出站等待归属](RFC-CLUSTER-OUTBOUND-CALL-OWNERSHIP.md)。
+
 入站诊断由 listener 创建的 `inboundDiagnostics` 统一承接：所有连接直接非阻塞上报到一个固定容量队列，共享丢弃计数，不创建每连接诊断缓冲或转发 goroutine，也不执行外部 callback。单连接仅借用出口，不能关闭；listener 等全部生产者退出后才关闭通道。共享容量意味着噪声连接可能挤占其它连接的诊断，事件仍是 best-effort，不承诺审计可靠性。
 
 内部 `tcpListener` 接管一个已经建立的 TCP listener，显式配置正数连接上限、每连接 Call 上限及写 timeout。连接满额时立即关闭新接入 socket，不为其创建处理任务或用户态等待队列；已接纳连接不受影响。诊断以远端地址和 Session 定位，有界、非阻塞，满载计数可观测，不依赖 NodeID。

@@ -9,7 +9,7 @@ import (
 	"github.com/cnooljaw/gsr/runtime"
 )
 
-// 验证响应读循环完成匹配 Call，断线只清理该节点剩余等待。
+// 验证响应读循环完成匹配 Call，断线只清理该连接剩余等待。
 func TestResponseReaderCompletesAndFailsPendingCalls(t *testing.T) {
 	connection, peer, codec := newTestStreamConnection(t)
 	calls := NewClusterCallRegistry()
@@ -18,7 +18,8 @@ func TestResponseReaderCompletesAndFailsPendingCalls(t *testing.T) {
 	rejected := beginResponseReaderCall(t, calls, "node-b")
 	remaining := beginResponseReaderCall(t, calls, "node-b")
 	other := beginResponseReaderCall(t, calls, "node-c")
-	run := startResponseReader(t, connection, calls, nil)
+	queued := beginResponseReaderCall(t, calls, "node-b")
+	run := startResponseReader(t, connection, calls, nil, first, rejected, remaining)
 	response := ClusterEnvelope{Kind: FrameResponse, Session: first.session, Target: first.target, Command: first.command, Payload: []byte("result")}
 	if err := codec.writeFrame(peer, response); err != nil {
 		t.Fatal(err)
@@ -49,7 +50,12 @@ func TestResponseReaderCompletesAndFailsPendingCalls(t *testing.T) {
 		t.Fatal("other node call was completed")
 	default:
 	}
-	if calls.PendingCount() != 1 {
+	select {
+	case <-queued.done:
+		t.Fatal("unbound same-node call was completed")
+	default:
+	}
+	if calls.PendingCount() != 2 {
 		t.Fatalf("pending count = %d", calls.PendingCount())
 	}
 }
@@ -61,7 +67,7 @@ func TestResponseReaderDropsInvalidResponsesWithoutBlocking(t *testing.T) {
 	t.Cleanup(func() { calls.Close() })
 	call := beginResponseReaderCall(t, calls, "node-b")
 	diagnostics := make(chan responseReadFailure, 1)
-	run := startResponseReader(t, connection, calls, diagnostics)
+	run := startResponseReader(t, connection, calls, diagnostics, call)
 	wrong := ClusterEnvelope{Kind: FrameResponse, Session: call.session, Target: ServiceTarget{ServiceID: 99}, Command: call.command}
 	for i := 0; i < 3; i++ {
 		if err := codec.writeFrame(peer, wrong); err != nil {
@@ -103,7 +109,7 @@ func TestResponseReaderInvalidLengthClosesConnection(t *testing.T) {
 	calls := NewClusterCallRegistry()
 	t.Cleanup(func() { calls.Close() })
 	call := beginResponseReaderCall(t, calls, "node-b")
-	run := startResponseReader(t, connection, calls, nil)
+	run := startResponseReader(t, connection, calls, nil, call)
 	if err := writeFrameBytes(peer, []byte{255, 255, 255, 255}); err != nil {
 		t.Fatal(err)
 	}
@@ -131,7 +137,7 @@ func TestResponseReaderLocalCloseCompletesCalls(t *testing.T) {
 	calls := NewClusterCallRegistry()
 	t.Cleanup(func() { calls.Close() })
 	call := beginResponseReaderCall(t, calls, "node-b")
-	run := startResponseReader(t, connection, calls, nil)
+	run := startResponseReader(t, connection, calls, nil, call)
 	if err := connection.close(); err != nil {
 		t.Fatal(err)
 	}
@@ -147,12 +153,16 @@ func TestResponseReaderLocalCloseCompletesCalls(t *testing.T) {
 	}
 }
 
-func startResponseReader(t *testing.T, connection *streamConnection, calls *ClusterCallRegistry, diagnostics chan<- responseReadFailure) *responseReaderRun {
+func startResponseReader(t *testing.T, connection *streamConnection, calls *ClusterCallRegistry, diagnostics chan<- responseReadFailure, bound ...*clusterPendingCall) *responseReaderRun {
 	t.Helper()
+	owner := newConnectionCallsTest(t, calls, "node-b")
+	for _, call := range bound {
+		bindConnectionCallTest(t, owner, call)
+	}
 	run := &responseReaderRun{done: make(chan struct{})}
 	go func() {
 		defer close(run.done)
-		run.dropped, run.err = connection.receiveResponses("node-b", calls, diagnostics)
+		run.dropped, run.err = connection.receiveResponses(owner, diagnostics)
 	}()
 	t.Cleanup(func() {
 		connection.close()

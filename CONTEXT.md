@@ -17,7 +17,7 @@
 - **Runtime.Call**：宿主或受信任基础设施的本地 Call 入口，Source 固定为零；使用独立本地 Session、普通 Mailbox 和有限等待，不创建 goroutine。普通 Service 仍通过 ServiceContext.Call 发起调用。
 - **入站连接并发**：连接组件管理一个读循环和数量有上限的 Call 等待任务；满载暂停读取，Send 顺序接纳，混合请求以本地 Mailbox 接纳顺序执行。连接关闭取消基础设施等待并等待任务退出；目标 Handler 不被强杀。
 - **PendingCall**：Runtime 内部以非零 SessionID 索引的一次等待。Reply 通过 completion 路径完成它，不进入调用方 Mailbox 或业务 Handler。
-- **ClusterPendingCall**：Cluster 内部以非零 ClusterSessionID 索引的一次远程等待，保存本地 Source、远端 Node、Target 和 Command；Response/Error 只完成匹配记录，Source 不进入 wire。
+- **ClusterPendingCall**：Cluster 内部以非零 ClusterSessionID 索引的一次远程等待，保存本地 Source、远端 Node、Target 和 Command；网络写入前绑定私有连接 owner，断线只清理该连接的等待，网络回复还须匹配此归属。尚未绑定的排队等待保留原超时；Source 和连接 owner 不进入 wire。
 - **Run-to-completion**：一个 Handler（包括其中的 Call 等待）结束前，同一 Service 不执行下一条消息；等待期间其它 Service 仍可运行。
 - **MaxCallWait**：Runtime 对一次本地 Call 施加的最大等待时间。调用方必须提供 `context.Context`，其 deadline 可以缩短实际等待，但不能延长或取消 Runtime 上限。
 - **Service Runner**：由 Runtime 为每个 Running Service 管理的 goroutine，串行消费该 Service 的 Mailbox；其生命周期和 recovery 属于 Scheduler，不属于业务。
@@ -31,7 +31,7 @@
 - **CommandCodecRegistry**：启动期创建并冻结的 `CommandID -> CommandCodec` 表；构造后只查找，不允许运行期注册、覆盖或删除，重复 CommandID 是配置错误。
 - **FrameCodec**：Cluster 0 的长度前缀 frame 编解码器；使用四字节大端 body length，`MaxFrame` 包含前缀，只处理一个完整 frame，不负责 stream I/O、版本协商或连接生命周期。
 - **ClusterClient**：初始化时绑定一个 Source ServiceID、NodeSenderResolver、启动期 CommandCodecRegistry、ClusterCallRegistry 和有限 MaxCallWait 的 per-Service 窄 client；不能覆盖 Source，Send/Call 都通过同一个 Cluster 入口。
-- **ClusterCallRegistry**：一个 Cluster 级的 PendingCall owner。所有 source-bound ClusterClient 共享它分配 ClusterSessionID；ConnectionAgent/Transport 只通过 `Complete(from, envelope)` 完成响应，关闭时统一结束未完成的 Call。
+- **ClusterCallRegistry**：一个 Cluster 级的 PendingCall owner。所有 source-bound ClusterClient 共享它分配 ClusterSessionID；`Complete(from, envelope)` 只完成未绑定连接的逻辑/内存链路响应，网络响应通过私有连接 owner 完成。关闭时统一结束未完成的 Call。
 - **Redirect / Relay**：仅供 Runtime 或明确受信任的 Adapter/Transport 使用的消息转发能力。它转发 Runtime-owned Message 或 relay token，不接受业务任意指定的 Source；首版只考虑单向转发，不转移 Call 的 PendingCall/Session。
 - **ClusterSessionID**：`uint64` 形式的 Cluster 请求关联号；零表示 Send，非零表示 Call。它由 Cluster 管理、在当前实例内单调分配且不回绕复用，不要求与 Core SessionID 相同。
 - **ErrorClass**：Reply error 的顶层类别。第一版只有 Domain 与 Runtime；programmer error 在 Runtime 边界转成稳定 Runtime error，并把内部诊断留在本地。

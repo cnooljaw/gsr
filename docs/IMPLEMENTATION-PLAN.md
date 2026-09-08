@@ -297,15 +297,15 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 
 ### Cluster 2：远程 Call
 
-- 状态：基础远程 Call 本地等待和逻辑 ConnectionAgent 切片已完成，真实网络 response 路由尚未接入。
+- 状态：基础远程 Call、本地等待和内部 TCP response 路由已完成并通过真实回环测试；生产 Transport 组装尚未完成。
 - Cluster-owned PendingCall 表保存 `Session → Source、RemoteNode、Target、Command`，Source 只在发起节点本地使用。
 - ClusterSessionID 在当前 Cluster 实例内单调分配，耗尽返回 `runtime.ErrIDExhausted`，不回绕或复用。
 - Response/Error 只完成匹配的 RemoteNode/Target/Command；未知、迟到、重复或错路由 frame 被拒绝并进入诊断。
-- 取消、timeout、节点/Cluster 关闭都恰好清理一次 PendingCall。
+- 取消、timeout、所属连接断开或 Cluster 关闭都恰好清理一次 PendingCall。
 - 已实现：共享 `ClusterCallRegistry` 的 Session 分配与 `Complete` 入口，以及 `Client.Call` 的请求编码、有限等待、caller cancellation、Response/Error 解码。
-- 已实现内部 `failNode` 收尾入口：按目标节点清理当前等待并保留底层错误原因；与回复、取消竞争时只完成一次，不影响其它节点，也不永久关闭 registry。已验证它能恢复等待中的 ClusterClient.Call。
-- 接线约束：TCP owner 必须在旧连接等待清理完成后再开放替代连接请求；该入口只按 NodeID 匹配，不能用于并行新旧连接的迟到清理。当前尚未自动接入 socket 断线事件。
-- 已接通内部响应读循环：通过 streamConnection 读取 Response/Error 并完成 PendingCall；流终止时执行 failNode。已用 net.Pipe 验证成功/业务错误回复、远端断线、主动关闭和非法帧长的收尾。
+- 已实现内部 `connectionCalls`：写入前在共享 registry 同步边界内绑定等待；断线只清理当前连接已绑定 Call，保留底层原因，不影响同节点未绑定或其它连接等待。移除原节点范围清理入口。
+- 接线约束：出站写入必须经 `outboundConnection` 绑定，响应读循环使用同一连接 owner；绑定是发送尝试的线性化点，绑定前已取消则不发包，绑定后不承诺撤销或重放。
+- 已接通内部响应读循环：通过 streamConnection 读取 Response/Error，并校验连接归属后完成 PendingCall；流终止时清理该连接等待。已用 net.Pipe 验证成功/业务错误回复、远端断线、主动关闭和非法帧长的收尾。
 - 异常响应与完整坏帧通过调用方持有的非阻塞诊断通道报告；无消费者或通道满载时丢弃，循环返回丢弃计数。此通道只含节点、Session 和错误，不携带业务载荷。
 - 待实现：生产 TCP Transport 启动/等待读循环、绑定目标地址路由、连接替换与生产诊断消费；内部读循环已通过真实 TCP 夹具验证，不要求 NodeID 握手。
 - 待实现：断线、timeout 以及未知、重复和迟到 response 的连接级诊断。
@@ -335,6 +335,7 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 - tcpListener 的取消或 Accept 失败会关闭监听和全部已接纳连接、取消基础设施 Call 并等待全部连接处理任务退出；不会强杀目标 Handler。已验证满额隔离、坏帧隔离、慢 Call 期间关闭、空闲 Accept 取消、诊断满载计数与非法配置/重复启动。
 - 已统一入站诊断出口：listener 与全部连接共享一个有界队列和丢弃计数，删除每连接的 256 容量缓冲与转发 goroutine。单连接退出不关闭出口，listener 在全部生产者退出后关闭；保留解除 Accept/Read 阻塞所需的取消监视机制。
 - 当前连接上限属于单 listener owner。公开 open API、多个 listener 共享的节点总配额及生产诊断消费尚未组装，不能据此宣称完整 TCP Transport 已完成。
+- 出站连接等待归属已确认并实现内部绑定、响应校验和连接范围清理，真实 TCP 夹具已改用此路径。见 [出站连接与 Call 等待归属方案](RFC-CLUSTER-OUTBOUND-CALL-OWNERSHIP.md)。Dial、自动重连和生产连接替换仍待后续组装。
 - NodeSender 自动重连，但不自动重放已经失败或结果不确定的请求。
 
 ### Cluster 4：故障与资源收尾

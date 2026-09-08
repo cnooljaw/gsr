@@ -53,6 +53,7 @@ func (registry *ClusterCallRegistry) valid() bool {
 // Complete 将一个远端 Response 或 Error 匹配到对应的待完成调用。
 //
 // remoteNode 来自本地出站连接绑定的目标路由，不从消息封包读取，也不是入站来源身份。
+// 此逻辑适配入口只完成未绑定网络连接的等待；网络读循环必须通过连接 owner 完成。
 // 不匹配或未知的 Session 会被拒绝，不会完成其它调用。
 func (registry *ClusterCallRegistry) Complete(remoteNode NodeID, envelope ClusterEnvelope) error {
 	if !registry.valid() {
@@ -91,23 +92,8 @@ func (registry *ClusterCallRegistry) cancel(session ClusterSessionID, err error)
 	return registry.pending.cancel(session, err)
 }
 
-// failNode 完成该节点当前的待完成调用，但不关闭注册表。
-// 后续 NodeSender/Transport 管理组件必须先清理旧连接，再接纳替代连接上的调用；
-// 仅靠 NodeID 无法区分新旧连接。此操作不进行业务重试。
-func (registry *ClusterCallRegistry) failNode(node NodeID, cause error) (int, error) {
-	if !registry.valid() {
-		return 0, ErrInvalidClusterCallRegistry
-	}
-	if node == "" {
-		return 0, ErrInvalidNode
-	}
-	if cause == nil {
-		return 0, fmt.Errorf("%w: node failure requires a cause", ErrInvalidClusterCall)
-	}
-	return registry.pending.failNode(node, cause), nil
-}
-
 type clusterPendingCall struct {
+	owner   *connectionCalls
 	session ClusterSessionID
 	source  runtime.ServiceID
 	node    NodeID
@@ -164,6 +150,10 @@ func (registry *clusterPendingCalls) begin(source runtime.ServiceID, node NodeID
 }
 
 func (registry *clusterPendingCalls) complete(remoteNode NodeID, envelope ClusterEnvelope) error {
+	return registry.completeOwned(remoteNode, envelope, nil)
+}
+
+func (registry *clusterPendingCalls) completeOwned(remoteNode NodeID, envelope ClusterEnvelope, owner *connectionCalls) error {
 	if registry == nil {
 		return ErrClusterSessionNotFound
 	}
@@ -183,7 +173,7 @@ func (registry *clusterPendingCalls) complete(remoteNode NodeID, envelope Cluste
 		registry.mu.Unlock()
 		return fmt.Errorf("%w: session %d", ErrClusterSessionNotFound, envelope.Session)
 	}
-	if pending.node != remoteNode || pending.target != envelope.Target || pending.command != envelope.Command {
+	if pending.owner != owner || pending.node != remoteNode || pending.target != envelope.Target || pending.command != envelope.Command {
 		registry.mu.Unlock()
 		return fmt.Errorf("%w: session %d", ErrClusterResponseMismatch, envelope.Session)
 	}
@@ -241,22 +231,6 @@ func (registry *clusterPendingCalls) close(err error) error {
 		finishClusterPendingCall(call, clusterCallResult{err: err})
 	}
 	return nil
-}
-
-func (registry *clusterPendingCalls) failNode(node NodeID, cause error) int {
-	registry.mu.Lock()
-	var failed []*clusterPendingCall
-	for session, call := range registry.pending {
-		if call.node == node {
-			delete(registry.pending, session)
-			failed = append(failed, call)
-		}
-	}
-	registry.mu.Unlock()
-	for _, call := range failed {
-		finishClusterPendingCall(call, clusterCallResult{err: cause})
-	}
-	return len(failed)
 }
 
 func (registry *clusterPendingCalls) pendingCount() int {

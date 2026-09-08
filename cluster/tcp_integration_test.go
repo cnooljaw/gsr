@@ -207,6 +207,10 @@ func newTCPClusterTestLinkTo(t *testing.T, remoteNode NodeID) *tcpClusterTestLin
 		t.Fatal(err)
 	}
 	calls := NewClusterCallRegistry()
+	sending, err := newOutboundConnection(outbound, calls, remoteNode)
+	if err != nil {
+		t.Fatal(err)
+	}
 	diagnostics := make(chan responseReadFailure, 16)
 	ctx, cancel := context.WithCancel(context.Background())
 	inboundDone := make(chan error, 1)
@@ -217,7 +221,7 @@ func newTCPClusterTestLinkTo(t *testing.T, remoteNode NodeID) *tcpClusterTestLin
 		inboundDone <- err
 	}()
 	go func() {
-		_, err := outbound.receiveResponses(remoteNode, calls, diagnostics)
+		_, err := outbound.receiveResponses(sending.calls, diagnostics)
 		responseDone <- err
 	}()
 	t.Cleanup(func() {
@@ -238,7 +242,7 @@ func newTCPClusterTestLinkTo(t *testing.T, remoteNode NodeID) *tcpClusterTestLin
 			t.Error(err)
 		}
 	})
-	sender, err := NewNodeSender(NodeSenderConfig{RemoteNode: remoteNode, Transport: &tcpTestTransport{connection: outbound, target: remoteNode}})
+	sender, err := NewNodeSender(NodeSenderConfig{RemoteNode: remoteNode, Transport: &tcpTestTransport{connection: sending, target: remoteNode}})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -259,7 +263,7 @@ func newTCPClusterTestLinkTo(t *testing.T, remoteNode NodeID) *tcpClusterTestLin
 
 // tcpTestTransport 只连接测试已建立的单条 TCP 连接，不提供生产建连、认证或重连能力。
 type tcpTestTransport struct {
-	connection *streamConnection
+	connection *outboundConnection
 	target     NodeID
 }
 
