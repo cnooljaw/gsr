@@ -13,7 +13,7 @@ import (
 	"github.com/cnooljaw/gsr/runtime"
 )
 
-// 验证真实 TCP 连接上的 Send/Call 经本地 Runtime 执行，并保留结构化业务错误身份。
+// 验证没有本地 NodeID 或监听的 TCP 客户端可 Send/Call，并沿原连接收到结果和领域错误。
 func TestTCPClusterRoundTrip(t *testing.T) {
 	link := newTCPClusterTestLink(t)
 	target := ServiceTarget{ServiceID: link.target}
@@ -124,6 +124,36 @@ func TestTCPClusterSlowCallDoesNotBlockOtherService(t *testing.T) {
 	}
 }
 
+// 验证两个方向各自拥有 TCP 链路；关闭 A 到 B 不会关闭 B 到 A 的主动调用路径。
+func TestTCPClusterDirectionalConnectionsAreIndependent(t *testing.T) {
+	toB := newTCPClusterTestLinkTo(t, "node-b")
+	toA := newTCPClusterTestLinkTo(t, "node-a")
+	if toB.server.socket == toA.server.socket {
+		t.Fatal("opposite directions share a socket")
+	}
+	for _, call := range []struct {
+		link *tcpClusterTestLink
+		node NodeID
+	}{
+		{link: toB, node: "node-b"},
+		{link: toA, node: "node-a"},
+	} {
+		value, err := call.link.client.Call(context.Background(), call.node, ServiceTarget{ServiceID: call.link.target}, clusterTestCommand, string(call.node))
+		if err != nil || !reflect.DeepEqual(value, []any{string(call.node)}) {
+			t.Fatalf("Call(%s) = %#v, %v", call.node, value, err)
+		}
+	}
+	if err := toB.server.close(); err != nil {
+		t.Fatal(err)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	value, err := toA.client.Call(ctx, "node-a", ServiceTarget{ServiceID: toA.target}, clusterTestCommand, "still open")
+	if err != nil || !reflect.DeepEqual(value, []any{"still open"}) {
+		t.Fatalf("opposite direction after close = %#v, %v", value, err)
+	}
+}
+
 type tcpClusterTestLink struct {
 	client      *ClusterClient
 	calls       *ClusterCallRegistry
@@ -134,6 +164,12 @@ type tcpClusterTestLink struct {
 }
 
 func newTCPClusterTestLink(t *testing.T) *tcpClusterTestLink {
+	t.Helper()
+	return newTCPClusterTestLinkTo(t, "node-b")
+}
+
+// 每条测试链路只配置出站目标，不注册调用方；接收端 writer 绑定同一 socket。
+func newTCPClusterTestLinkTo(t *testing.T, remoteNode NodeID) *tcpClusterTestLink {
 	t.Helper()
 	adapter, target, _ := newLocalAdapterTest(t)
 	listener, err := net.ListenTCP("tcp4", &net.TCPAddr{IP: net.IPv4(127, 0, 0, 1)})
@@ -166,7 +202,7 @@ func newTCPClusterTestLink(t *testing.T) *tcpClusterTestLink {
 	if err != nil {
 		t.Fatal(err)
 	}
-	owner, err := newInboundConnection(inbound, "node-a", adapter, 2)
+	owner, err := newInboundConnection(inbound, adapter, 2)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -177,7 +213,7 @@ func newTCPClusterTestLink(t *testing.T) *tcpClusterTestLink {
 	responseDone := make(chan error, 1)
 	go func() { inboundDone <- owner.serve(ctx) }()
 	go func() {
-		_, err := outbound.receiveResponses("node-b", calls, diagnostics)
+		_, err := outbound.receiveResponses(remoteNode, calls, diagnostics)
 		responseDone <- err
 	}()
 	t.Cleanup(func() {
@@ -198,7 +234,7 @@ func newTCPClusterTestLink(t *testing.T) *tcpClusterTestLink {
 			t.Error(err)
 		}
 	})
-	sender, err := NewNodeSender(NodeSenderConfig{LocalNode: "node-a", RemoteNode: "node-b", Transport: &tcpTestTransport{connection: outbound}})
+	sender, err := NewNodeSender(NodeSenderConfig{RemoteNode: remoteNode, Transport: &tcpTestTransport{connection: outbound, target: remoteNode}})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -220,25 +256,14 @@ func newTCPClusterTestLink(t *testing.T) *tcpClusterTestLink {
 // tcpTestTransport 只连接测试已建立的单条 TCP 连接，不提供生产建连、认证或重连能力。
 type tcpTestTransport struct {
 	connection *streamConnection
+	target     NodeID
 }
 
-func (*tcpTestTransport) Register(NodeID, Receiver) error {
-	return ErrInvalidNode
-}
-
-func (*tcpTestTransport) Unregister(NodeID) error {
-	return ErrInvalidNode
-}
-
-func (transport *tcpTestTransport) Send(from, to NodeID, request ClusterEnvelope) error {
-	if from != "node-a" || to != "node-b" {
+func (transport *tcpTestTransport) Send(to NodeID, request ClusterEnvelope) error {
+	if to != transport.target {
 		return ErrInvalidNode
 	}
 	return transport.connection.write(request)
-}
-
-func (transport *tcpTestTransport) Close() error {
-	return transport.connection.close()
 }
 
 type tcpErrorService struct {

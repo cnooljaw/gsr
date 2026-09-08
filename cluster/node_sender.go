@@ -19,7 +19,6 @@ const (
 // DeliveryFailure 描述本地接纳后的基础设施失败。
 // 仅包含路由元数据，不携带业务载荷。
 type DeliveryFailure struct {
-	LocalNode  NodeID
 	RemoteNode NodeID
 	Kind       FrameKind
 	Session    ClusterSessionID
@@ -30,7 +29,6 @@ type DeliveryFailure struct {
 
 // NodeSenderConfig 配置对应单个远端 NodeID 的出站发送器。
 type NodeSenderConfig struct {
-	LocalNode     NodeID
 	RemoteNode    NodeID
 	Transport     Transport
 	QueueCapacity int
@@ -50,7 +48,6 @@ var (
 // NodeSender 是本地节点到某个远端节点的唯一出站管理组件。
 // 它将复制后的消息封包接纳到有界队列，并串行投递。
 type NodeSender struct {
-	localNode       NodeID
 	remoteNode      NodeID
 	transport       Transport
 	queue           chan ClusterEnvelope
@@ -65,8 +62,8 @@ type NodeSender struct {
 
 // NewNodeSender 构造并启动一个使用有界队列的出站发送 worker。
 func NewNodeSender(config NodeSenderConfig) (*NodeSender, error) {
-	if config.LocalNode == "" || config.RemoteNode == "" || isNilTransport(config.Transport) {
-		return nil, fmt.Errorf("%w: local node, remote node, and Transport are required", ErrInvalidNodeSenderConfig)
+	if config.RemoteNode == "" || isNilTransport(config.Transport) {
+		return nil, fmt.Errorf("%w: remote node and Transport are required", ErrInvalidNodeSenderConfig)
 	}
 	if config.QueueCapacity == 0 {
 		config.QueueCapacity = defaultOutboundQueueCapacity
@@ -75,7 +72,6 @@ func NewNodeSender(config NodeSenderConfig) (*NodeSender, error) {
 		return nil, fmt.Errorf("%w: QueueCapacity must be greater than zero", ErrInvalidNodeSenderConfig)
 	}
 	sender := &NodeSender{
-		localNode:  config.LocalNode,
 		remoteNode: config.RemoteNode,
 		transport:  config.Transport,
 		queue:      make(chan ClusterEnvelope, config.QueueCapacity),
@@ -182,12 +178,11 @@ func (sender *NodeSender) sendTransport(envelope ClusterEnvelope) (err error) {
 			err = fmt.Errorf("%w: %v", ErrTransportPanicked, recovered)
 		}
 	}()
-	return sender.transport.Send(sender.localNode, sender.remoteNode, envelope)
+	return sender.transport.Send(sender.remoteNode, envelope)
 }
 
 func (sender *NodeSender) tryReportFailure(envelope ClusterEnvelope, err error) {
 	failure := DeliveryFailure{
-		LocalNode:  sender.localNode,
 		RemoteNode: sender.remoteNode,
 		Kind:       envelope.Kind,
 		Session:    envelope.Session,

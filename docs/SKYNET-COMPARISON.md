@@ -112,6 +112,8 @@ GSR 只用 `SessionID == 0` 或 `SessionID > 0` 区分 Send/Call；Skynet 还把
 | 断线、重连和重放 | Cluster 计划 | `socketchannel` 的 reconnect/changehost、`clusterd` sender 重建 | 借鉴后重构 | GSR 重连只恢复未来通信，不宣称 exactly-once，也不自动重放业务 Call/Send；幂等、RequestID 和补偿属于业务。 |
 | Cluster 关闭顺序 | Cluster 计划 | socket close/free、cluster sender/agent service 退出、Harbor release | 借鉴后重构 | 外层 Node/Host 先停止入站和新的出站 admission，再 `Runtime.Close`；Core 完成后再关闭 Transport 和连接 goroutine。 |
 
+主动 `cluster.call/send` 与 `cluster.open` 是独立能力：Skynet 按目标创建 sender，不要求调用方先 open；open 只开启入站监听。GSR 沿用这个边界，删除 LocalNode 和入站来源 NodeID。A→B 与 B→A 的主动请求分别使用各自的出站连接，各自回复沿原连接返回；TCP 本身仍是全双工，不是每次调用创建 socket。GSR 的生产 open API 尚未实现，当前已通过测试夹具验证连接方向与回复归属。
+
 ## 五、最容易误译的 Skynet API
 
 | 看到的 Skynet API/机制 | 不要直接翻译成 | 在 GSR 中应理解为 |

@@ -307,7 +307,7 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 - 接线约束：TCP owner 必须在旧连接等待清理完成后再开放替代连接请求；该入口只按 NodeID 匹配，不能用于并行新旧连接的迟到清理。当前尚未自动接入 socket 断线事件。
 - 已接通内部响应读循环：通过 streamConnection 读取 Response/Error 并完成 PendingCall；流终止时执行 failNode。已用 net.Pipe 验证成功/业务错误回复、远端断线、主动关闭和非法帧长的收尾。
 - 异常响应与完整坏帧通过调用方持有的非阻塞诊断通道报告；无消费者或通道满载时丢弃，循环返回丢弃计数。此通道只含节点、Session 和错误，不携带业务载荷。
-- 待实现：TCP Transport 启动/等待读循环、确认远端身份、连接替换与生产诊断消费；内部读循环尚未接入真实 TCP。
+- 待实现：生产 TCP Transport 启动/等待读循环、绑定目标地址路由、连接替换与生产诊断消费；内部读循环已通过真实 TCP 夹具验证，不要求 NodeID 握手。
 - 待实现：断线、timeout 以及未知、重复和迟到 response 的连接级诊断。
 - 已验证：`cluster/roundtrip_test.go` 通过公开 API 组装双节点内存链路，连接 ClusterClient、NodeSender、ConnectionAgent 和 ClusterCallRegistry；请求与回复均经过完整 FrameCodec 编解码。覆盖成功返回、Domain Error 的 Class/Code、安全 Message 和 `errors.Is`，以及未知错误/panic 的安全转换。
 - 已验证：Send 的 B 侧 Handler error 由接收适配器本地记录、不产生回复；随后同一链路可继续 Call。目标节点未注册时，Send 入队成功后的失败在 A 侧保留节点、目标、命令和 `ErrNodeNotFound` 原因。
@@ -321,7 +321,7 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 - 已实现内部 localRequestAdapter：查找 Command codec、解码参数列表、按 ID 或外层名称解析目标，再经 Runtime.Send/Call 执行；未知 Command/坏载荷仅返回接收侧诊断错误，不产生响应。Send 接纳错误归接收侧，Call 执行错误沿 ConnectionAgent 回包，写回故障保留 I/O 错误链。该适配器尚未接入网络入站读循环，不管理并发或连接生命周期。
 - 入站并发方案已获确认并实现为内部 inboundConnection：单读循环、显式 Call 名额上限、满载暂停读取、顺序 Send、有界非阻塞诊断；详见 [入站并发方案](RFC-CLUSTER-INBOUND-CONCURRENCY.md)。关闭取消基础设施等待并等待连接任务退出，不强杀目标 Handler。
 - 已用 net.Pipe 验证慢 Call 隔离、满载背压、连续 Send 顺序、满载时取消、诊断溢出、codec/名称解析 panic 和重复启动拒绝。响应编码失败也返回接收侧诊断；这些测试不等于真实 TCP 或节点级资源上限验证。
-- 已新增真实 TCP 回环集成门禁 `tcp_integration_test.go`：连接 ClusterClient、NodeSender、帧编解码、入站连接、本地 Runtime 和响应读循环，验证 Send/Call、领域错误、同连接慢 Call 隔离和断线完成等待。使用测试专用 Transport 接线及预先确定的节点身份；生产 listener、身份确认、连接数量限制与重连仍未实现。
+- 已新增真实 TCP 回环集成门禁 `tcp_integration_test.go`：连接 ClusterClient、NodeSender、帧编解码、入站连接、本地 Runtime 和响应读循环，验证 Send/Call、领域错误、同连接慢 Call 隔离和断线完成等待。A 不配置 NodeID 或监听，B 接受匿名入站并沿原连接回复；使用测试专用 Transport 及预先配置的目标路由，生产 listener、认证、连接数量限制与重连仍未实现。
 - 已实现内部 stream framing 函数：按长度前缀读取单帧，分配前检查上限；覆盖逐字节拆包、连续帧、截断和完整坏帧后的边界保持。写入失败或短写直接返回，不重放。
 - stream 解码错误带有内部“完整帧已消费”标记，并保留原错误链，供连接层识别边界；非法长度、截断和 I/O 错误不携带该标记。标记不替代认证、越界等必须关闭连接的检查。
 - 已通过 `net.Pipe` 验证 ConnectionAgent 原连接请求/回复、关闭解除读写等待，以及连接 deadline 的超时错误传播；尚未覆盖真实 TCP、连接重建或双 Runtime 调度。
@@ -329,7 +329,8 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 - `streamConnection` 不启动 goroutine、不建连或重连；写 timeout 不包含等待串行锁的时间。后续 Transport 必须限制并发写调用数量、拥有唯一读循环并负责关闭后等待退出，尚未接入生产连接。
 - 长度前缀 framing。
 - 每条 inbound socket 一个 ConnectionAgent，响应沿原连接返回。
-- 可选 NodeID/shared-token 握手。
+- 已确认并清理出站调用与监听身份：删除 LocalNode、入站来源 NodeID；主动 Send/Call 只需目标，open 只决定是否接受新调用。Transport 仅要求 Send(to, envelope)，内存往返测试通过绑定 writer 回复，不注册调用方或反向 Send。见 [连接身份方案](RFC-CLUSTER-CONNECTION-IDENTITY.md)。认证协议另行裁决，不与调用方的可寻址身份绑定。
+- 已用真实 TCP 测试夹具验证两个方向分别建立独立连接，关闭 A→B 后 B→A 仍能主动 Call；此门禁验证连接组织，不代表生产节点管理器或公开 open API 已实现。
 - NodeSender 自动重连，但不自动重放已经失败或结果不确定的请求。
 
 ### Cluster 4：故障与资源收尾

@@ -14,13 +14,13 @@ func TestNodeSenderDeliversAdmittedEnvelopesInOrder(t *testing.T) {
 		t.Fatalf("NewInMemoryTransport() error = %v, want nil", err)
 	}
 	received := make(chan string, 2)
-	if err := transport.Register("node-b", func(_ NodeID, envelope ClusterEnvelope) {
+	if err := transport.Register("node-b", func(envelope ClusterEnvelope) {
 		received <- string(envelope.Payload)
 	}); err != nil {
 		t.Fatalf("Register() error = %v, want nil", err)
 	}
 	sender, err := NewNodeSender(NodeSenderConfig{
-		LocalNode:     "node-a",
+
 		RemoteNode:    "node-b",
 		Transport:     transport,
 		QueueCapacity: 2,
@@ -58,14 +58,14 @@ func TestNodeSenderRejectsFullQueueWithoutBlocking(t *testing.T) {
 	started := make(chan struct{})
 	release := make(chan struct{})
 	transport := &senderTestTransport{
-		send: func(NodeID, NodeID, ClusterEnvelope) error {
+		send: func(NodeID, ClusterEnvelope) error {
 			close(started)
 			<-release
 			return nil
 		},
 	}
 	sender, err := NewNodeSender(NodeSenderConfig{
-		LocalNode:     "node-a",
+
 		RemoteNode:    "node-b",
 		Transport:     transport,
 		QueueCapacity: 1,
@@ -97,7 +97,7 @@ func TestNodeSenderClonesEnvelopeOnAdmission(t *testing.T) {
 	release := make(chan struct{})
 	received := make(chan ClusterEnvelope, 1)
 	transport := &senderTestTransport{
-		send: func(_ NodeID, _ NodeID, envelope ClusterEnvelope) error {
+		send: func(_ NodeID, envelope ClusterEnvelope) error {
 			close(started)
 			<-release
 			received <- envelope
@@ -105,7 +105,7 @@ func TestNodeSenderClonesEnvelopeOnAdmission(t *testing.T) {
 		},
 	}
 	sender, err := NewNodeSender(NodeSenderConfig{
-		LocalNode:  "node-a",
+
 		RemoteNode: "node-b",
 		Transport:  transport,
 	})
@@ -138,12 +138,12 @@ func TestNodeSenderClonesEnvelopeOnAdmission(t *testing.T) {
 func TestNodeSenderReportsPostAdmissionTransportFailure(t *testing.T) {
 	wantErr := errors.New("dial failed")
 	transport := &senderTestTransport{
-		send: func(NodeID, NodeID, ClusterEnvelope) error {
+		send: func(NodeID, ClusterEnvelope) error {
 			return wantErr
 		},
 	}
 	sender, err := NewNodeSender(NodeSenderConfig{
-		LocalNode:  "node-a",
+
 		RemoteNode: "node-b",
 		Transport:  transport,
 	})
@@ -158,8 +158,8 @@ func TestNodeSenderReportsPostAdmissionTransportFailure(t *testing.T) {
 		if !errors.Is(failure.Err, wantErr) {
 			t.Fatalf("failure.Err = %v, want %v", failure.Err, wantErr)
 		}
-		if failure.LocalNode != "node-a" || failure.RemoteNode != "node-b" {
-			t.Fatalf("failure nodes = %q -> %q, want node-a -> node-b", failure.LocalNode, failure.RemoteNode)
+		if failure.RemoteNode != "node-b" {
+			t.Fatalf("failure target = %q, want node-b", failure.RemoteNode)
 		}
 		if failure.Kind != FrameRequest || failure.Target.ServiceID != 7 || failure.Command != frameTestCommand {
 			t.Fatalf("failure routing metadata = %+v, want request to service 7 command %d", failure, frameTestCommand)
@@ -177,7 +177,7 @@ func TestNodeSenderReportsUnavailableRemoteAndContinues(t *testing.T) {
 		t.Fatalf("NewInMemoryTransport() error = %v, want nil", err)
 	}
 	sender, err := NewNodeSender(NodeSenderConfig{
-		LocalNode:  "node-a",
+
 		RemoteNode: "node-b",
 		Transport:  transport,
 	})
@@ -200,7 +200,7 @@ func TestNodeSenderReportsUnavailableRemoteAndContinues(t *testing.T) {
 	}
 
 	received := make(chan string, 1)
-	if err := transport.Register("node-b", func(_ NodeID, envelope ClusterEnvelope) {
+	if err := transport.Register("node-b", func(envelope ClusterEnvelope) {
 		received <- string(envelope.Payload)
 	}); err != nil {
 		t.Fatalf("Register(node-b) error = %v, want nil", err)
@@ -222,12 +222,12 @@ func TestNodeSenderReportsUnavailableRemoteAndContinues(t *testing.T) {
 // 验证 Transport 的 panic 被发送器管理组件转成可观察的投递失败，而不会杀死进程。
 func TestNodeSenderReportsTransportPanic(t *testing.T) {
 	transport := &senderTestTransport{
-		send: func(NodeID, NodeID, ClusterEnvelope) error {
+		send: func(NodeID, ClusterEnvelope) error {
 			panic("transport panic")
 		},
 	}
 	sender, err := NewNodeSender(NodeSenderConfig{
-		LocalNode:  "node-a",
+
 		RemoteNode: "node-b",
 		Transport:  transport,
 	})
@@ -255,7 +255,7 @@ func TestNodeSenderDoesNotBlockOnFullFailureQueue(t *testing.T) {
 	attempted := make(chan int, total)
 	attempt := 0
 	transport := &senderTestTransport{
-		send: func(_ NodeID, _ NodeID, _ ClusterEnvelope) error {
+		send: func(_ NodeID, _ ClusterEnvelope) error {
 			attempt++
 			attempted <- attempt
 			if attempt == total {
@@ -265,7 +265,7 @@ func TestNodeSenderDoesNotBlockOnFullFailureQueue(t *testing.T) {
 		},
 	}
 	sender, err := NewNodeSender(NodeSenderConfig{
-		LocalNode:     "node-a",
+
 		RemoteNode:    "node-b",
 		Transport:     transport,
 		QueueCapacity: total,
@@ -299,14 +299,14 @@ func TestNodeSenderReportsQueuedMessagesOnClose(t *testing.T) {
 	started := make(chan struct{})
 	release := make(chan struct{})
 	transport := &senderTestTransport{
-		send: func(NodeID, NodeID, ClusterEnvelope) error {
+		send: func(NodeID, ClusterEnvelope) error {
 			close(started)
 			<-release
 			return nil
 		},
 	}
 	sender, err := NewNodeSender(NodeSenderConfig{
-		LocalNode:     "node-a",
+
 		RemoteNode:    "node-b",
 		Transport:     transport,
 		QueueCapacity: 1,
@@ -352,7 +352,7 @@ func TestNodeSenderCloseIsFinal(t *testing.T) {
 		t.Fatalf("NewInMemoryTransport() error = %v, want nil", err)
 	}
 	sender, err := NewNodeSender(NodeSenderConfig{
-		LocalNode:  "node-a",
+
 		RemoteNode: "node-b",
 		Transport:  transport,
 	})
@@ -378,14 +378,15 @@ func TestNewNodeSenderRejectsInvalidConfig(t *testing.T) {
 		t.Fatalf("NewInMemoryTransport() error = %v, want nil", err)
 	}
 	valid := NodeSenderConfig{
-		LocalNode:  "node-a",
+
 		RemoteNode: "node-b",
 		Transport:  transport,
 	}
 	cases := []NodeSenderConfig{
 		{},
-		{LocalNode: valid.LocalNode, RemoteNode: valid.RemoteNode},
-		{LocalNode: valid.LocalNode, RemoteNode: valid.RemoteNode, Transport: valid.Transport, QueueCapacity: -1},
+		{Transport: valid.Transport},
+		{RemoteNode: valid.RemoteNode},
+		{RemoteNode: valid.RemoteNode, Transport: valid.Transport, QueueCapacity: -1},
 	}
 	for index, config := range cases {
 		if _, err := NewNodeSender(config); !errors.Is(err, ErrInvalidNodeSenderConfig) {
@@ -413,21 +414,9 @@ func closeSender(t *testing.T, sender *NodeSender) {
 }
 
 type senderTestTransport struct {
-	send func(NodeID, NodeID, ClusterEnvelope) error
+	send func(NodeID, ClusterEnvelope) error
 }
 
-func (transport *senderTestTransport) Register(NodeID, Receiver) error {
-	return nil
-}
-
-func (transport *senderTestTransport) Unregister(NodeID) error {
-	return nil
-}
-
-func (transport *senderTestTransport) Send(from NodeID, to NodeID, envelope ClusterEnvelope) error {
-	return transport.send(from, to, envelope)
-}
-
-func (transport *senderTestTransport) Close() error {
-	return nil
+func (transport *senderTestTransport) Send(to NodeID, envelope ClusterEnvelope) error {
+	return transport.send(to, envelope)
 }

@@ -7,17 +7,15 @@ import (
 	runtime "github.com/cnooljaw/gsr/runtime"
 )
 
-// 验证 InMemoryTransport 传递来源并在接收边界复制可变 Envelope 值。
+// 验证 InMemoryTransport 仅按目标投递并在接收边界复制可变 Envelope 值。
 func TestInMemoryTransportDeliversClonedEnvelope(t *testing.T) {
 	transport, err := NewInMemoryTransport(InMemoryTransportConfig{MaxPayload: 32})
 	if err != nil {
 		t.Fatalf("NewInMemoryTransport() error = %v, want nil", err)
 	}
 
-	var gotFrom NodeID
 	var gotPayload string
-	if err := transport.Register("node-b", func(from NodeID, envelope ClusterEnvelope) {
-		gotFrom = from
+	if err := transport.Register("node-b", func(envelope ClusterEnvelope) {
 		gotPayload = string(envelope.Payload)
 		envelope.Payload[0] = 'X'
 	}); err != nil {
@@ -31,11 +29,8 @@ func TestInMemoryTransportDeliversClonedEnvelope(t *testing.T) {
 		Command: clusterTestCommand,
 		Payload: []byte("hello"),
 	}
-	if err := transport.Send("node-a", "node-b", envelope); err != nil {
+	if err := transport.Send("node-b", envelope); err != nil {
 		t.Fatalf("Send() error = %v, want nil", err)
-	}
-	if gotFrom != "node-a" {
-		t.Fatalf("receiver from = %q, want node-a", gotFrom)
 	}
 	if gotPayload != "hello" {
 		t.Fatalf("receiver payload = %q, want hello", gotPayload)
@@ -51,7 +46,7 @@ func TestInMemoryTransportRejectsInvalidOrOversizedSend(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewInMemoryTransport() error = %v, want nil", err)
 	}
-	if err := transport.Register("node-b", func(NodeID, ClusterEnvelope) {}); err != nil {
+	if err := transport.Register("node-b", func(ClusterEnvelope) {}); err != nil {
 		t.Fatalf("Register() error = %v, want nil", err)
 	}
 
@@ -61,20 +56,20 @@ func TestInMemoryTransportRejectsInvalidOrOversizedSend(t *testing.T) {
 		Command: clusterTestCommand,
 		Payload: []byte("large"),
 	}
-	if err := transport.Send("node-a", "node-b", envelope); !errors.Is(err, ErrPayloadTooLarge) {
+	if err := transport.Send("node-b", envelope); !errors.Is(err, ErrPayloadTooLarge) {
 		t.Fatalf("oversized Send() error = %v, want ErrPayloadTooLarge", err)
 	}
-	if err := transport.Send("node-a", "missing", ClusterEnvelope{
+	if err := transport.Send("missing", ClusterEnvelope{
 		Kind:    FrameRequest,
 		Target:  ServiceTarget{ServiceID: 1},
 		Command: clusterTestCommand,
 	}); !errors.Is(err, ErrNodeNotFound) {
 		t.Fatalf("unknown destination Send() error = %v, want ErrNodeNotFound", err)
 	}
-	if err := transport.Send("", "node-b", envelope); !errors.Is(err, ErrInvalidNode) {
-		t.Fatalf("empty source Send() error = %v, want ErrInvalidNode", err)
+	if err := transport.Send("", envelope); !errors.Is(err, ErrInvalidNode) {
+		t.Fatalf("empty target Send() error = %v, want ErrInvalidNode", err)
 	}
-	if err := transport.Register("", func(NodeID, ClusterEnvelope) {}); !errors.Is(err, ErrInvalidNode) {
+	if err := transport.Register("", func(ClusterEnvelope) {}); !errors.Is(err, ErrInvalidNode) {
 		t.Fatalf("empty Register() error = %v, want ErrInvalidNode", err)
 	}
 }
@@ -85,7 +80,7 @@ func TestInMemoryTransportCloseIsFinal(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewInMemoryTransport() error = %v, want nil", err)
 	}
-	if err := transport.Register("node-a", func(NodeID, ClusterEnvelope) {}); err != nil {
+	if err := transport.Register("node-a", func(ClusterEnvelope) {}); err != nil {
 		t.Fatalf("Register() error = %v, want nil", err)
 	}
 	if err := transport.Close(); err != nil {
@@ -100,10 +95,10 @@ func TestInMemoryTransportCloseIsFinal(t *testing.T) {
 		Target:  ServiceTarget{ServiceID: runtime.ServiceID(1)},
 		Command: clusterTestCommand,
 	}
-	if err := transport.Send("node-a", "node-a", envelope); !errors.Is(err, ErrTransportClosed) {
+	if err := transport.Send("node-a", envelope); !errors.Is(err, ErrTransportClosed) {
 		t.Fatalf("closed Send() error = %v, want ErrTransportClosed", err)
 	}
-	if err := transport.Register("node-b", func(NodeID, ClusterEnvelope) {}); !errors.Is(err, ErrTransportClosed) {
+	if err := transport.Register("node-b", func(ClusterEnvelope) {}); !errors.Is(err, ErrTransportClosed) {
 		t.Fatalf("closed Register() error = %v, want ErrTransportClosed", err)
 	}
 	if err := transport.Unregister("node-a"); !errors.Is(err, ErrTransportClosed) {

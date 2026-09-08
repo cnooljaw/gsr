@@ -143,7 +143,7 @@ func TestClusterPendingNodeFailureWakesClient(t *testing.T) {
 	registry := NewClusterCallRegistry()
 	t.Cleanup(func() { registry.Close() })
 	admitted := make(chan ClusterEnvelope, 1)
-	client, transport, sender := newClientCallTestClient(t, registry, func(_ NodeID, request ClusterEnvelope) {
+	client, transport, sender := newClientCallTestClient(t, registry, func(request ClusterEnvelope) {
 		admitted <- request
 	}, time.Second)
 	defer closeCallTestResources(t, transport, sender)

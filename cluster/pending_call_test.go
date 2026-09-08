@@ -106,16 +106,16 @@ func TestClusterPendingCallsRejectMismatchedResponses(t *testing.T) {
 		Payload: []byte("result"),
 	}
 	cases := []struct {
-		name string
-		from NodeID
-		env  ClusterEnvelope
+		name       string
+		remoteNode NodeID
+		env        ClusterEnvelope
 	}{
-		{name: "wrong node", from: "node-c", env: base},
-		{name: "wrong target", from: "node-b", env: ClusterEnvelope{Kind: FrameResponse, Session: pending.session, Target: ServiceTarget{ServiceID: 8}, Command: pending.command}},
-		{name: "wrong command", from: "node-b", env: ClusterEnvelope{Kind: FrameResponse, Session: pending.session, Target: pending.target, Command: clusterTestCommand + 1}},
+		{name: "wrong node", remoteNode: "node-c", env: base},
+		{name: "wrong target", remoteNode: "node-b", env: ClusterEnvelope{Kind: FrameResponse, Session: pending.session, Target: ServiceTarget{ServiceID: 8}, Command: pending.command}},
+		{name: "wrong command", remoteNode: "node-b", env: ClusterEnvelope{Kind: FrameResponse, Session: pending.session, Target: pending.target, Command: clusterTestCommand + 1}},
 	}
 	for _, testCase := range cases {
-		if err := registry.complete(testCase.from, testCase.env); !errors.Is(err, ErrClusterResponseMismatch) {
+		if err := registry.complete(testCase.remoteNode, testCase.env); !errors.Is(err, ErrClusterResponseMismatch) {
 			t.Errorf("%s complete() error = %v, want ErrClusterResponseMismatch", testCase.name, err)
 		}
 	}

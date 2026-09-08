@@ -30,9 +30,9 @@ func TestClusterRoundTripCall(t *testing.T) {
 	}
 	for _, testCase := range cases {
 		t.Run(testCase.name, func(t *testing.T) {
-			link := newRoundTripLink(t, func(_ context.Context, from cluster.NodeID, request cluster.ClusterEnvelope) ([]byte, error) {
-				if from != "node-a" || request.Target.ServiceName != "room" || request.Command != roundTripCommand {
-					t.Errorf("unexpected request route: from=%s request=%+v", from, request)
+			link := newRoundTripLink(t, func(_ context.Context, request cluster.ClusterEnvelope) ([]byte, error) {
+				if request.Target.ServiceName != "room" || request.Command != roundTripCommand {
+					t.Errorf("unexpected request route: request=%+v", request)
 				}
 				if testCase.panics {
 					panic("private panic detail")
@@ -65,7 +65,7 @@ func TestClusterRoundTripCall(t *testing.T) {
 func TestClusterRoundTripSendFailureStaysRemote(t *testing.T) {
 	remoteErrors := make(chan error, 1)
 	remoteErr := errors.New("node-b handler failed")
-	link := newRoundTripLink(t, func(_ context.Context, _ cluster.NodeID, request cluster.ClusterEnvelope) ([]byte, error) {
+	link := newRoundTripLink(t, func(_ context.Context, request cluster.ClusterEnvelope) ([]byte, error) {
 		if request.Session == 0 {
 			remoteErrors <- remoteErr
 			return nil, remoteErr
@@ -97,7 +97,7 @@ func TestClusterRoundTripSendFailureStaysRemote(t *testing.T) {
 
 // 验证目标节点未注册时 Send 仍只表示入队成功，后续失败记录包含节点、命令和底层原因。
 func TestClusterRoundTripSendUnavailableNode(t *testing.T) {
-	link := newRoundTripLink(t, func(_ context.Context, _ cluster.NodeID, request cluster.ClusterEnvelope) ([]byte, error) {
+	link := newRoundTripLink(t, func(_ context.Context, request cluster.ClusterEnvelope) ([]byte, error) {
 		return request.Payload, nil
 	})
 	if err := link.transport.Unregister("node-b"); err != nil {
@@ -109,7 +109,7 @@ func TestClusterRoundTripSendUnavailableNode(t *testing.T) {
 	}
 	select {
 	case failure := <-link.sender.Failures():
-		if failure.LocalNode != "node-a" || failure.RemoteNode != "node-b" || failure.Target != target ||
+		if failure.RemoteNode != "node-b" || failure.Target != target ||
 			failure.Command != roundTripCommand || failure.Session != 0 || !errors.Is(failure.Err, cluster.ErrNodeNotFound) {
 			t.Fatalf("unexpected transport failure: %+v", failure)
 		}
@@ -165,30 +165,24 @@ func newRoundTripLink(t *testing.T, handler cluster.RequestHandler) *roundTripLi
 			t.Error(err)
 		}
 	})
-	if err := transport.Register("node-a", func(from cluster.NodeID, response cluster.ClusterEnvelope) {
-		decoded, err := wireCopy(response)
-		if err == nil {
-			err = calls.Complete(from, decoded)
-		}
-		if err != nil {
-			t.Errorf("node-a receive: %v", err)
-		}
-	}); err != nil {
-		t.Fatal(err)
-	}
+	// 回复绑定当前链路，不注册调用方，也不通过反向 Send 路由。
 	agent, err := cluster.NewConnectionAgent(cluster.ConnectionAgentConfig{
 		Handler: handler,
 		Write: func(response cluster.ClusterEnvelope) error {
-			return transport.Send("node-b", "node-a", response)
+			decoded, err := wireCopy(response)
+			if err != nil {
+				return err
+			}
+			return calls.Complete("node-b", decoded)
 		},
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := transport.Register("node-b", func(from cluster.NodeID, request cluster.ClusterEnvelope) {
+	if err := transport.Register("node-b", func(request cluster.ClusterEnvelope) {
 		decoded, err := wireCopy(request)
 		if err == nil {
-			err = agent.Handle(context.Background(), from, decoded)
+			err = agent.Handle(context.Background(), decoded)
 		}
 		if err != nil {
 			t.Errorf("node-b receive: %v", err)
@@ -196,7 +190,7 @@ func newRoundTripLink(t *testing.T, handler cluster.RequestHandler) *roundTripLi
 	}); err != nil {
 		t.Fatal(err)
 	}
-	sender, err := cluster.NewNodeSender(cluster.NodeSenderConfig{LocalNode: "node-a", RemoteNode: "node-b", Transport: transport})
+	sender, err := cluster.NewNodeSender(cluster.NodeSenderConfig{RemoteNode: "node-b", Transport: transport})
 	if err != nil {
 		t.Fatal(err)
 	}

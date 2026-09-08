@@ -52,13 +52,13 @@ func (registry *ClusterCallRegistry) valid() bool {
 
 // Complete 将一个远端 Response 或 Error 匹配到对应的待完成调用。
 //
-// from NodeID 由 Transport 提供，不从消息封包读取。
+// remoteNode 来自本地出站连接绑定的目标路由，不从消息封包读取，也不是入站来源身份。
 // 不匹配或未知的 Session 会被拒绝，不会完成其它调用。
-func (registry *ClusterCallRegistry) Complete(from NodeID, envelope ClusterEnvelope) error {
+func (registry *ClusterCallRegistry) Complete(remoteNode NodeID, envelope ClusterEnvelope) error {
 	if !registry.valid() {
 		return ErrInvalidClusterCallRegistry
 	}
-	return registry.pending.complete(from, envelope)
+	return registry.pending.complete(remoteNode, envelope)
 }
 
 // Close 使用 ErrClusterCallClosed 完成所有剩余调用，并阻止注册新 Session。
@@ -163,12 +163,12 @@ func (registry *clusterPendingCalls) begin(source runtime.ServiceID, node NodeID
 	return pending, nil
 }
 
-func (registry *clusterPendingCalls) complete(from NodeID, envelope ClusterEnvelope) error {
+func (registry *clusterPendingCalls) complete(remoteNode NodeID, envelope ClusterEnvelope) error {
 	if registry == nil {
 		return ErrClusterSessionNotFound
 	}
-	if from == "" {
-		return fmt.Errorf("%w: source node is empty", ErrInvalidClusterResponse)
+	if remoteNode == "" {
+		return fmt.Errorf("%w: remote node is empty", ErrInvalidClusterResponse)
 	}
 	if envelope.Kind != FrameResponse && envelope.Kind != FrameError {
 		return fmt.Errorf("%w: frame kind %s cannot complete a call", ErrInvalidClusterResponse, envelope.Kind)
@@ -183,7 +183,7 @@ func (registry *clusterPendingCalls) complete(from NodeID, envelope ClusterEnvel
 		registry.mu.Unlock()
 		return fmt.Errorf("%w: session %d", ErrClusterSessionNotFound, envelope.Session)
 	}
-	if pending.node != from || pending.target != envelope.Target || pending.command != envelope.Command {
+	if pending.node != remoteNode || pending.target != envelope.Target || pending.command != envelope.Command {
 		registry.mu.Unlock()
 		return fmt.Errorf("%w: session %d", ErrClusterResponseMismatch, envelope.Session)
 	}

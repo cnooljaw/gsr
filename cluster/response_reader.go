@@ -5,14 +5,15 @@ import (
 	"net"
 )
 
-// responseReadFailure 只记录来源节点、Session 和失败原因，不保留业务载荷。
+// responseReadFailure 只记录出站目标节点、Session 和失败原因，不保留业务载荷。
 type responseReadFailure struct {
 	node    NodeID
 	session ClusterSessionID
 	err     error
 }
 
-// receiveResponses 在已确认对端身份的出站连接上同步读取响应，直到连接结束。
+// receiveResponses 在绑定目标 NodeID 的出站连接上同步读取响应，直到连接结束。
+// node 来自本地目标路由，不表示已通过握手认证；不要求本地拥有 NodeID。
 // 外层 Transport 负责启动且仅启动一个读循环，通过 close 取消，并等待返回；
 // 返回前完成该节点旧连接的等待清理，之后才能开放替代连接上的请求。
 // diagnostics 由调用方管理，必须保持打开直到本函数返回；建议使用有界缓冲。

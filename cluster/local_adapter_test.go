@@ -18,7 +18,7 @@ func TestLocalAdapterCallsRuntime(t *testing.T) {
 			t.Fatal(err)
 		}
 		var replies []ClusterEnvelope
-		err = adapter.handle(context.Background(), "node-a", ClusterEnvelope{Kind: FrameRequest, Session: 99, Target: target, Command: clusterTestCommand, Payload: payload}, func(reply ClusterEnvelope) error {
+		err = adapter.handle(context.Background(), ClusterEnvelope{Kind: FrameRequest, Session: 99, Target: target, Command: clusterTestCommand, Payload: payload}, func(reply ClusterEnvelope) error {
 			replies = append(replies, reply)
 			return nil
 		})
@@ -56,7 +56,7 @@ func TestLocalAdapterDropsInvalidPayload(t *testing.T) {
 		{command: clusterTestCommand, payload: scalar, want: runtime.ErrInvalidCommandArguments},
 	} {
 		writes := 0
-		err := adapter.handle(context.Background(), "node-a", ClusterEnvelope{Kind: FrameRequest, Session: 1, Target: ServiceTarget{ServiceID: id}, Command: testCase.command, Payload: testCase.payload}, func(ClusterEnvelope) error { writes++; return nil })
+		err := adapter.handle(context.Background(), ClusterEnvelope{Kind: FrameRequest, Session: 1, Target: ServiceTarget{ServiceID: id}, Command: testCase.command, Payload: testCase.payload}, func(ClusterEnvelope) error { writes++; return nil })
 		if !errors.Is(err, testCase.want) || writes != 0 {
 			t.Fatalf("error = %v, writes = %d", err, writes)
 		}
@@ -72,7 +72,7 @@ func TestLocalAdapterTargetFailureOwnership(t *testing.T) {
 	}
 	for _, session := range []ClusterSessionID{0, 1} {
 		var replies []ClusterEnvelope
-		err := adapter.handle(context.Background(), "node-a", ClusterEnvelope{Kind: FrameRequest, Session: session, Target: ServiceTarget{ServiceName: "missing"}, Command: clusterTestCommand, Payload: payload}, func(reply ClusterEnvelope) error { replies = append(replies, reply); return nil })
+		err := adapter.handle(context.Background(), ClusterEnvelope{Kind: FrameRequest, Session: session, Target: ServiceTarget{ServiceName: "missing"}, Command: clusterTestCommand, Payload: payload}, func(reply ClusterEnvelope) error { replies = append(replies, reply); return nil })
 		if session == 0 {
 			if !errors.Is(err, runtime.ErrServiceNotFound) || len(replies) != 0 {
 				t.Fatalf("Send error=%v replies=%v", err, replies)
@@ -93,7 +93,7 @@ func TestLocalAdapterSendDoesNotReply(t *testing.T) {
 		t.Fatal(err)
 	}
 	writes := 0
-	err = adapter.handle(context.Background(), "node-a", ClusterEnvelope{Kind: FrameRequest, Target: ServiceTarget{ServiceID: id}, Command: clusterTestCommand, Payload: payload}, func(ClusterEnvelope) error {
+	err = adapter.handle(context.Background(), ClusterEnvelope{Kind: FrameRequest, Target: ServiceTarget{ServiceID: id}, Command: clusterTestCommand, Payload: payload}, func(ClusterEnvelope) error {
 		writes++
 		return nil
 	})
@@ -114,14 +114,14 @@ func TestLocalAdapterReportsWriteFailureAndCancellation(t *testing.T) {
 	}
 	request := ClusterEnvelope{Kind: FrameRequest, Session: 1, Target: ServiceTarget{ServiceID: id}, Command: clusterTestCommand, Payload: payload}
 	writeErr := errors.New("connection closed")
-	err = adapter.handle(context.Background(), "node-a", request, func(ClusterEnvelope) error { return writeErr })
+	err = adapter.handle(context.Background(), request, func(ClusterEnvelope) error { return writeErr })
 	if !errors.Is(err, ErrConnectionAgentWrite) || !errors.Is(err, writeErr) {
 		t.Fatalf("write error = %v", err)
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 	writes := 0
-	err = adapter.handle(ctx, "node-a", request, func(ClusterEnvelope) error { writes++; return nil })
+	err = adapter.handle(ctx, request, func(ClusterEnvelope) error { writes++; return nil })
 	if !errors.Is(err, context.Canceled) || writes != 0 {
 		t.Fatalf("cancelled request error=%v writes=%d", err, writes)
 	}

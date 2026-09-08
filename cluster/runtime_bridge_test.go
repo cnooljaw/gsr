@@ -43,7 +43,7 @@ func TestClusterCallBridgesToRuntime(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			link := newRoundTripLink(t, func(ctx context.Context, _ cluster.NodeID, request cluster.ClusterEnvelope) ([]byte, error) {
+			link := newRoundTripLink(t, func(ctx context.Context, request cluster.ClusterEnvelope) ([]byte, error) {
 				if request.Target.ServiceName != "room" || request.Command != roundTripCommand {
 					return nil, runtime.ErrUnknownCommand
 				}

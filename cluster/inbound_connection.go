@@ -12,17 +12,17 @@ var (
 	errInboundRequestPanicked   = errors.New("cluster: inbound request adapter panicked")
 )
 
-// inboundFailure 不持有业务载荷；来源节点由所属 inboundConnection 确定。
+// inboundFailure 不持有业务载荷；由所属连接区分来源，不依赖来源节点名。
 type inboundFailure struct {
 	session ClusterSessionID
 	err     error
 }
 
 // inboundConnection 管理单个入站连接的有界 Call 任务和非阻塞诊断。
-// 组装方先确认 node 身份，限制节点级连接总数，再调用一次 serve 并等待其返回。
+// 每条连接拥有独立 owner，不要求来源 NodeID 或身份交换。
+// 组装方限制节点级连接总数，再调用一次 serve 并等待其返回。
 type inboundConnection struct {
 	connection *streamConnection
-	node       NodeID
 	adapter    *localRequestAdapter
 	maxCalls   int
 	started    atomic.Bool
@@ -30,12 +30,12 @@ type inboundConnection struct {
 	dropped    atomic.Uint64
 }
 
-func newInboundConnection(connection *streamConnection, node NodeID, adapter *localRequestAdapter, maxCalls int) (*inboundConnection, error) {
-	if connection == nil || node == "" || adapter == nil || adapter.runtime == nil || adapter.codecs == nil || maxCalls <= 0 {
+func newInboundConnection(connection *streamConnection, adapter *localRequestAdapter, maxCalls int) (*inboundConnection, error) {
+	if connection == nil || adapter == nil || adapter.runtime == nil || adapter.codecs == nil || maxCalls <= 0 {
 		return nil, errInvalidInboundConnection
 	}
 	return &inboundConnection{
-		connection: connection, node: node, adapter: adapter, maxCalls: maxCalls,
+		connection: connection, adapter: adapter, maxCalls: maxCalls,
 		failures: make(chan inboundFailure, defaultFailureQueueCapacity),
 	}, nil
 }
@@ -103,7 +103,7 @@ func (owner *inboundConnection) handle(ctx context.Context, request ClusterEnvel
 			owner.report(request.Session, errInboundRequestPanicked)
 		}
 	}()
-	if err := owner.adapter.handle(ctx, owner.node, request, owner.connection.write); err != nil {
+	if err := owner.adapter.handle(ctx, request, owner.connection.write); err != nil {
 		owner.report(request.Session, err)
 		if errors.Is(err, ErrConnectionAgentWrite) {
 			owner.connection.close()

@@ -374,10 +374,7 @@ type ClusterEnvelope struct {
 }
 
 type Transport interface {
-	Register(NodeID, Receiver) error
-	Unregister(NodeID) error
-	Send(from NodeID, to NodeID, envelope ClusterEnvelope) error
-	Close() error
+	Send(to NodeID, envelope ClusterEnvelope) error
 }
 
 type OutboundSender interface {
@@ -404,11 +401,11 @@ func (client *ClusterClient) Send(node NodeID, target ServiceTarget, command run
 func (client *ClusterClient) Call(ctx context.Context, node NodeID, target ServiceTarget, command runtime.CommandID, args ...any) (any, error)
 
 func NewClusterCallRegistry() *ClusterCallRegistry
-func (registry *ClusterCallRegistry) Complete(from NodeID, envelope ClusterEnvelope) error
+func (registry *ClusterCallRegistry) Complete(remoteNode NodeID, envelope ClusterEnvelope) error
 func (registry *ClusterCallRegistry) Close() error
 func (registry *ClusterCallRegistry) PendingCount() int
 
-type RequestHandler func(context.Context, NodeID, ClusterEnvelope) ([]byte, error)
+type RequestHandler func(context.Context, ClusterEnvelope) ([]byte, error)
 type ResponseWriter func(ClusterEnvelope) error
 
 type ConnectionAgentConfig struct {
@@ -417,10 +414,9 @@ type ConnectionAgentConfig struct {
 }
 
 func NewConnectionAgent(config ConnectionAgentConfig) (*ConnectionAgent, error)
-func (agent *ConnectionAgent) Handle(ctx context.Context, from NodeID, request ClusterEnvelope) error
+func (agent *ConnectionAgent) Handle(ctx context.Context, request ClusterEnvelope) error
 
 type DeliveryFailure struct {
-	LocalNode  NodeID
 	RemoteNode NodeID
 	Kind       FrameKind
 	Session    ClusterSessionID
@@ -430,7 +426,6 @@ type DeliveryFailure struct {
 }
 
 type NodeSenderConfig struct {
-	LocalNode     NodeID
 	RemoteNode    NodeID
 	Transport     Transport
 	QueueCapacity int
@@ -491,7 +486,7 @@ Cluster 1 同时提供 source-bound `ClusterClient` 的单向 `Send`：
 - Source 只用于绑定调用者能力和后续本地 Call/PendingCall 归属，不是业务可覆盖的 Envelope 字段；ClusterEnvelope 不携带任意 Core Source，远端 adapter 按本地策略创建 Message Source。
 - `ClusterClient` 需要共享的 `ClusterCallRegistry` 和正数 `MaxCallWait` 配置；所有绑定同一 Cluster 的 client 复用这个 registry，当前 `Send` 仍只确认本地 admission。
 
-`DeliveryFailure` 只包含 LocalNode、RemoteNode、frame kind、Session、Target、Command 和底层 error，不复制或暴露业务 payload，也不用于自动重放。Cluster diagnostics owner 可以消费它写一条网络/I/O 诊断记录；如果消费能力不足，丢弃计数仍然可观测。它是 best-effort 基础设施诊断，不是不能丢失的业务审计日志。
+`DeliveryFailure` 只包含 RemoteNode、frame kind、Session、Target、Command 和底层 error，不复制或暴露业务 payload，也不用于自动重放。Cluster diagnostics owner 可以消费它写一条网络/I/O 诊断记录；如果消费能力不足，丢弃计数仍然可观测。它是 best-effort 基础设施诊断，不是不能丢失的业务审计日志。
 
 Cluster 2 的远程 Call 使用 Cluster-owned `ClusterCallRegistry` 和内部 `ClusterPendingCall` 表：
 
@@ -503,7 +498,7 @@ Cluster 2 的远程 Call 使用 Cluster-owned `ClusterCallRegistry` 和内部 `C
 
 `ConnectionAgent` 是每条入站连接的逻辑接收适配器：
 
-- `Handle` 只接受已解码的 `FrameRequest`，把 `from NodeID` 和 Request 快照交给注入的 `RequestHandler`；它不构造 Core Message，也不解析 Service 实现。
+- `Handle` 只接受已解码的 `FrameRequest`，把 Request 快照交给注入的 `RequestHandler`；它不构造 Core Message，也不解析 Service 实现。
 - `Session == 0` 的 Send 不写回 Response；接收节点的 Runtime/Adapter 负责记录自己的 Handler error。
 - `Session > 0` 的 Call 沿注入的 `ResponseWriter` 写回同一 Session、Target、Command 的 Response 或结构化 Error。Handler 的未知 error/panic 转成安全的 Runtime StatusError。
 - Agent 不拥有 socket、FrameCodec、连接 goroutine 或重连状态；这些由外层 Connection owner 管理。Writer 错误/ panic 返回基础设施错误，不伪装成远端业务结果。
@@ -547,7 +542,10 @@ Error frame 实际携带 `ErrorClass + ErrorCode + Message`；Message 只用于�
 - 每个远端 Node 只有一个 outbound NodeSender；并发建连请求合并到该 sender，不创建多个竞争 sender。
 - 每条 inbound socket 由独立 ConnectionAgent 读取和响应，不要求把两个方向合并成一条全双工连接。
 - outbound 通道断开后自动重连，但已经失败或结果不确定的业务请求不自动重放。
-- NodeID 握手在可信内网可关闭；启用时使用 NodeID 加共享 token 的简单校验。认证配置属于 Cluster，不进入 Core。
+- 出站 Send/Call 不要求本地 NodeID 或 open 监听；open 只负责接受新入站连接，节点配置只负责目标地址解析。不强制交换 NodeID；Call 回复沿原连接返回，不是反向业务调用。
+- 删除 `LocalNode` 与入站 `from NodeID`：出站只按目标路由，入站只按连接管理。`Complete(remoteNode, response)` 中的节点来自出站连接绑定的目标，用于共享 PendingCall 匹配，不是入站来源身份。双方相互主动调用使用各自的出站连接，回复各沿原连接返回。
+- `Transport` 只要求 `Send(to, envelope)` 能力；内存替身的 `Register/Unregister` 与具体实现的 `Close` 不属于发送器的依赖接口。生命周期仍由外层 owner 负责。内存往返测试的 writer 直接绑定调用方 completion，不把回复模拟成反向 Send 或要求调用方注册。
+- 认证与可寻址 NodeID 分离，可信内网可关闭认证；具体认证协议另行裁决，不要求调用方注册节点或监听。详见 [出站调用、监听与节点身份](RFC-CLUSTER-CONNECTION-IDENTITY.md)。生产 open/连接管理尚未实现。
 - 对同一 Node 的“重复连接胜负”不单独建模：outbound 由唯一 NodeSender 保证唯一；inbound agent 按连接独立存在，响应关联保持在原连接内。
 
 ## 7. ServiceContext

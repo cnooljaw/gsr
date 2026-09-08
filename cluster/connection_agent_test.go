@@ -13,10 +13,7 @@ func TestConnectionAgentDispatchesCallResponse(t *testing.T) {
 	requestPayload := []byte("request")
 	written := make(chan ClusterEnvelope, 1)
 	agent, err := NewConnectionAgent(ConnectionAgentConfig{
-		Handler: func(_ context.Context, from NodeID, request ClusterEnvelope) ([]byte, error) {
-			if from != "node-a" {
-				t.Errorf("handler from = %q, want node-a", from)
-			}
+		Handler: func(_ context.Context, request ClusterEnvelope) ([]byte, error) {
 			if request.Session == 0 {
 				t.Error("handler request session = 0, want non-zero")
 			}
@@ -38,7 +35,7 @@ func TestConnectionAgentDispatchesCallResponse(t *testing.T) {
 		Command: clusterTestCommand,
 		Payload: requestPayload,
 	}
-	if err := agent.Handle(context.Background(), "node-a", request); err != nil {
+	if err := agent.Handle(context.Background(), request); err != nil {
 		t.Fatalf("Handle() error = %v, want nil", err)
 	}
 	if string(request.Payload) != "request" {
@@ -61,7 +58,7 @@ func TestConnectionAgentDispatchesStructuredError(t *testing.T) {
 	wantErr := runtime.NewStatusError(runtime.ErrorClassDomain, runtime.ErrorCode("room.full"), "room is full")
 	written := make(chan ClusterEnvelope, 1)
 	agent, err := NewConnectionAgent(ConnectionAgentConfig{
-		Handler: func(context.Context, NodeID, ClusterEnvelope) ([]byte, error) {
+		Handler: func(context.Context, ClusterEnvelope) ([]byte, error) {
 			return nil, wantErr
 		},
 		Write: func(response ClusterEnvelope) error {
@@ -78,7 +75,7 @@ func TestConnectionAgentDispatchesStructuredError(t *testing.T) {
 		Target:  ServiceTarget{ServiceName: "room"},
 		Command: clusterTestCommand,
 	}
-	if err := agent.Handle(context.Background(), "node-a", request); err != nil {
+	if err := agent.Handle(context.Background(), request); err != nil {
 		t.Fatalf("Handle() error = %v, want nil", err)
 	}
 	response := <-written
@@ -97,7 +94,7 @@ func TestConnectionAgentDispatchesStructuredError(t *testing.T) {
 func TestConnectionAgentSuppressesSendError(t *testing.T) {
 	writeCount := 0
 	agent, err := NewConnectionAgent(ConnectionAgentConfig{
-		Handler: func(context.Context, NodeID, ClusterEnvelope) ([]byte, error) {
+		Handler: func(context.Context, ClusterEnvelope) ([]byte, error) {
 			return nil, runtime.ErrHandlerFailed
 		},
 		Write: func(ClusterEnvelope) error {
@@ -108,7 +105,7 @@ func TestConnectionAgentSuppressesSendError(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewConnectionAgent() error = %v, want nil", err)
 	}
-	if err := agent.Handle(context.Background(), "node-a", ClusterEnvelope{
+	if err := agent.Handle(context.Background(), ClusterEnvelope{
 		Kind:    FrameRequest,
 		Target:  ServiceTarget{ServiceID: 7},
 		Command: clusterTestCommand,
@@ -124,7 +121,7 @@ func TestConnectionAgentSuppressesSendError(t *testing.T) {
 func TestConnectionAgentRecoversHandlerPanic(t *testing.T) {
 	written := make(chan ClusterEnvelope, 1)
 	agent, err := NewConnectionAgent(ConnectionAgentConfig{
-		Handler: func(context.Context, NodeID, ClusterEnvelope) ([]byte, error) {
+		Handler: func(context.Context, ClusterEnvelope) ([]byte, error) {
 			panic("secret handler detail")
 		},
 		Write: func(response ClusterEnvelope) error {
@@ -141,7 +138,7 @@ func TestConnectionAgentRecoversHandlerPanic(t *testing.T) {
 		Target:  ServiceTarget{ServiceID: 7},
 		Command: clusterTestCommand,
 	}
-	if err := agent.Handle(context.Background(), "node-a", request); err != nil {
+	if err := agent.Handle(context.Background(), request); err != nil {
 		t.Fatalf("Handle() error = %v, want nil", err)
 	}
 	response := <-written
@@ -157,9 +154,9 @@ func TestConnectionAgentRecoversHandlerPanic(t *testing.T) {
 	}
 }
 
-// 验证 Agent 在构造和请求边界拒绝缺失依赖、空来源、错误帧和 nil context。
+// 验证 Agent 在构造和请求边界拒绝缺失依赖、错误帧和 nil context。
 func TestConnectionAgentRejectsInvalidConfigAndRequest(t *testing.T) {
-	validHandler := func(context.Context, NodeID, ClusterEnvelope) ([]byte, error) { return nil, nil }
+	validHandler := func(context.Context, ClusterEnvelope) ([]byte, error) { return nil, nil }
 	validWriter := func(ClusterEnvelope) error { return nil }
 	if _, err := NewConnectionAgent(ConnectionAgentConfig{Write: validWriter}); !errors.Is(err, ErrInvalidConnectionAgentConfig) {
 		t.Fatalf("missing Handler error = %v, want ErrInvalidConnectionAgentConfig", err)
@@ -175,23 +172,21 @@ func TestConnectionAgentRejectsInvalidConfigAndRequest(t *testing.T) {
 	cases := []struct {
 		name string
 		ctx  context.Context
-		from NodeID
 		data ClusterEnvelope
 	}{
-		{name: "nil context", from: "node-a", data: validRequest},
-		{name: "empty source", ctx: context.Background(), data: validRequest},
-		{name: "wrong kind", ctx: context.Background(), from: "node-a", data: ClusterEnvelope{Kind: FrameResponse, Session: 1, Target: validRequest.Target, Command: validRequest.Command}},
-		{name: "invalid target", ctx: context.Background(), from: "node-a", data: ClusterEnvelope{Kind: FrameRequest, Command: validRequest.Command}},
+		{name: "nil context", data: validRequest},
+		{name: "wrong kind", ctx: context.Background(), data: ClusterEnvelope{Kind: FrameResponse, Session: 1, Target: validRequest.Target, Command: validRequest.Command}},
+		{name: "invalid target", ctx: context.Background(), data: ClusterEnvelope{Kind: FrameRequest, Command: validRequest.Command}},
 	}
 	for _, testCase := range cases {
 		t.Run(testCase.name, func(t *testing.T) {
-			if err := agent.Handle(testCase.ctx, testCase.from, testCase.data); !errors.Is(err, ErrInvalidConnectionAgentRequest) {
+			if err := agent.Handle(testCase.ctx, testCase.data); !errors.Is(err, ErrInvalidConnectionAgentRequest) {
 				t.Fatalf("Handle() error = %v, want ErrInvalidConnectionAgentRequest", err)
 			}
 		})
 	}
 	var nilAgent *ConnectionAgent
-	if err := nilAgent.Handle(context.Background(), "node-a", validRequest); !errors.Is(err, ErrInvalidConnectionAgentConfig) {
+	if err := nilAgent.Handle(context.Background(), validRequest); !errors.Is(err, ErrInvalidConnectionAgentConfig) {
 		t.Fatalf("nil agent Handle() error = %v, want ErrInvalidConnectionAgentConfig", err)
 	}
 }
@@ -200,7 +195,7 @@ func TestConnectionAgentRejectsInvalidConfigAndRequest(t *testing.T) {
 func TestConnectionAgentReportsWriterFailure(t *testing.T) {
 	writeErr := errors.New("write failed")
 	agent, err := NewConnectionAgent(ConnectionAgentConfig{
-		Handler: func(context.Context, NodeID, ClusterEnvelope) ([]byte, error) {
+		Handler: func(context.Context, ClusterEnvelope) ([]byte, error) {
 			return []byte("response"), nil
 		},
 		Write: func(ClusterEnvelope) error {
@@ -211,12 +206,12 @@ func TestConnectionAgentReportsWriterFailure(t *testing.T) {
 		t.Fatalf("NewConnectionAgent() error = %v, want nil", err)
 	}
 	request := ClusterEnvelope{Kind: FrameRequest, Session: 12, Target: ServiceTarget{ServiceID: 7}, Command: clusterTestCommand}
-	if err := agent.Handle(context.Background(), "node-a", request); !errors.Is(err, ErrConnectionAgentWrite) || !errors.Is(err, writeErr) {
+	if err := agent.Handle(context.Background(), request); !errors.Is(err, ErrConnectionAgentWrite) || !errors.Is(err, writeErr) {
 		t.Fatalf("Handle() error = %v, want ErrConnectionAgentWrite and writeErr", err)
 	}
 
 	agent, err = NewConnectionAgent(ConnectionAgentConfig{
-		Handler: func(context.Context, NodeID, ClusterEnvelope) ([]byte, error) {
+		Handler: func(context.Context, ClusterEnvelope) ([]byte, error) {
 			return []byte("response"), nil
 		},
 		Write: func(ClusterEnvelope) error {
@@ -226,7 +221,7 @@ func TestConnectionAgentReportsWriterFailure(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewConnectionAgent(panic writer) error = %v, want nil", err)
 	}
-	if err := agent.Handle(context.Background(), "node-a", request); !errors.Is(err, ErrConnectionAgentWrite) {
+	if err := agent.Handle(context.Background(), request); !errors.Is(err, ErrConnectionAgentWrite) {
 		t.Fatalf("Handle(panic writer) error = %v, want ErrConnectionAgentWrite", err)
 	}
 }

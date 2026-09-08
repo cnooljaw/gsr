@@ -19,11 +19,11 @@ type localRequestAdapter struct {
 // handle 在调用 Service 之前完成协议校验，坏载荷只返回本地诊断错误，不回包。
 // Call 的执行错误由 ConnectionAgent 回包；Send 的本地接纳错误返回接收侧记录，
 // 已接纳 Send 的 Handler 错误仍由目标 Runtime 记录。
-func (adapter *localRequestAdapter) handle(ctx context.Context, from NodeID, request ClusterEnvelope, write ResponseWriter) error {
+func (adapter *localRequestAdapter) handle(ctx context.Context, request ClusterEnvelope, write ResponseWriter) error {
 	if adapter == nil || adapter.runtime == nil || adapter.codecs == nil || write == nil {
 		return ErrInvalidConnectionAgentConfig
 	}
-	if ctx == nil || from == "" || request.Kind != FrameRequest {
+	if ctx == nil || request.Kind != FrameRequest {
 		return ErrInvalidConnectionAgentRequest
 	}
 	if err := request.Validate(); err != nil {
@@ -56,7 +56,7 @@ func (adapter *localRequestAdapter) handle(ctx context.Context, from NodeID, req
 	}
 	agent := ConnectionAgent{
 		write: write,
-		handler: func(callCtx context.Context, _ NodeID, envelope ClusterEnvelope) ([]byte, error) {
+		handler: func(callCtx context.Context, envelope ClusterEnvelope) ([]byte, error) {
 			if localErr != nil {
 				return nil, localErr
 			}
@@ -73,7 +73,7 @@ func (adapter *localRequestAdapter) handle(ctx context.Context, from NodeID, req
 			return payload, err
 		},
 	}
-	if err := agent.Handle(ctx, from, request); err != nil {
+	if err := agent.Handle(ctx, request); err != nil {
 		return errors.Join(err, encodingErr)
 	}
 	if request.Session == 0 {

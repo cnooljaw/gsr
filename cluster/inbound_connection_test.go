@@ -196,11 +196,11 @@ func TestInboundConnectionRejectsInvalidLifecycle(t *testing.T) {
 	adapter, _, _ := newLocalAdapterTest(t)
 	connection, _, _ := newTestStreamConnection(t)
 	for _, limit := range []int{0, -1} {
-		if _, err := newInboundConnection(connection, "node-a", adapter, limit); !errors.Is(err, errInvalidInboundConnection) {
+		if _, err := newInboundConnection(connection, adapter, limit); !errors.Is(err, errInvalidInboundConnection) {
 			t.Fatalf("invalid limit = %v", err)
 		}
 	}
-	owner, err := newInboundConnection(connection, "node-a", adapter, 1)
+	owner, err := newInboundConnection(connection, adapter, 1)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -220,7 +220,7 @@ func TestInboundConnectionRejectsInvalidLifecycle(t *testing.T) {
 func startInboundTest(t *testing.T, adapter *localRequestAdapter, limit int) (*inboundConnection, net.Conn, *FrameCodec, context.CancelFunc, <-chan struct{}) {
 	t.Helper()
 	connection, peer, codec := newTestStreamConnection(t)
-	owner, err := newInboundConnection(connection, "node-a", adapter, limit)
+	owner, err := newInboundConnection(connection, adapter, limit)
 	if err != nil {
 		t.Fatal(err)
 	}

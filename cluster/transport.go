@@ -10,15 +10,14 @@ const defaultMaxPayload = 4 << 20
 
 // Receiver 处理投递给已注册节点的消息封包。
 // 封包是由 Transport 持有的值快照，接收器可以修改它。
-type Receiver func(from NodeID, envelope ClusterEnvelope)
+type Receiver func(envelope ClusterEnvelope)
 
 // Transport 在节点间传递 ClusterEnvelope 值，
 // 不暴露 Core Service、Mailbox、Session 或连接实现细节。
+// 它只要求主动发送能力，to 必须非空；不要求注册接收器或开放监听。
+// 具体实现的生命周期由外层 owner 管理，不由 NodeSender 关闭共享 Transport。
 type Transport interface {
-	Register(NodeID, Receiver) error
-	Unregister(NodeID) error
-	Send(from NodeID, to NodeID, envelope ClusterEnvelope) error
-	Close() error
+	Send(to NodeID, envelope ClusterEnvelope) error
 }
 
 // InMemoryTransportConfig 配置确定性的进程内传输。
@@ -50,7 +49,7 @@ var (
 	ErrTransportClosed = errors.New("cluster: transport is closed")
 )
 
-// InMemoryTransport 在已注册节点间同步投递复制后的消息封包。
+// InMemoryTransport 只按目标同步投递复制后的消息封包，不持有调用方身份。
 // 它是用于确定性测试的替换边界，不是生产网络传输实现。
 type InMemoryTransport struct {
 	mu         sync.RWMutex
@@ -71,7 +70,7 @@ func NewInMemoryTransport(config InMemoryTransportConfig) (*InMemoryTransport, e
 	}, nil
 }
 
-// Register 为本地 NodeID 注册接收器。
+// Register 为测试目标开放接收能力；主动 Send 不要求调用方先注册。
 func (transport *InMemoryTransport) Register(node NodeID, receiver Receiver) error {
 	if transport == nil || node == "" || receiver == nil {
 		return ErrInvalidNode
@@ -103,11 +102,11 @@ func (transport *InMemoryTransport) Unregister(node NodeID) error {
 }
 
 // Send 校验消息封包，并将其副本同步投递给目标节点。
-func (transport *InMemoryTransport) Send(from NodeID, to NodeID, envelope ClusterEnvelope) error {
+func (transport *InMemoryTransport) Send(to NodeID, envelope ClusterEnvelope) error {
 	if transport == nil {
 		return ErrTransportClosed
 	}
-	if from == "" || to == "" {
+	if to == "" {
 		return ErrInvalidNode
 	}
 	if err := envelope.Validate(); err != nil {
@@ -127,7 +126,7 @@ func (transport *InMemoryTransport) Send(from NodeID, to NodeID, envelope Cluste
 	if !exists {
 		return ErrNodeNotFound
 	}
-	receiver(from, envelope.Clone())
+	receiver(envelope.Clone())
 	return nil
 }
 

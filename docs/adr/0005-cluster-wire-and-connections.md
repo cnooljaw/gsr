@@ -27,7 +27,9 @@ GSR Cluster 需要保持 Skynet 风格的简洁调用面，同时明确 Go 的�
 - 同一 Cluster 使用一个共享 `ClusterCallRegistry` 管理全部 source-bound `ClusterClient` 的 Session 分配和 completion；每个 client 只绑定自己的 Source。`Call` 的等待必须受正数 `MaxCallWait` 约束，调用方 context 只能取消或缩短等待。
 - 每条入站连接的 `ConnectionAgent` 只接收已解码的 Request，调用注入的本地 dispatch 并通过该连接的 writer 返回 Call Response/Error；Session 为零的 Send 不回包。Agent 不拥有 socket、FrameCodec、goroutine 或重连状态，Handler 的 panic/未分类 error 转换为安全 StatusError，writer 故障保留为基础设施错误。
 - 当前 NodeSender 只编排注入的 Transport 调用；TCP stream、并发建连合并和自动重连属于后续 Connection/Transport 子切片，在此基础行为上扩展。
-- NodeID/token 握手可配置；可信内网可以关闭，开启后使用 NodeID 加共享 token 的简单校验。
+- 出站调用与监听身份分离：仅出站进程不要求本地 NodeID 或 open；目标 NodeID 用于地址解析，open 用于接受新入站连接。不强制交换 NodeID，Call 回复沿原连接返回。删除出站 LocalNode 与入站来源 NodeID，入站按各自连接 owner 管理；目标及响应匹配节点仍必须非空。A 主动调用 B 与 B 主动调用 A 使用各自的出站连接，各自的回复沿原连接返回，不进行双向连接仲裁。
+- 发送器仅依赖 `Transport.Send(to, envelope)`；注册监听能力与主动发送分离。内存往返替身通过绑定的 writer 完成响应，不通过反向目标路由模拟回复。
+- 认证与可寻址 NodeID 分开，可信内网可关闭认证；具体认证协议另行裁决，不要求调用方先注册节点或监听。此裁决取代原先 NodeID 加共享 token 捆绑的握手描述，见 [连接身份方案](../RFC-CLUSTER-CONNECTION-IDENTITY.md)。
 - 远端目标使用 NodeID 与 ServiceName/Discovery 或当前远端 Runtime 的临时 ServiceID 分层表达；不引入 Epoch、Lease 或 Generation。Runtime/Cluster 只负责路由、投递和连接恢复，不判断业务资源的唯一所有权、一致性或过期。
 
 ## Consequences

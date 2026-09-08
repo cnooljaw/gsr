@@ -9,6 +9,7 @@ import (
 )
 
 // NodeID 标识目标远端 Runtime 节点，不编码进 Core ServiceID。
+// 主动调用无需本地 NodeID；目标路由必须非空，入站不传递来源 NodeID。
 type NodeID string
 
 // ServiceName 是稳定的 Service 逻辑名称，由 Core 之外的组件解析。
@@ -53,7 +54,7 @@ type ServiceTarget struct {
 
 // ClusterEnvelope 是 Cluster 与 Transport 之间的值边界。
 //
-// 来源与目标 NodeID 由 Transport 提供。
+// 目标 NodeID 由出站路由提供，回复沿原连接返回，不传递来源 NodeID。
 // 消息封包不携带 Core Message 指针、NodeID 或任意指定的来源身份。
 type ClusterEnvelope struct {
 	Kind    FrameKind

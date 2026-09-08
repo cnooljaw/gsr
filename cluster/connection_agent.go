@@ -10,7 +10,8 @@ import (
 
 // RequestHandler 将 Cluster 请求适配到本地 Runtime/Service 分派路径。
 // 返回的字节必须已通过该命令的响应编解码器编码。
-type RequestHandler func(context.Context, NodeID, ClusterEnvelope) ([]byte, error)
+// 不传递来源节点；回复由所属连接的 writer 负责。
+type RequestHandler func(context.Context, ClusterEnvelope) ([]byte, error)
 
 // ResponseWriter 通过 agent 所属的入站连接写回一个响应。
 // TCP 连接管理组件可以将它绑定到自身的帧写入函数。
@@ -35,7 +36,7 @@ var (
 var errConnectionAgentHandlerPanicked = errors.New("cluster: connection agent handler panicked")
 
 // ConnectionAgent 处理单条入站连接收到的逻辑请求。
-// 远端 NodeID 元数据保留在 Cluster 边界，agent 自身不构造或修改 Core Message。
+// 它不持有来源 NodeID，也不构造或修改 Core Message。
 type ConnectionAgent struct {
 	handler RequestHandler
 	write   ResponseWriter
@@ -55,15 +56,12 @@ func NewConnectionAgent(config ConnectionAgentConfig) (*ConnectionAgent, error) 
 // Handle 校验入站 Request 并通过本地适配器分派。
 // Send（Session == 0）不写回响应；Call 使用原始 Session、Target 和 Command
 // 写回一个 Response 或结构化 Error。
-func (agent *ConnectionAgent) Handle(ctx context.Context, from NodeID, request ClusterEnvelope) error {
+func (agent *ConnectionAgent) Handle(ctx context.Context, request ClusterEnvelope) error {
 	if agent == nil || agent.handler == nil || agent.write == nil {
 		return ErrInvalidConnectionAgentConfig
 	}
 	if ctx == nil {
 		return fmt.Errorf("%w: context is nil", ErrInvalidConnectionAgentRequest)
-	}
-	if from == "" {
-		return fmt.Errorf("%w: source node is empty", ErrInvalidConnectionAgentRequest)
 	}
 	if request.Kind != FrameRequest {
 		return fmt.Errorf("%w: frame kind %s is not a request", ErrInvalidConnectionAgentRequest, request.Kind)
@@ -75,7 +73,7 @@ func (agent *ConnectionAgent) Handle(ctx context.Context, from NodeID, request C
 		return err
 	}
 
-	payload, handlerErr := invokeConnectionAgentHandler(agent.handler, ctx, from, request.Clone())
+	payload, handlerErr := invokeConnectionAgentHandler(agent.handler, ctx, request.Clone())
 	if request.Session == 0 {
 		// Send 没有响应路径，由接收节点的本地 Runtime/适配器记录 Handler 错误。
 		return nil
@@ -101,14 +99,14 @@ func (agent *ConnectionAgent) Handle(ctx context.Context, from NodeID, request C
 	return nil
 }
 
-func invokeConnectionAgentHandler(handler RequestHandler, ctx context.Context, from NodeID, request ClusterEnvelope) (payload []byte, err error) {
+func invokeConnectionAgentHandler(handler RequestHandler, ctx context.Context, request ClusterEnvelope) (payload []byte, err error) {
 	defer func() {
 		if recovered := recover(); recovered != nil {
 			err = errConnectionAgentHandlerPanicked
 			payload = nil
 		}
 	}()
-	return handler(ctx, from, request)
+	return handler(ctx, request)
 }
 
 func writeConnectionAgentResponse(writer ResponseWriter, response ClusterEnvelope) (err error) {

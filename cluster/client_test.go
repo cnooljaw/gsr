@@ -24,13 +24,13 @@ func TestClusterClientSendsEncodedRequest(t *testing.T) {
 		t.Fatalf("NewInMemoryTransport() error = %v, want nil", err)
 	}
 	received := make(chan ClusterEnvelope, 1)
-	if err := transport.Register("node-b", func(_ NodeID, envelope ClusterEnvelope) {
+	if err := transport.Register("node-b", func(envelope ClusterEnvelope) {
 		received <- envelope
 	}); err != nil {
 		t.Fatalf("Register() error = %v, want nil", err)
 	}
 	sender, err := NewNodeSender(NodeSenderConfig{
-		LocalNode:  "node-a",
+
 		RemoteNode: "node-b",
 		Transport:  transport,
 	})
@@ -186,7 +186,7 @@ func TestClusterClientCallReturnsDecodedResponse(t *testing.T) {
 		t.Fatalf("Encode(response) error = %v, want nil", err)
 	}
 	received := make(chan ClusterEnvelope, 1)
-	client, transport, sender := newClientCallTestClient(t, calls, func(_ NodeID, envelope ClusterEnvelope) {
+	client, transport, sender := newClientCallTestClient(t, calls, func(envelope ClusterEnvelope) {
 		received <- envelope
 		if envelope.Session == 0 {
 			t.Errorf("request session = 0, want non-zero")
@@ -228,7 +228,7 @@ func TestClusterClientCallReturnsDecodedResponse(t *testing.T) {
 func TestClusterClientCallReturnsRemoteError(t *testing.T) {
 	calls := NewClusterCallRegistry()
 	wantErr := runtime.NewStatusError(runtime.ErrorClassDomain, runtime.ErrorCode("room.full"), "room is full")
-	client, transport, sender := newClientCallTestClient(t, calls, func(_ NodeID, envelope ClusterEnvelope) {
+	client, transport, sender := newClientCallTestClient(t, calls, func(envelope ClusterEnvelope) {
 		if err := calls.Complete("node-b", ClusterEnvelope{
 			Kind:    FrameError,
 			Session: envelope.Session,
@@ -256,7 +256,7 @@ func TestClusterClientCallReturnsRemoteError(t *testing.T) {
 // 验证 Runtime 最大等待时间会结束远程 Call，并在超时后拒绝迟到 Response。
 func TestClusterClientCallHonorsMaxWait(t *testing.T) {
 	calls := NewClusterCallRegistry()
-	client, transport, sender := newClientCallTestClient(t, calls, func(NodeID, ClusterEnvelope) {}, 25*time.Millisecond)
+	client, transport, sender := newClientCallTestClient(t, calls, func(ClusterEnvelope) {}, 25*time.Millisecond)
 	defer closeCallTestResources(t, transport, sender)
 
 	value, err := client.Call(context.Background(), "node-b", ServiceTarget{ServiceID: 7}, clientTestCommand)
@@ -277,7 +277,7 @@ func TestClusterClientCallHonorsMaxWait(t *testing.T) {
 // 验证调用方更早的 deadline 优先于 MaxCallWait，并不伪装成 Runtime 最大等待超时。
 func TestClusterClientCallHonorsEarlierDeadline(t *testing.T) {
 	calls := NewClusterCallRegistry()
-	client, transport, sender := newClientCallTestClient(t, calls, func(NodeID, ClusterEnvelope) {}, time.Second)
+	client, transport, sender := newClientCallTestClient(t, calls, func(ClusterEnvelope) {}, time.Second)
 	defer closeCallTestResources(t, transport, sender)
 
 	callContext, cancel := context.WithTimeout(context.Background(), 25*time.Millisecond)
@@ -301,7 +301,7 @@ func TestClusterClientCallHonorsEarlierDeadline(t *testing.T) {
 func TestClusterClientCallHonorsCallerCancellation(t *testing.T) {
 	calls := NewClusterCallRegistry()
 	received := make(chan struct{}, 1)
-	client, transport, sender := newClientCallTestClient(t, calls, func(NodeID, ClusterEnvelope) {
+	client, transport, sender := newClientCallTestClient(t, calls, func(ClusterEnvelope) {
 		received <- struct{}{}
 	}, time.Second)
 	defer closeCallTestResources(t, transport, sender)
@@ -343,7 +343,7 @@ func TestClusterClientCallHonorsCallerCancellation(t *testing.T) {
 func TestClusterCallRegistryCloseCompletesClientCall(t *testing.T) {
 	calls := NewClusterCallRegistry()
 	received := make(chan ClusterEnvelope, 1)
-	client, transport, sender := newClientCallTestClient(t, calls, func(_ NodeID, envelope ClusterEnvelope) {
+	client, transport, sender := newClientCallTestClient(t, calls, func(envelope ClusterEnvelope) {
 		received <- envelope
 	}, time.Second)
 	defer closeCallTestResources(t, transport, sender)
@@ -389,7 +389,7 @@ func TestClusterCallRegistryCloseCompletesClientCall(t *testing.T) {
 // 验证 nil context 在建立 Cluster PendingCall 前被拒绝。
 func TestClusterClientCallRejectsNilContext(t *testing.T) {
 	calls := NewClusterCallRegistry()
-	client, transport, sender := newClientCallTestClient(t, calls, func(NodeID, ClusterEnvelope) {
+	client, transport, sender := newClientCallTestClient(t, calls, func(ClusterEnvelope) {
 		t.Error("nil-context Call unexpectedly reached remote receiver")
 	}, time.Second)
 	defer closeCallTestResources(t, transport, sender)
@@ -433,7 +433,7 @@ func newClientCallTestClient(t *testing.T, calls *ClusterCallRegistry, receiver 
 		t.Fatalf("Register() error = %v, want nil", err)
 	}
 	sender, err := NewNodeSender(NodeSenderConfig{
-		LocalNode:  "node-a",
+
 		RemoteNode: "node-b",
 		Transport:  transport,
 	})

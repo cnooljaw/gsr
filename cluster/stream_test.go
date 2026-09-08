@@ -155,7 +155,7 @@ func TestStreamConnectionAgentRoundTrip(t *testing.T) {
 		}
 	}
 	agent, err := NewConnectionAgent(ConnectionAgentConfig{
-		Handler: func(_ context.Context, _ NodeID, request ClusterEnvelope) ([]byte, error) {
+		Handler: func(_ context.Context, request ClusterEnvelope) ([]byte, error) {
 			return request.Payload, nil
 		},
 		Write: func(response ClusterEnvelope) error {
@@ -169,7 +169,7 @@ func TestStreamConnectionAgentRoundTrip(t *testing.T) {
 	go func() {
 		request, err := codec.readFrame(server)
 		if err == nil {
-			err = agent.Handle(context.Background(), "node-a", request)
+			err = agent.Handle(context.Background(), request)
 		}
 		done <- err
 	}()

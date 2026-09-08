@@ -4,7 +4,7 @@
 
 - **ServiceID**：`uint64` 形式的 Runtime 局部 Service 地址，只在当前 Runtime 生命周期内有效，不包含 Node、Epoch 或 Generation，也不是可持久化业务身份。
 - **ServiceName**：由 Core 外层 Registry/Discovery 管理的稳定逻辑名称，可解析为当前 ServiceID。
-- **NodeID**：Cluster 用于选择远端节点和连接的路由名称，不属于 Core ServiceID。
+- **NodeID**：Cluster 用于选择远端节点和连接的路由名称，不属于 Core ServiceID。仅出站调用不要求本地 NodeID 或监听；入站不持有来源 NodeID，Call 回复沿原连接返回。主动 Send/Call 与 open 接受新调用是独立能力，NodeID 不是认证凭据。
 - **SessionID**：`uint64` 形式的 Core 本地请求关联号；零表示 Send、不需要 Reply，非零表示 Call、等待一次 Reply。它只负责关联，在当前 Runtime 内单调分配且不回绕复用。
 - **TimerID**：`uint64` 形式的 Runtime 局部 Timer 标识，只在当前 Runtime 生命周期内有效；零值无效，已发放的 ID 不回绕复用。
 - **CommandID**：`uint32` 形式的业务命令标识，与协议字段保持同宽以兼容现有命令值；由业务/协议包维护静态常量或生成代码。Runtime 不分配、不回收，也不从它推断 Service 能力。一个 CommandID 对应的 typed Handler 参数数量和类型固定。
