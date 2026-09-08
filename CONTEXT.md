@@ -40,7 +40,7 @@
 - **Revision**：领域状态版本，用于拒绝同一 Service 实例中的迟到异步结果；它不同于 ServiceID，也不属于 Core Service 身份。
 - **业务语义边界**：Runtime/Cluster 只负责消息投递、路由和连接恢复，不判断业务资源的唯一所有权、一致性或过期。fencing、幂等、RequestID、补偿和业务过期规则由拥有该操作语义的业务或外层模块负责；ServiceID 不引入 Epoch、Lease 或 Generation。
 - **Admission**：Mailbox 或出站队列对消息的本地接受动作。Send 返回 nil 只说明 admission 成功，不说明目标 Handler 已执行或业务操作已成功。
-- **NodeSender**：Cluster 为一个远端 Node 唯一管理的 outbound 发送者。当前基础实现用固定容量队列和单一 worker 完成本地 admission 与顺序投递；队列满立即失败。admission 后的 Transport error/panic 和关闭丢弃进入有界、非阻塞的 `Failures()` 诊断 stream，慢消费者不会阻塞 sender，溢出由 `DroppedFailureCount()` 计数。TCP 连接合并与自动重连仍由后续 Connection/Transport 子切片加入，不自动重放结果不确定的业务请求。
+- **NodeSender**：Cluster 为一个远端 Node 唯一管理的 outbound 发送者。当前基础实现用固定容量队列和单一 worker 完成本地 admission 与顺序投递；队列满立即失败。admission 后的 Transport error/panic 和关闭丢弃进入有界、非阻塞的 `Failures()` 诊断 stream，慢消费者不会阻塞 sender，溢出由 `DroppedFailureCount()` 计数。内部单目标连接 owner 已实现按需建连与恢复：空闲时不拨号，下一请求至多触发一次有限 Dial，不自动重放结果不确定的请求；生产目标路由与公开 TCP 组装仍待实现。
 - **DeliveryFailure**：NodeSender 在 Envelope 已 admission 后发布的一次基础设施失败，包含本地/远端节点及路由元数据和底层 error，不携带业务 payload、不触发业务 callback，也不表示远端 Handler 的业务结果。
 - **远程 Send 所有权**：A 节点只负责本地 admission 和自身的传输诊断，B 节点负责收到消息后的 Handler 处理与错误记录；Send 不把 B 的 Handler error 返回 A。需要远端结果时使用 Call。
 - **ConnectionAgent**：Cluster 为一条 inbound socket 创建的接收适配器。当前只处理已解码的逻辑 Request：调用窄的本地 dispatch、为 Call 沿所属连接写回 Response/Error，并把 socket/frame 读写生命周期留给外层连接 owner。

@@ -56,6 +56,33 @@ func (owner *connectionCalls) complete(response ClusterEnvelope) error {
 	return owner.registry.completeOwned(owner.node, response, owner)
 }
 
+// pending 在拨号前检查未绑定等待，不改变连接归属；实际写入仍须再次 bind。
+func (owner *connectionCalls) pending(request ClusterEnvelope) (bool, error) {
+	if request.Kind != FrameRequest {
+		return false, ErrInvalidEnvelope
+	}
+	if err := request.Validate(); err != nil {
+		return false, err
+	}
+	registry := owner.registry
+	registry.mu.Lock()
+	defer registry.mu.Unlock()
+	if registry.closed {
+		return false, ErrClusterCallClosed
+	}
+	if request.Session == 0 {
+		return true, nil
+	}
+	call := registry.pending[request.Session]
+	if call == nil {
+		return false, nil
+	}
+	if call.owner != nil || call.node != owner.node || call.target != request.Target || call.command != request.Command {
+		return false, ErrClusterResponseMismatch
+	}
+	return true, nil
+}
+
 // reject 只结束当前尚未绑定的请求，不把一次发送接纳失败扩散到同节点其它 Call。
 func (owner *connectionCalls) reject(request ClusterEnvelope, cause error) {
 	registry := owner.registry

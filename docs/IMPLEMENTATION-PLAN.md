@@ -315,7 +315,7 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 
 ### Cluster 3：TCP 与连接 owner
 
-- 状态：逻辑 ConnectionAgent、内部单连接 I/O 封装、出站响应读循环、有界并发入站请求循环和单 listener 入站连接 owner 已完成；生产公开组装 API、出站建连与重连管理尚未实现。
+- 状态：逻辑 ConnectionAgent、内部单连接 I/O 封装、出站响应读循环、有界并发入站请求循环、单 listener 入站连接 owner 和单目标按需出站连接 owner 已完成；生产公开组装 API 与目标路由管理尚未实现。
 - 已裁决并实现基础设施 Runtime.Call：Source 固定为零，经普通 Mailbox 执行，复用有限等待与停止收尾；ServiceContext.Call 仍绑定真实 Service。取舍见 [Cluster 入站 Call 方案](RFC-CLUSTER-INBOUND-CALL.md)。
 - 已用 ConnectionAgent 测试适配器接通真实 Runtime，覆盖成功/领域错误回复、零 Source，以及本地 Session 与 ClusterSession 分离；网络入站并发管理和正式适配器组装仍待接入。
 - 已实现内部 localRequestAdapter：查找 Command codec、解码参数列表、按 ID 或外层名称解析目标，再经 Runtime.Send/Call 执行；未知 Command/坏载荷仅返回接收侧诊断错误，不产生响应。Send 接纳错误归接收侧，Call 执行错误沿 ConnectionAgent 回包，写回故障保留 I/O 错误链。该适配器尚未接入网络入站读循环，不管理并发或连接生命周期。
@@ -335,7 +335,8 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 - tcpListener 的取消或 Accept 失败会关闭监听和全部已接纳连接、取消基础设施 Call 并等待全部连接处理任务退出；不会强杀目标 Handler。已验证满额隔离、坏帧隔离、慢 Call 期间关闭、空闲 Accept 取消、诊断满载计数与非法配置/重复启动。
 - 已统一入站诊断出口：listener 与全部连接共享一个有界队列和丢弃计数，删除每连接的 256 容量缓冲与转发 goroutine。单连接退出不关闭出口，listener 在全部生产者退出后关闭；保留解除 Accept/Read 阻塞所需的取消监视机制。
 - 当前连接上限属于单 listener owner。公开 open API、多个 listener 共享的节点总配额及生产诊断消费尚未组装，不能据此宣称完整 TCP Transport 已完成。
-- 出站连接等待归属已确认并实现内部绑定、响应校验和连接范围清理，真实 TCP 夹具已改用此路径。见 [出站连接与 Call 等待归属方案](RFC-CLUSTER-OUTBOUND-CALL-OWNERSHIP.md)。Dial、自动重连和生产连接替换仍待后续组装。
+- 出站连接等待归属已确认并实现内部绑定、响应校验和连接范围清理，真实 TCP 夹具已改用此路径。见 [出站连接与 Call 等待归属方案](RFC-CLUSTER-OUTBOUND-CALL-OWNERSHIP.md)。单目标 Dial 与连接替换已由内部 outboundPeer 接管，生产路由组装仍待完成。
+- 按需建连已确认并实现内部 `outboundPeer`：单目标有限 Dial、连接复用、下一请求触发恢复、不重放；关闭先取消 Dial/关闭 socket，再等待发送与唯一响应读循环退出。见 [按需建连方案](RFC-CLUSTER-ON-DEMAND-CONNECT.md)。已覆盖 TCP 回环恢复、失败隔离、取消跳过、半写不重放、Send 诊断及关闭；公开 TCP Transport 与目标路由组装仍待后续切片。
 - NodeSender 自动重连，但不自动重放已经失败或结果不确定的请求。
 
 ### Cluster 4：故障与资源收尾

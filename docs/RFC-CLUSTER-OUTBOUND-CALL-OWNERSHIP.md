@@ -45,4 +45,4 @@ GSR 可以沿用“等待有明确的传输 owner”，但 Go 的读写 goroutin
 
 ## 实施状态
 
-内部 `connectionCalls`、`outboundConnection`、响应读循环和真实 TCP 测试夹具已接通；公开 `Complete` 仅保留未绑定连接的逻辑/内存链路用途，不能绕过网络归属校验。绑定是发送尝试的线性化点，不代表远端已接收。Dial、自动重连和公开 TCP 组装接口尚未实现。
+内部 `connectionCalls`、`outboundConnection`、响应读循环和真实 TCP 测试夹具已接通；公开 `Complete` 仅保留未绑定连接的逻辑/内存链路用途，不能绕过网络归属校验。绑定是发送尝试的线性化点，不代表远端已接收。后续内部 outboundPeer 已实现单目标 Dial 与按需恢复，见 [按需建连方案](RFC-CLUSTER-ON-DEMAND-CONNECT.md)；公开 TCP 组装接口尚未实现。

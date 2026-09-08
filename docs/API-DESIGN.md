@@ -477,7 +477,7 @@ func (codec *FrameCodec) Decode(frame []byte) (ClusterEnvelope, error)
 - `Send` 先校验并 Clone Envelope，再以 FIFO 顺序交给唯一 worker；返回 nil 只表示本地队列 admission 成功，不表示远端执行成功。
 - `Transport.Send` 的错误或 panic 发生在 admission 后时，NodeSender 向有界的 `Failures()` stream 非阻塞发布一条基础设施事件；慢消费者不会阻塞发送 worker，stream 满时丢弃事件并由 `DroppedFailureCount()` 累计。
 - `Close(ctx)` 先停止 admission；队列中尚未开始发送的 Envelope 以 `ErrNodeSenderClosed` 报告并丢弃，已经进入 `Transport.Send` 的调用允许自然返回。`ctx` 只控制调用方等待，不强杀 transport goroutine；超时后可以再次调用 `Close` 等待同一 worker。
-- 当前 sender 直接调用注入的 `Transport`，尚未实现 TCP stream、连接合并和自动重连；这些仍属于后续 Connection/Transport 子切片，不能由 `Send` 的 nil 返回暗示。
+- sender 直接调用注入的 `Transport`，自身不管理 TCP；内部单目标 outboundPeer 已提供按需建连、连接复用与恢复，生产公开组装仍待实现。这些连接行为不能由 `Send` 的 nil 返回暗示。
 
 Cluster 1 同时提供 source-bound `ClusterClient` 的单向 `Send`：
 
@@ -549,7 +549,7 @@ Error frame 实际携带 `ErrorClass + ErrorCode + Message`；Message 只用于�
 
 - 每个远端 Node 只有一个 outbound NodeSender；并发建连请求合并到该 sender，不创建多个竞争 sender。
 - 每条 inbound socket 由独立 ConnectionAgent 读取和响应，不要求把两个方向合并成一条全双工连接。
-- outbound 通道断开后自动重连，但已经失败或结果不确定的业务请求不自动重放。
+- outbound 通道断开后按需恢复：没有请求时不后台拨号，下一条尚未发送的请求至多触发一次有限 Dial。失败只结束当前请求，后续请求可再次尝试；已经失败或结果不确定的业务请求不自动重放。Call 总 deadline 不重置，写入前再次检查是否已取消。内部 `outboundPeer` 已实现连接复用、替换和关闭等待，公开 TCP 组装接口尚未实现。详见 [按需建连方案](RFC-CLUSTER-ON-DEMAND-CONNECT.md)。
 - 出站 Send/Call 不要求本地 NodeID 或 open 监听；open 只负责接受新入站连接，节点配置只负责目标地址解析。不强制交换 NodeID；Call 回复沿原连接返回，不是反向业务调用。
 - 删除 `LocalNode` 与入站 `from NodeID`：出站只按目标路由，入站只按连接管理。`Complete(remoteNode, response)` 中的节点来自出站连接绑定的目标，用于共享 PendingCall 匹配，不是入站来源身份。双方相互主动调用使用各自的出站连接，回复各沿原连接返回。
 - `Transport` 只要求 `Send(to, envelope)` 能力；内存替身的 `Register/Unregister` 与具体实现的 `Close` 不属于发送器的依赖接口。生命周期仍由外层 owner 负责。内存往返测试的 writer 直接绑定调用方 completion，不把回复模拟成反向 Send 或要求调用方注册。
