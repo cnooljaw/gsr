@@ -479,7 +479,7 @@ func (codec *FrameCodec) Decode(frame []byte) (ClusterEnvelope, error)
 - `Close(ctx)` 先停止 admission；队列中尚未开始发送的 Envelope 以 `ErrNodeSenderClosed` 报告并丢弃，已经进入 `Transport.Send` 的调用允许自然返回。`ctx` 只控制调用方等待，不强杀 transport goroutine；超时后可以再次调用 `Close` 等待同一 worker。
 - sender 直接调用注入的 `Transport`，自身不管理 TCP；内部单目标 outboundPeer 已提供按需建连、连接复用与恢复，生产公开组装仍待实现。这些连接行为不能由 `Send` 的 nil 返回暗示。
 
-公开组装的易用性方向已确认：显式 Cluster 对象统一管理静态目标路由、共享等待表和每目标发送组件，Service 继续使用 source-bound ClusterClient；主动调用不要求本地 NodeID、Runtime 或 open。已确认签名 `NewCluster(config ClusterConfig) (*Cluster, error)` 与 `(*Cluster).Client(source runtime.ServiceID) (*ClusterClient, error)`；两者只构造本地状态，不拨号、不监听，Client 不单独拥有发送器或等待表。绑定来源是受信任组装能力，只校验非零 ID，不验证 Service 存活。该组装层尚未实现，首轮配置已确认，生命周期与诊断入口仍待逐项确认，见 [组装入口方案](RFC-CLUSTER-ASSEMBLY.md)。
+公开组装的易用性方向已确认：显式 Cluster 对象统一管理静态目标路由、共享等待表和每目标发送组件，Service 继续使用 source-bound ClusterClient；主动调用不要求本地 NodeID、Runtime 或 open。已确认签名 `NewCluster(config ClusterConfig) (*Cluster, error)` 与 `(*Cluster).Client(source runtime.ServiceID) (*ClusterClient, error)`；两者只构造本地状态，不拨号、不监听，Client 不单独拥有发送器或等待表。绑定来源是受信任组装能力，只校验非零 ID，不验证 Service 存活。该组装层尚未实现，首轮配置与两阶段关闭已确认，诊断入口仍待确认，见 [组装入口方案](RFC-CLUSTER-ASSEMBLY.md)。
 
 已确认的首轮出站配置（尚未实现）：
 
@@ -496,6 +496,15 @@ type ClusterConfig struct {
 ```
 
 Nodes 在构造时复制，允许空表；每项要求非空 NodeID 与非空 host、1–65535 数字端口组成的 TCP 地址，构造不进行 DNS 查询或拨号。Codecs 必须显式提供不可变 registry，codec 实例沿用已有并发安全契约。数值零值采用默认值：MaxCallWait 5 秒、DialTimeout 3 秒、WriteTimeout 3 秒、每目标 OutboundQueueCapacity 1024 条、MaxFrame 4 MiB（含四字节长度前缀）；负数拒绝，零不表示无限。Call 总等待、单次拨号和单次 socket 写入是不同预算；调用方放弃等待不强杀连接级 Dial 或撤销已开始写入。配置不包含本地身份、Runtime、监听地址或热更新入口。
+
+公开 Cluster 关闭契约已确认（尚未实现）：
+
+```go
+func (cluster *Cluster) Quiesce()
+func (cluster *Cluster) Close(ctx context.Context) error
+```
+
+Quiesce 幂等且不可恢复，同步拒绝新 Client/Send/Call 及新 sender/Dial，取消未绑定 Call，尚未开始投递的 Send 丢弃并诊断；已绑定 Call 保留原 deadline 与回复机会。它不关闭已建立的 socket，不等待任务退出；绑定与 Quiesce 必须在统一同步边界竞争。Close 自动发起 Quiesce，结束剩余等待，先对所有目标发出取消/关闭信号，再等待 sender、连接与诊断生产者退出。nil context 拒绝，调用方取消等待不终止唯一清理流程，后续 Close 可继续等待并获取最终合并错误；不增加 Cluster ShutdownTimeout 配置。业务退出保存应在 Quiesce 前完成，OnStop 不拥有新的跨节点调用旁路。Host 正常按“停止入站接纳 → Cluster.Quiesce → Core Stop/Close → Cluster.Close(ctx)”收尾；Runtime 停止超时也不能跳过 Cluster 资源清理。详见 [两阶段关闭](RFC-CLUSTER-SHUTDOWN.md)，诊断公开形式仍待确认。
 
 Cluster 1 同时提供 source-bound `ClusterClient` 的单向 `Send`：
 

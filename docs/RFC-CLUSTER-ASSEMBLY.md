@@ -1,6 +1,6 @@
 # Cluster 公开组装入口
 
-状态：统一组装方向、首轮出站范围、创建/绑定签名及 ClusterConfig 字段与默认值已获用户确认，用于改善易用性；生命周期与诊断入口仍待确认。尚未新增运行代码。
+状态：统一组装方向、首轮出站范围、创建/绑定签名、ClusterConfig 字段与默认值及两阶段关闭已获用户确认，用于改善易用性；诊断入口仍待确认。尚未新增运行代码。
 
 ## 本轮只确认一个方向
 
@@ -47,7 +47,7 @@ GSR 可以直接借鉴“集中组装、按目标管理、主动调用与监听�
 
 新增一个固定的资源 owner，可以减少应用接线错误，并让共享等待表、唯一 sender 和关闭归属一致。代价是需要明确这个 owner 的生命周期；不能只提供一个构造函数而把关闭责任重新推回使用者。
 
-本轮确认方向后，下一项单独收口公开创建/绑定签名与关闭阶段。必须遵守已有的 Host 关闭顺序：先停止入站与新的出站 admission，再停止 Core，最后释放 Transport 和连接任务；不能未经裁决把它简化成任意时刻一次性销毁全部资源。
+公开创建/绑定签名与关闭阶段已确认。必须遵守已有的 Host 关闭顺序：先停止入站与新的出站 admission，再停止 Core，最后释放 Transport 和连接任务；具体见 [两阶段关闭](RFC-CLUSTER-SHUTDOWN.md)。
 
 第一版静态地址表意味着不支持运行中修改目标映射；DNS 地址解析仍可由标准 Dialer 在拨号时执行，这不等同于 GSR 提供配置热更新。
 
@@ -59,7 +59,7 @@ GSR 可以直接借鉴“集中组装、按目标管理、主动调用与监听�
 - 共享 Session 不冲突，Source 只保存在本地等待记录中。
 - 保留已有真实 TCP Send/Call、断线恢复、不重放和关闭测试。
 
-创建/绑定类型名、签名、首轮 Config 与默认超时已确认；诊断出口与生命周期方法尚未定稿。本文不新增另一种业务 Call。
+创建/绑定类型名、签名、首轮 Config、默认超时与两阶段关闭已确认；诊断出口尚未定稿。本文不新增另一种业务 Call。
 
 ## 创建与绑定签名（已确认）
 
@@ -74,7 +74,7 @@ func (cluster *Cluster) Client(source runtime.ServiceID) (*ClusterClient, error)
 
 `Client` 只创建绑定来源的轻量 client，复用 Cluster 的 codec、sender resolver、等待表和有限 MaxCallWait。它不创建 socket、队列或独立等待表，不需要独立 Close。重复获取同一 ServiceID 的 client 不创建第二个 sender；不承诺 client 指针相同，也不为此增加 client 缓存。
 
-返回 error 用于明确拒绝零 ServiceID、无效/已经关闭的 owner；关闭接纳后是否仍允许创建 client，将随生命周期契约单独收口。不提供 Must 变体或另一套 BindClient 别名。
+返回 error 用于明确拒绝零 ServiceID、无效或已停止接纳的 owner；Quiesce 后不再允许创建 client。不提供 Must 变体或另一套 BindClient 别名。
 
 ### 来源绑定的使用边界
 
@@ -90,7 +90,7 @@ Client(source) 是受信任组装入口。常见接线点是 Service 的 OnStart
 
 常规应用组装只推荐 `NewCluster → Client → Send/Call`。现有 `NewClusterClient(config)` 是基础设施依赖注入入口，不作为普通业务的第二套推荐写法；本轮不删除它，也不添加兼容别名。公开低层构造器是否进一步收窄，不与本次两条签名捆绑裁决。
 
-ClusterConfig 与默认值见下文；Open 和关闭方法仍留待下一项，不在示例中提前定稿。
+ClusterConfig 与默认值见下文；已确认 Quiesce() 与 Close(ctx)，详见两阶段关闭方案。Open 仍留待后续入站切片。
 
 ## 首轮出站配置（已确认）
 
@@ -128,4 +128,4 @@ Nodes 的 map 副本归 Cluster 所有；Codecs 复用现有不可变 registry�
 
 这些默认值用于开箱即用，不是容量承诺：队列条数乘以帧上限可能产生较大内存占用，而且每目标都有独立队列；部署时应按目标数和消息体大小调低上限。首轮不增加另一套全局字节预算，以免在本次配置中引入新的 admission 语义。
 
-下一项单独收口关闭与诊断入口；在生命周期完整之前，不只实现一个无法完整收尾的公开构造器。
+两阶段关闭已确认，下一项单独收口诊断入口；随后按最小纵向切片实现完整组装与收尾，不只提供无法完整收尾的公开构造器。

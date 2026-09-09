@@ -49,7 +49,7 @@
 - **Timer owner**：登记 Timer 的 Service/Runtime owner。它用于校验取消权限和表达 Timer 创建者；Timer 到期消息的 Source 不使用 owner 的 ServiceID，而固定为零值。
 - **RuntimeState**：Runtime 的生命周期状态。公开顺序为 `Created → Starting → Running → Stopping → Stopped → Closed`；`Starting` 表示 Runtime-owned Core 组件正在启动，`Stopped` 表示停止流程完成，`Closed` 表示 Runtime-owned 资源已最终释放。
 - **Lifecycle Coordinator**：Runtime 内部按固定 start/stop 计划编排 Core 组件的生命周期；它不拥有组件资源，也不是可无限注册的业务插件容器。
-- **Quiesce**：关闭流程中停止新 admission、入站和重连的阶段；它不等同于已经等待所有已接受任务完成。
+- **Quiesce**：关闭流程中停止新 admission、入站和重连的阶段，不等同于等待所有任务完成。已确认、尚未实现的 Cluster.Quiesce() 针对首轮出站组装拒绝新 Client/Send/Call，取消尚未绑定的 Call 并停止新拨号；已绑定 Call 保留原等待上限和回复机会。最终资源释放由 Cluster.Close(ctx) 完成，调用方停止等待不取消清理；入站能力的独立停止接纳仍待 Open 切片实现。
 - **Stop / Close**：`Runtime.Stop(ctx)` 负责关闭 admission 并有序停止全部 Core 组件，`Runtime.Close()` 负责 Stop 完成后的最终资源释放；二者幂等，Stop 后不得再次 Start。`Close()` 使用 `ShutdownTimeout`，没有调用方 context。
 - **RuntimeInspection**：`Runtime.Inspect()` 返回的只读值快照，包含 Runtime 状态、Service/ mailbox/runner 状态、PendingCall/Timer 数量和基础故障计数；它不暴露 Runtime-owned 内部对象。
 - **ServiceInspection**：RuntimeInspection 中一个 Service 的值快照，包含 ServiceID、生命周期状态、Mailbox 深度、runner 完成状态和 shutdown deadline 是否已超过。

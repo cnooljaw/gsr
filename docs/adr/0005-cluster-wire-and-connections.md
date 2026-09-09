@@ -36,6 +36,8 @@ GSR Cluster 需要保持 Skynet 风格的简洁调用面，同时明确 Go 的�
 
 ## Consequences
 
+- 公开 Cluster 采用已确认的 Quiesce() 与 Close(ctx) 两阶段关闭：前者关闭接纳与新拨号，取消未绑定等待并保留已绑定 Call 的回复机会；后者最终取消剩余等待、关闭连接并等待全部内部任务退出。调用方 context 仅控制此次 Close 等待，不取消清理。该契约尚未实现，具体竞争边界与 Host 顺序见 [两阶段关闭](../RFC-CLUSTER-SHUTDOWN.md)。
+
 - 业务 API 保持 `Send(node, target, ...)` / `Call(node, target, ...)`，连接和 source 路由细节由绑定后的 ClusterClient 隐藏。
 - 方向性连接避免额外的“双连接胜负”协议；同一节点可以各自拥有一条 outbound，并各自接受对方的 inbound。
 - 丢弃完整但不支持的 Call 请求会使调用方等待超时，因此必须可观测；协议升级应优先在握手阶段阻止长期不兼容连接。
