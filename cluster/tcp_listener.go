@@ -29,11 +29,14 @@ type tcpListenerConfig struct {
 // tcpListener 拥有一个监听 socket 及全部已接纳连接，serve 返回前等待任务退出。
 // 每个已接纳连接有一个处理任务，受 maxConnections 约束；诊断直接写入共享出口。
 type tcpListener struct {
-	config      tcpListenerConfig
-	started     atomic.Bool
-	mu          sync.Mutex
-	connections map[*streamConnection]struct{}
-	diagnostics *inboundDiagnostics
+	config           tcpListenerConfig
+	started          atomic.Bool
+	mu               sync.Mutex
+	connections      map[*streamConnection]struct{}
+	diagnostics      *inboundDiagnostics
+	admissionStopped atomic.Bool
+	quiesceOnce      sync.Once
+	quiesceErr       error
 }
 
 // newTCPListener 成功后转移监听 socket 管理权；失败时仍由调用方负责关闭。
@@ -50,7 +53,8 @@ func newTCPListener(config tcpListenerConfig) (*tcpListener, error) {
 	}, nil
 }
 
-// serve 只允许启动一次。取消或 Accept 失败时关闭监听和连接，取消 Call 并等待收尾。
+// serve 只允许启动一次。取消或异常 Accept 失败时关闭监听和连接，取消 Call 并等待收尾。
+// quiesce 关闭监听属于正常停止接纳，仍保留连接直到最终取消。
 // 不强杀业务 Handler 或无限阻塞的扩展代码；终止后不重新监听。
 func (owner *tcpListener) serve(parent context.Context) error {
 	if owner == nil || parent == nil || !owner.started.CompareAndSwap(false, true) {
@@ -78,6 +82,11 @@ func (owner *tcpListener) serve(parent context.Context) error {
 			if ctx.Err() != nil {
 				return ctx.Err()
 			}
+			if owner.admissionStopped.Load() {
+				// 停止 Accept 不等于最终清理；已有 Call 继续使用原连接回包。
+				<-ctx.Done()
+				return ctx.Err()
+			}
 			return err
 		}
 		connection, err := newStreamConnection(socket, owner.config.codec, owner.config.writeTimeout)
@@ -86,10 +95,10 @@ func (owner *tcpListener) serve(parent context.Context) error {
 			return err
 		}
 		owner.mu.Lock()
-		if ctx.Err() != nil {
+		if ctx.Err() != nil || owner.admissionStopped.Load() {
 			owner.mu.Unlock()
 			connection.close()
-			return ctx.Err()
+			continue
 		}
 		if len(owner.connections) >= owner.config.maxConnections {
 			owner.mu.Unlock()
@@ -120,10 +129,23 @@ func (owner *tcpListener) serveConnection(ctx context.Context, connection *strea
 		owner.diagnostics.report(inboundFailure{remoteAddress: address, err: err})
 		return
 	}
+	inbound.admissionStopped = &owner.admissionStopped
 	err = inbound.serve(ctx)
 	if err != nil && !errors.Is(err, context.Canceled) && !errors.Is(err, net.ErrClosed) && !errors.Is(err, io.EOF) {
 		owner.diagnostics.report(inboundFailure{remoteAddress: address, err: err})
 	}
+}
+
+// quiesce 只关闭监听和请求门禁，不取消已接纳请求，也不等待连接任务。
+// 共享原子门禁覆盖已存在和刚注册的连接；只进行一次监听关闭。
+func (owner *tcpListener) quiesce() error {
+	owner.quiesceOnce.Do(func() {
+		owner.mu.Lock()
+		owner.admissionStopped.Store(true)
+		owner.mu.Unlock()
+		owner.quiesceErr = owner.config.listener.Close()
+	})
+	return owner.quiesceErr
 }
 
 // shutdown 不等待任务；先解除 Accept 与 socket I/O 等待，再由 serve 统一等待退出。

@@ -47,7 +47,17 @@ Quiesce 不接收 context，也不进行网络 I/O 或等待 worker；它完成�
 
 ## Host 调用顺序与业务影响
 
-正常 Host 停机维持已有顺序：停止可选入站 admission，Cluster.Quiesce，Runtime.Stop/Close，最后 Cluster.Close(ctx)。本方案首轮只实现出站组装；现有 tcpListener 的取消会同时关闭入站连接，不能宣称它已具备保留连接的独立入站 Quiesce，公开 Open 阶段必须另行接线和验证。
+正常 Host 停机维持已有顺序：停止可选入站 admission，Cluster.Quiesce，Runtime.Stop/Close，最后 Cluster.Close(ctx)。公开 Cluster 目前仍只组装出站能力，入站停止规则已确认，公开 Open 的签名与接线留待后续。
+
+### 入站停止接纳（已确认）
+
+停止入站时关闭监听，不再接纳新连接，也不再接纳已有连接上的新请求；已经接纳的 Call 保留原连接、有限等待和回复机会。最终关闭才取消剩余基础设施等待、断开连接并等待连接任务，不强杀 Handler。
+
+Skynet 的 `snax/gateserver.lua` 中 `CMD.close` 只关闭监听 socket，客户端连接另行管理，依赖 C socket 事件和 Lua Service 调度。GSR 借鉴监听与连接的生命周期分离，但还必须对旧连接上的请求设置门禁，不能只停止 Accept。
+
+内部实现以完整帧读取后、交给请求处理任务前的门禁检查作为请求 admission 边界，与停止标记按统一原子顺序竞争。先接纳的请求可以继续校验、解码和本地投递；先停止则不得交给 Handler。该边界不是业务执行成功的承诺，也不等于 Runtime Mailbox admission。
+
+停止后暂停读取，不增加停机拒绝回包或 wire 协议；正在读取的至多一帧也必须经过门禁。未接纳 Call 由调用方原有限超时或最终断线结束，Send 仍遵循 A 管 A、B 管 B 的既有语义。已接纳的 Call 可继续写回复；最终取消能解除空闲读取、容量背压和停止等待。不等待业务扩展代码或 Handler 无限阻塞，不承诺所有请求成功完成。
 
 例：A 正在 Call B 查询背包，随后 A 开始停机。若 Call 已绑定连接，Quiesce 后仍可收到结果，让当前 Handler 结束；若还在队列中，则直接以停止原因返回。最后 Close 会结束仍未完成的等待，不无限等待 B。
 

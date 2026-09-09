@@ -332,7 +332,8 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 - 已确认并清理出站调用与监听身份：删除 LocalNode、入站来源 NodeID；主动 Send/Call 只需目标，open 只决定是否接受新调用。Transport 仅要求 Send(to, envelope)，内存往返测试通过绑定 writer 回复，不注册调用方或反向 Send。见 [连接身份方案](RFC-CLUSTER-CONNECTION-IDENTITY.md)。认证协议另行裁决，不与调用方的可寻址身份绑定。
 - 已用真实 TCP 测试夹具验证两个方向分别建立独立连接，关闭 A→B 后 B→A 仍能主动 Call；此门禁验证连接组织，不代表生产节点管理器或公开 open API 已实现。
 - 已实现内部 tcpListener：接管一个 TCP listener，限制已接纳连接总数；满额时关闭新 socket，不启动连接任务、不建立用户态等待队列，诊断有界非阻塞。每条已接纳连接使用独立 inboundConnection，来源诊断只附连接远端地址与 Session，不添加 NodeID。
-- tcpListener 的取消或 Accept 失败会关闭监听和全部已接纳连接、取消基础设施 Call 并等待全部连接处理任务退出；不会强杀目标 Handler。已验证满额隔离、坏帧隔离、慢 Call 期间关闭、空闲 Accept 取消、诊断满载计数与非法配置/重复启动。
+- tcpListener 的取消或异常 Accept 失败会关闭监听和全部已接纳连接、取消基础设施 Call 并等待全部连接处理任务退出；不会强杀目标 Handler。已验证满额隔离、坏帧隔离、慢 Call 期间关闭、空闲 Accept 取消、诊断满载计数与非法配置/重复启动。
+- 已确认并实现内部入站 quiesce：关闭监听，所有连接共享请求门禁；完整帧在交给处理任务前决定 admission，停止后暂停读取，已接纳 Call 仍可沿原连接回复。最终取消解除读取、满载名额和停止等待。已补充真实 TCP 的新连接拒绝、新 Send/Call 不执行、旧 Call 回复、并发重复停止、空闲与满载取消测试。公开 Open 和统一入站诊断接线仍未实现。
 - 已统一入站诊断出口：listener 与全部连接共享一个有界队列和丢弃计数，删除每连接的 256 容量缓冲与转发 goroutine。单连接退出不关闭出口，listener 在全部生产者退出后关闭；保留解除 Accept/Read 阻塞所需的取消监视机制。
 - 当前连接上限属于单 listener owner。公开 open API、多个 listener 共享的节点总配额及生产诊断消费尚未组装，不能据此宣称完整 TCP Transport 已完成。
 - 出站连接等待归属已确认并实现内部绑定、响应校验和连接范围清理，真实 TCP 夹具已改用此路径。见 [出站连接与 Call 等待归属方案](RFC-CLUSTER-OUTBOUND-CALL-OWNERSHIP.md)。单目标 Dial 与连接替换由 outboundPeer 接管，静态目标路由由公开 Cluster 组装，动态路由仍待后续切片。

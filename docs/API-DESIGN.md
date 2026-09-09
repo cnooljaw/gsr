@@ -576,7 +576,9 @@ Cluster 2 的远程 Call 使用 Cluster-owned `ClusterCallRegistry` 和内部 `C
 
 内部 `tcpListener` 接管一个已经建立的 TCP listener，显式配置正数连接上限、每连接 Call 上限及写 timeout。连接满额时立即关闭新接入 socket，不为其创建处理任务或用户态等待队列；已接纳连接不受影响。诊断以远端地址和 Session 定位，有界、非阻塞，满载计数可观测，不依赖 NodeID。
 
-listener 的 context 取消或 Accept 失败时，组件关闭监听及所有已接纳 socket，取消连接内基础设施等待，并等待全部连接处理任务退出；不自动重新监听，不强杀 Handler。当前连接上限属于单个 listener owner，公开 open API、多 listener 的节点总配额与生产诊断消费仍待外层组装；此组件不拥有出站连接或 Runtime 生命周期。
+入站停止接纳已确认：关闭监听并阻止旧连接接纳新请求，但保留已接纳 Call 的原连接回复机会；最终关闭才取消剩余等待并断连。完整帧交给处理任务前的门禁检查是入站请求 admission 边界，不等于本地 Mailbox admission。停止后暂停读取，不新增拒绝回包；未接纳 Call 仍由原有限超时或断线结束。内部接线与公开 Open 分开推进，不改变当前出站 Cluster.Quiesce 的无网络 I/O 契约，详见两阶段关闭文档。
+
+listener 的 context 取消或非停止接纳导致的 Accept 失败时，组件关闭监听及所有已接纳 socket，取消连接内基础设施等待，并等待全部连接处理任务退出；不自动重新监听，不强杀 Handler。内部 quiesce 关闭监听后，serve 保留已有连接并等待最终 context 取消，不提前关闭诊断出口。当前连接上限属于单个 listener owner，公开 open API、多 listener 的节点总配额与生产诊断消费仍待外层组装；此组件不拥有出站连接或 Runtime 生命周期。
 
 入站连接采用一个读循环和数量有上限的 Call 等待任务。Send 在读循环中只完成本地接纳；Call 交给连接组件管理的任务，经 Runtime.Call 等待。每连接 Call 名额满载时暂停读取（包括后续 Send），不建立无界队列。响应通过同一连接串行写入，允许不同 Call 按完成顺序回包。
 

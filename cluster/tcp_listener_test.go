@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net"
 	"reflect"
+	"sync"
 	"testing"
 	"time"
 )
@@ -38,6 +39,160 @@ func TestTCPListenerBoundsConnections(t *testing.T) {
 // 验证关闭监听组件能解除阻塞的 Accept，不要求曾经接入客户端。
 func TestTCPListenerCancelIdleAccept(t *testing.T) {
 	_, _, cancel, done := newTCPListenerTest(t, 2)
+	cancel()
+	awaitListenerTest(t, done)
+}
+
+// 验证停止接纳拒绝新连接及旧连接的新请求，同时让已接纳 Call 沿原连接回复。
+func TestTCPListenerQuiescePreservesReply(t *testing.T) {
+	owner, target, cancel, done := newTCPListenerTest(t, 2)
+	blocked := &inboundRecordingService{entered: make(chan struct{}), release: make(chan struct{})}
+	var releaseOnce sync.Once
+	release := func() { releaseOnce.Do(func() { close(blocked.release) }) }
+	defer release()
+	id, err := owner.config.adapter.runtime.CreateService(context.Background(), blocked)
+	if err != nil {
+		t.Fatal(err)
+	}
+	counter := &tcpCountingService{inboundRecordingService: &inboundRecordingService{}}
+	counterID, err := owner.config.adapter.runtime.CreateService(context.Background(), counter)
+	if err != nil {
+		t.Fatal(err)
+	}
+	connection := dialListenerTest(t, owner)
+	idle := dialListenerTest(t, owner)
+	listenerCallTest(t, idle, target, 10)
+	values, err := NewValueCodec(ValueCodecConfig{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	payload, err := values.Encode([]any{"block"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	request := ClusterEnvelope{Kind: FrameRequest, Session: 1, Target: ServiceTarget{ServiceID: id}, Command: clusterTestCommand, Payload: payload}
+	if err := connection.write(request); err != nil {
+		t.Fatal(err)
+	}
+	select {
+	case <-blocked.entered:
+	case <-time.After(time.Second):
+		t.Fatal("Handler did not start")
+	}
+	if err := owner.quiesce(); err != nil {
+		t.Fatal(err)
+	}
+	if err := owner.quiesce(); err != nil {
+		t.Fatal(err)
+	}
+	extra, err := net.DialTimeout("tcp4", owner.config.listener.Addr().String(), time.Second)
+	if err == nil {
+		extra.Close()
+		t.Fatal("listener still accepts connections")
+	}
+	request.Session = 2
+	request.Target = ServiceTarget{ServiceID: counterID}
+	request.Payload, err = values.Encode([]any{"after-stop"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := connection.write(request); err != nil {
+		t.Fatal(err)
+	}
+	// 新 Send 也不能从另一条已存在的连接进入业务。
+	request.Session = 0
+	if err := idle.write(request); err != nil {
+		t.Fatal(err)
+	}
+	release()
+	response, err := connection.read()
+	if err != nil || response.Kind != FrameResponse || response.Session != 1 {
+		t.Fatalf("admitted reply = %+v, %v", response, err)
+	}
+	if err := connection.socket.SetReadDeadline(time.Now().Add(30 * time.Millisecond)); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := connection.read(); err == nil {
+		t.Fatal("new request was handled after quiesce")
+	} else {
+		var timeout net.Error
+		if !errors.As(err, &timeout) || !timeout.Timeout() {
+			t.Fatalf("connection closed before final cleanup: %v", err)
+		}
+	}
+	select {
+	case err := <-done:
+		t.Fatalf("quiesce terminated owner: %v", err)
+	default:
+	}
+	cancel()
+	awaitListenerTest(t, done)
+	// 本地 Call 作为 Mailbox 屏障：若错误投递了前面的 Send，它必已执行。
+	if _, err := owner.config.adapter.runtime.Call(context.Background(), counterID, clusterTestCommand); err != nil {
+		t.Fatal(err)
+	}
+	if counter.invocations.Load() != 1 {
+		t.Fatalf("post-quiesce requests reached Handler: %d", counter.invocations.Load()-1)
+	}
+	for failure := range owner.diagnostics.failures {
+		t.Fatalf("unexpected shutdown diagnostic: %+v", failure)
+	}
+}
+
+// 验证停止接纳后最终取消能解除满载 Call 名额等待，不等待被阻塞的业务 Handler。
+func TestTCPListenerQuiesceCancelSaturatedCalls(t *testing.T) {
+	owner, _, cancel, done := newTCPListenerTest(t, 1)
+	connection := dialListenerTest(t, owner)
+	values, err := NewValueCodec(ValueCodecConfig{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	payload, err := values.Encode([]any{"block"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for session := ClusterSessionID(1); session <= 2; session++ {
+		blocked := &inboundRecordingService{entered: make(chan struct{}), release: make(chan struct{})}
+		defer close(blocked.release)
+		id, err := owner.config.adapter.runtime.CreateService(context.Background(), blocked)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := connection.write(ClusterEnvelope{Kind: FrameRequest, Session: session, Target: ServiceTarget{ServiceID: id}, Command: clusterTestCommand, Payload: payload}); err != nil {
+			t.Fatal(err)
+		}
+		select {
+		case <-blocked.entered:
+		case <-time.After(time.Second):
+			t.Fatal("Handler did not start")
+		}
+	}
+	var stops sync.WaitGroup
+	for index := 0; index < 8; index++ {
+		stops.Add(1)
+		go func() {
+			defer stops.Done()
+			if err := owner.quiesce(); err != nil {
+				t.Error(err)
+			}
+		}()
+	}
+	stops.Wait()
+	cancel()
+	awaitListenerTest(t, done)
+}
+
+// 验证停止空闲监听后仍等待最终取消，既不提前结束 owner，也不泄漏 Accept 任务。
+func TestTCPListenerQuiesceIdle(t *testing.T) {
+	owner, _, cancel, done := newTCPListenerTest(t, 1)
+	if err := owner.quiesce(); err != nil {
+		t.Fatal(err)
+	}
+	select {
+	case err := <-done:
+		t.Fatalf("quiesce terminated owner: %v", err)
+	default:
+	}
 	cancel()
 	awaitListenerTest(t, done)
 }

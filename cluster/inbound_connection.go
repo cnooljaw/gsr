@@ -22,6 +22,8 @@ type inboundConnection struct {
 	started       atomic.Bool
 	diagnostics   *inboundDiagnostics
 	remoteAddress string
+	// listener 组装时共享门禁；独立连接测试不配置时保持原接纳行为。
+	admissionStopped *atomic.Bool
 }
 
 func newInboundConnection(connection *streamConnection, adapter *localRequestAdapter, maxCalls int, diagnostics *inboundDiagnostics) (*inboundConnection, error) {
@@ -57,6 +59,10 @@ func (owner *inboundConnection) serve(parent context.Context) (result error) {
 	}()
 	slots := make(chan struct{}, owner.maxCalls)
 	for {
+		if owner.stoppedAdmission() {
+			<-ctx.Done()
+			return ctx.Err()
+		}
 		// 在读下一帧前预留名额，满载时连后续 Send 也背压；最多保留一帧读取中的数据。
 		select {
 		case slots <- struct{}{}:
@@ -64,6 +70,13 @@ func (owner *inboundConnection) serve(parent context.Context) (result error) {
 			return ctx.Err()
 		}
 		request, err := owner.connection.read()
+		// 这次原子检查是完整帧的 admission 边界；先于停止者才可交给处理任务。
+		// 即使读取期间发生停止，也不能把新请求投递给本地 Runtime。
+		if owner.stoppedAdmission() {
+			<-slots
+			<-ctx.Done()
+			return ctx.Err()
+		}
 		if err != nil {
 			<-slots
 			if ctx.Err() != nil {
@@ -88,6 +101,10 @@ func (owner *inboundConnection) serve(parent context.Context) (result error) {
 		owner.handle(ctx, request)
 		<-slots
 	}
+}
+
+func (owner *inboundConnection) stoppedAdmission() bool {
+	return owner.admissionStopped != nil && owner.admissionStopped.Load()
 }
 
 func (owner *inboundConnection) handle(ctx context.Context, request ClusterEnvelope) {
