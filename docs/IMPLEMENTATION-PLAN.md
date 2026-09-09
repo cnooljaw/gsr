@@ -297,7 +297,7 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 
 ### Cluster 2：远程 Call
 
-- 状态：基础远程 Call、本地等待和内部 TCP response 路由已完成并通过真实回环测试；生产 Transport 组装尚未完成。
+- 状态：基础远程 Call、本地等待和内部 TCP response 路由已完成并通过真实回环测试；公开静态出站组装已完成，公开入站组装尚未完成。
 - Cluster-owned PendingCall 表保存 `Session → Source、RemoteNode、Target、Command`，Source 只在发起节点本地使用。
 - ClusterSessionID 在当前 Cluster 实例内单调分配，耗尽返回 `runtime.ErrIDExhausted`，不回绕或复用。
 - Response/Error 只完成匹配的 RemoteNode/Target/Command；未知、迟到、重复或错路由 frame 被拒绝并进入诊断。
@@ -307,15 +307,15 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 - 接线约束：出站写入必须经 `outboundConnection` 绑定，响应读循环使用同一连接 owner；绑定是发送尝试的线性化点，绑定前已取消则不发包，绑定后不承诺撤销或重放。
 - 已接通内部响应读循环：通过 streamConnection 读取 Response/Error，并校验连接归属后完成 PendingCall；流终止时清理该连接等待。已用 net.Pipe 验证成功/业务错误回复、远端断线、主动关闭和非法帧长的收尾。
 - 异常响应与完整坏帧通过调用方持有的非阻塞诊断通道报告；无消费者或通道满载时丢弃，循环返回丢弃计数。此通道只含节点、Session 和错误，不携带业务载荷。
-- 待实现：生产 TCP Transport 启动/等待读循环、绑定目标地址路由、连接替换与生产诊断消费；内部读循环已通过真实 TCP 夹具验证，不要求 NodeID 握手。
-- 待实现：断线、timeout 以及未知、重复和迟到 response 的连接级诊断。
+- 已实现公开静态出站组装：管理目标地址、唯一 sender、响应读循环、按需连接替换和统一诊断。真实 TCP 门禁不要求 NodeID 握手；日志消费由宿主基础设施负责。
+- 已实现断线与被拒绝 response 的结构化诊断；正常 Call timeout/cancellation 由调用方处理，迟到 response 可进入诊断。限频与可靠日志不由当前共享队列承诺。
 - 已验证：`cluster/roundtrip_test.go` 通过公开 API 组装双节点内存链路，连接 ClusterClient、NodeSender、ConnectionAgent 和 ClusterCallRegistry；请求与回复均经过完整 FrameCodec 编解码。覆盖成功返回、Domain Error 的 Class/Code、安全 Message 和 `errors.Is`，以及未知错误/panic 的安全转换。
 - 已验证：Send 的 B 侧 Handler error 由接收适配器本地记录、不产生回复；随后同一链路可继续 Call。目标节点未注册时，Send 入队成功后的失败在 A 侧保留节点、目标、命令和 `ErrNodeNotFound` 原因。
 - 门禁范围：InMemoryTransport 同步调用接收器，测试使用逻辑 Handler，没有组装两个 Core Runtime 或真实 socket；不能据此证明慢 Handler 不阻塞同节点后续投递。TCP 调度、连接关闭和 Service 并发隔离仍需在真实 owner 接入时验证。
 
 ### Cluster 3：TCP 与连接 owner
 
-- 状态：逻辑 ConnectionAgent、内部单连接 I/O 封装、出站响应读循环、有界并发入站请求循环、单 listener 入站连接 owner 和单目标按需出站连接 owner 已完成；生产公开组装 API 与目标路由管理尚未实现。
+- 状态：逻辑 ConnectionAgent、内部单连接 I/O 封装、出站响应读循环、有界并发入站请求循环、单 listener 入站连接 owner 和单目标按需出站连接 owner 已完成；公开静态出站组装已完成，Open、认证与动态路由仍待后续切片。
 - 已裁决并实现基础设施 Runtime.Call：Source 固定为零，经普通 Mailbox 执行，复用有限等待与停止收尾；ServiceContext.Call 仍绑定真实 Service。取舍见 [Cluster 入站 Call 方案](RFC-CLUSTER-INBOUND-CALL.md)。
 - 已用 ConnectionAgent 测试适配器接通真实 Runtime，覆盖成功/领域错误回复、零 Source，以及本地 Session 与 ClusterSession 分离；网络入站并发管理和正式适配器组装仍待接入。
 - 已实现内部 localRequestAdapter：查找 Command codec、解码参数列表、按 ID 或外层名称解析目标，再经 Runtime.Send/Call 执行；未知 Command/坏载荷仅返回接收侧诊断错误，不产生响应。Send 接纳错误归接收侧，Call 执行错误沿 ConnectionAgent 回包，写回故障保留 I/O 错误链。该适配器尚未接入网络入站读循环，不管理并发或连接生命周期。
@@ -335,11 +335,11 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 - tcpListener 的取消或 Accept 失败会关闭监听和全部已接纳连接、取消基础设施 Call 并等待全部连接处理任务退出；不会强杀目标 Handler。已验证满额隔离、坏帧隔离、慢 Call 期间关闭、空闲 Accept 取消、诊断满载计数与非法配置/重复启动。
 - 已统一入站诊断出口：listener 与全部连接共享一个有界队列和丢弃计数，删除每连接的 256 容量缓冲与转发 goroutine。单连接退出不关闭出口，listener 在全部生产者退出后关闭；保留解除 Accept/Read 阻塞所需的取消监视机制。
 - 当前连接上限属于单 listener owner。公开 open API、多个 listener 共享的节点总配额及生产诊断消费尚未组装，不能据此宣称完整 TCP Transport 已完成。
-- 出站连接等待归属已确认并实现内部绑定、响应校验和连接范围清理，真实 TCP 夹具已改用此路径。见 [出站连接与 Call 等待归属方案](RFC-CLUSTER-OUTBOUND-CALL-OWNERSHIP.md)。单目标 Dial 与连接替换已由内部 outboundPeer 接管，生产路由组装仍待完成。
+- 出站连接等待归属已确认并实现内部绑定、响应校验和连接范围清理，真实 TCP 夹具已改用此路径。见 [出站连接与 Call 等待归属方案](RFC-CLUSTER-OUTBOUND-CALL-OWNERSHIP.md)。单目标 Dial 与连接替换由 outboundPeer 接管，静态目标路由由公开 Cluster 组装，动态路由仍待后续切片。
 - 按需建连已确认并实现内部 `outboundPeer`：单目标有限 Dial、连接复用、下一请求触发恢复、不重放；关闭先取消 Dial/关闭 socket，再等待发送与唯一响应读循环退出。见 [按需建连方案](RFC-CLUSTER-ON-DEMAND-CONNECT.md)。已覆盖 TCP 回环恢复、失败隔离、取消跳过、半写不重放、Send 诊断及关闭；公开 TCP Transport 与目标路由组装仍待后续切片。
-- 已确认易用性方向、`NewCluster(config)`、`Client(source ServiceID)` 两个签名及首轮 ClusterConfig 字段与默认值：显式 Cluster 对象统一出站组装，业务继续使用 source-bound ClusterClient，不手工接线内部组件。见 [公开组装入口方案](RFC-CLUSTER-ASSEMBLY.md)。两阶段关闭已确认，统一诊断入口也已确认，公开组装层尚未实现。
-- 生命周期已确认，见 [两阶段关闭方案](RFC-CLUSTER-SHUTDOWN.md)：Quiesce 停止接纳，Close(ctx) 最终释放与等待；已绑定 Call 保留回复机会，未发送请求按停止策略收尾。统一诊断入口也已确认，公开组装代码与对应生命周期测试尚未实现。
-- 统一诊断出口已确认，见 [诊断方案](RFC-CLUSTER-DIAGNOSTICS.md)：每 Cluster 单一 256 容量的非阻塞 Diagnostics 与丢弃计数，内部直接上报，不执行外部 callback 或创建每目标转发任务。创建/绑定、配置、关闭与诊断契约均已收口，下一步实现最小公开出站组装及其测试；Open、认证和动态路由不纳入本轮。
+- 已确认易用性方向、`NewCluster(config)`、`Client(source ServiceID)` 两个签名及首轮 ClusterConfig 字段与默认值：显式 Cluster 对象统一出站组装，业务继续使用 source-bound ClusterClient，不手工接线内部组件。见 [公开组装入口方案](RFC-CLUSTER-ASSEMBLY.md)。两阶段关闭已确认，统一诊断入口也已确认，公开出站组装已实现。
+- 生命周期已确认，见 [两阶段关闭方案](RFC-CLUSTER-SHUTDOWN.md)：Quiesce 停止接纳，Close(ctx) 最终释放与等待；已绑定 Call 保留回复机会，未发送请求按停止策略收尾。统一诊断入口也已确认，公开出站组装代码与对应生命周期测试已实现。
+- 统一诊断出口已确认，见 [诊断方案](RFC-CLUSTER-DIAGNOSTICS.md)：每 Cluster 单一 256 容量的非阻塞 Diagnostics 与丢弃计数，内部直接上报，不执行外部 callback 或创建每目标转发任务。创建/绑定、配置、关闭与诊断契约均已收口，已实现最小公开出站组装及其测试；Open、认证和动态路由不纳入本轮。
 - NodeSender 自动重连，但不自动重放已经失败或结果不确定的请求。
 
 ### Cluster 4：故障与资源收尾

@@ -35,6 +35,9 @@ func (owner *connectionCalls) bind(request ClusterEnvelope) (bool, error) {
 	if registry.closed {
 		return false, ErrClusterCallClosed
 	}
+	if registry.quiescing {
+		return false, ErrClusterQuiescing
+	}
 	if owner.failure != nil {
 		return false, owner.failure
 	}
@@ -69,6 +72,9 @@ func (owner *connectionCalls) pending(request ClusterEnvelope) (bool, error) {
 	defer registry.mu.Unlock()
 	if registry.closed {
 		return false, ErrClusterCallClosed
+	}
+	if registry.quiescing {
+		return false, ErrClusterQuiescing
 	}
 	if request.Session == 0 {
 		return true, nil

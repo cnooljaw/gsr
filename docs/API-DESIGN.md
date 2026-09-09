@@ -477,11 +477,11 @@ func (codec *FrameCodec) Decode(frame []byte) (ClusterEnvelope, error)
 - `Send` 先校验并 Clone Envelope，再以 FIFO 顺序交给唯一 worker；返回 nil 只表示本地队列 admission 成功，不表示远端执行成功。
 - `Transport.Send` 的错误或 panic 发生在 admission 后时，NodeSender 向有界的 `Failures()` stream 非阻塞发布一条基础设施事件；慢消费者不会阻塞发送 worker，stream 满时丢弃事件并由 `DroppedFailureCount()` 累计。
 - `Close(ctx)` 先停止 admission；队列中尚未开始发送的 Envelope 以 `ErrNodeSenderClosed` 报告并丢弃，已经进入 `Transport.Send` 的调用允许自然返回。`ctx` 只控制调用方等待，不强杀 transport goroutine；超时后可以再次调用 `Close` 等待同一 worker。
-- sender 直接调用注入的 `Transport`，自身不管理 TCP；内部单目标 outboundPeer 已提供按需建连、连接复用与恢复，生产公开组装仍待实现。这些连接行为不能由 `Send` 的 nil 返回暗示。
+- sender 直接调用注入的 `Transport`，自身不管理 TCP；内部单目标 outboundPeer 已提供按需建连、连接复用与恢复，公开静态出站组装已实现，Open 与动态路由仍待后续切片。这些连接行为不能由 `Send` 的 nil 返回暗示。
 
-公开组装的易用性方向已确认：显式 Cluster 对象统一管理静态目标路由、共享等待表和每目标发送组件，Service 继续使用 source-bound ClusterClient；主动调用不要求本地 NodeID、Runtime 或 open。已确认签名 `NewCluster(config ClusterConfig) (*Cluster, error)` 与 `(*Cluster).Client(source runtime.ServiceID) (*ClusterClient, error)`；两者只构造本地状态，不拨号、不监听，Client 不单独拥有发送器或等待表。绑定来源是受信任组装能力，只校验非零 ID，不验证 Service 存活。该组装层尚未实现，首轮配置与两阶段关闭已确认，统一诊断入口也已确认，见 [组装入口方案](RFC-CLUSTER-ASSEMBLY.md)。
+公开组装的易用性方向已确认：显式 Cluster 对象统一管理静态目标路由、共享等待表和每目标发送组件，Service 继续使用 source-bound ClusterClient；主动调用不要求本地 NodeID、Runtime 或 open。已确认签名 `NewCluster(config ClusterConfig) (*Cluster, error)` 与 `(*Cluster).Client(source runtime.ServiceID) (*ClusterClient, error)`；两者只构造本地状态，不拨号、不监听，Client 不单独拥有发送器或等待表。绑定来源是受信任组装能力，只校验非零 ID，不验证 Service 存活。该出站组装层已实现，首轮配置与两阶段关闭已确认，统一诊断入口也已确认，见 [组装入口方案](RFC-CLUSTER-ASSEMBLY.md)。
 
-已确认的首轮出站配置（尚未实现）：
+已确认的首轮出站配置（已实现）：
 
 ```go
 type ClusterConfig struct {
@@ -497,7 +497,7 @@ type ClusterConfig struct {
 
 Nodes 在构造时复制，允许空表；每项要求非空 NodeID 与非空 host、1–65535 数字端口组成的 TCP 地址，构造不进行 DNS 查询或拨号。Codecs 必须显式提供不可变 registry，codec 实例沿用已有并发安全契约。数值零值采用默认值：MaxCallWait 5 秒、DialTimeout 3 秒、WriteTimeout 3 秒、每目标 OutboundQueueCapacity 1024 条、MaxFrame 4 MiB（含四字节长度前缀）；负数拒绝，零不表示无限。Call 总等待、单次拨号和单次 socket 写入是不同预算；调用方放弃等待不强杀连接级 Dial 或撤销已开始写入。配置不包含本地身份、Runtime、监听地址或热更新入口。
 
-公开 Cluster 关闭契约已确认（尚未实现）：
+公开 Cluster 关闭契约已确认（已实现）：
 
 ```go
 func (cluster *Cluster) Quiesce()
@@ -506,7 +506,7 @@ func (cluster *Cluster) Close(ctx context.Context) error
 
 Quiesce 幂等且不可恢复，同步拒绝新 Client/Send/Call 及新 sender/Dial，取消未绑定 Call，尚未开始投递的 Send 丢弃并诊断；已绑定 Call 保留原 deadline 与回复机会。它不关闭已建立的 socket，不等待任务退出；绑定与 Quiesce 必须在统一同步边界竞争。Close 自动发起 Quiesce，结束剩余等待，先对所有目标发出取消/关闭信号，再等待 sender、连接与诊断生产者退出。nil context 拒绝，调用方取消等待不终止唯一清理流程，后续 Close 可继续等待并获取最终合并错误；不增加 Cluster ShutdownTimeout 配置。业务退出保存应在 Quiesce 前完成，OnStop 不拥有新的跨节点调用旁路。Host 正常按“停止入站接纳 → Cluster.Quiesce → Core Stop/Close → Cluster.Close(ctx)”收尾；Runtime 停止超时也不能跳过 Cluster 资源清理。详见 [两阶段关闭](RFC-CLUSTER-SHUTDOWN.md)，诊断公开形式见已确认的统一诊断方案。
 
-公开 Cluster 统一诊断契约已确认（尚未实现）：
+公开 Cluster 统一诊断契约已确认（已实现）：
 
 ```go
 func (cluster *Cluster) Diagnostics() <-chan Diagnostic
@@ -549,7 +549,7 @@ Cluster 2 的远程 Call 使用 Cluster-owned `ClusterCallRegistry` 和内部 `C
 - wire request 只携带 `Session + Target + Command + Payload`；B 返回同一 `Session` 的 Response 或 Error，A 再按 Session 找回原 PendingCall 并恢复调用方 runner。
 - completion 必须来自登记的 RemoteNode，且 Target/Command 与原请求一致；未知、迟到、重复或错路由的 frame 不得完成其它 Session，只进入受控诊断。
 - cancellation、timeout、相关节点关闭和 Cluster 关闭都只完成并清理一次 PendingCall；不存在自动重放或 Session 转移。
-- 当前切片已实现 `ClusterClient.Call` 的请求编码、共享 Session 注册、本地有限等待、caller cancellation、Response/Error 解码和 `ClusterCallRegistry.Complete`；逻辑 `ConnectionAgent.Handle` 也已实现，真实网络 stream、response 路由和节点断线批量失败仍留在后续子切片。
+- 已实现 `ClusterClient.Call` 的请求编码、共享 Session 注册、本地有限等待、caller cancellation、Response/Error 解码及公开出站组装。逻辑 `Complete` 只处理未绑定连接的等待；真实 TCP 响应校验连接归属，断线只清理该连接等待，不按整个 NodeID 批量清理。公开 Open 与动态路由仍在后续切片。
 
 `ConnectionAgent` 是每条入站连接的逻辑接收适配器：
 
@@ -604,11 +604,11 @@ Error frame 实际携带 `ErrorClass + ErrorCode + Message`；Message 只用于�
 
 - 每个远端 Node 只有一个 outbound NodeSender；并发建连请求合并到该 sender，不创建多个竞争 sender。
 - 每条 inbound socket 由独立 ConnectionAgent 读取和响应，不要求把两个方向合并成一条全双工连接。
-- outbound 通道断开后按需恢复：没有请求时不后台拨号，下一条尚未发送的请求至多触发一次有限 Dial。失败只结束当前请求，后续请求可再次尝试；已经失败或结果不确定的业务请求不自动重放。Call 总 deadline 不重置，写入前再次检查是否已取消。内部 `outboundPeer` 已实现连接复用、替换和关闭等待，公开 TCP 组装接口尚未实现。详见 [按需建连方案](RFC-CLUSTER-ON-DEMAND-CONNECT.md)。
+- outbound 通道断开后按需恢复：没有请求时不后台拨号，下一条尚未发送的请求至多触发一次有限 Dial。失败只结束当前请求，后续请求可再次尝试；已经失败或结果不确定的业务请求不自动重放。Call 总 deadline 不重置，写入前再次检查是否已取消。内部 `outboundPeer` 已实现连接复用、替换和关闭等待，公开出站组装已实现，入站 Open 尚未实现。详见 [按需建连方案](RFC-CLUSTER-ON-DEMAND-CONNECT.md)。
 - 出站 Send/Call 不要求本地 NodeID 或 open 监听；open 只负责接受新入站连接，节点配置只负责目标地址解析。不强制交换 NodeID；Call 回复沿原连接返回，不是反向业务调用。
 - 删除 `LocalNode` 与入站 `from NodeID`：出站只按目标路由，入站只按连接管理。`Complete(remoteNode, response)` 中的节点来自出站连接绑定的目标，用于共享 PendingCall 匹配，不是入站来源身份。双方相互主动调用使用各自的出站连接，回复各沿原连接返回。
 - `Transport` 只要求 `Send(to, envelope)` 能力；内存替身的 `Register/Unregister` 与具体实现的 `Close` 不属于发送器的依赖接口。生命周期仍由外层 owner 负责。内存往返测试的 writer 直接绑定调用方 completion，不把回复模拟成反向 Send 或要求调用方注册。
-- 认证与可寻址 NodeID 分离，可信内网可关闭认证；具体认证协议另行裁决，不要求调用方注册节点或监听。详见 [出站调用、监听与节点身份](RFC-CLUSTER-CONNECTION-IDENTITY.md)。生产 open/连接管理尚未实现。
+- 认证与可寻址 NodeID 分离，可信内网可关闭认证；具体认证协议另行裁决，不要求调用方注册节点或监听。详见 [出站调用、监听与节点身份](RFC-CLUSTER-CONNECTION-IDENTITY.md)。公开 Open 与生产认证尚未实现。
 - 对同一 Node 的“重复连接胜负”不单独建模：outbound 由唯一 NodeSender 保证唯一；inbound agent 按连接独立存在，响应关联保持在原连接内。
 
 ## 7. ServiceContext

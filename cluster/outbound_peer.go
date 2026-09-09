@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"net"
 	"sync"
 	"sync/atomic"
@@ -19,7 +20,8 @@ type outboundPeerConfig struct {
 	dialTimeout  time.Duration
 	writeTimeout time.Duration
 	// dial 是标准拨号器的测试替换边界，必须遵守 ctx 并转移成功连接的所有权。
-	dial func(context.Context, string, string) (net.Conn, error)
+	dial              func(context.Context, string, string) (net.Conn, error)
+	sharedDiagnostics *clusterDiagnostics
 }
 
 // outboundPeer 为一个目标管理按需连接，不拥有业务队列或后台拨号循环。
@@ -30,11 +32,12 @@ type outboundPeer struct {
 	ctx    context.Context
 	cancel context.CancelFunc
 
-	sendMu sync.Mutex
-	mu     sync.Mutex
-	closed bool
-	active *outboundConnection // mu 保护，close 无需等待 sendMu 即可关闭 socket。
-	done   chan struct{}       // sendMu 保护，仅关联 active 的读循环。
+	sendMu    sync.Mutex
+	mu        sync.Mutex
+	closed    bool
+	quiescing bool
+	active    *outboundConnection // mu 保护，close 无需等待 sendMu 即可关闭 socket。
+	done      chan struct{}       // sendMu 保护，仅关联 active 的读循环。
 
 	diagnostics       chan responseReadFailure
 	dropped           atomic.Uint64
@@ -51,10 +54,13 @@ func newOutboundPeer(config outboundPeerConfig) (*outboundPeer, error) {
 		config.dial = (&net.Dialer{}).DialContext
 	}
 	ctx, cancel := context.WithCancel(context.Background())
-	return &outboundPeer{
+	peer := &outboundPeer{
 		config: config, ctx: ctx, cancel: cancel,
-		diagnostics: make(chan responseReadFailure, defaultFailureQueueCapacity),
-	}, nil
+	}
+	if config.sharedDiagnostics == nil {
+		peer.diagnostics = make(chan responseReadFailure, defaultFailureQueueCapacity)
+	}
+	return peer, nil
 }
 
 // Send 至多执行一次 Dial 和一次发送尝试，不等待远端业务结果，也不重放。
@@ -111,6 +117,9 @@ func (peer *outboundPeer) connection() (*outboundConnection, error) {
 	}
 	ctx, cancel := context.WithTimeout(peer.ctx, peer.config.dialTimeout)
 	defer cancel()
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 	socket, err := peer.config.dial(ctx, "tcp", peer.config.address)
 	if err != nil {
 		if socket != nil {
@@ -134,7 +143,7 @@ func (peer *outboundPeer) connection() (*outboundConnection, error) {
 		return nil, errors.Join(err, stream.close())
 	}
 	peer.mu.Lock()
-	if peer.closed {
+	if peer.closed || peer.quiescing {
 		peer.mu.Unlock()
 		return nil, errors.Join(ErrTransportClosed, stream.close())
 	}
@@ -153,7 +162,13 @@ func (peer *outboundPeer) receive(connection *outboundConnection, done chan stru
 		}
 		terminal = errors.Join(terminal, connection.stream.close())
 		connection.calls.fail(terminal)
-		if terminal != nil {
+		peer.mu.Lock()
+		closing := peer.closed
+		peer.mu.Unlock()
+		expectedClose := closing && (errors.Is(terminal, net.ErrClosed) || errors.Is(terminal, io.ErrClosedPipe) || errors.Is(terminal, context.Canceled)) && !errors.Is(terminal, ErrTransportPanicked)
+		if terminal != nil && !expectedClose && peer.config.sharedDiagnostics != nil {
+			peer.config.sharedDiagnostics.report(Diagnostic{Kind: DiagnosticConnectionFailure, RemoteNode: peer.config.node, Err: terminal})
+		} else if terminal != nil && peer.config.sharedDiagnostics == nil {
 			select {
 			case peer.diagnostics <- responseReadFailure{node: peer.config.node, err: terminal}:
 			default:
@@ -162,7 +177,7 @@ func (peer *outboundPeer) receive(connection *outboundConnection, done chan stru
 		}
 		close(done)
 	}()
-	dropped, err := connection.stream.receiveResponses(connection.calls, peer.diagnostics)
+	dropped, err := connection.stream.receiveResponsesTo(connection.calls, peer.diagnostics, peer.config.sharedDiagnostics)
 	peer.dropped.Add(dropped)
 	terminal = err
 }
@@ -170,6 +185,21 @@ func (peer *outboundPeer) receive(connection *outboundConnection, done chan stru
 // close 先取消拨号并关闭 socket，随后等待正在发送的调用及响应读循环退出。
 // 标准 Dial/写入有有限超时；测试拨号器也必须遵守 context，不能被强杀。
 func (peer *outboundPeer) close() error {
+	err := peer.signalClose()
+	peer.waitClosed()
+	return err
+}
+
+// quiesce 只取消拨号，不关闭已经建立的 socket。
+func (peer *outboundPeer) quiesce() {
+	peer.mu.Lock()
+	peer.quiescing = true
+	peer.cancel()
+	peer.mu.Unlock()
+}
+
+// signalClose 解除连接 I/O 等待，不等待发送器或响应读循环。
+func (peer *outboundPeer) signalClose() error {
 	peer.mu.Lock()
 	peer.closed = true
 	peer.cancel()
@@ -179,14 +209,19 @@ func (peer *outboundPeer) close() error {
 	if active != nil {
 		err = active.stream.close()
 	}
+	return err
+}
+
+func (peer *outboundPeer) waitClosed() {
 	peer.sendMu.Lock()
 	defer peer.sendMu.Unlock()
 	if peer.done != nil {
 		<-peer.done
 	}
 	if !peer.diagnosticsClosed {
-		close(peer.diagnostics)
+		if peer.diagnostics != nil {
+			close(peer.diagnostics)
+		}
 		peer.diagnosticsClosed = true
 	}
-	return err
 }

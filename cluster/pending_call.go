@@ -105,10 +105,11 @@ type clusterPendingCall struct {
 // clusterPendingCalls 管理单个 Cluster 实例的 ClusterSessionID 分配与响应完成。
 // 它不执行网络 I/O，也不直接唤醒 Runtime runner；这些接线由调用方负责。
 type clusterPendingCalls struct {
-	mu      sync.Mutex
-	next    ClusterSessionID
-	pending map[ClusterSessionID]*clusterPendingCall
-	closed  bool
+	mu        sync.Mutex
+	next      ClusterSessionID
+	pending   map[ClusterSessionID]*clusterPendingCall
+	closed    bool
+	quiescing bool
 }
 
 func newClusterPendingCalls() *clusterPendingCalls {
@@ -127,6 +128,9 @@ func (registry *clusterPendingCalls) begin(source runtime.ServiceID, node NodeID
 	defer registry.mu.Unlock()
 	if registry.closed {
 		return nil, ErrClusterCallClosed
+	}
+	if registry.quiescing {
+		return nil, ErrClusterQuiescing
 	}
 	if registry.next == 0 {
 		return nil, runtime.ErrIDExhausted
@@ -240,6 +244,23 @@ func (registry *clusterPendingCalls) pendingCount() int {
 	registry.mu.Lock()
 	defer registry.mu.Unlock()
 	return len(registry.pending)
+}
+
+// quiesce 与连接绑定共享锁，仅结束尚未绑定的等待，保留已经发送的回复机会。
+func (registry *clusterPendingCalls) quiesce() {
+	registry.mu.Lock()
+	registry.quiescing = true
+	var cancelled []*clusterPendingCall
+	for session, call := range registry.pending {
+		if call.owner == nil {
+			delete(registry.pending, session)
+			cancelled = append(cancelled, call)
+		}
+	}
+	registry.mu.Unlock()
+	for _, call := range cancelled {
+		finishClusterPendingCall(call, clusterCallResult{err: ErrClusterQuiescing})
+	}
 }
 
 func finishClusterPendingCall(pending *clusterPendingCall, result clusterCallResult) {

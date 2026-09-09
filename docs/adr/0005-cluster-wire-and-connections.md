@@ -36,9 +36,9 @@ GSR Cluster 需要保持 Skynet 风格的简洁调用面，同时明确 Go 的�
 
 ## Consequences
 
-- 公开出站组装采用已确认的单一 Diagnostics 出口及丢弃计数，固定 256 容量、非阻塞、无外部 callback、无每目标诊断转发任务；只记录基础设施事件，不改变 Send/Call 结果。所有生产者退出后关闭，不等待日志消费者，不能当作可靠审计通道。尚未实现，详见 [统一诊断](../RFC-CLUSTER-DIAGNOSTICS.md)。
+- 公开出站组装采用已确认的单一 Diagnostics 出口及丢弃计数，固定 256 容量、非阻塞、无外部 callback、无每目标诊断转发任务；只记录基础设施事件，不改变 Send/Call 结果。所有生产者退出后关闭，不等待日志消费者，不能当作可靠审计通道。首轮出站已实现，详见 [统一诊断](../RFC-CLUSTER-DIAGNOSTICS.md)。
 
-- 公开 Cluster 采用已确认的 Quiesce() 与 Close(ctx) 两阶段关闭：前者关闭接纳与新拨号，取消未绑定等待并保留已绑定 Call 的回复机会；后者最终取消剩余等待、关闭连接并等待全部内部任务退出。调用方 context 仅控制此次 Close 等待，不取消清理。该契约尚未实现，具体竞争边界与 Host 顺序见 [两阶段关闭](../RFC-CLUSTER-SHUTDOWN.md)。
+- 公开 Cluster 采用已确认的 Quiesce() 与 Close(ctx) 两阶段关闭：前者关闭接纳与新拨号，取消未绑定等待并保留已绑定 Call 的回复机会；后者最终取消剩余等待、关闭连接并等待全部内部任务退出。调用方 context 仅控制此次 Close 等待，不取消清理。首轮出站已实现该契约，具体竞争边界与 Host 顺序见 [两阶段关闭](../RFC-CLUSTER-SHUTDOWN.md)。
 
 - 业务 API 保持 `Send(node, target, ...)` / `Call(node, target, ...)`，连接和 source 路由细节由绑定后的 ClusterClient 隐藏。
 - 方向性连接避免额外的“双连接胜负”协议；同一节点可以各自拥有一条 outbound，并各自接受对方的 inbound。

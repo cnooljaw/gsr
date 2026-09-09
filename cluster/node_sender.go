@@ -48,20 +48,25 @@ var (
 // NodeSender 是本地节点到某个远端节点的唯一出站管理组件。
 // 它将复制后的消息封包接纳到有界队列，并串行投递。
 type NodeSender struct {
-	remoteNode      NodeID
-	transport       Transport
-	queue           chan ClusterEnvelope
-	failures        chan DeliveryFailure
-	stop            chan struct{}
-	done            chan struct{}
-	closeOnce       sync.Once
-	mu              sync.Mutex
-	closed          bool
-	droppedFailures atomic.Uint64
+	remoteNode        NodeID
+	transport         Transport
+	queue             chan ClusterEnvelope
+	failures          chan DeliveryFailure
+	stop              chan struct{}
+	done              chan struct{}
+	closeOnce         sync.Once
+	mu                sync.Mutex
+	closed            bool
+	droppedFailures   atomic.Uint64
+	sharedDiagnostics *clusterDiagnostics
 }
 
 // NewNodeSender 构造并启动一个使用有界队列的出站发送 worker。
 func NewNodeSender(config NodeSenderConfig) (*NodeSender, error) {
+	return newNodeSender(config, nil)
+}
+
+func newNodeSender(config NodeSenderConfig, diagnostics *clusterDiagnostics) (*NodeSender, error) {
 	if config.RemoteNode == "" || isNilTransport(config.Transport) {
 		return nil, fmt.Errorf("%w: remote node and Transport are required", ErrInvalidNodeSenderConfig)
 	}
@@ -72,12 +77,15 @@ func NewNodeSender(config NodeSenderConfig) (*NodeSender, error) {
 		return nil, fmt.Errorf("%w: QueueCapacity must be greater than zero", ErrInvalidNodeSenderConfig)
 	}
 	sender := &NodeSender{
-		remoteNode: config.RemoteNode,
-		transport:  config.Transport,
-		queue:      make(chan ClusterEnvelope, config.QueueCapacity),
-		failures:   make(chan DeliveryFailure, defaultFailureQueueCapacity),
-		stop:       make(chan struct{}),
-		done:       make(chan struct{}),
+		remoteNode:        config.RemoteNode,
+		transport:         config.Transport,
+		queue:             make(chan ClusterEnvelope, config.QueueCapacity),
+		sharedDiagnostics: diagnostics,
+		stop:              make(chan struct{}),
+		done:              make(chan struct{}),
+	}
+	if diagnostics == nil {
+		sender.failures = make(chan DeliveryFailure, defaultFailureQueueCapacity)
 	}
 	go sender.run()
 	return sender, nil
@@ -135,12 +143,7 @@ func (sender *NodeSender) Close(ctx context.Context) error {
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	sender.closeOnce.Do(func() {
-		sender.mu.Lock()
-		sender.closed = true
-		close(sender.stop)
-		sender.mu.Unlock()
-	})
+	sender.stopAdmission()
 	select {
 	case <-sender.done:
 		return nil
@@ -149,9 +152,21 @@ func (sender *NodeSender) Close(ctx context.Context) error {
 	}
 }
 
+// stopAdmission 只关闭接纳和发布停止意图，不等待 Transport。
+func (sender *NodeSender) stopAdmission() {
+	sender.closeOnce.Do(func() {
+		sender.mu.Lock()
+		sender.closed = true
+		close(sender.stop)
+		sender.mu.Unlock()
+	})
+}
+
 func (sender *NodeSender) run() {
 	defer close(sender.done)
-	defer close(sender.failures)
+	if sender.failures != nil {
+		defer close(sender.failures)
+	}
 	for {
 		select {
 		case <-sender.stop:
@@ -182,6 +197,12 @@ func (sender *NodeSender) sendTransport(envelope ClusterEnvelope) (err error) {
 }
 
 func (sender *NodeSender) tryReportFailure(envelope ClusterEnvelope, err error) {
+	if sender.sharedDiagnostics != nil {
+		sender.sharedDiagnostics.report(Diagnostic{Kind: DiagnosticDeliveryFailure,
+			RemoteNode: sender.remoteNode, Session: envelope.Session, Target: envelope.Target,
+			Command: envelope.Command, Err: err})
+		return
+	}
 	failure := DeliveryFailure{
 		RemoteNode: sender.remoteNode,
 		Kind:       envelope.Kind,
