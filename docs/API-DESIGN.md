@@ -479,6 +479,24 @@ func (codec *FrameCodec) Decode(frame []byte) (ClusterEnvelope, error)
 - `Close(ctx)` 先停止 admission；队列中尚未开始发送的 Envelope 以 `ErrNodeSenderClosed` 报告并丢弃，已经进入 `Transport.Send` 的调用允许自然返回。`ctx` 只控制调用方等待，不强杀 transport goroutine；超时后可以再次调用 `Close` 等待同一 worker。
 - sender 直接调用注入的 `Transport`，自身不管理 TCP；内部单目标 outboundPeer 已提供按需建连、连接复用与恢复，生产公开组装仍待实现。这些连接行为不能由 `Send` 的 nil 返回暗示。
 
+公开组装的易用性方向已确认：显式 Cluster 对象统一管理静态目标路由、共享等待表和每目标发送组件，Service 继续使用 source-bound ClusterClient；主动调用不要求本地 NodeID、Runtime 或 open。已确认签名 `NewCluster(config ClusterConfig) (*Cluster, error)` 与 `(*Cluster).Client(source runtime.ServiceID) (*ClusterClient, error)`；两者只构造本地状态，不拨号、不监听，Client 不单独拥有发送器或等待表。绑定来源是受信任组装能力，只校验非零 ID，不验证 Service 存活。该组装层尚未实现，首轮配置已确认，生命周期与诊断入口仍待逐项确认，见 [组装入口方案](RFC-CLUSTER-ASSEMBLY.md)。
+
+已确认的首轮出站配置（尚未实现）：
+
+```go
+type ClusterConfig struct {
+    Nodes                 map[NodeID]string
+    Codecs                *CommandCodecRegistry
+    MaxCallWait           time.Duration
+    DialTimeout           time.Duration
+    WriteTimeout          time.Duration
+    OutboundQueueCapacity int
+    MaxFrame              int
+}
+```
+
+Nodes 在构造时复制，允许空表；每项要求非空 NodeID 与非空 host、1–65535 数字端口组成的 TCP 地址，构造不进行 DNS 查询或拨号。Codecs 必须显式提供不可变 registry，codec 实例沿用已有并发安全契约。数值零值采用默认值：MaxCallWait 5 秒、DialTimeout 3 秒、WriteTimeout 3 秒、每目标 OutboundQueueCapacity 1024 条、MaxFrame 4 MiB（含四字节长度前缀）；负数拒绝，零不表示无限。Call 总等待、单次拨号和单次 socket 写入是不同预算；调用方放弃等待不强杀连接级 Dial 或撤销已开始写入。配置不包含本地身份、Runtime、监听地址或热更新入口。
+
 Cluster 1 同时提供 source-bound `ClusterClient` 的单向 `Send`：
 
 - 构造时必须绑定非零 Source、`NodeSenderResolver` 和启动期冻结的 `CommandCodecRegistry`；resolver 负责返回每个远端 Node 的唯一 sender，client 不拥有 sender 或连接。

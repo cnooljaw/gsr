@@ -29,8 +29,9 @@
 - **ValueCodec**：Cluster 0 的默认值编码器，只接受 nil、bool、整数、有限浮点数、string、`[]byte`、list 和 string-key map；解码将整数规范化为 `int64`/`uint64`，浮点数规范化为 `float64`，并执行深度与 payload 上限。
 - **CommandCodec**：一个 Command 的 payload 编解码能力，既可以使用默认 `ValueCodec`，也可以由业务提供 typed 实现；它只负责值与字节之间的转换，不负责路由、Service 能力或 Source。
 - **CommandCodecRegistry**：启动期创建并冻结的 `CommandID -> CommandCodec` 表；构造后只查找，不允许运行期注册、覆盖或删除，重复 CommandID 是配置错误。
+- **ClusterConfig**：已确认、尚未实现的公开出站组装配置，包含静态目标地址表、不可变 Command codec registry、有限 Call/Dial/Write 等待、每目标出站队列容量和帧上限；不包含本地 NodeID、Runtime 或监听能力。零值数值使用有限默认值，负数拒绝。
 - **FrameCodec**：Cluster 0 的长度前缀 frame 编解码器；使用四字节大端 body length，`MaxFrame` 包含前缀，只处理一个完整 frame，不负责 stream I/O、版本协商或连接生命周期。
-- **ClusterClient**：初始化时绑定一个 Source ServiceID、NodeSenderResolver、启动期 CommandCodecRegistry、ClusterCallRegistry 和有限 MaxCallWait 的 per-Service 窄 client；不能覆盖 Source，Send/Call 都通过同一个 Cluster 入口。
+- **ClusterClient**：初始化时绑定一个 Source ServiceID、NodeSenderResolver、启动期 CommandCodecRegistry、ClusterCallRegistry 和有限 MaxCallWait 的 per-Service 窄 client；不能覆盖 Source，Send/Call 都通过同一个 Cluster 入口。已确认由 NewCluster 构造显式组装对象，再由 Cluster.Client(source ServiceID) 集中提供这些依赖以改善易用性；绑定入口属于受信任组装能力，不验证 Service 存活，不新增另一种业务 Call。公开组装层尚未实现。
 - **ClusterCallRegistry**：一个 Cluster 级的 PendingCall owner。所有 source-bound ClusterClient 共享它分配 ClusterSessionID；`Complete(from, envelope)` 只完成未绑定连接的逻辑/内存链路响应，网络响应通过私有连接 owner 完成。关闭时统一结束未完成的 Call。
 - **Redirect / Relay**：仅供 Runtime 或明确受信任的 Adapter/Transport 使用的消息转发能力。它转发 Runtime-owned Message 或 relay token，不接受业务任意指定的 Source；首版只考虑单向转发，不转移 Call 的 PendingCall/Session。
 - **ClusterSessionID**：`uint64` 形式的 Cluster 请求关联号；零表示 Send，非零表示 Call。它由 Cluster 管理、在当前实例内单调分配且不回绕复用，不要求与 Core SessionID 相同。
