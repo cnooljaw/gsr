@@ -42,7 +42,8 @@
 - **业务语义边界**：Runtime/Cluster 只负责消息投递、路由和连接恢复，不判断业务资源的唯一所有权、一致性或过期。fencing、幂等、RequestID、补偿和业务过期规则由拥有该操作语义的业务或外层模块负责；ServiceID 不引入 Epoch、Lease 或 Generation。
 - **Admission**：Mailbox 或出站队列对消息的本地接受动作。Send 返回 nil 只说明 admission 成功，不说明目标 Handler 已执行或业务操作已成功。
 - **NodeSender**：Cluster 为一个远端 Node 唯一管理的 outbound 发送者。当前基础实现用固定容量队列和单一 worker 完成本地 admission 与顺序投递；队列满立即失败。admission 后的 Transport error/panic 和关闭丢弃进入有界、非阻塞的 `Failures()` 诊断 stream，慢消费者不会阻塞 sender，溢出由 `DroppedFailureCount()` 计数。内部单目标连接 owner 已实现按需建连与恢复：空闲时不拨号，下一请求至多触发一次有限 Dial，不自动重放结果不确定的请求；生产目标路由与公开 TCP 组装仍待实现。
-- **DeliveryFailure**：NodeSender 在 Envelope 已 admission 后发布的一次基础设施失败，包含本地/远端节点及路由元数据和底层 error，不携带业务 payload、不触发业务 callback，也不表示远端 Handler 的业务结果。
+- **DeliveryFailure**：NodeSender 在 Envelope 已 admission 后发布的一次基础设施失败，包含目标节点、路由元数据和底层 error，不携带业务 payload、不触发业务 callback，也不表示远端 Handler 的业务结果。
+- **Diagnostic**：已确认、尚未实现的公开 Cluster 出站诊断事件，区分投递失败、连接异常和响应拒绝。所有组装内生产者共享一个 256 容量的非阻塞 Diagnostics 出口，满载丢弃并计数；不是广播、可靠审计或业务结果通道，正常调用失败仍遵循 Send/Call 契约。全部生产者退出后才关闭出口，日志消费者由宿主基础设施管理。
 - **远程 Send 所有权**：A 节点只负责本地 admission 和自身的传输诊断，B 节点负责收到消息后的 Handler 处理与错误记录；Send 不把 B 的 Handler error 返回 A。需要远端结果时使用 Call。
 - **ConnectionAgent**：Cluster 为一条 inbound socket 创建的接收适配器。当前只处理已解码的逻辑 Request：调用窄的本地 dispatch、为 Call 沿所属连接写回 Response/Error，并把 socket/frame 读写生命周期留给外层连接 owner。
 - **InMemoryTransport**：Cluster 0 提供的同步、确定性进程内 Transport；它在接收边界 Clone Envelope，供测试和后续 sender/agent 使用，不代表生产 TCP、重连或远端执行语义。

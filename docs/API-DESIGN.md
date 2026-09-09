@@ -479,7 +479,7 @@ func (codec *FrameCodec) Decode(frame []byte) (ClusterEnvelope, error)
 - `Close(ctx)` 先停止 admission；队列中尚未开始发送的 Envelope 以 `ErrNodeSenderClosed` 报告并丢弃，已经进入 `Transport.Send` 的调用允许自然返回。`ctx` 只控制调用方等待，不强杀 transport goroutine；超时后可以再次调用 `Close` 等待同一 worker。
 - sender 直接调用注入的 `Transport`，自身不管理 TCP；内部单目标 outboundPeer 已提供按需建连、连接复用与恢复，生产公开组装仍待实现。这些连接行为不能由 `Send` 的 nil 返回暗示。
 
-公开组装的易用性方向已确认：显式 Cluster 对象统一管理静态目标路由、共享等待表和每目标发送组件，Service 继续使用 source-bound ClusterClient；主动调用不要求本地 NodeID、Runtime 或 open。已确认签名 `NewCluster(config ClusterConfig) (*Cluster, error)` 与 `(*Cluster).Client(source runtime.ServiceID) (*ClusterClient, error)`；两者只构造本地状态，不拨号、不监听，Client 不单独拥有发送器或等待表。绑定来源是受信任组装能力，只校验非零 ID，不验证 Service 存活。该组装层尚未实现，首轮配置与两阶段关闭已确认，诊断入口仍待确认，见 [组装入口方案](RFC-CLUSTER-ASSEMBLY.md)。
+公开组装的易用性方向已确认：显式 Cluster 对象统一管理静态目标路由、共享等待表和每目标发送组件，Service 继续使用 source-bound ClusterClient；主动调用不要求本地 NodeID、Runtime 或 open。已确认签名 `NewCluster(config ClusterConfig) (*Cluster, error)` 与 `(*Cluster).Client(source runtime.ServiceID) (*ClusterClient, error)`；两者只构造本地状态，不拨号、不监听，Client 不单独拥有发送器或等待表。绑定来源是受信任组装能力，只校验非零 ID，不验证 Service 存活。该组装层尚未实现，首轮配置与两阶段关闭已确认，统一诊断入口也已确认，见 [组装入口方案](RFC-CLUSTER-ASSEMBLY.md)。
 
 已确认的首轮出站配置（尚未实现）：
 
@@ -504,7 +504,35 @@ func (cluster *Cluster) Quiesce()
 func (cluster *Cluster) Close(ctx context.Context) error
 ```
 
-Quiesce 幂等且不可恢复，同步拒绝新 Client/Send/Call 及新 sender/Dial，取消未绑定 Call，尚未开始投递的 Send 丢弃并诊断；已绑定 Call 保留原 deadline 与回复机会。它不关闭已建立的 socket，不等待任务退出；绑定与 Quiesce 必须在统一同步边界竞争。Close 自动发起 Quiesce，结束剩余等待，先对所有目标发出取消/关闭信号，再等待 sender、连接与诊断生产者退出。nil context 拒绝，调用方取消等待不终止唯一清理流程，后续 Close 可继续等待并获取最终合并错误；不增加 Cluster ShutdownTimeout 配置。业务退出保存应在 Quiesce 前完成，OnStop 不拥有新的跨节点调用旁路。Host 正常按“停止入站接纳 → Cluster.Quiesce → Core Stop/Close → Cluster.Close(ctx)”收尾；Runtime 停止超时也不能跳过 Cluster 资源清理。详见 [两阶段关闭](RFC-CLUSTER-SHUTDOWN.md)，诊断公开形式仍待确认。
+Quiesce 幂等且不可恢复，同步拒绝新 Client/Send/Call 及新 sender/Dial，取消未绑定 Call，尚未开始投递的 Send 丢弃并诊断；已绑定 Call 保留原 deadline 与回复机会。它不关闭已建立的 socket，不等待任务退出；绑定与 Quiesce 必须在统一同步边界竞争。Close 自动发起 Quiesce，结束剩余等待，先对所有目标发出取消/关闭信号，再等待 sender、连接与诊断生产者退出。nil context 拒绝，调用方取消等待不终止唯一清理流程，后续 Close 可继续等待并获取最终合并错误；不增加 Cluster ShutdownTimeout 配置。业务退出保存应在 Quiesce 前完成，OnStop 不拥有新的跨节点调用旁路。Host 正常按“停止入站接纳 → Cluster.Quiesce → Core Stop/Close → Cluster.Close(ctx)”收尾；Runtime 停止超时也不能跳过 Cluster 资源清理。详见 [两阶段关闭](RFC-CLUSTER-SHUTDOWN.md)，诊断公开形式见已确认的统一诊断方案。
+
+公开 Cluster 统一诊断契约已确认（尚未实现）：
+
+```go
+func (cluster *Cluster) Diagnostics() <-chan Diagnostic
+func (cluster *Cluster) DroppedDiagnosticCount() uint64
+
+type DiagnosticKind uint8
+
+const (
+    DiagnosticDeliveryFailure DiagnosticKind = iota + 1
+    DiagnosticConnectionFailure
+    DiagnosticResponseRejected
+)
+
+type Diagnostic struct {
+    Kind       DiagnosticKind
+    RemoteNode NodeID
+    Session    ClusterSessionID
+    Target     ServiceTarget
+    Command    runtime.CommandID
+    Err        error
+}
+```
+
+每个 Cluster 使用一个固定 256 容量的非阻塞队列，满载丢弃新事件并单调累计 DroppedDiagnosticCount；重复获取为同一消费通道，不是广播。只保存出站目标、可信的请求关联元数据与错误链，不携带 payload；错误文本不承诺天然脱敏。内部生产者直接写共享出口，不执行外部 callback、不为每目标保留诊断转发 goroutine 或在两套出口双写。应用基础设施消费日志，普通 Service 不管理诊断任务。
+
+admission 前错误不重复上报；远端领域错误及正常 Call 取消/超时走调用方结果，迟到响应仍可产生 ResponseRejected。一次断线可能产生连接事件及受影响投递事件，不做全局根因去重。主动关闭的预期连接结束不报 ConnectionFailure，但丢弃排队 Send 仍报告投递失败。Quiesce 不关闭出口，Close 等全部生产者退出后关闭，不等待消费者读空；丢弃计数在关闭后仍可读取。此出口不提供可靠审计、逐节点公平性或完整限频保证。具体字段有效性与门禁见 [统一诊断](RFC-CLUSTER-DIAGNOSTICS.md)。
 
 Cluster 1 同时提供 source-bound `ClusterClient` 的单向 `Send`：
 

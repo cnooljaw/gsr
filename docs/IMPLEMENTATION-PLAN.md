@@ -337,8 +337,9 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 - 当前连接上限属于单 listener owner。公开 open API、多个 listener 共享的节点总配额及生产诊断消费尚未组装，不能据此宣称完整 TCP Transport 已完成。
 - 出站连接等待归属已确认并实现内部绑定、响应校验和连接范围清理，真实 TCP 夹具已改用此路径。见 [出站连接与 Call 等待归属方案](RFC-CLUSTER-OUTBOUND-CALL-OWNERSHIP.md)。单目标 Dial 与连接替换已由内部 outboundPeer 接管，生产路由组装仍待完成。
 - 按需建连已确认并实现内部 `outboundPeer`：单目标有限 Dial、连接复用、下一请求触发恢复、不重放；关闭先取消 Dial/关闭 socket，再等待发送与唯一响应读循环退出。见 [按需建连方案](RFC-CLUSTER-ON-DEMAND-CONNECT.md)。已覆盖 TCP 回环恢复、失败隔离、取消跳过、半写不重放、Send 诊断及关闭；公开 TCP Transport 与目标路由组装仍待后续切片。
-- 已确认易用性方向、`NewCluster(config)`、`Client(source ServiceID)` 两个签名及首轮 ClusterConfig 字段与默认值：显式 Cluster 对象统一出站组装，业务继续使用 source-bound ClusterClient，不手工接线内部组件。见 [公开组装入口方案](RFC-CLUSTER-ASSEMBLY.md)。两阶段关闭已确认，下一项收口诊断入口，公开组装层尚未实现。
-- 生命周期已确认，见 [两阶段关闭方案](RFC-CLUSTER-SHUTDOWN.md)：Quiesce 停止接纳，Close(ctx) 最终释放与等待；已绑定 Call 保留回复机会，未发送请求按停止策略收尾。下一项仅收口诊断入口，公开组装代码与对应生命周期测试尚未实现。
+- 已确认易用性方向、`NewCluster(config)`、`Client(source ServiceID)` 两个签名及首轮 ClusterConfig 字段与默认值：显式 Cluster 对象统一出站组装，业务继续使用 source-bound ClusterClient，不手工接线内部组件。见 [公开组装入口方案](RFC-CLUSTER-ASSEMBLY.md)。两阶段关闭已确认，统一诊断入口也已确认，公开组装层尚未实现。
+- 生命周期已确认，见 [两阶段关闭方案](RFC-CLUSTER-SHUTDOWN.md)：Quiesce 停止接纳，Close(ctx) 最终释放与等待；已绑定 Call 保留回复机会，未发送请求按停止策略收尾。统一诊断入口也已确认，公开组装代码与对应生命周期测试尚未实现。
+- 统一诊断出口已确认，见 [诊断方案](RFC-CLUSTER-DIAGNOSTICS.md)：每 Cluster 单一 256 容量的非阻塞 Diagnostics 与丢弃计数，内部直接上报，不执行外部 callback 或创建每目标转发任务。创建/绑定、配置、关闭与诊断契约均已收口，下一步实现最小公开出站组装及其测试；Open、认证和动态路由不纳入本轮。
 - NodeSender 自动重连，但不自动重放已经失败或结果不确定的请求。
 
 ### Cluster 4：故障与资源收尾
