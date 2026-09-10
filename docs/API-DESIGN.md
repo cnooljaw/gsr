@@ -504,7 +504,7 @@ func (cluster *Cluster) Quiesce()
 func (cluster *Cluster) Close(ctx context.Context) error
 ```
 
-Quiesce 幂等且不可恢复，同步拒绝新 Client/Send/Call 及新 sender/Dial，取消未绑定 Call，尚未开始投递的 Send 丢弃并诊断；已绑定 Call 保留原 deadline 与回复机会。它不关闭已建立的 socket，不等待任务退出；绑定与 Quiesce 必须在统一同步边界竞争。Close 自动发起 Quiesce，结束剩余等待，先对所有目标发出取消/关闭信号，再等待 sender、连接与诊断生产者退出。nil context 拒绝，调用方取消等待不终止唯一清理流程，后续 Close 可继续等待并获取最终合并错误；不增加 Cluster ShutdownTimeout 配置。业务退出保存应在 Quiesce 前完成，OnStop 不拥有新的跨节点调用旁路。Host 正常按“停止入站接纳 → Cluster.Quiesce → Core Stop/Close → Cluster.Close(ctx)”收尾；Runtime 停止超时也不能跳过 Cluster 资源清理。详见 [两阶段关闭](RFC-CLUSTER-SHUTDOWN.md)，诊断公开形式见已确认的统一诊断方案。
+Quiesce 幂等且不可恢复，同步拒绝新 Client/Send/Call 及新 sender/Dial，取消未绑定 Call，尚未开始投递的 Send 丢弃并诊断；已绑定 Call 保留原 deadline 与回复机会。它不关闭已建立的 socket，不等待任务退出；绑定与 Quiesce 必须在统一同步边界竞争。Close 自动发起 Quiesce，结束剩余等待，先对所有目标发出取消/关闭信号，再等待 sender、连接与诊断生产者退出。nil context 拒绝，调用方取消等待不终止唯一清理流程，后续 Close 可继续等待并获取最终合并错误；不增加 Cluster ShutdownTimeout 配置。业务退出保存应在 Quiesce 前完成，OnStop 不拥有新的跨节点调用旁路。Host 正常按“Cluster.Quiesce（统一停止入站与出站接纳，关闭监听）→ Core Stop/Close → Cluster.Close(ctx)”收尾；Runtime 停止超时也不能跳过 Cluster 资源清理。详见 [两阶段关闭](RFC-CLUSTER-SHUTDOWN.md)，诊断公开形式见已确认的统一诊断方案。
 
 公开 Cluster 统一诊断契约已确认（已实现）：
 
@@ -551,7 +551,7 @@ Cluster 2 的远程 Call 使用 Cluster-owned `ClusterCallRegistry` 和内部 `C
 - cancellation、timeout、相关节点关闭和 Cluster 关闭都只完成并清理一次 PendingCall；不存在自动重放或 Session 转移。
 - 已实现 `ClusterClient.Call` 的请求编码、共享 Session 注册、本地有限等待、caller cancellation、Response/Error 解码及公开出站组装。逻辑 `Complete` 只处理未绑定连接的等待；真实 TCP 响应校验连接归属，断线只清理该连接等待，不按整个 NodeID 批量清理。公开 Open 与动态路由仍在后续切片。
 
-可选入站组装的资源归属及签名已确认：`func (cluster *Cluster) Open(target *runtime.Runtime, config ListenConfig) (string, error)` 显式接收目标 Runtime，成功返回实际监听地址（`host:port`），监听失败返回 error。由现有 Cluster 管理监听、入站连接及网络任务，不返回独立 Listener owner，也不启动、停止或关闭 Runtime。第一版每个 Cluster 最多一个监听，可接纳多个连接并投递到多个 Service；不支持多监听、监听热切换或运行中换绑 Runtime。不 Open 仍可主动 Send/Call，回复沿原连接返回。ListenConfig 已确认四个字段：必填 `Address string`、监听连接上限 `MaxConnections int`、每连接 Call 上限 `MaxConcurrentCalls int`、可选 `ResolveService func(ServiceName) (runtime.ServiceID, error)`。编码注册表、帧长及写超时复用 ClusterConfig，本地 Call 等待上限由目标 Runtime 控制。默认连接上限为 128、每连接 Call 上限为 32（零值使用默认，负数无效），Address 为空报错，ResolveService 可为 nil。重复调用规则及停止接线仍待收口，尚未实现，见 [可选入站组装](RFC-CLUSTER-OPEN.md)。
+可选入站组装的资源归属及签名已确认：`func (cluster *Cluster) Open(target *runtime.Runtime, config ListenConfig) (string, error)` 显式接收目标 Runtime，成功返回实际监听地址（`host:port`），监听失败返回 error。由现有 Cluster 管理监听、入站连接及网络任务，不返回独立 Listener owner，也不启动、停止或关闭 Runtime。第一版每个 Cluster 最多一个监听，可接纳多个连接并投递到多个 Service；不支持多监听、监听热切换或运行中换绑 Runtime。不 Open 仍可主动 Send/Call，回复沿原连接返回。ListenConfig 已确认四个字段：必填 `Address string`、监听连接上限 `MaxConnections int`、每连接 Call 上限 `MaxConcurrentCalls int`、可选 `ResolveService func(ServiceName) (runtime.ServiceID, error)`。编码注册表、帧长及写超时复用 ClusterConfig，本地 Call 等待上限由目标 Runtime 控制。默认连接上限为 128、每连接 Call 上限为 32（零值使用默认，负数无效），Address 为空报错，ResolveService 可为 nil。Open 成功后再次调用返回错误（不比较配置），失败清理本次资源后允许应用重试；并发只允许一个打开流程，其余报错；Quiesce/Close 后拒绝 Open。停止接线约定已确认：Quiesce 统一停止接纳并关闭监听，监听关闭错误由 Close 合并返回；不主动关闭已建立连接或等待任务退出。入站诊断接线仍待收口，尚未实现，见 [可选入站组装](RFC-CLUSTER-OPEN.md)。
 
 注册与发现属于 Core 和 Cluster 之外的能力：外层维护 `NodeID → 可访问地址`，Open 不自动注册、续约或发布地址。保留显式 `ListenConfig.Address`，不增加按 NodeID 打开的公共重载；共同节点表的查找及“只取端口绑定 0.0.0.0”等部署转换由应用组装。Open 返回实际绑定地址，不保证是外部可访问地址。当前 ClusterConfig.Nodes 仅提供静态路由，不表示成员存活、业务就绪或资源所有权；动态发现结果的路由更新接线另行设计，本轮不增加通用 Discovery 框架。
 
@@ -582,7 +582,7 @@ Cluster 2 的远程 Call 使用 Cluster-owned `ClusterCallRegistry` 和内部 `C
 
 内部 `tcpListener` 接管一个已经建立的 TCP listener，显式配置正数连接上限、每连接 Call 上限及写 timeout。连接满额时立即关闭新接入 socket，不为其创建处理任务或用户态等待队列；已接纳连接不受影响。诊断以远端地址和 Session 定位，有界、非阻塞，满载计数可观测，不依赖 NodeID。
 
-入站停止接纳已确认：关闭监听并阻止旧连接接纳新请求，但保留已接纳 Call 的原连接回复机会；最终关闭才取消剩余等待并断连。完整帧交给处理任务前的门禁检查是入站请求 admission 边界，不等于本地 Mailbox admission。停止后暂停读取，不新增拒绝回包；未接纳 Call 仍由原有限超时或断线结束。内部接线与公开 Open 分开推进，不改变当前出站 Cluster.Quiesce 的无网络 I/O 契约，详见两阶段关闭文档。
+入站停止接纳已确认：关闭监听并阻止旧连接接纳新请求，但保留已接纳 Call 的原连接回复机会；最终关闭才取消剩余等待并断连。完整帧交给处理任务前的门禁检查是入站请求 admission 边界，不等于本地 Mailbox admission。停止后暂停读取，不新增拒绝回包；未接纳 Call 仍由原有限超时或断线结束。公开 Open 接线已确认复用 Cluster.Quiesce 关闭监听及入站门禁，替代原无网络 I/O 表述；不增加公共停止入口，尚未实现公开入站接线，详见两阶段关闭文档。
 
 listener 的 context 取消或非停止接纳导致的 Accept 失败时，组件关闭监听及所有已接纳 socket，取消连接内基础设施等待，并等待全部连接处理任务退出；不自动重新监听，不强杀 Handler。内部 quiesce 关闭监听后，serve 保留已有连接并等待最终 context 取消，不提前关闭诊断出口。当前连接上限属于单个 listener owner，公开 open API、多 listener 的节点总配额与生产诊断消费仍待外层组装；此组件不拥有出站连接或 Runtime 生命周期。
 

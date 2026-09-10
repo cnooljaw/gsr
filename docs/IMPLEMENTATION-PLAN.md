@@ -334,7 +334,7 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 - 已实现内部 tcpListener：接管一个 TCP listener，限制已接纳连接总数；满额时关闭新 socket，不启动连接任务、不建立用户态等待队列，诊断有界非阻塞。每条已接纳连接使用独立 inboundConnection，来源诊断只附连接远端地址与 Session，不添加 NodeID。
 - tcpListener 的取消或异常 Accept 失败会关闭监听和全部已接纳连接、取消基础设施 Call 并等待全部连接处理任务退出；不会强杀目标 Handler。已验证满额隔离、坏帧隔离、慢 Call 期间关闭、空闲 Accept 取消、诊断满载计数与非法配置/重复启动。
 - 已确认并实现内部入站 quiesce：关闭监听，所有连接共享请求门禁；完整帧在交给处理任务前决定 admission，停止后暂停读取，已接纳 Call 仍可沿原连接回复。最终取消解除读取、满载名额和停止等待。已补充真实 TCP 的新连接拒绝、新 Send/Call 不执行、旧 Call 回复、并发重复停止、空闲与满载取消测试。公开 Open 和统一入站诊断接线仍未实现。
-- 已确认公开 Open 的资源归属及签名：`Open(target *runtime.Runtime, config ListenConfig) (string, error)` 返回实际监听地址；现有 Cluster 拥有可选单监听及入站连接，但不管理目标 Runtime 生命周期。不支持多监听与热切换，不影响仅出站调用。ListenConfig 的 Address、MaxConnections、MaxConcurrentCalls 和 ResolveService 四个字段已确认。默认连接上限 128、每连接 Call 上限 32 及零值/负数规则已确认。下一步逐项确认重复调用规则、停止及诊断接线，再实施公开入站切片，见 [可选入站组装](RFC-CLUSTER-OPEN.md)。
+- 已确认公开 Open 的资源归属及签名：`Open(target *runtime.Runtime, config ListenConfig) (string, error)` 返回实际监听地址；现有 Cluster 拥有可选单监听及入站连接，但不管理目标 Runtime 生命周期。不支持多监听与热切换，不影响仅出站调用。ListenConfig 的 Address、MaxConnections、MaxConcurrentCalls 和 ResolveService 四个字段已确认。默认连接上限 128、每连接 Call 上限 32 及零值/负数规则已确认。重复调用规则已确认：成功后拒绝重复打开、失败回滚后可重试、并发仅一个打开流程、停止后禁止 Open。停止接线已确认复用 Quiesce 关闭监听和入站门禁、保留连接回复，关闭错误由 Close 合并返回。下一步确认入站诊断接线，再实施公开入站切片，见 [可选入站组装](RFC-CLUSTER-OPEN.md)。
 - 已确认注册与发现属于外部能力：保留显式地址的 Open，不增加按节点名打开的公共 API；静态表查找和发布地址由应用组装。当前静态出站路由不等于已实现动态发现或地址更新，相关接线留待后续需求。
 - 已统一入站诊断出口：listener 与全部连接共享一个有界队列和丢弃计数，删除每连接的 256 容量缓冲与转发 goroutine。单连接退出不关闭出口，listener 在全部生产者退出后关闭；保留解除 Accept/Read 阻塞所需的取消监视机制。
 - 当前连接上限属于单 listener owner。公开 open API、多个 listener 共享的节点总配额及生产诊断消费尚未组装，不能据此宣称完整 TCP Transport 已完成。

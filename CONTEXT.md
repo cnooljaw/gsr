@@ -52,7 +52,7 @@
 - **Timer owner**：登记 Timer 的 Service/Runtime owner。它用于校验取消权限和表达 Timer 创建者；Timer 到期消息的 Source 不使用 owner 的 ServiceID，而固定为零值。
 - **RuntimeState**：Runtime 的生命周期状态。公开顺序为 `Created → Starting → Running → Stopping → Stopped → Closed`；`Starting` 表示 Runtime-owned Core 组件正在启动，`Stopped` 表示停止流程完成，`Closed` 表示 Runtime-owned 资源已最终释放。
 - **Lifecycle Coordinator**：Runtime 内部按固定 start/stop 计划编排 Core 组件的生命周期；它不拥有组件资源，也不是可无限注册的业务插件容器。
-- **Quiesce**：关闭流程中停止新 admission、入站和重连的阶段，不等同于等待所有任务完成。已实现的 Cluster.Quiesce() 针对首轮出站组装拒绝新 Client/Send/Call，取消尚未绑定的 Call 并停止新拨号；已绑定 Call 保留原等待上限和回复机会。最终资源释放由 Cluster.Close(ctx) 完成，调用方停止等待不取消清理。内部 tcpListener 已支持独立停止入站接纳：关闭监听并阻止旧连接的新请求，保留已接纳 Call 的原连接回复机会，最终取消才断连；公开 Open 接线仍待后续实现。
+- **Quiesce**：关闭流程中停止新 admission、入站和重连的阶段，不等同于等待所有任务完成。已实现的 Cluster.Quiesce() 针对首轮出站组装拒绝新 Client/Send/Call，取消尚未绑定的 Call 并停止新拨号；已绑定 Call 保留原等待上限和回复机会。最终资源释放由 Cluster.Close(ctx) 完成，调用方停止等待不取消清理。内部 tcpListener 已支持独立停止入站接纳：关闭监听并阻止旧连接的新请求，保留已接纳 Call 的原连接回复机会，最终取消才断连；公开 Open 已确认复用 Cluster.Quiesce 统一停止入站与出站接纳并关闭监听，不主动关闭已建立连接、不等待任务退出，监听关闭错误由最终 Close 合并返回；接线尚未实现。
 - **Stop / Close**：`Runtime.Stop(ctx)` 负责关闭 admission 并有序停止全部 Core 组件，`Runtime.Close()` 负责 Stop 完成后的最终资源释放；二者幂等，Stop 后不得再次 Start。`Close()` 使用 `ShutdownTimeout`，没有调用方 context。
 - **RuntimeInspection**：`Runtime.Inspect()` 返回的只读值快照，包含 Runtime 状态、Service/ mailbox/runner 状态、PendingCall/Timer 数量和基础故障计数；它不暴露 Runtime-owned 内部对象。
 - **Runtime Handler 诊断**：`runtime.Diagnostic` 是本地 Handler 错误或真实 panic 的值快照，包含消息关联字段、错误分类、最多 4 KiB 的 Message 和最多 16 KiB 的 panic Stack；不保留业务对象或原始 error 引用。`Runtime.Diagnostics()` 是容量 256 的非阻塞单消费流，满载丢弃由 `DroppedDiagnosticCount()` 计数，仅在 Runtime 进入 Closed 时关闭。它与 Cluster 诊断分属不同包，不共用事件框架；宿主负责日志输出与脱敏。

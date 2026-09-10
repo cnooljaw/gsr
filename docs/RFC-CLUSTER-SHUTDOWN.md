@@ -1,6 +1,6 @@
 # Cluster 两阶段关闭
 
-状态：已获用户确认，首轮公开出站 Cluster 生命周期已实现。
+状态：已获用户确认，首轮公开出站 Cluster 生命周期已实现；Quiesce 统一停止可选入站的扩展约定已确认，公开 Open 接线尚未实现。
 
 ## 已确认入口
 
@@ -31,7 +31,7 @@ Quiesce 表示停止接纳和启动新工作，不表示全部任务已结束；
 - 已绑定连接的 Call 保留原等待上限，可以接收正常结果、远端错误或连接错误；不因 Quiesce 统一立即失败，不重置 deadline。
 - 已开始的单次 socket 写入可在原有限写超时内自然结束，不能承诺撤销远端执行。Quiesce 不主动关闭已建立的 socket，不等待 Handler 或读写循环结束。
 
-Quiesce 不接收 context，也不进行网络 I/O 或等待 worker；它完成接纳门禁与停止信号的发布。队列诊断和 worker 收尾可以随后完成，不能据其返回宣称已释放资源。无返回错误是因为它只发起不可逆且幂等的本地停止动作；最终释放错误由 Close 返回。
+Quiesce 不接收 context，不等待 Handler 或 worker 退出。接入可选 Open 后，它统一停止入站与出站的新 admission，并关闭监听 socket，但不主动关闭已建立连接；已接纳的入站 Call 保留原回复机会。监听关闭错误保存并由最终 Close 合并返回，Quiesce 仍无返回值。队列诊断和 worker 收尾可以随后完成，不能据其返回宣称已释放资源。此已确认约定替代首轮出站组装的“不进行网络 I/O”表述，不增加 StopListener 或其它公共停止入口。
 
 绑定与 Quiesce 必须有统一的竞争边界：先绑定者可继续等回复，先 Quiesce 者不得新增绑定。不得把“先查一个 bool，再无锁写入”的检查当作该保证。
 
@@ -47,7 +47,7 @@ Quiesce 不接收 context，也不进行网络 I/O 或等待 worker；它完成�
 
 ## Host 调用顺序与业务影响
 
-正常 Host 停机维持已有顺序：停止可选入站 admission，Cluster.Quiesce，Runtime.Stop/Close，最后 Cluster.Close(ctx)。公开 Cluster 目前仍只组装出站能力，入站停止规则已确认，公开 Open 的签名与接线留待后续。
+接入公开 Open 后，正常 Host 停机顺序为 Cluster.Quiesce（统一停止入站与出站接纳并关闭监听）、Runtime.Stop/Close、最后 Cluster.Close(ctx)。Close 最终取消剩余入站等待、断开连接并等待网络任务，不管理 Runtime 生命周期。公开 Cluster 目前仍只组装出站能力，上述入站生命周期扩展已确认但尚未接线。
 
 ### 入站停止接纳（已确认）
 
