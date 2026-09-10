@@ -1,6 +1,6 @@
 # Cluster 可选入站组装
 
-状态：资源归属、公开签名、配置字段、默认值、重复调用规则及停止接线约定已获用户确认；公开 Open 尚未实现，入站诊断接线仍待确认。
+状态：资源归属、公开签名、配置字段、默认值、重复调用规则及停止接线约定已获用户确认；公开 Open 尚未实现，入站诊断方案也已确认，待实施公开入站切片。
 
 ## 当前依据
 
@@ -90,6 +90,8 @@ Skynet 的 clusterd 每次 listen 创建新的 gate，而单个 gate 通过 `ass
 
 Host 按 Cluster.Quiesce → Runtime.Stop/Close → Cluster.Close(ctx) 收尾。Close 自动发起 Quiesce，最终取消剩余等待、断开连接并等待网络任务，仍不管理 Runtime 生命周期；调用方 context 只限制本次等待，不中断唯一清理流程。此公开入站接线尚未实现，详见 [两阶段关闭](RFC-CLUSTER-SHUTDOWN.md)。
 
-## 后续逐项收口
+## 已确认：统一入站诊断
 
-入站诊断目前有独立内部队列，合入公开诊断出口时需要明确字段及关闭归属，不增加诊断转发 goroutine。认证仍是后续能力；Open 本身不构成可信网络边界，未认证监听不应暴露给不可信网络。
+入站合入现有 Cluster.Diagnostics，新增 DiagnosticInboundFailure 类别及 RemoteAddress 字段；入站 RemoteNode 留空，可信请求信息可带 Session/Target/Command，不记录业务载荷。共用容量 256 与丢弃计数，不增加转发 goroutine。最终 Close 等全部入站及出站生产者退出后关闭出口；Handler 错误仍归 Runtime，Open 同步失败直接返回 error，成功后监听异常进入诊断。详见 [统一诊断出口](RFC-CLUSTER-DIAGNOSTICS.md)。此方案尚未实现。
+
+认证仍是后续能力；Open 本身不构成可信网络边界，未认证监听不应暴露给不可信网络。

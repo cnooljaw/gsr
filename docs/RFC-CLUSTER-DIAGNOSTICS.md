@@ -1,6 +1,6 @@
 # Cluster 统一诊断出口
 
-状态：已获用户确认，首轮出站公开诊断已实现；不改变已确认的 Send/Call 结果语义。
+状态：已获用户确认，首轮出站公开诊断已实现；入站统一接线方案已确认、尚未实现。不改变已确认的 Send/Call 结果语义。
 
 ## 已确认入口
 
@@ -23,7 +23,7 @@ GSR 可以沿用基础设施在故障边界报告的分工，不需要业务为�
 
 ## 事件内容
 
-已确认最小字段与三个确有生产者的类别：
+已确认字段与类别如下，其中 InboundFailure 和 RemoteAddress 是本轮待实现的入站扩展：
 
 ```go
 type DiagnosticKind uint8
@@ -32,11 +32,13 @@ const (
     DiagnosticDeliveryFailure DiagnosticKind = iota + 1
     DiagnosticConnectionFailure
     DiagnosticResponseRejected
+    DiagnosticInboundFailure
 )
 
 type Diagnostic struct {
     Kind       DiagnosticKind
     RemoteNode NodeID
+    RemoteAddress string
     Session    ClusterSessionID
     Target     ServiceTarget
     Command    runtime.CommandID
@@ -49,8 +51,9 @@ type Diagnostic struct {
 | DeliveryFailure | admission 后一次请求投递失败，包括拨号/写入失败、发送侧 panic 和关闭时丢弃排队请求 | 目标节点、请求 Session/Target/Command；Send 的 Session 为零。 |
 | ConnectionFailure | 已建立出站连接异常结束或响应读循环 panic | 目标节点；无单个请求归属时 Session/Target/Command 为零值。 |
 | ResponseRejected | 收到完整但不可接受的响应或坏帧，例如未知/迟到 Session、错归属、解码失败 | 目标节点；仅在已有可信解码结果时附请求关联字段，否则零值。 |
+| InboundFailure | 入站接收、处理适配、回复发送失败或成功 Open 后监听异常退出 | 对端 socket 地址；监听故障无对端时为空。仅在已有可信请求信息时附 Session/Target/Command，RemoteNode 留空。 |
 
-Kind 只用于诊断分类，错误判断继续用 errors.Is/errors.As，不通过字符串猜测“对方节点未启动”。保留底层错误链，不新增重复的错误码体系。RemoteNode 是出站目标，不是本地身份；不预留 LocalNode、Epoch、连接 ID 或未来入站字段。
+Kind 只用于诊断分类，错误判断继续用 errors.Is/errors.As，不通过字符串猜测“对方节点未启动”。保留底层错误链，不新增重复的错误码体系。RemoteNode 是出站目标，不是本地身份；入站 RemoteAddress 只作诊断标签，不是认证身份，不据其推断 NodeID。出站不要求填充 RemoteAddress。不预留 LocalNode、Epoch 或连接 ID。
 
 不携带 Payload、Args、业务对象或完整 wire frame，不生成业务 OperationID，不把本地诊断回传远端。Err 可能包含底层地址或自定义错误文本，不能宣称天然脱敏；宿主输出日志时仍需按部署要求处理敏感内容。
 
@@ -63,7 +66,9 @@ Kind 只用于诊断分类，错误判断继续用 errors.Is/errors.As，不通�
 - 同一次底层断线可能产生一条连接事件及若干受影响的投递事件，不承诺按根因全局去重，不新增复杂的去重缓存。
 - 主动 Close 所引发的预期 socket 关闭不报告为 ConnectionFailure；需要依据 owner 的关闭意图判断，不能把所有 net.ErrClosed 都一概忽略。Quiesce/Close 丢弃排队 Send 的 DeliveryFailure 仍保留。最终资源释放错误仍从 Close 返回。
 
-本出口只覆盖首轮出站组装。现有 inboundDiagnostics 的共享出口继续保持内部实现；未来 Open 时再确定如何纳入，不提前增加无使用者的字段或类别。
+入站事件归接收节点 B，不回传 A，也不改变 A 的 Send 返回值。B 的业务 Handler error 仍由 Runtime 诊断记录，不重复记为 Cluster 网络故障；Call 的远端错误回复语义不变。Open 当场失败通过 error 返回，不复制诊断；成功后监听异常退出进入 InboundFailure。正常停机不是基础设施故障，监听关闭错误仍按两阶段关闭约定由最终 Close 合并返回。
+
+Skynet 的 gateserver 在监听错误边界调用 skynet.error，连接错误交给 handler；clusteragent 也在自身故障边界记录日志。GSR 沿用故障归属，不依赖 Lua/C 日志运行环境，入站直接写现有共享有界出口，不增加业务 callback 或日志转发任务。
 
 ## 内部组装与关闭
 
@@ -73,8 +78,12 @@ Kind 只用于诊断分类，错误判断继续用 errors.Is/errors.As，不通�
 
 Quiesce 不关闭 Diagnostics；Close 只有在全部生产者退出后才关闭通道。Close 不等待日志消费者，不要求缓冲区先被读空；关闭后的缓冲事件仍可读取。Host 可在 Close 完成后等待自己的日志消费组件读到通道结束，但消费组件的磁盘/网络输出不属于 Cluster 清理责任。
 
+公开 Open 组装后，listener 与全部入站连接直接借用同一个 Cluster-owned 出口，共享容量 256 与丢弃计数，不另设入站公开通道或转发 goroutine。listener 退出不得关闭该共享通道，最终 Cluster.Close 等全部入站与出站生产者退出后才关闭。现有内部独立组装路径的队列所有权需明确保留，不与共享模式双写。
+
 DroppedDiagnosticCount 单调累计队列满导致的丢弃次数，Close 后仍可读取，不包含主动过滤的正常关闭事件。共享队列不提供每节点公平性，噪声目标可能挤占其它目标诊断；当前有界性不等同于已有完整限频或可靠日志保证。
 
 ## 实施门禁
+
+入站扩展需覆盖真实 TCP 坏帧与可信请求字段、回复写入失败、连接上限拒绝、成功 Open 后监听异常、正常停机过滤、Runtime Handler 错误不重复诊断、共享队列满载计数及入站退出不提前关闭共享出口。Open 同步失败不重复诊断，不把已确认契约写成已完成实现。
 
 测试门禁包含无消费者时的连续失败调用、队列满载丢弃计数、发送失败元数据、真实 TCP 未知响应/连接异常、预期关闭过滤、Close 提前返回不关闭出口、全部生产者退出后关闭通道，以及组装模式不再分配每目标旧诊断队列。普通业务 Service 不获得 Diagnostics 或创建日志 goroutine 的权限。共享上报组件不创建 goroutine，也不调用外部日志函数。
