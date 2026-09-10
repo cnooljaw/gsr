@@ -336,6 +336,7 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 - 已确认并实现内部入站 quiesce：关闭监听，所有连接共享请求门禁；完整帧在交给处理任务前决定 admission，停止后暂停读取，已接纳 Call 仍可沿原连接回复。最终取消解除读取、满载名额和停止等待。已补充真实 TCP 的新连接拒绝、新 Send/Call 不执行、旧 Call 回复、并发重复停止、空闲与满载取消测试。公开 Open 和统一入站诊断接线仍未实现。
 - 已确认公开 Open 的资源归属及签名：`Open(target *runtime.Runtime, config ListenConfig) (string, error)` 返回实际监听地址；现有 Cluster 拥有可选单监听及入站连接，但不管理目标 Runtime 生命周期。不支持多监听与热切换，不影响仅出站调用。ListenConfig 的 Address、MaxConnections、MaxConcurrentCalls 和 ResolveService 四个字段已确认。默认连接上限 128、每连接 Call 上限 32 及零值/负数规则已确认。重复调用规则已确认：成功后拒绝重复打开、失败回滚后可重试、并发仅一个打开流程、停止后禁止 Open。停止接线已确认复用 Quiesce 关闭监听和入站门禁、保留连接回复，关闭错误由 Close 合并返回。入站诊断已确认新增 InboundFailure 和 RemoteAddress，共用现有有界出口。下一步实施公开入站切片，见 [可选入站组装](RFC-CLUSTER-OPEN.md)。
 - 已确认注册与发现属于外部能力：保留显式地址的 Open，不增加按节点名打开的公共 API；静态表查找和发布地址由应用组装。当前静态出站路由不等于已实现动态发现或地址更新，相关接线留待后续需求。
+- 公开入站首步已实现 ListenConfig 类型及内部默认值/校验，覆盖显式配置保留、无解析副作用、非法输入和监听/出站端口零的区别。尚未接入 Open；后续实现打开竞争、失败回滚及入站生命周期/诊断接线。
 - 已统一入站诊断出口：listener 与全部连接共享一个有界队列和丢弃计数，删除每连接的 256 容量缓冲与转发 goroutine。单连接退出不关闭出口，listener 在全部生产者退出后关闭；保留解除 Accept/Read 阻塞所需的取消监视机制。
 - 当前连接上限属于单 listener owner。公开 open API、多个 listener 共享的节点总配额及生产诊断消费尚未组装，不能据此宣称完整 TCP Transport 已完成。
 - 出站连接等待归属已确认并实现内部绑定、响应校验和连接范围清理，真实 TCP 夹具已改用此路径。见 [出站连接与 Call 等待归属方案](RFC-CLUSTER-OUTBOUND-CALL-OWNERSHIP.md)。单目标 Dial 与连接替换由 outboundPeer 接管，静态目标路由由公开 Cluster 组装，动态路由仍待后续切片。

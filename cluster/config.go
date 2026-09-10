@@ -57,6 +57,12 @@ func (config ClusterConfig) normalized() (ClusterConfig, error) {
 }
 
 func validTargetAddress(address string) bool {
+	return validTCPAddress(address, 1)
+}
+
+// validTCPAddress 只检查地址格式；监听允许零端口，出站目标必须使用实际端口。
+// DNS 解析与实际绑定/拨号仍由网络边界负责。
+func validTCPAddress(address string, minPort int) bool {
 	host, port, err := net.SplitHostPort(address)
 	if err != nil || host == "" || strings.ContainsAny(host, "/\\ \t\r\n") || port == "" {
 		return false
@@ -67,5 +73,5 @@ func validTargetAddress(address string) bool {
 		}
 	}
 	number, err := strconv.Atoi(port)
-	return err == nil && number >= 1 && number <= 65535
+	return err == nil && number >= minPort && number <= 65535
 }

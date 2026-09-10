@@ -39,6 +39,8 @@ Skynet 的数字端口路径返回实际地址与端口，GSR 沿用这一用途
 
 ## 已确认：ListenConfig 字段
 
+实现进度：ListenConfig 类型及内部默认值/校验已落地；Open 尚未实现，配置尚未接入监听生命周期。地址格式校验复用出站规则，但监听允许端口 0，出站仍要求实际端口；校验阶段不做 DNS、绑定或名称解析回调。
+
 ```go
 type ListenConfig struct {
     Address            string

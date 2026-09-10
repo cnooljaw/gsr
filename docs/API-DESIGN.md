@@ -553,6 +553,8 @@ Cluster 2 的远程 Call 使用 Cluster-owned `ClusterCallRegistry` 和内部 `C
 
 可选入站组装的资源归属及签名已确认：`func (cluster *Cluster) Open(target *runtime.Runtime, config ListenConfig) (string, error)` 显式接收目标 Runtime，成功返回实际监听地址（`host:port`），监听失败返回 error。由现有 Cluster 管理监听、入站连接及网络任务，不返回独立 Listener owner，也不启动、停止或关闭 Runtime。第一版每个 Cluster 最多一个监听，可接纳多个连接并投递到多个 Service；不支持多监听、监听热切换或运行中换绑 Runtime。不 Open 仍可主动 Send/Call，回复沿原连接返回。ListenConfig 已确认四个字段：必填 `Address string`、监听连接上限 `MaxConnections int`、每连接 Call 上限 `MaxConcurrentCalls int`、可选 `ResolveService func(ServiceName) (runtime.ServiceID, error)`。编码注册表、帧长及写超时复用 ClusterConfig，本地 Call 等待上限由目标 Runtime 控制。默认连接上限为 128、每连接 Call 上限为 32（零值使用默认，负数无效），Address 为空报错，ResolveService 可为 nil。Open 成功后再次调用返回错误（不比较配置），失败清理本次资源后允许应用重试；并发只允许一个打开流程，其余报错；Quiesce/Close 后拒绝 Open。停止接线约定已确认：Quiesce 统一停止接纳并关闭监听，监听关闭错误由 Close 合并返回；不主动关闭已建立连接或等待任务退出。入站诊断方案已确认：增加 DiagnosticInboundFailure 和 RemoteAddress，入站 RemoteNode 留空；可信请求关联字段按需记录，Handler 错误仍归 Runtime。入站与出站共用容量 256 的 Diagnostics，最终 Close 等所有生产者退出才关闭，尚未实现，见 [可选入站组装](RFC-CLUSTER-OPEN.md)。
 
+ListenConfig 类型及内部校验已实现，公开 Open 尚未实现。地址必须包含显式主机和数字端口，监听允许端口 0；非法格式或负容量返回 ErrInvalidListenConfig。此校验不执行 DNS、绑定或 ResolveService，实际网络错误留到 Open 处理。
+
 注册与发现属于 Core 和 Cluster 之外的能力：外层维护 `NodeID → 可访问地址`，Open 不自动注册、续约或发布地址。保留显式 `ListenConfig.Address`，不增加按 NodeID 打开的公共重载；共同节点表的查找及“只取端口绑定 0.0.0.0”等部署转换由应用组装。Open 返回实际绑定地址，不保证是外部可访问地址。当前 ClusterConfig.Nodes 仅提供静态路由，不表示成员存活、业务就绪或资源所有权；动态发现结果的路由更新接线另行设计，本轮不增加通用 Discovery 框架。
 
 `ConnectionAgent` 是每条入站连接的逻辑接收适配器：
