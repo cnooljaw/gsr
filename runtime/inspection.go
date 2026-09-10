@@ -148,7 +148,7 @@ func (runtime *Runtime) recordHandlerMetric(err error) {
 		return
 	}
 	runtime.metrics.handlerErrors.Add(1)
-	if isStatusCode(err, ErrorCodeServicePanicked) {
+	if errors.Is(err, ErrServicePanicked) {
 		runtime.metrics.panics.Add(1)
 	}
 }

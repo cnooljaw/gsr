@@ -142,7 +142,7 @@ func normalizeCallError(err error) error {
 	if err == nil {
 		return nil
 	}
-	if isStatusCode(err, ErrorCodeServicePanicked) {
+	if errors.Is(err, ErrServicePanicked) {
 		return ErrServicePanicked
 	}
 	var status *StatusError

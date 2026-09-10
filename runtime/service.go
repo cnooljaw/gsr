@@ -165,7 +165,7 @@ func (instance *serviceInstance) run() {
 		}
 		if _, err := instance.runtime.executeMessage(instance, message); err != nil {
 			instance.runtime.recordHandlerError(instance, message, err)
-			if err == ErrServicePanicked || isStatusCode(err, ErrorCodeServicePanicked) {
+			if errors.Is(err, ErrServicePanicked) {
 				failureContext, cancel := instance.runtime.failureContext()
 				instance.requestStopWithCancel(failureContext, cancel)
 			}
@@ -294,9 +294,4 @@ func (runtime *Runtime) recordHandlerError(_ *serviceInstance, _ Message, err er
 
 func (runtime *Runtime) failureContext() (context.Context, context.CancelFunc) {
 	return context.WithTimeout(context.Background(), runtime.config.ShutdownTimeout)
-}
-
-func isStatusCode(err error, code ErrorCode) bool {
-	var status *StatusError
-	return errors.As(err, &status) && status.Code == code
 }

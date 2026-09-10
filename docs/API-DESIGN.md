@@ -700,6 +700,7 @@ type StatusError struct {
 
 - Domain code 使用稳定、可读的 `{domain}.{reason}`，例如 `room.full`；GSR 保留 `runtime.` 前缀。
 - `StatusError` 同时承载本地 error 和可传输的稳定状态，不再额外包装一个重复的 `ErrorStatus`；它按 Class + Code 实现 `errors.Is`，本地和 Cluster 解码后的 typed client 使用同一种判断方式。
+- Runtime 的 panic 判定、Service 停止和 panic 计数同样按 Class + Code 比较，不因 Code 相同就将 Domain 错误当成 Runtime panic。Handler 返回带类型的 nil `*StatusError`（包括包装后的错误）时按未分类错误处理，Call 返回 `ErrHandlerFailed`，Send 记录 Handler error 计数；不得因此崩溃或误停 Service。
 - Message 是经过审查的安全文本，只用于日志或展示，禁止比较字符串决定业务分支。
 - Handler 返回未实现 GSR 状态契约的普通 error 时，Runtime 在本地记录原始 error，并向调用方返回 `runtime.handler_failed`。
 - Handler panic 对调用方返回 `runtime.service_panicked`；panic value 和 stack 只进入本地诊断，不进入 Reply 或 wire。
