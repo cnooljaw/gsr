@@ -2,6 +2,8 @@
 
 状态：已获用户确认，首轮公开出站组装已实现。Open、认证和动态路由不在当前实现范围内。
 
+后续可选入站组装的资源归属建议见 [Open 草案](RFC-CLUSTER-OPEN.md)，该草案尚待确认，不改变本文已确认的出站契约。
+
 ## 本轮只确认一个方向
 
 由一个显式的 Cluster 组装对象管理 Cluster 资源，并为每个 Service 提供已有的 `ClusterClient`，不让应用逐个拼接 PendingCall、NodeSender、连接和响应读循环。此方向已确认：收口易用性，不新增业务调用能力。
