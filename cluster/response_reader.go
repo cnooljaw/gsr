@@ -19,11 +19,11 @@ type responseReadFailure struct {
 // diagnostics 由调用方管理，必须保持打开直到本函数返回；建议使用有界缓冲。
 // nil 或满载通道不会阻塞读取，返回值记录丢弃的诊断数；终止错误直接返回。
 func (connection *streamConnection) receiveResponses(calls *connectionCalls, diagnostics chan<- responseReadFailure) (uint64, error) {
-	return connection.receiveResponsesTo(calls, diagnostics, nil)
+	return connection.receiveResponsesTo(calls, responseDiagnostics{events: diagnostics})
 }
 
-// receiveResponsesTo 在共享组装模式直接上报，不保留或转发每连接诊断队列。
-func (connection *streamConnection) receiveResponsesTo(calls *connectionCalls, diagnostics chan<- responseReadFailure, shared *clusterDiagnostics) (uint64, error) {
+// receiveResponsesTo 通过借用的诊断出口直接上报，不创建队列或转发任务。
+func (connection *streamConnection) receiveResponsesTo(calls *connectionCalls, diagnostics responseDiagnostics) (uint64, error) {
 	if connection == nil {
 		return 0, net.ErrClosed
 	}
@@ -45,16 +45,7 @@ func (connection *streamConnection) receiveResponsesTo(calls *connectionCalls, d
 		if err == nil {
 			continue
 		}
-		if shared != nil {
-			shared.report(Diagnostic{Kind: DiagnosticResponseRejected, RemoteNode: calls.node,
-				Session: envelope.Session, Target: envelope.Target, Command: envelope.Command, Err: err})
-			continue
-		}
-		failure := responseReadFailure{node: calls.node, session: envelope.Session, err: err}
-		select {
-		case diagnostics <- failure:
-		default:
-			dropped++
-		}
+		dropped += diagnostics.report(Diagnostic{Kind: DiagnosticResponseRejected, RemoteNode: calls.node,
+			Session: envelope.Session, Target: envelope.Target, Command: envelope.Command, Err: err})
 	}
 }

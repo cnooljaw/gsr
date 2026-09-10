@@ -156,6 +156,7 @@ func (peer *outboundPeer) connection() (*outboundConnection, error) {
 
 func (peer *outboundPeer) receive(connection *outboundConnection, done chan struct{}) {
 	var terminal error
+	diagnostics := responseDiagnostics{events: peer.diagnostics, shared: peer.config.sharedDiagnostics}
 	defer func() {
 		if recovered := recover(); recovered != nil {
 			terminal = fmt.Errorf("%w: response reader: %v", ErrTransportPanicked, recovered)
@@ -166,18 +167,10 @@ func (peer *outboundPeer) receive(connection *outboundConnection, done chan stru
 		closing := peer.closed
 		peer.mu.Unlock()
 		expectedClose := closing && (errors.Is(terminal, net.ErrClosed) || errors.Is(terminal, io.ErrClosedPipe) || errors.Is(terminal, context.Canceled)) && !errors.Is(terminal, ErrTransportPanicked)
-		if terminal != nil && !expectedClose && peer.config.sharedDiagnostics != nil {
-			peer.config.sharedDiagnostics.report(Diagnostic{Kind: DiagnosticConnectionFailure, RemoteNode: peer.config.node, Err: terminal})
-		} else if terminal != nil && peer.config.sharedDiagnostics == nil {
-			select {
-			case peer.diagnostics <- responseReadFailure{node: peer.config.node, err: terminal}:
-			default:
-				peer.dropped.Add(1)
-			}
-		}
+		peer.dropped.Add(diagnostics.terminal(peer.config.node, terminal, expectedClose))
 		close(done)
 	}()
-	dropped, err := connection.stream.receiveResponsesTo(connection.calls, peer.diagnostics, peer.config.sharedDiagnostics)
+	dropped, err := connection.stream.receiveResponsesTo(connection.calls, diagnostics)
 	peer.dropped.Add(dropped)
 	terminal = err
 }

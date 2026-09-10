@@ -69,6 +69,8 @@ Kind 只用于诊断分类，错误判断继续用 errors.Is/errors.As，不通�
 
 组装模式下 NodeSender 与响应读循环直接写入 Cluster-owned 的同一内部诊断组件。它是受控的非阻塞队列，不是外部 callback，不为每个目标保留额外诊断缓冲或转发 goroutine。现有独立 NodeSender.Failures 用于低层独立组装，不能在 Cluster 模式与 Diagnostics 双写，也不能让应用同时消费两套出口。
 
+响应路径通过包内具体类型 `responseDiagnostics` 集中适配独立与共享出口，读循环只报告事件。该类型仅借用出口，不拥有队列或关闭责任：共享出口自行累计丢弃数，独立出口将丢弃数返回连接 owner，避免重复计数。共享出口过滤 owner 确认的预期关闭；底层独立响应出口继续保留全部终止错误。此调整不增加公共接口、转发 goroutine 或通用诊断框架。
+
 Quiesce 不关闭 Diagnostics；Close 只有在全部生产者退出后才关闭通道。Close 不等待日志消费者，不要求缓冲区先被读空；关闭后的缓冲事件仍可读取。Host 可在 Close 完成后等待自己的日志消费组件读到通道结束，但消费组件的磁盘/网络输出不属于 Cluster 清理责任。
 
 DroppedDiagnosticCount 单调累计队列满导致的丢弃次数，Close 后仍可读取，不包含主动过滤的正常关闭事件。共享队列不提供每节点公平性，噪声目标可能挤占其它目标诊断；当前有界性不等同于已有完整限频或可靠日志保证。
