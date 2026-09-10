@@ -15,6 +15,8 @@
 - **Message Ownership**：消息成功被 Runtime 接受后，Message 独占自己的 `Args` 外层切片。`any` 内部的 map、slice、pointer 等引用数据必须由 typed client 按具体消息类型复制成消息专用快照；发送方不得在 admission 后继续修改，也不得把 Service 拥有的可变状态引用作为参数发送。
 - **CommandContext**：Runtime 为每次 Handler 调用创建的只读消息上下文，提供当前 Service 的 Core 能力以及由 Runtime 填入的 `Source()`；Source 可能为 `ServiceID(0)`（Timer 或宿主/基础设施注入）；业务不能覆盖 Source，也不能通过它手工或异步 Reply。
 - **Runtime.Call**：宿主或受信任基础设施的本地 Call 入口，Source 固定为零；使用独立本地 Session、普通 Mailbox 和有限等待，不创建 goroutine。普通 Service 仍通过 ServiceContext.Call 发起调用。
+- **Cluster.Open**：已确认的可选入站组装动作，尚未实现公开入口。显式提供目标 Runtime 和 ListenConfig.Address，由 Cluster 管理监听及入站连接，不管理 Runtime 生命周期，不自动注册或发布地址；第一版每个 Cluster 最多一个监听，不支持多监听、监听热切换或运行中换绑 Runtime。不 Open 仍可主动 Send/Call 并沿原连接接收回复。
+- **节点注册与发现**：Core 和 Cluster 之外的能力，由外层维护 NodeID 到可访问地址的映射；不等同于监听，也不替业务判断资源归属。ClusterConfig.Nodes 是当前静态路由来源，不是集群成员或存活表；动态发现的路由更新接线尚未实现。监听绑定地址不必等于外部发布地址，发布由应用负责。
 - **入站连接并发**：连接组件管理一个读循环和数量有上限的 Call 等待任务；满载暂停读取，Send 顺序接纳，混合请求以本地 Mailbox 接纳顺序执行。连接关闭取消基础设施等待并等待任务退出；目标 Handler 不被强杀。
 - **PendingCall**：Runtime 内部以非零 SessionID 索引的一次等待。Reply 通过 completion 路径完成它，不进入调用方 Mailbox 或业务 Handler。
 - **ClusterPendingCall**：Cluster 内部以非零 ClusterSessionID 索引的一次远程等待，保存本地 Source、远端 Node、Target 和 Command；网络写入前绑定私有连接 owner，断线只清理该连接的等待，网络回复还须匹配此归属。尚未绑定的排队等待保留原超时；Source 和连接 owner 不进入 wire。
