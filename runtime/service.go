@@ -164,7 +164,6 @@ func (instance *serviceInstance) run() {
 			break
 		}
 		if _, err := instance.runtime.executeMessage(instance, message); err != nil {
-			instance.runtime.recordHandlerError(instance, message, err)
 			if errors.Is(err, ErrServicePanicked) {
 				failureContext, cancel := instance.runtime.failureContext()
 				instance.requestStopWithCancel(failureContext, cancel)
@@ -273,10 +272,15 @@ func (context *commandContext) Source() ServiceID {
 
 func (runtime *Runtime) executeMessage(instance *serviceInstance, message Message) (result any, err error) {
 	defer func() {
+		var stack string
 		if recovered := recover(); recovered != nil {
+			stack = handlerPanicStack()
 			err = wrapStatusError(ErrServicePanicked, "service Handler panicked: %v", recovered)
 		}
 		runtime.completeMessage(message, result, err)
+		if err != nil {
+			runtime.recordHandlerError(instance, message, err, stack)
+		}
 	}()
 
 	result, err = instance.service.Handle(&commandContext{
@@ -284,12 +288,6 @@ func (runtime *Runtime) executeMessage(instance *serviceInstance, message Messag
 		source:         message.Source,
 	}, message.Command, message.Args...)
 	return result, err
-}
-
-func (runtime *Runtime) recordHandlerError(_ *serviceInstance, _ Message, err error) {
-	// Send 没有完成结果通道；Inspection 展示此诊断，
-	// 但不改变单向投递的接纳契约。
-	runtime.recordHandlerMetric(err)
 }
 
 func (runtime *Runtime) failureContext() (context.Context, context.CancelFunc) {

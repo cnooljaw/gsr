@@ -3,6 +3,7 @@ package runtime
 import (
 	"context"
 	"sync"
+	"sync/atomic"
 )
 
 // RuntimeState 表示 Runtime 的生命周期状态。
@@ -47,20 +48,22 @@ func (state RuntimeState) String() string {
 type Runtime struct {
 	config Config
 
-	mu           sync.Mutex
-	state        RuntimeState
-	startDone    chan struct{}
-	stopDone     chan struct{}
-	stopQueued   bool
-	stopStarted  bool
-	stopResult   error
-	closeResult  error
-	lifecycle    *lifecycleCoordinator
-	dispatcher   *localDispatcher
-	timers       *timerManager
-	pendingCalls *pendingCallManager
-	scheduler    *scheduler
-	metrics      runtimeMetrics
+	mu                 sync.Mutex
+	state              RuntimeState
+	startDone          chan struct{}
+	stopDone           chan struct{}
+	stopQueued         bool
+	stopStarted        bool
+	stopResult         error
+	closeResult        error
+	lifecycle          *lifecycleCoordinator
+	dispatcher         *localDispatcher
+	timers             *timerManager
+	pendingCalls       *pendingCallManager
+	scheduler          *scheduler
+	metrics            runtimeMetrics
+	diagnostics        chan Diagnostic
+	droppedDiagnostics atomic.Uint64
 
 	serviceIDs *idAllocator
 	sessionIDs *idAllocator
@@ -86,14 +89,15 @@ func newRuntimeWithClock(config Config, clock runtimeClock) (*Runtime, error) {
 		return nil, err
 	}
 	runtime := &Runtime{
-		config:     normalized,
-		state:      RuntimeCreated,
-		startDone:  make(chan struct{}),
-		stopDone:   make(chan struct{}),
-		serviceIDs: newIDAllocator(1),
-		sessionIDs: newIDAllocator(1),
-		timerIDs:   newIDAllocator(1),
-		services:   make(map[ServiceID]*serviceInstance),
+		config:      normalized,
+		state:       RuntimeCreated,
+		startDone:   make(chan struct{}),
+		stopDone:    make(chan struct{}),
+		serviceIDs:  newIDAllocator(1),
+		sessionIDs:  newIDAllocator(1),
+		timerIDs:    newIDAllocator(1),
+		services:    make(map[ServiceID]*serviceInstance),
+		diagnostics: make(chan Diagnostic, diagnosticCapacity),
 	}
 	runtime.dispatcher = &localDispatcher{runtime: runtime}
 	runtime.timers = newTimerManager(runtime, clock)
@@ -268,6 +272,7 @@ func (runtime *Runtime) Close() error {
 			}
 			runtime.closeResult = result
 			runtime.state = RuntimeClosed
+			close(runtime.diagnostics)
 			runtime.mu.Unlock()
 			return result
 		case RuntimeClosed:

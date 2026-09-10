@@ -828,6 +828,8 @@ func (r *Runtime) Inspect() RuntimeInspection
 
 `RuntimeMetricsSnapshot` 至少包含 admission rejected、Handler error、panic、Call timeout、Timer 创建/取消/触发/投递失败和 Stop timeout 计数。计数是 Runtime 生命周期内单调累计值，Inspect 不会重置它们。
 
+已实现 `Runtime.Diagnostics() <-chan Diagnostic` 和 `Runtime.DroppedDiagnosticCount() uint64`，由宿主负责日志消费。每 Runtime 固定 256 条非阻塞队列，满载丢弃新事件并计数，只有资源释放、进入 Closed 时关闭；Stop/Close 超时不提前关闭。事件仅含 ServiceID、Source、Command、Session、Class、Code、Message 和 Stack 值快照；Message 最多 4 KiB、真实 Handler panic 的 Stack 最多 16 KiB，不保留业务引用，也不进入 Reply。Inspect 继续只提供状态与计数。本轮只覆盖 Handler，详见 [Runtime 诊断契约](RFC-RUNTIME-DIAGNOSTICS.md)。
+
 ## 11. Core 不变量测试
 
 实现 Runtime 前先用测试锁死：
