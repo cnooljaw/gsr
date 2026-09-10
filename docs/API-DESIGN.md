@@ -553,6 +553,8 @@ Cluster 2 的远程 Call 使用 Cluster-owned `ClusterCallRegistry` 和内部 `C
 
 `ConnectionAgent` 是每条入站连接的逻辑接收适配器：
 
+公开逻辑入口保留用于低层组装。真实 TCP 路径由 `inboundConnection → localRequestAdapter → Runtime.Send/Call` 直接处理，不逐请求构造 ConnectionAgent；两者共用响应构造、错误转换与安全写入函数，不改变下面的 Send/Call 契约。
+
 - `Handle` 只接受已解码的 `FrameRequest`，把 Request 快照交给注入的 `RequestHandler`；它不构造 Core Message，也不解析 Service 实现。
 - `Session == 0` 的 Send 不写回 Response；接收节点的 Runtime/Adapter 负责记录自己的 Handler error。
 - `Session > 0` 的 Call 沿注入的 `ResponseWriter` 写回同一 Session、Target、Command 的 Response 或结构化 Error。Handler 的未知 error/panic 转成安全的 Runtime StatusError。

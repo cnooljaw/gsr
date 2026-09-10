@@ -17,7 +17,7 @@ type localRequestAdapter struct {
 }
 
 // handle 在调用 Service 之前完成协议校验，坏载荷只返回本地诊断错误，不回包。
-// Call 的执行错误由 ConnectionAgent 回包；Send 的本地接纳错误返回接收侧记录，
+// Call 的执行错误经共享响应函数回包；Send 的本地接纳错误返回接收侧记录，
 // 已接纳 Send 的 Handler 错误仍由目标 Runtime 记录。
 func (adapter *localRequestAdapter) handle(ctx context.Context, request ClusterEnvelope, write ResponseWriter) error {
 	if adapter == nil || adapter.runtime == nil || adapter.codecs == nil || write == nil {
@@ -44,42 +44,36 @@ func (adapter *localRequestAdapter) handle(ctx context.Context, request ClusterE
 	if !ok {
 		return runtime.ErrInvalidCommandArguments
 	}
-	var localErr error
-	var encodingErr error
+	var targetErr error
 	target := request.Target.ServiceID
 	if request.Target.ServiceName != "" {
 		if adapter.resolve == nil {
-			localErr = runtime.ErrServiceNotFound
+			targetErr = runtime.ErrServiceNotFound
 		} else {
-			target, localErr = adapter.resolve(request.Target.ServiceName)
+			target, targetErr = adapter.resolve(request.Target.ServiceName)
 		}
 	}
-	agent := ConnectionAgent{
-		write: write,
-		handler: func(callCtx context.Context, envelope ClusterEnvelope) ([]byte, error) {
-			if localErr != nil {
-				return nil, localErr
-			}
-			if envelope.Session == 0 {
-				localErr = adapter.runtime.Send(target, envelope.Command, args...)
-				return nil, localErr
-			}
-			value, err := adapter.runtime.Call(callCtx, target, envelope.Command, args...)
-			if err != nil {
-				return nil, err
-			}
-			payload, err := encodeLocalResponse(codec, value)
-			encodingErr = err
-			return payload, err
-		},
-	}
-	if err := agent.Handle(ctx, request); err != nil {
-		return errors.Join(err, encodingErr)
+	// 解码或外层名称解析期间可能取消，保留实际投递前的第二次检查。
+	if err := ctx.Err(); err != nil {
+		return err
 	}
 	if request.Session == 0 {
-		return localErr
+		if targetErr != nil {
+			return targetErr
+		}
+		return adapter.runtime.Send(target, request.Command, args...)
 	}
-	return encodingErr
+	if targetErr != nil {
+		return writeRequestResponse(write, request, nil, targetErr)
+	}
+	value, err := adapter.runtime.Call(ctx, target, request.Command, args...)
+	if err != nil {
+		return writeRequestResponse(write, request, nil, err)
+	}
+	payload, encodingErr := encodeLocalResponse(codec, value)
+	writeErr := writeRequestResponse(write, request, payload, encodingErr)
+	// 编码失败既需安全回包，也需在 B 侧记录；写入失败不能掩盖编码原因。
+	return errors.Join(writeErr, encodingErr)
 }
 
 // encodeLocalResponse 将编码扩展的 panic 转为安全错误，同时供回包和本地诊断使用。

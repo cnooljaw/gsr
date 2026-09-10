@@ -78,6 +78,11 @@ func (agent *ConnectionAgent) Handle(ctx context.Context, request ClusterEnvelop
 		// Send 没有响应路径，由接收节点的本地 Runtime/适配器记录 Handler 错误。
 		return nil
 	}
+	return writeRequestResponse(agent.write, request, payload, handlerErr)
+}
+
+// writeRequestResponse 供逻辑 agent 与真实入站适配器共用响应格式和安全写入边界。
+func writeRequestResponse(writer ResponseWriter, request ClusterEnvelope, payload []byte, handlerErr error) error {
 	response := ClusterEnvelope{
 		Kind:    FrameResponse,
 		Session: request.Session,
@@ -93,10 +98,7 @@ func (agent *ConnectionAgent) Handle(ctx context.Context, request ClusterEnvelop
 	if err := response.Validate(); err != nil {
 		return fmt.Errorf("%w: %v", ErrInvalidConnectionAgentRequest, err)
 	}
-	if err := writeConnectionAgentResponse(agent.write, response); err != nil {
-		return err
-	}
-	return nil
+	return writeConnectionAgentResponse(writer, response)
 }
 
 func invokeConnectionAgentHandler(handler RequestHandler, ctx context.Context, request ClusterEnvelope) (payload []byte, err error) {

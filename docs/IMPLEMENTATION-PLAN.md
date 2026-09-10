@@ -318,7 +318,7 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 - 状态：逻辑 ConnectionAgent、内部单连接 I/O 封装、出站响应读循环、有界并发入站请求循环、单 listener 入站连接 owner 和单目标按需出站连接 owner 已完成；公开静态出站组装已完成，Open、认证与动态路由仍待后续切片。
 - 已裁决并实现基础设施 Runtime.Call：Source 固定为零，经普通 Mailbox 执行，复用有限等待与停止收尾；ServiceContext.Call 仍绑定真实 Service。取舍见 [Cluster 入站 Call 方案](RFC-CLUSTER-INBOUND-CALL.md)。
 - 已用 ConnectionAgent 测试适配器接通真实 Runtime，覆盖成功/领域错误回复、零 Source，以及本地 Session 与 ClusterSession 分离；网络入站并发管理和正式适配器组装仍待接入。
-- 已实现内部 localRequestAdapter：查找 Command codec、解码参数列表、按 ID 或外层名称解析目标，再经 Runtime.Send/Call 执行；未知 Command/坏载荷仅返回接收侧诊断错误，不产生响应。Send 接纳错误归接收侧，Call 执行错误沿 ConnectionAgent 回包，写回故障保留 I/O 错误链。该适配器尚未接入网络入站读循环，不管理并发或连接生命周期。
+- 已实现内部 localRequestAdapter 并接入 inboundConnection：查找 Command codec、解码参数列表、按 ID 或外层名称解析目标，再直接经 Runtime.Send/Call 执行；未知 Command/坏载荷仅返回接收侧诊断错误，不产生响应。Send 接纳错误归接收侧，Call 通过与逻辑 ConnectionAgent 共用的响应函数回包，写回故障保留 I/O 错误链。已删除临时 ConnectionAgent 和闭包错误回传；保留解析后取消检查、编码与写入双重失败原因。适配器不管理并发或连接生命周期，公开 ConnectionAgent 保持不变。
 - 入站并发方案已获确认并实现为内部 inboundConnection：单读循环、显式 Call 名额上限、满载暂停读取、顺序 Send、有界非阻塞诊断；详见 [入站并发方案](RFC-CLUSTER-INBOUND-CONCURRENCY.md)。关闭取消基础设施等待并等待连接任务退出，不强杀目标 Handler。
 - 已用 net.Pipe 验证慢 Call 隔离、满载背压、连续 Send 顺序、满载时取消、诊断溢出、codec/名称解析 panic 和重复启动拒绝。响应编码失败也返回接收侧诊断；这些测试不等于真实 TCP 或节点级资源上限验证。
 - 真实 TCP 回环集成门禁 `tcp_integration_test.go` 已改用内部 `outboundPeer` 与 `tcpListener`，删除预建 socket 和测试专用 Transport，连接 ClusterClient、NodeSender、帧编解码、入站连接、目标 Runtime 和响应读循环。覆盖 Send/Call、领域错误、慢 Call 隔离、断线完成等待和下一 Call 按需恢复；通过 Handler 执行计数验证旧请求不重放。A 不配置 NodeID 或监听，B 接受匿名入站并沿原连接回复。夹具仍负责静态目标与生命周期组装，不代表公开 TCP API、生产认证或路由管理已完成。

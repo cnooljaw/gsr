@@ -127,6 +127,63 @@ func TestLocalAdapterReportsWriteFailureAndCancellation(t *testing.T) {
 	}
 }
 
+// 验证响应编码和写入同时失败时，两种本地原因都保留，远端错误不包含编码内部文本。
+func TestLocalAdapterPreservesEncodingAndWriteFailures(t *testing.T) {
+	adapter, id, codec := newLocalAdapterTest(t)
+	encodeErr := errors.New("private encoding failure")
+	writeErr := errors.New("socket write failed")
+	adapter.codecs = MustCommandCodecRegistry([]CommandCodecEntry{{CommandID: clusterTestCommand, Codec: localFailingEncodeCodec{CommandCodec: codec, err: encodeErr}}})
+	payload, err := codec.Encode([]any{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	writes := 0
+	err = adapter.handle(context.Background(), ClusterEnvelope{Kind: FrameRequest, Session: 7, Target: ServiceTarget{ServiceID: id}, Command: clusterTestCommand, Payload: payload}, func(reply ClusterEnvelope) error {
+		writes++
+		if reply.Kind != FrameError || !errors.Is(reply.Error, runtime.ErrHandlerFailed) || reply.Error.Message == encodeErr.Error() {
+			t.Fatalf("unsafe encoding response: %+v", reply)
+		}
+		return writeErr
+	})
+	if writes != 1 || !errors.Is(err, encodeErr) || !errors.Is(err, writeErr) || !errors.Is(err, ErrConnectionAgentWrite) {
+		t.Fatalf("writes=%d error=%v", writes, err)
+	}
+}
+
+// 验证名称解析期间发生取消后，不继续投递或回复，无论原请求是 Send 还是 Call。
+func TestLocalAdapterCancellationDuringResolution(t *testing.T) {
+	adapter, id, codec := newLocalAdapterTest(t)
+	payload, err := codec.Encode([]any{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, session := range []ClusterSessionID{0, 1} {
+		ctx, cancel := context.WithCancel(context.Background())
+		adapter.resolve = func(ServiceName) (runtime.ServiceID, error) {
+			cancel()
+			return id, nil
+		}
+		writes := 0
+		err := adapter.handle(ctx, ClusterEnvelope{Kind: FrameRequest, Session: session, Target: ServiceTarget{ServiceName: "room"}, Command: clusterTestCommand, Payload: payload}, func(ClusterEnvelope) error {
+			writes++
+			return nil
+		})
+		cancel()
+		if !errors.Is(err, context.Canceled) || writes != 0 {
+			t.Fatalf("session=%d error=%v writes=%d", session, err, writes)
+		}
+	}
+}
+
+type localFailingEncodeCodec struct {
+	CommandCodec
+	err error
+}
+
+func (codec localFailingEncodeCodec) Encode(any) ([]byte, error) {
+	return nil, codec.err
+}
+
 func newLocalAdapterTest(t *testing.T) (*localRequestAdapter, runtime.ServiceID, *ValueCodec) {
 	t.Helper()
 	local, err := runtime.NewRuntime(runtime.Config{})
