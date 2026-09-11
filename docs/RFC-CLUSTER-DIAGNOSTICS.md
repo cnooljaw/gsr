@@ -1,6 +1,6 @@
 # Cluster 统一诊断出口
 
-状态：已获用户确认，首轮出站公开诊断已实现；入站统一接线方案已确认、尚未实现。不改变已确认的 Send/Call 结果语义。
+状态：已获用户确认，首轮出站公开诊断已实现；入站统一接线已实现。不改变已确认的 Send/Call 结果语义。
 
 ## 已确认入口
 
@@ -23,7 +23,7 @@ GSR 可以沿用基础设施在故障边界报告的分工，不需要业务为�
 
 ## 事件内容
 
-已确认字段与类别如下，其中 InboundFailure 和 RemoteAddress 是本轮待实现的入站扩展：
+已确认字段与类别如下，其中 InboundFailure 和 RemoteAddress 是已实现的入站扩展：
 
 ```go
 type DiagnosticKind uint8

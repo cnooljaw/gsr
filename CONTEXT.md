@@ -15,7 +15,7 @@
 - **Message Ownership**：消息成功被 Runtime 接受后，Message 独占自己的 `Args` 外层切片。`any` 内部的 map、slice、pointer 等引用数据必须由 typed client 按具体消息类型复制成消息专用快照；发送方不得在 admission 后继续修改，也不得把 Service 拥有的可变状态引用作为参数发送。
 - **CommandContext**：Runtime 为每次 Handler 调用创建的只读消息上下文，提供当前 Service 的 Core 能力以及由 Runtime 填入的 `Source()`；Source 可能为 `ServiceID(0)`（Timer 或宿主/基础设施注入）；业务不能覆盖 Source，也不能通过它手工或异步 Reply。
 - **Runtime.Call**：宿主或受信任基础设施的本地 Call 入口，Source 固定为零；使用独立本地 Session、普通 Mailbox 和有限等待，不创建 goroutine。普通 Service 仍通过 ServiceContext.Call 发起调用。
-- **Cluster.Open**：已确认的可选入站组装动作，尚未实现公开入口。显式提供目标 Runtime 和 ListenConfig.Address，由 Cluster 管理监听及入站连接，不管理 Runtime 生命周期，不自动注册或发布地址；第一版每个 Cluster 最多一个监听，不支持多监听、监听热切换或运行中换绑 Runtime。不 Open 仍可主动 Send/Call 并沿原连接接收回复。
+- **Cluster.Open**：已确认的可选入站组装动作，已实现公开入口。显式提供目标 Runtime 和 ListenConfig.Address，由 Cluster 管理监听及入站连接，不管理 Runtime 生命周期，不自动注册或发布地址；第一版每个 Cluster 最多一个监听，不支持多监听、监听热切换或运行中换绑 Runtime。不 Open 仍可主动 Send/Call 并沿原连接接收回复。
 - **节点注册与发现**：Core 和 Cluster 之外的能力，由外层维护 NodeID 到可访问地址的映射；不等同于监听，也不替业务判断资源归属。ClusterConfig.Nodes 是当前静态路由来源，不是集群成员或存活表；动态发现的路由更新接线尚未实现。监听绑定地址不必等于外部发布地址，发布由应用负责。
 - **入站连接并发**：连接组件管理一个读循环和数量有上限的 Call 等待任务；满载暂停读取，Send 顺序接纳，混合请求以本地 Mailbox 接纳顺序执行。连接关闭取消基础设施等待并等待任务退出；目标 Handler 不被强杀。
 - **PendingCall**：Runtime 内部以非零 SessionID 索引的一次等待。Reply 通过 completion 路径完成它，不进入调用方 Mailbox 或业务 Handler。
@@ -33,7 +33,7 @@
 - **CommandCodecRegistry**：启动期创建并冻结的 `CommandID -> CommandCodec` 表；构造后只查找，不允许运行期注册、覆盖或删除，重复 CommandID 是配置错误。
 - **ClusterConfig**：已实现的公开出站组装配置，包含静态目标地址表、不可变 Command codec registry、有限 Call/Dial/Write 等待、每目标出站队列容量和帧上限；不包含本地 NodeID、Runtime 或监听能力。零值数值使用有限默认值，负数拒绝。
 - **FrameCodec**：Cluster 0 的长度前缀 frame 编解码器；使用四字节大端 body length，`MaxFrame` 包含前缀，只处理一个完整 frame，不负责 stream I/O、版本协商或连接生命周期。
-- **ClusterClient**：初始化时绑定一个 Source ServiceID、NodeSenderResolver、启动期 CommandCodecRegistry、ClusterCallRegistry 和有限 MaxCallWait 的 per-Service 窄 client；不能覆盖 Source，Send/Call 都通过同一个 Cluster 入口。已确认由 NewCluster 构造显式组装对象，再由 Cluster.Client(source ServiceID) 集中提供这些依赖以改善易用性；绑定入口属于受信任组装能力，不验证 Service 存活，不新增另一种业务 Call。公开出站组装已实现，Open 仍待后续切片。
+- **ClusterClient**：初始化时绑定一个 Source ServiceID、NodeSenderResolver、启动期 CommandCodecRegistry、ClusterCallRegistry 和有限 MaxCallWait 的 per-Service 窄 client；不能覆盖 Source，Send/Call 都通过同一个 Cluster 入口。已确认由 NewCluster 构造显式组装对象，再由 Cluster.Client(source ServiceID) 集中提供这些依赖以改善易用性；绑定入口属于受信任组装能力，不验证 Service 存活，不新增另一种业务 Call。公开出站组装已实现，Open 已实现。
 - **ClusterCallRegistry**：一个 Cluster 级的 PendingCall owner。所有 source-bound ClusterClient 共享它分配 ClusterSessionID；`Complete(from, envelope)` 只完成未绑定连接的逻辑/内存链路响应，网络响应通过私有连接 owner 完成。关闭时统一结束未完成的 Call。
 - **Redirect / Relay**：仅供 Runtime 或明确受信任的 Adapter/Transport 使用的消息转发能力。它转发 Runtime-owned Message 或 relay token，不接受业务任意指定的 Source；首版只考虑单向转发，不转移 Call 的 PendingCall/Session。
 - **ClusterSessionID**：`uint64` 形式的 Cluster 请求关联号；零表示 Send，非零表示 Call。它由 Cluster 管理、在当前实例内单调分配且不回绕复用，不要求与 Core SessionID 相同。
@@ -43,7 +43,7 @@
 - **Revision**：领域状态版本，用于拒绝同一 Service 实例中的迟到异步结果；它不同于 ServiceID，也不属于 Core Service 身份。
 - **业务语义边界**：Runtime/Cluster 只负责消息投递、路由和连接恢复，不判断业务资源的唯一所有权、一致性或过期。fencing、幂等、RequestID、补偿和业务过期规则由拥有该操作语义的业务或外层模块负责；ServiceID 不引入 Epoch、Lease 或 Generation。
 - **Admission**：Mailbox 或出站队列对消息的本地接受动作。Send 返回 nil 只说明 admission 成功，不说明目标 Handler 已执行或业务操作已成功。
-- **NodeSender**：Cluster 为一个远端 Node 唯一管理的 outbound 发送者。当前基础实现用固定容量队列和单一 worker 完成本地 admission 与顺序投递；队列满立即失败。admission 后的 Transport error/panic 和关闭丢弃进入有界、非阻塞的 `Failures()` 诊断 stream，慢消费者不会阻塞 sender，溢出由 `DroppedFailureCount()` 计数。内部单目标连接 owner 已实现按需建连与恢复：空闲时不拨号，下一请求至多触发一次有限 Dial，不自动重放结果不确定的请求；静态目标路由与公开出站组装已实现，动态路由及 Open 仍待后续切片。
+- **NodeSender**：Cluster 为一个远端 Node 唯一管理的 outbound 发送者。当前基础实现用固定容量队列和单一 worker 完成本地 admission 与顺序投递；队列满立即失败。admission 后的 Transport error/panic 和关闭丢弃进入有界、非阻塞的 `Failures()` 诊断 stream，慢消费者不会阻塞 sender，溢出由 `DroppedFailureCount()` 计数。内部单目标连接 owner 已实现按需建连与恢复：空闲时不拨号，下一请求至多触发一次有限 Dial，不自动重放结果不确定的请求；静态目标路由与公开出站组装已实现，动态路由及 Open 已实现。
 - **DeliveryFailure**：NodeSender 在 Envelope 已 admission 后发布的一次基础设施失败，包含目标节点、路由元数据和底层 error，不携带业务 payload、不触发业务 callback，也不表示远端 Handler 的业务结果。
 - **Diagnostic**：已实现的公开 Cluster 出站诊断事件，区分投递失败、连接异常和响应拒绝。所有组装内生产者共享一个 256 容量的非阻塞 Diagnostics 出口，满载丢弃并计数；不是广播、可靠审计或业务结果通道，正常调用失败仍遵循 Send/Call 契约。全部生产者退出后才关闭出口，日志消费者由宿主基础设施管理。
 - **远程 Send 所有权**：A 节点只负责本地 admission 和自身的传输诊断，B 节点负责收到消息后的 Handler 处理与错误记录；Send 不把 B 的 Handler error 返回 A。需要远端结果时使用 Call。
@@ -52,7 +52,7 @@
 - **Timer owner**：登记 Timer 的 Service/Runtime owner。它用于校验取消权限和表达 Timer 创建者；Timer 到期消息的 Source 不使用 owner 的 ServiceID，而固定为零值。
 - **RuntimeState**：Runtime 的生命周期状态。公开顺序为 `Created → Starting → Running → Stopping → Stopped → Closed`；`Starting` 表示 Runtime-owned Core 组件正在启动，`Stopped` 表示停止流程完成，`Closed` 表示 Runtime-owned 资源已最终释放。
 - **Lifecycle Coordinator**：Runtime 内部按固定 start/stop 计划编排 Core 组件的生命周期；它不拥有组件资源，也不是可无限注册的业务插件容器。
-- **Quiesce**：关闭流程中停止新 admission、入站和重连的阶段，不等同于等待所有任务完成。已实现的 Cluster.Quiesce() 针对首轮出站组装拒绝新 Client/Send/Call，取消尚未绑定的 Call 并停止新拨号；已绑定 Call 保留原等待上限和回复机会。最终资源释放由 Cluster.Close(ctx) 完成，调用方停止等待不取消清理。内部 tcpListener 已支持独立停止入站接纳：关闭监听并阻止旧连接的新请求，保留已接纳 Call 的原连接回复机会，最终取消才断连；公开 Open 已确认复用 Cluster.Quiesce 统一停止入站与出站接纳并关闭监听，不主动关闭已建立连接、不等待任务退出，监听关闭错误由最终 Close 合并返回；接线尚未实现。
+- **Quiesce**：关闭流程中停止新 admission、入站和重连的阶段，不等同于等待所有任务完成。已实现的 Cluster.Quiesce() 针对首轮出站组装拒绝新 Client/Send/Call，取消尚未绑定的 Call 并停止新拨号；已绑定 Call 保留原等待上限和回复机会。最终资源释放由 Cluster.Close(ctx) 完成，调用方停止等待不取消清理。内部 tcpListener 已支持独立停止入站接纳：关闭监听并阻止旧连接的新请求，保留已接纳 Call 的原连接回复机会，最终取消才断连；公开 Open 已确认复用 Cluster.Quiesce 统一停止入站与出站接纳并关闭监听，不主动关闭已建立连接、不等待任务退出，监听关闭错误由最终 Close 合并返回；接线已实现。
 - **Stop / Close**：`Runtime.Stop(ctx)` 负责关闭 admission 并有序停止全部 Core 组件，`Runtime.Close()` 负责 Stop 完成后的最终资源释放；二者幂等，Stop 后不得再次 Start。`Close()` 使用 `ShutdownTimeout`，没有调用方 context。
 - **RuntimeInspection**：`Runtime.Inspect()` 返回的只读值快照，包含 Runtime 状态、Service/ mailbox/runner 状态、PendingCall/Timer 数量和基础故障计数；它不暴露 Runtime-owned 内部对象。
 - **Runtime Handler 诊断**：`runtime.Diagnostic` 是本地 Handler 错误或真实 panic 的值快照，包含消息关联字段、错误分类、最多 4 KiB 的 Message 和最多 16 KiB 的 panic Stack；不保留业务对象或原始 error 引用。`Runtime.Diagnostics()` 是容量 256 的非阻塞单消费流，满载丢弃由 `DroppedDiagnosticCount()` 计数，仅在 Runtime 进入 Closed 时关闭。它与 Cluster 诊断分属不同包，不共用事件框架；宿主负责日志输出与脱敏。

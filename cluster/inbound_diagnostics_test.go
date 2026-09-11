@@ -33,3 +33,18 @@ func TestInboundDiagnosticsConcurrentOverflow(t *testing.T) {
 		t.Fatalf("received = %d, dropped = %d", count, diagnostics.dropped.Load())
 	}
 }
+
+// 验证共享模式不双写独立出口，满载丢弃只记入 Cluster 总数。
+func TestInboundDiagnosticsSharedOverflow(t *testing.T) {
+	shared := newClusterDiagnostics()
+	diagnostics := &inboundDiagnostics{shared: shared}
+	for i := 0; i < defaultFailureQueueCapacity+3; i++ {
+		diagnostics.report(inboundFailure{remoteAddress: "peer", session: 1, err: errInboundRequestPanicked})
+	}
+	if shared.dropped.Load() != 3 || diagnostics.dropped.Load() != 0 || diagnostics.failures != nil {
+		t.Fatal("incorrect drop owner")
+	}
+	if event := <-shared.events; event.Kind != DiagnosticInboundFailure || event.RemoteAddress != "peer" || event.RemoteNode != "" {
+		t.Fatalf("event=%+v", event)
+	}
+}

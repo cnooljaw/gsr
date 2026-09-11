@@ -18,12 +18,13 @@ var (
 // tcpListenerConfig 仅组装入站能力，不包含节点身份、出站路由或认证协议。
 // 所有容量和写入等待显式配置；listener 只能由这个 owner 接纳连接。
 type tcpListenerConfig struct {
-	listener       *net.TCPListener
-	codec          *FrameCodec
-	adapter        *localRequestAdapter
-	maxConnections int
-	maxCalls       int
-	writeTimeout   time.Duration
+	listener          *net.TCPListener
+	codec             *FrameCodec
+	adapter           *localRequestAdapter
+	maxConnections    int
+	maxCalls          int
+	writeTimeout      time.Duration
+	sharedDiagnostics *clusterDiagnostics
 }
 
 // tcpListener 拥有一个监听 socket 及全部已接纳连接，serve 返回前等待任务退出。
@@ -46,10 +47,14 @@ func newTCPListener(config tcpListenerConfig) (*tcpListener, error) {
 		config.maxConnections <= 0 || config.maxCalls <= 0 || config.writeTimeout <= 0 {
 		return nil, errInvalidTCPListener
 	}
+	diagnostics := &inboundDiagnostics{shared: config.sharedDiagnostics}
+	if config.sharedDiagnostics == nil {
+		diagnostics = newInboundDiagnostics()
+	}
 	return &tcpListener{
 		config:      config,
 		connections: make(map[*streamConnection]struct{}),
-		diagnostics: newInboundDiagnostics(),
+		diagnostics: diagnostics,
 	}, nil
 }
 
@@ -74,7 +79,9 @@ func (owner *tcpListener) serve(parent context.Context) error {
 		workers.Wait()
 		<-watchDone
 		// Accept 与全部连接生产者均已退出，至此才能关闭共享出口。
-		close(owner.diagnostics.failures)
+		if owner.diagnostics.shared == nil {
+			close(owner.diagnostics.failures)
+		}
 	}()
 	for {
 		socket, err := owner.config.listener.AcceptTCP()

@@ -16,17 +16,21 @@ const (
 	DiagnosticConnectionFailure
 	// DiagnosticResponseRejected 表示完整响应或帧被拒绝。
 	DiagnosticResponseRejected
+	// DiagnosticInboundFailure 表示入站接收、适配、回复或监听失败。
+	DiagnosticInboundFailure
 )
 
-// Diagnostic 只保存出站目标、可信关联字段和错误链，不保留业务载荷。
+// Diagnostic 只保存出站目标或入站对端地址、可信关联字段和错误链，不保留业务载荷。
 // 无单个请求归属时关联字段为零；Err 文本不承诺自动脱敏。
 type Diagnostic struct {
 	Kind       DiagnosticKind
 	RemoteNode NodeID
-	Session    ClusterSessionID
-	Target     ServiceTarget
-	Command    runtime.CommandID
-	Err        error
+	// RemoteAddress 是入站对端地址，不是 NodeID 或认证身份；监听故障时可为空。
+	RemoteAddress string
+	Session       ClusterSessionID
+	Target        ServiceTarget
+	Command       runtime.CommandID
+	Err           error
 }
 
 // clusterDiagnostics 由 Cluster 持有；所有生产者退出后才允许关闭。

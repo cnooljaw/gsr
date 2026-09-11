@@ -1,10 +1,10 @@
 # Cluster 可选入站组装
 
-状态：资源归属、公开签名、配置字段、默认值、重复调用规则及停止接线约定已获用户确认；公开 Open 尚未实现，入站诊断方案也已确认，待实施公开入站切片。
+状态：资源归属、公开签名、配置字段、默认值、重复调用规则及停止接线约定已获用户确认；公开 Open、统一停止与入站诊断最小切片已实现。
 
 ## 当前依据
 
-内部 tcpListener 已实现停止接纳与最终取消分离，入站请求通过 localRequestAdapter 落地到显式传入的本地 Runtime。公开 Cluster 当前仅管理出站资源；不能把内部能力已完成等同于公开 Open 已完成。
+内部 tcpListener 已实现停止接纳与最终取消分离，入站请求通过 localRequestAdapter 落地到显式传入的本地 Runtime。公开 Cluster 已通过 Open 管理可选入站监听及其连接。
 
 只读参考本地 Skynet：
 
@@ -33,13 +33,13 @@ GSR 沿用“显式开放入站、框架负责接线”，不照搬 Lua 模块�
 func (cluster *Cluster) Open(target *runtime.Runtime, config ListenConfig) (string, error)
 ```
 
-`target` 显式指定入站请求投递到的本地 Runtime；`ListenConfig` 承载入站监听配置，字段及默认值见下文。成功返回实际监听地址，格式为 `host:port`，不是需要独立关闭的资源对象。例如配置 `127.0.0.1:0` 时，由系统分配端口并返回实际地址；监听失败通过 error 返回。此签名尚未落地为 Go API。
+`target` 显式指定入站请求投递到的本地 Runtime；`ListenConfig` 承载入站监听配置，字段及默认值见下文。成功返回实际监听地址，格式为 `host:port`，不是需要独立关闭的资源对象。例如配置 `127.0.0.1:0` 时，由系统分配端口并返回实际地址；监听失败通过 error 返回。此签名已落地为 Go API。
 
 Skynet 的数字端口路径返回实际地址与端口，GSR 沿用这一用途，以单个 Go 地址字符串表达，不照搬 Lua 的多种参数形式。
 
 ## 已确认：ListenConfig 字段
 
-实现进度：ListenConfig 类型及内部默认值/校验已落地；Open 尚未实现，配置尚未接入监听生命周期。地址格式校验复用出站规则，但监听允许端口 0，出站仍要求实际端口；校验阶段不做 DNS、绑定或名称解析回调。
+实现进度：ListenConfig 类型及内部默认值/校验已落地；Open 已实现，配置已接入监听生命周期。地址格式校验复用出站规则，但监听允许端口 0，出站仍要求实际端口；校验阶段不做 DNS、绑定或名称解析回调。
 
 ```go
 type ListenConfig struct {
@@ -90,10 +90,16 @@ Skynet 的 clusterd 每次 listen 创建新的 gate，而单个 gate 通过 `ass
 
 沿用 Quiesce / Close 两个公开入口，不增加 StopListener。Quiesce 统一阻止新入站与出站请求，关闭监听，保留已接纳入站 Call 的连接及回复机会，不等待 Handler 或连接任务退出。监听关闭错误保存至最终 Close 合并返回，不改变 Quiesce() 签名。这替代原“不进行网络 I/O”的约定，准确边界为“允许关闭监听，不主动关闭已建立连接，不等待任务退出”。
 
-Host 按 Cluster.Quiesce → Runtime.Stop/Close → Cluster.Close(ctx) 收尾。Close 自动发起 Quiesce，最终取消剩余等待、断开连接并等待网络任务，仍不管理 Runtime 生命周期；调用方 context 只限制本次等待，不中断唯一清理流程。此公开入站接线尚未实现，详见 [两阶段关闭](RFC-CLUSTER-SHUTDOWN.md)。
+Host 按 Cluster.Quiesce → Runtime.Stop/Close → Cluster.Close(ctx) 收尾。Close 自动发起 Quiesce，最终取消剩余等待、断开连接并等待网络任务，仍不管理 Runtime 生命周期；调用方 context 只限制本次等待，不中断唯一清理流程。此公开入站接线已实现，详见 [两阶段关闭](RFC-CLUSTER-SHUTDOWN.md)。
 
 ## 已确认：统一入站诊断
 
-入站合入现有 Cluster.Diagnostics，新增 DiagnosticInboundFailure 类别及 RemoteAddress 字段；入站 RemoteNode 留空，可信请求信息可带 Session/Target/Command，不记录业务载荷。共用容量 256 与丢弃计数，不增加转发 goroutine。最终 Close 等全部入站及出站生产者退出后关闭出口；Handler 错误仍归 Runtime，Open 同步失败直接返回 error，成功后监听异常进入诊断。详见 [统一诊断出口](RFC-CLUSTER-DIAGNOSTICS.md)。此方案尚未实现。
+入站合入现有 Cluster.Diagnostics，新增 DiagnosticInboundFailure 类别及 RemoteAddress 字段；入站 RemoteNode 留空，可信请求信息可带 Session/Target/Command，不记录业务载荷。共用容量 256 与丢弃计数，不增加转发 goroutine。最终 Close 等全部入站及出站生产者退出后关闭出口；Handler 错误仍归 Runtime，Open 同步失败直接返回 error，成功后监听异常进入诊断。详见 [统一诊断出口](RFC-CLUSTER-DIAGNOSTICS.md)。此方案已实现。
 
 认证仍是后续能力；Open 本身不构成可信网络边界，未认证监听不应暴露给不可信网络。
+
+## 实现与验证
+
+Open 在锁内预留唯一打开名额，在锁外解析及绑定地址，再与停止门禁竞争移交监听。停止先发生则关闭本次 socket 并返回错误；Close 等待正在打开的流程退出后才关闭诊断出口。监听任务使用已有 tcpListener，不新增独立公共 Listener 或诊断转发任务。
+
+公开入口测试覆盖真实 TCP Call、重复打开、端口占用后重试、并发打开、Open/Close 竞争无监听残留、Quiesce 保留旧 Call 回复、关闭不接管 Runtime、入站请求关联字段及监听异常退出不提前关闭共享出口。共享诊断测试另覆盖容量溢出归属；既有内部入站测试继续保护连接名额与停止门禁。

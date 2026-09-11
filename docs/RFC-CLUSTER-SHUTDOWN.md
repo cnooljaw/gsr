@@ -1,6 +1,6 @@
 # Cluster 两阶段关闭
 
-状态：已获用户确认，首轮公开出站 Cluster 生命周期已实现；Quiesce 统一停止可选入站的扩展约定已确认，公开 Open 接线尚未实现。
+状态：已获用户确认，首轮公开出站 Cluster 生命周期已实现；Quiesce 统一停止可选入站的扩展约定已确认，公开 Open 接线已实现。
 
 ## 已确认入口
 
@@ -47,7 +47,7 @@ Quiesce 不接收 context，不等待 Handler 或 worker 退出。接入可选 O
 
 ## Host 调用顺序与业务影响
 
-接入公开 Open 后，正常 Host 停机顺序为 Cluster.Quiesce（统一停止入站与出站接纳并关闭监听）、Runtime.Stop/Close、最后 Cluster.Close(ctx)。Close 最终取消剩余入站等待、断开连接并等待网络任务，不管理 Runtime 生命周期。公开 Cluster 目前仍只组装出站能力，上述入站生命周期扩展已确认但尚未接线。
+接入公开 Open 后，正常 Host 停机顺序为 Cluster.Quiesce（统一停止入站与出站接纳并关闭监听）、Runtime.Stop/Close、最后 Cluster.Close(ctx)。Close 最终取消剩余入站等待、断开连接并等待网络任务，不管理 Runtime 生命周期。公开 Cluster 已同时组装出站与可选入站能力。
 
 ### 入站停止接纳（已确认）
 

@@ -20,18 +20,21 @@ var (
 )
 
 // Cluster 统一管理出站路由、共享等待表和每目标发送组件。
-// 必须通过 NewCluster 构造；不管理 Runtime、监听或业务 Service 生命周期。
+// 必须通过 NewCluster 构造；可选管理入站监听，不管理 Runtime 或业务 Service 生命周期。
 type Cluster struct {
-	config      ClusterConfig
-	frames      *FrameCodec
-	calls       *ClusterCallRegistry
-	diagnostics *clusterDiagnostics
-	mu          sync.Mutex
-	quiescing   bool
-	targets     map[NodeID]*clusterTarget
-	closeOnce   sync.Once
-	done        chan struct{}
-	closeErr    error // 只在 done 关闭后读取。
+	config         ClusterConfig
+	frames         *FrameCodec
+	calls          *ClusterCallRegistry
+	diagnostics    *clusterDiagnostics
+	mu             sync.Mutex
+	quiescing      bool
+	opening        chan struct{} // 当前打开流程退出后关闭，Close 等待其回滚或移交。
+	inbound        *clusterInbound
+	listenCloseErr error
+	targets        map[NodeID]*clusterTarget
+	closeOnce      sync.Once
+	done           chan struct{}
+	closeErr       error // 只在 done 关闭后读取。
 	// dial 仅为包内测试替换标准拨号器，不是公开配置能力。
 	dial func(context.Context, string, string) (net.Conn, error)
 }
@@ -114,7 +117,8 @@ func (target *clusterTarget) Send(request ClusterEnvelope) error {
 	return target.sender.Send(request)
 }
 
-// Quiesce 同步停止接纳、取消未绑定 Call 并阻止新拨号；不等待任务或关闭现有 socket。
+// Quiesce 同步停止入站与出站接纳、关闭监听、取消未绑定 Call 并阻止新拨号。
+// 不等待任务或主动关闭已建立连接；监听关闭错误由 Close 合并返回。
 // 已绑定 Call 保留原等待上限，不能通过此方法恢复接纳。
 func (cluster *Cluster) Quiesce() {
 	if cluster == nil || cluster.calls == nil {
@@ -126,6 +130,9 @@ func (cluster *Cluster) Quiesce() {
 		return
 	}
 	cluster.quiescing = true
+	if cluster.inbound != nil {
+		cluster.listenCloseErr = cluster.inbound.listener.quiesce()
+	}
 	cluster.calls.pending.quiesce()
 	for _, target := range cluster.targets {
 		target.sender.stopAdmission()
@@ -161,12 +168,27 @@ func (cluster *Cluster) finishClose() {
 	// Quiesce 后 targets 不再增删；发送与读循环不需要 Cluster.mu。
 	cluster.calls.pending.close(ErrClusterQuiescing)
 	var failures []error
+	cluster.mu.Lock()
+	opening := cluster.opening
+	inbound := cluster.inbound
+	failures = append(failures, cluster.listenCloseErr)
+	cluster.mu.Unlock()
+	if inbound != nil {
+		inbound.cancel()
+	}
 	for _, target := range cluster.targets {
 		failures = append(failures, target.peer.signalClose())
 	}
 	for _, target := range cluster.targets {
 		<-target.sender.done
 		target.peer.waitClosed()
+	}
+	if opening != nil {
+		<-opening
+	}
+	if inbound != nil {
+		<-inbound.done
+		failures = append(failures, inbound.result)
 	}
 	cluster.closeErr = errors.Join(failures...)
 	close(cluster.diagnostics.events)

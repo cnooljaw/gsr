@@ -27,7 +27,7 @@ type inboundConnection struct {
 }
 
 func newInboundConnection(connection *streamConnection, adapter *localRequestAdapter, maxCalls int, diagnostics *inboundDiagnostics) (*inboundConnection, error) {
-	if connection == nil || adapter == nil || adapter.runtime == nil || adapter.codecs == nil || maxCalls <= 0 || diagnostics == nil || diagnostics.failures == nil {
+	if connection == nil || adapter == nil || adapter.runtime == nil || adapter.codecs == nil || maxCalls <= 0 || diagnostics == nil || (diagnostics.failures == nil && diagnostics.shared == nil) {
 		return nil, errInvalidInboundConnection
 	}
 	return &inboundConnection{
@@ -84,7 +84,7 @@ func (owner *inboundConnection) serve(parent context.Context) (result error) {
 			}
 			var complete *completeFrameError
 			if errors.As(err, &complete) {
-				owner.report(0, err)
+				owner.report(ClusterEnvelope{}, err)
 				continue
 			}
 			return err
@@ -110,17 +110,21 @@ func (owner *inboundConnection) stoppedAdmission() bool {
 func (owner *inboundConnection) handle(ctx context.Context, request ClusterEnvelope) {
 	defer func() {
 		if recover() != nil {
-			owner.report(request.Session, errInboundRequestPanicked)
+			owner.report(request, errInboundRequestPanicked)
 		}
 	}()
 	if err := owner.adapter.handle(ctx, request, owner.connection.write); err != nil {
-		owner.report(request.Session, err)
+		owner.report(request, err)
 		if errors.Is(err, ErrConnectionAgentWrite) {
 			owner.connection.close()
 		}
 	}
 }
 
-func (owner *inboundConnection) report(session ClusterSessionID, err error) {
-	owner.diagnostics.report(inboundFailure{remoteAddress: owner.remoteAddress, session: session, err: err})
+func (owner *inboundConnection) report(request ClusterEnvelope, err error) {
+	if request.Validate() != nil {
+		request = ClusterEnvelope{}
+	}
+	owner.diagnostics.report(inboundFailure{remoteAddress: owner.remoteAddress, session: request.Session,
+		target: request.Target, command: request.Command, err: err})
 }

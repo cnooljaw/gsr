@@ -1,12 +1,17 @@
 package cluster
 
-import "sync/atomic"
+import (
+	"github.com/cnooljaw/gsr/runtime"
+	"sync/atomic"
+)
 
-// inboundFailure 只携带连接地址、Session 和错误，不持有业务载荷或来源 NodeID。
+// inboundFailure 只携带连接地址、可信请求字段和错误，不持有业务载荷或来源 NodeID。
 // 远端地址是诊断标签，不是身份认证凭据。
 type inboundFailure struct {
 	remoteAddress string
 	session       ClusterSessionID
+	target        ServiceTarget
+	command       runtime.CommandID
 	err           error
 }
 
@@ -16,6 +21,7 @@ type inboundFailure struct {
 type inboundDiagnostics struct {
 	failures chan inboundFailure
 	dropped  atomic.Uint64
+	shared   *clusterDiagnostics
 }
 
 func newInboundDiagnostics() *inboundDiagnostics {
@@ -23,6 +29,11 @@ func newInboundDiagnostics() *inboundDiagnostics {
 }
 
 func (diagnostics *inboundDiagnostics) report(failure inboundFailure) {
+	if diagnostics.shared != nil {
+		diagnostics.shared.report(Diagnostic{Kind: DiagnosticInboundFailure, RemoteAddress: failure.remoteAddress,
+			Session: failure.session, Target: failure.target, Command: failure.command, Err: failure.err})
+		return
+	}
 	select {
 	case diagnostics.failures <- failure:
 	default:

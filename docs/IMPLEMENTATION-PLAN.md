@@ -297,7 +297,7 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 
 ### Cluster 2：远程 Call
 
-- 状态：基础远程 Call、本地等待和内部 TCP response 路由已完成并通过真实回环测试；公开静态出站组装已完成，公开入站组装尚未完成。
+- 状态：基础远程 Call、本地等待和内部 TCP response 路由已完成并通过真实回环测试；公开静态出站组装已完成，公开入站最小组装已完成。
 - Cluster-owned PendingCall 表保存 `Session → Source、RemoteNode、Target、Command`，Source 只在发起节点本地使用。
 - ClusterSessionID 在当前 Cluster 实例内单调分配，耗尽返回 `runtime.ErrIDExhausted`，不回绕或复用。
 - Response/Error 只完成匹配的 RemoteNode/Target/Command；未知、迟到、重复或错路由 frame 被拒绝并进入诊断。
@@ -315,7 +315,7 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 
 ### Cluster 3：TCP 与连接 owner
 
-- 状态：逻辑 ConnectionAgent、内部单连接 I/O 封装、出站响应读循环、有界并发入站请求循环、单 listener 入站连接 owner 和单目标按需出站连接 owner 已完成；公开静态出站组装已完成，Open、认证与动态路由仍待后续切片。
+- 状态：逻辑 ConnectionAgent、内部单连接 I/O 封装、出站响应读循环、有界并发入站请求循环、单 listener 入站连接 owner 和单目标按需出站连接 owner 已完成；公开静态出站组装已完成，Open 已实现，认证与动态路由仍待后续切片。
 - 已裁决并实现基础设施 Runtime.Call：Source 固定为零，经普通 Mailbox 执行，复用有限等待与停止收尾；ServiceContext.Call 仍绑定真实 Service。取舍见 [Cluster 入站 Call 方案](RFC-CLUSTER-INBOUND-CALL.md)。
 - 已用 ConnectionAgent 测试适配器接通真实 Runtime，覆盖成功/领域错误回复、零 Source，以及本地 Session 与 ClusterSession 分离；网络入站并发管理和正式适配器组装仍待接入。
 - 已实现内部 localRequestAdapter 并接入 inboundConnection：查找 Command codec、解码参数列表、按 ID 或外层名称解析目标，再直接经 Runtime.Send/Call 执行；未知 Command/坏载荷仅返回接收侧诊断错误，不产生响应。Send 接纳错误归接收侧，Call 通过与逻辑 ConnectionAgent 共用的响应函数回包，写回故障保留 I/O 错误链。已删除临时 ConnectionAgent 和闭包错误回传；保留解析后取消检查、编码与写入双重失败原因。适配器不管理并发或连接生命周期，公开 ConnectionAgent 保持不变。
@@ -333,10 +333,10 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 - 已用真实 TCP 测试夹具验证两个方向分别建立独立连接，关闭 A→B 后 B→A 仍能主动 Call；此门禁验证连接组织，不代表生产节点管理器或公开 open API 已实现。
 - 已实现内部 tcpListener：接管一个 TCP listener，限制已接纳连接总数；满额时关闭新 socket，不启动连接任务、不建立用户态等待队列，诊断有界非阻塞。每条已接纳连接使用独立 inboundConnection，来源诊断只附连接远端地址与 Session，不添加 NodeID。
 - tcpListener 的取消或异常 Accept 失败会关闭监听和全部已接纳连接、取消基础设施 Call 并等待全部连接处理任务退出；不会强杀目标 Handler。已验证满额隔离、坏帧隔离、慢 Call 期间关闭、空闲 Accept 取消、诊断满载计数与非法配置/重复启动。
-- 已确认并实现内部入站 quiesce：关闭监听，所有连接共享请求门禁；完整帧在交给处理任务前决定 admission，停止后暂停读取，已接纳 Call 仍可沿原连接回复。最终取消解除读取、满载名额和停止等待。已补充真实 TCP 的新连接拒绝、新 Send/Call 不执行、旧 Call 回复、并发重复停止、空闲与满载取消测试。公开 Open 和统一入站诊断接线仍未实现。
-- 已确认公开 Open 的资源归属及签名：`Open(target *runtime.Runtime, config ListenConfig) (string, error)` 返回实际监听地址；现有 Cluster 拥有可选单监听及入站连接，但不管理目标 Runtime 生命周期。不支持多监听与热切换，不影响仅出站调用。ListenConfig 的 Address、MaxConnections、MaxConcurrentCalls 和 ResolveService 四个字段已确认。默认连接上限 128、每连接 Call 上限 32 及零值/负数规则已确认。重复调用规则已确认：成功后拒绝重复打开、失败回滚后可重试、并发仅一个打开流程、停止后禁止 Open。停止接线已确认复用 Quiesce 关闭监听和入站门禁、保留连接回复，关闭错误由 Close 合并返回。入站诊断已确认新增 InboundFailure 和 RemoteAddress，共用现有有界出口。下一步实施公开入站切片，见 [可选入站组装](RFC-CLUSTER-OPEN.md)。
+- 已确认并实现内部入站 quiesce：关闭监听，所有连接共享请求门禁；完整帧在交给处理任务前决定 admission，停止后暂停读取，已接纳 Call 仍可沿原连接回复。最终取消解除读取、满载名额和停止等待。已补充真实 TCP 的新连接拒绝、新 Send/Call 不执行、旧 Call 回复、并发重复停止、空闲与满载取消测试。公开 Open 和统一入站诊断接线已实现。
+- 已确认公开 Open 的资源归属及签名：`Open(target *runtime.Runtime, config ListenConfig) (string, error)` 返回实际监听地址；现有 Cluster 拥有可选单监听及入站连接，但不管理目标 Runtime 生命周期。不支持多监听与热切换，不影响仅出站调用。ListenConfig 的 Address、MaxConnections、MaxConcurrentCalls 和 ResolveService 四个字段已确认。默认连接上限 128、每连接 Call 上限 32 及零值/负数规则已确认。重复调用规则已确认：成功后拒绝重复打开、失败回滚后可重试、并发仅一个打开流程、停止后禁止 Open。停止接线已确认复用 Quiesce 关闭监听和入站门禁、保留连接回复，关闭错误由 Close 合并返回。入站诊断已确认新增 InboundFailure 和 RemoteAddress，共用现有有界出口。已实现公开入站最小切片，见 [可选入站组装](RFC-CLUSTER-OPEN.md)。
 - 已确认注册与发现属于外部能力：保留显式地址的 Open，不增加按节点名打开的公共 API；静态表查找和发布地址由应用组装。当前静态出站路由不等于已实现动态发现或地址更新，相关接线留待后续需求。
-- 公开入站首步已实现 ListenConfig 类型及内部默认值/校验，覆盖显式配置保留、无解析副作用、非法输入和监听/出站端口零的区别。尚未接入 Open；后续实现打开竞争、失败回滚及入站生命周期/诊断接线。
+- 公开入站首步已实现 ListenConfig 类型及内部默认值/校验，覆盖显式配置保留、无解析副作用、非法输入和监听/出站端口零的区别。已接入 Open，覆盖重复打开、失败重试、关闭竞争及入站生命周期/诊断接线。
 - 已统一入站诊断出口：listener 与全部连接共享一个有界队列和丢弃计数，删除每连接的 256 容量缓冲与转发 goroutine。单连接退出不关闭出口，listener 在全部生产者退出后关闭；保留解除 Accept/Read 阻塞所需的取消监视机制。
 - 当前连接上限属于单 listener owner。公开 open API、多个 listener 共享的节点总配额及生产诊断消费尚未组装，不能据此宣称完整 TCP Transport 已完成。
 - 出站连接等待归属已确认并实现内部绑定、响应校验和连接范围清理，真实 TCP 夹具已改用此路径。见 [出站连接与 Call 等待归属方案](RFC-CLUSTER-OUTBOUND-CALL-OWNERSHIP.md)。单目标 Dial 与连接替换由 outboundPeer 接管，静态目标路由由公开 Cluster 组装，动态路由仍待后续切片。

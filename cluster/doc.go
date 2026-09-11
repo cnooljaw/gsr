@@ -5,5 +5,5 @@
 // Send 成功只表示本地接纳；投递异常从有界 Diagnostics 出口读取。
 //
 // 停机先 Quiesce，停止 Core 后再 Close；Close 的 context 只限制调用方等待。
-// 本包当前提供公开出站组装，入站 Open、认证和动态目标配置尚未公开。
+// 本包提供公开出站组装及可选入站 Open；认证和动态目标配置尚未公开。
 package cluster
