@@ -6,7 +6,7 @@
 
 原 recordHandlerError 只累加 HandlerErrors/Panics，未保存消息关联信息和错误原因；Handler recovery 未采集 stack。本切片已补 Handler 的 Send/Call 错误与真实 panic 诊断，不同时扩展 OnStart/OnStop、Timer 或 admission 事件类别。其它诊断缺口保留后续处理，不能宣称本轮覆盖全部 Runtime 故障。
 
-Inspect 继续提供状态和计数快照；事件流提供逐次故障记录。Core 只提供基础观测机制，不拥有日志文件、日志库、订阅系统或日志消费任务。
+Inspect 继续提供状态和计数快照；事件流提供逐次故障观测。Core 不拥有日志文件、订阅系统或消费任务。按最新统一日志裁决，Config.Logger 可借用 logging.Logger，在错误边界直接入主日志队列，不经 Diagnostics 转发；日志写入者由应用最后关闭。
 
 ## Skynet 依据
 
@@ -47,7 +47,7 @@ type Diagnostic struct {
 
 - 每个 Runtime 固定一个容量 256 的队列，不新增 Config 字段。满载丢弃新事件并累加 DroppedDiagnosticCount，不等待消费者。
 - 每次 Handler 非 nil error 或真实 panic 最多投递一条事件；保留原计数规则，不因事件丢弃而少计数。Send 不增加返回路径，Call 不改变回复或 Service 停止语义。
-- Diagnostics 返回同一条单消费流，不是广播。宿主基础设施负责消费和输出，普通 Service 不启动日志 goroutine。
+- Diagnostics 返回同一条单消费观测流，不是广播。主日志已在记录处直接入共享 Logger，宿主不能再把同一事件转发为重复主日志；普通 Service 通过绑定的 Logger 记录，不启动日志 goroutine。
 - 不在 Stop 返回或 shutdown timeout 时关闭出口；残留 Handler 仍可能产生日志。仅在 Runtime 确认资源释放、进入 Closed 时幂等关闭。
 - Close 未能进入 Closed 时出口保持打开；残留任务结束后，宿主可再次 Close 完成释放。日志消费 owner 也必须具备自己的取消方式，不能在异常停机时无限等待通道关闭。
 - Closed 后缓冲事件仍可读取，丢弃计数仍可查询；Close 不等待消费者读空或日志落盘。nil Runtime 的诊断通道返回 nil，丢弃计数返回零。

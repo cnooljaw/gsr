@@ -6,11 +6,15 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/cnooljaw/gsr/logging"
 )
 
 // ClusterConfig 配置静态出站路由；不包含本地身份、Runtime 或监听能力。
 // 数值零使用有限默认值，负数无效；构造复制 Nodes，Codecs 复用不可变注册表。
 type ClusterConfig struct {
+	// Logger 与所属 Runtime/业务共享同一入口；Cluster 不负责关闭，nil 不输出主日志。
+	Logger *logging.Logger
 	Nodes  map[NodeID]string
 	Codecs *CommandCodecRegistry
 	// MaxCallWait 默认 5 秒，调用方 context 只能缩短等待。

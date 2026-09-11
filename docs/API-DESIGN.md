@@ -671,6 +671,8 @@ func (client *BattleClient) StartBattle(
 
 ## 9. Error、panic 与可观测性
 
+统一 FIFO 日志服务已实现：logging.New(logging.Config{Writer, Capacity}) 创建单写入者（默认 stdout、容量 1024），Info/Error 在调用处采集时间/位置并快照字段，WithService 仅绑定来源。Runtime.Config.Logger 与 ClusterConfig.Logger 注入同一个入口，框架同步入主日志队列，Diagnostics 仍作观测，不再转发为主日志。满载返回 ErrQueueFull 并计数，成功入队不等待写盘；Close(ctx) 排空并有限等待，不关闭借用 Writer。Logger 由应用最后关闭，不进入普通 Service 生命周期。滚动文件及源头限频尚未实现，详见 [日志方案](RFC-LOGGING.md)。
+
 错误分为三类，但继续使用标准 Go `error` 和稳定 error type/sentinel 表达：
 
 - **Domain Error**：房间已满、状态不允许、余额不足等正常业务拒绝。

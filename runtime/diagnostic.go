@@ -58,6 +58,13 @@ func (runtime *Runtime) recordHandlerError(instance *serviceInstance, message Me
 		event.Class = ErrorClass(strings.Clone(string(status.Class)))
 		event.Code = ErrorCode(strings.Clone(string(status.Code)))
 	}
+	// 在当前错误边界同步入日志队列，不能由 Diagnostics 消费者稍后转发排序。
+	if logger := runtime.config.Logger; logger != nil {
+		// 满载由 Logger 独立计数；不能为记录失败递归记日志或改变 Handler 结果。
+		_ = logger.WithService(uint64(instance.id)).Error("Handler failed",
+			"source", message.Source, "command", message.Command, "session", message.Session,
+			"class", event.Class, "code", event.Code, "error", event.Message, "stack", event.Stack)
+	}
 	// 所有生产者都在 runner 内；Close 确认资源释放后才关闭队列。
 	select {
 	case runtime.diagnostics <- event:

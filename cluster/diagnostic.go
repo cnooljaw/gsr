@@ -3,6 +3,8 @@ package cluster
 import (
 	"sync/atomic"
 
+	"github.com/cnooljaw/gsr/logging"
+
 	"github.com/cnooljaw/gsr/runtime"
 )
 
@@ -35,6 +37,7 @@ type Diagnostic struct {
 
 // clusterDiagnostics 由 Cluster 持有；所有生产者退出后才允许关闭。
 type clusterDiagnostics struct {
+	logger  *logging.Logger
 	events  chan Diagnostic
 	dropped atomic.Uint64
 }
@@ -44,6 +47,11 @@ func newClusterDiagnostics() *clusterDiagnostics {
 }
 
 func (diagnostics *clusterDiagnostics) report(event Diagnostic) {
+	// 直接在诊断产生路径入主日志队列，保留 Diagnostics 作为独立观测流。
+	// 主日志满载由 Logger 计数，不回流为新的诊断或改变网络结果。
+	_ = diagnostics.logger.Error("Cluster failure", "kind", event.Kind,
+		"remote_node", event.RemoteNode, "remote_address", event.RemoteAddress,
+		"session", event.Session, "target", event.Target, "command", event.Command, "error", event.Err)
 	select {
 	case diagnostics.events <- event:
 	default:

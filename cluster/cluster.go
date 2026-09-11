@@ -55,8 +55,10 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 	if err != nil {
 		return nil, fmt.Errorf("%w: %w", ErrInvalidClusterConfig, err)
 	}
+	diagnostics := newClusterDiagnostics()
+	diagnostics.logger = config.Logger
 	return &Cluster{config: config, frames: frames, calls: NewClusterCallRegistry(),
-		diagnostics: newClusterDiagnostics(), targets: make(map[NodeID]*clusterTarget), done: make(chan struct{})}, nil
+		diagnostics: diagnostics, targets: make(map[NodeID]*clusterTarget), done: make(chan struct{})}, nil
 }
 
 // Client 是受信任组装入口，只绑定非零来源值，不校验 Service 存活。

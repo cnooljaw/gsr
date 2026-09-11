@@ -3,6 +3,8 @@ package runtime
 import (
 	"fmt"
 	"time"
+
+	"github.com/cnooljaw/gsr/logging"
 )
 
 const (
@@ -13,6 +15,9 @@ const (
 
 // Config 定义 Core Runtime 的配置。
 type Config struct {
+	// Logger 与业务及 Cluster 共享同一日志入口；nil 保留仅 Diagnostics 的行为。
+	// Runtime 只借用，应用必须在 Runtime 与 Cluster 收尾后最后关闭 Logger。
+	Logger *logging.Logger
 	// MaxCallWait 是本地 Call 的最长等待时间。
 	MaxCallWait time.Duration
 	// MailboxCapacity 限制每个 Service Mailbox 的容量。
