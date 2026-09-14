@@ -10,6 +10,71 @@ import (
 	"time"
 )
 
+// 验证 TCP 半关闭造成的残缺帧不进入 Handler、不携带未验证字段，且其它连接继续调用。
+func TestClusterOpenTruncatedFrameIsolatesConnection(t *testing.T) {
+	for _, part := range []string{"header", "body"} {
+		t.Run(part, func(t *testing.T) {
+			adapter, _, codec := newLocalAdapterTest(t)
+			service := &tcpCountingService{inboundRecordingService: &inboundRecordingService{}}
+			id, err := adapter.runtime.CreateService(context.Background(), service)
+			if err != nil {
+				t.Fatal(err)
+			}
+			server, client, caller := newOpenBoundaryLink(t, adapter, nil)
+			socket, err := net.DialTimeout("tcp", caller.config.Nodes["b"], time.Second)
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer socket.Close()
+			if err := socket.SetDeadline(time.Now().Add(2 * time.Second)); err != nil {
+				t.Fatal(err)
+			}
+			payload, err := codec.Encode([]any{"must-not-run"})
+			if err != nil {
+				t.Fatal(err)
+			}
+			frame, err := server.frames.Encode(ClusterEnvelope{Kind: FrameRequest, Session: 123, Target: ServiceTarget{ServiceID: id}, Command: clusterTestCommand, Payload: payload})
+			if err != nil {
+				t.Fatal(err)
+			}
+			if part == "header" {
+				frame = frame[:2]
+			} else {
+				// 保留看似完整的 Session、Target 和 Command，仅截掉正文末尾。
+				frame = frame[:len(frame)-1]
+			}
+			if err := writeFrameBytes(socket, frame); err != nil {
+				t.Fatal(err)
+			}
+			// 只关闭发送方向，接收方向仍可观察服务端主动断连。
+			if err := socket.(*net.TCPConn).CloseWrite(); err != nil {
+				t.Fatal(err)
+			}
+			var probe [1]byte
+			if n, err := socket.Read(probe[:]); n != 0 || !errors.Is(err, io.EOF) {
+				t.Fatalf("read after truncation: n=%d err=%v", n, err)
+			}
+			select {
+			case event := <-server.Diagnostics():
+				if event.Kind != DiagnosticInboundFailure || !errors.Is(event.Err, io.ErrUnexpectedEOF) || event.Session != 0 || event.Command != 0 || event.Target != (ServiceTarget{}) || event.RemoteAddress != socket.LocalAddr().String() {
+					t.Fatalf("truncation diagnostic=%+v", event)
+				}
+			case <-time.After(time.Second):
+				t.Fatal("missing truncation diagnostic")
+			}
+			if service.invocations.Load() != 0 || server.SuppressedDiagnosticCount() != 0 {
+				t.Fatal("truncated request invoked Handler or was treated as duplicate")
+			}
+			ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+			defer cancel()
+			value, err := client.Call(ctx, "b", ServiceTarget{ServiceID: id}, clusterTestCommand, "healthy")
+			if err != nil || !reflect.DeepEqual(value, []any{"healthy"}) || service.invocations.Load() != 1 {
+				t.Fatalf("healthy call: value=%v err=%v calls=%d", value, err, service.invocations.Load())
+			}
+		})
+	}
+}
+
 // 验证完整坏载荷仅丢弃该请求，同连接下一条合法 Call 仍正常回复。
 func TestClusterOpenMalformedPayloadKeepsConnection(t *testing.T) {
 	adapter, id, codec := newLocalAdapterTest(t)
