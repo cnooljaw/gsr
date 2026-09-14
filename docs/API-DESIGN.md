@@ -671,7 +671,9 @@ func (client *BattleClient) StartBattle(
 
 ## 9. Error、panic 与可观测性
 
-统一 FIFO 日志服务已实现：logging.New(logging.Config{Writer, Capacity}) 创建单写入者（默认 stdout、容量 1024），Info/Error 在调用处采集时间/位置并快照字段，WithService 仅绑定来源。Runtime.Config.Logger 与 ClusterConfig.Logger 注入同一个入口，框架同步入主日志队列，Diagnostics 仍作观测，不再转发为主日志。满载返回 ErrQueueFull 并计数，成功入队不等待写盘；Close(ctx) 排空并有限等待，不关闭借用 Writer。Logger 由应用最后关闭，不进入普通 Service 生命周期。滚动文件及源头限频尚未实现，详见 [日志方案](RFC-LOGGING.md)。
+文件滚动已实现：当前文件 gsr.log，固定 100 MiB，下一条会超限时先滚动，不拆记录；保留 10 个历史文件（.1 最新，.10 最旧），超过后删除最旧的受管理文件。现有单写入者负责滚动，不增加任务、不重置 seq；第一版不按日期切分、不压缩，不暴露大小和保留数量配置。各进程由启动参数选择不同配置，显式传入独占的相对日志目录；Logger.New 将其相对当前工作目录解析并固定，应用应在启动时创建 Logger。日志组件不读取命令行、不推断节点名。文件模式创建缺失目录，初始化失败直接报错；重启追加当前文件。运行中写入或滚动失败后拒绝新日志、累计已接纳未输出记录、停止继续写入和滚动，Err() 和 Close 返回首次错误，不自动重试/转终端/退出进程。
+
+统一 FIFO 日志服务已实现：logging.New(logging.Config{Directory: "./log/battle-01"}) 选择文件输出；Directory 为空时使用 Writer，两者同时设置报错，都未设置则默认 stdout。Capacity 默认 1024。Info/Error 在调用处采集时间/位置并快照字段，WithService 仅绑定来源。Runtime.Config.Logger 与 ClusterConfig.Logger 注入同一个入口，框架同步入主日志队列，Diagnostics 仍作观测，不再转发为主日志。满载返回 ErrQueueFull 并计数，成功入队不等待写盘；文件和借用 Writer 均在首次输出故障后停止写入和接纳。Close(ctx) 正常排空、失败时统计残留，并有限等待；关闭内部文件，不关闭借用 Writer。Logger 由应用最后关闭，不进入普通 Service 生命周期。源头限频尚未实现，详见 [日志方案](RFC-LOGGING.md)。
 
 错误分为三类，但继续使用标准 Go `error` 和稳定 error type/sentinel 表达：
 

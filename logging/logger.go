@@ -25,11 +25,14 @@ var (
 	ErrSequenceExhausted = errors.New("logging: sequence exhausted")
 )
 
-// Config 配置唯一写入者；Writer 为 nil 时使用 stdout，Capacity 为零时使用 1024。
-// Writer 由应用拥有，不会被关闭；应用须在 Logger.Close 成功后再关闭文件。
+// Config 配置唯一写入者；Directory 和 Writer 都未设置时使用 stdout，Capacity 为零时使用 1024。
+// Writer 由应用拥有，不会被关闭；应用须在 Logger.Close 完成后再释放它。
 type Config struct {
-	Writer   io.Writer
-	Capacity int
+	// Directory 非空选择文件模式，与 Writer 互斥；路径在 New 时解析为绝对路径并固定。
+	// 当前文件为 gsr.log，按 100 MiB 滚动并保留 10 份历史；目录须由本 Logger 独占。
+	Directory string
+	Writer    io.Writer
+	Capacity  int
 }
 
 // Logger 是轻量绑定入口；WithService 共享相同队列、计数器和生命周期。
@@ -45,9 +48,10 @@ type writerState struct {
 	sequence uint64
 	closed   bool
 	writer   io.Writer
+	file     *fileWriter // 仅内部文件由 Logger 负责关闭。
 	dropped  atomic.Uint64
 	failures atomic.Uint64
-	result   error // done 关闭后读取；仅保存首次输出错误，避免无限错误链。
+	result   error // mu 保护；仅保存首次输出错误，避免无限错误链。
 }
 
 type record struct {
@@ -63,6 +67,9 @@ type record struct {
 
 // New 启动一个串行写入任务，输出每行一条 JSON，不等待日志消费者或云服务。
 func New(config Config) (*Logger, error) {
+	if config.Directory != "" && config.Writer != nil {
+		return nil, errors.New("logging: Directory and Writer are mutually exclusive")
+	}
 	if config.Capacity < 0 {
 		return nil, errors.New("logging: negative capacity")
 	}
@@ -73,6 +80,14 @@ func New(config Config) (*Logger, error) {
 		config.Writer = os.Stdout
 	}
 	state := &writerState{queue: make(chan []byte, config.Capacity), done: make(chan struct{}), writer: config.Writer}
+	if config.Directory != "" {
+		file, err := newFileWriter(config.Directory)
+		if err != nil {
+			return nil, err
+		}
+		state.file = file
+		state.writer = file
+	}
 	go state.run()
 	return &Logger{core: state}, nil
 }
@@ -98,6 +113,9 @@ func (logger *Logger) Error(message string, fields ...any) error {
 func (logger *Logger) write(level, message string, fields []any) (err error) {
 	if logger == nil || logger.core == nil {
 		return nil
+	}
+	if err := logger.Err(); err != nil {
+		return err
 	}
 	entry := record{Time: time.Now(), Level: level, Service: logger.service, Message: message}
 	_, entry.File, entry.Line, _ = runtime.Caller(2)
@@ -135,6 +153,9 @@ func (logger *Logger) write(level, message string, fields []any) (err error) {
 	state := logger.core
 	state.mu.Lock()
 	defer state.mu.Unlock()
+	if state.result != nil {
+		return state.result
+	}
 	if state.closed {
 		return ErrClosed
 	}
@@ -175,7 +196,17 @@ func (logger *Logger) WriteFailureCount() uint64 {
 	return logger.core.failures.Load()
 }
 
-// Close 停止接纳并等待排空和 Flush；ctx 只限制本次等待，不强杀阻塞 Writer。
+// Err 返回首次输出故障；可在运行中查询，不表示队列满载或入参错误。
+func (logger *Logger) Err() error {
+	if logger == nil || logger.core == nil {
+		return nil
+	}
+	logger.core.mu.Lock()
+	defer logger.core.mu.Unlock()
+	return logger.core.result
+}
+
+// Close 停止接纳并等待排空和 Flush，关闭内部文件；ctx 只限制本次等待，不强杀阻塞 Writer。
 // 可再次等待同一流程；返回 nil 代表已写入 Writer，不代表文件已 fsync 或已被 SLS 收集。
 func (logger *Logger) Close(ctx context.Context) error {
 	if ctx == nil {
@@ -206,16 +237,39 @@ func (logger *Logger) Close(ctx context.Context) error {
 
 func (state *writerState) run() {
 	defer close(state.done)
+	failed := false
 	for data := range state.queue {
+		if failed {
+			state.failures.Add(1)
+			continue
+		}
 		if err := writeRecord(state.writer, data); err != nil {
 			state.failures.Add(1)
-			if state.result == nil {
-				state.result = err
-			}
+			state.fail(err)
+			failed = true
 		}
 	}
-	if err := flushWriter(state.writer); err != nil && state.result == nil {
+	if !failed {
+		if err := flushWriter(state.writer); err != nil {
+			state.fail(err)
+		}
+	}
+	if state.file != nil {
+		if err := state.file.Close(); err != nil {
+			state.fail(err)
+		}
+	}
+}
+
+func (state *writerState) fail(err error) {
+	state.mu.Lock()
+	defer state.mu.Unlock()
+	if state.result == nil {
 		state.result = err
+	}
+	if !state.closed {
+		state.closed = true
+		close(state.queue)
 	}
 }
 
