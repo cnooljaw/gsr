@@ -13,7 +13,7 @@ func (diagnostics responseDiagnostics) report(event Diagnostic) uint64 {
 		diagnostics.shared.report(event)
 		return 0
 	}
-	failure := responseReadFailure{node: event.RemoteNode, session: event.Session, err: event.Err}
+	failure := responseReadFailure{node: event.RemoteNode, session: event.Session, err: event.Err, suppressed: event.Suppressed}
 	select {
 	case diagnostics.events <- failure:
 		return 0

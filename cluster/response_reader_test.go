@@ -131,6 +131,44 @@ type responseReaderRun struct {
 	err     error
 }
 
+// 验证出站坏帧首条保留、重复计数独立于丢弃数，合法回复不受影响且关闭时汇总。
+func TestResponseReaderSuppressesRepeatedBadFrames(t *testing.T) {
+	connection, peer, codec := newTestStreamConnection(t)
+	calls := NewClusterCallRegistry()
+	t.Cleanup(func() { calls.Close() })
+	call := beginResponseReaderCall(t, calls, "node-b")
+	owner := newConnectionCallsTest(t, calls, "node-b")
+	bindConnectionCallTest(t, owner, call)
+	shared := newClusterDiagnostics()
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		connection.receiveResponsesTo(owner, responseDiagnostics{shared: shared})
+	}()
+	t.Cleanup(func() { connection.close(); <-done })
+	for i := 0; i < 5; i++ {
+		if err := writeFrameBytes(peer, []byte{0, 0, 0, 1, 255}); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if err := codec.writeFrame(peer, ClusterEnvelope{Kind: FrameResponse, Session: call.session, Target: call.target, Command: call.command}); err != nil {
+		t.Fatal(err)
+	}
+	if result := receiveClusterCallResult(t, call); result.err != nil {
+		t.Fatal(result.err)
+	}
+	cluster := &Cluster{diagnostics: shared}
+	if cluster.SuppressedDiagnosticCount() != 4 || cluster.DroppedDiagnosticCount() != 0 || len(shared.events) != 1 {
+		t.Fatal("live counters or first detail incorrect")
+	}
+	peer.Close()
+	<-done
+	first, summary := <-shared.events, <-shared.events
+	if !errors.Is(first.Err, ErrMalformedFrame) || summary.Kind != DiagnosticBadFramesSuppressed || summary.Suppressed != 4 {
+		t.Fatalf("first=%+v summary=%+v", first, summary)
+	}
+}
+
 // 验证连接管理组件主动关闭时，读循环退出并完成仍在等待的 Call。
 func TestResponseReaderLocalCloseCompletesCalls(t *testing.T) {
 	connection, _, _ := newTestStreamConnection(t)

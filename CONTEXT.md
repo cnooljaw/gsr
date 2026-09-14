@@ -2,6 +2,8 @@
 
 ## Glossary
 
+- **坏帧诊断抑制**：单连接内按固定协议错误类别只保留首条明细，重复项不进入日志或 Diagnostics；Cluster.SuppressedDiagnosticCount 独立累计，连接结束用 DiagnosticBadFramesSuppressed 汇总数量。不是业务日志去重，不改变消息投递或错误结果。
+
 - **统一日志服务**：logging.Logger 提供共享 FIFO 队列和单写入者；记录处采集时间、位置和内容快照，按成功入队序号输出。业务、Runtime、Cluster 注入同一 Logger，框架直接记录，不通过 Diagnostics 转发。应用最后关闭它；支持终端、借用 Writer 和 Directory 选择的滚动文件，内部文件由 Logger 管理。输出失败后拒绝接纳，Err() 与 Close 保留首次故障；SLS 外部采集待后续。
 
 - **ServiceID**：`uint64` 形式的 Runtime 局部 Service 地址，只在当前 Runtime 生命周期内有效，不包含 Node、Epoch 或 Generation，也不是可持久化业务身份。

@@ -13,6 +13,7 @@ type inboundFailure struct {
 	target        ServiceTarget
 	command       runtime.CommandID
 	err           error
+	suppressed    uint64
 }
 
 // inboundDiagnostics 是 listener 与全部入站连接共享的有界、非阻塞诊断出口。
@@ -30,8 +31,12 @@ func newInboundDiagnostics() *inboundDiagnostics {
 
 func (diagnostics *inboundDiagnostics) report(failure inboundFailure) {
 	if diagnostics.shared != nil {
-		diagnostics.shared.report(Diagnostic{Kind: DiagnosticInboundFailure, RemoteAddress: failure.remoteAddress,
-			Session: failure.session, Target: failure.target, Command: failure.command, Err: failure.err})
+		kind := DiagnosticInboundFailure
+		if failure.suppressed > 0 {
+			kind = DiagnosticBadFramesSuppressed
+		}
+		diagnostics.shared.report(Diagnostic{Kind: kind, RemoteAddress: failure.remoteAddress,
+			Session: failure.session, Target: failure.target, Command: failure.command, Err: failure.err, Suppressed: failure.suppressed})
 		return
 	}
 	select {

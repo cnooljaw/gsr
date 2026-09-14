@@ -518,19 +518,25 @@ const (
     DiagnosticDeliveryFailure DiagnosticKind = iota + 1
     DiagnosticConnectionFailure
     DiagnosticResponseRejected
+    DiagnosticInboundFailure
+    DiagnosticBadFramesSuppressed
 )
 
 type Diagnostic struct {
     Kind       DiagnosticKind
     RemoteNode NodeID
+    RemoteAddress string
     Session    ClusterSessionID
     Target     ServiceTarget
     Command    runtime.CommandID
     Err        error
+    Suppressed uint64
 }
 ```
 
 每个 Cluster 使用一个固定 256 容量的非阻塞队列，满载丢弃新事件并单调累计 DroppedDiagnosticCount；重复获取为同一消费通道，不是广播。只保存出站目标、可信的请求关联元数据与错误链，不携带 payload；错误文本不承诺天然脱敏。内部生产者直接写共享出口，不执行外部 callback、不为每目标保留诊断转发 goroutine 或在两套出口双写。应用基础设施消费日志，普通 Service 不管理诊断任务。
+
+重复坏帧按单条连接生命周期去重，同类只尝试记录首条，不按秒重复。固定类别为完整帧格式错误、未注册 Command、请求载荷解码失败、错误的入站请求类型；不按 Command 值或错误文本建立无界表。重复项不进入 Logger 或 Diagnostics，单独累计 `Cluster.SuppressedDiagnosticCount()`，不混入 DroppedDiagnosticCount。连接结束且所属请求任务退出后，若有抑制，追加一条 DiagnosticBadFramesSuppressed 汇总，Suppressed 为该连接抑制总数；汇总不重复错误明细、不携带请求关联字段，同样受日志与诊断队列容量限制。首条即使遇满载也不重试，累计抑制数在 Close 后仍可读取。新连接重新保留首条；合法请求、业务错误、Send 投递失败、断线、迟到或不匹配响应不受此规则抑制。这不是全局防攻击或可靠审计机制。
 
 admission 前错误不重复上报；远端领域错误及正常 Call 取消/超时走调用方结果，迟到响应仍可产生 ResponseRejected。一次断线可能产生连接事件及受影响投递事件，不做全局根因去重。主动关闭的预期连接结束不报 ConnectionFailure，但丢弃排队 Send 仍报告投递失败。Quiesce 不关闭出口，Close 等全部生产者退出后关闭，不等待消费者读空；丢弃计数在关闭后仍可读取。此出口不提供可靠审计、逐节点公平性或完整限频保证。具体字段有效性与门禁见 [统一诊断](RFC-CLUSTER-DIAGNOSTICS.md)。
 
@@ -673,7 +679,7 @@ func (client *BattleClient) StartBattle(
 
 文件滚动已实现：当前文件 gsr.log，固定 100 MiB，下一条会超限时先滚动，不拆记录；保留 10 个历史文件（.1 最新，.10 最旧），超过后删除最旧的受管理文件。现有单写入者负责滚动，不增加任务、不重置 seq；第一版不按日期切分、不压缩，不暴露大小和保留数量配置。各进程由启动参数选择不同配置，显式传入独占的相对日志目录；Logger.New 将其相对当前工作目录解析并固定，应用应在启动时创建 Logger。日志组件不读取命令行、不推断节点名。文件模式创建缺失目录，初始化失败直接报错；重启追加当前文件。运行中写入或滚动失败后拒绝新日志、累计已接纳未输出记录、停止继续写入和滚动，Err() 和 Close 返回首次错误，不自动重试/转终端/退出进程。
 
-统一 FIFO 日志服务已实现：logging.New(logging.Config{Directory: "./log/battle-01"}) 选择文件输出；Directory 为空时使用 Writer，两者同时设置报错，都未设置则默认 stdout。Capacity 默认 1024。Info/Error 在调用处采集时间/位置并快照字段，WithService 仅绑定来源。Runtime.Config.Logger 与 ClusterConfig.Logger 注入同一个入口，框架同步入主日志队列，Diagnostics 仍作观测，不再转发为主日志。满载返回 ErrQueueFull 并计数，成功入队不等待写盘；文件和借用 Writer 均在首次输出故障后停止写入和接纳。Close(ctx) 正常排空、失败时统计残留，并有限等待；关闭内部文件，不关闭借用 Writer。Logger 由应用最后关闭，不进入普通 Service 生命周期。源头限频尚未实现，详见 [日志方案](RFC-LOGGING.md)。
+统一 FIFO 日志服务已实现：logging.New(logging.Config{Directory: "./log/battle-01"}) 选择文件输出；Directory 为空时使用 Writer，两者同时设置报错，都未设置则默认 stdout。Capacity 默认 1024。Info/Error 在调用处采集时间/位置并快照字段，WithService 仅绑定来源。Runtime.Config.Logger 与 ClusterConfig.Logger 注入同一个入口，框架同步入主日志队列，Diagnostics 仍作观测，不再转发为主日志。满载返回 ErrQueueFull 并计数，成功入队不等待写盘；文件和借用 Writer 均在首次输出故障后停止写入和接纳。Close(ctx) 正常排空、失败时统计残留，并有限等待；关闭内部文件，不关闭借用 Writer。Logger 由应用最后关闭，不进入普通 Service 生命周期。Cluster 已在源头实现同连接同类坏帧首条保留、抑制计数与关闭汇总，详见 [日志方案](RFC-LOGGING.md)。
 
 错误分为三类，但继续使用标准 Go `error` 和稳定 error type/sentinel 表达：
 

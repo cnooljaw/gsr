@@ -20,6 +20,8 @@ const (
 	DiagnosticResponseRejected
 	// DiagnosticInboundFailure 表示入站接收、适配、回复或监听失败。
 	DiagnosticInboundFailure
+	// DiagnosticBadFramesSuppressed 是连接结束时的重复坏帧计数汇总，不重复错误明细。
+	DiagnosticBadFramesSuppressed
 )
 
 // Diagnostic 只保存出站目标或入站对端地址、可信关联字段和错误链，不保留业务载荷。
@@ -33,13 +35,16 @@ type Diagnostic struct {
 	Target        ServiceTarget
 	Command       runtime.CommandID
 	Err           error
+	// Suppressed 仅用于重复坏帧汇总；不表示队列满载丢弃。
+	Suppressed uint64
 }
 
 // clusterDiagnostics 由 Cluster 持有；所有生产者退出后才允许关闭。
 type clusterDiagnostics struct {
-	logger  *logging.Logger
-	events  chan Diagnostic
-	dropped atomic.Uint64
+	logger     *logging.Logger
+	events     chan Diagnostic
+	dropped    atomic.Uint64
+	suppressed atomic.Uint64
 }
 
 func newClusterDiagnostics() *clusterDiagnostics {
@@ -51,7 +56,8 @@ func (diagnostics *clusterDiagnostics) report(event Diagnostic) {
 	// 主日志满载由 Logger 计数，不回流为新的诊断或改变网络结果。
 	_ = diagnostics.logger.Error("Cluster failure", "kind", event.Kind,
 		"remote_node", event.RemoteNode, "remote_address", event.RemoteAddress,
-		"session", event.Session, "target", event.Target, "command", event.Command, "error", event.Err)
+		"session", event.Session, "target", event.Target, "command", event.Command, "error", event.Err,
+		"suppressed", event.Suppressed)
 	select {
 	case diagnostics.events <- event:
 	default:

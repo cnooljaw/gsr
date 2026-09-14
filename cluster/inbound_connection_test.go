@@ -146,8 +146,8 @@ func TestInboundConnectionRecoversAdapterPanics(t *testing.T) {
 	}
 }
 
-// 验证慢诊断消费者不会阻塞入站读取，超出固定容量的事件可通过计数观测。
-func TestInboundConnectionDropsExcessDiagnostics(t *testing.T) {
+// 验证重复未知 Command 只记录首条和关闭汇总，不挤满队列且合法 Call 继续处理。
+func TestInboundConnectionSuppressesRepeatedBadFrames(t *testing.T) {
 	adapter, id, values := newLocalAdapterTest(t)
 	owner, peer, frames, cancel, done := startInboundTest(t, adapter, 1)
 	for i := 0; i < defaultFailureQueueCapacity+3; i++ {
@@ -162,8 +162,16 @@ func TestInboundConnectionDropsExcessDiagnostics(t *testing.T) {
 	}
 	cancel()
 	<-done
-	if owner.diagnostics.dropped.Load() != 3 {
+	if owner.diagnostics.dropped.Load() != 0 {
 		t.Fatalf("dropped = %d", owner.diagnostics.dropped.Load())
+	}
+	first := <-owner.diagnostics.failures
+	summary := <-owner.diagnostics.failures
+	if !errors.Is(first.err, ErrCommandCodecNotFound) || summary.suppressed != defaultFailureQueueCapacity+2 {
+		t.Fatalf("first=%+v summary=%+v", first, summary)
+	}
+	if len(owner.diagnostics.failures) != 0 {
+		t.Fatal("repeated details retained")
 	}
 }
 

@@ -7,9 +7,10 @@ import (
 
 // responseReadFailure 只记录出站目标节点、Session 和失败原因，不保留业务载荷。
 type responseReadFailure struct {
-	node    NodeID
-	session ClusterSessionID
-	err     error
+	node       NodeID
+	session    ClusterSessionID
+	err        error
+	suppressed uint64
 }
 
 // receiveResponses 在绑定目标 NodeID 的出站连接上同步读取响应，直到连接结束。
@@ -23,14 +24,20 @@ func (connection *streamConnection) receiveResponses(calls *connectionCalls, dia
 }
 
 // receiveResponsesTo 通过借用的诊断出口直接上报，不创建队列或转发任务。
-func (connection *streamConnection) receiveResponsesTo(calls *connectionCalls, diagnostics responseDiagnostics) (uint64, error) {
+func (connection *streamConnection) receiveResponsesTo(calls *connectionCalls, diagnostics responseDiagnostics) (dropped uint64, result error) {
 	if connection == nil {
 		return 0, net.ErrClosed
 	}
 	if calls == nil || calls.registry == nil {
 		return 0, ErrInvalidClusterCallRegistry
 	}
-	var dropped uint64
+	var badFrames badFrameDiagnostics
+	defer func() {
+		if badFrames.suppressed > 0 {
+			dropped += diagnostics.report(Diagnostic{Kind: DiagnosticBadFramesSuppressed,
+				RemoteNode: calls.node, Err: errBadFramesSuppressed, Suppressed: badFrames.suppressed})
+		}
+	}()
 	for {
 		envelope, err := connection.read()
 		if err != nil {
@@ -38,6 +45,12 @@ func (connection *streamConnection) receiveResponsesTo(calls *connectionCalls, d
 			if !errors.As(err, &complete) {
 				calls.fail(err)
 				return dropped, err
+			}
+			if !badFrames.accept(err) {
+				if diagnostics.shared != nil {
+					diagnostics.shared.suppressed.Add(1)
+				}
+				continue
 			}
 		} else {
 			err = calls.complete(envelope)

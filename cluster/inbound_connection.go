@@ -22,6 +22,7 @@ type inboundConnection struct {
 	started       atomic.Bool
 	diagnostics   *inboundDiagnostics
 	remoteAddress string
+	badFrames     badFrameDiagnostics
 	// listener 组装时共享门禁；独立连接测试不配置时保持原接纳行为。
 	admissionStopped *atomic.Bool
 }
@@ -55,6 +56,10 @@ func (owner *inboundConnection) serve(parent context.Context) (result error) {
 		cancel()
 		result = errors.Join(result, owner.connection.close())
 		workers.Wait()
+		if count := owner.badFrames.suppressed; count > 0 {
+			owner.diagnostics.report(inboundFailure{remoteAddress: owner.remoteAddress,
+				err: errBadFramesSuppressed, suppressed: count})
+		}
 		<-watchDone
 	}()
 	slots := make(chan struct{}, owner.maxCalls)
@@ -122,6 +127,12 @@ func (owner *inboundConnection) handle(ctx context.Context, request ClusterEnvel
 }
 
 func (owner *inboundConnection) report(request ClusterEnvelope, err error) {
+	if !owner.badFrames.accept(err) {
+		if shared := owner.diagnostics.shared; shared != nil {
+			shared.suppressed.Add(1)
+		}
+		return
+	}
 	if request.Validate() != nil {
 		request = ClusterEnvelope{}
 	}

@@ -205,6 +205,14 @@ func (cluster *Cluster) Diagnostics() <-chan Diagnostic {
 	return cluster.diagnostics.events
 }
 
+// SuppressedDiagnosticCount 返回重复坏帧被源头抑制的累计次数，关闭后仍可读取。
+func (cluster *Cluster) SuppressedDiagnosticCount() uint64 {
+	if cluster == nil || cluster.diagnostics == nil {
+		return 0
+	}
+	return cluster.diagnostics.suppressed.Load()
+}
+
 // DroppedDiagnosticCount 返回队列满导致的累计丢弃数，关闭后仍可读取。
 func (cluster *Cluster) DroppedDiagnosticCount() uint64 {
 	if cluster == nil || cluster.diagnostics == nil {

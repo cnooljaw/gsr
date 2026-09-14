@@ -38,11 +38,11 @@ func (adapter *localRequestAdapter) handle(ctx context.Context, request ClusterE
 	}
 	decoded, err := codec.Decode(request.Payload)
 	if err != nil {
-		return err
+		return &badPayloadError{err}
 	}
 	args, ok := decoded.([]any)
 	if !ok {
-		return runtime.ErrInvalidCommandArguments
+		return &badPayloadError{runtime.ErrInvalidCommandArguments}
 	}
 	var targetErr error
 	target := request.Target.ServiceID
