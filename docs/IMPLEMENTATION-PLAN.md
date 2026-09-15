@@ -8,6 +8,8 @@
 
 已补固定容量热点突发测量：GSR_LOAD_TEST=1 启用 TestRuntimeHotMailboxLoad，分别记录成功接纳、满载拒绝、实际处理数量及发送到 Handler 的延迟分位数；只有成功消息全部被观察后才关闭，不把关闭丢弃算作正常处理。持续输入速率与业务 Handler 成本仍需单独确定。
 
+同一开关已加入 TestRuntimeTimerBurstLoad：10,000 个 Timer 同轮到期、容量 64/1024，核对到期=接纳+拒绝、Handler 次数、零 Source 和关闭后清理，记录从 fake clock 推进到 Handler 的延迟；不当成真实时钟精度，也不改变满载不重试的契约。
+
 Core v0.1 是第一条公开兼容基线。此前各切片只在能力真正实现时把对应方法加入代码接口：Core 1 提供 Self/Send，Core 2 加入 After/CancelTimer，Core 3 加入 Call；不得为了让接口提前看似完整而加入固定返回“未实现”的占位方法。每次接口增长仍须同步文档和测试。
 
 ## 总体顺序

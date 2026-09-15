@@ -83,3 +83,30 @@ GSR_LOAD_TEST=1 go test -race ./runtime -run '^TestRuntimeHotMailboxLoad$' -time
 ```
 
 race 只验证夹具和运行链并发安全，不能将其耗时与上表比较。重复观测时应记录运行条件和全部样本，不挑选“最好的一次”。下一步仍需按目标业务节奏确定持续输入速率、Handler 成本与时长，再测稳态容量和尾延迟；不把固定突发测试包装成生产验收。
+
+## Timer 集中到期：2026-09-15 补充
+
+测量使用 `180f697` 的生产实现，加上 [Timer 集中到期测试](../runtime/timer_burst_test.go)。在同一个 Service 的 OnStart 中登记 10,000 个 Timer，全部 Running/arm 后推进一次 fake clock，使它们共享的 deadline 到期。未启用 race 的首轮记录如下：
+
+| Mailbox 容量 | 到期 | 接纳 | 满载拒绝 | Handler 处理 | 观察到全部投递完成 | 到达 p50 / p95 / p99 / 最大 |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| 64 | 10,000 | 5,738 | 4,262 | 5,738 | 11.454 ms | 3.105 / 9.828 / 10.199 / 10.242 ms |
+| 1024 | 10,000 | 6,083 | 3,917 | 6,083 | 12.901 ms | 4.749 / 11.315 / 11.682 / 11.748 ms |
+
+测试校验 Created=Fired=10,000、Cancelled=0、Admitted+Rejected=10,000；已接纳数量必须等于 Handler 观察数，每个消息下标不重复且 Source=0。等待这些消息到达后再关闭 Runtime，确认没有额外观察或残留 Timer。
+
+口径与限制：
+
+- 到达延迟以调用 fakeClock.Advance 前的真实时间为起点，到 Handler 采样为终点；包含 fake clock 遍历和唤醒、goroutine 调度、投递竞争与 Mailbox 排队。它不是操作系统 Timer 的到期误差。
+- “观察到全部投递完成”包含 Inspect 及毫秒级轮询开销，不能用于宣称 Timer 调度精度。
+- Handler 只写入固定容量采样 channel，没有业务负载或日志。分位数只包含成功接纳项；不能忽略被拒绝的 Timer。
+- fake clock 使用 map 遍历 Timer，不承诺这一轮的唤醒顺序；不验证同 deadline 的 Timer 按创建顺序执行。
+- 本次容量 1024 仍有 39.17% 满载拒绝，反映的是集中唤醒与目标消费的竞争，不表示 Timer 登记失败。After 成功不是最终投递成功保证；当前契约不为 Timer 提供优先级或自动重试。
+- 该记录不足以决定更换 Timer 架构或增大默认 Mailbox。若业务要求关键定时动作不可丢失，需要先明确操作语义，再讨论外层补偿/调度策略，不能静默修改 Core 契约。
+
+复现命令：
+
+```sh
+GSR_LOAD_TEST=1 go test ./runtime -run '^TestRuntimeTimerBurstLoad$' -v -timeout=2m
+GSR_LOAD_TEST=1 go test -race ./runtime -run '^TestRuntimeTimerBurstLoad$' -timeout=2m
+```
