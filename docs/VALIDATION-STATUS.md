@@ -24,6 +24,8 @@ Timer 集中到期切片新增 TestRuntimeTimerBurstLoad，沿用 GSR_LOAD_TEST=
 
 日志测量切片新增 TestLoggingBatchAccounting 与 BenchmarkLoggingBatch：比较禁用、io.Discard、临时文件输出，分别报告成功接纳、满载丢弃及关闭排空成本。本次固定小字段单发送者样本无丢弃；多生产者、慢盘和真实业务日志频率仍未测量。
 
+日志隔离切片新增 TestRuntimeLoggingFailureIsolation：受控阻塞 Writer 填满队列以及终止输出失败时，业务返回值、领域错误、Runtime 独立诊断与资源关闭均不被日志基础设施改变。测试不包含真实慢盘性能测量；业务若主动将日志错误返回给调用方，仍属于业务自己的选择。
+
 双进程示例切片补充：已在临时工作目录启动两个独立进程，观察 Send 接收和 Call 成功；停止接收端后调用端继续运行并记录 connection refused，重启接收端后后续新操作恢复成功；最后两个进程均以退出码 0 结束并写出 process stopped。此为本机手动演练，不等同于自动化跨进程门禁或长期负载测试。
 
 - 全仓 `go test ./... -timeout=5m` 与 `go vet ./...` 在前一测试切片通过；本轮仅整理文档，没有改动 Go 代码。

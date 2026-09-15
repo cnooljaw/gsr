@@ -101,6 +101,8 @@ Logger.Close 停止接纳，正常时排空队列并调用输出器可选的 Flu
 
 ## 验证
 
+Runtime 集成回归 TestRuntimeLoggingFailureIsolation 覆盖 Writer 阻塞且队列满、Writer 已失败两种状态：Service 内记录返回日志错误，但业务成功值与领域错误不被替换；框架自动日志失败不阻断独立 Diagnostics。Runtime.Stop/Close 不等待借用的 Logger 写入完成，也不关闭它；日志满载/输出失败与 Runtime 诊断丢弃计数分别核对。测试 Service 显式不将日志错误作为业务返回值；框架不会替业务代码吞掉它自己返回的错误。
+
 输出器生命周期回归覆盖：短写返回 io.ErrShortWrite 并终止输出；写入故障后不再 Flush；正常关闭只 Flush 一次；Flush 错误或 panic 保留在 Err()/Close 中但不虚构逐条失败数；重复 Close 保持同一结果；无论成功或失败都不调用借用 Writer 的 Close。
 
 测试覆盖并发 FIFO 序号、来源绑定、调用处时间与行号、字段快照、满载非阻塞、关闭超时后继续等待、Writer 错误/panic，以及业务、Runtime、Cluster 共享序列且生产者关闭后仍可记录退出日志。文件测试覆盖相对目录、冲突配置、初始化错误、完整记录滚动、10 份历史保留、重开追加、跨文件序号连续、异常目录项保护和失败后停止接纳及残留计数。
