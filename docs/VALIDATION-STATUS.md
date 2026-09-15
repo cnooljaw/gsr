@@ -11,11 +11,14 @@
 | 公开 Cluster 调用、Open 与关闭 | [公开出站](../cluster/cluster_test.go)、[Open](../cluster/open_test.go)、[关闭边界](../cluster/open_boundary_test.go) | 同一测试进程内的真实 TCP 回环，不是独立进程部署验收 |
 | 断线、按需恢复与不重放 | [出站连接](../cluster/outbound_peer_test.go)、[TCP 集成](../cluster/tcp_integration_test.go) | 覆盖半写、断线和下一请求恢复；不承诺结果不确定请求可安全重试 |
 | 远端 Service panic 与新实例隔离 | [TCP 故障链路](../cluster/tcp_service_failure_test.go) | 结构化 panic 错误不泄露内部文本；健康 Service 可继续调用，新实例获得新 ID，旧 ID 不误投；同进程真实 TCP，不是进程崩溃测试 |
+| Call 取消与迟到回复 | [TCP 迟到回复](../cluster/tcp_late_reply_test.go) | 远端 Handler 已进入后取消本地等待；迟到回复报告未知 Session 并丢弃，同一连接前后健康调用成功，两端 PendingCall 清理；不覆盖业务副作用撤销或 deadline 精度 |
 | 坏帧、超限与残帧隔离 | [协议故障](../cluster/open_protocol_test.go)、[响应读取](../cluster/response_reader_test.go) | 合法后续调用继续运行；不可恢复帧边界关闭连接，不把残帧送入 Handler |
 | 重复坏帧诊断与日志 | [双连接日志](../cluster/open_logging_test.go)、[入站连接](../cluster/inbound_connection_test.go) | 每连接同类首条、抑制计数和结束汇总；不是全局限流或可靠审计 |
 | FIFO 日志、文件滚动及失败收尾 | [日志顺序](../logging/logger_test.go)、[文件](../logging/file_test.go)、[输出器生命周期](../logging/writer_lifecycle_test.go) | 覆盖短写、Flush 故障、保留历史和借用所有权；不保证 fsync、磁盘崩溃恢复或云端收到 |
 
 ## 当前检查结果
+
+2026-09-15 迟到回复切片：TestTCPCallCancellationDiscardsLateReply 使用 channel 控制远端 Handler 进入与释放，确认调用方取消后先恢复、其他 Service 可在旧 Handler 返回前完成 Call；随后等待真实迟到响应的诊断，再验证新 Call 的结果及原连接继续可用。只有测试使用阻塞控制，不新增生产 API、不强杀 Handler、不改变取消或回复协议，也不重复运行持续压力测试。
 
 2026-09-15 Call 故障切片：TestTCPCallServicePanicAndReplacement 默认验证一次完整故障/重建链路；`GSR_CALL_STABILITY=1` 额外持续两分钟，每 10ms 尝试一轮串行闭环检查（迟到不追赶）。首轮 120.001 秒完成 11,803 轮：旧 ID 预期返回 ErrServiceClosed 11,803 次，健康 Service 与新实例合计成功回复 23,606 次，无意外错误、旧 ID 误投或 PendingCall 残留。最初 panic 仅执行一次，并校验远端 ErrServicePanicked 不含私有 panic 文本；这些数值不包括最初的一次性检查。未修改生产代码。
 
