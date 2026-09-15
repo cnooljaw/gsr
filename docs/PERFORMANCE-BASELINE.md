@@ -265,3 +265,33 @@ GSR_LOAD_TEST=1 go test -race ./logging -run '^TestLoggerConcurrentFileLoad$' -t
 ```
 
 默认跳过此压力项；已有小规模并发顺序测试仍属于默认门禁。本切片没有修改生产日志代码。
+
+## 多 Service 定速共享日志：2026-09-15
+
+生产版本 `b5eb9cf`，新增 TestRuntimePacedMultiServiceLoad，复用定速夹具但创建 8 个真实 Service，各有自己的 runner 和默认容量 1024 的 Mailbox，共享默认容量 1024 的文件 Logger。单宿主发送者每 10ms 投入 100 条，按操作编号轮流选择目标；目标是**总量** 10,000 条/秒，不是每个 Service 一万条。Handler 每条记一行日志，无额外业务计算，不覆盖 Service 内 Send/Call。
+
+首轮非 race 结果：
+
+| 指标 | 结果 |
+| --- | ---: |
+| 实际输入 / 输入持续时间 | 9,959.11 条/秒 / 10.041 s |
+| 尝试 / 接纳 / 处理 | 100,000 / 100,000 / 100,000 |
+| 每个 Service 处理 | 12,500 |
+| Mailbox 拒绝 / 日志丢弃 | 0 / 0 |
+| 文件行数 | 100,000 |
+| 到达 p50 / p95 / p99 | 129.292 / 385.917 / 870.292 μs |
+| 到达最大 / 日志调用后观察 p99 | 8.178 ms / 912.416 μs |
+| 估算跳过的 tick 间隔 | 4 |
+| tick 唤醒 p99 / 最大 | 3.053 / 31.209 ms |
+| 发送批次 p99 / 最大 / 累计 | 215.167 μs / 2.897 ms / 44.695 ms |
+| 输入阶段 GC 次数 / 累计暂停 | 29 / 3.810 ms |
+| 输入阶段进程堆分配增量 | 129,050,400 B |
+
+除原有唯一性与计数检查外，采样携带处理 ServiceID，并逐条核对是否等于预定目标。所有接纳消息被观察后停止 Runtime，再排空 Logger 并核对文件行数。单 Service 两个原有子项保留，同样增加目标身份检查。
+
+```sh
+GSR_LOAD_TEST=1 go test ./runtime -run '^TestRuntimePacedMultiServiceLoad$' -v -timeout=1m
+GSR_LOAD_TEST=1 go test -race ./runtime -run '^TestRuntimePaced' -timeout=2m
+```
+
+本轮证明这个短时实际输入下多个 runner 能共享日志且计数守恒，不代表严格达到目标、长期稳定性或真实业务容量验收。8 个 Mailbox 的总容量高于单热点场景，不用两轮结果直接证明并行加速；GC/分配仍包含测试采样成本。本切片只改测试，不改生产代码或 API。
