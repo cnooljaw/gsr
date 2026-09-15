@@ -24,6 +24,8 @@ Timer 集中到期切片新增 TestRuntimeTimerBurstLoad，沿用 GSR_LOAD_TEST=
 
 日志测量切片新增 TestLoggingBatchAccounting 与 BenchmarkLoggingBatch：比较禁用、io.Discard、临时文件输出，分别报告成功接纳、满载丢弃及关闭排空成本。本次固定小字段单发送者样本无丢弃；多生产者、慢盘和真实业务日志频率仍未测量。
 
+后续 TestLoggerConcurrentFileLoad 补充 8 个生产者共享文件 Logger 的 10 万条突发，逐条核对接纳、唯一性、文件顺序与丢弃计数。首轮写入 97,097 条、满载丢弃 2,903 条，符合有界非阻塞契约但不代表零丢日志容量达标；慢盘、真实 Service 组合和持续负载仍未覆盖，具体口径见性能基线。
+
 日志隔离切片新增 TestRuntimeLoggingFailureIsolation：受控阻塞 Writer 填满队列以及终止输出失败时，业务返回值、领域错误、Runtime 独立诊断与资源关闭均不被日志基础设施改变。测试不包含真实慢盘性能测量；业务若主动将日志错误返回给调用方，仍属于业务自己的选择。
 
 双进程示例切片补充：已在临时工作目录启动两个独立进程，观察 Send 接收和 Call 成功；停止接收端后调用端继续运行并记录 connection refused，重启接收端后后续新操作恢复成功；最后两个进程均以退出码 0 结束并写出 process stopped。此为本机手动演练，不等同于自动化跨进程门禁或长期负载测试。
