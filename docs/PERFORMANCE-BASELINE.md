@@ -295,3 +295,15 @@ GSR_LOAD_TEST=1 go test -race ./runtime -run '^TestRuntimePaced' -timeout=2m
 ```
 
 本轮证明这个短时实际输入下多个 runner 能共享日志且计数守恒，不代表严格达到目标、长期稳定性或真实业务容量验收。8 个 Mailbox 的总容量高于单热点场景，不用两轮结果直接证明并行加速；GC/分配仍包含测试采样成本。本切片只改测试，不改生产代码或 API。
+
+## 本地 Call 基准复核与下一阶段入口
+
+2026-09-15 在 `2d13014` 运行已有 BenchmarkRuntimeCallRoundTrip，固定 10,000 次，结果为 1,496 ns/op、584 B/op、10 allocs/op。命令为：
+
+```sh
+go test ./runtime -run '^$' -bench '^BenchmarkRuntimeCallRoundTrip$' -benchtime=10000x -benchmem -timeout=1m
+```
+
+这只是本页早期同一基准的复核，不是新增行为覆盖，也不据 1,515 与 1,496 ns/op 的小样本差异宣称性能提升。计时包括宿主 Send、caller Handler 中的本地 Call、空目标 Handler 自动回复与测试 channel 通知；无日志、无网络、无业务计算。循环等待本次通知才发下一条，属于串行闭环，不是外部定速输入。MailboxCapacity=b.N+1，本次为 10,001，不能代替默认有界队列的背压验收。
+
+下一阶段不继续用同类空 Handler 样本推导生产容量。先由应用确定暂定 10,000 条/秒是哪些操作的总量，以及本地 Send、本地 Call、跨节点 Send/Call 的构成；未裁决前不假设比例或将四种操作视为等价。随后再确定 Handler 业务成本、日志频率、持续时长及延迟/拒绝率门槛，建立代表性场景。当前数据只用于基础机制与量级参考。
