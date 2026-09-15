@@ -10,11 +10,21 @@
 | 规模与关闭后的资源状态 | [规模测试](../runtime/scale_test.go) | 包含 10,000 个空闲 Service 和 10,000 个 Timer；不是吞吐、尾延迟或长期内存稳定性承诺 |
 | 公开 Cluster 调用、Open 与关闭 | [公开出站](../cluster/cluster_test.go)、[Open](../cluster/open_test.go)、[关闭边界](../cluster/open_boundary_test.go) | 同一测试进程内的真实 TCP 回环，不是独立进程部署验收 |
 | 断线、按需恢复与不重放 | [出站连接](../cluster/outbound_peer_test.go)、[TCP 集成](../cluster/tcp_integration_test.go) | 覆盖半写、断线和下一请求恢复；不承诺结果不确定请求可安全重试 |
+| 远端 Service panic 与新实例隔离 | [TCP 故障链路](../cluster/tcp_service_failure_test.go) | 结构化 panic 错误不泄露内部文本；健康 Service 可继续调用，新实例获得新 ID，旧 ID 不误投；同进程真实 TCP，不是进程崩溃测试 |
 | 坏帧、超限与残帧隔离 | [协议故障](../cluster/open_protocol_test.go)、[响应读取](../cluster/response_reader_test.go) | 合法后续调用继续运行；不可恢复帧边界关闭连接，不把残帧送入 Handler |
 | 重复坏帧诊断与日志 | [双连接日志](../cluster/open_logging_test.go)、[入站连接](../cluster/inbound_connection_test.go) | 每连接同类首条、抑制计数和结束汇总；不是全局限流或可靠审计 |
 | FIFO 日志、文件滚动及失败收尾 | [日志顺序](../logging/logger_test.go)、[文件](../logging/file_test.go)、[输出器生命周期](../logging/writer_lifecycle_test.go) | 覆盖短写、Flush 故障、保留历史和借用所有权；不保证 fsync、磁盘崩溃恢复或云端收到 |
 
 ## 当前检查结果
+
+2026-09-15 Call 故障切片：TestTCPCallServicePanicAndReplacement 默认验证一次完整故障/重建链路；`GSR_CALL_STABILITY=1` 额外持续两分钟，每 10ms 尝试一轮串行闭环检查（迟到不追赶）。首轮 120.001 秒完成 11,803 轮：旧 ID 预期返回 ErrServiceClosed 11,803 次，健康 Service 与新实例合计成功回复 23,606 次，无意外错误、旧 ID 误投或 PendingCall 残留。最初 panic 仅执行一次，并校验远端 ErrServicePanicked 不含私有 panic 文本；这些数值不包括最初的一次性检查。未修改生产代码。
+
+这是故障后的持续正确性检查，不是两分钟一万条/秒的 Call 容量测试；同一测试进程内走真实 TCP，并非前一轮独立进程混合负载。默认行为测试及其 race 已通过，持续部分以非 race 运行。专项允许 150 秒命令超时以容纳两分钟观察及初始化/清理，不扩大普通测试门禁。
+
+```sh
+go test -race ./cluster -run '^TestTCPCallServicePanicAndReplacement$' -v -timeout=2m
+GSR_CALL_STABILITY=1 go test ./cluster -run '^TestTCPCallServicePanicAndReplacement$' -v -timeout=150s
+```
 
 2026-09-15 规模切片：已实际运行现有空闲 Service/Timer 规模测试及固定次数 benchmark，结果见 [本地规模基线](PERFORMANCE-BASELINE.md)。这是单机小样本，不替代持续负载或生产验收；该切片未修改 Go 代码。
 
