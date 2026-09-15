@@ -226,3 +226,27 @@ GSR_LOAD_TEST=1 go test -race ./runtime -run '^TestRuntimePaced10000Load$' -time
 - 新增观测本身有小额时间与分配开销，本轮不做采样前后性能提升百分比比较。
 
 结论：本轮接近暂定输入目标且无丢弃，上一节的严重抖动未复现。由于没有改变生产实现，不能宣称优化了性能，也不能倒推出上轮必然是磁盘、GC 或主机调度问题。当前 GC 暂停聚合值不支持将本轮全部尖峰简单解释为 stop-the-world，但不排除并发 GC、锁竞争或其它因素。若较差样本再次出现，需要同轮 trace/profile 才能进一步归因；一次较好观测仍不是生产容量或稳定性验收。
+
+## 定速抖动的同轮 trace 采集
+
+直接使用 Go 自带的 `go test -trace`，不增加生产观测开关或测试配置层。默认测试不采集 trace；需要诊断时，从仓库根目录选择一个子项运行，避免把两个场景混在同一份轨迹里：
+
+```sh
+trace_dir=$(mktemp -d "${TMPDIR:-/tmp}/gsr-paced-trace.XXXXXX")
+GSR_LOAD_TEST=1 go test ./runtime \
+  -run '^TestRuntimePaced10000Load$/^file_per_message$' \
+  -trace="$trace_dir/file.trace" -o "$trace_dir/runtime.test" \
+  -v -timeout=1m
+go tool trace -http=127.0.0.1:6060 "$trace_dir/file.trace"
+```
+
+最后一条命令启动本机查看器，检查后用 Ctrl+C 退出。关闭日志对照项将子项名替换成 `logging_disabled`，另建临时目录保留独立样本。`-o` 将测试二进制也放入临时目录，避免污染工作树；trace 文件需要保留到分析完成，不能依赖临时目录长期保存。
+
+排查时保留同一轮完整测试输出、trace、提交号、Go 版本及主机负载情况：
+
+1. 先检查实际输入速率、拒绝/丢弃计数与生成器唤醒、批次指标，不把测试 PASS 等同于容量 PASS。
+2. 在轨迹中查看测试发送者、Service runner 和 Logger writer 的运行与等待区间，区分 runnable 等待调度、channel/锁等待、系统调用及 GC 暂停。正常 ticker 等待和空闲 writer 等待不是瓶颈。
+3. 必须在同一时间区间看到证据才能归因；目前聚合分位数没有逐条消息的 trace 标记，不声称能精确定位每个业务样本。没有异常的轨迹不能解释之前未采集的异常。
+4. trace 本身增加开销，这轮只用于诊断，不与未采集的基线直接计算性能变化。先做这一项，不同时叠加 race、CPU 和锁 profile；需要额外证据时再单独采集。
+
+2026-09-15 已以 `41a8564` 验证文件日志子项的采集，并用 `go tool trace -d=1` 完整解析轨迹。测试接纳/处理 100,000 条，输出 100,000 行日志，拒绝与丢弃均为零；实际输入约 9,999 条/秒，到达 p99 约 601μs、最大约 7.36ms。此为诊断入口验证，未复现先前严重抖动，不新增生产容量结论。没有修改 Go 代码，因此本切片不重复执行全仓测试与 race。
