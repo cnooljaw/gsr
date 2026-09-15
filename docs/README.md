@@ -22,5 +22,6 @@
 16. [统一 FIFO 日志服务](RFC-LOGGING.md)：记录处采集时间位置、共享队列顺序、终端和滚动文件输出、故障与最后关闭；外部 SLS 采集待部署验证。
 17. [当前阶段验证清单](VALIDATION-STATUS.md)：已覆盖运行链、测试证据、当前验证结果与尚未验收的范围。
 18. [最小双进程示例](../examples/twonode/README.md)：独立配置与日志目录、Send/Call、停机与恢复演练。
+19. [本地规模基线](PERFORMANCE-BASELINE.md)：10,000 Service/Timer 与 Send/Call 测量结果、复现命令及口径限制。
 
 后续出现需要长期保留的重大架构取舍时，新增 ADR 或 RFC，并从这里建立索引。
