@@ -13,13 +13,14 @@
 | 远端 Service panic 与新实例隔离 | [TCP 故障链路](../cluster/tcp_service_failure_test.go) | 结构化 panic 错误不泄露内部文本；健康 Service 可继续调用，新实例获得新 ID，旧 ID 不误投；同进程真实 TCP，不是进程崩溃测试 |
 | Call 取消与迟到回复 | [TCP 迟到回复](../cluster/tcp_late_reply_test.go) | 远端 Handler 已进入后取消本地等待；迟到回复报告未知 Session 并丢弃，同一连接前后健康调用成功，两端 PendingCall 清理；不覆盖业务副作用撤销或 deadline 精度 |
 | 目标 Mailbox 满载与恢复 | [TCP Mailbox](../cluster/tcp_mailbox_test.go) | 受控阻塞目标并本地填满默认队列，远端 Call 返回 ErrMailboxFull；健康 Service 继续调用，排空后原连接及原目标恢复；不是远端 Send 失败回执或吞吐测试 |
+| 名称映射更新与旧 ID 隔离 | [名称映射](../cluster/name_rebinding_test.go) | 外层发布新映射后，后续名称 Call 到达新实例，旧 ID 仍返回已关闭；不提供注册发现、不迁移在途请求 |
 | 坏帧、超限与残帧隔离 | [协议故障](../cluster/open_protocol_test.go)、[响应读取](../cluster/response_reader_test.go) | 合法后续调用继续运行；不可恢复帧边界关闭连接，不把残帧送入 Handler |
 | 重复坏帧诊断与日志 | [双连接日志](../cluster/open_logging_test.go)、[入站连接](../cluster/inbound_connection_test.go) | 每连接同类首条、抑制计数和结束汇总；不是全局限流或可靠审计 |
 | FIFO 日志、文件滚动及失败收尾 | [日志顺序](../logging/logger_test.go)、[文件](../logging/file_test.go)、[输出器生命周期](../logging/writer_lifecycle_test.go) | 覆盖短写、Flush 故障、保留历史和借用所有权；不保证 fsync、磁盘崩溃恢复或云端收到 |
 
 ## 当前检查结果
 
-名称映射切片待执行：已新增 TestClusterNameRebindingAfterServiceFailure，通过公开 Open 的外层 ResolveService 和 ClusterClient.Call 验证故障实例、未更新映射的错误、新实例映射发布及旧 ID 不误投。仅测试使用原子值模拟外层注册表，不新增发现能力，不承诺映射变更会迁移在途请求。首次 TCP 测试启动被审核服务容量故障阻止，尚未取得行为或 race 通过证据，不计入上表已验证能力。
+2026-09-15 名称映射切片：权限恢复后 TestClusterNameRebindingAfterServiceFailure 的真实 TCP 测试及 race 均通过，关闭此前审核服务容量故障造成的未验证项。通过公开 Open 的外层 ResolveService 和 ClusterClient.Call 验证故障实例、未更新映射的错误、新实例映射发布及旧 ID 不误投。仅测试使用原子值模拟外层注册表，不新增发现能力，不承诺映射变更会迁移在途请求；也不将该正确性验证当作名称查询的性能测量。
 
 2026-09-15 Mailbox 背压切片：TestTCPCallMailboxFullAndRecovery 使用真实 TCP Call，确定性填满默认容量 Mailbox，检查满载结构化错误、健康目标隔离、已接纳消息按序排空、拒绝消息不执行、原目标恢复，以及两端 PendingCall 清理。Runtime admission 拒绝计数恰为一次，不改容量、不自动重试、不修改生产实现。
 
