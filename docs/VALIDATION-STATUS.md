@@ -19,6 +19,8 @@
 
 ## 当前检查结果
 
+名称映射切片待执行：已新增 TestClusterNameRebindingAfterServiceFailure，通过公开 Open 的外层 ResolveService 和 ClusterClient.Call 验证故障实例、未更新映射的错误、新实例映射发布及旧 ID 不误投。仅测试使用原子值模拟外层注册表，不新增发现能力，不承诺映射变更会迁移在途请求。首次 TCP 测试启动被审核服务容量故障阻止，尚未取得行为或 race 通过证据，不计入上表已验证能力。
+
 2026-09-15 Mailbox 背压切片：TestTCPCallMailboxFullAndRecovery 使用真实 TCP Call，确定性填满默认容量 Mailbox，检查满载结构化错误、健康目标隔离、已接纳消息按序排空、拒绝消息不执行、原目标恢复，以及两端 PendingCall 清理。Runtime admission 拒绝计数恰为一次，不改容量、不自动重试、不修改生产实现。
 
 2026-09-15 迟到回复切片：TestTCPCallCancellationDiscardsLateReply 使用 channel 控制远端 Handler 进入与释放，确认调用方取消后先恢复、其他 Service 可在旧 Handler 返回前完成 Call；随后等待真实迟到响应的诊断，再验证新 Call 的结果及原连接继续可用。只有测试使用阻塞控制，不新增生产 API、不强杀 Handler、不改变取消或回复协议，也不重复运行持续压力测试。
