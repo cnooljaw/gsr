@@ -121,12 +121,13 @@ func run(ctx context.Context, cfg config) (result error) {
 	if err := local.Start(); err != nil {
 		return err
 	}
+	var listenAddress string
 	if cfg.Role == "server" {
 		id, err := local.CreateService(ctx, &echoService{log: logger})
 		if err != nil {
 			return err
 		}
-		_, err = network.Open(local, cluster.ListenConfig{Address: cfg.Listen,
+		listenAddress, err = network.Open(local, cluster.ListenConfig{Address: cfg.Listen,
 			ResolveService: func(name cluster.ServiceName) (runtime.ServiceID, error) {
 				if name == "echo" {
 					return id, nil
@@ -141,7 +142,7 @@ func run(ctx context.Context, cfg config) (result error) {
 			return err
 		}
 	}
-	if err := logger.Info("process ready", "role", cfg.Role); err != nil {
+	if err := logger.Info("process ready", "role", cfg.Role, "listen_address", listenAddress); err != nil {
 		return err
 	}
 	<-ctx.Done()

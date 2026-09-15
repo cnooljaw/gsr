@@ -361,7 +361,7 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 
 ## Core 之外：日志输出
 
-- 已提供 [最小双进程示例](../examples/twonode/README.md)：标准库 JSON 配置、独立日志目录、Service 绑定 ClusterClient、Timer 驱动新操作、名称解析和有序退出；不引入通用配置框架，不新增 Core/Cluster API。跨进程故障的自动化门禁仍待补充。
+- 已提供 [最小双进程示例](../examples/twonode/README.md)：标准库 JSON 配置、独立日志目录、Service 绑定 ClusterClient、Timer 驱动新操作、名称解析和有序退出；不引入通用配置框架，不新增 Core/Cluster API。显式开启 GSR_PROCESS_TEST=1 可运行跨进程正常停机/重启门禁，验证调用端继续运行、后续新请求恢复、Send 到达、无重复投递及最终退出日志；不代表强杀、网络分区或跨机器故障均已覆盖。
 
 - 已补输出器生命周期门禁：短写终止、首次错误保留、失败后跳过 Flush、Flush error/panic、重复关闭幂等与借用 Writer 不被关闭。此测试不代表 fsync 或 SLS 可靠送达。
 
