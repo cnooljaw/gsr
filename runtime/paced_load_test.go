@@ -6,6 +6,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	stdruntime "runtime"
 	"sort"
 	"testing"
 	"time"
@@ -64,6 +65,12 @@ func measurePaced10000(t *testing.T, fileLogging bool) {
 	}
 	accepted := make([]bool, attempts)
 	admitted := 0
+	wakeDelays := make([]time.Duration, 0, attempts/batch)
+	batchDurations := make([]time.Duration, 0, attempts/batch)
+	var previousTick time.Time
+	skippedTicks := 0
+	var memoryBefore, memoryAfter stdruntime.MemStats
+	stdruntime.ReadMemStats(&memoryBefore)
 	// 每 10ms 投入一批 100 条。调度落后时不追赶补发，最终报告实际发送速率。
 	start := time.Now()
 	ticker := time.NewTicker(10 * time.Millisecond)
@@ -72,10 +79,20 @@ func measurePaced10000(t *testing.T, fileLogging bool) {
 	defer cancel()
 	for first := 0; first < attempts; first += batch {
 		select {
-		case <-ticker.C:
+		case scheduled := <-ticker.C:
+			wakeDelays = append(wakeDelays, time.Since(scheduled))
+			if !previousTick.IsZero() {
+				// 根据相邻收到的 tick 时间戳估算跳过的间隔，不把它当作 Runtime 丢消息。
+				intervals := int((scheduled.Sub(previousTick) + 5*time.Millisecond) / (10 * time.Millisecond))
+				if intervals > 1 {
+					skippedTicks += intervals - 1
+				}
+			}
+			previousTick = scheduled
 		case <-budget.Done():
 			t.Fatalf("load generator could not finish within budget: attempts=%d", first)
 		}
+		batchStart := time.Now()
 		for index := first; index < first+batch; index++ {
 			err := local.Send(id, scaleSendCommand, hotMessage{index: index, sent: time.Now()})
 			if err == nil {
@@ -87,9 +104,12 @@ func measurePaced10000(t *testing.T, fileLogging bool) {
 				t.Fatalf("unexpected Send failure: %v", err)
 			}
 		}
+		batchDurations = append(batchDurations, time.Since(batchStart))
 	}
 	inputElapsed := time.Since(start)
 	ticker.Stop()
+	// 在输入计时外采集；这是测试进程的聚合统计，不足以定位某次尖峰的根因。
+	stdruntime.ReadMemStats(&memoryAfter)
 	if admitted == 0 {
 		t.Fatal("no messages admitted")
 	}
@@ -156,6 +176,18 @@ func measurePaced10000(t *testing.T, fileLogging bool) {
 		attempts-admitted, len(latencies), inputElapsed, percentile(50), percentile(95), percentile(99), latencies[len(latencies)-1])
 	t.Logf("file_logging=%t log_lines=%d log_rejected=%d handler_observed_p99=%s",
 		fileLogging, logLines, logRejected, handledLatencies[(len(handledLatencies)*99+99)/100-1])
+	var sendingTime time.Duration
+	for _, elapsed := range batchDurations {
+		sendingTime += elapsed
+	}
+	sort.Slice(wakeDelays, func(i, j int) bool { return wakeDelays[i] < wakeDelays[j] })
+	sort.Slice(batchDurations, func(i, j int) bool { return batchDurations[i] < batchDurations[j] })
+	p99 := (len(wakeDelays)*99+99)/100 - 1
+	t.Logf("generator_ticks=%d estimated_skipped_ticks=%d wake_p99=%s wake_max=%s batch_p99=%s batch_max=%s batch_total=%s gc_cycles=%d gc_pause_total=%s allocated_bytes=%d",
+		len(wakeDelays), skippedTicks, wakeDelays[p99], wakeDelays[len(wakeDelays)-1],
+		batchDurations[p99], batchDurations[len(batchDurations)-1], sendingTime,
+		memoryAfter.NumGC-memoryBefore.NumGC, time.Duration(memoryAfter.PauseTotalNs-memoryBefore.PauseTotalNs),
+		memoryAfter.TotalAlloc-memoryBefore.TotalAlloc)
 }
 
 type pacedSample struct {
