@@ -12,11 +12,14 @@
 | 断线、按需恢复与不重放 | [出站连接](../cluster/outbound_peer_test.go)、[TCP 集成](../cluster/tcp_integration_test.go) | 覆盖半写、断线和下一请求恢复；不承诺结果不确定请求可安全重试 |
 | 远端 Service panic 与新实例隔离 | [TCP 故障链路](../cluster/tcp_service_failure_test.go) | 结构化 panic 错误不泄露内部文本；健康 Service 可继续调用，新实例获得新 ID，旧 ID 不误投；同进程真实 TCP，不是进程崩溃测试 |
 | Call 取消与迟到回复 | [TCP 迟到回复](../cluster/tcp_late_reply_test.go) | 远端 Handler 已进入后取消本地等待；迟到回复报告未知 Session 并丢弃，同一连接前后健康调用成功，两端 PendingCall 清理；不覆盖业务副作用撤销或 deadline 精度 |
+| 目标 Mailbox 满载与恢复 | [TCP Mailbox](../cluster/tcp_mailbox_test.go) | 受控阻塞目标并本地填满默认队列，远端 Call 返回 ErrMailboxFull；健康 Service 继续调用，排空后原连接及原目标恢复；不是远端 Send 失败回执或吞吐测试 |
 | 坏帧、超限与残帧隔离 | [协议故障](../cluster/open_protocol_test.go)、[响应读取](../cluster/response_reader_test.go) | 合法后续调用继续运行；不可恢复帧边界关闭连接，不把残帧送入 Handler |
 | 重复坏帧诊断与日志 | [双连接日志](../cluster/open_logging_test.go)、[入站连接](../cluster/inbound_connection_test.go) | 每连接同类首条、抑制计数和结束汇总；不是全局限流或可靠审计 |
 | FIFO 日志、文件滚动及失败收尾 | [日志顺序](../logging/logger_test.go)、[文件](../logging/file_test.go)、[输出器生命周期](../logging/writer_lifecycle_test.go) | 覆盖短写、Flush 故障、保留历史和借用所有权；不保证 fsync、磁盘崩溃恢复或云端收到 |
 
 ## 当前检查结果
+
+2026-09-15 Mailbox 背压切片：TestTCPCallMailboxFullAndRecovery 使用真实 TCP Call，确定性填满默认容量 Mailbox，检查满载结构化错误、健康目标隔离、已接纳消息按序排空、拒绝消息不执行、原目标恢复，以及两端 PendingCall 清理。Runtime admission 拒绝计数恰为一次，不改容量、不自动重试、不修改生产实现。
 
 2026-09-15 迟到回复切片：TestTCPCallCancellationDiscardsLateReply 使用 channel 控制远端 Handler 进入与释放，确认调用方取消后先恢复、其他 Service 可在旧 Handler 返回前完成 Call；随后等待真实迟到响应的诊断，再验证新 Call 的结果及原连接继续可用。只有测试使用阻塞控制，不新增生产 API、不强杀 Handler、不改变取消或回复协议，也不重复运行持续压力测试。
 
