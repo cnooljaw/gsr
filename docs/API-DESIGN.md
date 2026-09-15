@@ -54,6 +54,20 @@ Skynet 的接口形状是 API 设计的重要参照，但 GSR 的具体契约由
 - 不向业务 API 暴露 Skynet `PTYPE`、Mailbox、Session table、Scheduler queue 或 Transport frame。
 - 不用一个不断增长的 `RuntimeContext` 承载 Cluster、Discovery、数据库、配置和其它外层能力。
 
+### 1.1 Service 化原则
+
+**Service 是运行单元，不是代码分类方式。**
+
+- 需要独立状态、异步处理、排队背压、串行执行或独立生命周期的功能，优先考虑 Service；还须确认其启动、停止、排队与故障语义适合由 Runtime 管理。
+- 普通计算、编码和工具函数直接调用，不为分类而包装成 JsonService、RuleService 等。
+- Redis、HTTP 等 I/O 可以直接调用，但必须设置有限超时，并接受等待期间当前 Service 不处理后续消息；不能接受时，再考虑独立 Service 或职责明确的有界外部 worker，不因依赖某项技术就自动 Service 化。
+- Service 提供运行边界，不等于进程级隔离，也不能强杀阻塞代码；状态所有权与禁止业务自行启动 goroutine 的规则不变。
+- 为 Runtime 自身提供启动、收尾或故障支撑的基础设施，若普通 Service 不能满足其生命周期，可以保留职责明确、数量有界的独立运行组件。例外必须说明具体原因，并负责取消、关闭、等待、并发上限、panic 与错误归属，不能成为随意自建运行框架的理由。
+
+Logger 保持现有实现：由应用在 Runtime、Cluster 收尾后最后关闭，正常关闭时排空已接纳日志；当前普通 Service 随 Runtime 停止，其 Mailbox 停止时清空待处理消息，不能直接满足上述契约。Logger 的独立单写入者是有明确生命周期理由的基础设施例外，不新增 LoggerService，也不改变现有日志 API。
+
+**需要独立运行，优先 Service；只是被调用，直接调用；基础设施例外，必须有具体理由。**
+
 ## 2. Runtime ID
 
 Core 与 Cluster 的运行期 ID 使用简单标量：
