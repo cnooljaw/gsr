@@ -10,6 +10,8 @@
 
 同一开关已加入 TestRuntimeTimerBurstLoad：10,000 个 Timer 同轮到期、容量 64/1024，核对到期=接纳+拒绝、Handler 次数、零 Source 和关闭后清理，记录从 fake clock 推进到 Handler 的延迟；不当成真实时钟精度，也不改变满载不重试的契约。
 
+日志基准 BenchmarkLoggingBatch 已补禁用、io.Discard、文件三种模式，每批 10,000 次调用并包含关闭排空，报告接纳/丢弃/禁用及分配成本；TestLoggingBatchAccounting 验证计数与文件行数。单发送者文件缓存写入结果不代表慢盘、多 Service 并发或可靠落盘性能。
+
 Core v0.1 是第一条公开兼容基线。此前各切片只在能力真正实现时把对应方法加入代码接口：Core 1 提供 Self/Send，Core 2 加入 After/CancelTimer，Core 3 加入 Call；不得为了让接口提前看似完整而加入固定返回“未实现”的占位方法。每次接口增长仍须同步文档和测试。
 
 ## 总体顺序

@@ -110,3 +110,32 @@ race 只验证夹具和运行链并发安全，不能将其耗时与上表比较
 GSR_LOAD_TEST=1 go test ./runtime -run '^TestRuntimeTimerBurstLoad$' -v -timeout=2m
 GSR_LOAD_TEST=1 go test -race ./runtime -run '^TestRuntimeTimerBurstLoad$' -timeout=2m
 ```
+
+## 日志输出成本：2026-09-15 补充
+
+生产代码版本 `4d1aec0`，新增 [日志批量测试及基准](../logging/load_test.go)。同一 Apple M2 / Go 1.23.3 环境，固定每批 10,000 次 Info，单发送者、容量 1024，记录固定消息和两个小字段；每批重新创建 Logger，并将关闭排空计入计时。禁用模式使用 nil Logger，不创建后台写入者。
+
+| 模式 | 批次数 | 每批耗时 | 平均每次尝试 | 每批接纳 / 丢弃 / 禁用 | B/op（每批） | allocs/op（每批） |
+| --- | ---: | ---: | ---: | --- | ---: | ---: |
+| disabled | 3 | 0.184 ms | 18.43 ns | 0 / 0 / 10,000 | 78,224 | 9,748 |
+| io.Discard | 3 | 18.596 ms | 1,860 ns | 10,000 / 0 / 0 | 12,035,389 | 139,789 |
+| file | 3 | 21.928 ms | 2,193 ns | 10,000 / 0 / 0 | 12,037,693 | 139,804 |
+
+基准分开累计禁用、接纳和满载丢弃；Close 错误、WriteFailureCount 非零或计数不一致直接使测量失败，不把输出故障算作正常高吞吐。普通 TestLoggingBatchAccounting 用小批次验证文件行数等于接纳数，禁用不算接纳。
+
+解释边界：
+
+- io.Discard 仍执行调用处时间/位置采集、字段快照、JSON 编码、排队和后台消费，仅省去实际 I/O；不是禁用日志。
+- file 使用临时目录和正常文件写入，不 fsync，不能等同于可靠落盘延迟。每个 benchmark 子项独占目录，批次追加同一个文件；本次数据量不足以触发 100 MiB 滚动。
+- ns/attempt 是整批生命周期总时间除以尝试次数，不是单次 Info 的延迟分位数。若未来出现丢弃，必须结合接纳数量理解，不可直接换算为日志写入吞吐。
+- disabled 仍有调用侧字段构造及装箱成本；nil 入口不代表参数表达式不会执行，不据此新增 lazy callback 或另一套日志 API。
+- B/op 和 allocs/op 是每 10,000 次尝试的批次统计，不是每条日志。当前 JSON 快照存在明确分配成本；真实业务场景需要先测对象大小和日志频率，再决定是否值得优化。
+- 本次没有丢弃，只能说明此单发送者短批次没有观察到满载。没有测试多个 Service 同时记录、慢盘、日志滚动或 SLS 采集，更不能将两种输出的耗时差解释为纯磁盘成本。
+
+复现：
+
+```sh
+go test ./logging -run '^TestLoggingBatchAccounting$' -bench '^BenchmarkLoggingBatch$' -benchtime=3x -benchmem -v -timeout=2m
+```
+
+普通全仓测试覆盖计数夹具；benchmark 仅显式运行。本轮不改变 Logger 实现、默认容量或输出契约。
