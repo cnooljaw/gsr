@@ -4,9 +4,11 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"syscall"
 	"testing"
 	"time"
 
@@ -15,6 +17,16 @@ import (
 
 // 验证两个独立进程在目标停机后继续产生新操作，重启后恢复调用并有序退出。
 func TestTwoNodeProcessRecovery(t *testing.T) {
+	runProcessRecovery(t, false)
+}
+
+// 验证接收端被强杀而未执行退出钩子时，调用端继续运行且重启后的新请求恢复成功。
+func TestTwoNodeProcessCrashRecovery(t *testing.T) {
+	runProcessRecovery(t, true)
+}
+
+func runProcessRecovery(t *testing.T, crash bool) {
+	t.Helper()
 	if os.Getenv("GSR_PROCESS_TEST") != "1" {
 		t.Skip("显式设置 GSR_PROCESS_TEST=1 运行跨进程故障门禁")
 	}
@@ -35,7 +47,21 @@ func TestTwoNodeProcessRecovery(t *testing.T) {
 	first := awaitProcessLog(t, caller, callerLog, func(entry processLog) bool {
 		return entry.Message == "Call result" && entry.Fields.Error == nil
 	})
-	stopExampleProcess(t, server)
+	// 强杀不保证排队日志落盘；先确认首轮记录已输出，再注入连接存续期间的进程故障。
+	awaitProcessLog(t, server, serverLog, func(entry processLog) bool {
+		return entry.Message == "received" && entry.Fields.Command == uint32(echoCommand) &&
+			len(entry.Fields.Args) == 1 && entry.Fields.Args[0] == first.Fields.Operation
+	})
+	if crash {
+		killExampleProcess(t, server)
+		for _, entry := range readProcessLogs(t, serverLog) {
+			if entry.Message == "process stopped" {
+				t.Fatal("killed process unexpectedly completed graceful shutdown")
+			}
+		}
+	} else {
+		stopExampleProcess(t, server)
+	}
 	failed := awaitProcessLog(t, caller, callerLog, func(entry processLog) bool {
 		return entry.Message == "Call result" && entry.Fields.Operation > first.Fields.Operation && entry.Fields.Error != nil
 	})
@@ -54,7 +80,11 @@ func TestTwoNodeProcessRecovery(t *testing.T) {
 	}
 	notifications := make(map[uint64]bool)
 	received := make(map[[2]uint64]bool)
+	stops := 0
 	for _, entry := range serverEntries {
+		if entry.Message == "process stopped" {
+			stops++
+		}
 		if entry.Message == "received" && len(entry.Fields.Args) == 1 {
 			key := [2]uint64{uint64(entry.Fields.Command), entry.Fields.Args[0]}
 			if received[key] {
@@ -68,6 +98,13 @@ func TestTwoNodeProcessRecovery(t *testing.T) {
 	}
 	if !notifications[first.Fields.Operation] || !notifications[recovered.Fields.Operation] {
 		t.Fatal("Send did not reach server before and after restart")
+	}
+	wantStops := 2
+	if crash {
+		wantStops = 1 // 只有重启后的进程正常退出，不能替已崩溃进程伪造收尾记录。
+	}
+	if stops != wantStops {
+		t.Fatalf("server shutdown records=%d want=%d", stops, wantStops)
 	}
 	t.Logf("成功操作=%d，停机失败操作=%d，恢复成功操作=%d", first.Fields.Operation, failed.Fields.Operation, recovered.Fields.Operation)
 }
@@ -134,6 +171,27 @@ func stopExampleProcess(t *testing.T, process *exampleProcess) {
 		}
 	case <-time.After(8 * time.Second):
 		t.Fatal("process did not exit after interrupt")
+	}
+}
+
+func killExampleProcess(t *testing.T, process *exampleProcess) {
+	t.Helper()
+	// 只终止本测试 Start 后持有的子进程对象，不按名称搜索或批量杀进程。
+	if err := process.command.Process.Kill(); err != nil {
+		t.Fatal(err)
+	}
+	select {
+	case <-process.done:
+		var exit *exec.ExitError
+		if !errors.As(process.err, &exit) {
+			t.Fatalf("expected killed exit: %v", process.err)
+		}
+		status, ok := exit.Sys().(syscall.WaitStatus)
+		if !ok || !status.Signaled() || status.Signal() != syscall.SIGKILL {
+			t.Fatalf("unexpected exit status: %v", exit)
+		}
+	case <-time.After(8 * time.Second):
+		t.Fatal("killed process was not reaped")
 	}
 }
 

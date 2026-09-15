@@ -32,13 +32,15 @@ tail -f log/caller-01/gsr.log
 ## 自动化跨进程门禁
 
 ```sh
-GSR_PROCESS_TEST=1 go test ./examples/twonode -run '^TestTwoNodeProcessRecovery$' -v -timeout=1m
-GSR_PROCESS_TEST=1 go test -race ./examples/twonode -run '^TestTwoNodeProcessRecovery$' -v -timeout=1m
+GSR_PROCESS_TEST=1 go test ./examples/twonode -run '^TestTwoNodeProcess.*Recovery$' -v -timeout=1m
+GSR_PROCESS_TEST=1 go test -race ./examples/twonode -run '^TestTwoNodeProcess.*Recovery$' -v -timeout=1m
 ```
 
 测试使用两个独立测试子进程调用同一 `runFile` 启动入口，保留真实配置解析、信号处理、TCP 和日志文件；不在每次测试时重新构建可执行文件。它不覆盖 main 的命令行 flag 解析。测试使用临时目录和系统分配的回环端口，等待日志中的成功/失败/恢复证据；并验证两端退出、Send 到达及演练中没有重复投递。重启复用原端口，若被其它进程占用则测试失败，不静默改用其它端口。
 
 默认 `go test ./...` 跳过此跨进程演练；开启后各等待阶段和子进程均有超时，断言失败也会取消并回收子进程。当前使用 Unix 中断信号，面向本项目的 macOS/Linux 开发环境，不代表 Windows 信号行为已验证。
+
+`TestTwoNodeProcessRecovery` 使用中断信号正常停机；`TestTwoNodeProcessCrashRecovery` 使用 SIGKILL 强杀测试自己启动的接收端，确认它没有正常退出记录，再验证重启后恢复。强杀发生在首轮 Call 完成且接收日志已输出后，覆盖既有连接突然消失；不代表在途业务执行结果、排队日志或持久化数据已获得崩溃安全保证。断电、网络分区和跨机器故障不在这两个测试的覆盖范围。
 
 ## 观察什么
 
