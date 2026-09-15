@@ -361,6 +361,8 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 
 ## Core 之外：日志输出
 
+- 已提供 [最小双进程示例](../examples/twonode/README.md)：标准库 JSON 配置、独立日志目录、Service 绑定 ClusterClient、Timer 驱动新操作、名称解析和有序退出；不引入通用配置框架，不新增 Core/Cluster API。跨进程故障的自动化门禁仍待补充。
+
 - 已补输出器生命周期门禁：短写终止、首次错误保留、失败后跳过 Flush、Flush error/panic、重复关闭幂等与借用 Writer 不被关闭。此测试不代表 fsync 或 SLS 可靠送达。
 
 统一 FIFO 日志入口、单写入者及 Runtime/Cluster 直接接线已实现；不再通过 Diagnostics 转发主日志。已覆盖并发顺序、记录处时间位置、字段快照、满载、关闭和输出失败。默认终端，可借用 Writer；Config.Directory 已支持文件输出，与 Writer 互斥。固定 100 MiB、10 个历史文件，由现有写入者滚动且不重置 seq，不拆记录、不压缩；不同启动配置显式指定独占相对目录，在 New 时解析并固定。首次输出失败后停止写入和接纳、残留记录计数，Err() 和 Close 返回首次错误，内部文件由 Logger 最终释放。已补文件滚动、历史保留、跨文件序号及失败状态测试。Cluster 同连接同类坏帧只记录首条、重复抑制计数与关闭汇总已实现，不增加定时任务，不抑制业务日志、投递失败或断线诊断。SLS 由外部采集器接入，见 [日志方案](RFC-LOGGING.md)。
