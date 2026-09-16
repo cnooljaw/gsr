@@ -4,6 +4,8 @@
 
 ## 已确认入口
 
+以下是 `cluster` 包基础设施接口。普通应用由 `gsr.Run` 自动执行固定关闭顺序，业务取得的 `self.Cluster()` 不暴露 Quiesce/Close，不要求持有 Host 对象。
+
 ```go
 func (cluster *Cluster) Quiesce()
 func (cluster *Cluster) Close(ctx context.Context) error
@@ -43,11 +45,13 @@ Quiesce 不接收 context，不等待 Handler 或 worker 退出。接入可选 O
 - 同一 Cluster 只启动一次最终清理。调用方 context 只限制这次等待，取消后清理继续，后续 Close 可以继续等待同一流程，不重新创建关闭任务。
 - nil context 拒绝；context 超时不等于资源已释放。完成后重复调用返回同一最终清理结果，错误合并保留，诊断出口在全部生产者退出后关闭。
 
-这里 Close(ctx) 与 Core Close() 的签名不同：Cluster 使用调用方显式给出的等待预算，不在已确认 ClusterConfig 中再增加 ShutdownTimeout。它不要求 Runtime，也不代替 Host 调用 Runtime.Stop/Close。具体公开状态/诊断查询形式留在下一项，不提前增加状态枚举。
+这里 Close(ctx) 与 Core Close() 的签名不同：Cluster 使用调用方显式给出的等待预算，不在已确认 ClusterConfig 中再增加 ShutdownTimeout。它不要求 Runtime，也不代替运行环境调用 Runtime.Stop/Close。公开诊断见 [统一诊断入口](RFC-CLUSTER-DIAGNOSTICS.md)。
 
-## Host 调用顺序与业务影响
+## 应用运行环境的关闭顺序与业务影响
 
-接入公开 Open 后，正常 Host 停机顺序为 Cluster.Quiesce（统一停止入站与出站接纳并关闭监听）、Runtime.Stop/Close、最后 Cluster.Close(ctx)。Close 最终取消剩余入站等待、断开连接并等待网络任务，不管理 Runtime 生命周期。公开 Cluster 已同时组装出站与可选入站能力。
+gsr.Run 等待宿主 context 取消后，内部依次执行 Cluster.Quiesce（统一停止入站与出站接纳并关闭监听）、Runtime.Close、Cluster.Close(ctx)、最终停止日志、Logger.Close(ctx)。各阶段错误合并返回，不跳过后续清理。Cluster 和 Logger 各使用五秒等待预算，Runtime 沿用自身关闭预算；超时不代表强杀任务或保证资源已全部释放。入口 Service 的 Exit 不触发整个节点关闭。
+
+Cluster.Close 最终取消剩余入站等待、断开连接并等待网络任务，不管理 Runtime 生命周期。固定跨组件顺序属于 gsr.Run 内部运行环境，不要求业务自己排列，也不新增公开 Host。
 
 ### 入站停止接纳（已确认）
 
@@ -63,7 +67,7 @@ Skynet 的 `snax/gateserver.lua` 中 `CMD.close` 只关闭监听 socket，客户
 
 停机后 OnStop 也不能发起新的 Cluster Call/Send。因此“退出时最后存一次远端数据”必须在 Quiesce 之前由应用的业务退出流程完成；框架不为 OnStop 开旁路，也不自动补发丢弃消息。
 
-如果 Runtime 停止超时，Host 不能因此跳过 Cluster 的资源收尾；它应记录残留业务任务并执行有限等待的最终清理，不把异常残留误报为正常停机完成。该异常路径不改变 Core 无法强杀 Handler 的规则。
+如果 Runtime 停止超时，gsr.Run 仍尝试 Cluster 和 Logger 的有限等待清理，并保留错误；不能因为写入了最终停止日志就把异常残留误报为正常停机完成。该异常路径不改变 Core 无法强杀 Handler 的规则。
 
 ## 代价与验证
 
