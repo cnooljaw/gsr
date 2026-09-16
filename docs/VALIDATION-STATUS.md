@@ -4,6 +4,10 @@
 
 ## 已覆盖的运行链
 
+应用宿主首个切片：新增 app.Host，集中默认 codec 组装、共享 Logger、初始化失败回滚、入口启动和固定顺序关闭。测试覆盖正常取消、入口失败、构造回滚、重复关闭及未注册 Command 拒绝；双节点示例已改用 Host。全仓测试、vet，以及启用 GSR_PROCESS_TEST=1 的全仓 race（包含正常停机和强杀恢复）通过。按节点名称 Open 尚未落地，当前宿主保留显式 ListenConfig；不宣称已完成全部易用性方案。
+
+双节点启动组装切片：宿主只创建普通 MainService，由其创建 Echo/Caller 后 Exit，监听和资源关闭仍归宿主。新增 `TestMainServiceCreatesEcho` 验证入口关闭接纳后 Echo 仍可调用；改造前后均运行跨进程正常停机与强杀恢复门禁。改造后全仓测试、vet，以及启用 `GSR_PROCESS_TEST=1` 的全仓 race 通过；不改变 wire 协议、业务命令或关闭顺序。
+
 退出失败隔离切片补充 `TestServiceExitDoesNotHidePanic`：OnStart 或 Handler 请求 Exit 后 panic，仍返回 ErrServicePanicked，而非正常退出成功；启动失败不返回有效 ID，Handler 失败后拒绝新消息。两条路径均只执行一次 OnStop、清空 PendingCall，健康 Service 仍可调用。相关测试、Runtime 全包、全仓测试、vet 和 race 通过；未修改生产代码。
 
 退出与整体停止交错切片补充 `TestServiceExitOverlapsRuntimeStop`：Handler 已请求 Exit 但未返回时，Runtime Stop 以停止错误完成在途 Call；取消一次 Stop 等待不取消关闭流程。释放 Handler 后正常 Stop/Close，OnStop 仅执行一次，PendingCall 归零。相关测试、Runtime 全包、全仓测试、vet 和 race 通过；使用同步屏障固定交错顺序，不是随机压力或强杀测试，未修改生产代码。

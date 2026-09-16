@@ -12,6 +12,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/cnooljaw/gsr/app"
 	"github.com/cnooljaw/gsr/cluster"
 	"github.com/cnooljaw/gsr/logging"
 	"github.com/cnooljaw/gsr/runtime"
@@ -83,69 +84,66 @@ func runFile(path string) error {
 	return run(ctx, cfg)
 }
 
-func run(ctx context.Context, cfg config) (result error) {
-	logger, err := logging.New(logging.Config{Directory: cfg.LogDirectory})
-	if err != nil {
-		return err
-	}
-	defer func() {
-		wait, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()
-		result = errors.Join(result, logger.Close(wait))
-	}()
-	local, err := runtime.NewRuntime(runtime.Config{Logger: logger})
-	if err != nil {
-		return err
-	}
-	codec, err := cluster.NewValueCodec(cluster.ValueCodecConfig{})
-	if err != nil {
-		return errors.Join(err, local.Close())
-	}
-	codecs := cluster.MustCommandCodecRegistry([]cluster.CommandCodecEntry{
-		{CommandID: notifyCommand, Codec: codec},
-		{CommandID: echoCommand, Codec: codec},
+func run(ctx context.Context, cfg config) error {
+	host, err := app.New(app.Config{
+		Logging:  logging.Config{Directory: cfg.LogDirectory},
+		Cluster:  cluster.ClusterConfig{Nodes: cfg.Nodes},
+		Commands: []runtime.CommandID{notifyCommand, echoCommand},
 	})
-	network, err := cluster.NewCluster(cluster.ClusterConfig{Nodes: cfg.Nodes, Codecs: codecs, Logger: logger})
 	if err != nil {
-		return errors.Join(err, local.Close())
-	}
-	defer func() {
-		network.Quiesce()
-		// 每阶段均尝试收尾；某阶段错误不能跳过后续资源释放。
-		result = errors.Join(result, local.Close())
-		wait, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()
-		result = errors.Join(result, network.Close(wait))
-		result = errors.Join(result, logger.Info("process stopped", "role", cfg.Role))
-	}()
-	if err := local.Start(); err != nil {
 		return err
 	}
+	return host.Run(ctx, &mainService{cfg: cfg, host: host, network: host.Cluster(), log: host.Logger()})
+}
+
+// mainService 是一次性应用入口，不持有 Runtime，也不拥有新建 Service 的生命周期。
+type mainService struct {
+	cfg     config
+	host    *app.Host
+	network *cluster.Cluster
+	log     *logging.Logger
+	echoID  runtime.ServiceID // OnStart 的组装结果，仅供宿主随后发布名称映射。
+}
+
+func (service *mainService) OnStart(ctx context.Context, scoped runtime.ServiceContext) error {
 	var listenAddress string
-	if cfg.Role == "server" {
-		id, err := local.CreateService(ctx, &echoService{log: logger})
+	if service.cfg.Role == "server" {
+		id, err := scoped.CreateService(ctx, &echoService{log: service.log})
 		if err != nil {
 			return err
 		}
-		listenAddress, err = network.Open(local, cluster.ListenConfig{Address: cfg.Listen,
-			ResolveService: func(name cluster.ServiceName) (runtime.ServiceID, error) {
-				if name == "echo" {
-					return id, nil
-				}
-				return 0, runtime.ErrServiceNotFound
-			}})
-		if err != nil {
-			return err
+		service.echoID = id
+		if service.host != nil {
+			listenAddress, err = service.host.Open(cluster.ListenConfig{Address: service.cfg.Listen,
+				ResolveService: func(name cluster.ServiceName) (runtime.ServiceID, error) {
+					if name == "echo" {
+						return id, nil
+					}
+					return 0, runtime.ErrServiceNotFound
+				}})
+			if err != nil {
+				return err
+			}
 		}
 	} else {
-		if _, err := local.CreateService(ctx, &callerService{network: network, target: cfg.Target, log: logger}); err != nil {
+		if _, err := scoped.CreateService(ctx, &callerService{
+			network: service.network, target: service.cfg.Target, log: service.log,
+		}); err != nil {
 			return err
 		}
 	}
-	if err := logger.Info("process ready", "role", cfg.Role, "listen_address", listenAddress); err != nil {
+	if err := service.log.Info("process ready", "role", service.cfg.Role, "listen_address", listenAddress); err != nil {
 		return err
 	}
-	<-ctx.Done()
+	scoped.Exit()
+	return nil
+}
+
+func (service *mainService) Handle(_ runtime.CommandContext, _ runtime.CommandID, _ ...any) (any, error) {
+	return nil, runtime.ErrUnknownCommand
+}
+
+func (service *mainService) OnStop(_ context.Context) error {
 	return nil
 }
 

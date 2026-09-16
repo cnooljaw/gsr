@@ -797,6 +797,12 @@ Service 不提供额外 `Close` 钩子；本地资源释放属于 `OnStop`。`Ru
 
 应用启动采用普通 MainService：Go main 配置、启动 Runtime，显式创建 MainService，等待进程信号或应用完成通知，最后关闭 Runtime。MainService 使用 ServiceContext.CreateService 组装业务，并通过自身上下文 Send/Call；无需注入 Runtime，不新增 Launcher、ServiceManager 或 Runtime 自动 Bootstrap。MainService 退出不代表 Runtime 退出。宿主 Runtime.Send/Call 保留用于 Cluster 等受信任适配器和测试注入，不作为应用业务通信的第二种常规写法。
 
+Core 之外的 `app.Host` 统一承担应用组装：`app.New(Config)` 创建共享 Logger、Runtime、Cluster；`host.Run(ctx, mainService)` 启动普通入口实例，等待 context 取消并自动关闭。取消等待是正常退出信号，初始化失败保留原错误并回滚。Run 只能执行一次，不得与 Close 并发；未调用 Run 而放弃启动时必须 Close。Host 不公开 Runtime 或业务 Send/Call，不增加全局实例、工厂或插件容器。
+
+Host 固定按 Cluster.Quiesce → Runtime.Close → Cluster.Close → 最终日志 → Logger.Close 收尾，聚合错误且不跳过后续步骤。Cluster/Logger 每阶段预算五秒，Runtime 沿用自身预算，不强杀 Handler/Writer。Logging 创建的 Logger 由 Host 独占关闭，组件配置中的外部 Logger 被拒绝。Commands 声明使用默认 ValueCodec 的命令，与自定义 Cluster.Codecs 互斥；重复注册仍 panic，未注册命令仍拒绝。
+
+首个切片的 `host.Open(ListenConfig)` 隐藏 Runtime 绑定，保留显式地址及名称解析器。已确认的按共同节点表名称 Open 尚待后续切片落地，当前不能写 `Open("battle")`。Cluster 自身仍不拥有 Runtime 生命周期。
+
 Service 创建成功后即可工作；`OnStart` 是 Runtime 生命周期钩子，`Start` Command 则是 Service 自行定义的可选业务协议，二者不同。Counter 等简单 Service 不增加 Start Command；需要分阶段启动参数或业务准备的 Service 才定义它。
 
 业务跨节点调用使用绑定当前 Service 的 `ClusterClient.Call`；目标节点 Cluster 内部通过 `Runtime.Call` 将远端请求落地成本地调用。两者是同一调用链的不同层，不是业务可二选一的跨节点 API。
