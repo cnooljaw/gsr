@@ -216,6 +216,13 @@ type testCommandContext struct {
 	source runtime.ServiceID
 }
 
+func (testCommandContext) CreateService(context.Context, runtime.Service) (runtime.ServiceID, error) {
+	return 0, runtime.ErrInvalidService
+}
+
+func (testCommandContext) Exit() {
+}
+
 func (context testCommandContext) Self() runtime.ServiceID {
 	return 1
 }

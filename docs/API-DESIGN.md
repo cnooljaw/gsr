@@ -648,6 +648,8 @@ Error frame 实际携带 `ErrorClass + ErrorCode + Message`；Message 只用于�
 ```go
 type ServiceContext interface {
 	Self() ServiceID
+	CreateService(context.Context, Service) (ServiceID, error)
+	Exit()
 	Send(ServiceID, CommandID, ...any) error
 	Call(context.Context, ServiceID, CommandID, ...any) (any, error)
 	After(time.Duration, CommandID, ...any) (TimerID, error)
@@ -656,6 +658,9 @@ type ServiceContext interface {
 ```
 
 - `Self()` 返回当前 ServiceID。
+- `CreateService(ctx, service)` 委托所属 Runtime 创建 Service，签名和错误契约与宿主入口一致；只能在当前 Service 的 OnStart/Handler 中调用。新 Service 归 Runtime 管理，创建者退出或启动失败不自动回滚已经创建成功的其它 Service。
+- `Exit()` 幂等地标记自身退出，不等待、不强杀，也不会跳过后续 Go 代码；调用方应立即正常返回。OnStart 成功返回后直接进入停止收尾，不接纳业务消息、不启用启动期 Timer；CreateService 仍成功返回该次分配的 ID。OnStart 返回错误则保持原有启动失败语义。Handler 返回后先按 return 完成当前 Call，再停止自身，其余排队消息丢弃、对应等待失败；已有取消、超时、Runtime Stop 或 panic 规则仍然生效，不保证覆盖这些并发终止结果。
+- Exit 复用停止机制取消 Timer、清理 PendingCall、执行一次 OnStop 并结束 runner，不关闭 Runtime 或其它 Service。忽略返回或阻塞的代码不能被 Exit 强杀；OnStop 使用有界关闭 context，重复 Exit 不产生额外清理。
 - 普通 `Send` 和 `Call` 由 Runtime 自动使用 `Self()` 作为 Source；`After` 触发的 Command 使用 `ServiceID(0)`，创建者由 Timer owner 表达。
 - `Call` 的 context 只能取消或收紧本次等待；实际等待永远不超过 Runtime `MaxCallWait`。
 - Cluster、Discovery 和业务 Repository 通过单独的窄 client 注入，不加入 ServiceContext。
@@ -788,6 +793,10 @@ func (r *Runtime) Close() error
 Service 不提供额外 `Close` 钩子；本地资源释放属于 `OnStop`。`Runtime.Stop` 是整个 Runtime 的有序停止操作，`Runtime.Close` 是最终资源释放操作；单个 Service 的停止若需要公开，使用 `StopService` 命名，不复用 Runtime `Stop`。
 
 `Runtime.Send` / `Runtime.Call` 属于 **Infrastructure API**，只供受信任基础设施或宿主注入本地消息，消息的 `Source` 固定为 `ServiceID(0)`；普通 Service 使用绑定当前 ServiceID 的 `ServiceContext.Send` / `ServiceContext.Call`。组装时业务只获得 ServiceContext，基础设施持有 Runtime。
+
+应用启动采用普通 MainService：Go main 配置、启动 Runtime，显式创建 MainService，等待进程信号或应用完成通知，最后关闭 Runtime。MainService 使用 ServiceContext.CreateService 组装业务，并通过自身上下文 Send/Call；无需注入 Runtime，不新增 Launcher、ServiceManager 或 Runtime 自动 Bootstrap。MainService 退出不代表 Runtime 退出。宿主 Runtime.Send/Call 保留用于 Cluster 等受信任适配器和测试注入，不作为应用业务通信的第二种常规写法。
+
+Service 创建成功后即可工作；`OnStart` 是 Runtime 生命周期钩子，`Start` Command 则是 Service 自行定义的可选业务协议，二者不同。Counter 等简单 Service 不增加 Start Command；需要分阶段启动参数或业务准备的 Service 才定义它。
 
 业务跨节点调用使用绑定当前 Service 的 `ClusterClient.Call`；目标节点 Cluster 内部通过 `Runtime.Call` 将远端请求落地成本地调用。两者是同一调用链的不同层，不是业务可二选一的跨节点 API。
 

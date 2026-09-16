@@ -19,10 +19,14 @@ type Service interface {
 
 // ServiceContext 提供当前 Service 可使用的 Core 能力。
 //
-// Core 3 提供本地身份、Send、有等待上限的 Call 和一次性 Timer 操作。
+// 提供本地身份、创建 Service、自身退出、Send、有等待上限的 Call 和一次性 Timer 操作。
 // Call 等待目标 Handler 的返回值，期间不会重入调用方 Service 的 runner。
 type ServiceContext interface {
 	Self() ServiceID
+	// CreateService 将实例交给所属 Runtime；创建者退出不停止新 Service。
+	CreateService(context.Context, Service) (ServiceID, error)
+	// Exit 请求自身在当前 OnStart/Handler 返回后退出；不会中断 Go 控制流，调用后应正常返回。
+	Exit()
 	Send(ServiceID, CommandID, ...any) error
 	Call(context.Context, ServiceID, CommandID, ...any) (any, error)
 	After(time.Duration, CommandID, ...any) (TimerID, error)
@@ -95,6 +99,7 @@ type serviceInstance struct {
 	mu                   sync.Mutex
 	state                serviceState
 	stopRequested        bool
+	exitRequested        bool
 	stopContext          context.Context
 	stopCancel           context.CancelFunc
 	stopResult           error
@@ -123,8 +128,22 @@ func (instance *serviceInstance) currentState() serviceState {
 
 func (instance *serviceInstance) setRunning() {
 	instance.mu.Lock()
-	instance.state = serviceRunning
+	// OnStart 可以请求 Exit，已进入收尾的实例不能重新开放接纳。
+	if instance.state == serviceStarting {
+		instance.state = serviceRunning
+	}
 	instance.mu.Unlock()
+}
+
+// stopAfterExit 只在当前执行返回之后调用，避免停止清理抢先完成当前 Call。
+func (instance *serviceInstance) stopAfterExit() {
+	instance.mu.Lock()
+	exit := instance.exitRequested && !instance.stopRequested
+	instance.mu.Unlock()
+	if exit {
+		ctx, cancel := instance.runtime.failureContext()
+		instance.requestStopWithCancel(ctx, cancel)
+	}
 }
 
 func (instance *serviceInstance) requestStop(ctx context.Context) {
@@ -169,6 +188,7 @@ func (instance *serviceInstance) run() {
 				instance.requestStopWithCancel(failureContext, cancel)
 			}
 		}
+		instance.stopAfterExit()
 	}
 
 	instance.finishStop()
@@ -243,6 +263,26 @@ type serviceContext struct {
 
 func (context *serviceContext) Self() ServiceID {
 	return context.instance.id
+}
+
+func (context *serviceContext) CreateService(ctx context.Context, service Service) (ServiceID, error) {
+	switch context.instance.currentState() {
+	case serviceStarting, serviceRunning:
+		return context.runtime.CreateService(ctx, service)
+	case serviceStopping:
+		return 0, ErrServiceStopping
+	default:
+		return 0, ErrServiceClosed
+	}
+}
+
+func (context *serviceContext) Exit() {
+	instance := context.instance
+	instance.mu.Lock()
+	if instance.state == serviceStarting || instance.state == serviceRunning {
+		instance.exitRequested = true
+	}
+	instance.mu.Unlock()
 }
 
 func (context *serviceContext) Send(target ServiceID, command CommandID, args ...any) error {

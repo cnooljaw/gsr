@@ -7,7 +7,8 @@ import (
 )
 
 // Call 是 Infrastructure API，供宿主或受信任基础设施调用本地 Service，消息 Source 固定为零。
-// 普通 Service 应使用 ServiceContext.Call；目标仍通过 Mailbox 串行执行。
+// 业务通信必须使用 ServiceContext.Call；宿主应用通过创建 MainService 启动业务。
+// 该入口保留给 Cluster 入站等受信任适配器，目标仍通过 Mailbox 串行执行。
 // 等待不超过 MaxCallWait，ctx 可进一步缩短；本方法不创建 goroutine。
 func (runtime *Runtime) Call(ctx context.Context, target ServiceID, command CommandID, args ...any) (any, error) {
 	if ctx == nil {

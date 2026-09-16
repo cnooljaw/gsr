@@ -27,7 +27,10 @@
 - **Run-to-completion**：一个 Handler（包括其中的 Call 等待）结束前，同一 Service 不执行下一条消息；等待期间其它 Service 仍可运行。
 - **MaxCallWait**：Runtime 对一次本地 Call 施加的最大等待时间。调用方必须提供 `context.Context`，其 deadline 可以缩短实际等待，但不能延长或取消 Runtime 上限。
 - **Service Runner**：由 Runtime 为每个 Running Service 管理的 goroutine，串行消费该 Service 的 Mailbox；其生命周期和 recovery 属于 Scheduler，不属于业务。
-- **Service 组装**：`Runtime.Start()` 只启动 Runtime-owned 基础设施；应用层构造 `Service` 实例，并在 Runtime Running 后通过 `CreateService(ctx, service) (ServiceID, error)` 逐个交给 Runtime 管理，不使用工厂或 Bootstrap Service。
+- **Service 组装**：宿主启动 Runtime 并显式创建普通 MainService；Service 内使用 ServiceContext.CreateService 创建其它实例，底层仍委托所属 Runtime。传实例，不引入工厂、Launcher、ServiceManager 或 Runtime 自动 Bootstrap。创建成功的 Service 归 Runtime 管理，不随创建者退出而停止。
+- **MainService**：应用定义的普通入口 Service，负责业务组装和 Send/Call；名字不具有 Runtime 特权。退出不代表 Runtime 退出，宿主负责进程信号或完成通知及最终收尾。
+- **Exit**：ServiceContext 的自身退出请求，幂等、不阻塞、不强杀当前 Go 执行。OnStart/Handler 返回后由 Runtime 收尾；当前 Handler 的 Call 先按 return 完成，其余排队请求停止执行，已有取消、超时、panic 和 Runtime Stop 语义不变。
+- **Start Command**：可选的业务协议，不是所有 Service 必须实现的生命周期；与 Runtime.Start 和 Service.OnStart 区分。
 - **OnStart 失败**：只回滚当前 Service，Runtime 保持 Running，可以继续创建其它 Service；失败实例不发布 ServiceID，且该 ID 永不复用。Runtime 至多调用一次 `OnStop` 为部分初始化资源清理。
 - **ClusterEnvelope**：Cluster/Transport 使用的可编码网络载体，显式区分 request、response 和 error frame；不携带业务或 wire version。远端 relay 解码请求后创建新的本地 Message；本地投递不创建或编码 ClusterEnvelope。
 - **FrameKind**：ClusterEnvelope 的显式方向标签，第一版只有 Request、Response 和 Error；不能只凭 Session 是否为零推断 frame 方向。

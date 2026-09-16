@@ -4,6 +4,8 @@
 
 ## 阅读顺序
 
+初次运行可先看 [最小 CounterService 示例](../examples/counter/README.md)，只涉及本地 Service、Send、Call 和关闭。
+
 1. [项目术语](../CONTEXT.md)：ServiceID、NodeID、Message、ClusterEnvelope、Session、Source 和 Revision 的准确含义。
 2. [API 设计规范](API-DESIGN.md)：Runtime 边界、消息管道、Cluster API 和 Skynet 风格。
 3. [ADR 0001](adr/0001-local-service-id-and-cluster-routing.md)：Runtime 局部 ServiceID、Cluster 路由及 Source 绑定的裁决。

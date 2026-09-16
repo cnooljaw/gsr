@@ -185,6 +185,7 @@ func (runtime *Runtime) CreateService(ctx context.Context, service Service) (Ser
 	}); startErr != nil {
 		return 0, runtime.cleanupUnpublishedService(instance, ctx, startErr)
 	}
+	instance.stopAfterExit()
 
 	runtime.mu.Lock()
 	if runtime.state != RuntimeRunning {
@@ -195,7 +196,9 @@ func (runtime *Runtime) CreateService(ctx context.Context, service Service) (Ser
 	runtime.servicesMu.Lock()
 	instance.setRunning()
 	runtime.services[id] = instance
-	runtime.timers.armOwner(instance)
+	if instance.currentState() == serviceRunning {
+		runtime.timers.armOwner(instance)
+	}
 	spawnErr := runtime.scheduler.spawn(instance)
 	if spawnErr != nil {
 		delete(runtime.services, id)
@@ -208,8 +211,8 @@ func (runtime *Runtime) CreateService(ctx context.Context, service Service) (Ser
 	return id, nil
 }
 
-// Send 接纳 Runtime 基础设施发出的消息，Source 为零。
-// Service 代码通常使用 ServiceContext.Send，由 Runtime 记录发送方 ServiceID。
+// Send 是 Infrastructure API，接纳受信任基础设施注入的消息，Source 为零。
+// 业务通信必须使用 ServiceContext.Send；宿主应用通过创建 MainService 启动业务。
 func (runtime *Runtime) Send(target ServiceID, command CommandID, args ...any) error {
 	if runtime.dispatcher == nil {
 		return ErrRuntimeClosed
