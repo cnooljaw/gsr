@@ -4,6 +4,8 @@
 
 Accepted
 
+部分被 [ADR 0011](0011-service-first-application-api.md) 替代（待实现）：取消节点级 Command codec 清单及据此拒绝未知 wire Command 的契约，改由目标 Handler/Dispatcher 判断。其余帧安全、连接和重连边界继续有效。
+
 ## Context
 
 GSR Cluster 需要保持 Skynet 风格的简洁调用面，同时明确 Go 的编码集合、注册时机、异常帧边界和连接 owner。若把每条连接都建模为同一 Node 的竞争全双工通道，就必须增加复杂的重复连接仲裁；Skynet 实际采用每个目标节点一个 sender、每条入站 socket 一个 agent 的方向性组织。

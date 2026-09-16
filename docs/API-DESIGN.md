@@ -1,5 +1,7 @@
 # GSR API 设计规范
 
+> 最新裁决（已确认、待实现）：[ADR 0011](adr/0011-service-first-application-api.md) 以 MainService 集中组装、节点唯一 Runtime/Cluster、Service 局部 CommandID 和统一 Cluster 编码为目标。不再要求业务认识 Host 或登记节点级 Command codec 清单。未知 Command 由目标处理：Send 丢弃，Call 返回 ErrUnknownCommand。本文后续 Host、registry 和未知 wire Command 拒绝规则仍记录旧实现；与 ADR 0011 冲突时以新裁决为准，不表示代码已迁移。
+
 GSR 学习 Skynet 的核心设计方法：Service 使用 Runtime 内的局部数字地址，本地 Send 与 Call 共用消息管道，Cluster 在 Core 之外完成节点路由和网络编码。GSR 不复制 Lua 的动态类型，而是采用“Skynet 语义，Go 类型系统”。
 
 ## 1. 最小 Core

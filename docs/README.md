@@ -4,6 +4,8 @@
 
 ## 阅读顺序
 
+最新已确认、待实现的入口简化方案见 [ADR 0011：以 Service 为中心的应用入口与统一 Command](adr/0011-service-first-application-api.md)。先看目标业务写法，再看旧实现，避免继续围绕 Host 扩展接口。
+
 初次运行可先看 [最小 CounterService 示例](../examples/counter/README.md)，只涉及本地 Service、Send、Call 和关闭。
 
 1. [项目术语](../CONTEXT.md)：ServiceID、NodeID、Message、ClusterEnvelope、Session、Source 和 Revision 的准确含义。
