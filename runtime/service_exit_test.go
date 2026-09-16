@@ -227,6 +227,70 @@ func TestServiceCreateInHandlerAndExitWithSlowStop(t *testing.T) {
 	}
 }
 
+// 验证 Exit 尚未完成时 Runtime Stop 仍能结束等待，迟到返回不会覆盖停止错误或重复执行 OnStop。
+func TestServiceExitOverlapsRuntimeStop(t *testing.T) {
+	local := newCallTestRuntime(t, Config{})
+	entered, releaseHandler := make(chan struct{}), make(chan struct{})
+	var once sync.Once
+	release := func() { once.Do(func() { close(releaseHandler) }) }
+	defer release()
+	var stops atomic.Int32
+	service := &exitProbe{
+		handle: func(ctx CommandContext) (any, error) {
+			ctx.Exit()
+			close(entered)
+			<-releaseHandler
+			return "late result", nil
+		},
+		stop: func(context.Context) error {
+			stops.Add(1)
+			return nil
+		},
+	}
+	id, err := local.CreateService(context.Background(), service)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	result := make(chan callOutcome, 1)
+	callDone := make(chan struct{})
+	go func() {
+		defer close(callDone)
+		value, err := local.Call(ctx, id, callTestCommand)
+		result <- callOutcome{value: value, err: err}
+	}()
+	defer func() {
+		cancel()
+		release()
+		<-callDone
+	}()
+	waitSignal(t, entered)
+	// 取消的是本次停止等待，不是 Runtime 自己的关闭流程。
+	waitContext, cancelWait := context.WithCancel(context.Background())
+	cancelWait()
+	if err := local.Stop(waitContext); !errors.Is(err, context.Canceled) {
+		t.Fatalf("Stop wait error: %v", err)
+	}
+	outcome := waitCallOutcome(t, result)
+	if !errors.Is(outcome.err, ErrRuntimeStopping) || outcome.value != nil {
+		t.Fatalf("Call result: %+v", outcome)
+	}
+	if stops.Load() != 0 {
+		t.Fatal("OnStop ran before Handler returned")
+	}
+	release()
+	if err := local.Stop(ctx); err != nil {
+		t.Fatal(err)
+	}
+	if err := local.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if stops.Load() != 1 || local.Inspect().PendingCallCount != 0 {
+		t.Fatal("stop cleanup incomplete or repeated")
+	}
+}
+
 func waitExitedService(t *testing.T, local *Runtime, id ServiceID) {
 	t.Helper()
 	waitRuntimeInspection(t, local, func(value RuntimeInspection) bool {

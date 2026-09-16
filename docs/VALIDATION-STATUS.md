@@ -4,6 +4,8 @@
 
 ## 已覆盖的运行链
 
+退出与整体停止交错切片补充 `TestServiceExitOverlapsRuntimeStop`：Handler 已请求 Exit 但未返回时，Runtime Stop 以停止错误完成在途 Call；取消一次 Stop 等待不取消关闭流程。释放 Handler 后正常 Stop/Close，OnStop 仅执行一次，PendingCall 归零。相关测试、Runtime 全包、全仓测试、vet 和 race 通过；使用同步屏障固定交错顺序，不是随机压力或强杀测试，未修改生产代码。
+
 后续退出隔离切片补充 `TestServiceCreateInHandlerAndExitWithSlowStop`：普通 Handler 创建并调用新 Service 时 Source 正确；自身 Exit 后，即使 OnStop 受控阻塞，当前 Call 已返回、新实例仍可调用，退出者拒绝新消息，释放 OnStop 后只清理一次且 PendingCall 归零。相关测试、Runtime 全包、全仓测试、vet 和 race 通过；本轮未修改生产实现，不代表能强杀阻塞的 OnStop。
 
 2026-09-16：ServiceContext.CreateService / Exit 和 MainService Counter 示例已通过全仓 `go test ./... -timeout=2m`、`go vet ./...`、`go test -race ./... -timeout=5m`。首次沙箱运行的 TCP bind 被拒绝，授权后完整通过；部分未变化 package 使用缓存。新增 [退出测试](../runtime/service_exit_test.go) 覆盖启动期退出、当前 Call 正常返回后退出、排队 Call 失败、Timer 清理，以及创建者启动失败或退出不停止已创建的 Service。这不是强杀或生产容量验证。
