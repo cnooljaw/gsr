@@ -14,7 +14,7 @@ import (
 
 // 验证入口完成组装后可退出，取消应用等待会统一关闭组件且重复关闭安全。
 func TestHostRunAndClose(t *testing.T) {
-	host, err := New(Config{Logging: logging.Config{Writer: io.Discard}, Commands: []runtime.CommandID{1}})
+	host, err := New(Config{Logging: logging.Config{Writer: io.Discard}})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -102,9 +102,9 @@ func TestHostConstructionRollback(t *testing.T) {
 	}
 }
 
-// 验证默认编码仅向显式声明的 Command 开放，未注册命令不能进入出站队列。
-func TestHostDefaultCodecPreservesCommandAdmission(t *testing.T) {
-	host, err := New(Config{Logging: logging.Config{Writer: io.Discard}, Commands: []runtime.CommandID{1}})
+// 验证默认编码无需注册 Command，合法参数继续到目标节点解析阶段。
+func TestHostDefaultCodecNeedsNoCommandList(t *testing.T) {
+	host, err := New(Config{Logging: logging.Config{Writer: io.Discard}})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -118,7 +118,7 @@ func TestHostDefaultCodecPreservesCommandAdmission(t *testing.T) {
 		t.Fatal(err)
 	}
 	err = client.Send("absent", cluster.ServiceTarget{ServiceID: 1}, 2)
-	if !errors.Is(err, cluster.ErrCommandCodecNotFound) {
+	if !errors.Is(err, cluster.ErrNodeNotFound) {
 		t.Fatal(err)
 	}
 }

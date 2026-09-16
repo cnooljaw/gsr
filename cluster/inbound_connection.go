@@ -28,7 +28,7 @@ type inboundConnection struct {
 }
 
 func newInboundConnection(connection *streamConnection, adapter *localRequestAdapter, maxCalls int, diagnostics *inboundDiagnostics) (*inboundConnection, error) {
-	if connection == nil || adapter == nil || adapter.runtime == nil || adapter.codecs == nil || maxCalls <= 0 || diagnostics == nil || (diagnostics.failures == nil && diagnostics.shared == nil) {
+	if connection == nil || adapter == nil || adapter.runtime == nil || isNilPayloadCodec(adapter.codec) || maxCalls <= 0 || diagnostics == nil || (diagnostics.failures == nil && diagnostics.shared == nil) {
 		return nil, errInvalidInboundConnection
 	}
 	return &inboundConnection{

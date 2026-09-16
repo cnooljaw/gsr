@@ -17,9 +17,7 @@ func testClusterConfig(t *testing.T) ClusterConfig {
 	if err != nil {
 		t.Fatal(err)
 	}
-	return ClusterConfig{Codecs: MustCommandCodecRegistry([]CommandCodecEntry{
-		{CommandID: clusterTestCommand, Codec: codec},
-	})}
+	return ClusterConfig{Codec: codec}
 }
 
 func closeTestCluster(t *testing.T, cluster *Cluster) {
@@ -73,7 +71,7 @@ func TestClusterRejectsInvalidConfig(t *testing.T) {
 		}
 	}
 	for _, change := range []func(*ClusterConfig){
-		func(config *ClusterConfig) { config.Codecs = nil },
+		func(config *ClusterConfig) { config.Codec = (*ValueCodec)(nil) },
 		func(config *ClusterConfig) { config.Nodes = map[NodeID]string{"": "localhost:1"} },
 		func(config *ClusterConfig) { config.MaxCallWait = -1 },
 		func(config *ClusterConfig) { config.DialTimeout = -1 },

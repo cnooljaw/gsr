@@ -14,11 +14,11 @@ func (err *badPayloadError) Unwrap() error {
 
 var errBadFramesSuppressed = errors.New("cluster: repeated bad frames suppressed")
 
-// badFrameDiagnostics 归单连接所有，固定四类，不按不可信 Command 或文本建表。
+// badFrameDiagnostics 归单连接所有，固定三类，不按不可信 Command 或文本建表。
 // 入站 Call 解码可以并发；连接汇总只在所有处理任务退出后读取。
 type badFrameDiagnostics struct {
 	mu         sync.Mutex
-	seen       [4]bool
+	seen       [3]bool
 	suppressed uint64
 }
 
@@ -28,12 +28,10 @@ func (records *badFrameDiagnostics) accept(err error) bool {
 	switch {
 	case errors.Is(err, ErrMalformedFrame):
 		category = 0
-	case errors.Is(err, ErrCommandCodecNotFound):
-		category = 1
 	case errors.As(err, &payload):
-		category = 2
+		category = 1
 	case errors.Is(err, ErrInvalidConnectionAgentRequest):
-		category = 3
+		category = 2
 	default:
 		return true
 	}

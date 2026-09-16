@@ -73,7 +73,7 @@ func (cluster *Cluster) Client(source runtime.ServiceID) (*ClusterClient, error)
 		return nil, ErrClusterQuiescing
 	}
 	return NewClusterClient(ClusterClientConfig{Source: source, Senders: clusterResolver{cluster},
-		Codecs: cluster.config.Codecs, PendingCalls: cluster.calls, MaxCallWait: cluster.config.MaxCallWait})
+		Codec: cluster.config.Codec, PendingCalls: cluster.calls, MaxCallWait: cluster.config.MaxCallWait})
 }
 
 // clusterResolver 隐藏 sender 管理能力，不额外导出 Cluster 的解析接口。

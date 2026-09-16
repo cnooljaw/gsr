@@ -21,7 +21,7 @@ import (
 const (
 	notifyCommand runtime.CommandID = 0x04100306
 	echoCommand   runtime.CommandID = 0x04100307
-	tickCommand   runtime.CommandID = 1 // 仅本地使用，不注册 wire codec。
+	tickCommand   runtime.CommandID = 1
 )
 
 type config struct {
@@ -86,9 +86,8 @@ func runFile(path string) error {
 
 func run(ctx context.Context, cfg config) error {
 	host, err := app.New(app.Config{
-		Logging:  logging.Config{Directory: cfg.LogDirectory},
-		Cluster:  cluster.ClusterConfig{Nodes: cfg.Nodes},
-		Commands: []runtime.CommandID{notifyCommand, echoCommand},
+		Logging: logging.Config{Directory: cfg.LogDirectory},
+		Cluster: cluster.ClusterConfig{Nodes: cfg.Nodes},
 	})
 	if err != nil {
 		return err

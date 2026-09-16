@@ -43,7 +43,7 @@ type tcpListener struct {
 // newTCPListener 成功后转移监听 socket 管理权；失败时仍由调用方负责关闭。
 func newTCPListener(config tcpListenerConfig) (*tcpListener, error) {
 	if config.listener == nil || config.codec == nil || config.codec.maxFrame <= frameHeaderSize ||
-		config.adapter == nil || config.adapter.runtime == nil || config.adapter.codecs == nil ||
+		config.adapter == nil || config.adapter.runtime == nil || isNilPayloadCodec(config.adapter.codec) ||
 		config.maxConnections <= 0 || config.maxCalls <= 0 || config.writeTimeout <= 0 {
 		return nil, errInvalidTCPListener
 	}

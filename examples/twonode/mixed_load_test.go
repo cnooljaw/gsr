@@ -201,7 +201,7 @@ func newMixedCluster(t *testing.T, nodes map[cluster.NodeID]string) *cluster.Clu
 	if err != nil {
 		t.Fatal(err)
 	}
-	network, err := cluster.NewCluster(cluster.ClusterConfig{Nodes: nodes, Codecs: cluster.MustCommandCodecRegistry([]cluster.CommandCodecEntry{{CommandID: notifyCommand, Codec: codec}})})
+	network, err := cluster.NewCluster(cluster.ClusterConfig{Nodes: nodes, Codec: codec})
 	if err != nil {
 		t.Fatal(err)
 	}

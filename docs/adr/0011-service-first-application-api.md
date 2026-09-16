@@ -56,4 +56,4 @@ value, err = cluster.Call(ctx, "battle", "echo", echoCommand, "hello")
 3. 收口运行入口、名称注册和按节点表 Open，将双节点示例改成目标写法；不为旧 Host 或 registry 添加迁移别名。
 4. 验证多 Service 并发来源隔离、仅出站节点、初始化回滚、有序关闭，以及双进程恢复。
 
-当前 app.Host、app.Config.Commands、CommandCodecRegistry 及相关测试仍是旧实现，不因本裁决被描述为已完成迁移。只做文档裁决时不修改运行行为。
+实施进度：已移除 app.Config.Commands、CommandCodecRegistry 及“未知 wire Command 属于坏帧”的旧规则，统一默认编码并由目标解释 Command；原注册表专用测试已被新行为测试取代。app.Host 和显式 Client 绑定仍待替换，self.Cluster() 尚未落地。

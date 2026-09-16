@@ -39,7 +39,7 @@ func TestLocalAdapterCallsRuntime(t *testing.T) {
 	}
 }
 
-// 验证未知命令、坏载荷和非参数列表在调用 Service 前被拒绝，不制造响应帧。
+// 验证坏载荷和非参数列表在调用 Service 前被拒绝，不制造响应帧。
 func TestLocalAdapterDropsInvalidPayload(t *testing.T) {
 	adapter, id, codec := newLocalAdapterTest(t)
 	scalar, err := codec.Encode("not an argument list")
@@ -51,7 +51,6 @@ func TestLocalAdapterDropsInvalidPayload(t *testing.T) {
 		payload []byte
 		want    error
 	}{
-		{command: clusterTestCommand + 1, want: ErrCommandCodecNotFound},
 		{command: clusterTestCommand, payload: []byte{255}, want: ErrMalformedPayload},
 		{command: clusterTestCommand, payload: scalar, want: runtime.ErrInvalidCommandArguments},
 	} {
@@ -132,7 +131,7 @@ func TestLocalAdapterPreservesEncodingAndWriteFailures(t *testing.T) {
 	adapter, id, codec := newLocalAdapterTest(t)
 	encodeErr := errors.New("private encoding failure")
 	writeErr := errors.New("socket write failed")
-	adapter.codecs = MustCommandCodecRegistry([]CommandCodecEntry{{CommandID: clusterTestCommand, Codec: localFailingEncodeCodec{CommandCodec: codec, err: encodeErr}}})
+	adapter.codec = localFailingEncodeCodec{PayloadCodec: codec, err: encodeErr}
 	payload, err := codec.Encode([]any{})
 	if err != nil {
 		t.Fatal(err)
@@ -176,7 +175,7 @@ func TestLocalAdapterCancellationDuringResolution(t *testing.T) {
 }
 
 type localFailingEncodeCodec struct {
-	CommandCodec
+	PayloadCodec
 	err error
 }
 
@@ -208,7 +207,7 @@ func newLocalAdapterTest(t *testing.T) (*localRequestAdapter, runtime.ServiceID,
 	}
 	adapter := &localRequestAdapter{
 		runtime: local,
-		codecs:  MustCommandCodecRegistry([]CommandCodecEntry{{CommandID: clusterTestCommand, Codec: codec}}),
+		codec:   codec,
 		resolve: func(name ServiceName) (runtime.ServiceID, error) {
 			if name == "room" {
 				return id, nil

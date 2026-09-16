@@ -11,12 +11,13 @@ import (
 )
 
 // ClusterConfig 配置静态出站路由；不包含本地身份、Runtime 或监听能力。
-// 数值零使用有限默认值，负数无效；构造复制 Nodes，Codecs 复用不可变注册表。
+// 数值零使用有限默认值，负数无效；构造复制 Nodes，所有 Command 共用同一个 Codec。
 type ClusterConfig struct {
 	// Logger 与所属 Runtime/业务共享同一入口；Cluster 不负责关闭，nil 不输出主日志。
 	Logger *logging.Logger
 	Nodes  map[NodeID]string
-	Codecs *CommandCodecRegistry
+	// Codec 为空使用 ValueCodec；不是 Command 准入清单。
+	Codec PayloadCodec
 	// MaxCallWait 默认 5 秒，调用方 context 只能缩短等待。
 	MaxCallWait time.Duration
 	// DialTimeout 默认 3 秒，限制一次拨号而不是整个 Call。
@@ -30,9 +31,19 @@ type ClusterConfig struct {
 }
 
 func (config ClusterConfig) normalized() (ClusterConfig, error) {
-	if config.Codecs == nil || config.Codecs.codecs == nil || config.MaxCallWait < 0 ||
+	if config.MaxCallWait < 0 ||
 		config.DialTimeout < 0 || config.WriteTimeout < 0 || config.OutboundQueueCapacity < 0 || config.MaxFrame < 0 {
-		return ClusterConfig{}, fmt.Errorf("%w: initialized codecs and nonnegative limits are required", ErrInvalidClusterConfig)
+		return ClusterConfig{}, fmt.Errorf("%w: nonnegative limits are required", ErrInvalidClusterConfig)
+	}
+	if config.Codec == nil {
+		codec, err := NewValueCodec(ValueCodecConfig{})
+		if err != nil {
+			return ClusterConfig{}, err
+		}
+		config.Codec = codec
+	}
+	if isNilPayloadCodec(config.Codec) {
+		return ClusterConfig{}, fmt.Errorf("%w: typed nil codec", ErrInvalidClusterConfig)
 	}
 	if config.MaxCallWait == 0 {
 		config.MaxCallWait = 5 * time.Second

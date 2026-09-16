@@ -26,7 +26,7 @@ type NodeSenderResolver interface {
 type ClusterClientConfig struct {
 	Source       runtime.ServiceID
 	Senders      NodeSenderResolver
-	Codecs       *CommandCodecRegistry
+	Codec        PayloadCodec
 	PendingCalls *ClusterCallRegistry
 	MaxCallWait  time.Duration
 }
@@ -43,20 +43,20 @@ var (
 type ClusterClient struct {
 	source       runtime.ServiceID
 	senders      NodeSenderResolver
-	codecs       *CommandCodecRegistry
+	codec        PayloadCodec
 	pendingCalls *ClusterCallRegistry
 	maxCallWait  time.Duration
 }
 
 // NewClusterClient 校验并构造绑定来源身份的客户端。
 func NewClusterClient(config ClusterClientConfig) (*ClusterClient, error) {
-	if config.Source == 0 || isNilNodeSenderResolver(config.Senders) || config.Codecs == nil || !config.PendingCalls.valid() || config.MaxCallWait <= 0 {
-		return nil, fmt.Errorf("%w: Source, Senders, Codecs, PendingCalls, and positive MaxCallWait are required", ErrInvalidClusterClientConfig)
+	if config.Source == 0 || isNilNodeSenderResolver(config.Senders) || isNilPayloadCodec(config.Codec) || !config.PendingCalls.valid() || config.MaxCallWait <= 0 {
+		return nil, fmt.Errorf("%w: Source, Senders, Codec, PendingCalls, and positive MaxCallWait are required", ErrInvalidClusterClientConfig)
 	}
 	return &ClusterClient{
 		source:       config.Source,
 		senders:      config.Senders,
-		codecs:       config.Codecs,
+		codec:        config.Codec,
 		pendingCalls: config.PendingCalls,
 		maxCallWait:  config.MaxCallWait,
 	}, nil
@@ -139,13 +139,13 @@ func (client *ClusterClient) Call(ctx context.Context, node NodeID, target Servi
 }
 
 func (client *ClusterClient) validateConfig() error {
-	if client == nil || client.source == 0 || isNilNodeSenderResolver(client.senders) || client.codecs == nil || !client.pendingCalls.valid() || client.maxCallWait <= 0 {
+	if client == nil || client.source == 0 || isNilNodeSenderResolver(client.senders) || isNilPayloadCodec(client.codec) || !client.pendingCalls.valid() || client.maxCallWait <= 0 {
 		return ErrInvalidClusterClientConfig
 	}
 	return nil
 }
 
-func (client *ClusterClient) prepareRequest(node NodeID, target ServiceTarget, command runtime.CommandID, args ...any) (CommandCodec, OutboundSender, []byte, error) {
+func (client *ClusterClient) prepareRequest(node NodeID, target ServiceTarget, command runtime.CommandID, args ...any) (PayloadCodec, OutboundSender, []byte, error) {
 	if err := client.validateConfig(); err != nil {
 		return nil, nil, nil, err
 	}
@@ -155,10 +155,10 @@ func (client *ClusterClient) prepareRequest(node NodeID, target ServiceTarget, c
 	if err := target.validate(); err != nil {
 		return nil, nil, nil, err
 	}
-	codec, err := client.codecs.Lookup(command)
-	if err != nil {
-		return nil, nil, nil, err
+	if command == 0 {
+		return nil, nil, nil, ErrInvalidEnvelope
 	}
+	codec := client.codec
 	ownedArgs := append([]any(nil), args...)
 	payload, err := codec.Encode(ownedArgs)
 	if err != nil {
@@ -184,7 +184,7 @@ func clusterCallWaitError(ctx context.Context, effectiveContext context.Context)
 	return effectiveContext.Err()
 }
 
-func decodeClusterCallResult(codec CommandCodec, command runtime.CommandID, result clusterCallResult) (any, error) {
+func decodeClusterCallResult(codec PayloadCodec, command runtime.CommandID, result clusterCallResult) (any, error) {
 	if result.err != nil {
 		return nil, result.err
 	}

@@ -12,7 +12,7 @@ import (
 // 名称解析留在 Cluster 外层；此适配器不管理连接、注册表变更或 goroutine。
 type localRequestAdapter struct {
 	runtime *runtime.Runtime
-	codecs  *CommandCodecRegistry
+	codec   PayloadCodec
 	resolve func(ServiceName) (runtime.ServiceID, error)
 }
 
@@ -20,7 +20,7 @@ type localRequestAdapter struct {
 // Call 的执行错误经共享响应函数回包；Send 的本地接纳错误返回接收侧记录，
 // 已接纳 Send 的 Handler 错误仍由目标 Runtime 记录。
 func (adapter *localRequestAdapter) handle(ctx context.Context, request ClusterEnvelope, write ResponseWriter) error {
-	if adapter == nil || adapter.runtime == nil || adapter.codecs == nil || write == nil {
+	if adapter == nil || adapter.runtime == nil || isNilPayloadCodec(adapter.codec) || write == nil {
 		return ErrInvalidConnectionAgentConfig
 	}
 	if ctx == nil || request.Kind != FrameRequest {
@@ -32,10 +32,7 @@ func (adapter *localRequestAdapter) handle(ctx context.Context, request ClusterE
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	codec, err := adapter.codecs.Lookup(request.Command)
-	if err != nil {
-		return err
-	}
+	codec := adapter.codec
 	decoded, err := codec.Decode(request.Payload)
 	if err != nil {
 		return &badPayloadError{err}
@@ -77,7 +74,7 @@ func (adapter *localRequestAdapter) handle(ctx context.Context, request ClusterE
 }
 
 // encodeLocalResponse 将编码扩展的 panic 转为安全错误，同时供回包和本地诊断使用。
-func encodeLocalResponse(codec CommandCodec, value any) (payload []byte, err error) {
+func encodeLocalResponse(codec PayloadCodec, value any) (payload []byte, err error) {
 	defer func() {
 		if recover() != nil {
 			payload = nil

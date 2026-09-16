@@ -4,6 +4,8 @@
 
 ## 已覆盖的运行链
 
+统一 Command 编码切片：移除 CommandCodecRegistry 和 app.Config.Commands，Cluster 默认使用统一 ValueCodec；合法请求交给目标 Service 判断 Command。新增 adapter 与真实 TCP 测试，覆盖跨 Service 复用同一编号、未知 Send 无回包、未知 Call 返回 ErrUnknownCommand，以及后续正常调用。原未知命令坏帧测试改为坏载荷诊断，保留限频、编解码 panic、错误回包和连接恢复验证。全仓测试、vet、启用 GSR_PROCESS_TEST=1 的全仓 race（含双进程正常停机及强杀恢复）通过。self.Cluster() 和应用入口替换尚待落地；下方历史切片的 Command 清单描述不再代表当前接口。
+
 应用宿主首个切片：新增 app.Host，集中默认 codec 组装、共享 Logger、初始化失败回滚、入口启动和固定顺序关闭。测试覆盖正常取消、入口失败、构造回滚、重复关闭及未注册 Command 拒绝；双节点示例已改用 Host。全仓测试、vet，以及启用 GSR_PROCESS_TEST=1 的全仓 race（包含正常停机和强杀恢复）通过。按节点名称 Open 尚未落地，当前宿主保留显式 ListenConfig；不宣称已完成全部易用性方案。
 
 双节点启动组装切片：宿主只创建普通 MainService，由其创建 Echo/Caller 后 Exit，监听和资源关闭仍归宿主。新增 `TestMainServiceCreatesEcho` 验证入口关闭接纳后 Echo 仍可调用；改造前后均运行跨进程正常停机与强杀恢复门禁。改造后全仓测试、vet，以及启用 `GSR_PROCESS_TEST=1` 的全仓 race 通过；不改变 wire 协议、业务命令或关闭顺序。

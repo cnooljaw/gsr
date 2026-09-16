@@ -294,7 +294,7 @@ func newTCPClusterTestLinkTo(t *testing.T, remoteNode NodeID) *tcpClusterTestLin
 		}
 	})
 	client, err := NewClusterClient(ClusterClientConfig{
-		Source: 11, Senders: clientSenderResolver{sender: sender}, Codecs: adapter.codecs,
+		Source: 11, Senders: clientSenderResolver{sender: sender}, Codec: adapter.codec,
 		PendingCalls: calls, MaxCallWait: 5 * time.Second,
 	})
 	if err != nil {

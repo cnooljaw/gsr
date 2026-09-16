@@ -64,8 +64,8 @@
 - ClusterEnvelope、NodeID、连接和编码不得进入 Core 本地 Message 或 ServiceID。
 - Cluster 主动 Send/Call 不要求本地 NodeID 或 open；open 只负责接受新调用。出站只持有目标，入站只持有连接，不传递 LocalNode 或来源 NodeID；回复沿原连接返回，反向主动调用使用独立出站连接。
 - Cluster 每个远端 Node 只有一个 outbound NodeSender，并为每条 inbound socket 建立独立 ConnectionAgent；断线自动重连，但不自动重放业务请求。
-- Cluster codec/Command 在启动阶段注册，重复注册 panic；wire 输入必须设置帧长、集合深度和 payload 上限。
-- 能安全确认帧边界的未知版本、未知 Command 和解码失败帧丢弃并限频诊断；非法长度、越界、认证失败或无法恢复帧边界时关闭连接。
+- Cluster 统一编码，不维护节点级 Command 准入清单；CommandID 由目标 Service 解释，不同 Service 可复用编号。未知 Send 由目标丢弃，未知 Call 返回 ErrUnknownCommand。wire 输入必须设置帧长、集合深度和 payload 上限。
+- 能安全确认帧边界的格式错误和解码失败帧丢弃并限频诊断；非法长度、越界、认证失败或无法恢复帧边界时关闭连接。合法载荷中的未知 Command 不是坏帧。
 - Timer 只投递 Command，不通过回调直接修改业务状态。
 - 第一版 Timer 只有一次性 After 和 CancelTimer；Timer 不拥有更高 admission 优先级。
 - Service 和业务层不得直接启动 goroutine，也不得引入公共 `Runtime.Go` 或 `Fork` 作为逃生口。

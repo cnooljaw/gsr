@@ -103,11 +103,7 @@ func TestInboundConnectionBackpressureAndSendOrder(t *testing.T) {
 // 验证解码和名称解析 panic 只进入本地诊断，不使连接退出或泄露 panic 文本。
 func TestInboundConnectionRecoversAdapterPanics(t *testing.T) {
 	adapter, id, values := newLocalAdapterTest(t)
-	adapter.codecs = MustCommandCodecRegistry([]CommandCodecEntry{
-		{CommandID: clusterTestCommand, Codec: values},
-		{CommandID: clusterTestCommand + 1, Codec: inboundPanicCodec{}},
-		{CommandID: clusterTestCommand + 2, Codec: inboundPanicEncodeCodec{CommandCodec: values}},
-	})
+	adapter.codec = inboundFaultCodec{PayloadCodec: values}
 	adapter.resolve = func(ServiceName) (runtime.ServiceID, error) { panic("private resolver detail") }
 	owner, peer, frames, cancel, done := startInboundTest(t, adapter, 2)
 	payload, err := values.Encode([]any{})
@@ -115,14 +111,18 @@ func TestInboundConnectionRecoversAdapterPanics(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, request := range []ClusterEnvelope{
-		{Kind: FrameRequest, Target: ServiceTarget{ServiceID: id}, Command: clusterTestCommand + 1, Payload: payload},
+		{Kind: FrameRequest, Target: ServiceTarget{ServiceID: id}, Command: clusterTestCommand + 1, Payload: []byte{255}},
 		{Kind: FrameRequest, Target: ServiceTarget{ServiceName: "panic"}, Command: clusterTestCommand, Payload: payload},
 	} {
 		if err := frames.writeFrame(peer, request); err != nil {
 			t.Fatal(err)
 		}
 	}
-	if err := frames.writeFrame(peer, ClusterEnvelope{Kind: FrameRequest, Session: 9, Target: ServiceTarget{ServiceID: id}, Command: clusterTestCommand + 2, Payload: payload}); err != nil {
+	encodePanicPayload, err := values.Encode([]any{"encode panic"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := frames.writeFrame(peer, ClusterEnvelope{Kind: FrameRequest, Session: 9, Target: ServiceTarget{ServiceID: id}, Command: clusterTestCommand + 2, Payload: encodePanicPayload}); err != nil {
 		t.Fatal(err)
 	}
 	if reply, err := frames.readFrame(peer); err != nil || reply.Session != 9 || !errors.Is(reply.Error, runtime.ErrHandlerFailed) {
@@ -146,7 +146,7 @@ func TestInboundConnectionRecoversAdapterPanics(t *testing.T) {
 	}
 }
 
-// 验证重复未知 Command 只记录首条和关闭汇总，不挤满队列且合法 Call 继续处理。
+// 验证重复坏载荷只记录首条和关闭汇总，不挤满队列且合法 Call 继续处理。
 func TestInboundConnectionSuppressesRepeatedBadFrames(t *testing.T) {
 	adapter, id, values := newLocalAdapterTest(t)
 	owner, peer, frames, cancel, done := startInboundTest(t, adapter, 1)
@@ -167,7 +167,7 @@ func TestInboundConnectionSuppressesRepeatedBadFrames(t *testing.T) {
 	}
 	first := <-owner.diagnostics.failures
 	summary := <-owner.diagnostics.failures
-	if !errors.Is(first.err, ErrCommandCodecNotFound) || summary.suppressed != defaultFailureQueueCapacity+2 {
+	if !errors.Is(first.err, ErrMalformedPayload) || summary.suppressed != defaultFailureQueueCapacity+2 {
 		t.Fatalf("first=%+v summary=%+v", first, summary)
 	}
 	if len(owner.diagnostics.failures) != 0 {
@@ -269,7 +269,7 @@ func TestInboundConnectionKeepsSharedDiagnosticsOpen(t *testing.T) {
 	}
 	select {
 	case failure := <-diagnostics.failures:
-		if failure.remoteAddress != peer.LocalAddr().String() || failure.session != 7 || !errors.Is(failure.err, ErrCommandCodecNotFound) {
+		if failure.remoteAddress != peer.LocalAddr().String() || failure.session != 7 || !errors.Is(failure.err, ErrMalformedPayload) {
 			t.Fatalf("second connection diagnostic = %+v", failure)
 		}
 	case <-time.After(time.Second):
@@ -332,20 +332,20 @@ func (*inboundRecordingService) OnStop(context.Context) error {
 	return nil
 }
 
-type inboundPanicCodec struct{}
-
-func (inboundPanicCodec) Encode(any) ([]byte, error) {
-	panic("private codec detail")
+type inboundFaultCodec struct {
+	PayloadCodec
 }
 
-func (inboundPanicCodec) Decode([]byte) (any, error) {
-	panic("private codec detail")
+func (codec inboundFaultCodec) Encode(value any) ([]byte, error) {
+	if reflect.DeepEqual(value, []any{"encode panic"}) {
+		panic("private encoding detail")
+	}
+	return codec.PayloadCodec.Encode(value)
 }
 
-type inboundPanicEncodeCodec struct {
-	CommandCodec
-}
-
-func (inboundPanicEncodeCodec) Encode(any) ([]byte, error) {
-	panic("private encoding detail")
+func (codec inboundFaultCodec) Decode(payload []byte) (any, error) {
+	if len(payload) == 1 && payload[0] == 255 {
+		panic("private codec detail")
+	}
+	return codec.PayloadCodec.Decode(payload)
 }

@@ -23,7 +23,7 @@ func TestClusterNameRebindingAfterServiceFailure(t *testing.T) {
 	// 注册表由外层拥有；原子值只用于测试中跨 goroutine 发布映射，不让 Cluster 管理注册表。
 	var current atomic.Uint64
 	current.Store(uint64(oldID))
-	server, err := NewCluster(ClusterConfig{Codecs: adapter.codecs})
+	server, err := NewCluster(ClusterConfig{Codec: adapter.codec})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -40,7 +40,7 @@ func TestClusterNameRebindingAfterServiceFailure(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	caller, err := NewCluster(ClusterConfig{Codecs: adapter.codecs, Nodes: map[NodeID]string{"b": address}})
+	caller, err := NewCluster(ClusterConfig{Codec: adapter.codec, Nodes: map[NodeID]string{"b": address}})
 	if err != nil {
 		t.Fatal(err)
 	}

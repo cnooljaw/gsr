@@ -1,6 +1,6 @@
 # GSR API 设计规范
 
-> 最新裁决（已确认、待实现）：[ADR 0011](adr/0011-service-first-application-api.md) 以 MainService 集中组装、节点唯一 Runtime/Cluster、Service 局部 CommandID 和统一 Cluster 编码为目标。不再要求业务认识 Host 或登记节点级 Command codec 清单。未知 Command 由目标处理：Send 丢弃，Call 返回 ErrUnknownCommand。本文后续 Host、registry 和未知 wire Command 拒绝规则仍记录旧实现；与 ADR 0011 冲突时以新裁决为准，不表示代码已迁移。
+> 最新裁决：[ADR 0011](adr/0011-service-first-application-api.md) 的统一编码与 Service 局部 CommandID 已落地：不登记节点级命令清单，未知 Send 由目标丢弃，未知 Call 返回 ErrUnknownCommand。应用入口、self.Cluster() 和 Host 移除尚待实现，不表示完整 API 已迁移。
 
 GSR 学习 Skynet 的核心设计方法：Service 使用 Runtime 内的局部数字地址，本地 Send 与 Call 共用消息管道，Cluster 在 Core 之外完成节点路由和网络编码。GSR 不复制 Lua 的动态类型，而是采用“Skynet 语义，Go 类型系统”。
 
@@ -340,7 +340,7 @@ callFrom(source, node, target, command, args...)
 clusterClient, err := cluster.NewClusterClient(cluster.ClusterClientConfig{
 	Source:       serviceContext.Self(),
 	Senders:      senderResolver,
-	Codecs:       commandCodecs,
+	Codec:        payloadCodec,
 	PendingCalls: clusterCallRegistry,
 	MaxCallWait:  5 * time.Second,
 })
@@ -407,7 +407,7 @@ type NodeSenderResolver interface {
 type ClusterClientConfig struct {
 	Source       runtime.ServiceID
 	Senders      NodeSenderResolver
-	Codecs       *CommandCodecRegistry
+	Codec        PayloadCodec
 	PendingCalls *ClusterCallRegistry
 	MaxCallWait  time.Duration
 }
@@ -465,19 +465,10 @@ func NewValueCodec(config ValueCodecConfig) (*ValueCodec, error)
 func (codec *ValueCodec) Encode(value any) ([]byte, error)
 func (codec *ValueCodec) Decode(payload []byte) (any, error)
 
-type CommandCodec interface {
+type PayloadCodec interface {
 	Encode(value any) ([]byte, error)
 	Decode(payload []byte) (any, error)
 }
-
-type CommandCodecEntry struct {
-	CommandID runtime.CommandID
-	Codec     CommandCodec
-}
-
-func NewCommandCodecRegistry(entries []CommandCodecEntry) (*CommandCodecRegistry, error)
-func MustCommandCodecRegistry(entries []CommandCodecEntry) *CommandCodecRegistry
-func (registry *CommandCodecRegistry) Lookup(command runtime.CommandID) (CommandCodec, error)
 
 type FrameCodecConfig struct {
 	MaxFrame int
@@ -505,7 +496,7 @@ func (codec *FrameCodec) Decode(frame []byte) (ClusterEnvelope, error)
 ```go
 type ClusterConfig struct {
     Nodes                 map[NodeID]string
-    Codecs                *CommandCodecRegistry
+    Codec        PayloadCodec
     MaxCallWait           time.Duration
     DialTimeout           time.Duration
     WriteTimeout          time.Duration
@@ -514,7 +505,7 @@ type ClusterConfig struct {
 }
 ```
 
-Nodes 在构造时复制，允许空表；每项要求非空 NodeID 与非空 host、1–65535 数字端口组成的 TCP 地址，构造不进行 DNS 查询或拨号。Codecs 必须显式提供不可变 registry，codec 实例沿用已有并发安全契约。数值零值采用默认值：MaxCallWait 5 秒、DialTimeout 3 秒、WriteTimeout 3 秒、每目标 OutboundQueueCapacity 1024 条、MaxFrame 4 MiB（含四字节长度前缀）；负数拒绝，零不表示无限。Call 总等待、单次拨号和单次 socket 写入是不同预算；调用方放弃等待不强杀连接级 Dial 或撤销已开始写入。配置不包含本地身份、Runtime、监听地址或热更新入口。
+Nodes 在构造时复制，允许空表；每项要求非空 NodeID 与非空 host、1–65535 数字端口组成的 TCP 地址，构造不进行 DNS 查询或拨号。Codec 为空时内建默认 ValueCodec，自定义 codec 实例必须并发安全。数值零值采用默认值：MaxCallWait 5 秒、DialTimeout 3 秒、WriteTimeout 3 秒、每目标 OutboundQueueCapacity 1024 条、MaxFrame 4 MiB（含四字节长度前缀）；负数拒绝，零不表示无限。Call 总等待、单次拨号和单次 socket 写入是不同预算；调用方放弃等待不强杀连接级 Dial 或撤销已开始写入。配置不包含本地身份、Runtime、监听地址或热更新入口。
 
 公开 Cluster 关闭契约已确认（已实现）：
 
@@ -561,8 +552,8 @@ admission 前错误不重复上报；远端领域错误及正常 Call 取消/超
 
 Cluster 1 同时提供 source-bound `ClusterClient` 的单向 `Send`：
 
-- 构造时必须绑定非零 Source、`NodeSenderResolver` 和启动期冻结的 `CommandCodecRegistry`；resolver 负责返回每个远端 Node 的唯一 sender，client 不拥有 sender 或连接。
-- `Send` 校验 Node/Target/Command，通过对应 CommandCodec 将 `args` 作为一个参数列表编码，再交给 sender admission；编码或本地 sender 错误直接返回，sender 的 nil 仍只表示本地 admission。
+- 构造时必须绑定非零 Source、`NodeSenderResolver` 和统一的 `PayloadCodec`；resolver 负责返回每个远端 Node 的唯一 sender，client 不拥有 sender 或连接。
+- `Send` 校验 Node/Target/Command，通过共享 PayloadCodec 将 `args` 作为一个参数列表编码，再交给 sender admission；编码或本地 sender 错误直接返回，sender 的 nil 仍只表示本地 admission。
 - Source 只用于绑定调用者能力和后续本地 Call/PendingCall 归属，不是业务可覆盖的 Envelope 字段；ClusterEnvelope 不携带任意 Core Source，远端 adapter 按本地策略创建 Message Source。
 - `ClusterClient` 需要共享的 `ClusterCallRegistry` 和正数 `MaxCallWait` 配置；所有绑定同一 Cluster 的 client 复用这个 registry，当前 `Send` 仍只确认本地 admission。
 
@@ -576,7 +567,7 @@ Cluster 2 的远程 Call 使用 Cluster-owned `ClusterCallRegistry` 和内部 `C
 - cancellation、timeout、相关节点关闭和 Cluster 关闭都只完成并清理一次 PendingCall；不存在自动重放或 Session 转移。
 - 已实现 `ClusterClient.Call` 的请求编码、共享 Session 注册、本地有限等待、caller cancellation、Response/Error 解码及公开出站组装。逻辑 `Complete` 只处理未绑定连接的等待；真实 TCP 响应校验连接归属，断线只清理该连接等待，不按整个 NodeID 批量清理。公开 Open 已实现，动态路由仍在后续切片。
 
-可选入站组装的资源归属及签名已确认：`func (cluster *Cluster) Open(target *runtime.Runtime, config ListenConfig) (string, error)` 显式接收目标 Runtime，成功返回实际监听地址（`host:port`），监听失败返回 error。由现有 Cluster 管理监听、入站连接及网络任务，不返回独立 Listener owner，也不启动、停止或关闭 Runtime。第一版每个 Cluster 最多一个监听，可接纳多个连接并投递到多个 Service；不支持多监听、监听热切换或运行中换绑 Runtime。不 Open 仍可主动 Send/Call，回复沿原连接返回。ListenConfig 已确认四个字段：必填 `Address string`、监听连接上限 `MaxConnections int`、每连接 Call 上限 `MaxConcurrentCalls int`、可选 `ResolveService func(ServiceName) (runtime.ServiceID, error)`。编码注册表、帧长及写超时复用 ClusterConfig，本地 Call 等待上限由目标 Runtime 控制。默认连接上限为 128、每连接 Call 上限为 32（零值使用默认，负数无效），Address 为空报错，ResolveService 可为 nil。Open 成功后再次调用返回错误（不比较配置），失败清理本次资源后允许应用重试；并发只允许一个打开流程，其余报错；Quiesce/Close 后拒绝 Open。停止接线约定已确认：Quiesce 统一停止接纳并关闭监听，监听关闭错误由 Close 合并返回；不主动关闭已建立连接或等待任务退出。入站诊断方案已确认：增加 DiagnosticInboundFailure 和 RemoteAddress，入站 RemoteNode 留空；可信请求关联字段按需记录，Handler 错误仍归 Runtime。入站与出站共用容量 256 的 Diagnostics，最终 Close 等所有生产者退出才关闭，最小接线已实现，见 [可选入站组装](RFC-CLUSTER-OPEN.md)。
+可选入站组装的资源归属及签名已确认：`func (cluster *Cluster) Open(target *runtime.Runtime, config ListenConfig) (string, error)` 显式接收目标 Runtime，成功返回实际监听地址（`host:port`），监听失败返回 error。由现有 Cluster 管理监听、入站连接及网络任务，不返回独立 Listener owner，也不启动、停止或关闭 Runtime。第一版每个 Cluster 最多一个监听，可接纳多个连接并投递到多个 Service；不支持多监听、监听热切换或运行中换绑 Runtime。不 Open 仍可主动 Send/Call，回复沿原连接返回。ListenConfig 已确认四个字段：必填 `Address string`、监听连接上限 `MaxConnections int`、每连接 Call 上限 `MaxConcurrentCalls int`、可选 `ResolveService func(ServiceName) (runtime.ServiceID, error)`。统一编解码器、帧长及写超时复用 ClusterConfig，本地 Call 等待上限由目标 Runtime 控制。默认连接上限为 128、每连接 Call 上限为 32（零值使用默认，负数无效），Address 为空报错，ResolveService 可为 nil。Open 成功后再次调用返回错误（不比较配置），失败清理本次资源后允许应用重试；并发只允许一个打开流程，其余报错；Quiesce/Close 后拒绝 Open。停止接线约定已确认：Quiesce 统一停止接纳并关闭监听，监听关闭错误由 Close 合并返回；不主动关闭已建立连接或等待任务退出。入站诊断方案已确认：增加 DiagnosticInboundFailure 和 RemoteAddress，入站 RemoteNode 留空；可信请求关联字段按需记录，Handler 错误仍归 Runtime。入站与出站共用容量 256 的 Diagnostics，最终 Close 等所有生产者退出才关闭，最小接线已实现，见 [可选入站组装](RFC-CLUSTER-OPEN.md)。
 
 ListenConfig 类型及内部校验已实现，公开 Open 已实现。地址必须包含显式主机和数字端口，监听允许端口 0；非法格式或负容量返回 ErrInvalidListenConfig。此校验不执行 DNS、绑定或 ResolveService，实际网络错误留到 Open 处理。
 
@@ -595,9 +586,9 @@ ListenConfig 类型及内部校验已实现，公开 Open 已实现。地址必�
 
 远程 Send 坚持“A 管 A、B 管 B”：A 在本地 Cluster admission 成功后继续运行；B 收到后独立执行并在 B 侧记录自己的 Handler error。A 不通过 Send 获得 B 的 Handler 结果。需要返回值或远端处理错误时使用 Call；Call 的 response/error 由共享 `ClusterCallRegistry` 完成，真实网络 stream 和连接 owner 仍属于后续切片。
 
-默认 `ValueCodec` 的解码结果使用稳定的规范类型：有符号整数为 `int64`，无符号整数为 `uint64`，浮点数为 `float64`；复合值为 `[]any` 和 `map[string]any`。它拒绝 pointer、func、chan、struct、复杂数、`uintptr`、非有限浮点和非 string map key。Command-specific struct 由后续启动期注册的 Command codec 负责，不由默认值 Codec 猜测。
+默认 `ValueCodec` 的解码结果使用稳定的规范类型：有符号整数为 `int64`，无符号整数为 `uint64`，浮点数为 `float64`；复合值为 `[]any` 和 `map[string]any`。它拒绝 pointer、func、chan、struct、复杂数、`uintptr`、非有限浮点和非 string map key。自定义结构须在业务边界转换为支持的值，不由默认 Codec 猜测，也不按 Command 注册编码器。
 
-`CommandCodecRegistry` 在启动期接收一份 entries 列表，校验非零 `CommandID`、非 nil codec 和重复注册后复制成不可变表。它不提供运行期 `Register`/`Unregister`，也不从 codec 推断 Service 能力；未知 Command 由调用方通过稳定的 `ErrCommandCodecNotFound` 处理。
+Cluster 不维护 Command 清单。`ClusterConfig.Codec` 为节点所有命令共享的 PayloadCodec，未设置时使用默认 ValueCodec；不能按 CommandID 切换协议或把编码配置用作命令准入表。需要自定义编码时两端须一致，普通业务无需配置。未知 Command 与其它合法 Message 一样进入目标 Mailbox，Send 不回包，Call 由目标返回 ErrUnknownCommand。
 
 `FrameCodec` 为每个逻辑 Envelope 添加四字节大端 body length，长度上限 `MaxFrame` 包含这四个字节。`Decode` 只接受一个边界完整、没有尾随数据的 frame；读取部分帧、拼接多个 frame 和连接关闭由未来 Transport/ConnectionAgent 负责。Envelope 仍不携带 version，版本协商留在 framing 或连接握手。
 
@@ -632,7 +623,7 @@ Error frame 实际携带 `ErrorClass + ErrorCode + Message`；Message 只用于�
 - 默认 codec 支持 nil、bool、有符号/无符号整数、浮点数、string、`[]byte`，以及由这些值递归组成的 list 和 string-key map。
 - 领域 struct 通过启动阶段注册的 Command codec 转换；不直接编码任意 pointer、func、chan、unsafe pointer、循环引用或进程内资源句柄。
 - codec 与 Command 在启动阶段注册；重复注册属于 programmer error，允许 panic 并阻止 Runtime/Cluster 启动。
-- 能够确认完整帧边界的未知 framing version、未知 Command 或 payload 解码失败帧直接丢弃，并记录限频诊断与指标。
+- 能够确认完整帧边界的格式错误或 payload 解码失败帧直接丢弃，并记录限频诊断与指标；合法载荷的未知 Command 不是坏帧。
 - 非法长度、超过最大帧、无法确认下一帧边界或认证失败不能安全丢弃，必须关闭该连接。
 
 连接组织参考 Skynet：
@@ -803,7 +794,7 @@ Service 不提供额外 `Close` 钩子；本地资源释放属于 `OnStop`。`Ru
 
 Core 之外的 `app.Host` 统一承担应用组装：`app.New(Config)` 创建共享 Logger、Runtime、Cluster；`host.Run(ctx, mainService)` 启动普通入口实例，等待 context 取消并自动关闭。取消等待是正常退出信号，初始化失败保留原错误并回滚。Run 只能执行一次，不得与 Close 并发；未调用 Run 而放弃启动时必须 Close。Host 不公开 Runtime 或业务 Send/Call，不增加全局实例、工厂或插件容器。
 
-Host 固定按 Cluster.Quiesce → Runtime.Close → Cluster.Close → 最终日志 → Logger.Close 收尾，聚合错误且不跳过后续步骤。Cluster/Logger 每阶段预算五秒，Runtime 沿用自身预算，不强杀 Handler/Writer。Logging 创建的 Logger 由 Host 独占关闭，组件配置中的外部 Logger 被拒绝。Commands 声明使用默认 ValueCodec 的命令，与自定义 Cluster.Codecs 互斥；重复注册仍 panic，未注册命令仍拒绝。
+Host 固定按 Cluster.Quiesce → Runtime.Close → Cluster.Close → 最终日志 → Logger.Close 收尾，聚合错误且不跳过后续步骤。Cluster/Logger 每阶段预算五秒，Runtime 沿用自身预算，不强杀 Handler/Writer。Logging 创建的 Logger 由 Host 独占关闭，组件配置中的外部 Logger 被拒绝。Commands 清单已移除，Cluster 统一使用默认编码，合法命令是否支持由目标判断。
 
 首个切片的 `host.Open(ListenConfig)` 隐藏 Runtime 绑定，保留显式地址及名称解析器。已确认的按共同节点表名称 Open 尚待后续切片落地，当前不能写 `Open("battle")`。Cluster 自身仍不拥有 Runtime 生命周期。
 

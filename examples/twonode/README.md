@@ -2,7 +2,7 @@
 
 使用标准库 JSON 配置和公开 GSR API，不依赖发现服务。两个进程各有自己的 Runtime、Cluster 和 Logger；示例仅监听本机回环地址。
 
-应用通过 app.New 声明日志、节点配置和 Command 清单，再调用 host.Run(ctx, mainService)。默认 codec、共享日志绑定、初始化回滚和关闭顺序由 Host 处理。MainService 创建 Echo 或 Caller，接收端通过 host.Open 发布固定名称映射并监听，再 Exit；它退出不停止业务 Service。Echo 创建后即可工作，Caller 通过 Timer 驱动业务，不额外定义 Start Command。当前 Open 仍使用显式 ListenConfig，按节点名开放监听将在下一切片落地。
+应用通过 app.New 声明日志和节点配置，再调用 host.Run(ctx, mainService)。Cluster 内建统一 ValueCodec，无需 Command 清单；命令是否支持由目标 Service 判断。共享日志绑定、初始化回滚和关闭顺序暂由 Host 处理。MainService 创建 Echo 或 Caller，接收端通过 host.Open 发布固定名称映射并监听，再 Exit；它退出不停止业务 Service。Echo 创建后即可工作，Caller 通过 Timer 驱动业务，不额外定义 Start Command。当前 Host、显式 Client 绑定和 ListenConfig 是待替换入口，self.Cluster() 与按节点名 Open 尚未落地。
 
 从仓库根目录构建一次：
 

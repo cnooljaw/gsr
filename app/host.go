@@ -17,8 +17,6 @@ type Config struct {
 	Logging logging.Config
 	Runtime runtime.Config
 	Cluster cluster.ClusterConfig
-	// Commands 使用默认 ValueCodec；与 Cluster.Codecs 互斥，重复注册属于编程错误。
-	Commands []runtime.CommandID
 }
 
 // Host 拥有固定的三个组件，不支持插件注册或运行后重新启动。
@@ -36,21 +34,6 @@ type Host struct {
 func New(config Config) (_ *Host, result error) {
 	if config.Runtime.Logger != nil || config.Cluster.Logger != nil {
 		return nil, errors.New("app: configure shared logger through Logging")
-	}
-	if config.Cluster.Codecs != nil && len(config.Commands) != 0 {
-		return nil, errors.New("app: Commands and Cluster.Codecs are mutually exclusive")
-	}
-	if config.Cluster.Codecs == nil {
-		codec, err := cluster.NewValueCodec(cluster.ValueCodecConfig{})
-		if err != nil {
-			return nil, err
-		}
-		entries := make([]cluster.CommandCodecEntry, len(config.Commands))
-		for index, command := range config.Commands {
-			entries[index] = cluster.CommandCodecEntry{CommandID: command, Codec: codec}
-		}
-		// 静态协议声明先校验；panic 前尚未分配任何运行资源。
-		config.Cluster.Codecs = cluster.MustCommandCodecRegistry(entries)
 	}
 	host := &Host{}
 	defer func() {

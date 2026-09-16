@@ -11,7 +11,7 @@ import (
 var ErrInvalidListenConfig = errors.New("cluster: invalid listen config")
 
 // ListenConfig 配置单个入站监听，不包含本地节点身份或外部发布地址。
-// 编码注册表、帧长和写超时由 ClusterConfig 提供，不在此重复配置。
+// 统一编解码器、帧长和写超时由 ClusterConfig 提供，不在此重复配置。
 type ListenConfig struct {
 	// Address 必须显式包含主机和数字端口；端口 0 允许系统分配端口。
 	Address string

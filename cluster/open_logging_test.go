@@ -22,7 +22,7 @@ func TestClusterOpenBadFrameLoggingPerConnection(t *testing.T) {
 	}
 	t.Cleanup(func() { logger.Close(context.Background()) })
 	adapter, id, codec := newLocalAdapterTest(t)
-	server, err := NewCluster(ClusterConfig{Codecs: adapter.codecs, Logger: logger})
+	server, err := NewCluster(ClusterConfig{Codec: adapter.codec, Logger: logger})
 	if err != nil {
 		t.Fatal(err)
 	}

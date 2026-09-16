@@ -13,7 +13,7 @@ import (
 // 验证公开监听可被匿名出站节点调用，重复打开被拒绝，关闭不接管 Runtime。
 func TestClusterOpenCallAndClose(t *testing.T) {
 	adapter, id, _ := newLocalAdapterTest(t)
-	server, err := NewCluster(ClusterConfig{Codecs: adapter.codecs})
+	server, err := NewCluster(ClusterConfig{Codec: adapter.codec})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -25,7 +25,7 @@ func TestClusterOpenCallAndClose(t *testing.T) {
 	if _, err := server.Open(adapter.runtime, ListenConfig{Address: address}); !errors.Is(err, ErrClusterAlreadyOpen) {
 		t.Fatal(err)
 	}
-	caller, err := NewCluster(ClusterConfig{Codecs: adapter.codecs, Nodes: map[NodeID]string{"b": address}})
+	caller, err := NewCluster(ClusterConfig{Codec: adapter.codec, Nodes: map[NodeID]string{"b": address}})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -63,7 +63,7 @@ func TestClusterOpenQuiesceKeepsReply(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	server, err := NewCluster(ClusterConfig{Codecs: adapter.codecs})
+	server, err := NewCluster(ClusterConfig{Codec: adapter.codec})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -72,7 +72,7 @@ func TestClusterOpenQuiesceKeepsReply(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	caller, err := NewCluster(ClusterConfig{Codecs: adapter.codecs, Nodes: map[NodeID]string{"b": address}})
+	caller, err := NewCluster(ClusterConfig{Codec: adapter.codec, Nodes: map[NodeID]string{"b": address}})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -112,7 +112,7 @@ func TestClusterOpenQuiesceKeepsReply(t *testing.T) {
 func TestClusterOpenCloseRace(t *testing.T) {
 	adapter, _, _ := newLocalAdapterTest(t)
 	for i := 0; i < 20; i++ {
-		server, err := NewCluster(ClusterConfig{Codecs: adapter.codecs})
+		server, err := NewCluster(ClusterConfig{Codec: adapter.codec})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -141,10 +141,10 @@ func TestClusterOpenCloseRace(t *testing.T) {
 	}
 }
 
-// 验证未知命令在 B 侧共享诊断中保留可信请求字段，不构造来源 NodeID。
+// 验证坏载荷在 B 侧共享诊断中保留可信请求字段，不构造来源 NodeID。
 func TestClusterOpenInboundDiagnostic(t *testing.T) {
 	adapter, id, _ := newLocalAdapterTest(t)
-	server, err := NewCluster(ClusterConfig{Codecs: adapter.codecs})
+	server, err := NewCluster(ClusterConfig{Codec: adapter.codec})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -168,7 +168,7 @@ func TestClusterOpenInboundDiagnostic(t *testing.T) {
 	}
 	select {
 	case event := <-server.Diagnostics():
-		if event.Kind != DiagnosticInboundFailure || event.RemoteNode != "" || event.RemoteAddress != socket.LocalAddr().String() || event.Session != 77 || event.Target != request.Target || event.Command != request.Command || !errors.Is(event.Err, ErrCommandCodecNotFound) {
+		if event.Kind != DiagnosticInboundFailure || event.RemoteNode != "" || event.RemoteAddress != socket.LocalAddr().String() || event.Session != 77 || event.Target != request.Target || event.Command != request.Command || !errors.Is(event.Err, ErrMalformedPayload) {
 			t.Fatalf("event=%+v", event)
 		}
 	case <-time.After(time.Second):
@@ -182,7 +182,7 @@ func TestClusterOpenInboundDiagnostic(t *testing.T) {
 // 验证监听失败不占用打开名额、不重复诊断，并发打开最多成功一次。
 func TestClusterOpenRetryAndConcurrency(t *testing.T) {
 	adapter, _, _ := newLocalAdapterTest(t)
-	server, err := NewCluster(ClusterConfig{Codecs: adapter.codecs})
+	server, err := NewCluster(ClusterConfig{Codec: adapter.codec})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -226,7 +226,7 @@ func TestClusterOpenRetryAndConcurrency(t *testing.T) {
 // 验证成功打开后监听异常退出会报告，且不会关闭仍供出站使用的共享出口。
 func TestClusterOpenListenerFailure(t *testing.T) {
 	adapter, _, _ := newLocalAdapterTest(t)
-	server, err := NewCluster(ClusterConfig{Codecs: adapter.codecs})
+	server, err := NewCluster(ClusterConfig{Codec: adapter.codec})
 	if err != nil {
 		t.Fatal(err)
 	}

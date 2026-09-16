@@ -109,7 +109,7 @@ func TestClusterOpenCloseTimeoutKeepsDiagnostics(t *testing.T) {
 
 func newOpenBoundaryLink(t *testing.T, adapter *localRequestAdapter, resolve func(ServiceName) (runtime.ServiceID, error)) (*Cluster, *ClusterClient, *Cluster) {
 	t.Helper()
-	server, err := NewCluster(ClusterConfig{Codecs: adapter.codecs})
+	server, err := NewCluster(ClusterConfig{Codec: adapter.codec})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -118,7 +118,7 @@ func newOpenBoundaryLink(t *testing.T, adapter *localRequestAdapter, resolve fun
 	if err != nil {
 		t.Fatal(err)
 	}
-	caller, err := NewCluster(ClusterConfig{Codecs: adapter.codecs, Nodes: map[NodeID]string{"b": address}})
+	caller, err := NewCluster(ClusterConfig{Codec: adapter.codec, Nodes: map[NodeID]string{"b": address}})
 	if err != nil {
 		t.Fatal(err)
 	}

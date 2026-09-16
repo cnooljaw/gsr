@@ -61,7 +61,7 @@ func (cluster *Cluster) Open(target *runtime.Runtime, config ListenConfig) (stri
 	}
 	listener, err := newTCPListener(tcpListenerConfig{
 		listener: socket, codec: cluster.frames,
-		adapter:        &localRequestAdapter{runtime: target, codecs: cluster.config.Codecs, resolve: config.ResolveService},
+		adapter:        &localRequestAdapter{runtime: target, codec: cluster.config.Codec, resolve: config.ResolveService},
 		maxConnections: config.MaxConnections, maxCalls: config.MaxConcurrentCalls,
 		writeTimeout: cluster.config.WriteTimeout, sharedDiagnostics: cluster.diagnostics,
 	})

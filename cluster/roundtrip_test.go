@@ -208,7 +208,7 @@ func newRoundTripLink(t *testing.T, handler cluster.RequestHandler) *roundTripLi
 	client, err := cluster.NewClusterClient(cluster.ClusterClientConfig{
 		Source:       11,
 		Senders:      roundTripResolver{sender: sender},
-		Codecs:       cluster.MustCommandCodecRegistry([]cluster.CommandCodecEntry{{CommandID: roundTripCommand, Codec: values}}),
+		Codec:        values,
 		PendingCalls: calls,
 		MaxCallWait:  time.Second,
 	})
