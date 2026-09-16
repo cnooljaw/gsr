@@ -4,6 +4,8 @@
 
 ## 已覆盖的运行链
 
+应用入口故障收尾切片：TestRunCleanupAfterOpen 覆盖真实监听建立后入口启动失败，以及正常取消时子 Service 的 OnStop 返回错误。验证入口和子 Service 各停止一次、启动与停止错误均保留、子 Service 停止日志先于最终日志且全部排空，并通过重绑原端口确认监听释放。全仓测试、vet 和 race 通过；未修改生产代码，未重跑跨进程演练，不覆盖无法返回的 OnStop 或阻塞 Writer。
+
 Counter 入口统一切片：最小本地示例也改用 gsr.Run 和应用层 ServiceContext。三个命令由简单 Handle 校验并分派，不增加 Core dispatcher 的应用层适配框架；有限演示在 OnStop 通知宿主取消等待，Exit 本身仍不停止整个节点。真实运行输出保持 count = 5 / count = 0，新增输出失败保留错误测试。全仓测试、vet 和 race 通过；本轮未重跑跨进程演练，未修改 Runtime/Cluster 生产实现。
 
 应用入口迁移切片：移除公开 app.Host，新增 gsr.Run 与应用层 ServiceContext/CommandContext，self.Cluster() 自动绑定 Self，self.Logger() 绑定同一来源。MainService 创建业务 Service、Register、按节点表 Open 后 Exit；双节点示例不再持有 Host 或 Client。测试覆盖多 Service 并发来源隔离、转调不继承上一跳、同进程两节点名称与连接独立、纯调用节点无需 Open、启动失败回滚，以及双进程正常停机/强杀后的恢复。全仓 go test、go vet、启用 GSR_PROCESS_TEST=1 的全仓 race 通过。Open 取节点表端口绑定所有接口；测试端口零仅供动态监听，不进入出站路由。下方 Host 描述属于历史切片，不代表当前应用接口。
