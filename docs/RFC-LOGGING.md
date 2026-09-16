@@ -13,40 +13,36 @@
 ## 已实现使用方式
 
 ```go
-logger, err := logging.New(logging.Config{})
-// 处理 err；默认 stdout，每行一个 JSON 对象。
+// main：默认 stdout；Run 负责共享日志接线与关闭。
+err := gsr.Run(ctx, gsr.Config{}, &MainService{})
+// 处理运行结果 err。
 
-local, err := runtime.NewRuntime(runtime.Config{Logger: logger})
-network, err := cluster.NewCluster(cluster.ClusterConfig{
-    Codecs: codecs,
-    Nodes: nodes,
-    Logger: logger,
-})
-// 处理构造错误，按应用顺序启动与创建 Service。
-
-log := logger.WithService(uint64(serviceID))
+// Service 回调：以下是另一个调用位置的片段，框架已绑定当前 Self。
+log := self.Logger()
 err = log.Info("开始结算", "battleID", battleID)
 err = log.Error("结算失败", "battleID", battleID, "err", cause)
 // 根据需要处理入队错误；不等待写盘。
 ```
 
-logging.Logger 是专用日志服务的入口，不是普通业务 Service，也不依赖普通 Runtime Mailbox。所有绑定入口共享一个队列和一个串行 writer goroutine。应用创建一个 Logger 并给所属 Runtime、Cluster 和业务注入同一个实例，最后关闭；没有全局 logger 或 goroutine-local。业务可在 OnStart 使用 Self() 绑定并保存自己的日志入口，不必保存 ServiceContext。
+logging.Logger 是专用日志服务的入口，不是普通业务 Service，也不依赖普通 Runtime Mailbox。所有绑定入口共享一个队列和一个串行 writer goroutine。gsr.Run 创建 Logger 并给所属 Runtime、Cluster 和业务接入同一个实例，最后关闭；没有全局 logger 或 goroutine-local。业务可在 OnStart 取得并保存自身 Logger，用于 OnStop 等场景，不必保存 ServiceContext。
 
-Runtime.Config.Logger 与 ClusterConfig.Logger 都只借用该实例，不管理其生命周期。nil 保留原先仅 Diagnostics 的行为，不隐式启动后台写入者。logging.New 的 Directory 和 Writer 都未设置时默认终端；可传入 io.Writer，输出所有权仍归应用。
+底层 Runtime.Config.Logger 与 ClusterConfig.Logger 都只借用该实例，不管理其生命周期；底层直接构造时 nil 保留仅 Diagnostics 的行为，不隐式启动后台写入者。应用使用 gsr.Run 时必须通过 Config.Logging 配置，不能自行设置这两个 Logger 字段。logging.New 的 Directory 和 Writer 都未设置时默认终端；可传入 io.Writer，输出所有权仍归应用。
 
 文件输出由配置显式选择，内部文件由 Logger 创建并关闭；Directory 与 Writer 同时设置返回错误：
 
 ```go
-logger, err := logging.New(logging.Config{Directory: "./log/battle-01"})
+err := gsr.Run(ctx, gsr.Config{
+    Logging: logging.Config{Directory: "./log/battle-01"},
+}, &MainService{})
 // 处理 err；另一个进程从自己的配置传入 ./log/battle-02。
-// 运行中可用 logger.Err() 查询首次输出故障，退出时仍须等待 Close。
+// 业务可用 self.Logger().Err() 查询首次输出故障，Run 收尾时等待日志关闭。
 ```
 
 ## 顺序、时间与地点
 
 每行输出 time、seq、level、service、file、line、message、fields。time 在 Info/Error 调用路径采集，file/line 指向调用者；字段在调用返回前 JSON 快照，后台不再读取 map、slice、error 或业务对象。调用期间并发修改传入字段仍由调用方避免。
 
-服务标识通过 WithService 显式绑定；无绑定为零。框架自动日志的位置是 Runtime/Cluster 捕获并记录故障的边界，不伪造为业务错误源头。Handler panic 另带已有 stack；普通 error 的原始位置需要业务在发生处记录。
+服务标识由框架通过 WithService 绑定当前 Self；无绑定为零。框架自动日志的位置是 Runtime/Cluster 捕获并记录故障的边界，不伪造为业务错误源头。Handler panic 另带已有 stack；普通 error 的原始位置需要业务在发生处记录。
 
 Diagnostics 保留独立观测用途：Runtime/Cluster 在产生诊断的同步路径直接写 Logger，然后投递观测事件。不得再消费 Diagnostics 转发到同一 Logger，否则会重复记录并扭曲顺序。此前“外层消费 Diagnostics 作为主日志”的方案已被此裁决替代。
 

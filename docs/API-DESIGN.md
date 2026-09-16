@@ -622,8 +622,8 @@ Payload or ErrorClass/ErrorCode/Message
 Error frame 实际携带 `ErrorClass + ErrorCode + Message`；Message 只用于安全展示或诊断，不能参与程序分支。
 
 - 默认 codec 支持 nil、bool、有符号/无符号整数、浮点数、string、`[]byte`，以及由这些值递归组成的 list 和 string-key map。
-- 领域 struct 通过启动阶段注册的 Command codec 转换；不直接编码任意 pointer、func、chan、unsafe pointer、循环引用或进程内资源句柄。
-- codec 与 Command 在启动阶段注册；重复注册属于 programmer error，允许 panic 并阻止 Runtime/Cluster 启动。
+- 领域 struct 由业务显式转换为默认 codec 支持的值；特殊编码可配置节点统一的 PayloadCodec，两端须一致。不直接编码任意 pointer、func、chan、unsafe pointer、循环引用或进程内资源句柄。
+- Cluster 不提供按 Command 注册 codec 的入口；Command 的支持范围由目标 Service 的 Handler/Dispatcher 决定，不维护节点级命令准入清单。
 - 能够确认完整帧边界的格式错误或 payload 解码失败帧直接丢弃，并记录限频诊断与指标；合法载荷的未知 Command 不是坏帧。
 - 非法长度、超过最大帧、无法确认下一帧边界或认证失败不能安全丢弃，必须关闭该连接。
 

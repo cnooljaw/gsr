@@ -2,6 +2,8 @@
 
 本文把已接受的 API 和 ADR 拆成可验证的纵向切片。每个切片只引入完成当前运行链所需的能力；Core 完成后再开始 Cluster。
 
+当前应用入口及编码契约以 [ADR 0011](adr/0011-service-first-application-api.md) 为准：gsr.Run 统一管理运行环境，业务使用 self.Cluster()/self.Logger()；已移除 CommandCodecRegistry，合法未知命令由目标 Service 判断。下方历史切片中的 registry、未知 Command 坏帧及 Node/Host 组装描述不作为当前实施要求。
+
 本文保留历次切片记录，部分“本轮未实现”描述仅代表当时范围。当前能力与证据汇总见 [当前阶段验证清单](VALIDATION-STATUS.md)，不要将历史切片的非目标误读为当前缺失。
 
 当前空闲规模及消息基准的实测记录见 [2026-09-15 本地规模基线](PERFORMANCE-BASELINE.md)。该记录不作为生产容量门槛，持续负载、真实背压、集中 Timer 到期和日志开销仍需分别测量。

@@ -4,7 +4,7 @@
 
 Accepted
 
-部分被 [ADR 0011](0011-service-first-application-api.md) 替代（待实现）：取消节点级 Command codec 清单及据此拒绝未知 wire Command 的契约，改由目标 Handler/Dispatcher 判断。其余帧安全、连接和重连边界继续有效。
+部分被 [ADR 0011](0011-service-first-application-api.md) 替代（已实现）：取消节点级 Command codec 清单及据此拒绝未知 wire Command 的契约，改由目标 Handler/Dispatcher 判断。下方相应条目保留为原始裁决记录，不再作为实现要求；其余帧安全、连接和重连边界继续有效。
 
 ## Context
 

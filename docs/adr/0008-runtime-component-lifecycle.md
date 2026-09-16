@@ -4,6 +4,8 @@
 
 Accepted
 
+后续说明：本文的外层 Node/Host 表示 Core 之外的生命周期协调职责，不要求公开 Host 对象；该职责现由 gsr.Run 内部承担，见 [ADR 0011](0011-service-first-application-api.md)。Core 固定组件计划与本裁决保持不变。
+
 ## Context
 
 Core 0 为让 `Runtime.Close` 可测试，暂时使用了 `closeFn func() error` 占位。随着 Service、Scheduler、Timer 和 Cluster 进入实现，如果继续把清理逻辑追加到一个函数中，组件所有权、依赖顺序、超时、错误聚合和启动失败回滚都会被隐藏在 Runtime 的单一过程里。

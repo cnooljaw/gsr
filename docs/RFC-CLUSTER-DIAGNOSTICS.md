@@ -76,7 +76,7 @@ Skynet 的 gateserver 在监听错误边界调用 skynet.error，连接错误交
 
 响应路径通过包内具体类型 `responseDiagnostics` 集中适配独立与共享出口，读循环只报告事件。该类型仅借用出口，不拥有队列或关闭责任：共享出口自行累计丢弃数，独立出口将丢弃数返回连接 owner，避免重复计数。共享出口过滤 owner 确认的预期关闭；底层独立响应出口继续保留全部终止错误。此调整不增加公共接口、转发 goroutine 或通用诊断框架。
 
-Quiesce 不关闭 Diagnostics；Close 只有在全部生产者退出后才关闭通道。Close 不等待日志消费者，不要求缓冲区先被读空；关闭后的缓冲事件仍可读取。Host 可在 Close 完成后等待自己的日志消费组件读到通道结束，但消费组件的磁盘/网络输出不属于 Cluster 清理责任。
+Quiesce 不关闭 Diagnostics；Close 只有在全部生产者退出后才关闭通道。Close 不等待日志消费者，不要求缓冲区先被读空；关闭后的缓冲事件仍可读取。自定义诊断消费者可在 Close 完成后读完缓冲事件；其输出不属于 Cluster 清理责任。主日志由 Runtime/Cluster 在事件产生处直接写入共享 Logger，不再消费 Diagnostics 转发同一日志；gsr.Run 在 Cluster.Close 后关闭 Logger。
 
 公开 Open 组装后，listener 与全部入站连接直接借用同一个 Cluster-owned 出口，共享容量 256 与丢弃计数，不另设入站公开通道或转发 goroutine。listener 退出不得关闭该共享通道，最终 Cluster.Close 等全部入站与出站生产者退出后才关闭。现有内部独立组装路径的队列所有权需明确保留，不与共享模式双写。
 
