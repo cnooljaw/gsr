@@ -4,11 +4,93 @@ import (
 	"context"
 	"errors"
 	"io"
+	"sync/atomic"
 	"testing"
+	"time"
 
 	"github.com/cnooljaw/gsr/logging"
 	"github.com/cnooljaw/gsr/runtime"
 )
+
+// 验证应用上下文拒绝无效子实例并隔离启动错误或 panic，后续创建与调用仍正常且来源不串。
+func TestServiceChildStartupFailureIsolation(t *testing.T) {
+	startFailure := errors.New("child startup failed")
+	for _, mode := range []string{"error", "panic", "typed_nil"} {
+		t.Run(mode, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+			defer cancel()
+			var failedStops, healthyStops atomic.Int32
+			var failedSelf runtime.ServiceID
+			wantError := startFailure
+			failed := &probeService{
+				start: func(_ context.Context, self ServiceContext) error {
+					failedSelf = self.Self()
+					if mode == "panic" {
+						panic("child startup panic")
+					}
+					return startFailure
+				},
+				stop: func(_ context.Context) error {
+					failedStops.Add(1)
+					return nil
+				},
+			}
+			if mode == "panic" {
+				wantError = runtime.ErrServicePanicked
+			}
+			if mode == "typed_nil" {
+				failed = nil
+				wantError = runtime.ErrInvalidService
+			}
+			called := false
+			entry := &probeService{start: func(ctx context.Context, self ServiceContext) error {
+				id, err := self.CreateService(ctx, failed)
+				if id != 0 || !errors.Is(err, wantError) {
+					return errors.New("child startup failure was not preserved")
+				}
+				parentID := self.Self()
+				id, err = self.CreateService(ctx, &probeService{
+					handle: func(current CommandContext) (any, error) {
+						if current.Source() != parentID {
+							return nil, errors.New("healthy child received wrong source")
+						}
+						return current.Self(), nil
+					},
+					stop: func(_ context.Context) error {
+						healthyStops.Add(1)
+						return nil
+					},
+				})
+				if err != nil {
+					return err
+				}
+				if id == 0 || id == failedSelf {
+					return errors.New("healthy child reused failed identity")
+				}
+				value, err := self.Call(ctx, id, 1)
+				if err != nil {
+					return err
+				}
+				if value != id {
+					return errors.New("healthy child call returned wrong identity")
+				}
+				called = true
+				cancel()
+				return nil
+			}}
+			if err := Run(ctx, Config{Logging: logging.Config{Writer: io.Discard}}, entry); err != nil {
+				t.Fatal(err)
+			}
+			wantStops := int32(1)
+			if mode == "typed_nil" {
+				wantStops = 0
+			}
+			if !called || failedStops.Load() != wantStops || healthyStops.Load() != 1 {
+				t.Fatalf("called=%v failed stops=%d healthy stops=%d", called, failedStops.Load(), healthyStops.Load())
+			}
+		})
+	}
+}
 
 // 验证框架自动绑定各 Service 自身身份，转调时不继承收到消息的 Source。
 func TestServiceClusterBindingUsesSelf(t *testing.T) {
