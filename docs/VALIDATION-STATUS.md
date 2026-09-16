@@ -4,6 +4,8 @@
 
 ## 已覆盖的运行链
 
+应用节点配置切片：新增 Run 非法节点表测试，覆盖空名称、缺失 host/port、非数字或越界端口、非法 host 分隔符及未加括号的 IPv6，确认业务入口不会执行。节点表拆分测试覆盖域名、IPv6、端口上下界、端口零仅保留在监听表，以及输入表/监听表/出站表互不共享 map。相关测试、全仓测试和 vet 通过；未修改生产实现或并发逻辑，本轮不重复运行 race 和跨进程演练。
+
 应用入口故障收尾切片：TestRunCleanupAfterOpen 覆盖真实监听建立后入口启动失败，以及正常取消时子 Service 的 OnStop 返回错误。验证入口和子 Service 各停止一次、启动与停止错误均保留、子 Service 停止日志先于最终日志且全部排空，并通过重绑原端口确认监听释放。全仓测试、vet 和 race 通过；未修改生产代码，未重跑跨进程演练，不覆盖无法返回的 OnStop 或阻塞 Writer。
 
 Counter 入口统一切片：最小本地示例也改用 gsr.Run 和应用层 ServiceContext。三个命令由简单 Handle 校验并分派，不增加 Core dispatcher 的应用层适配框架；有限演示在 OnStop 通知宿主取消等待，Exit 本身仍不停止整个节点。真实运行输出保持 count = 5 / count = 0，新增输出失败保留错误测试。全仓测试、vet 和 race 通过；本轮未重跑跨进程演练，未修改 Runtime/Cluster 生产实现。
