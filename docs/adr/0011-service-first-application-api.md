@@ -2,7 +2,7 @@
 
 ## 状态
 
-Accepted，2026-09-16 用户确认；待实现。Cluster 能力入口确定为应用层 `gsr.ServiceContext.Cluster()`。
+Accepted，2026-09-16 用户确认；已落地最小应用运行链。Cluster 能力入口为应用层 `gsr.ServiceContext.Cluster()`。
 
 本裁决替代旧设计中节点级 CommandCodecRegistry 作为远端命令准入清单的要求，以及要求应用理解 app.Host 的使用模型。不改变 Core 与 Cluster 的职责边界。
 
@@ -30,11 +30,11 @@ Accepted，2026-09-16 用户确认；待实现。Cluster 能力入口确定为�
 
 ## 目标业务形状
 
-以下是已确认的目标形状，不是当前可编译 API。cluster 是通过 self.Cluster() 取得的当前 Service 绑定入口，不是全局包状态。
+以下为调用步骤示意，完整可运行代码见 examples/twonode。cluster 是通过 self.Cluster() 取得的当前 Service 绑定入口，不是全局包状态。
 
 ```go
 // main：运行环境统一处理启动、进程等待及关闭。
-err := gsr.Run(config, &MainService{})
+err := gsr.Run(ctx, config, &MainService{})
 
 // MainService.OnStart：每一步照常检查 error。
 cluster := self.Cluster()
@@ -56,4 +56,4 @@ value, err = cluster.Call(ctx, "battle", "echo", echoCommand, "hello")
 3. 收口运行入口、名称注册和按节点表 Open，将双节点示例改成目标写法；不为旧 Host 或 registry 添加迁移别名。
 4. 验证多 Service 并发来源隔离、仅出站节点、初始化回滚、有序关闭，以及双进程恢复。
 
-实施进度：已移除 app.Config.Commands、CommandCodecRegistry 及“未知 wire Command 属于坏帧”的旧规则，统一默认编码并由目标解释 Command；原注册表专用测试已被新行为测试取代。app.Host 和显式 Client 绑定仍待替换，self.Cluster() 尚未落地。
+实施进度：已移除 app.Host、app.Config.Commands、CommandCodecRegistry，统一默认编码并由目标解释 Command。gsr.Run、self.Cluster()、self.Logger()、名称发布和按节点名 Open 已落地；双节点示例不再持有 Host 或手工绑定 Client。底层 Runtime/Cluster 仍保留基础设施 API，应用层通过最小 Service 适配器复用 Core 生命周期，不增加 ServiceManager。

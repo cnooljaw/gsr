@@ -1,8 +1,10 @@
 # 最小双进程示例
 
-使用标准库 JSON 配置和公开 GSR API，不依赖发现服务。两个进程各有自己的 Runtime、Cluster 和 Logger；示例仅监听本机回环地址。
+使用标准库 JSON 配置和公开 GSR API，不依赖发现服务。两个进程各有自己的 Runtime、Cluster 和 Logger；配置中的目标地址是回环地址，Open 按节点表取端口并绑定 0.0.0.0。只用于可信网络，需按部署要求配置防火墙，不应直接暴露公网。
 
-应用通过 app.New 声明日志和节点配置，再调用 host.Run(ctx, mainService)。Cluster 内建统一 ValueCodec，无需 Command 清单；命令是否支持由目标 Service 判断。共享日志绑定、初始化回滚和关闭顺序暂由 Host 处理。MainService 创建 Echo 或 Caller，接收端通过 host.Open 发布固定名称映射并监听，再 Exit；它退出不停止业务 Service。Echo 创建后即可工作，Caller 通过 Timer 驱动业务，不额外定义 Start Command。当前 Host、显式 Client 绑定和 ListenConfig 是待替换入口，self.Cluster() 与按节点名 Open 尚未落地。
+main 只调用 `gsr.Run(ctx, config, mainService)`。MainService 创建 Echo 或 Caller；接收端通过 `cluster := self.Cluster()`、`cluster.Register("echo", id)`、`cluster.Open("battle")` 完成发布和监听，再 Exit。普通 Handler 通过 `ctx.Cluster().Send/Call` 通信、`ctx.Logger()` 写入来源绑定的日志，不持有 Host、ClusterClient 或全局单例。框架负责初始化回滚和最终关闭；入口退出不停止其它 Service。
+
+Cluster 内建统一 ValueCodec，无需 Command 清单。Echo 创建后即可工作，Caller 用 Timer 驱动业务，不强制 Start Command。
 
 从仓库根目录构建一次：
 
@@ -29,7 +31,7 @@ tail -f log/battle-01/gsr.log
 tail -f log/caller-01/gsr.log
 ```
 
-`process ready` 包含实际 `listen_address`，调用端为空；接收端配置端口 0 时可据此获知系统分配的端口。
+`process ready` 包含实际 `listen_address`，调用端为空；接收端的 listen 配置是节点名，地址位于共同 nodes 表中。测试可在表中配置端口 0，按实际绑定结果构造回环拨号地址；端口零条目不是有效出站路由，不用于正式部署。
 
 ## 自动化跨进程门禁
 
@@ -48,7 +50,7 @@ GSR_PROCESS_TEST=1 go test -race ./examples/twonode -run '^TestTwoNodeProcess.*R
 
 - 接收端创建名为 `echo` 的示例 Service，名称映射由应用闭包提供；不把跨重启无效的 ServiceID 写进配置。
 - 调用端不监听，也没有本地 NodeID；配置中的 `battle` 只是远端路由名。
-- 调用端在 Service.OnStart 绑定 ClusterClient，然后使用 Timer Command 发起一轮 Send 和 Call；业务代码不启动 goroutine。
+- 调用端使用 Timer Command 发起一轮 Send 和 Call；框架通过 ServiceContext 自动绑定当前 Service，业务不创建 Client 或 goroutine。
 - `Send admission` 的 error 为空只表示本地接受，不能据此认定对端已经处理。接纳后的网络故障由同一个 Logger 中的 Cluster failure 记录。
 - `Call result` 记录本轮 OperationID、回复或错误。等待只阻塞当前 Service，不阻塞整个 Runtime。单次 Call 上限为 2 秒，结束后等待 3 秒再发起新的操作。
 - 接收端 `received` 记录实际处理的命令与参数；本示例不消费 Diagnostics 再转写日志，避免重复。
@@ -59,7 +61,7 @@ GSR_PROCESS_TEST=1 go test -race ./examples/twonode -run '^TestTwoNodeProcess.*R
 2. 使用原配置重新启动接收端，观察后续新操作恢复成功；旧请求不会自动重放。
 3. 先停止调用端，再停止接收端，检查两份日志末尾的 `process stopped`。
 
-每次运行的 OperationID 只是示例 Service 内的序号，不保证跨进程重启唯一，不用于可靠重试或幂等协议。接收端端口占用时启动直接失败；换端口需同步修改 server 的 listen 和 caller 的 nodes。
+每次运行的 OperationID 只是示例 Service 内的序号，不保证跨进程重启唯一，不用于可靠重试或幂等协议。接收端端口占用时启动直接失败；换端口需同步修改两端 nodes 表中的 battle 地址，listen 名称不变。
 
 配置解析和启动信号属于应用层。日志目录须由该进程独占；不要让两个示例进程使用同一个目录。所有初始化与退出错误会写入 stderr 并产生非零退出码；文件模式下正常业务日志不输出终端。
 

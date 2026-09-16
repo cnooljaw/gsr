@@ -12,7 +12,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/cnooljaw/gsr/app"
+	"github.com/cnooljaw/gsr"
 	"github.com/cnooljaw/gsr/cluster"
 	"github.com/cnooljaw/gsr/logging"
 	"github.com/cnooljaw/gsr/runtime"
@@ -27,7 +27,7 @@ const (
 type config struct {
 	Role         string                    `json:"role"`
 	LogDirectory string                    `json:"log_directory"`
-	Listen       string                    `json:"listen"`
+	Listen       cluster.NodeID            `json:"listen"`
 	Target       cluster.NodeID            `json:"target"`
 	Nodes        map[cluster.NodeID]string `json:"nodes"`
 }
@@ -48,8 +48,8 @@ func decodeConfig(reader io.Reader) (config, error) {
 	}
 	switch cfg.Role {
 	case "server":
-		if cfg.Listen == "" {
-			return cfg, errors.New("server requires listen")
+		if cfg.Listen == "" || cfg.Nodes[cfg.Listen] == "" {
+			return cfg, errors.New("server requires a listen node in nodes")
 		}
 	case "caller":
 		if cfg.Listen != "" || cfg.Target == "" || cfg.Nodes[cfg.Target] == "" {
@@ -85,60 +85,45 @@ func runFile(path string) error {
 }
 
 func run(ctx context.Context, cfg config) error {
-	host, err := app.New(app.Config{
+	return gsr.Run(ctx, gsr.Config{
 		Logging: logging.Config{Directory: cfg.LogDirectory},
 		Cluster: cluster.ClusterConfig{Nodes: cfg.Nodes},
-	})
-	if err != nil {
-		return err
-	}
-	return host.Run(ctx, &mainService{cfg: cfg, host: host, network: host.Cluster(), log: host.Logger()})
+	}, &mainService{cfg: cfg})
 }
 
 // mainService 是一次性应用入口，不持有 Runtime，也不拥有新建 Service 的生命周期。
 type mainService struct {
-	cfg     config
-	host    *app.Host
-	network *cluster.Cluster
-	log     *logging.Logger
-	echoID  runtime.ServiceID // OnStart 的组装结果，仅供宿主随后发布名称映射。
+	cfg config
 }
 
-func (service *mainService) OnStart(ctx context.Context, scoped runtime.ServiceContext) error {
-	var listenAddress string
+func (service *mainService) OnStart(ctx context.Context, self gsr.ServiceContext) error {
+	cluster := self.Cluster()
 	if service.cfg.Role == "server" {
-		id, err := scoped.CreateService(ctx, &echoService{log: service.log})
+		id, err := self.CreateService(ctx, &echoService{})
 		if err != nil {
 			return err
 		}
-		service.echoID = id
-		if service.host != nil {
-			listenAddress, err = service.host.Open(cluster.ListenConfig{Address: service.cfg.Listen,
-				ResolveService: func(name cluster.ServiceName) (runtime.ServiceID, error) {
-					if name == "echo" {
-						return id, nil
-					}
-					return 0, runtime.ErrServiceNotFound
-				}})
-			if err != nil {
-				return err
-			}
+		if err := cluster.Register("echo", id); err != nil {
+			return err
+		}
+		if err := cluster.Open(service.cfg.Listen); err != nil {
+			return err
 		}
 	} else {
-		if _, err := scoped.CreateService(ctx, &callerService{
-			network: service.network, target: service.cfg.Target, log: service.log,
+		if _, err := self.CreateService(ctx, &callerService{
+			target: service.cfg.Target,
 		}); err != nil {
 			return err
 		}
 	}
-	if err := service.log.Info("process ready", "role", service.cfg.Role, "listen_address", listenAddress); err != nil {
+	if err := self.Logger().Info("process ready", "role", service.cfg.Role, "listen_address", cluster.ListenAddress()); err != nil {
 		return err
 	}
-	scoped.Exit()
+	self.Exit()
 	return nil
 }
 
-func (service *mainService) Handle(_ runtime.CommandContext, _ runtime.CommandID, _ ...any) (any, error) {
+func (service *mainService) Handle(_ gsr.CommandContext, _ runtime.CommandID, _ ...any) (any, error) {
 	return nil, runtime.ErrUnknownCommand
 }
 
@@ -146,19 +131,18 @@ func (service *mainService) OnStop(_ context.Context) error {
 	return nil
 }
 
-type echoService struct{ log *logging.Logger }
+type echoService struct{}
 
-func (service *echoService) OnStart(_ context.Context, ctx runtime.ServiceContext) error {
-	service.log = service.log.WithService(uint64(ctx.Self()))
+func (service *echoService) OnStart(_ context.Context, _ gsr.ServiceContext) error {
 	return nil
 }
 
-func (service *echoService) Handle(_ runtime.CommandContext, command runtime.CommandID, args ...any) (any, error) {
+func (service *echoService) Handle(ctx gsr.CommandContext, command runtime.CommandID, args ...any) (any, error) {
 	if command != notifyCommand && command != echoCommand {
 		return nil, runtime.ErrUnknownCommand
 	}
 	// 日志输出故障不替换业务结果；Logger.Err/Close 负责保留输出故障。
-	_ = service.log.Info("received", "command", command, "args", args)
+	_ = ctx.Logger().Info("received", "command", command, "args", args)
 	return args, nil
 }
 
@@ -167,37 +151,28 @@ func (service *echoService) OnStop(context.Context) error {
 }
 
 type callerService struct {
-	network   *cluster.Cluster
-	client    *cluster.ClusterClient
 	target    cluster.NodeID
-	log       *logging.Logger
 	operation uint64
 }
 
-func (service *callerService) OnStart(_ context.Context, ctx runtime.ServiceContext) error {
-	client, err := service.network.Client(ctx.Self())
-	if err != nil {
-		return err
-	}
-	service.client = client
-	service.log = service.log.WithService(uint64(ctx.Self()))
-	_, err = ctx.After(0, tickCommand)
+func (service *callerService) OnStart(_ context.Context, ctx gsr.ServiceContext) error {
+	_, err := ctx.After(0, tickCommand)
 	return err
 }
 
-func (service *callerService) Handle(ctx runtime.CommandContext, command runtime.CommandID, _ ...any) (any, error) {
+func (service *callerService) Handle(ctx gsr.CommandContext, command runtime.CommandID, _ ...any) (any, error) {
 	if command != tickCommand {
 		return nil, runtime.ErrUnknownCommand
 	}
 	service.operation++
-	target := cluster.ServiceTarget{ServiceName: "echo"}
+	cluster := ctx.Cluster()
 	// 每轮是新的示例操作，不重试上一轮失败或结果不确定的业务请求。
-	err := service.client.Send(service.target, target, notifyCommand, service.operation)
-	_ = service.log.Info("Send admission", "operation", service.operation, "error", err)
+	err := cluster.Send(service.target, "echo", notifyCommand, service.operation)
+	_ = ctx.Logger().Info("Send admission", "operation", service.operation, "error", err)
 	wait, cancel := context.WithTimeout(context.Background(), 2*time.Second)
-	value, callErr := service.client.Call(wait, service.target, target, echoCommand, service.operation)
+	value, callErr := cluster.Call(wait, service.target, "echo", echoCommand, service.operation)
 	cancel()
-	_ = service.log.Info("Call result", "operation", service.operation, "result", value, "error", callErr)
+	_ = ctx.Logger().Info("Call result", "operation", service.operation, "result", value, "error", callErr)
 	_, err = ctx.After(3*time.Second, tickCommand)
 	return nil, err
 }

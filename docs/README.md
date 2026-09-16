@@ -4,7 +4,7 @@
 
 ## 阅读顺序
 
-最新已确认、待实现的入口简化方案见 [ADR 0011：以 Service 为中心的应用入口与统一 Command](adr/0011-service-first-application-api.md)。先看目标业务写法，再看旧实现，避免继续围绕 Host 扩展接口。
+应用入口见 [ADR 0011：以 Service 为中心的应用入口与统一 Command](adr/0011-service-first-application-api.md) 和 [双节点示例](../examples/twonode/README.md)：gsr.Run 启动 MainService，业务通过 self.Cluster() 通信，不需要 Host。
 
 初次运行可先看 [最小 CounterService 示例](../examples/counter/README.md)，只涉及本地 Service、Send、Call 和关闭。
 

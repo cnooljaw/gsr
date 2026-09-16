@@ -2,11 +2,11 @@
 
 ## Glossary
 
-- **Service 绑定的 Cluster 入口（目标接口，待实现）**：应用层通过 `self.Cluster()` 取得；框架绑定当前 Service 的 Self ID，而非消息的 Source。多个入口共享节点唯一 Cluster，不各自拥有连接或关闭责任；业务不手工注入 Host/Cluster，不通过全局状态推断当前 Service。
+- **Service 绑定的 Cluster 入口**：应用层通过 `self.Cluster()` 取得；框架绑定当前 Service 的 Self ID，而非消息的 Source。多个入口共享节点唯一 Cluster，不各自拥有连接或关闭责任；业务不手工注入 Host/Cluster，不通过全局状态推断当前 Service。
 
-> 迁移说明：[ADR 0011](docs/adr/0011-service-first-application-api.md) 已确认，统一编码已实现，其余入口待迁移。目标是每节点一个 Runtime/Cluster，MainService 集中组装，业务不感知 Host；CommandID 由目标 Service 解释、跨 Service 可复用，不区分本地/远程。下文 Host 与 ClusterClient 组装描述属于待替换的当前实现。
+> [ADR 0011](docs/adr/0011-service-first-application-api.md) 已落地应用入口：每节点一个 Runtime/Cluster，MainService 集中组装，CommandID 由目标解释。下文底层 ClusterClient 等类型属于基础设施，业务不手工构造。
 
-- **应用宿主（app.Host）**：Core 之外的具体组装 owner，统一创建 Runtime、Cluster、Logger、启动普通 MainService，并负责初始化回滚与固定顺序关闭。不是 ServiceManager、全局 Runtime 或通用组件容器；业务仍通过自身 ServiceContext 通信。
+- **应用运行入口（gsr.Run）**：Core 之外的统一启动函数，创建独立 Runtime、Cluster、Logger，运行普通 MainService，并负责初始化回滚和固定顺序关闭。内部资源 owner 不公开，不是全局单例或组件容器；app.Host 已移除。
 
 - **坏帧诊断抑制**：单连接内按固定协议错误类别只保留首条明细，重复项不进入日志或 Diagnostics；Cluster.SuppressedDiagnosticCount 独立累计，连接结束用 DiagnosticBadFramesSuppressed 汇总数量。不是业务日志去重，不改变消息投递或错误结果。
 

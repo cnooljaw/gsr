@@ -1,12 +1,12 @@
 # GSR API 设计规范
 
-> 最新裁决：[ADR 0011](adr/0011-service-first-application-api.md) 的统一编码与 Service 局部 CommandID 已落地：不登记节点级命令清单，未知 Send 由目标丢弃，未知 Call 返回 ErrUnknownCommand。应用入口、self.Cluster() 和 Host 移除尚待实现，不表示完整 API 已迁移。
+> [ADR 0011](adr/0011-service-first-application-api.md) 的应用入口已落地：`gsr.Run(ctx, config, mainService)`、`self.Cluster()`、名称注册和按节点表 Open。业务不再组装 Host 或 Client，不登记节点级命令清单；未知 Send 由目标丢弃，未知 Call 返回 ErrUnknownCommand。下文 runtime/cluster 包的底层接口仍供基础设施使用，不是应用必须理解的启动步骤。
 
 GSR 学习 Skynet 的核心设计方法：Service 使用 Runtime 内的局部数字地址，本地 Send 与 Call 共用消息管道，Cluster 在 Core 之外完成节点路由和网络编码。GSR 不复制 Lua 的动态类型，而是采用“Skynet 语义，Go 类型系统”。
 
 ## 1. 最小 Core
 
-ADR 0011 的应用层接口已进一步确认：业务使用 `cluster := self.Cluster()`，由框架绑定当前执行 Service 的 Self ID，不继承收到消息的 Source，不要求业务注入 Cluster 或创建 Client。所有绑定入口共享节点唯一 Cluster 的连接、队列及生命周期。能力组合位于应用层 `gsr.ServiceContext` / `gsr.CommandContext`，不将 Cluster 引入 Core 的 `runtime.ServiceContext`。该接口待实现，不使用全局单例或 goroutine-local 推断当前 Service。
+业务使用 `cluster := self.Cluster()`，由框架绑定当前执行 Service 的 Self ID，不继承收到消息的 Source，不要求业务注入 Cluster 或创建 Client。所有绑定入口共享节点唯一 Cluster 的连接、队列及生命周期。能力组合位于应用层 `gsr.ServiceContext` / `gsr.CommandContext`，不将 Cluster 引入 Core 的 `runtime.ServiceContext`。`self.Logger()` 同样提供绑定自身 ID 的共享日志入口，不使用全局单例或 goroutine-local 推断当前 Service。
 
 GSR Core 只建立以下模型：
 
@@ -792,15 +792,15 @@ Service 不提供额外 `Close` 钩子；本地资源释放属于 `OnStop`。`Ru
 
 应用启动采用普通 MainService：Go main 配置、启动 Runtime，显式创建 MainService，等待进程信号或应用完成通知，最后关闭 Runtime。MainService 使用 ServiceContext.CreateService 组装业务，并通过自身上下文 Send/Call；无需注入 Runtime，不新增 Launcher、ServiceManager 或 Runtime 自动 Bootstrap。MainService 退出不代表 Runtime 退出。宿主 Runtime.Send/Call 保留用于 Cluster 等受信任适配器和测试注入，不作为应用业务通信的第二种常规写法。
 
-Core 之外的 `app.Host` 统一承担应用组装：`app.New(Config)` 创建共享 Logger、Runtime、Cluster；`host.Run(ctx, mainService)` 启动普通入口实例，等待 context 取消并自动关闭。取消等待是正常退出信号，初始化失败保留原错误并回滚。Run 只能执行一次，不得与 Close 并发；未调用 Run 而放弃启动时必须 Close。Host 不公开 Runtime 或业务 Send/Call，不增加全局实例、工厂或插件容器。
+应用使用 `gsr.Run(ctx, Config, Service)`；Config 包含 Logging、Runtime、Cluster 的明确配置。每次 Run 创建独立的 Runtime、Cluster、Logger 并启动普通入口实例，等待 context 取消后自动关闭。运行期间取消是正常退出信号，已取消的启动 context 返回取消错误；初始化失败保留原错误并回滚。进程信号由 main 转成 context 取消，入口 Exit 不结束进程。旧 app.Host 已移除，不提供兼容别名。
 
-Host 固定按 Cluster.Quiesce → Runtime.Close → Cluster.Close → 最终日志 → Logger.Close 收尾，聚合错误且不跳过后续步骤。Cluster/Logger 每阶段预算五秒，Runtime 沿用自身预算，不强杀 Handler/Writer。Logging 创建的 Logger 由 Host 独占关闭，组件配置中的外部 Logger 被拒绝。Commands 清单已移除，Cluster 统一使用默认编码，合法命令是否支持由目标判断。
+Run 内部固定按 Cluster.Quiesce → Runtime.Close → Cluster.Close → 最终日志 → Logger.Close 收尾，聚合错误且不跳过后续步骤。Cluster/Logger 每阶段预算五秒，Runtime 沿用自身预算，不强杀 Handler/Writer。Logging 创建的 Logger 由运行环境独占关闭，组件配置中的外部 Logger 被拒绝。Commands 清单已移除，Cluster 统一使用默认编码，合法命令是否支持由目标判断。
 
-首个切片的 `host.Open(ListenConfig)` 隐藏 Runtime 绑定，保留显式地址及名称解析器。已确认的按共同节点表名称 Open 尚待后续切片落地，当前不能写 `Open("battle")`。Cluster 自身仍不拥有 Runtime 生命周期。
+`self.Cluster().Register(name, id)` 发布节点内名称，空名/零 ID 拒绝，重复名返回 ErrServiceNameRegistered，不静默替换、不自动注销，不负责业务资源所有权或发现。`Open(nodeName)` 从 Config.Cluster.Nodes 取端口绑定 0.0.0.0，由共享 Cluster 管理唯一监听；未知名称报错，不 Open 仍可主动 Send/Call。`ListenAddress()` 供日志观测实际绑定地址，不等于外部可达地址。应用配置允许端口零用于测试动态监听，这类节点不进入出站路由；正常部署使用非零固定端口。底层 cluster.Open(Runtime, ListenConfig) 仍是基础设施接口，Cluster 本身不管理 Runtime 生命周期。
 
 Service 创建成功后即可工作；`OnStart` 是 Runtime 生命周期钩子，`Start` Command 则是 Service 自行定义的可选业务协议，二者不同。Counter 等简单 Service 不增加 Start Command；需要分阶段启动参数或业务准备的 Service 才定义它。
 
-业务跨节点调用使用绑定当前 Service 的 `ClusterClient.Call`；目标节点 Cluster 内部通过 `Runtime.Call` 将远端请求落地成本地调用。两者是同一调用链的不同层，不是业务可二选一的跨节点 API。
+业务跨节点调用使用 `self.Cluster().Call(ctx, node, serviceName, command, args...)`；内部使用来源绑定的 ClusterClient，目标节点通过 Runtime.Call 落地到本地 Service。它们是同一调用链的不同层，不是业务可二选一的 API。
 
 `Runtime.Call` 创建独立的本地 Session，复用 Dispatcher、Mailbox、Service runner 和 PendingCall，不绕过 Handler，也不把 ClusterSessionID 带入 Core。最大等待时间为 Runtime 的 MaxCallWait，调用方 context 只能缩短；nil context 返回 ErrInvalidCallContext，nil Runtime 返回 ErrRuntimeClosed。Runtime 停止时统一完成剩余等待。它不创建 goroutine；外层网络组件负责并发上限、取消和等待。内部通过独立命名的基础设施入口分派，不以 nil Service 选择来源语义。
 

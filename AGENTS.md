@@ -26,6 +26,7 @@
 - 先完成最小、可验证的纵向切片，不提前建设尚无调用者的通用框架。
 - Service 是运行单元，不是代码分类方式；需要独立运行时优先 Service，普通调用不额外包装，基础设施例外必须说明具体理由。见 [Service 化原则](docs/API-DESIGN.md#11-service-化原则)。
 - 应用由普通 MainService 发起业务：Service 内通过 ServiceContext.CreateService/Send/Call/Exit 创建、通信和自身退出；宿主管 Runtime。Runtime.Send/Call 仅作基础设施或测试注入，不作为业务通信捷径；不新增 Launcher/ServiceManager，不强制业务 Start Command。
+- 应用启动使用 gsr.Run；业务通过 self.Cluster() / self.Logger() 取得自身来源绑定能力，不手工注入 Host 或创建 ClusterClient。Core 的 runtime.ServiceContext 不反向依赖 Cluster；禁止用全局单例的“当前 Service”或 goroutine-local 推断来源。
 - 修改范围必须能够追溯到当前任务；不顺手重构无关代码。
 - 公开 API 或架构边界发生变化时，同步更新 `docs/API-DESIGN.md`。
 - 新增或修改 Go 代码必须遵守 `docs/GO-CODE-STYLE.md`。

@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"net"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -31,7 +32,7 @@ func runProcessRecovery(t *testing.T, crash bool) {
 		t.Skip("显式设置 GSR_PROCESS_TEST=1 运行跨进程故障门禁")
 	}
 	directory := t.TempDir()
-	serverConfig := config{Role: "server", LogDirectory: "log/server", Listen: "127.0.0.1:0"}
+	serverConfig := config{Role: "server", LogDirectory: "log/server", Listen: "battle", Nodes: map[cluster.NodeID]string{"battle": "127.0.0.1:0"}}
 	serverLog := filepath.Join(directory, "log/server/gsr.log")
 	callerLog := filepath.Join(directory, "log/caller/gsr.log")
 	server := startExampleProcess(t, directory, "server.json", serverConfig)
@@ -39,7 +40,12 @@ func runProcessRecovery(t *testing.T, crash bool) {
 		return entry.Message == "process ready" && entry.Fields.ListenAddress != ""
 	})
 	// 使用 Open 实际绑定的端口，不先探测空闲端口再释放，避免初次启动端口竞争。
-	address := ready.Fields.ListenAddress
+	_, port, err := net.SplitHostPort(ready.Fields.ListenAddress)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Open 绑定所有接口；测试拨号必须使用可达的回环地址。
+	address := net.JoinHostPort("127.0.0.1", port)
 	caller := startExampleProcess(t, directory, "caller.json", config{
 		Role: "caller", LogDirectory: "log/caller", Target: "battle",
 		Nodes: map[cluster.NodeID]string{"battle": address},
@@ -65,7 +71,7 @@ func runProcessRecovery(t *testing.T, crash bool) {
 	failed := awaitProcessLog(t, caller, callerLog, func(entry processLog) bool {
 		return entry.Message == "Call result" && entry.Fields.Operation > first.Fields.Operation && entry.Fields.Error != nil
 	})
-	serverConfig.Listen = address
+	serverConfig.Nodes["battle"] = address
 	restarted := startExampleProcess(t, directory, "server-restarted.json", serverConfig)
 	recovered := awaitProcessLog(t, caller, callerLog, func(entry processLog) bool {
 		return entry.Message == "Call result" && entry.Fields.Operation > failed.Fields.Operation && entry.Fields.Error == nil
