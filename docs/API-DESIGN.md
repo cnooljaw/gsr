@@ -489,14 +489,15 @@ func (codec *FrameCodec) Decode(frame []byte) (ClusterEnvelope, error)
 - `Close(ctx)` 先停止 admission；队列中尚未开始发送的 Envelope 以 `ErrNodeSenderClosed` 报告并丢弃，已经进入 `Transport.Send` 的调用允许自然返回。`ctx` 只控制调用方等待，不强杀 transport goroutine；超时后可以再次调用 `Close` 等待同一 worker。
 - sender 直接调用注入的 `Transport`，自身不管理 TCP；内部单目标 outboundPeer 已提供按需建连、连接复用与恢复，公开静态出站组装已实现，Open 已实现，动态路由仍待后续切片。这些连接行为不能由 `Send` 的 nil 返回暗示。
 
-公开组装的易用性方向已确认：显式 Cluster 对象统一管理静态目标路由、共享等待表和每目标发送组件，Service 继续使用 source-bound ClusterClient；主动调用不要求本地 NodeID、Runtime 或 open。已确认签名 `NewCluster(config ClusterConfig) (*Cluster, error)` 与 `(*Cluster).Client(source runtime.ServiceID) (*ClusterClient, error)`；两者只构造本地状态，不拨号、不监听，Client 不单独拥有发送器或等待表。绑定来源是受信任组装能力，只校验非零 ID，不验证 Service 存活。该出站组装层已实现，首轮配置与两阶段关闭已确认，统一诊断入口也已确认，见 [组装入口方案](RFC-CLUSTER-ASSEMBLY.md)。
+公开组装的易用性方向已确认：显式 Cluster 对象统一管理静态目标路由、共享等待表和每目标发送组件，应用通过 self.Cluster() 使用自动来源绑定入口，底层适配器使用 source-bound ClusterClient；主动调用不要求本地 NodeID、Runtime 或 open。已确认签名 `NewCluster(config ClusterConfig) (*Cluster, error)` 与 `(*Cluster).Client(source runtime.ServiceID) (*ClusterClient, error)`；两者只构造本地状态，不拨号、不监听，Client 不单独拥有发送器或等待表。绑定来源是受信任组装能力，只校验非零 ID，不验证 Service 存活。该出站组装层已实现，首轮配置与两阶段关闭已确认，统一诊断入口也已确认，见 [组装入口方案](RFC-CLUSTER-ASSEMBLY.md)。
 
 已确认的首轮出站配置（已实现）：
 
 ```go
 type ClusterConfig struct {
     Nodes                 map[NodeID]string
-    Codec        PayloadCodec
+    Codec                 PayloadCodec
+    Logger                *logging.Logger
     MaxCallWait           time.Duration
     DialTimeout           time.Duration
     WriteTimeout          time.Duration
@@ -505,7 +506,7 @@ type ClusterConfig struct {
 }
 ```
 
-Nodes 在构造时复制，允许空表；每项要求非空 NodeID 与非空 host、1–65535 数字端口组成的 TCP 地址，构造不进行 DNS 查询或拨号。Codec 为空时内建默认 ValueCodec，自定义 codec 实例必须并发安全。数值零值采用默认值：MaxCallWait 5 秒、DialTimeout 3 秒、WriteTimeout 3 秒、每目标 OutboundQueueCapacity 1024 条、MaxFrame 4 MiB（含四字节长度前缀）；负数拒绝，零不表示无限。Call 总等待、单次拨号和单次 socket 写入是不同预算；调用方放弃等待不强杀连接级 Dial 或撤销已开始写入。配置不包含本地身份、Runtime、监听地址或热更新入口。
+Logger 是借用入口，Cluster 不负责关闭；使用 gsr.Run 时由 Logging 统一创建并注入，不由业务自行设置。Nodes 在构造时复制，允许空表；每项要求非空 NodeID 与非空 host、1–65535 数字端口组成的 TCP 地址，构造不进行 DNS 查询或拨号。Codec 为空时内建默认 ValueCodec，自定义 codec 实例必须并发安全。数值零值采用默认值：MaxCallWait 5 秒、DialTimeout 3 秒、WriteTimeout 3 秒、每目标 OutboundQueueCapacity 1024 条、MaxFrame 4 MiB（含四字节长度前缀）；负数拒绝，零不表示无限。Call 总等待、单次拨号和单次 socket 写入是不同预算；调用方放弃等待不强杀连接级 Dial 或撤销已开始写入。配置不包含本地身份、Runtime、监听地址或热更新入口。
 
 公开 Cluster 关闭契约已确认（已实现）：
 
@@ -514,7 +515,7 @@ func (cluster *Cluster) Quiesce()
 func (cluster *Cluster) Close(ctx context.Context) error
 ```
 
-Quiesce 幂等且不可恢复，同步拒绝新 Client/Send/Call 及新 sender/Dial，取消未绑定 Call，尚未开始投递的 Send 丢弃并诊断；已绑定 Call 保留原 deadline 与回复机会。它不关闭已建立的 socket，不等待任务退出；绑定与 Quiesce 必须在统一同步边界竞争。Close 自动发起 Quiesce，结束剩余等待，先对所有目标发出取消/关闭信号，再等待 sender、连接与诊断生产者退出。nil context 拒绝，调用方取消等待不终止唯一清理流程，后续 Close 可继续等待并获取最终合并错误；不增加 Cluster ShutdownTimeout 配置。业务退出保存应在 Quiesce 前完成，OnStop 不拥有新的跨节点调用旁路。Host 正常按“Cluster.Quiesce（统一停止入站与出站接纳，关闭监听）→ Core Stop/Close → Cluster.Close(ctx)”收尾；Runtime 停止超时也不能跳过 Cluster 资源清理。详见 [两阶段关闭](RFC-CLUSTER-SHUTDOWN.md)，诊断公开形式见已确认的统一诊断方案。
+Quiesce 幂等且不可恢复，同步拒绝新 Client/Send/Call 及新 sender/Dial，取消未绑定 Call，尚未开始投递的 Send 丢弃并诊断；已绑定 Call 保留原 deadline 与回复机会。它不关闭已建立的 socket，不等待任务退出；绑定与 Quiesce 必须在统一同步边界竞争。Close 自动发起 Quiesce，结束剩余等待，先对所有目标发出取消/关闭信号，再等待 sender、连接与诊断生产者退出。nil context 拒绝，调用方取消等待不终止唯一清理流程，后续 Close 可继续等待并获取最终合并错误；不增加 Cluster ShutdownTimeout 配置。业务退出保存应在 Quiesce 前完成，OnStop 不拥有新的跨节点调用旁路。gsr.Run 内部按“Cluster.Quiesce（统一停止入站与出站接纳，关闭监听）→ Runtime.Close → Cluster.Close(ctx) → 最终日志 → Logger.Close(ctx)”收尾；Runtime 停止超时也不能跳过 Cluster 资源清理。详见 [两阶段关闭](RFC-CLUSTER-SHUTDOWN.md)，诊断公开形式见已确认的统一诊断方案。
 
 公开 Cluster 统一诊断契约已确认（已实现）：
 
@@ -546,7 +547,7 @@ type Diagnostic struct {
 
 每个 Cluster 使用一个固定 256 容量的非阻塞队列，满载丢弃新事件并单调累计 DroppedDiagnosticCount；重复获取为同一消费通道，不是广播。只保存出站目标、可信的请求关联元数据与错误链，不携带 payload；错误文本不承诺天然脱敏。内部生产者直接写共享出口，不执行外部 callback、不为每目标保留诊断转发 goroutine 或在两套出口双写。应用基础设施消费日志，普通 Service 不管理诊断任务。
 
-重复坏帧按单条连接生命周期去重，同类只尝试记录首条，不按秒重复。固定类别为完整帧格式错误、未注册 Command、请求载荷解码失败、错误的入站请求类型；不按 Command 值或错误文本建立无界表。重复项不进入 Logger 或 Diagnostics，单独累计 `Cluster.SuppressedDiagnosticCount()`，不混入 DroppedDiagnosticCount。连接结束且所属请求任务退出后，若有抑制，追加一条 DiagnosticBadFramesSuppressed 汇总，Suppressed 为该连接抑制总数；汇总不重复错误明细、不携带请求关联字段，同样受日志与诊断队列容量限制。首条即使遇满载也不重试，累计抑制数在 Close 后仍可读取。新连接重新保留首条；合法请求、业务错误、Send 投递失败、断线、迟到或不匹配响应不受此规则抑制。这不是全局防攻击或可靠审计机制。
+重复坏帧按单条连接生命周期去重，同类只尝试记录首条，不按秒重复。固定类别为完整帧格式错误、请求载荷解码失败、错误的入站请求类型；合法未知 Command 由目标 Service 判断，不属于坏帧；不按 Command 值或错误文本建立无界表。重复项不进入 Logger 或 Diagnostics，单独累计 `Cluster.SuppressedDiagnosticCount()`，不混入 DroppedDiagnosticCount。连接结束且所属请求任务退出后，若有抑制，追加一条 DiagnosticBadFramesSuppressed 汇总，Suppressed 为该连接抑制总数；汇总不重复错误明细、不携带请求关联字段，同样受日志与诊断队列容量限制。首条即使遇满载也不重试，累计抑制数在 Close 后仍可读取。新连接重新保留首条；合法请求、业务错误、Send 投递失败、断线、迟到或不匹配响应不受此规则抑制。这不是全局防攻击或可靠审计机制。
 
 admission 前错误不重复上报；远端领域错误及正常 Call 取消/超时走调用方结果，迟到响应仍可产生 ResponseRejected。一次断线可能产生连接事件及受影响投递事件，不做全局根因去重。主动关闭的预期连接结束不报 ConnectionFailure，但丢弃排队 Send 仍报告投递失败。Quiesce 不关闭出口，Close 等全部生产者退出后关闭，不等待消费者读空；丢弃计数在关闭后仍可读取。此出口不提供可靠审计、逐节点公平性或完整限频保证。具体字段有效性与门禁见 [统一诊断](RFC-CLUSTER-DIAGNOSTICS.md)。
 
@@ -790,7 +791,7 @@ Service 不提供额外 `Close` 钩子；本地资源释放属于 `OnStop`。`Ru
 
 `Runtime.Send` / `Runtime.Call` 属于 **Infrastructure API**，只供受信任基础设施或宿主注入本地消息，消息的 `Source` 固定为 `ServiceID(0)`；普通 Service 使用绑定当前 ServiceID 的 `ServiceContext.Send` / `ServiceContext.Call`。组装时业务只获得 ServiceContext，基础设施持有 Runtime。
 
-应用启动采用普通 MainService：Go main 配置、启动 Runtime，显式创建 MainService，等待进程信号或应用完成通知，最后关闭 Runtime。MainService 使用 ServiceContext.CreateService 组装业务，并通过自身上下文 Send/Call；无需注入 Runtime，不新增 Launcher、ServiceManager 或 Runtime 自动 Bootstrap。MainService 退出不代表 Runtime 退出。宿主 Runtime.Send/Call 保留用于 Cluster 等受信任适配器和测试注入，不作为应用业务通信的第二种常规写法。
+应用启动采用普通 MainService：Go main 配置运行环境并调用 gsr.Run，后者启动 Runtime、创建 MainService、等待宿主 context 取消并统一关闭。MainService 使用 ServiceContext.CreateService 组装业务，并通过自身上下文 Send/Call；无需注入 Runtime，不新增 Launcher、ServiceManager 或 Runtime 自动 Bootstrap。MainService 退出不代表 Runtime 退出。宿主 Runtime.Send/Call 保留用于 Cluster 等受信任适配器和测试注入，不作为应用业务通信的第二种常规写法。
 
 应用使用 `gsr.Run(ctx, Config, Service)`；Config 包含 Logging、Runtime、Cluster 的明确配置。每次 Run 创建独立的 Runtime、Cluster、Logger 并启动普通入口实例，等待 context 取消后自动关闭。运行期间取消是正常退出信号，已取消的启动 context 返回取消错误；初始化失败保留原错误并回滚。进程信号由 main 转成 context 取消，入口 Exit 不结束进程。旧 app.Host 已移除，不提供兼容别名。
 
@@ -816,7 +817,7 @@ Service 创建成功后即可工作；`OnStart` 是 Runtime 生命周期钩子�
 
 Runtime 不使用一个不断增长的 `closeFn` 承载所有清理逻辑。Runtime 内部维护固定、可审计的 Core 生命周期计划；组件拥有自己的资源和 goroutine，协调器只负责按明确顺序调用组件。
 
-- Core 组件计划只覆盖本地 Admission、Service 管理、Timer、PendingCall、Scheduler、Registry 等能力；Cluster、Transport、NodeSender 和 ConnectionAgent 由 Core 之外的 Node/Host 生命周期协调器负责。
+- Core 组件计划只覆盖本地 Admission、Service 管理、Timer、PendingCall、Scheduler、Registry 等能力；Cluster、Transport、NodeSender 和 ConnectionAgent 由 Core 之外的 Cluster 管理，跨组件关闭顺序由 gsr.Run 内部运行环境协调。
 - 启动按显式 `startOrder` 执行；某个组件启动失败时，只逆序回滚已经成功启动的组件，Runtime 不允许从部分启动状态重试。
 - 关闭的线性化点是 Runtime 进入 `Stopping` 并关闭全局 admission。随后依次停止 Timer、结束 PendingCall、停止 Service、等待 Scheduler/runner，最后释放 Core 资源。
 - 同一组件只由自己的 owner 释放；组件关闭错误继续收集并合并，不能因为一个组件失败就跳过后续组件。
