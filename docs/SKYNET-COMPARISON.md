@@ -24,11 +24,12 @@
 | `RuntimeState`：`Created → Starting → Running → Stopping → Stopped → Closed` | Core 0.5 | 没有同等的公开状态机；启动和退出分散在 `skynet_start.c`、`skynet.start()`、`skynet.exit()` | GSR 新增约束 | GSR 用状态决定 admission 边界，并把“停止完成”和“资源最终释放”分开；Skynet 更依赖命令、句柄和协程状态。 |
 | Lifecycle Coordinator、固定 `startOrder`/`stopOrder` | Core 0.5 | `skynet_start.c` 中的固定初始化、`thread_timer` 退出 socket/唤醒 worker、主线程 join、最后 `harbor_exit`/`socket_free` | 借鉴后重构 | GSR 把顺序和回滚集中成可测试的内部计划；组件自己拥有资源，Cluster 不进入 Core 计划。 |
 | `ShutdownTimeout` | Core 0.5 | Skynet 主退出路径主要 join 线程，没有 GSR 同等的统一 Runtime deadline | GSR 新增约束 | GSR 的内部关闭预算用于 `Close()` 触发的停止；`Stop(ctx)` 的调用方 context 只控制当前等待。Go 不能强杀不响应取消的 Handler/`OnStop`。 |
-| `Service`、`CreateService(ctx, service)` | Core 1 计划 | `skynet_context`、Lua service、`skynet.newservice()`、`.launcher` | 借鉴后重构 | GSR 由应用层传入 Go Service 实例，不提供 Bootstrap Service 或工厂；创建成功要经过 `OnStart(ctx, serviceContext)`，失败只回滚当前 Service，ID 作废且不复用。 |
+| `Service`、`CreateService(ctx, service)` | 已实现 | `skynet_context`、Lua service、`skynet.newservice()`、`.launcher` | 借鉴后重构 | 宿主创建普通 MainService；任何 Service 都可通过 ServiceContext.CreateService 创建实例，复用 Runtime，不新增 Launcher、工厂或自动 Bootstrap。创建经过 OnStart，失败只回滚当前实例；已成功创建的子 Service 仍归 Runtime 管理。 |
 | `ServiceID uint64` | Core 0 已定 | `skynet_context` 的 32 位 handle；远端 handle 还可能带 harbor 位 | 借鉴后重构 | GSR ServiceID 只在当前 Runtime 有效，不编码 Node、Epoch、Generation，也不作为远端地址。 |
 | `ServiceName`、外层 Registry/Discovery | Core 1/Cluster 计划 | `skynet.register()`、`skynet.localname()`、`.service`、`SERVICE`、`service_mgr.lua` | 直接对应 | GSR 稳定逻辑名称不属于 Core ServiceID；解析名称与持有运行期 ID 分层。 |
 | `Service.OnStart` / `OnStop` | Core 1 计划 | `skynet.start(func)`、`skynet.init_service()`、`skynet.exit()` | 借鉴后重构 | Skynet 的 `start` 是单个 Lua service 的初始化入口；GSR 把 Runtime 基础设施启动和 Service 生命周期分开，OnStart 接收协作 context 并显式返回 error。 |
-| `Stop(ctx)`、Runtime `Close()` | Core 1/0.5 | `skynet.exit()`、`skynet.kill()`、`skynet_handle_retireall()` | 直接对应但语义更严格 | GSR 将有序停止与最终资源释放分成两个幂等阶段；有 deadline 但不能强杀，旧 ServiceID 隔离，Stop 后不允许重启。 |
+| `ServiceContext.Exit()` | 已实现 | `skynet.exit()` | 借鉴后重构 | Skynet 通过协程 QUIT 离开执行；Go 只标记退出，必须正常 return。当前 Call 按返回值完成，再停止自身；不停止新建的 Service 或 Runtime。 |
+| Runtime `Stop(ctx)` / `Close()` | Core 0.5 | `skynet_handle_retireall()` 与进程退出清理 | 职责相近而非直接对应 | 面向整个 Runtime；有序停止与最终释放分为两个幂等阶段，有 deadline 但不能强杀，Stop 后不允许重启。不等同于单 Service 的 exit/kill。 |
 | Service 状态唯一 owner | Core 1 计划 | `skynet_context`、handle 表和 Lua service 状态 | GSR 新增约束 | GSR 业务状态只能由所属 Service Handler 修改，Service 之间不能持有彼此实现指针。 |
 
 Skynet 的关闭顺序可概括为：timer 线程停止时间/socket 事件并唤醒 worker，主线程等待 worker 结束，再释放 Harbor 和 socket。GSR 沿用“先 quiesce、再等待、最后释放”的思想，但由 Core 与外层 Node/Host 分别负责。

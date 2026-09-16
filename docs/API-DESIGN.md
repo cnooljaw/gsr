@@ -41,10 +41,11 @@ Close
 | `skynet.send()` | `ServiceContext.Send()` | 普通消息的 Source 由 Runtime 绑定当前 Service；admission 有界。 |
 | `skynet.call()` | `ServiceContext.Call(ctx, ...)` | 保持 run-to-completion，并强制受 Runtime 最大等待时间约束。 |
 | `skynet.timeout()` | `ServiceContext.After()` | Timer 只投递 Command，不执行业务回调；Timer 消息的 Source 固定为零值。 |
-| `skynet.newservice()` | `Runtime.CreateService()` | 使用 Go Service 接口和显式启动错误。 |
+| `skynet.newservice()` | `ServiceContext.CreateService()`；宿主使用 `Runtime.CreateService()` | 同一 Runtime 创建路径，传入 Go Service 实例，不经过 Launcher。 |
 | `skynet.dispatch()` | `Service.Handle()`，可选嵌入 `CommandDispatcher` | Runtime 只调用一个 Service.Handle 入口；不可变的 per-Service typed dispatcher 负责参数绑定，普通消息的 Source 由 Runtime 填入，Timer 消息可为零值。 |
 | `skynet.ret()/response()` | Handler 返回值 | GSR 不暴露手工或异步 Reply API。 |
-| `skynet.exit()/kill()` | `Runtime.Stop(ctx)` / `Runtime.Close()` | `Stop` 负责可等待的有序停止，`Close` 负责最终释放；两者幂等且不允许重启。 |
+| `skynet.exit()` | `ServiceContext.Exit()` | 标记自身退出，当前 OnStart/Handler 正常返回后收尾；不终止 Go 控制流，不停止整个 Runtime。 |
+| `skynet.kill()` | 不提供对应的业务强杀 API | Runtime.Stop/Close 面向整个 Runtime 的有序停止和资源释放，不等同于 kill 单个 Service。 |
 
 Skynet 的接口形状是 API 设计的重要参照，但 GSR 的具体契约由 Go 的类型系统、错误模型、消息所有权和生命周期约束决定。
 

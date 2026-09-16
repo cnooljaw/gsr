@@ -49,7 +49,7 @@ Cluster 0–4
 已经冻结：
 
 - Core 和外层地址都只使用 Runtime 局部 `ServiceID`；不定义额外的地址包装类型。稳定逻辑身份由 Core 外层的 Registry/Discovery 管理。
-- Runtime 不提供 Bootstrap Service；`Runtime.Start()` 只启动基础设施，应用层在 Running 后逐个创建 Service 实例。
+- Runtime 不自动创建 Bootstrap Service；`Runtime.Start()` 只启动基础设施，宿主随后创建普通 MainService，由它通过 ServiceContext.CreateService 组装业务。
 - `CreateService` 固定为 `CreateService(ctx context.Context, service Service) (ServiceID, error)`；Service 由业务层构造，Runtime 接管其生命周期。
 - `Service.OnStart` 固定接收 `context.Context` 和 `ServiceContext`；CreateService 的 context 是协作取消信号，并传给 OnStart。
 - OnStart 失败只回滚当前 Service，Runtime 保持 Running，可以继续创建其它 Service；失败 ID 不发布且永不复用，并由 Runtime 至多调用一次 OnStop 做部分初始化清理。
@@ -148,7 +148,7 @@ Start
 实现：
 
 - `Service`、`ServiceContext`、`CommandContext`。
-- `Runtime.CreateService(ctx context.Context, service Service) (ServiceID, error)`；Service 由应用层传入实例，不提供工厂或 Bootstrap Service。
+- `Runtime.CreateService(ctx context.Context, service Service) (ServiceID, error)`；Service 由应用层传入实例，不提供工厂或内置 Bootstrap Service。Service 内通过 ServiceContext.CreateService 复用这条创建路径。
 - Service registry 和不可复用 ServiceID。
 - 有界 Mailbox 和非无限阻塞 admission。
 - per-Service runner；Scheduler 负责 runner 创建、panic recovery、停止、等待和观测，不引入全局 ReadyQueue 或固定 worker pool。

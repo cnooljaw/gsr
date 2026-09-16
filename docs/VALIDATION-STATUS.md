@@ -4,6 +4,8 @@
 
 ## 已覆盖的运行链
 
+2026-09-16：ServiceContext.CreateService / Exit 和 MainService Counter 示例已通过全仓 `go test ./... -timeout=2m`、`go vet ./...`、`go test -race ./... -timeout=5m`。首次沙箱运行的 TCP bind 被拒绝，授权后完整通过；部分未变化 package 使用缓存。新增 [退出测试](../runtime/service_exit_test.go) 覆盖启动期退出、当前 Call 正常返回后退出、排队 Call 失败、Timer 清理，以及创建者启动失败或退出不停止已创建的 Service。这不是强杀或生产容量验证。
+
 | 能力 | 主要测试证据 | 证据边界 |
 | --- | --- | --- |
 | 本地 Service 生命周期、Send、Call、Timer | [Service](../runtime/service_test.go)、[Call](../runtime/call_test.go)、[Timer](../runtime/timer_test.go) | 本地行为与关闭契约，不代表真实业务负载 |
