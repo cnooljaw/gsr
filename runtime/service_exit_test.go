@@ -157,6 +157,76 @@ func TestServiceCreateSurvivesCreatorStartFailure(t *testing.T) {
 	}
 }
 
+// 验证 Handler 创建的实例独立存活，退出者的慢 OnStop 不阻塞当前 Reply 或新实例处理消息。
+func TestServiceCreateInHandlerAndExitWithSlowStop(t *testing.T) {
+	local := newCallTestRuntime(t, Config{})
+	stopEntered, releaseStop := make(chan struct{}), make(chan struct{})
+	var releaseOnce sync.Once
+	release := func() { releaseOnce.Do(func() { close(releaseStop) }) }
+	defer release()
+	var stops atomic.Int32
+	entry := &exitProbe{
+		handle: func(ctx CommandContext) (any, error) {
+			child := &exitProbe{handle: func(childContext CommandContext) (any, error) {
+				return childContext.Source(), nil
+			}}
+			id, err := ctx.CreateService(context.Background(), child)
+			if err != nil {
+				return nil, err
+			}
+			// 普通 Handler 与 OnStart 一样，以当前 Service 身份通信。
+			source, err := ctx.Call(context.Background(), id, callTestCommand)
+			if err != nil {
+				return nil, err
+			}
+			if source != ctx.Self() {
+				return nil, errors.New("child received incorrect source")
+			}
+			ctx.Exit()
+			return id, nil
+		},
+		stop: func(context.Context) error {
+			stops.Add(1)
+			close(stopEntered)
+			<-releaseStop
+			return nil
+		},
+	}
+	id, err := local.CreateService(context.Background(), entry)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	value, err := local.Call(ctx, id, callTestCommand)
+	if err != nil {
+		t.Fatal(err)
+	}
+	childID, ok := value.(ServiceID)
+	if !ok || childID == 0 || childID == id {
+		t.Fatalf("invalid child ID: %v", value)
+	}
+	select {
+	case <-stopEntered:
+	case <-ctx.Done():
+		t.Fatal(ctx.Err())
+	}
+	if err := local.Send(id, callTestCommand); !errors.Is(err, ErrServiceStopping) {
+		t.Fatalf("exiting service admission: %v", err)
+	}
+	if _, err := local.Call(ctx, childID, callTestCommand); err != nil {
+		t.Fatalf("child blocked by creator OnStop: %v", err)
+	}
+	release()
+	waitExitedService(t, local, id)
+	if _, err := local.Call(ctx, childID, callTestCommand); err != nil {
+		t.Fatalf("child stopped with creator: %v", err)
+	}
+	if stops.Load() != 1 || local.Inspect().PendingCallCount != 0 {
+		t.Fatal("exit cleanup incomplete or repeated")
+	}
+}
+
 func waitExitedService(t *testing.T, local *Runtime, id ServiceID) {
 	t.Helper()
 	waitRuntimeInspection(t, local, func(value RuntimeInspection) bool {
