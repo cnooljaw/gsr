@@ -2,10 +2,9 @@ package main
 
 import (
 	"bytes"
-	"context"
 	"errors"
+	"io"
 	"testing"
-	"time"
 
 	"github.com/cnooljaw/gsr/runtime"
 )
@@ -23,24 +22,8 @@ func TestCounterExample(t *testing.T) {
 
 // 验证非法命令与参数不会修改计数，错误之后合法调用仍然成功。
 func TestCounterRejectsInvalidCommands(t *testing.T) {
-	local, err := runtime.NewRuntime(runtime.Config{})
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(func() {
-		if err := local.Close(); err != nil {
-			t.Error(err)
-		}
-	})
-	if err := local.Start(); err != nil {
-		t.Fatal(err)
-	}
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-	id, err := local.CreateService(ctx, newCounterService())
-	if err != nil {
-		t.Fatal(err)
-	}
+	// 本测试独占未启动实例，只验证命令处理函数；真实消息路径由 TestCounterExample 覆盖。
+	counter := newCounterService()
 	for _, command := range []struct {
 		id   runtime.CommandID
 		args []any
@@ -51,12 +34,25 @@ func TestCounterRejectsInvalidCommands(t *testing.T) {
 		{resetCommand, []any{1}, runtime.ErrInvalidCommandArguments},
 		{99, nil, runtime.ErrUnknownCommand},
 	} {
-		if _, err := local.Call(ctx, id, command.id, command.args...); !errors.Is(err, command.want) {
+		if _, err := counter.Handle(nil, command.id, command.args...); !errors.Is(err, command.want) {
 			t.Fatalf("command=%d error=%v", command.id, err)
 		}
 	}
-	value, err := local.Call(ctx, id, getCommand)
+	value, err := counter.Handle(nil, getCommand)
 	if err != nil || value != 0 {
 		t.Fatalf("value=%v error=%v", value, err)
 	}
+}
+
+// 验证输出失败不会因为演示完成通知而丢失，Run 仍返回原始错误。
+func TestCounterOutputFailure(t *testing.T) {
+	if err := run(failingOutput{}); !errors.Is(err, io.ErrClosedPipe) {
+		t.Fatalf("output failure=%v", err)
+	}
+}
+
+type failingOutput struct{}
+
+func (writer failingOutput) Write(_ []byte) (int, error) {
+	return 0, io.ErrClosedPipe
 }

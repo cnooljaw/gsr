@@ -155,8 +155,8 @@ type callerService struct {
 	operation uint64
 }
 
-func (service *callerService) OnStart(_ context.Context, ctx gsr.ServiceContext) error {
-	_, err := ctx.After(0, tickCommand)
+func (service *callerService) OnStart(_ context.Context, self gsr.ServiceContext) error {
+	_, err := self.After(0, tickCommand)
 	return err
 }
 

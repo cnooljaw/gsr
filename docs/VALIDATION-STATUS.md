@@ -4,6 +4,8 @@
 
 ## 已覆盖的运行链
 
+Counter 入口统一切片：最小本地示例也改用 gsr.Run 和应用层 ServiceContext。三个命令由简单 Handle 校验并分派，不增加 Core dispatcher 的应用层适配框架；有限演示在 OnStop 通知宿主取消等待，Exit 本身仍不停止整个节点。真实运行输出保持 count = 5 / count = 0，新增输出失败保留错误测试。全仓测试、vet 和 race 通过；本轮未重跑跨进程演练，未修改 Runtime/Cluster 生产实现。
+
 应用入口迁移切片：移除公开 app.Host，新增 gsr.Run 与应用层 ServiceContext/CommandContext，self.Cluster() 自动绑定 Self，self.Logger() 绑定同一来源。MainService 创建业务 Service、Register、按节点表 Open 后 Exit；双节点示例不再持有 Host 或 Client。测试覆盖多 Service 并发来源隔离、转调不继承上一跳、同进程两节点名称与连接独立、纯调用节点无需 Open、启动失败回滚，以及双进程正常停机/强杀后的恢复。全仓 go test、go vet、启用 GSR_PROCESS_TEST=1 的全仓 race 通过。Open 取节点表端口绑定所有接口；测试端口零仅供动态监听，不进入出站路由。下方 Host 描述属于历史切片，不代表当前应用接口。
 
 统一 Command 编码切片：移除 CommandCodecRegistry 和 app.Config.Commands，Cluster 默认使用统一 ValueCodec；合法请求交给目标 Service 判断 Command。新增 adapter 与真实 TCP 测试，覆盖跨 Service 复用同一编号、未知 Send 无回包、未知 Call 返回 ErrUnknownCommand，以及后续正常调用。原未知命令坏帧测试改为坏载荷诊断，保留限频、编解码 panic、错误回包和连接恢复验证。全仓测试、vet、启用 GSR_PROCESS_TEST=1 的全仓 race（含双进程正常停机及强杀恢复）通过。self.Cluster() 和应用入口替换尚待落地；下方历史切片的 Command 清单描述不再代表当前接口。

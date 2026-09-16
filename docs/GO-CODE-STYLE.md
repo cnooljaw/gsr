@@ -35,6 +35,7 @@ func (service *PlayerService) Close() error {
 - 缩写按 Go 习惯统一为 `ID`、`URL`、`HTTP`、`RPC`、`GSR`。
 - 方法接收者必须命名；同一类型保持一致，不使用 `this` 或 `self`。
 - 使用中的参数必须表达用途；为满足接口而未使用的参数显式命名为 `_`。
+- `gsr.ServiceContext` 参数统一命名为 `self`，表示当前 Service 的身份与能力，不使用 `scoped` 或 `ctx`；普通 `context.Context` 仍命名为 `ctx`。未使用的 ServiceContext 参数保持 `_`。此规则针对上下文参数，不把业务 Service 的方法接收者改名为 self。
 - 沿用项目稳定术语，不为相同概念创造近义词。
 
 ### 2.3 控制流
