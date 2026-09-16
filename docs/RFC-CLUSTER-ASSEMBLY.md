@@ -1,8 +1,8 @@
 # Cluster 公开组装入口
 
-状态：已获用户确认，首轮公开出站组装已实现。Open、认证和动态路由不在当前实现范围内。
+状态：出站组装、可选 Open、两阶段关闭和诊断已实现。本文描述 `cluster` 包的基础设施组装；普通应用使用 `gsr.Run` 与 `self.Cluster()`，不手工创建 Client。
 
-后续可选入站组装的资源归属建议见 [Open 草案](RFC-CLUSTER-OPEN.md)，该草案尚待确认，不改变本文已确认的出站契约。
+当前应用入口及统一编码以 [ADR 0011](adr/0011-service-first-application-api.md) 为准；入站资源归属见已确认的 [Open 方案](RFC-CLUSTER-OPEN.md)。认证和动态路由尚未实现。
 
 ## 本轮只确认一个方向
 
@@ -25,31 +25,31 @@ GSR 可以直接借鉴“集中组装、按目标管理、主动调用与监听�
 
 | 使用者 | 负责什么 | 不需要接触什么 |
 | --- | --- | --- |
-| 应用启动层 | 配置目标地址、Command codec 和资源上限；建立 Cluster 对象 | 每目标 socket、响应读循环、Session 表接线 |
-| Service 组装层 | 把绑定当前 ServiceID 的 ClusterClient 交给该 Service | 为每条请求填写 Source |
-| 普通业务 Handler | 使用现有 client.Send / client.Call | NodeSender、Transport、PendingCall、手动重连 |
-| 可选入站组装 | 显式开放监听并绑定本地 Runtime/名称解析能力 | 给仅出站进程强配 LocalNode 或监听 |
+| Go main | 向 gsr.Run 提供配置和普通 MainService | 手工创建 Cluster、Client 或排列关闭步骤 |
+| MainService | 通过 self 创建业务 Service，使用 self.Cluster() 注册名称、按节点名 Open | socket、Session 表、来源绑定接线 |
+| 普通业务 Handler | 使用自身上下文的 Cluster().Send / Call | NodeSender、Transport、PendingCall、手动重连 |
+| gsr.Run 内部适配层 | 为当前 Self 绑定 Client，管理固定关闭顺序 | 全局当前 Service 或 goroutine-local |
 
 绑定 ServiceID 的入口是受信任组装能力，不授予普通业务每条消息任意选择 Source 的能力。本文不引入 ServiceRef，也不通过全局变量或 goroutine-local 推断当前 Service。
 
-## 首个实现切片建议
+## 已实现的出站组装边界
 
-先做出站组装，不同时定稿所有 Cluster API：
+基础设施 Cluster 保持以下边界：
 
 - 启动时接受并复制静态 `NodeID → TCP 地址` 表，codec 和容量配置经校验后不可变。
 - 所有 client 共享一个 ClusterCallRegistry；每个已使用目标最多一个 NodeSender 和 outboundPeer。
 - 目标第一次使用时创建本地发送组件，但解析 sender 不做网络 Dial；拨号仍在已有 NodeSender worker 的投递阶段发生，保留 Send 的 admission 语义。
 - 目标不在配置表中立即返回稳定路由错误，不等待未来配置、不创建未知目标的等待队列。
 - sender 创建与关闭必须互斥，避免并发 client 为同一目标创建多个 worker。资源规模受配置目标数及各目标有界队列约束。
-- 仅出站实例不要求本地 Runtime、NodeID 或监听。可选入站能力后续单独组装，不让创建出站对象隐式 open。
+- 仅出站实例不要求本地 Runtime、NodeID 或监听。可选入站由 Open 单独开启，不让创建出站对象隐式 open。
 
-地址热更新、Discovery、认证、多个 listener 和公开诊断形式不一起塞进第一轮；这些能力仍保留独立演进空间。内部 Transport 替换边界继续用于测试，但不作为普通业务的日常组装入口。
+地址热更新、Discovery、认证和多个 listener 不属于当前能力；公开诊断形式已实现。内部 Transport 替换边界继续用于测试，但不作为普通业务的日常组装入口。
 
 ## 代价与边界
 
 新增一个固定的资源 owner，可以减少应用接线错误，并让共享等待表、唯一 sender 和关闭归属一致。代价是需要明确这个 owner 的生命周期；不能只提供一个构造函数而把关闭责任重新推回使用者。
 
-公开创建/绑定签名与关闭阶段已确认。必须遵守已有的 Host 关闭顺序：先停止入站与新的出站 admission，再停止 Core，最后释放 Transport 和连接任务；具体见 [两阶段关闭](RFC-CLUSTER-SHUTDOWN.md)。
+公开创建/绑定签名与关闭阶段已确认。gsr.Run 内部先停止入站与新的出站 admission，再停止 Core，最后释放 Transport 和连接任务；具体见 [两阶段关闭](RFC-CLUSTER-SHUTDOWN.md)。不要求业务持有 Host 对象。
 
 第一版静态地址表意味着不支持运行中修改目标映射；DNS 地址解析仍可由标准 Dialer 在拨号时执行，这不等同于 GSR 提供配置热更新。
 
@@ -80,28 +80,29 @@ func (cluster *Cluster) Client(source runtime.ServiceID) (*ClusterClient, error)
 
 ### 来源绑定的使用边界
 
-Client(source) 是受信任组装入口。常见接线点是 Service 的 OnStart 组装钩子：从当次 `ServiceContext.Self()` 取值，创建并注入 client；不保存 ServiceContext 或 CommandContext，也不要求先等 CreateService 返回再补 client。
+Client(source) 是受信任基础设施入口。gsr.Run 的 Service 适配器在 OnStart 前从 Core 上下文的 Self() 取值，创建来源绑定入口；业务仅通过 self.Cluster() 使用，不手工创建或注入 client，也不保存 ServiceContext 或 CommandContext。
 
 选择 ServiceID 而不是把整个 ServiceContext 交给 Cluster，是因为 Cluster 只需身份值，不应顺带获得本地 Send、Call、Timer 能力。ServiceContext 是接口，换成这个参数也不能自动成为不可伪造的安全凭据。
 
 仅出站 Cluster 不依赖 Runtime，因此它只能校验非零 ID，不能证明这个 Service 当前存活、属于哪个 Runtime 或是否已停止。组装层必须使用同一 Runtime 的真实身份，不能把不同 Runtime 中数值相同的 ID 混进一个 Cluster 的来源空间。此限制沿用现有 ClusterClientConfig.Source 的信任边界，不新增跨 Runtime 身份协议或存活检查。
 
-普通 Handler 只获得已经绑定好的 ClusterClient，不获得创建任意来源 client 的管理能力。Source 仍不进入 wire，也不能为单次 Send/Call 覆盖。
+普通 Handler 只获得已经绑定好的 gsr.Cluster 入口，不获得创建任意来源 client 的管理能力。Source 仍不进入 wire，也不能为单次 Send/Call 覆盖。
 
 ### 与现有入口的关系
 
-常规应用组装只推荐 `NewCluster → Client → Send/Call`。现有 `NewClusterClient(config)` 是基础设施依赖注入入口，不作为普通业务的第二套推荐写法；本轮不删除它，也不添加兼容别名。公开低层构造器是否进一步收窄，不与本次两条签名捆绑裁决。
+常规应用只推荐 `gsr.Run → MainService → self.Cluster().Send/Call`。`NewCluster → Client` 和 `NewClusterClient(config)` 都是基础设施接线入口，不作为普通业务的第二套推荐写法；保留低层构造器，不添加兼容别名。
 
-ClusterConfig 与默认值见下文；已确认 Quiesce() 与 Close(ctx)，详见两阶段关闭方案。Open 仍留待后续入站切片。
+ClusterConfig 与默认值见下文；Quiesce()、Close(ctx) 与 Open 均已实现。应用层 Open 按节点表名称开放监听，底层 Open 显式接收 Runtime 和 ListenConfig。
 
-## 首轮出站配置（已确认）
+## 当前基础设施配置
 
 只包含以下字段，不加入本地身份、Runtime、监听地址、Dial 回调或可注入的 PendingCall 表：
 
 ```go
 type ClusterConfig struct {
     Nodes                 map[NodeID]string
-    Codecs                *CommandCodecRegistry
+    Codec                 PayloadCodec
+    Logger                *logging.Logger
     MaxCallWait           time.Duration
     DialTimeout           time.Duration
     WriteTimeout          time.Duration
@@ -113,7 +114,8 @@ type ClusterConfig struct {
 | 字段 | 已确认规则 |
 | --- | --- |
 | Nodes | 静态目标地址表；构造时复制，允许 nil/空表，不读取配置文件或环境变量。 |
-| Codecs | 必须显式提供已构造的不可变 registry；不自动猜测 Command 的编码方式。 |
+| Codec | nil 使用默认 ValueCodec；所有 Command 统一编码，不登记命令准入清单，由目标 Handler 判断命令。 |
+| Logger | 借用日志入口，Cluster 不负责关闭；应用使用 gsr.Run 时由 Logging 配置统一创建并注入，不自行设置。 |
 | MaxCallWait | 默认 5 秒，覆盖编码、排队与远端等待；调用方 context 只能缩短。 |
 | DialTimeout | 默认 3 秒，每次拨号的上限，包含标准拨号器的地址解析等待。 |
 | WriteTimeout | 默认 3 秒，每次 socket 写入的上限，不包括排队或远端执行。 |
@@ -126,8 +128,8 @@ MaxCallWait 是调用方等待预算，不是 socket 的总执行预算。比如
 
 地址只接受非空 host 与数字端口组成的 host:port（IPv6 使用方括号），端口范围 1–65535。构造只做格式校验，不进行 DNS 查询或连接探测；格式正确不等于目标可达。NodeID 不得为空，地址不作为本地身份。第一版不接受 URL、多地址候选或特殊布尔值，避免多套配置写法。
 
-Nodes 的 map 副本归 Cluster 所有；Codecs 复用现有不可变 registry，内部 codec 实例必须遵守已存在的并发安全契约，不做通用深拷贝。两个 NodeID 即使配置相同地址，也仍按两个路由目标管理，不额外做地址去重或身份推断。
+Nodes 的 map 副本归 Cluster 所有；自定义 Codec 必须遵守并发安全契约，不做通用深拷贝。两个 NodeID 即使配置相同地址，也仍按两个路由目标管理，不额外做地址去重或身份推断。gsr.Run 额外允许共同节点表中的端口零用于本机测试监听，并在交给底层 Cluster 前从出站路由中剔除；它不是可拨号地址。
 
 这些默认值用于开箱即用，不是容量承诺：队列条数乘以帧上限可能产生较大内存占用，而且每目标都有独立队列；部署时应按目标数和消息体大小调低上限。首轮不增加另一套全局字节预算，以免在本次配置中引入新的 admission 语义。
 
-两阶段关闭与 [统一诊断入口](RFC-CLUSTER-DIAGNOSTICS.md) 已实现。公开入口集中在 cluster.go，配置校验在 config.go，诊断值与队列在 diagnostic.go；NodeSender、outboundPeer 和共享等待表继续承担各自职责。已加入真实 TCP 往返、断线恢复、来源共享、Quiesce/绑定竞争、Close 取消等待和诊断溢出测试。Open、认证、动态路由与未来入站诊断扩展不纳入此切片。
+两阶段关闭与 [统一诊断入口](RFC-CLUSTER-DIAGNOSTICS.md) 已实现。底层公开入口集中在 cluster/cluster.go，配置校验在 cluster/config.go，诊断值与队列在 cluster/diagnostic.go；NodeSender、outboundPeer 和共享等待表继续承担各自职责。已有真实 TCP 往返、断线恢复、来源共享、Quiesce/绑定竞争、Close 取消等待、Open 和诊断溢出测试。当前验证范围见 [验证清单](VALIDATION-STATUS.md)。
