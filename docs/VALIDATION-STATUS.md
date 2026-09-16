@@ -4,6 +4,8 @@
 
 ## 已覆盖的运行链
 
+退出失败隔离切片补充 `TestServiceExitDoesNotHidePanic`：OnStart 或 Handler 请求 Exit 后 panic，仍返回 ErrServicePanicked，而非正常退出成功；启动失败不返回有效 ID，Handler 失败后拒绝新消息。两条路径均只执行一次 OnStop、清空 PendingCall，健康 Service 仍可调用。相关测试、Runtime 全包、全仓测试、vet 和 race 通过；未修改生产代码。
+
 退出与整体停止交错切片补充 `TestServiceExitOverlapsRuntimeStop`：Handler 已请求 Exit 但未返回时，Runtime Stop 以停止错误完成在途 Call；取消一次 Stop 等待不取消关闭流程。释放 Handler 后正常 Stop/Close，OnStop 仅执行一次，PendingCall 归零。相关测试、Runtime 全包、全仓测试、vet 和 race 通过；使用同步屏障固定交错顺序，不是随机压力或强杀测试，未修改生产代码。
 
 后续退出隔离切片补充 `TestServiceCreateInHandlerAndExitWithSlowStop`：普通 Handler 创建并调用新 Service 时 Source 正确；自身 Exit 后，即使 OnStop 受控阻塞，当前 Call 已返回、新实例仍可调用，退出者拒绝新消息，释放 OnStop 后只清理一次且 PendingCall 归零。相关测试、Runtime 全包、全仓测试、vet 和 race 通过；本轮未修改生产实现，不代表能强杀阻塞的 OnStop。

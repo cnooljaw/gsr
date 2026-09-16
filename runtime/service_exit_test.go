@@ -291,6 +291,59 @@ func TestServiceExitOverlapsRuntimeStop(t *testing.T) {
 	}
 }
 
+// 验证 Exit 不吞掉随后发生的启动或 Handler panic，清理仅执行一次且其它 Service 仍可运行。
+func TestServiceExitDoesNotHidePanic(t *testing.T) {
+	for _, phase := range []string{"OnStart", "Handler"} {
+		t.Run(phase, func(t *testing.T) {
+			local := newCallTestRuntime(t, Config{})
+			healthyID, err := local.CreateService(context.Background(), &exitProbe{})
+			if err != nil {
+				t.Fatal(err)
+			}
+			var stops atomic.Int32
+			service := &exitProbe{
+				stop: func(context.Context) error {
+					stops.Add(1)
+					return nil
+				},
+			}
+			if phase == "OnStart" {
+				service.start = func(_ context.Context, ctx ServiceContext) error {
+					ctx.Exit()
+					panic("private startup detail")
+				}
+				id, err := local.CreateService(context.Background(), service)
+				if id != 0 || !errors.Is(err, ErrServicePanicked) {
+					t.Fatalf("startup result: id=%d error=%v", id, err)
+				}
+			} else {
+				service.handle = func(ctx CommandContext) (any, error) {
+					ctx.Exit()
+					panic("private handler detail")
+				}
+				id, err := local.CreateService(context.Background(), service)
+				if err != nil {
+					t.Fatal(err)
+				}
+				value, err := local.Call(context.Background(), id, callTestCommand)
+				if value != nil || !errors.Is(err, ErrServicePanicked) {
+					t.Fatalf("Handler result: value=%v error=%v", value, err)
+				}
+				waitExitedService(t, local, id)
+				if err := local.Send(id, callTestCommand); !errors.Is(err, ErrServiceClosed) {
+					t.Fatalf("failed service admission: %v", err)
+				}
+			}
+			if stops.Load() != 1 || local.Inspect().PendingCallCount != 0 {
+				t.Fatal("panic cleanup incomplete or repeated")
+			}
+			if _, err := local.Call(context.Background(), healthyID, callTestCommand); err != nil {
+				t.Fatalf("healthy service affected: %v", err)
+			}
+		})
+	}
+}
+
 func waitExitedService(t *testing.T, local *Runtime, id ServiceID) {
 	t.Helper()
 	waitRuntimeInspection(t, local, func(value RuntimeInspection) bool {
