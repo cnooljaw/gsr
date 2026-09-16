@@ -2,7 +2,7 @@
 
 ## 状态
 
-Accepted，2026-09-16 用户确认；待实现。具体 Cluster 能力取得及 Source 绑定接口仍待收口。
+Accepted，2026-09-16 用户确认；待实现。Cluster 能力入口确定为应用层 `gsr.ServiceContext.Cluster()`。
 
 本裁决替代旧设计中节点级 CommandCodecRegistry 作为远端命令准入清单的要求，以及要求应用理解 app.Host 的使用模型。不改变 Core 与 Cluster 的职责边界。
 
@@ -23,16 +23,21 @@ Accepted，2026-09-16 用户确认；待实现。具体 Cluster 能力取得及 
 - 帧边界、长度、深度、载荷上限及解码校验继续保留；非法输入不能进入 Handler。不支持编码的参数明确失败，Go 指针和任意自定义对象不会自动获得跨进程语义。
 - Codec 不是权限表；访问控制如有需求应单独设计。取消清单意味着合法但未知命令会进入目标 Mailbox，仍受有界 admission 约束。
 - 业务来源仍由框架绑定。节点唯一 Cluster 不等于唯一发送 Service；不得以共享可变的“当前 Service”推断 Source。
+- 应用 Service 通过 `cluster := self.Cluster()` 取得绑定当前 Service 的能力入口。框架从 `self.Self()` 绑定调用来源，而不是从收到消息的 `CommandContext.Source()` 继承上一跳；业务不传 source、不调用 Client 构造器，也不手工注入 Host/Cluster。
+- 每节点仍只有一份 Cluster 资源。来源绑定入口只是使用视图，不创建独立连接、队列、PendingCall 表或后台任务，不需要业务单独关闭。
+- Cluster 能力组合放在应用层 `gsr.ServiceContext` / `gsr.CommandContext`；Core 的 `runtime.ServiceContext` 不依赖 Cluster，不引入通用能力注册容器。新 Service 由框架接线，业务仅传实例。
+- 绑定入口遵守所属 Service 上下文的使用范围，不得借给其它 Service 或异步任务；节点唯一不授权进程级“当前 Service”变量。MainService 退出不能关闭其它 Service 使用的共享 Cluster。
 
 ## 目标业务形状
 
-以下是方向示意，不是当前可编译 API。cluster 表示当前节点能力；它如何取得和绑定来源尚未裁决。
+以下是已确认的目标形状，不是当前可编译 API。cluster 是通过 self.Cluster() 取得的当前 Service 绑定入口，不是全局包状态。
 
 ```go
 // main：运行环境统一处理启动、进程等待及关闭。
 err := gsr.Run(config, &MainService{})
 
 // MainService.OnStart：每一步照常检查 error。
+cluster := self.Cluster()
 id, err := self.CreateService(ctx, &EchoService{})
 err = cluster.Register("echo", id)
 err = cluster.Open("battle")
@@ -46,7 +51,7 @@ value, err = cluster.Call(ctx, "battle", "echo", echoCommand, "hello")
 
 ## 实施顺序与验收
 
-1. 先明确 Service 如何取得 cluster 并自动绑定来源，避免将 Host 换名后再暴露同样的组装负担。
+1. 按 self.Cluster() 落地应用层上下文与框架自动来源绑定，避免将 Host 换名后再暴露同样的组装负担。验证多个 Service 交错调用时来源不串、收到非零 Source 的 Service 转调时使用自身 ID，以及同进程独立节点不串资源。
 2. 调整协议契约和测试，再移除节点级 Command codec 清单；验证不同 Service 复用编号、未知 Send 丢弃、未知 Call 及时报错，以及坏载荷仍被拦截。
 3. 收口运行入口、名称注册和按节点表 Open，将双节点示例改成目标写法；不为旧 Host 或 registry 添加迁移别名。
 4. 验证多 Service 并发来源隔离、仅出站节点、初始化回滚、有序关闭，以及双进程恢复。

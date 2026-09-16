@@ -2,6 +2,8 @@
 
 ## Glossary
 
+- **Service 绑定的 Cluster 入口（目标接口，待实现）**：应用层通过 `self.Cluster()` 取得；框架绑定当前 Service 的 Self ID，而非消息的 Source。多个入口共享节点唯一 Cluster，不各自拥有连接或关闭责任；业务不手工注入 Host/Cluster，不通过全局状态推断当前 Service。
+
 > 迁移说明：[ADR 0011](docs/adr/0011-service-first-application-api.md) 已确认但未实现。目标是每节点一个 Runtime/Cluster，MainService 集中组装，业务不感知 Host；CommandID 由目标 Service 解释、跨 Service 可复用，不区分本地/远程。下文 Host、CommandCodecRegistry 与 ClusterClient 组装描述属于待替换的当前实现。
 
 - **应用宿主（app.Host）**：Core 之外的具体组装 owner，统一创建 Runtime、Cluster、Logger、启动普通 MainService，并负责初始化回滚与固定顺序关闭。不是 ServiceManager、全局 Runtime 或通用组件容器；业务仍通过自身 ServiceContext 通信。

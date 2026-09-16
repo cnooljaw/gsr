@@ -6,6 +6,8 @@ GSR 学习 Skynet 的核心设计方法：Service 使用 Runtime 内的局部数
 
 ## 1. 最小 Core
 
+ADR 0011 的应用层接口已进一步确认：业务使用 `cluster := self.Cluster()`，由框架绑定当前执行 Service 的 Self ID，不继承收到消息的 Source，不要求业务注入 Cluster 或创建 Client。所有绑定入口共享节点唯一 Cluster 的连接、队列及生命周期。能力组合位于应用层 `gsr.ServiceContext` / `gsr.CommandContext`，不将 Cluster 引入 Core 的 `runtime.ServiceContext`。该接口待实现，不使用全局单例或 goroutine-local 推断当前 Service。
+
 GSR Core 只建立以下模型：
 
 ```text
