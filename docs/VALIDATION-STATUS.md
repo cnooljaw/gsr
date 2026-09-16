@@ -4,6 +4,8 @@
 
 ## 已覆盖的运行链
 
+应用 Timer 身份切片：TestServiceTimerPreservesOwnIdentity 经 gsr.Run 在 OnStart 登记零延时 Timer，确认回调 Source 为零、Self 为拥有者；回调发起的本地 Call 使用拥有者来源，绑定 ClusterClient 仍使用 Self，实际排空的 JSON 日志也记录拥有者 ServiceID。相关测试、全仓测试、vet 和 race 通过；未修改生产代码，此测试不包含远端 Timer 调用或计时精度测量。
+
 应用子 Service 创建失败隔离切片：TestServiceChildStartupFailureIsolation 从 gsr.Run / self.CreateService 覆盖 OnStart 返回错误、panic 和 typed nil。失败不发布有效 ID，已进入启动的实例停止一次，无效实例不调用生命周期；后续健康实例获得不同 ID，Call 成功且 Source 为创建者，最终正常停止。相关测试、全仓测试、vet 和 race 通过；未修改生产实现，未重跑跨进程演练。
 
 应用节点配置切片：新增 Run 非法节点表测试，覆盖空名称、缺失 host/port、非数字或越界端口、非法 host 分隔符及未加括号的 IPv6，确认业务入口不会执行。节点表拆分测试覆盖域名、IPv6、端口上下界、端口零仅保留在监听表，以及输入表/监听表/出站表互不共享 map。相关测试、全仓测试和 vet 通过；未修改生产实现或并发逻辑，本轮不重复运行 race 和跨进程演练。

@@ -1,7 +1,9 @@
 package gsr
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"io"
 	"sync/atomic"
@@ -11,6 +13,80 @@ import (
 	"github.com/cnooljaw/gsr/logging"
 	"github.com/cnooljaw/gsr/runtime"
 )
+
+// 验证 Timer 消息来源为零，但回调发起的新调用与日志仍使用当前 Service 身份。
+func TestServiceTimerPreservesOwnIdentity(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	var output bytes.Buffer
+	var target, owner runtime.ServiceID
+	result := make(chan error, 1)
+	entry := &probeService{
+		start: func(ctx context.Context, self ServiceContext) error {
+			owner = self.Self()
+			var err error
+			target, err = self.CreateService(ctx, &probeService{handle: func(current CommandContext) (any, error) {
+				return current.Source(), nil
+			}})
+			if err != nil {
+				return err
+			}
+			_, err = self.After(0, 1)
+			return err
+		},
+		handle: func(current CommandContext) (any, error) {
+			defer cancel()
+			var err error
+			if current.Source() != 0 || current.Self() != owner {
+				err = errors.New("timer confused source and self")
+			} else if current.Cluster().client.Source() != owner {
+				err = errors.New("timer callback cluster client lost owner")
+			} else {
+				var source any
+				source, err = current.Call(ctx, target, 1)
+				if err == nil && source != owner {
+					err = errors.New("timer callback forwarded zero source")
+				}
+			}
+			err = errors.Join(err, current.Logger().Info("timer handled"))
+			result <- err
+			return nil, err
+		},
+	}
+	if err := Run(ctx, Config{Logging: logging.Config{Writer: &output}}, entry); err != nil {
+		t.Fatal(err)
+	}
+	select {
+	case err := <-result:
+		if err != nil {
+			t.Fatal(err)
+		}
+	default:
+		t.Fatal("timer handler did not complete")
+	}
+	decoder := json.NewDecoder(&output)
+	found := false
+	for {
+		var record struct {
+			Service runtime.ServiceID `json:"service"`
+			Message string            `json:"message"`
+		}
+		if err := decoder.Decode(&record); err == io.EOF {
+			break
+		} else if err != nil {
+			t.Fatal(err)
+		}
+		if record.Message == "timer handled" {
+			found = true
+			if record.Service != owner || owner == 0 {
+				t.Fatalf("log service=%d, want %d", record.Service, owner)
+			}
+		}
+	}
+	if !found {
+		t.Fatal("timer log was not drained")
+	}
+}
 
 // 验证应用上下文拒绝无效子实例并隔离启动错误或 panic，后续创建与调用仍正常且来源不串。
 func TestServiceChildStartupFailureIsolation(t *testing.T) {
