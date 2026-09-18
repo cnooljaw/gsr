@@ -126,16 +126,31 @@ message ErrorResponse {
 
 已确认方向及实施约束：
 
-- 每连接使用新的 X25519 临时密钥；私钥不发送，密钥仅存内存，连接结束后废弃。不按账号或跨连接复用，密钥和敏感明文不得写入日志。
+- 每连接由客户端和服务端分别使用 CSPRNG 生成一对新的 X25519 临时密钥。私钥为 32 字节，仅在本端内存中保存；公钥为原始 32 字节，分别放入握手请求和响应。私钥、shared secret 和 macKey 不发送、不写日志，连接结束后废弃；不按账号或跨连接复用。
+- 双方分别计算 `X25519(client_private_key, server_public_key)` 和 `X25519(server_private_key, client_public_key)`，结果必须一致；拒绝全零 shared secret。不要手工修改私钥位或自行实现曲线运算，交给标准 X25519 实现处理。
 - 握手可信性依赖正确验证服务端身份的 WSS；无额外身份认证的 X25519 不承诺抵御能替换公钥的本机主动代理。TLS 终止位置和之后的信任边界需在部署时明确。
 - 同连接串行执行：检查最小长度 → 读取大端 seq → 使用原始 Envelope 字节校验 MAC → 检查 seq 大于 lastSeq 并立即更新 → 解码及校验 Envelope → 校验 msg_id、方向、request_id 和 payload → 投递 Agent。认证失败不能推进 lastSeq；认证成功但消息未知或不合法时也消费该 seq。投递失败不能回退，序号接纳不代表业务执行成功。
 - 协商前只接受 C2S_KEY_EXCHANGE_REQUEST，服务端只回复 S2C_KEY_EXCHANGE_RESPONSE；完成后只接受带 seq/MAC 的业务上行，拒绝重复握手、错误方向、未知 msg_id 及无 MAC 降级。
 - 握手失败直接关闭连接，不进入 Agent，也不发送业务 ErrorResponse；握手成功后双方才启用派生的 macKey。
 - 必须设置消息大小、握手等待和接纳容量上限；具体默认值待裁决，Protobuf 不意味着无限消息大小。
 
-密码参数草案，实施前需与完整握手一起收口：
+已确认的密码参数：
 
-- X25519 → HKDF-SHA256 → 32 字节上行 macKey，绑定双方公钥、协议标识及 client→server 方向；拒绝全零共享秘密。精确 salt/info 编码待确定，不能让两端自行猜测。
+```text
+salt_input = ASCII("gsr/wss/hkdf-salt/v1")
+              || client_public_key
+              || server_public_key
+salt = SHA-256(salt_input)
+
+info = ASCII("gsr/wss/c2s-hmac-sha256/v1")
+
+prk    = HKDF-Extract-SHA256(salt, shared_secret)
+macKey = HKDF-Expand-SHA256(prk, info, 32)
+```
+
+- 公钥按客户端、服务端顺序拼接，使用原始 32 字节；不使用 Base64、十六进制或 Protobuf 编码后的握手包。
+- `salt` 可以公开；`info` 用于协议、方向和用途隔离。`v1` 是固定域分离标签，不是客户端可选择的版本字段。
+- 不协商算法，不把 `seq`、`request_id` 或业务数据放入 KDF。未来如果增加服务端到客户端的应用 MAC，必须使用不同的 `info` 派生独立密钥。
 - MAC 使用 HMAC-SHA256 的前 16 字节，覆盖大端 seq 原始 8 字节和 Envelope 原始 Protobuf 字节，不包含标签自身。使用常量时间比较，必须在 Protobuf 解码前校验，不能重新序列化 Envelope 后验 MAC；因此不要求 deterministic serialization。
 
 依据：[X25519](https://www.rfc-editor.org/rfc/rfc7748.html)、[HKDF](https://www.rfc-editor.org/rfc/rfc5869.html)、[HMAC](https://www.rfc-editor.org/rfc/rfc2104.html)。这是标准原语的组合设计，仍需完整握手定义与跨语言测试，不能把原语标准当作组合协议已审计的证明。
@@ -153,6 +168,6 @@ message ErrorResponse {
 
 ## 下一步与验收
 
-Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/通知/推送独立编号，共享 MsgId 常量与 Gate/Agent 注册表，控制握手消息，大端 seq 和原始字节 MAC 验证顺序，以及独立 DebugGate 已确认。后续逐项收口：错误码、HKDF 精确参数、Agent 归属、容量与关闭顺序。一次讨论一个问题，未确认前不新增公开 API 或通用安全插件框架。
+Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/通知/推送独立编号，共享 MsgId 常量与 Gate/Agent 注册表，控制握手消息，大端 seq 和原始字节 MAC 验证顺序，固定 HKDF 参数，以及独立 DebugGate 已确认。后续逐项收口：错误码、跨语言密码固定向量、Agent 归属、容量与关闭顺序。一次讨论一个问题，未确认前不新增公开 API 或通用安全插件框架。
 
 实施按共享 Envelope/注册表 → DebugGate 本地闭环 → 生产 Gate 握手及上行认证 → Gate/Agent 往返 → 失败、背压和关闭推进。验证应包含跨语言固定向量、两种 Gate 的边界隔离、跨连接旧包拒绝、同连接重复拒绝、MAC 篡改和失败不推进序号、未知 msg_id、阶段/方向错误、超限、request_id 超时与迟到、编号耗尽、慢客户端和断开回收。测试不替代密码协议审查。
