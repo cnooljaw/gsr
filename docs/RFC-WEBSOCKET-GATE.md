@@ -184,14 +184,19 @@ Gate 的网络/安全错误使用 Runtime 共享 Logger，按单连接、错误�
 客户端 ↔ WebSocket Gate ↔ Agent Service ↔ 业务 Service。
 
 - Gate 管连接、收发、上行认证和容量，剥离安全封装后交给 Agent；I/O 任务不得直接修改业务状态。
-- Agent 是普通 Service，解释客户端命令与数据并中转到对应业务 Service。客户端不能指定任意内部 ServiceID 或伪造 Source。
+- `AgentService` 是普通 Service，原则上一个连接对应一个 AgentService，负责解释客户端命令与数据并中转到对应业务 Service。客户端不能指定任意内部 ServiceID 或伪造 Source。
 - Agent 使用现有 Send/Call；内部 Handler 通过 return 完成 Reply，客户端响应由 Agent 组织并交 Gate 发出。不增加 Core 手工 Reply。
 - Agent 内 Call 仍是 run-to-completion，等待时该 Agent 不处理下一条消息，其它 Service 仍可运行。
-- Agent 与连接/玩家映射、业务 payload 解码归属、断开和退出顺序尚待裁决，不默认所有客户端共用一个串行 Agent。
+- Gate 仍是连接 owner：持有 WebSocket、握手状态、读写队列和关闭权；Agent 不接触 `net.Conn` 或 Gate 内部连接表。Gate 完成安全接纳后，把已认证 Envelope 投递给对应 Agent；Agent 通过受限的客户端会话能力发送 Response/Push。
+- `AgentService` 组合通用客户端会话、request_id 关联、响应/推送和断开清理能力，并持有一个具体的 `ProtocolHandler` 组件；`ProtocolHandler` 不是 Service，没有自己的 ServiceID、Mailbox 或生命周期。
+- 例如查询房间人数时，`GameProtocol` 解码 `GetRoomCountRequest`，在当前 Agent Handler 内通过 `self.Call` 调用 `RoomService`，得到结果后返回 `GetRoomCountResponse`；`AgentService` 使用原 request_id 编码并交给客户端会话发送。客户端响应能力不是 Core 的手工 Reply，也不完成 Core Session。
+- 具体 `GameProtocol`、`KickProtocol` 等组件只实现自己的 msg_id、Protobuf 类型和业务 Service 路由，不了解 WebSocket、seq、MAC、关闭码或 Runtime 内部调度。需要独立生命周期或状态所有权的部分，应另建业务 Service，由 Agent 使用 Send/Call 访问，不把两个 Service 嵌套成一个运行单元。
+- 不建立继承式或不断增长的公开 `BaseAgent`。Go embedding 只有在不会泄漏内部生命周期和方法集合时才可作为局部实现细节；具体 `ProtocolHandler` 接口在出现真实实现和测试边界后再定，不提前扩张 Core API。
+- 正常断开时 Gate 停止接纳新消息、使客户端会话能力失效并只通知 Agent 一次；Agent 完成自己的清理后退出。Gate 不等待或强杀阻塞的 Agent，Agent 退出也不关闭 Runtime 或其它 Agent。
 - Core Message、ServiceID、Cluster wire 不变；客户端 Envelope、seq、macKey 不进入 Core 或 Cluster 协议。
 
 ## 下一步与验收
 
-Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/通知/推送独立编号，共享 MsgId 常量与 Gate/Agent 注册表，控制握手消息，大端 seq 和原始字节 MAC 验证顺序，固定 HKDF 参数，独立 DebugGate，以及 WebSocket 关闭码和 Gate/Agent/业务错误归属已确认。后续逐项收口：错误码、跨语言密码固定向量、Agent 归属、容量与关闭顺序。一次讨论一个问题，未确认前不新增公开 API 或通用安全插件框架。
+Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/通知/推送独立编号，共享 MsgId 常量与 Gate/Agent 注册表，控制握手消息，大端 seq 和原始字节 MAC 验证顺序，固定 HKDF 参数，独立 DebugGate，WebSocket 关闭码和 Gate/Agent/业务错误归属，以及“一连接一个 AgentService、业务协议通过 ProtocolHandler 组件组合接入”的边界已确认。后续逐项收口：错误码、跨语言密码固定向量、Agent 的具体组装 API、容量与关闭顺序。一次讨论一个问题，未确认前不新增公开 API 或通用安全插件框架。
 
 实施按共享 Envelope/注册表 → DebugGate 本地闭环 → 生产 Gate 握手及上行认证 → Gate/Agent 往返 → 失败、背压和关闭推进。验证应包含跨语言固定向量、两种 Gate 的边界隔离、跨连接旧包拒绝、同连接重复拒绝、MAC 篡改和失败不推进序号、未知 msg_id、阶段/方向错误、超限、request_id 超时与迟到、编号耗尽、慢客户端和断开回收。测试不替代密码协议审查。

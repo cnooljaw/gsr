@@ -1,6 +1,6 @@
 # GSR API 设计规范
 
-客户端接入另见 [WebSocket Gate 草案](RFC-WEBSOCKET-GATE.md)：生产 Gate 的 WSS 上行使用 seq + Protobuf Envelope + MAC，下行只使用 Envelope；独立 DebugGate 仅传输 Envelope。Envelope 使用 msg_id、request_id(uint32) 和 payload，由 Agent Service 中转。C/S request_id、两种 Gate、连接认证、关闭码和错误归属均在 Core/Cluster 之外。Gate 只负责传输与安全边界，Agent 负责已认证 Envelope 的协议路由，业务 Service 负责业务拒绝；标准关闭码和结构化日志边界见 RFC。首版不实现 DES 或旧 12 字节头兼容。该能力尚未实现，公开 API、schema 与握手细节待裁决，不改变本文已有运行接口。
+客户端接入另见 [WebSocket Gate 草案](RFC-WEBSOCKET-GATE.md)：生产 Gate 的 WSS 上行使用 seq + Protobuf Envelope + MAC，下行只使用 Envelope；独立 DebugGate 仅传输 Envelope。Envelope 使用 msg_id、request_id(uint32) 和 payload，由 `AgentService` 中转。C/S request_id、两种 Gate、连接认证、关闭码和错误归属均在 Core/Cluster 之外。Gate 只负责传输与安全边界，AgentService 负责客户端会话并组合具体 `ProtocolHandler`；协议组件调用业务 Service 并组织客户端响应，业务 Service 负责业务拒绝。标准关闭码和结构化日志边界见 RFC。首版不实现 DES 或旧 12 字节头兼容。该能力尚未实现，公开 API、schema 与握手细节待裁决，不改变本文已有运行接口。
 
 > [ADR 0011](adr/0011-service-first-application-api.md) 的应用入口已落地：`gsr.Run(ctx, config, mainService)`、`self.Cluster()`、名称注册和按节点表 Open。业务不再组装 Host 或 Client，不登记节点级命令清单；未知 Send 由目标丢弃，未知 Call 返回 ErrUnknownCommand。下文 runtime/cluster 包的底层接口仍供基础设施使用，不是应用必须理解的启动步骤。
 
@@ -70,6 +70,7 @@ Skynet 的接口形状是 API 设计的重要参照，但 GSR 的具体契约由
 - Redis、HTTP 等 I/O 可以直接调用，但必须设置有限超时，并接受等待期间当前 Service 不处理后续消息；不能接受时，再考虑独立 Service 或职责明确的有界外部 worker，不因依赖某项技术就自动 Service 化。
 - Service 提供运行边界，不等于进程级隔离，也不能强杀阻塞代码；状态所有权与禁止业务自行启动 goroutine 的规则不变。
 - 为 Runtime 自身提供启动、收尾或故障支撑的基础设施，若普通 Service 不能满足其生命周期，可以保留职责明确、数量有界的独立运行组件。例外必须说明具体原因，并负责取消、关闭、等待、并发上限、panic 与错误归属，不能成为随意自建运行框架的理由。
+- 通用能力优先通过组合和窄能力接口提供，不建立继承式的公开基类；尤其不要用不断增长的 `BaseAgent`、`BaseService` 承载不同业务的协议和生命周期。只有真实的多实现、测试隔离或边界依赖倒置需要时，才提取接口。
 
 Logger 保持现有实现：由应用在 Runtime、Cluster 收尾后最后关闭，正常关闭时排空已接纳日志；当前普通 Service 随 Runtime 停止，其 Mailbox 停止时清空待处理消息，不能直接满足上述契约。Logger 的独立单写入者是有明确生命周期理由的基础设施例外，不新增 LoggerService，也不改变现有日志 API。
 
