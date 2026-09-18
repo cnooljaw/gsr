@@ -12,7 +12,7 @@ type GateConfig struct {
 
 Gate 的网络 goroutine 把新连接转成 GateService 的内部事件；GateService 在自己的 Service runner 中调用 `NewAgent` 和 `self.CreateService`。回调只构造连接私有的 Service，不执行 socket I/O、不持有 Runtime 或 Gate 内部连接表；构造或 OnStart 失败只关闭当前连接，不影响其它 Agent。
 
-Gate 的资源边界只保留连接数、握手等待、单帧大小和每连接出站队列四类有限上限；入站直接受 Agent Mailbox 容量约束，不再增加无界 Gate 中间队列。GateService 停止时先停止监听和新消息接纳，使 `ClientSession` 失效，再关闭连接、最多通知 Agent 一次并等待 Gate 自己的 I/O owner；Runtime 独立停止 Agent，不由 Gate 等待或强杀。
+Gate 的资源边界只保留连接数、握手等待、单帧大小和每连接出站队列四类有限上限。初始握手等待默认 5 秒，完整 WebSocket 二进制帧默认 4 MiB（生产帧包含 seq 和 MAC），`MaxConnections` 必须由部署显式配置且零值不表示无限，出站队列按编码后字节数限制；入站直接受 Agent Mailbox 容量约束，不再增加无界 Gate 中间队列。达到上限时分别拒绝新连接、关闭超时/超限连接、停止当前连接入站或返回 `ErrClientQueueFull`，不生成业务 `ErrorResponse`。GateService 停止时先停止监听和新消息接纳，使 `ClientSession` 失效，再关闭连接、最多通知 Agent 一次并等待 Gate 自己的 I/O owner；Runtime 独立停止 Agent，不由 Gate 等待或强杀。Gate 至少提供 accepted、rejected、handshake timeout、frame too large、inbound mailbox full 和 outbound queue full 的有限计数，不记录原始载荷或未认证字段。
 
 > [ADR 0011](adr/0011-service-first-application-api.md) 的应用入口已落地：`gsr.Run(ctx, config, mainService)`、`self.Cluster()`、名称注册和按节点表 Open。业务不再组装 Host 或 Client，不登记节点级命令清单；未知 Send 由目标丢弃，未知 Call 返回 ErrUnknownCommand。下文 runtime/cluster 包的底层接口仍供基础设施使用，不是应用必须理解的启动步骤。
 

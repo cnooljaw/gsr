@@ -236,6 +236,16 @@ Gate 的网络/安全错误使用 Runtime 共享 Logger，按单连接、错误�
 
 Gate 只设置四类资源上限：最大连接数、握手最长等待、单条 Envelope 最大帧大小和每连接出站队列容量。入站不再增加另一套无界 Gate 队列，已绑定 Agent 的消息直接受其 Runtime Mailbox 容量约束；Mailbox 满载时 Gate 停止当前连接的入站接纳并关闭连接，不无限等待或缓存。
 
+初始容量口径如下：
+
+- 握手最长等待默认 `5s`。
+- `MaxFrameBytes` 默认 `4 MiB`，按完整 WebSocket 二进制消息计算；生产消息包含 8 字节 seq、Envelope 和 16 字节 MAC，DebugGate 消息包含完整 Envelope。
+- `MaxConnections` 必须由每个部署显式配置为正数；零值不表示无限连接，GSR 不替所有部署猜一个默认连接数。
+- 出站队列按编码后应用消息的字节数限制，而不是按消息条数限制；慢客户端不能仅靠大量小消息或单个大消息绕过内存上限。
+- 入站继续复用 Agent 的 Runtime Mailbox 容量。达到上限时不建立第二个无限队列，当前连接停止接纳并关闭；出站队列满只返回稳定的 `ErrClientQueueFull`。
+
+容量边界只产生 Gate 结构化诊断，不生成业务 `ErrorResponse`。Gate 至少累计 accepted、rejected、handshake timeout、frame too large、inbound mailbox full 和 outbound queue full 六类计数；日志不记录原始载荷、密钥或未认证字段。
+
 Gate 停止按以下顺序执行：
 
 ```text
