@@ -4,6 +4,8 @@
 
 ## 阅读顺序
 
+下一阶段见 [WebSocket Gate、客户端协议与 Agent](RFC-WEBSOCKET-GATE.md)：WSS、Protobuf Envelope、X25519/HKDF 上行 MAC，以及单连接不复用的 uint32 C/S Session；首版不实现旧头兼容或 DES。API、schema 与完整握手细节尚待裁决，未实现。
+
 应用入口见 [ADR 0011：以 Service 为中心的应用入口与统一 Command](adr/0011-service-first-application-api.md) 和 [双节点示例](../examples/twonode/README.md)：gsr.Run 启动 MainService，业务通过 self.Cluster() 通信，不需要 Host。
 
 初次运行可先看 [最小 CounterService 示例](../examples/counter/README.md)，只涉及本地 Service、Send、Call 和关闭。

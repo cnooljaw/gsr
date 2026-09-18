@@ -2,6 +2,11 @@
 
 ## Glossary
 
+- **C/S Envelope（设计中）**：Protobuf 应用消息，字段为 kind、command、session、payload，编号依次为 1–4；握手类别不占业务命令号。正常回复/推送使用 BUSINESS，通用请求失败使用 ERROR 和 ErrorResponse（code、message），回复回传原 session。首版不使用旧 12 字节头；类别数字、握手细节及错误码待裁决。
+- **C/S Session（设计中）**：Envelope 中的 uint32 客户端请求关联号，0 为 Send/推送、非零为 Request，响应原样回传；单连接从 1 单调分配，不回绕、不复用，耗尽后重连。与 Core/Cluster Session 分离，不作为防重放或幂等凭据。见 [客户端接入草案](docs/RFC-WEBSOCKET-GATE.md)。
+- **C/S seq（设计中）**：独立于 Session 的 uint64 上行业务包序号，单连接从 1 单调递增、不回绕；与 Envelope 原始字节一起接受 MAC 校验，Send 也消耗序号。不得作为业务执行成功或幂等保证。
+- **Agent Service（客户端接入，设计中）**：接收客户端协议并中转到业务 Service 的普通 Service，不是 Cluster ConnectionAgent；不改变 Core 消息和 Reply 模型，连接映射及生命周期尚待裁决。
+
 - **Service 绑定的 Cluster 入口**：应用层通过 `self.Cluster()` 取得；框架绑定当前 Service 的 Self ID，而非消息的 Source。多个入口共享节点唯一 Cluster，不各自拥有连接或关闭责任；业务不手工注入 Host/Cluster，不通过全局状态推断当前 Service。
 
 > [ADR 0011](docs/adr/0011-service-first-application-api.md) 已落地应用入口：每节点一个 Runtime/Cluster，MainService 集中组装，CommandID 由目标解释。下文底层 ClusterClient 等类型属于基础设施，业务不手工构造。
