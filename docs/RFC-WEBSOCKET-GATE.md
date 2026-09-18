@@ -187,11 +187,11 @@ Gate 的网络/安全错误使用 Runtime 共享 Logger，按单连接、错误�
 - `AgentService` 是普通 Service，原则上一个连接对应一个 AgentService，负责解释客户端命令与数据并中转到对应业务 Service。客户端不能指定任意内部 ServiceID 或伪造 Source。
 - Agent 使用现有 Send/Call；内部 Handler 通过 return 完成 Reply，客户端响应由 Agent 组织并交 Gate 发出。不增加 Core 手工 Reply。
 - Agent 内 Call 仍是 run-to-completion，等待时该 Agent 不处理下一条消息，其它 Service 仍可运行。
-- Gate 仍是连接 owner：持有 WebSocket、握手状态、读写队列和关闭权；Agent 不接触 `net.Conn` 或 Gate 内部连接表。Gate 完成安全接纳后，把已认证 Envelope 投递给对应 Agent；Agent 通过受限的客户端会话能力发送 Response/Push。
-- `AgentService` 组合通用客户端会话、request_id 关联、响应/推送和断开清理能力，并持有一个具体的 `ProtocolHandler` 组件；`ProtocolHandler` 不是 Service，没有自己的 ServiceID、Mailbox 或生命周期。
+- Gate 仍是连接 owner：持有 WebSocket、握手状态、读写队列和关闭权；Agent 不接触 `net.Conn` 或 Gate 内部连接表。Gate 完成安全接纳后，把已认证 Envelope 投递给对应 Agent；Agent 通过受限的客户端会话能力发送完整的 Envelope。
+- `AgentService` 组合通用客户端会话、request_id 关联、出站 Envelope 组织和断开清理能力，并持有一个具体的 `ProtocolHandler` 组件；`ProtocolHandler` 不是 Service，没有自己的 ServiceID、Mailbox 或生命周期。
 - 例如查询房间人数时，`GameProtocol` 解码 `GetRoomCountRequest`，在当前 Agent Handler 内通过 `self.Call` 调用 `RoomService`，得到结果后返回 `GetRoomCountResponse`；`AgentService` 使用原 request_id 编码并交给客户端会话发送。客户端响应能力不是 Core 的手工 Reply，也不完成 Core Session。
 - Gate 到 Agent 的入站路径使用受信任的 Runtime-owned 单向投递：Gate 完成 WebSocket、握手、MAC 和 seq 校验后，把独占的客户端消息快照投递到 AgentService Mailbox，Source 固定为零。这个内部 Command 不属于客户端 `msg_id`，不进入业务协议，也不作为公开 Gate API。
-- Agent 到 Gate 的出站路径使用绑定当前连接的 `ClientSession` 能力。`Reply`、`Push` 和 `Close` 只操作 Gate 拥有的有界写队列和连接状态，不暴露 `net.Conn`、Gate ServiceID 或连接表；写入 socket 仍由 Gate 的写循环完成。写队列接纳成功不代表客户端已经收到数据。
+- Agent 到 Gate 的出站路径使用绑定当前连接的 `ClientSession` 能力，最小接口只有 `Send(Envelope)` 和 `Close`。Agent/ProtocolHandler 在调用前负责 `msg_id`、`request_id`、payload 类型以及 Response/Push 方向的协议校验；Response 通过复制原请求的 `request_id` 构造，Push 使用 `request_id == 0`，这些语义不由 Gate 判断，也不重复作为方法参数传递。ClientSession 的 `Send` 不改写或推断 Envelope，只负责检查连接状态、出站大小限制并把完整 Envelope 放入 Gate 的有界写队列；写入 socket 仍由 Gate 的写循环完成。写队列接纳成功不代表客户端已经收到数据。
 - Gate 与 Agent 的连接通知使用单向内部事件；断开时 Gate 先使 ClientSession 失效，再最多通知 Agent 一次，不等待或强杀 Agent。Agent 与 RoomService、PlayerService 等业务 Service 才使用普通 ServiceContext.Send/Call；业务协议代码不需要知道上述 Gate/Agent 连接细节。
 - 具体 `GameProtocol`、`KickProtocol` 等协议组件由业务项目实现，只实现自己的 msg_id、Protobuf 类型、请求校验、简单收发和业务 Service 路由，不了解 WebSocket、seq、MAC、关闭码或 Runtime 内部调度。Agent/协议组件可以持有连接私有的少量会话状态，例如 playerID、登录状态、roomID、seatIndex、客户端版本和临时流程状态；但不拥有跨连接共享、需要恢复或需要持久化的房间、玩家资产、战斗等权威业务状态，也不承担复杂业务流程。后者应由业务 Service 负责，Agent 使用 Send/Call 访问，不把两个 Service 嵌套成一个运行单元。
 - Agent 内的会话状态只由该 Agent 串行读写；roomID、playerID 等引用可以作为当前连接的缓存，但不能被当作业务事实来源。断线或重连后，需要从拥有状态的业务 Service 重新确认。
