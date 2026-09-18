@@ -232,9 +232,33 @@ Gate 的网络/安全错误使用 Runtime 共享 Logger，按单连接、错误�
 - 正常断开时 Gate 停止接纳新消息、使客户端会话能力失效并只通知 Agent 一次；Agent 完成自己的清理后退出。Gate 不等待或强杀阻塞的 Agent，Agent 退出也不关闭 Runtime 或其它 Agent。
 - Core Message、ServiceID、Cluster wire 不变；客户端 Envelope、seq、macKey 不进入 Core 或 Cluster 协议。
 
+## 已确认：Gate 容量与关闭顺序
+
+Gate 只设置四类资源上限：最大连接数、握手最长等待、单条 Envelope 最大帧大小和每连接出站队列容量。入站不再增加另一套无界 Gate 队列，已绑定 Agent 的消息直接受其 Runtime Mailbox 容量约束；Mailbox 满载时 Gate 停止当前连接的入站接纳并关闭连接，不无限等待或缓存。
+
+Gate 停止按以下顺序执行：
+
+```text
+停止 Listener 和新连接接纳
+        ↓
+停止新客户端消息接纳
+        ↓
+使所有 ClientSession 失效
+        ↓
+关闭 WebSocket，解除 reader/writer 阻塞
+        ↓
+每条连接最多通知 Agent 一次
+        ↓
+丢弃未发送的出站队列并记录统计
+        ↓
+等待 Gate 自己的 I/O owner 退出
+```
+
+Gate 不等待或强杀 Agent。Runtime 独立停止 Agent runner 并调用 Agent 的 `OnStop`；ClientSession 的失效和断开通知必须幂等，避免 Gate 与 Agent 并发停止形成相互等待。容量拒绝和关闭不生成业务 `ErrorResponse`，具体原因进入 Gate 结构化日志。
+
 ## 下一步与验收
 
-Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/通知/推送独立编号，共享 MsgId 常量与 Gate/Agent 注册表，控制握手消息，大端 seq 和原始字节 MAC 验证顺序，固定 HKDF 参数，独立 DebugGate，WebSocket 关闭码和 Gate/Agent/业务错误归属，以及“一连接一个 AgentService、业务协议通过 ProtocolHandler 组件组合接入”的边界已确认。跨语言密码固定向量和 Agent 的 `NewAgent` 组装回调已确认；后续逐项收口容量与关闭顺序，并在 Gate 完成后增加一个命令行 TypeScript 客户端和 GSR 服务端的联调示例。一次讨论一个问题，未确认前不新增公开 API 或通用安全插件框架。
+Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/通知/推送独立编号，共享 MsgId 常量与 Gate/Agent 注册表，控制握手消息，大端 seq 和原始字节 MAC 验证顺序，固定 HKDF 参数，独立 DebugGate，WebSocket 关闭码和 Gate/Agent/业务错误归属，以及“一连接一个 AgentService、业务协议通过 ProtocolHandler 组件组合接入”的边界已确认。跨语言密码固定向量、Agent 的 `NewAgent` 组装回调以及 Gate 的四类容量上限和关闭顺序已确认；后续按实现切片确定默认数值、验收阈值和命令行 TypeScript/GSR 联调示例。一次讨论一个问题，未确认前不新增公开 API 或通用安全插件框架。
 
 联调示例计划放在 `examples/websocket-gate/`：Go 端使用 GSR 组装最小 Gate、Agent 和业务 Service，TypeScript 端使用命令行客户端连接并发送 Envelope。示例不定义新的生产协议或框架，只复用业务项目提供的 Protobuf/MsgId；至少演练正常请求、业务拒绝、ErrorResponse、服务端 Push、request_id 关联、连接关闭和 DebugGate/生产 Gate 的边界。生产 Gate 的 X25519/HKDF/seq/MAC 固定向量验证另列为跨语言测试，不由示例掩盖安全协议审查。
 

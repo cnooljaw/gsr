@@ -12,6 +12,8 @@ type GateConfig struct {
 
 Gate 的网络 goroutine 把新连接转成 GateService 的内部事件；GateService 在自己的 Service runner 中调用 `NewAgent` 和 `self.CreateService`。回调只构造连接私有的 Service，不执行 socket I/O、不持有 Runtime 或 Gate 内部连接表；构造或 OnStart 失败只关闭当前连接，不影响其它 Agent。
 
+Gate 的资源边界只保留连接数、握手等待、单帧大小和每连接出站队列四类有限上限；入站直接受 Agent Mailbox 容量约束，不再增加无界 Gate 中间队列。GateService 停止时先停止监听和新消息接纳，使 `ClientSession` 失效，再关闭连接、最多通知 Agent 一次并等待 Gate 自己的 I/O owner；Runtime 独立停止 Agent，不由 Gate 等待或强杀。
+
 > [ADR 0011](adr/0011-service-first-application-api.md) 的应用入口已落地：`gsr.Run(ctx, config, mainService)`、`self.Cluster()`、名称注册和按节点表 Open。业务不再组装 Host 或 Client，不登记节点级命令清单；未知 Send 由目标丢弃，未知 Call 返回 ErrUnknownCommand。下文 runtime/cluster 包的底层接口仍供基础设施使用，不是应用必须理解的启动步骤。
 
 GSR 学习 Skynet 的核心设计方法：Service 使用 Runtime 内的局部数字地址，本地 Send 与 Call 共用消息管道，Cluster 在 Core 之外完成节点路由和网络编码。GSR 不复制 Lua 的动态类型，而是采用“Skynet 语义，Go 类型系统”。
