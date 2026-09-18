@@ -4,7 +4,7 @@
 
 ## 范围与参考
 
-首版只支持 WebSocket，公网使用 WSS/TLS，以最小业务往返验证接入设计。HTTP 入站/出站、Redis、MySQL 是另一组 Core 外能力，后续分别推进。
+首版只支持 WebSocket，公网使用 WSS/TLS，并额外提供显式开启的内网 DebugGate，以最小业务往返验证接入设计。HTTP 入站/出站、Redis、MySQL 是另一组 Core 外能力，后续分别推进。
 
 Skynet 的 `lualib/snax/gateserver.lua` 通过 socketdriver 消息及 Lua coroutine 管理监听、连接与数据事件；GSR 借鉴职责分离，不照搬 TCP netpack 和 C/Lua 调度。Go I/O 任务必须有明确 owner 管理容量、取消、关闭和等待。
 
@@ -18,11 +18,12 @@ Skynet 的 `lualib/snax/gateserver.lua` 通过 socketdriver 消息及 Lua corout
 连接阶段：Client ↔ Gateway，交换 X25519 公钥
           X25519 shared → HKDF → 上行 macKey
 
-业务上行：seq（8B） | Protobuf Envelope | MAC（16B）
-业务下行：Protobuf Envelope
+生产 Gate 上行：seq（8B） | Protobuf Envelope | MAC（16B）
+生产 Gate 下行：Protobuf Envelope
+DebugGate 上行/下行：Protobuf Envelope
 ```
 
-WSS 提供传输保密和完整性，应用层不再使用 DES 加密；仅上行增加连接绑定的认证与序号检查，下行不添加应用 MAC。握手阶段没有 macKey，使用握手 Envelope，不套业务上行格式。
+生产 Gate 使用 WSS 提供传输保密和完整性，应用层不再使用 DES 加密；仅上行增加连接绑定的认证与序号检查，下行不添加应用 MAC。握手阶段没有 macKey，使用握手 Envelope，不套生产业务上行格式。DebugGate 不做 X25519、seq 或 MAC，直接传输 Envelope。
 
 Envelope 采用 Protobuf 的薄包装，只标识具体消息和请求关联，不把业务字段、Core Command 或 ServiceID 放入其中：
 
@@ -77,6 +78,14 @@ enum MsgId {
 
 `Envelope.msg_id` 保持 `uint32`，枚举只提供共享常量。Gate/Agent 的注册表负责校验方向、payload 类型、request_id 规则和响应关系；数字范围只用于人工整理，不能作为运行时猜测语义的依据。该注册表属于客户端接入层，不进入 Core Runtime，也不限制不同 Service 复用内部 `CommandID`。
 
+## 已确认：生产 Gate 与 DebugGate
+
+- 生产 Gate 负责公网或不可信网络接入：WSS、X25519 握手、上行 seq/MAC、容量和连接生命周期。
+- DebugGate 只面向受信任内网调试：一条 WebSocket 二进制消息就是一份 Protobuf Envelope，不做 X25519 握手、不附加 seq、不校验 MAC。它仍使用同一份 Envelope、MsgId 常量、Gate/Agent 注册表和业务路由。
+- 两者使用不同监听器、端口和显式配置；生产 Gate 不自动降级到 DebugGate，DebugGate 也不根据首包猜测生产格式。DebugGate 默认关闭，启用时应绑定回环地址或明确的内网地址，并由部署防火墙限制访问。
+- DebugGate 没有应用层认证和防重放保证，不能暴露到公网，也不能被当作生产安全模式。业务鉴权仍由 Agent/业务 Service 负责。
+- 两个 Gate 只在 Envelope 解码和 Agent 路由之前共享协议注册表；帧接收和安全校验属于各自适配器，业务路由不复制两套。
+
 ## 已确认：业务回复、通用错误与推送
 
 | 情况 | msg_id | request_id | payload |
@@ -111,7 +120,7 @@ message ErrorResponse {
 - seq 是独立的 uint64 连接序号，所有上行业务包均消耗，包括 request_id=0 的通知。单连接从 1 单调递增，不回绕；Gateway 接受 seq > lastSeq。这个规则额外拒绝同连接重复旧包。
 - seq 在线上使用 8 字节大端序。Laya/TypeScript 实现不得用普通 number 表示完整 uint64，应采用 BigInt 或等效无损表示；uint32 request_id 可以精确表示。
 
-## 连接认证与接收边界
+## 生产 Gate 的连接认证与接收边界
 
 目标是让连接 A 录制的已认证上行包，不能拿到另一条连接 B 直接复用；seq 额外拒绝同连接的重复旧包。不承诺阻止控制客户端、提取密钥后重新计算 MAC 或重新构造业务请求，也不等于登录鉴权或业务幂等。
 
@@ -144,6 +153,6 @@ message ErrorResponse {
 
 ## 下一步与验收
 
-Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/通知/推送独立编号，共享 MsgId 常量与 Gate/Agent 注册表，控制握手消息，以及大端 seq 和原始字节 MAC 验证顺序已确认。后续逐项收口：错误码、HKDF 精确参数、Agent 归属、容量与关闭顺序。一次讨论一个问题，未确认前不新增公开 API 或通用安全插件框架。
+Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/通知/推送独立编号，共享 MsgId 常量与 Gate/Agent 注册表，控制握手消息，大端 seq 和原始字节 MAC 验证顺序，以及独立 DebugGate 已确认。后续逐项收口：错误码、HKDF 精确参数、Agent 归属、容量与关闭顺序。一次讨论一个问题，未确认前不新增公开 API 或通用安全插件框架。
 
-实施按 Envelope 编解码 → 握手及上行认证 → Gate/Agent 往返 → 失败、背压和关闭推进。验证应包含跨语言固定向量、跨连接旧包拒绝、同连接重复拒绝、MAC 篡改和失败不推进序号、未知类别、阶段/方向错误、超限、Session 超时与迟到、编号耗尽、慢客户端和断开回收。测试不替代密码协议审查。
+实施按共享 Envelope/注册表 → DebugGate 本地闭环 → 生产 Gate 握手及上行认证 → Gate/Agent 往返 → 失败、背压和关闭推进。验证应包含跨语言固定向量、两种 Gate 的边界隔离、跨连接旧包拒绝、同连接重复拒绝、MAC 篡改和失败不推进序号、未知 msg_id、阶段/方向错误、超限、request_id 超时与迟到、编号耗尽、慢客户端和断开回收。测试不替代密码协议审查。
