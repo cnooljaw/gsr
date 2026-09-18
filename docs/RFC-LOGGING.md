@@ -46,6 +46,8 @@ err := gsr.Run(ctx, gsr.Config{
 
 Diagnostics 保留独立观测用途：Runtime/Cluster 在产生诊断的同步路径直接写 Logger，然后投递观测事件。不得再消费 Diagnostics 转发到同一 Logger，否则会重复记录并扭曲顺序。此前“外层消费 Diagnostics 作为主日志”的方案已被此裁决替代。
 
+客户端接入的 WebSocket Gate 也使用同一个共享 Logger，直接记录握手、帧、seq、MAC 和连接关闭等传输/安全错误；Gate 不把这些错误包装成业务 Service 日志。已认证 Envelope 的路由错误归 Agent，余额不足等领域拒绝归业务 Service，避免同一失败在多个层重复记录。Gate 按单连接和错误类别保留首条明细并汇总重复项，业务日志不套用这条去重规则；字段脱敏和不记录密钥、原始载荷的约束见 [WebSocket Gate 草案](RFC-WEBSOCKET-GATE.md)。
+
 ## 有界性与失败
 
 本轮采用非阻塞有界 admission：默认 Capacity=1024，负数无效，正数显式配置。满载返回 ErrQueueFull，并由 DroppedCount 计数；不会静默扩容或等待磁盘。序号仅分配给成功接纳记录，uint64 耗尽返回 ErrSequenceExhausted，不回绕。

@@ -1,6 +1,6 @@
 # GSR API 设计规范
 
-客户端接入另见 [WebSocket Gate 草案](RFC-WEBSOCKET-GATE.md)：生产 Gate 的 WSS 上行使用 seq + Protobuf Envelope + MAC，下行只使用 Envelope；独立 DebugGate 仅传输 Envelope。Envelope 使用 msg_id、request_id(uint32) 和 payload，由 Agent Service 中转。C/S request_id、两种 Gate 和连接认证均在 Core/Cluster 之外。首版不实现 DES 或旧 12 字节头兼容。该能力尚未实现，公开 API、schema 与握手细节待裁决，不改变本文已有运行接口。
+客户端接入另见 [WebSocket Gate 草案](RFC-WEBSOCKET-GATE.md)：生产 Gate 的 WSS 上行使用 seq + Protobuf Envelope + MAC，下行只使用 Envelope；独立 DebugGate 仅传输 Envelope。Envelope 使用 msg_id、request_id(uint32) 和 payload，由 Agent Service 中转。C/S request_id、两种 Gate、连接认证、关闭码和错误归属均在 Core/Cluster 之外。Gate 只负责传输与安全边界，Agent 负责已认证 Envelope 的协议路由，业务 Service 负责业务拒绝；标准关闭码和结构化日志边界见 RFC。首版不实现 DES 或旧 12 字节头兼容。该能力尚未实现，公开 API、schema 与握手细节待裁决，不改变本文已有运行接口。
 
 > [ADR 0011](adr/0011-service-first-application-api.md) 的应用入口已落地：`gsr.Run(ctx, config, mainService)`、`self.Cluster()`、名称注册和按节点表 Open。业务不再组装 Host 或 Client，不登记节点级命令清单；未知 Send 由目标丢弃，未知 Call 返回 ErrUnknownCommand。下文 runtime/cluster 包的底层接口仍供基础设施使用，不是应用必须理解的启动步骤。
 

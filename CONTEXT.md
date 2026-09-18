@@ -8,6 +8,8 @@
 - **C/S 临时密钥（设计中）**：每条生产 Gate 连接由双方分别生成 32 字节 X25519 私钥和公钥；私钥不发送，公钥放入握手 Envelope，双方用 shared secret 和固定 HKDF-SHA256 参数派生上行 macKey。DebugGate 不执行此握手。
 - **Agent Service（客户端接入，设计中）**：接收客户端协议并中转到业务 Service 的普通 Service，不是 Cluster ConnectionAgent；不改变 Core 消息和 Reply 模型，连接映射及生命周期尚待裁决。
 - **DebugGate（客户端接入，设计中）**：独立于生产 Gate 的内网调试 WebSocket 入口，只传输 Protobuf Envelope，不做 X25519、seq 或 MAC；默认关闭，不提供公网安全保证，与生产 Gate 不自动降级或混用监听器。
+- **C/S WebSocket 关闭码（设计中）**：Gate 使用标准关闭码：1000 正常、1001 下线、1002 协议错误、1003 不支持数据、1008 安全策略拒绝、1009 超限、1011 Gate 内部故障；1006/1015 只作本地观察，不能主动发送。Gate 处理传输和安全失败，Agent 处理已认证 Envelope，业务 Service 处理业务拒绝；客户端不依赖关闭原因文本分支。
+- **C/S Gate 错误日志（设计中）**：Gate 使用共享 Logger 记录握手、帧、seq、MAC 和关闭错误，按单连接错误类别保留首条并汇总重复项；不记录私钥、shared secret、macKey、原始 payload 或未认证字段。Agent 和业务 Service 分别记录自己的路由及业务语义，不由 Gate 重复记录。
 
 - **Service 绑定的 Cluster 入口**：应用层通过 `self.Cluster()` 取得；框架绑定当前 Service 的 Self ID，而非消息的 Source。多个入口共享节点唯一 Cluster，不各自拥有连接或关闭责任；业务不手工注入 Host/Cluster，不通过全局状态推断当前 Service。
 

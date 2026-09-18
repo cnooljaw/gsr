@@ -129,8 +129,8 @@ message ErrorResponse {
 - 每连接由客户端和服务端分别使用 CSPRNG 生成一对新的 X25519 临时密钥。私钥为 32 字节，仅在本端内存中保存；公钥为原始 32 字节，分别放入握手请求和响应。私钥、shared secret 和 macKey 不发送、不写日志，连接结束后废弃；不按账号或跨连接复用。
 - 双方分别计算 `X25519(client_private_key, server_public_key)` 和 `X25519(server_private_key, client_public_key)`，结果必须一致；拒绝全零 shared secret。不要手工修改私钥位或自行实现曲线运算，交给标准 X25519 实现处理。
 - 握手可信性依赖正确验证服务端身份的 WSS；无额外身份认证的 X25519 不承诺抵御能替换公钥的本机主动代理。TLS 终止位置和之后的信任边界需在部署时明确。
-- 同连接串行执行：检查最小长度 → 读取大端 seq → 使用原始 Envelope 字节校验 MAC → 检查 seq 大于 lastSeq 并立即更新 → 解码及校验 Envelope → 校验 msg_id、方向、request_id 和 payload → 投递 Agent。认证失败不能推进 lastSeq；认证成功但消息未知或不合法时也消费该 seq。投递失败不能回退，序号接纳不代表业务执行成功。
-- 协商前只接受 C2S_KEY_EXCHANGE_REQUEST，服务端只回复 S2C_KEY_EXCHANGE_RESPONSE；完成后只接受带 seq/MAC 的业务上行，拒绝重复握手、错误方向、未知 msg_id 及无 MAC 降级。
+- 同连接串行执行：检查最小长度 → 读取大端 seq → 使用原始 Envelope 字节校验 MAC → 检查 seq 大于 lastSeq 并立即更新 → 解码及校验 Envelope 的结构字段 → 投递 Agent，由 Agent 校验 msg_id、方向、request_id 和 payload。认证失败不能推进 lastSeq；认证成功但消息未知或不合法时也消费该 seq。投递失败不能回退，序号接纳不代表业务执行成功。
+- 协商前只接受 C2S_KEY_EXCHANGE_REQUEST，服务端只回复 S2C_KEY_EXCHANGE_RESPONSE；完成后 Gate 只接受带 seq/MAC 的业务上行，拒绝重复握手、错误方向和无 MAC 降级。MAC 校验通过后，Envelope 的 msg_id、payload 类型和业务方向交给 Agent/注册表判断；未知 msg_id 不因“未知编号”本身关闭连接。
 - 握手失败直接关闭连接，不进入 Agent，也不发送业务 ErrorResponse；握手成功后双方才启用派生的 macKey。
 - 必须设置消息大小、握手等待和接纳容量上限；具体默认值待裁决，Protobuf 不意味着无限消息大小。
 
@@ -155,6 +155,30 @@ macKey = HKDF-Expand-SHA256(prk, info, 32)
 
 依据：[X25519](https://www.rfc-editor.org/rfc/rfc7748.html)、[HKDF](https://www.rfc-editor.org/rfc/rfc5869.html)、[HMAC](https://www.rfc-editor.org/rfc/rfc2104.html)。这是标准原语的组合设计，仍需完整握手定义与跨语言测试，不能把原语标准当作组合协议已审计的证明。
 
+## 已确认：WebSocket 关闭码与错误归属
+
+Gate 只使用标准 WebSocket 关闭码，不新增当前客户端必须理解的私有 4000–4999 关闭码。关闭原因是简短、稳定的通用标记，不暴露密钥、MAC、内部错误文本、堆栈或未认证载荷；具体错误写入服务端结构化日志。关闭控制帧的原因文本还必须满足 WebSocket 控制帧长度限制。
+
+| 场景 | 关闭码 | 客户端可见原因 |
+| --- | ---: | --- |
+| 正常关闭 | `1000` | `normal` |
+| Runtime 停止、服务下线或维护 | `1001` | `going_away` |
+| 非法消息阶段、重复握手、方向错误、Envelope/帧格式错误 | `1002` | `protocol_error` |
+| 收到不支持的数据类型，例如文本消息 | `1003` | `unsupported_data` |
+| MAC 错误、序号重放、生产/调试模式不匹配或其它安全策略拒绝 | `1008` | `policy_violation` |
+| 消息或 payload 超过配置上限 | `1009` | `message_too_big` |
+| Gate 自身发生未预期的内部故障 | `1011` | `server_error` |
+
+`1006`（异常断开）和 `1015`（TLS 握手失败）只能作为本地观察结果记录，不能主动放入 Close frame。当前不定义自有关闭码；如果将来确实需要客户端区分新的协议状态，再单独裁决版本兼容和 4000–4999 私有码。
+
+错误归属按处理边界划分：
+
+- **Gate** 负责 WebSocket、握手、帧大小、seq、MAC、模式和关闭；这些失败不进入 Agent，也不发送业务 `ErrorResponse`。
+- **Agent** 负责已认证 Envelope 的 `msg_id`、`request_id`、payload 解码、方向和路由。未知 `msg_id` 或合法载荷的协议不支持，有 request_id 时返回通用 `ErrorResponse`，无 request_id 时丢弃并记录；不把未知编号本身当作 WebSocket 坏帧。
+- **业务 Service** 负责余额不足、房间不存在、状态不允许等业务拒绝，按对应业务 Response 返回，不改用 WebSocket Close。
+
+Gate 的网络/安全错误使用 Runtime 共享 Logger，按单连接、错误类别限频：保留首条结构化明细，重复项只累计数量，连接结束时补一条汇总。日志可包含连接 ID、Gate 模式、阶段、远端地址、关闭码和内部错误分类；只有在完成认证和解码后才记录可信的 msg_id/request_id。不得记录私钥、shared secret、macKey、原始 payload 或未认证 Envelope 字段。业务日志不做这类去重，也不由 Gate 重复记录。
+
 ## 已确认：Gate、Agent 与业务 Service
 
 客户端 ↔ WebSocket Gate ↔ Agent Service ↔ 业务 Service。
@@ -168,6 +192,6 @@ macKey = HKDF-Expand-SHA256(prk, info, 32)
 
 ## 下一步与验收
 
-Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/通知/推送独立编号，共享 MsgId 常量与 Gate/Agent 注册表，控制握手消息，大端 seq 和原始字节 MAC 验证顺序，固定 HKDF 参数，以及独立 DebugGate 已确认。后续逐项收口：错误码、跨语言密码固定向量、Agent 归属、容量与关闭顺序。一次讨论一个问题，未确认前不新增公开 API 或通用安全插件框架。
+Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/通知/推送独立编号，共享 MsgId 常量与 Gate/Agent 注册表，控制握手消息，大端 seq 和原始字节 MAC 验证顺序，固定 HKDF 参数，独立 DebugGate，以及 WebSocket 关闭码和 Gate/Agent/业务错误归属已确认。后续逐项收口：错误码、跨语言密码固定向量、Agent 归属、容量与关闭顺序。一次讨论一个问题，未确认前不新增公开 API 或通用安全插件框架。
 
 实施按共享 Envelope/注册表 → DebugGate 本地闭环 → 生产 Gate 握手及上行认证 → Gate/Agent 往返 → 失败、背压和关闭推进。验证应包含跨语言固定向量、两种 Gate 的边界隔离、跨连接旧包拒绝、同连接重复拒绝、MAC 篡改和失败不推进序号、未知 msg_id、阶段/方向错误、超限、request_id 超时与迟到、编号耗尽、慢客户端和断开回收。测试不替代密码协议审查。
