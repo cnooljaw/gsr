@@ -7,6 +7,8 @@
 - **C/S seq（设计中）**：独立于 request_id 的 uint64 上行业务包序号，在线上使用 8 字节大端序，单连接从 1 单调递增、不回绕；先对 seq 原始字节和 Envelope 原始字节验 MAC，认证成功后立即消费序号，通知也消耗序号。不得作为业务执行成功或幂等保证。
 - **C/S 临时密钥（设计中）**：每条生产 Gate 连接由双方分别生成 32 字节 X25519 私钥和公钥；私钥不发送，公钥放入握手 Envelope，双方用 shared secret 和固定 HKDF-SHA256 参数派生上行 macKey。DebugGate 不执行此握手。
 - **Agent Service（客户端接入，设计中）**：原则上一个客户端连接对应一个普通 `AgentService`，不是 Cluster ConnectionAgent。Gate 持有 socket、握手、安全状态和关闭权；AgentService 持有客户端会话能力和 request_id 关联，并组合一个无独立 ServiceID/Mailbox 的 `ProtocolHandler` 组件。具体业务协议组件由业务项目实现，只负责 msg_id、Protobuf、请求校验、简单收发和业务 Service 路由；Agent 可以持有 playerID、登录状态、roomID、座位和临时流程等连接私有轻量状态，但不持有跨连接共享、可恢复或需持久化的权威房间/玩家/战斗状态。GSR 不内置大厅、游戏或其它业务协议；后者由独立业务 Service 所有，Agent 不接触 Gate/Runtime 内部细节，也不建立公开继承式 BaseAgent。
+- **ClientSession（客户端接入，设计中）**：Gate 绑定单条连接并授予 AgentService 的受限写回能力，只提供 Response/Push/Close 等意图操作；不暴露 `net.Conn`、Gate ServiceID 或连接表。调用只表示本地出站队列接纳，连接关闭或队列满时返回稳定错误，写循环是否送达由 Gate 管理。
+- **Gate→Agent 内部投递（客户端接入，设计中）**：Gate 完成 WebSocket 安全校验后，使用 Runtime-owned 的单向基础设施投递把消息快照送入 AgentService Mailbox，Source 固定为零。内部 Command 不属于客户端 msg_id，不是业务协议或公开 Gate API；Agent 到业务 Service 仍使用普通 ServiceContext.Send/Call。
 - **DebugGate（客户端接入，设计中）**：独立于生产 Gate 的内网调试 WebSocket 入口，只传输 Protobuf Envelope，不做 X25519、seq 或 MAC；默认关闭，不提供公网安全保证，与生产 Gate 不自动降级或混用监听器。
 - **C/S WebSocket 关闭码（设计中）**：Gate 使用标准关闭码：1000 正常、1001 下线、1002 协议错误、1003 不支持数据、1008 安全策略拒绝、1009 超限、1011 Gate 内部故障；1006/1015 只作本地观察，不能主动发送。Gate 处理传输和安全失败，Agent 处理已认证 Envelope，业务 Service 处理业务拒绝；客户端不依赖关闭原因文本分支。
 - **C/S Gate 错误日志（设计中）**：Gate 使用共享 Logger 记录握手、帧、seq、MAC 和关闭错误，按单连接错误类别保留首条并汇总重复项；不记录私钥、shared secret、macKey、原始 payload 或未认证字段。Agent 和业务 Service 分别记录自己的路由及业务语义，不由 Gate 重复记录。
