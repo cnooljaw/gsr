@@ -109,7 +109,7 @@ message ErrorResponse {
 - request_id=0 的通知处理失败由服务端记录，不自动生成请求回复；推送使用独立的 Push msg_id。
 - 连接断开时无法保证发送错误回复，由客户端连接事件结束等待。
 - 程序分支依赖稳定 code，不比较 message；不得直接透传内部 error 文本或堆栈。
-- 错误码清单尚待裁决；控制握手编号、payload 和阶段门禁已经确定。共享 MsgId 常量及 Gate/Agent 注册表的归属已经确定，业务消息的请求/响应编号规则也确定为独立编号。
+- 错误语义已经确认：业务拒绝使用业务 Response，无法取得正常结果时使用 ErrorResponse 并复用原 request_id；具体错误码常量和业务编号由业务协议项目维护，GSR 不建立跨业务的全局错误码表。控制握手编号、payload 和阶段门禁已经确定，消息编号及 Gate/Agent 注册表的归属也保持在客户端接入层。
 
 ## 已确认：C/S request_id 与 seq
 
@@ -202,6 +202,8 @@ Gate 的网络/安全错误使用 Runtime 共享 Logger，按单连接、错误�
 
 ## 下一步与验收
 
-Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/通知/推送独立编号，共享 MsgId 常量与 Gate/Agent 注册表，控制握手消息，大端 seq 和原始字节 MAC 验证顺序，固定 HKDF 参数，独立 DebugGate，WebSocket 关闭码和 Gate/Agent/业务错误归属，以及“一连接一个 AgentService、业务协议通过 ProtocolHandler 组件组合接入”的边界已确认。后续逐项收口：错误码、跨语言密码固定向量、Agent 的具体组装 API、容量与关闭顺序。一次讨论一个问题，未确认前不新增公开 API 或通用安全插件框架。
+Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/通知/推送独立编号，共享 MsgId 常量与 Gate/Agent 注册表，控制握手消息，大端 seq 和原始字节 MAC 验证顺序，固定 HKDF 参数，独立 DebugGate，WebSocket 关闭码和 Gate/Agent/业务错误归属，以及“一连接一个 AgentService、业务协议通过 ProtocolHandler 组件组合接入”的边界已确认。后续逐项收口：跨语言密码固定向量、Agent 的具体组装 API、容量与关闭顺序，并在 Gate 完成后增加一个命令行 TypeScript 客户端和 GSR 服务端的联调示例。一次讨论一个问题，未确认前不新增公开 API 或通用安全插件框架。
+
+联调示例计划放在 `examples/websocket-gate/`：Go 端使用 GSR 组装最小 Gate、Agent 和业务 Service，TypeScript 端使用命令行客户端连接并发送 Envelope。示例不定义新的生产协议或框架，只复用业务项目提供的 Protobuf/MsgId；至少演练正常请求、业务拒绝、ErrorResponse、服务端 Push、request_id 关联、连接关闭和 DebugGate/生产 Gate 的边界。生产 Gate 的 X25519/HKDF/seq/MAC 固定向量验证另列为跨语言测试，不由示例掩盖安全协议审查。
 
 实施按共享 Envelope/注册表 → DebugGate 本地闭环 → 生产 Gate 握手及上行认证 → Gate/Agent 往返 → 失败、背压和关闭推进。验证应包含跨语言固定向量、两种 Gate 的边界隔离、跨连接旧包拒绝、同连接重复拒绝、MAC 篡改和失败不推进序号、未知 msg_id、阶段/方向错误、超限、request_id 超时与迟到、编号耗尽、慢客户端和断开回收。测试不替代密码协议审查。

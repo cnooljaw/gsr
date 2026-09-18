@@ -385,6 +385,15 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 
 统一 FIFO 日志入口、单写入者及 Runtime/Cluster 直接接线已实现；不再通过 Diagnostics 转发主日志。已覆盖并发顺序、记录处时间位置、字段快照、满载、关闭和输出失败。默认终端，可借用 Writer；Config.Directory 已支持文件输出，与 Writer 互斥。固定 100 MiB、10 个历史文件，由现有写入者滚动且不重置 seq，不拆记录、不压缩；不同启动配置显式指定独占相对目录，在 New 时解析并固定。首次输出失败后停止写入和接纳、残留记录计数，Err() 和 Close 返回首次错误，内部文件由 Logger 最终释放。已补文件滚动、历史保留、跨文件序号及失败状态测试。Cluster 同连接同类坏帧只记录首条、重复抑制计数与关闭汇总已实现，不增加定时任务，不抑制业务日志、投递失败或断线诊断。SLS 由外部采集器接入，见 [日志方案](RFC-LOGGING.md)。
 
+## Core 之外：WebSocket Gate 联调示例
+
+状态：已记录，待 Gate 与 Agent 最小实现完成后建设，不提前加入 Core 或通用测试框架。
+
+- 在 `examples/websocket-gate/` 提供一个 GSR Go 服务端和一个命令行 TypeScript 客户端，用于验证真实 WebSocket 接入、Envelope 编解码、request_id 关联、业务 Response、业务拒绝、ErrorResponse、服务端 Push 和连接关闭。
+- 示例先覆盖 DebugGate 的内网闭环，再接入生产 Gate 的握手与上行认证；客户端使用与业务项目相同的 Protobuf/MsgId 生成代码，不另造一套协议。
+- 业务拒绝由业务 Response 表达，只有没有正常业务结果时才发送 ErrorResponse；客户端只按稳定错误码分支，不依赖 message 文本。
+- 示例只负责可重复联调，不替代跨语言密码固定向量、慢客户端背压、断线恢复和长期容量测试。
+
 ## Core 之外的能力候选：反向代理与网关
 
 状态：已记录，暂不进入 Core v0.1，也不提前实现通用网关框架。
