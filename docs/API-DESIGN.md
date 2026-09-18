@@ -1,6 +1,16 @@
 # GSR API 设计规范
 
-客户端接入另见 [WebSocket Gate 草案](RFC-WEBSOCKET-GATE.md)：生产 Gate 的 WSS 上行使用 seq + Protobuf Envelope + MAC，下行只使用 Envelope；独立 DebugGate 仅传输 Envelope。Envelope 使用 msg_id、request_id(uint32) 和 payload，由 `AgentService` 中转。C/S request_id、两种 Gate、连接认证、关闭码和错误归属均在 Core/Cluster 之外。Gate 只负责传输与安全边界，AgentService 负责客户端会话并组合业务项目提供的 `ProtocolHandler`；Gate 到 Agent 使用 Runtime-owned 的单向基础设施投递，Agent 到 Gate 使用不暴露 socket 的 `ClientSession` 写回能力，业务协议组件只做协议适配、简单收发和业务 Service 路由。协议组件可以持有连接私有的轻量会话状态，但不持有跨连接共享或需恢复的权威业务状态，业务 Service 负责业务拒绝和状态变化。GSR 不内置大厅、游戏或其它具体协议实现，只提供通用接入边界。标准关闭码和结构化日志边界见 RFC。首版不实现 DES 或旧 12 字节头兼容。该能力尚未实现，公开 API、schema 与握手细节待裁决，不改变本文已有运行接口。
+客户端接入另见 [WebSocket Gate 草案](RFC-WEBSOCKET-GATE.md)：生产 Gate 的 WSS 上行使用 seq + Protobuf Envelope + MAC，下行只使用 Envelope；独立 DebugGate 仅传输 Envelope。Envelope 使用 msg_id、request_id(uint32) 和 payload，由 `AgentService` 中转。C/S request_id、两种 Gate、连接认证、关闭码和错误归属均在 Core/Cluster 之外。Gate 只负责传输与安全边界，AgentService 负责客户端会话并组合业务项目提供的 `ProtocolHandler`；Gate 到 Agent 使用 Runtime-owned 的单向基础设施投递，Agent 到 Gate 使用不暴露 socket 的 `ClientSession` 写回能力，业务协议组件只做协议适配、简单收发和业务 Service 路由。协议组件可以持有连接私有的轻量会话状态，但不持有跨连接共享或需恢复的权威业务状态，业务 Service 负责业务拒绝和状态变化。GSR 不内置大厅、游戏或其它具体协议实现，只提供通用接入边界。标准关闭码、结构化日志和 Agent 组装边界见 RFC。首版不实现 DES 或旧 12 字节头兼容。该能力尚未实现，公开 API、schema 与握手细节仍待落地，不改变本文已有运行接口。
+
+Gate 与业务 Agent 的组装只需要一个构造回调，不增加 AgentFactory 抽象：
+
+```go
+type GateConfig struct {
+	NewAgent func(ClientSession) runtime.Service
+}
+```
+
+Gate 的网络 goroutine 把新连接转成 GateService 的内部事件；GateService 在自己的 Service runner 中调用 `NewAgent` 和 `self.CreateService`。回调只构造连接私有的 Service，不执行 socket I/O、不持有 Runtime 或 Gate 内部连接表；构造或 OnStart 失败只关闭当前连接，不影响其它 Agent。
 
 > [ADR 0011](adr/0011-service-first-application-api.md) 的应用入口已落地：`gsr.Run(ctx, config, mainService)`、`self.Cluster()`、名称注册和按节点表 Open。业务不再组装 Host 或 Client，不登记节点级命令清单；未知 Send 由目标丢弃，未知 Call 返回 ErrUnknownCommand。下文 runtime/cluster 包的底层接口仍供基础设施使用，不是应用必须理解的启动步骤。
 

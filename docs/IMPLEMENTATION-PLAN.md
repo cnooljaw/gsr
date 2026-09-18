@@ -392,6 +392,7 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 - 在 `examples/websocket-gate/` 提供一个 GSR Go 服务端和一个命令行 TypeScript 客户端，用于验证真实 WebSocket 接入、Envelope 编解码、request_id 关联、业务 Response、业务拒绝、ErrorResponse、服务端 Push 和连接关闭。
 - 示例先覆盖 DebugGate 的内网闭环，再接入生产 Gate 的握手与上行认证；客户端使用与业务项目相同的 Protobuf/MsgId 生成代码，不另造一套协议。
 - 在接入生产 Gate 前，先提供 Go 与 TypeScript 共同读取的跨语言密码固定向量，覆盖 X25519、HKDF、seq 大端编码和原始 Envelope 字节 MAC；向量是独立测试夹具，不把测试私钥带入示例运行。
+- Gate 组装使用 `NewAgent func(ClientSession) runtime.Service` 回调；Gate 的网络 goroutine 只投递内部事件，由 GateService runner 创建 Agent，不新增 AgentFactory、Service 管理器或通用依赖注入层。
 - 业务拒绝由业务 Response 表达，只有没有正常业务结果时才发送 ErrorResponse；客户端只按稳定错误码分支，不依赖 message 文本。
 - 示例只负责可重复联调，不替代跨语言密码固定向量、慢客户端背压、断线恢复和长期容量测试。
 
