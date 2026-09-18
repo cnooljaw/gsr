@@ -155,6 +155,36 @@ macKey = HKDF-Expand-SHA256(prk, info, 32)
 
 依据：[X25519](https://www.rfc-editor.org/rfc/rfc7748.html)、[HKDF](https://www.rfc-editor.org/rfc/rfc5869.html)、[HMAC](https://www.rfc-editor.org/rfc/rfc2104.html)。这是标准原语的组合设计，仍需完整握手定义与跨语言测试，不能把原语标准当作组合协议已审计的证明。
 
+## 已确认：跨语言固定向量
+
+Go 与 TypeScript 必须使用同一组独立生成的测试向量验证客户端上行认证，不以“两个实现互相算出相同结果”代替参考结果。固定向量只用于测试，里面的私钥是公开的测试常量，不得被生产连接复用。
+
+共享向量使用 JSON 或等价的文本字段承载十六进制字节，至少包含：
+
+```text
+client_private_key
+server_private_key
+client_public_key
+server_public_key
+shared_secret
+salt_input
+salt
+hkdf_prk
+mac_key
+seq_bytes
+envelope_bytes
+mac
+```
+
+向量生成和断言必须满足：
+
+- 私钥、公钥、shared secret、salt、HKDF 输出和 MAC 均按原始字节比较，不比较 Base64、PEM、DER 或 Protobuf 握手包的文本表示。
+- `salt_input` 严格为固定 ASCII 标签与客户端公钥、服务端公钥的原始字节拼接；不能交换公钥顺序，不能把 Envelope 编码放进 salt。
+- `seq_bytes` 必须是固定 `uint64` 的 8 字节大端表示；测试至少包含高位非零的序号，避免实现误用小端或 JavaScript `number`。
+- `envelope_bytes` 是参与 MAC 的原始 Protobuf 字节；验证器先对这些原始字节验 MAC，再交给 Protobuf 解码，不允许先解码再重新序列化替代输入。
+- MAC 只取 HMAC-SHA256 前 16 字节；测试覆盖正确 MAC、修改 seq、修改 Envelope、修改 `info`、交换公钥顺序和错误截断长度。
+- Go 和 TypeScript 的测试都直接读取同一份向量，生产实现不依赖测试向量文件；向量生成脚本与运行时实现分开，避免同一错误同时生成“期望值”和实际值。
+
 ## 已确认：WebSocket 关闭码与错误归属
 
 Gate 只使用标准 WebSocket 关闭码，不新增当前客户端必须理解的私有 4000–4999 关闭码。关闭原因是简短、稳定的通用标记，不暴露密钥、MAC、内部错误文本、堆栈或未认证载荷；具体错误写入服务端结构化日志。关闭控制帧的原因文本还必须满足 WebSocket 控制帧长度限制。
