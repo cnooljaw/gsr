@@ -34,7 +34,7 @@ message Envelope {
 }
 ```
 
-业务 payload 是对应业务消息的 Protobuf。请求、响应、通知和推送各自分配独立的 msg_id，由客户端协议表声明消息方向和 payload 类型；不维护节点级 Core Command 准入清单。旧打地鼠协议仅作业务样例，不进入 GSR 通用协议定义。
+业务 payload 是对应业务消息的 Protobuf。请求、响应、通知和推送各自分配独立的 msg_id；共享协议文件提供跨 Go/TypeScript 的 MsgId 常量，Gate/Agent 注册表声明消息方向和 payload 类型。不维护节点级 Core Command 准入清单。旧打地鼠协议仅作业务样例，不进入 GSR 通用协议定义。
 
 示例协议表：
 
@@ -47,6 +47,21 @@ message Envelope {
 ```
 
 响应使用独立的 msg_id，但回传原 request_id；通知和推送的 request_id 为零。握手也使用接入层约定的消息定义，具体 msg_id、payload 和阶段门禁仍待裁决。旧头的 Tag、Length、ver 不进入新协议。
+
+MsgId 常量示例：
+
+```protobuf
+enum MsgId {
+  MSG_ID_UNSPECIFIED = 0;
+  C2S_ENTER_ROOM_REQUEST = 1001;
+  S2C_ENTER_ROOM_RESPONSE = 1002;
+  C2S_MOVE_NOTIFY = 2001;
+  S2C_PLAYER_MOVED_PUSH = 3001;
+  S2C_ERROR_RESPONSE = 9001;
+}
+```
+
+`Envelope.msg_id` 保持 `uint32`，枚举只提供共享常量。Gate/Agent 的注册表负责校验方向、payload 类型、request_id 规则和响应关系；数字范围只用于人工整理，不能作为运行时猜测语义的依据。该注册表属于客户端接入层，不进入 Core Runtime，也不限制不同 Service 复用内部 `CommandID`。
 
 ## 已确认：业务回复、通用错误与推送
 
@@ -71,7 +86,7 @@ message ErrorResponse {
 - request_id=0 的通知处理失败由服务端记录，不自动生成请求回复；推送使用独立的 Push msg_id。
 - 连接断开时无法保证发送错误回复，由客户端连接事件结束等待。
 - 程序分支依赖稳定 code，不比较 message；不得直接透传内部 error 文本或堆栈。
-- msg_id 分配范围、方向表、错误码清单和握手编号尚待裁决；业务消息的请求/响应编号规则已经确定为独立编号。
+- 错误码清单和握手编号尚待裁决；共享 MsgId 常量及 Gate/Agent 注册表的归属已经确定，业务消息的请求/响应编号规则也确定为独立编号。
 
 ## 已确认：C/S request_id 与 seq
 
@@ -114,6 +129,6 @@ message ErrorResponse {
 
 ## 下一步与验收
 
-Envelope 的 msg_id、request_id(uint32)、payload 三个字段，以及请求/响应/通知/推送独立编号的规则已确认。后续逐项收口：msg_id 分配范围和方向表、错误码、握手字段、HKDF 精确参数和 seq 编码、Agent 归属、容量与关闭顺序。一次讨论一个问题，未确认前不新增公开 API 或通用安全插件框架。
+Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/通知/推送独立编号，以及共享 MsgId 常量与 Gate/Agent 注册表已确认。后续逐项收口：错误码、握手字段、HKDF 精确参数和 seq 编码、Agent 归属、容量与关闭顺序。一次讨论一个问题，未确认前不新增公开 API 或通用安全插件框架。
 
 实施按 Envelope 编解码 → 握手及上行认证 → Gate/Agent 往返 → 失败、背压和关闭推进。验证应包含跨语言固定向量、跨连接旧包拒绝、同连接重复拒绝、MAC 篡改和失败不推进序号、未知类别、阶段/方向错误、超限、Session 超时与迟到、编号耗尽、慢客户端和断开回收。测试不替代密码协议审查。
