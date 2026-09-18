@@ -2,9 +2,9 @@
 
 ## Glossary
 
-- **C/S Envelope（设计中）**：Protobuf 应用消息，字段为 msg_id、request_id、payload，编号依次为 1–3；请求、响应、通知和推送使用独立的消息编号。共享 MsgId 常量由协议文件提供，Gate/Agent 注册表负责方向和 payload 校验，不进入 Core。首版不使用旧 12 字节头；握手编号及错误编号待裁决。
+- **C/S Envelope（设计中）**：Protobuf 应用消息，字段为 msg_id、request_id、payload，编号依次为 1–3；请求、响应、通知和推送使用独立的消息编号。共享 MsgId 常量由协议文件提供，控制握手使用 1/2，Gate/Agent 注册表负责方向和 payload 校验，不进入 Core。首版不使用旧 12 字节头；错误编号待裁决。
 - **C/S request_id（设计中）**：Envelope 中的 uint32 客户端请求关联号，0 为通知/推送、非零为 Request，响应原样回传；单连接从 1 单调分配，不回绕、不复用，耗尽后重连。与 Core/Cluster Session 分离，不作为防重放或幂等凭据。见 [客户端接入草案](docs/RFC-WEBSOCKET-GATE.md)。
-- **C/S seq（设计中）**：独立于 request_id 的 uint64 上行业务包序号，单连接从 1 单调递增、不回绕；与 Envelope 原始字节一起接受 MAC 校验，通知也消耗序号。不得作为业务执行成功或幂等保证。
+- **C/S seq（设计中）**：独立于 request_id 的 uint64 上行业务包序号，在线上使用 8 字节大端序，单连接从 1 单调递增、不回绕；先对 seq 原始字节和 Envelope 原始字节验 MAC，认证成功后立即消费序号，通知也消耗序号。不得作为业务执行成功或幂等保证。
 - **Agent Service（客户端接入，设计中）**：接收客户端协议并中转到业务 Service 的普通 Service，不是 Cluster ConnectionAgent；不改变 Core 消息和 Reply 模型，连接映射及生命周期尚待裁决。
 
 - **Service 绑定的 Cluster 入口**：应用层通过 `self.Cluster()` 取得；框架绑定当前 Service 的 Self ID，而非消息的 Source。多个入口共享节点唯一 Cluster，不各自拥有连接或关闭责任；业务不手工注入 Host/Cluster，不通过全局状态推断当前 Service。

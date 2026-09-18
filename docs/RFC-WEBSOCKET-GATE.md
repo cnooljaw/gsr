@@ -46,13 +46,27 @@ message Envelope {
 9001  ErrorResponse       S2C error response
 ```
 
-响应使用独立的 msg_id，但回传原 request_id；通知和推送的 request_id 为零。握手也使用接入层约定的消息定义，具体 msg_id、payload 和阶段门禁仍待裁决。旧头的 Tag、Length、ver 不进入新协议。
+响应使用独立的 msg_id，但回传原 request_id；通知和推送的 request_id 为零。握手使用控制编号 1 和 2，具体 payload 为：
+
+```protobuf
+message KeyExchangeRequest {
+  bytes client_public_key = 1; // 32 字节 X25519 公钥
+}
+
+message KeyExchangeResponse {
+  bytes server_public_key = 1; // 32 字节 X25519 公钥
+}
+```
+
+握手消息的 request_id 固定为零，不带业务 seq/MAC；不增加应用层版本字段。旧头的 Tag、Length、ver 不进入新协议。
 
 MsgId 常量示例：
 
 ```protobuf
 enum MsgId {
   MSG_ID_UNSPECIFIED = 0;
+  C2S_KEY_EXCHANGE_REQUEST = 1;
+  S2C_KEY_EXCHANGE_RESPONSE = 2;
   C2S_ENTER_ROOM_REQUEST = 1001;
   S2C_ENTER_ROOM_RESPONSE = 1002;
   C2S_MOVE_NOTIFY = 2001;
@@ -86,7 +100,7 @@ message ErrorResponse {
 - request_id=0 的通知处理失败由服务端记录，不自动生成请求回复；推送使用独立的 Push msg_id。
 - 连接断开时无法保证发送错误回复，由客户端连接事件结束等待。
 - 程序分支依赖稳定 code，不比较 message；不得直接透传内部 error 文本或堆栈。
-- 错误码清单和握手编号尚待裁决；共享 MsgId 常量及 Gate/Agent 注册表的归属已经确定，业务消息的请求/响应编号规则也确定为独立编号。
+- 错误码清单尚待裁决；控制握手编号、payload 和阶段门禁已经确定。共享 MsgId 常量及 Gate/Agent 注册表的归属已经确定，业务消息的请求/响应编号规则也确定为独立编号。
 
 ## 已确认：C/S request_id 与 seq
 
@@ -95,7 +109,7 @@ message ErrorResponse {
 - 新连接可重新从 1 开始，旧连接等待不能迁移到新连接。按每秒 10 次 Request，编号约 4971 天（13.6 年）耗尽；通知和推送不消耗 request_id。
 - C/S request_id 与 Core SessionID、ClusterSessionID 分离；Agent 以连接和 request_id 关联客户端等待，不把它当身份凭据或业务幂等键。
 - seq 是独立的 uint64 连接序号，所有上行业务包均消耗，包括 request_id=0 的通知。单连接从 1 单调递增，不回绕；Gateway 接受 seq > lastSeq。这个规则额外拒绝同连接重复旧包。
-- seq 的线上字节序尚待确定。Laya/TypeScript 实现不得用普通 number 表示完整 uint64，应采用 BigInt 或等效无损表示；uint32 request_id 可以精确表示。
+- seq 在线上使用 8 字节大端序。Laya/TypeScript 实现不得用普通 number 表示完整 uint64，应采用 BigInt 或等效无损表示；uint32 request_id 可以精确表示。
 
 ## 连接认证与接收边界
 
@@ -105,14 +119,15 @@ message ErrorResponse {
 
 - 每连接使用新的 X25519 临时密钥；私钥不发送，密钥仅存内存，连接结束后废弃。不按账号或跨连接复用，密钥和敏感明文不得写入日志。
 - 握手可信性依赖正确验证服务端身份的 WSS；无额外身份认证的 X25519 不承诺抵御能替换公钥的本机主动代理。TLS 终止位置和之后的信任边界需在部署时明确。
-- 同连接串行执行：检查阶段、消息大小和 seq → 校验 MAC → 解码及校验 Envelope → 更新 lastSeq → 投递 Agent。认证失败不能推进 lastSeq，投递失败不能回退。序号接纳不代表业务执行成功。
-- 协商前只接受握手消息；完成后只接受带 seq/MAC 的业务上行，拒绝重复握手、错误方向、未知 msg_id 及无 MAC 降级。握手完成判定点、字段和失败处置仍待明确。
+- 同连接串行执行：检查最小长度 → 读取大端 seq → 使用原始 Envelope 字节校验 MAC → 检查 seq 大于 lastSeq 并立即更新 → 解码及校验 Envelope → 校验 msg_id、方向、request_id 和 payload → 投递 Agent。认证失败不能推进 lastSeq；认证成功但消息未知或不合法时也消费该 seq。投递失败不能回退，序号接纳不代表业务执行成功。
+- 协商前只接受 C2S_KEY_EXCHANGE_REQUEST，服务端只回复 S2C_KEY_EXCHANGE_RESPONSE；完成后只接受带 seq/MAC 的业务上行，拒绝重复握手、错误方向、未知 msg_id 及无 MAC 降级。
+- 握手失败直接关闭连接，不进入 Agent，也不发送业务 ErrorResponse；握手成功后双方才启用派生的 macKey。
 - 必须设置消息大小、握手等待和接纳容量上限；具体默认值待裁决，Protobuf 不意味着无限消息大小。
 
 密码参数草案，实施前需与完整握手一起收口：
 
 - X25519 → HKDF-SHA256 → 32 字节上行 macKey，绑定双方公钥、协议标识及 client→server 方向；拒绝全零共享秘密。精确 salt/info 编码待确定，不能让两端自行猜测。
-- MAC 使用 HMAC-SHA256 的前 16 字节，覆盖 seq 原始 8 字节和 Envelope 原始字节，不包含标签自身。常量时间比较，不能重新序列化 Envelope 后验 MAC。
+- MAC 使用 HMAC-SHA256 的前 16 字节，覆盖大端 seq 原始 8 字节和 Envelope 原始 Protobuf 字节，不包含标签自身。使用常量时间比较，必须在 Protobuf 解码前校验，不能重新序列化 Envelope 后验 MAC；因此不要求 deterministic serialization。
 
 依据：[X25519](https://www.rfc-editor.org/rfc/rfc7748.html)、[HKDF](https://www.rfc-editor.org/rfc/rfc5869.html)、[HMAC](https://www.rfc-editor.org/rfc/rfc2104.html)。这是标准原语的组合设计，仍需完整握手定义与跨语言测试，不能把原语标准当作组合协议已审计的证明。
 
@@ -129,6 +144,6 @@ message ErrorResponse {
 
 ## 下一步与验收
 
-Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/通知/推送独立编号，以及共享 MsgId 常量与 Gate/Agent 注册表已确认。后续逐项收口：错误码、握手字段、HKDF 精确参数和 seq 编码、Agent 归属、容量与关闭顺序。一次讨论一个问题，未确认前不新增公开 API 或通用安全插件框架。
+Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/通知/推送独立编号，共享 MsgId 常量与 Gate/Agent 注册表，控制握手消息，以及大端 seq 和原始字节 MAC 验证顺序已确认。后续逐项收口：错误码、HKDF 精确参数、Agent 归属、容量与关闭顺序。一次讨论一个问题，未确认前不新增公开 API 或通用安全插件框架。
 
 实施按 Envelope 编解码 → 握手及上行认证 → Gate/Agent 往返 → 失败、背压和关闭推进。验证应包含跨语言固定向量、跨连接旧包拒绝、同连接重复拒绝、MAC 篡改和失败不推进序号、未知类别、阶段/方向错误、超限、Session 超时与迟到、编号耗尽、慢客户端和断开回收。测试不替代密码协议审查。
