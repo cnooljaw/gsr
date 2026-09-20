@@ -1,6 +1,6 @@
 # WebSocket Gate、客户端协议与 Agent
 
-状态：设计方向已确认，部分基础能力已实现；Gate/Agent 的完整接入仍未完成。本文不是完整密码协议或生产安全验收结论。
+状态：设计方向已确认；DebugGate 示例的 Go 往返已实现，生产 Gate 与 TypeScript CLI 尚未完成。本文不是完整密码协议或生产安全验收结论。
 
 ## 范围与参考
 
@@ -85,6 +85,8 @@ enum MsgId {
 - 两者使用不同监听器、端口和显式配置；生产 Gate 不自动降级到 DebugGate，DebugGate 也不根据首包猜测生产格式。DebugGate 默认关闭，启用时应绑定回环地址或明确的内网地址，并由部署防火墙限制访问。
 - DebugGate 没有应用层认证和防重放保证，不能暴露到公网，也不能被当作生产安全模式。业务鉴权仍由 Agent/业务 Service 负责。
 - 两个 Gate 只在 Envelope 解码和 Agent 路由之前共享协议注册表；帧接收和安全校验属于各自适配器，业务路由不复制两套。
+
+`examples/websocket-gate/debuggate` 已实现本地示例闭环：`NewGateService` 显式接收底层 `*runtime.Runtime`，应用通过 `Runtime.CreateService` 启动它；这只是示例组装方式，不扩展 `gsr.Run`、Core 或业务 `ServiceContext`。Gate 只监听字面回环/私有 IP 的 `/ws`，每个连接由 Gate runner 调用 `NewAgent` 创建一个 Agent。创建返回的 AgentID 绑定到该连接，读循环直接调用 `Runtime.DeliverClientMessage` 投递不透明 Envelope 字节，不逐帧经过 Gate Mailbox；Gate runner 中的连接到 Agent 映射只用于断开通知。`ClientSession.Send(Envelope)` 将响应放入有界队列，再由唯一写循环发回。此处 `ClientSession` 表示客户端连接的写回能力，不是 Core `SessionID` 或 Envelope 的 `request_id`。DebugGate 显式限制连接数、帧大小和每连接出站队列，默认帧上限为 4 MiB。出站队列按序列化 Envelope 字节数加每项固定 64 字节队列开销计费，避免空帧或很多小帧绕过内存上限；正在写出的单帧另受 `MaxFrameBytes` 限制。集成测试覆盖请求/响应 request_id、连接上限、正常断开通知、Agent 创建期间既有连接继续收帧和 Runtime 关闭时连接回收。它仍是示例代码，不是稳定的生产 API；没有 TLS、生产握手、MAC、TypeScript 客户端或完整共享日志接线。
 
 ## 已确认：业务回复、通用错误与推送
 
@@ -233,8 +235,8 @@ Gate 的网络/安全错误使用 Runtime 共享 Logger，按单连接、错误�
 - `AgentService` 组合通用客户端会话、request_id 关联、出站 Envelope 组织和断开清理能力，并持有一个具体的 `ProtocolHandler` 组件；`ProtocolHandler` 不是 Service，没有自己的 ServiceID、Mailbox 或生命周期。
 - 例如查询房间人数时，`GameProtocol` 解码 `GetRoomCountRequest`，在当前 Agent Handler 内通过 `self.Call` 调用 `RoomService`，得到结果后返回 `GetRoomCountResponse`；`AgentService` 使用原 request_id 编码并交给客户端会话发送。客户端响应能力不是 Core 的手工 Reply，也不完成 Core Session。
 - Gate 到 Agent 的入站路径使用受信任的 Runtime-owned 单向投递：Gate 完成 WebSocket、握手、MAC 和 seq 校验后，通过 `Runtime.DeliverClientMessage(target, envelope)` 把完整 Protobuf Envelope 字节投递到 AgentService Mailbox；Runtime 在接纳时复制快照，Source、Session 和 Core CommandID 固定为零。目标 Service 必须实现 `runtime.ClientMessageHandler`，否则在 Mailbox admission 前立即返回 `runtime.ErrClientMessageUnsupported`，不入队、不静默丢弃。该类型不属于客户端 `msg_id`、不作为业务 Service 间的 Call/Send，也不作为公开 Gate API。Agent 收到后由 `Requests` 解码并按 Envelope `msg_id` 分发；普通 `Commands` 仍只处理 Core `CommandID`。
-- Gate 的 accept/reader goroutine 不保存或调用 `ServiceContext`，只把新连接、客户端消息和断开事件投递为 GateService 内部 Command；GateService 在自己的 runner 中调用 `NewAgent`、`self.CreateService` 和受控的 Agent 投递。Agent 构造或 `OnStart` 失败时只关闭当前 ClientSession 并记录原因，不影响 Gate、Runtime 或其它 Agent。
-- Agent 到 Gate 的出站路径使用绑定当前连接的 `ClientSession` 能力，最小接口只有 `Send(Envelope)` 和 `Close`。Agent/ProtocolHandler 在调用前负责 `msg_id`、`request_id`、payload 类型以及 Response/Push 方向的协议校验；Response 通过复制原请求的 `request_id` 构造，Push 使用 `request_id == 0`，这些语义不由 Gate 判断，也不重复作为方法参数传递。ClientSession 的 `Send` 不改写或推断 Envelope，只负责检查连接状态、出站大小限制并把完整 Envelope 放入 Gate 的有界写队列；写入 socket 仍由 Gate 的写循环完成。写队列接纳成功不代表客户端已经收到数据。
+- Gate 的 accept/reader goroutine 不保存或调用 `ServiceContext`。新连接和断开事件投递为 GateService 内部 Command，由其 runner 创建 Agent、管理连接到 Agent 的断开映射；创建成功后，读循环使用返回的 AgentID 直接调用 `Runtime.DeliverClientMessage`，不为每帧额外经过 Gate Mailbox/Core Command。Runtime 在 Agent Mailbox 接纳时复制 Envelope 字节。Agent 构造或 `OnStart` 失败时只关闭当前客户端连接并记录原因，不影响 Gate、Runtime 或其它 Agent。
+- Agent 到 Gate 的出站路径使用绑定当前连接的 `ClientSession` 能力，最小接口只有 `Send(Envelope)` 和 `Close`。这里的 `ClientSession` 是客户端连接能力，不是 Runtime `SessionID` 或 Envelope `request_id`。Agent/ProtocolHandler 在调用前负责 `msg_id`、`request_id`、payload 类型以及 Response/Push 方向的协议校验；Response 通过复制原请求的 `request_id` 构造，Push 使用 `request_id == 0`，这些语义不由 Gate 判断，也不重复作为方法参数传递。ClientSession 的 `Send` 不改写或推断 Envelope，只负责检查连接状态、出站大小限制并把完整 Envelope 放入 Gate 的有界写队列；写入 socket 仍由 Gate 的写循环完成。写队列接纳成功不代表客户端已经收到数据。
 - Gate 与 Agent 的连接通知使用单向内部事件；断开时 Gate 先使 ClientSession 失效，再最多通知 Agent 一次，不等待或强杀 Agent。Agent 与 RoomService、PlayerService 等业务 Service 才使用普通 ServiceContext.Send/Call；业务协议代码不需要知道上述 Gate/Agent 连接细节。
 - 具体 `GameProtocol`、`KickProtocol` 等协议组件由业务项目实现，只实现自己的 msg_id、Protobuf 类型、请求校验、简单收发和业务 Service 路由，不了解 WebSocket、seq、MAC、关闭码或 Runtime 内部调度。Agent/协议组件可以持有连接私有的少量会话状态，例如 playerID、登录状态、roomID、seatIndex、客户端版本和临时流程状态；但不拥有跨连接共享、需要恢复或需要持久化的房间、玩家资产、战斗等权威业务状态，也不承担复杂业务流程。后者应由业务 Service 负责，Agent 使用 Send/Call 访问，不把两个 Service 嵌套成一个运行单元。
 - Agent 内的会话状态只由该 Agent 串行读写；roomID、playerID 等引用可以作为当前连接的缓存，但不能被当作业务事实来源。断线或重连后，需要从拥有状态的业务 Service 重新确认。
@@ -252,10 +254,10 @@ Gate 只设置四类资源上限：最大连接数、握手最长等待、单条
 - 握手最长等待默认 `5s`。
 - `MaxFrameBytes` 默认 `4 MiB`，按完整 WebSocket 二进制消息计算；生产消息包含 8 字节 seq、Envelope 和 16 字节 MAC，DebugGate 消息包含完整 Envelope。
 - `MaxConnections` 必须由每个部署显式配置为正数；零值不表示无限连接，GSR 不替所有部署猜一个默认连接数。
-- 出站队列按编码后应用消息的字节数限制，而不是按消息条数限制；慢客户端不能仅靠大量小消息或单个大消息绕过内存上限。
+- 出站队列按编码后应用消息的字节数及每项固定队列开销计费，而不是按消息条数限制；慢客户端不能仅靠大量小消息或空消息绕过内存上限。DebugGate 示例当前固定收取 64 字节条目开销，部署需配置至少 64 字节队列容量。
 - 入站继续复用 Agent 的 Runtime Mailbox 容量。达到上限时不建立第二个无限队列，当前连接停止接纳并关闭；出站队列满只返回稳定的 `ErrClientQueueFull`。
 
-容量边界只产生 Gate 结构化诊断，不生成业务 `ErrorResponse`。Gate 至少累计 accepted、rejected、handshake timeout、frame too large、inbound mailbox full 和 outbound queue full 六类计数；日志不记录原始载荷、密钥或未认证字段。
+容量边界只产生 Gate 结构化诊断，不生成业务 `ErrorResponse`。生产 Gate 至少累计 accepted、rejected、handshake timeout、frame too large、inbound mailbox full 和 outbound queue full 六类计数；日志不记录原始载荷、密钥或未认证字段。DebugGate 没有应用层握手阶段，因此不产生握手超时计数；当前示例提供其余容量计数快照，完整共享结构化日志仍待接入。
 
 Gate 停止按以下顺序执行：
 
@@ -279,8 +281,8 @@ Gate 不等待或强杀 Agent。Runtime 独立停止 Agent runner 并调用 Agen
 
 ## 下一步与验收
 
-Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/通知/推送独立编号，共享 MsgId 常量与客户端协议注册表，控制握手消息，大端 seq 和原始字节 MAC 验证顺序，固定 HKDF 参数，独立 DebugGate，WebSocket 关闭码和 Gate/Agent/业务错误归属，以及“一连接一个业务定义的 AgentService、Runtime 内部消息类型区分客户端消息与普通 Core Command、Service 可选择实现 ClientMessageHandler、业务协议通过 ProtocolHandler 组件组合接入”的边界已确认。Runtime 的单向投递 API 与缺少客户端处理能力时的 admission 拒绝已实现；联调示例现包含共享 Envelope/握手 `.proto`、Go 生成类型，以及尚未接入 Gate/Agent 的独立 typed 消息注册表。TypeScript 生成、跨语言密码固定向量、Agent 的 `NewAgent` 组装回调以及 Gate 的四类容量上限仍需按实现切片推进。一次讨论一个问题，未确认前不新增公开 API 或通用安全插件框架。
+Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/通知/推送独立编号，共享 MsgId 常量与客户端协议注册表，控制握手消息，大端 seq 和原始字节 MAC 验证顺序，固定 HKDF 参数，独立 DebugGate，WebSocket 关闭码和 Gate/Agent/业务错误归属，以及“一连接一个业务定义的 AgentService、Runtime 内部消息类型区分客户端消息与普通 Core Command、Service 可选择实现 ClientMessageHandler、业务协议通过 ProtocolHandler 组件组合接入”的边界已确认。Runtime 的单向投递 API 与缺少客户端处理能力时的 admission 拒绝已实现；联调示例包含共享 Envelope/握手 `.proto`、Go 生成类型、typed 消息注册表及 `debuggate` Go 集成闭环。DebugGate 使用示例专用的底层 Runtime 注入，不扩展 Core 或 `gsr.Run`。生产 Gate、TypeScript CLI、跨语言密码固定向量、共享结构化日志接线和更完整的慢客户端/失败压力测试仍待推进。一次讨论一个问题，未确认前不新增公开 API 或通用安全插件框架。
 
-联调示例计划放在 `examples/websocket-gate/`：Go 端使用 GSR 组装最小 Gate、Agent 和业务 Service，TypeScript 端使用命令行客户端连接并发送 Envelope。示例不定义新的生产协议或框架，只复用业务项目提供的 Protobuf/MsgId；至少演练正常请求、业务拒绝、ErrorResponse、服务端 Push、request_id 关联、连接关闭和 DebugGate/生产 Gate 的边界。生产 Gate 的 X25519/HKDF/seq/MAC 固定向量验证另列为跨语言测试，不由示例掩盖安全协议审查。
+联调示例位于 `examples/websocket-gate/`：Go DebugGate、连接 Agent 和 request/response 往返测试已经落地；TypeScript 命令行客户端、业务拒绝、ErrorResponse、服务端 Push 和生产 Gate 尚未实现。示例不定义新的生产协议或框架，只复用业务项目提供的 Protobuf/MsgId。生产 Gate 的 X25519/HKDF/seq/MAC 固定向量验证另列为跨语言测试，不由示例掩盖安全协议审查。
 
-实施按共享 Envelope/注册表 → DebugGate 本地闭环 → 生产 Gate 握手及上行认证 → Gate/Agent 往返 → 失败、背压和关闭推进。验证应包含跨语言固定向量、两种 Gate 的边界隔离、跨连接旧包拒绝、同连接重复拒绝、MAC 篡改和失败不推进序号、未知 msg_id、阶段/方向错误、超限、request_id 超时与迟到、编号耗尽、慢客户端和断开回收。测试不替代密码协议审查。
+下一步按共享跨语言客户端 → 生产 Gate 握手及上行认证 → 失败、背压和关闭推进。验证应包含跨语言固定向量、两种 Gate 的边界隔离、跨连接旧包拒绝、同连接重复拒绝、MAC 篡改和失败不推进序号、未知 msg_id、阶段/方向错误、超限、request_id 超时与迟到、编号耗尽、慢客户端和断开回收。测试不替代密码协议审查。
