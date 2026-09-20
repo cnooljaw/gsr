@@ -185,6 +185,16 @@ mac
 - MAC 只取 HMAC-SHA256 前 16 字节；测试覆盖正确 MAC、修改 seq、修改 Envelope、修改 `info`、交换公钥顺序和错误截断长度。
 - Go 和 TypeScript 的测试都直接读取同一份向量，生产实现不依赖测试向量文件；向量生成脚本与运行时实现分开，避免同一错误同时生成“期望值”和实际值。
 
+## TypeScript Protobuf 生成方案
+
+命令行客户端使用 Protobuf-ES：`.proto` 是 Go 服务端与 TypeScript 客户端共同的唯一协议源，由 Buf CLI 的单个 `buf generate` 配置分别调用本地 `protoc-gen-go` 和 `protoc-gen-es`。TypeScript 使用 `@bufbuild/protobuf` 运行时和 `protoc-gen-es` 生成的类型化消息，不在客户端手写二进制编码或运行时反射解析 `.proto`。
+
+- `buf.yaml` 与 `buf.gen.yaml` 放在联调示例根目录；输入只来自该示例的 `proto/`。
+- 生成 Go 消息到示例服务端的 `gen/go/`，生成 TypeScript 消息到客户端的 `client/src/gen/`，两侧均从同一 schema 生成。
+- Buf CLI、`protoc-gen-es` 和 `@bufbuild/protobuf` 版本由示例 `package-lock.json` 固定；`protoc-gen-go` 与 Go Protobuf 运行时版本由 Go module/安装说明固定。使用本地插件，生成不依赖远程插件服务。
+- 生成源文件纳入版本控制，便于克隆后直接运行；改动 `.proto` 后通过单条生成命令更新两侧产物，并验证工作树没有遗漏的生成差异。
+- 固定向量验证仍使用已记录的原始字节，不依赖 Protobuf-ES 和 Go 生成器重新编码成相同字节；这样 MAC 契约仍以原始输入字节为准。
+
 ## 已确认：WebSocket 关闭码与错误归属
 
 Gate 只使用标准 WebSocket 关闭码，不新增当前客户端必须理解的私有 4000–4999 关闭码。关闭原因是简短、稳定的通用标记，不暴露密钥、MAC、内部错误文本、堆栈或未认证载荷；具体错误写入服务端结构化日志。关闭控制帧的原因文本还必须满足 WebSocket 控制帧长度限制。

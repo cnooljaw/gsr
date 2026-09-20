@@ -390,7 +390,8 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 状态：已记录，待 Gate 与 Agent 最小实现完成后建设，不提前加入 Core 或通用测试框架。
 
 - 在 `examples/websocket-gate/` 提供一个 GSR Go 服务端和一个命令行 TypeScript 客户端，用于验证真实 WebSocket 接入、Envelope 编解码、request_id 关联、业务 Response、业务拒绝、ErrorResponse、服务端 Push 和连接关闭。
-- 示例先覆盖 DebugGate 的内网闭环，再接入生产 Gate 的握手与上行认证；客户端使用与业务项目相同的 Protobuf/MsgId 生成代码，不另造一套协议。
+- 示例以 `proto/` 下的 `.proto` 作为唯一协议源，使用 Buf CLI 的单个 `buf generate` 配置调用本地 `protoc-gen-go` 与 `protoc-gen-es`，分别生成 Go 和 TypeScript 消息。客户端使用 `@bufbuild/protobuf` 的类型化消息和二进制 codec，不手写 wire 编码；示例锁定 generator/runtime 版本并跟踪生成源码。
+- 示例先覆盖 DebugGate 的内网闭环，再接入生产 Gate 的握手与上行认证；客户端与服务端始终复用同一套 Protobuf schema 和 MsgId，不另造一套协议。
 - 在接入生产 Gate 前，先提供 Go 与 TypeScript 共同读取的跨语言密码固定向量，覆盖 X25519、HKDF、seq 大端编码和原始 Envelope 字节 MAC；向量是独立测试夹具，不把测试私钥带入示例运行。
 - Gate 组装使用 `NewAgent func(ClientSession) runtime.Service` 回调；Gate 的网络 goroutine 只投递内部事件，由 GateService runner 创建 Agent，不新增 AgentFactory、Service 管理器或通用依赖注入层。
 - Gate 只配置最大连接数、握手等待、单帧大小和每连接出站队列四类有限上限：握手默认 5 秒、完整 WebSocket 帧默认 4 MiB，最大连接数显式配置，出站按字节限制，入站复用 Agent Mailbox，不建立无界中间队列。停止按“停监听 → 停止接纳 → 失效会话 → 关闭连接 → 通知 Agent → 等待 Gate I/O owner”验证，不等待或强杀 Agent；同时核对六类容量计数，不记录敏感字段。
