@@ -279,7 +279,7 @@ Gate 不等待或强杀 Agent。Runtime 独立停止 Agent runner 并调用 Agen
 
 ## 下一步与验收
 
-Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/通知/推送独立编号，共享 MsgId 常量与客户端协议注册表，控制握手消息，大端 seq 和原始字节 MAC 验证顺序，固定 HKDF 参数，独立 DebugGate，WebSocket 关闭码和 Gate/Agent/业务错误归属，以及“一连接一个业务定义的 AgentService、Runtime 内部消息类型区分客户端消息与普通 Core Command、Service 可选择实现 ClientMessageHandler、业务协议通过 ProtocolHandler 组件组合接入”的边界已确认。Runtime 的单向投递 API 与缺少客户端处理能力时的 admission 拒绝已实现；跨语言密码固定向量、Agent 的 `NewAgent` 组装回调以及 Gate 的四类容量上限仍需按实现切片推进。一次讨论一个问题，未确认前不新增公开 API 或通用安全插件框架。
+Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/通知/推送独立编号，共享 MsgId 常量与客户端协议注册表，控制握手消息，大端 seq 和原始字节 MAC 验证顺序，固定 HKDF 参数，独立 DebugGate，WebSocket 关闭码和 Gate/Agent/业务错误归属，以及“一连接一个业务定义的 AgentService、Runtime 内部消息类型区分客户端消息与普通 Core Command、Service 可选择实现 ClientMessageHandler、业务协议通过 ProtocolHandler 组件组合接入”的边界已确认。Runtime 的单向投递 API 与缺少客户端处理能力时的 admission 拒绝已实现；联调示例现包含共享 Envelope/握手 `.proto` 与 Go 生成类型，消息注册表、TypeScript 生成、跨语言密码固定向量、Agent 的 `NewAgent` 组装回调以及 Gate 的四类容量上限仍需按实现切片推进。一次讨论一个问题，未确认前不新增公开 API 或通用安全插件框架。
 
 联调示例计划放在 `examples/websocket-gate/`：Go 端使用 GSR 组装最小 Gate、Agent 和业务 Service，TypeScript 端使用命令行客户端连接并发送 Envelope。示例不定义新的生产协议或框架，只复用业务项目提供的 Protobuf/MsgId；至少演练正常请求、业务拒绝、ErrorResponse、服务端 Push、request_id 关联、连接关闭和 DebugGate/生产 Gate 的边界。生产 Gate 的 X25519/HKDF/seq/MAC 固定向量验证另列为跨语言测试，不由示例掩盖安全协议审查。
 

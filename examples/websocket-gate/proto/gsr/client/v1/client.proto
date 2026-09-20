@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package gsr.client.v1;
+
+option go_package = "github.com/cnooljaw/gsr/examples/websocket-gate/gen/go/gsr/client/v1;clientv1";
+
+// MsgId 是客户端连接协议使用的消息编号；业务编号由业务项目维护。
+enum MsgId {
+  MSG_ID_UNSPECIFIED = 0;
+
+  C2S_KEY_EXCHANGE_REQUEST = 1;
+  S2C_KEY_EXCHANGE_RESPONSE = 2;
+
+  S2C_ERROR_RESPONSE = 9001;
+}
+
+// Envelope 是一条完整客户端消息的 Protobuf 外层，不包含连接认证字段。
+message Envelope {
+  uint32 msg_id = 1;
+  uint32 request_id = 2;
+  bytes payload = 3;
+}
+
+// KeyExchangeRequest 在连接握手阶段承载客户端临时 X25519 公钥。
+message KeyExchangeRequest {
+  bytes client_public_key = 1;
+}
+
+// KeyExchangeResponse 在连接握手阶段承载服务端临时 X25519 公钥。
+message KeyExchangeResponse {
+  bytes server_public_key = 1;
+}
+
+// ErrorResponse 表示请求未能得到正常业务结果，不表示业务拒绝。
+message ErrorResponse {
+  int32 code = 1;
+  string message = 2;
+}
