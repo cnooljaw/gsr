@@ -1,6 +1,6 @@
 # GSR API 设计规范
 
-客户端接入另见 [WebSocket Gate 草案](RFC-WEBSOCKET-GATE.md)：生产 Gate 的 WSS 上行使用 seq + Protobuf Envelope + MAC，下行只使用 Envelope；独立 DebugGate 仅传输 Envelope。Envelope 使用 msg_id、request_id(uint32) 和 payload，由 `AgentService` 中转。C/S request_id、两种 Gate、连接认证、关闭码和错误归属均在 Core/Cluster 之外。Gate 只负责传输与安全边界，AgentService 负责客户端会话并组合业务项目提供的 `ProtocolHandler`；Gate 到 Agent 使用 Runtime-owned 的单向基础设施投递，Agent 到 Gate 使用不暴露 socket 的 `ClientSession` 写回能力，业务协议组件只做协议适配、简单收发和业务 Service 路由。协议组件可以持有连接私有的轻量会话状态，但不持有跨连接共享或需恢复的权威业务状态，业务 Service 负责业务拒绝和状态变化。GSR 不内置大厅、游戏或其它具体协议实现，只提供通用接入边界。标准关闭码、结构化日志和 Agent 组装边界见 RFC。首版不实现 DES 或旧 12 字节头兼容。该能力尚未实现，公开 API、schema 与握手细节仍待落地，不改变本文已有运行接口。
+客户端接入另见 [WebSocket Gate 草案](RFC-WEBSOCKET-GATE.md)：生产 Gate 的 WSS 上行使用 seq + Protobuf Envelope + MAC，下行只使用 Envelope；独立 DebugGate 仅传输 Envelope。Envelope 使用 msg_id、request_id(uint32) 和 payload，由业务定义的 `AgentService` 中转。C/S request_id、两种 Gate、连接认证、关闭码和错误归属均在 Core/Cluster 之外。Gate 只负责传输与安全边界。Runtime 内部消息类型区分客户端消息与普通 Core Command，Service 通过可选的 `ClientMessageHandler` 实现明确启用客户端处理能力；Agent 在同一 Service runner 中将客户端 Envelope 按 `msg_id` 路由到 `Requests`，将本地或 Cluster 投递的普通 Core Command 按 `CommandID` 路由到 `Commands`。Core Command 的 Send/Call 仍是同一种消息类型，由 Session 是否为零区分；`Source` 只表示 Service 来源，不作为入口类别。AgentService 负责客户端会话并组合业务项目提供的 `ProtocolHandler`；Gate 到 Agent 使用 Runtime-owned 的 `Runtime.DeliverClientMessage` 单向基础设施投递，Agent 到 Gate 使用不暴露 socket 的 `ClientSession` 写回能力，业务协议组件只做协议适配、简单收发和业务 Service 路由。协议组件可以持有连接私有的轻量会话状态，但不持有跨连接共享或需恢复的权威业务状态，业务 Service 负责业务拒绝和状态变化。GSR 不内置大厅、游戏或其它具体协议实现，只提供通用接入边界。Core 客户端消息投递能力已实现；Gate、ClientSession 和协议 schema 仍待实现。标准关闭码、结构化日志和 Agent 组装边界见 RFC。首版不实现 DES 或旧 12 字节头兼容。
 
 Gate 与业务 Agent 的组装只需要一个构造回调，不增加 AgentFactory 抽象：
 
@@ -153,7 +153,7 @@ Mailbox
 
 ## 4. 本地消息管道
 
-Core 内部只有一种未编码的本地消息模型：
+Core 使用一个 Runtime-owned 本地消息对象；其私有消息类型区分普通 Core Command 与客户端消息。普通 Send 和 Call 共用同一种 Command 消息：
 
 ```go
 type Message struct {
@@ -165,7 +165,7 @@ type Message struct {
 }
 ```
 
-`Message` 是 Runtime 内存对象，不是网络包，不执行 protobuf/TCP 编码。Send 与 Call 不是两种 Message 或两个 Dispatcher：
+`Message` 是 Runtime 内存对象，不是网络包，不执行 Core Message 的 wire 编码。Send 与 Call 不是两种 Message 或两个 Dispatcher：
 
 ```text
 SessionID == 0  → Send，不需要 Reply
@@ -179,6 +179,18 @@ SessionID > 0   → Call，等待一次 Reply
 - Send/Call 请求共用 Message；Reply 不是业务 Command，也不进入调用方的 Mailbox 或 Handler。
 - Runtime 以 SessionID 查询内部 `PendingCall`，通过独立的 completion 路径完成一次 Reply 或 Runtime Error。
 - 不为本地 Send/Call 分别实现 mailbox、scheduler 或 local dispatcher。
+
+客户端消息使用同一目标 Service、Mailbox 和 runner，但具有独立的 Runtime 内部类型，不使用 Core `CommandID` 或 Session：
+
+```go
+type ClientMessageHandler interface {
+	HandleClientMessage(CommandContext, []byte) error
+}
+
+func (runtime *Runtime) DeliverClientMessage(target ServiceID, envelope []byte) error
+```
+
+`envelope` 是完整的 Protobuf Envelope 编码字节；Runtime 不解析客户端协议，并在投递时复制字节快照。该入口是 Gate 等受信任基础设施的单向 API，消息的 Source、Session 和 CommandID 固定为零。Runtime 不维护额外的客户端处理器 Registry；目标 Service 实现 `ClientMessageHandler` 即声明这项能力。未实现时在 Mailbox admission 前返回稳定错误 `ErrClientMessageUnsupported`，不会入队后再静默丢弃。客户端处理函数与普通 `Handle` 在同一个 Service runner 中串行执行，不产生 Core Reply；Agent 根据 Envelope 自身的 `request_id` 组织客户端响应。
 
 ### 4.1 Args 的所有权
 
@@ -295,6 +307,7 @@ CommandID 由业务/协议包维护静态常量或生成代码；Runtime 不分�
 ## 5. Source 语义
 
 - 普通 Service 发起 Send 或 Call 时，Runtime 创建的 `Message.Source` 是当前发起 Service 的 `ServiceID`。
+- Runtime.DeliverClientMessage 投递的客户端消息 Source 固定为 `ServiceID(0)`，不能用 Source 推断消息类别。
 - `After` 到期后由 Runtime 创建普通 Command，但其 `Message.Source` 固定为 `ServiceID(0)`；Timer 的创建者由 Timer owner 记录，不能用 Source 冒充创建者。Handler 必须允许 `CommandContext.Source()` 为零值。
 - 业务调用者不能传入、覆盖或伪造 Source。`ServiceContext` 和 typed client 均不暴露任意 source 参数。
 - Core 内部对普通 Service、Runtime-owned 注入和 Timer 使用不同的显式投递入口；`nil` 不是 `Source == 0` 的业务语义。
@@ -904,6 +917,7 @@ func (r *Runtime) Inspect() RuntimeInspection
 - Call 的实际等待不超过 `MaxCallWait`；调用方 context 只能取消或选择更早 deadline。
 - Core 测试必须证明 admission 会复制 `Args` 外层切片；每个携带 map、slice 或 pointer 的 typed client 必须单独证明其具体请求快照在 admission 后不受调用方修改影响。
 - Mailbox 和 Cluster 出站队列容量有界；满载时快速返回稳定错误，不隐式扩容或无限等待。
+- Runtime.DeliverClientMessage 只接纳实现 ClientMessageHandler 的目标 Service；缺少该能力时在 Mailbox admission 前返回稳定错误，且不占用 Mailbox 容量。
 - 进入 `Stopping` 后拒绝新消息；已经接受的消息遵守唯一、明确的停止策略。
 - Service 进入 `Stopped` 后，Timer 不再向它投递 Command。
 - After 只触发一次；CancelTimer、Stop 和触发完成之间的竞争最多产生一次成功 admission。

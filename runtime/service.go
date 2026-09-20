@@ -10,11 +10,19 @@ import (
 // Service 通过 Runtime 本地的 ServiceID 对外提供入口，并独占其可变状态。
 //
 // OnStart 和 OnStop 是由 Runtime 管理的生命周期钩子。
-// 对已接纳的 Message，Handle 是 Runtime 调用的唯一业务入口。
+// Handle 是普通 Core Command 的业务入口；客户端消息由可选的 ClientMessageHandler 接收。
 type Service interface {
 	OnStart(context.Context, ServiceContext) error
 	Handle(CommandContext, CommandID, ...any) (any, error)
 	OnStop(context.Context) error
+}
+
+// ClientMessageHandler 是 Service 可选的客户端消息处理能力。
+//
+// 实现该接口后，Runtime 才会接纳 DeliverClientMessage 投递到此 Service 的 Envelope。
+// 客户端消息与 Core Command 共用目标 Service 的 Mailbox 和串行 runner；Runtime 不解析 Envelope。
+type ClientMessageHandler interface {
+	HandleClientMessage(CommandContext, []byte) error
 }
 
 // ServiceContext 提供当前 Service 可使用的 Core 能力。
@@ -35,8 +43,8 @@ type ServiceContext interface {
 
 // CommandContext 描述当前处理消息的 Service 及消息来源。
 //
-// 此上下文仅在 Handle 返回前有效，不提供 Reply 方法；
-// Runtime 使用 Handle 的返回值完成 Call。
+// 此上下文仅在 Handle 或 HandleClientMessage 返回前有效，不提供 Reply 方法；
+// Runtime 使用普通 Handle 的返回值完成 Core Call。
 type CommandContext interface {
 	ServiceContext
 	Source() ServiceID
@@ -323,11 +331,22 @@ func (runtime *Runtime) executeMessage(instance *serviceInstance, message Messag
 		}
 	}()
 
-	result, err = instance.service.Handle(&commandContext{
+	messageContext := &commandContext{
 		serviceContext: instance.context,
 		source:         message.Source,
-	}, message.Command, message.Args...)
-	return result, err
+	}
+	switch message.kind {
+	case messageKindCommand:
+		return instance.service.Handle(messageContext, message.Command, message.Args...)
+	case messageKindClient:
+		handler, ok := instance.service.(ClientMessageHandler)
+		if !ok {
+			return nil, ErrClientMessageUnsupported
+		}
+		return nil, handler.HandleClientMessage(messageContext, message.clientEnvelope)
+	default:
+		return nil, ErrClientMessageUnsupported
+	}
 }
 
 func (runtime *Runtime) failureContext() (context.Context, context.CancelFunc) {

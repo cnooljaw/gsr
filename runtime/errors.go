@@ -16,27 +16,28 @@ const (
 type ErrorCode string
 
 const (
-	ErrorCodeIDExhausted             ErrorCode = "runtime.id_exhausted"
-	ErrorCodeInvalidConfig           ErrorCode = "runtime.invalid_config"
-	ErrorCodeRuntimeAlreadyStarted   ErrorCode = "runtime.already_started"
-	ErrorCodeRuntimeNotRunning       ErrorCode = "runtime.not_running"
-	ErrorCodeRuntimeStopping         ErrorCode = "runtime.stopping"
-	ErrorCodeRuntimeStopped          ErrorCode = "runtime.stopped"
-	ErrorCodeRuntimeClosed           ErrorCode = "runtime.closed"
-	ErrorCodeInvalidService          ErrorCode = "runtime.invalid_service"
-	ErrorCodeServiceNotFound         ErrorCode = "runtime.service_not_found"
-	ErrorCodeServiceStarting         ErrorCode = "runtime.service_starting"
-	ErrorCodeServiceStopping         ErrorCode = "runtime.service_stopping"
-	ErrorCodeServiceClosed           ErrorCode = "runtime.service_closed"
-	ErrorCodeServicePanicked         ErrorCode = "runtime.service_panicked"
-	ErrorCodeMailboxFull             ErrorCode = "runtime.mailbox_full"
-	ErrorCodeUnknownCommand          ErrorCode = "runtime.unknown_command"
-	ErrorCodeInvalidCommandHandler   ErrorCode = "runtime.invalid_command_handler"
-	ErrorCodeInvalidCommandArguments ErrorCode = "runtime.invalid_command_arguments"
-	ErrorCodeInvalidCallContext      ErrorCode = "runtime.invalid_call_context"
-	ErrorCodeCallCycle               ErrorCode = "runtime.call_cycle"
-	ErrorCodeCallTimeout             ErrorCode = "runtime.call_timeout"
-	ErrorCodeHandlerFailed           ErrorCode = "runtime.handler_failed"
+	ErrorCodeIDExhausted              ErrorCode = "runtime.id_exhausted"
+	ErrorCodeInvalidConfig            ErrorCode = "runtime.invalid_config"
+	ErrorCodeRuntimeAlreadyStarted    ErrorCode = "runtime.already_started"
+	ErrorCodeRuntimeNotRunning        ErrorCode = "runtime.not_running"
+	ErrorCodeRuntimeStopping          ErrorCode = "runtime.stopping"
+	ErrorCodeRuntimeStopped           ErrorCode = "runtime.stopped"
+	ErrorCodeRuntimeClosed            ErrorCode = "runtime.closed"
+	ErrorCodeInvalidService           ErrorCode = "runtime.invalid_service"
+	ErrorCodeServiceNotFound          ErrorCode = "runtime.service_not_found"
+	ErrorCodeServiceStarting          ErrorCode = "runtime.service_starting"
+	ErrorCodeServiceStopping          ErrorCode = "runtime.service_stopping"
+	ErrorCodeServiceClosed            ErrorCode = "runtime.service_closed"
+	ErrorCodeServicePanicked          ErrorCode = "runtime.service_panicked"
+	ErrorCodeMailboxFull              ErrorCode = "runtime.mailbox_full"
+	ErrorCodeClientMessageUnsupported ErrorCode = "runtime.client_message_unsupported"
+	ErrorCodeUnknownCommand           ErrorCode = "runtime.unknown_command"
+	ErrorCodeInvalidCommandHandler    ErrorCode = "runtime.invalid_command_handler"
+	ErrorCodeInvalidCommandArguments  ErrorCode = "runtime.invalid_command_arguments"
+	ErrorCodeInvalidCallContext       ErrorCode = "runtime.invalid_call_context"
+	ErrorCodeCallCycle                ErrorCode = "runtime.call_cycle"
+	ErrorCodeCallTimeout              ErrorCode = "runtime.call_timeout"
+	ErrorCodeHandlerFailed            ErrorCode = "runtime.handler_failed"
 )
 
 // StatusError 是 Core 统一使用的结构化错误与状态类型，
@@ -169,6 +170,12 @@ var (
 		ErrorClassRuntime,
 		ErrorCodeMailboxFull,
 		"service mailbox is full",
+	)
+	// ErrClientMessageUnsupported 表示目标 Service 未实现客户端消息处理能力。
+	ErrClientMessageUnsupported error = NewStatusError(
+		ErrorClassRuntime,
+		ErrorCodeClientMessageUnsupported,
+		"service does not handle client messages",
 	)
 	// ErrUnknownCommand 表示 Service 没有对应 CommandID 的 Handler。
 	ErrUnknownCommand error = NewStatusError(

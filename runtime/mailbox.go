@@ -2,13 +2,24 @@ package runtime
 
 import "sync"
 
-// Message 是通过 Service Mailbox 投递的未编码本地消息值。
+// messageKind 区分普通 Core Command 与受信任基础设施投递的客户端消息。
+type messageKind uint8
+
+const (
+	messageKindCommand messageKind = iota
+	messageKindClient
+)
+
+// Message 是通过 Service Mailbox 投递的 Runtime 内部消息容器，不是 wire frame。
 type Message struct {
 	Source  ServiceID
 	Target  ServiceID
 	Session SessionID
 	Command CommandID
 	Args    []any
+
+	kind           messageKind // 当前内部消息类型。
+	clientEnvelope []byte      // 客户端 Protobuf Envelope 的独占字节快照。
 }
 
 // mailbox 是带有独立唤醒信号的有界 FIFO 队列。

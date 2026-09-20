@@ -13,8 +13,8 @@ type serviceLifecycle struct {
 }
 
 // localDispatcher 是由 Runtime 管理的本地路由边界。
-// 它查询当前 Service 注册表，但不检查 CommandID 支持情况；
-// 每条已接纳的 Message 都交给目标 Handler。
+// 它查询当前 Service 注册表，不检查 Core CommandID 支持情况；
+// 客户端消息则要求目标 Service 实现 ClientMessageHandler。
 type localDispatcher struct {
 	runtime *Runtime
 }
@@ -220,6 +220,16 @@ func (runtime *Runtime) Send(target ServiceID, command CommandID, args ...any) e
 	return runtime.dispatcher.dispatchRuntimeOwned(target, command, args...)
 }
 
+// DeliverClientMessage 将完整的 Protobuf Envelope 作为不透明字节投递给目标 Service。
+// 这是供 Gate 等受信任基础设施使用的单向入口；Runtime 会复制字节快照，
+// 且只接纳实现 ClientMessageHandler 的目标 Service。
+func (runtime *Runtime) DeliverClientMessage(target ServiceID, envelope []byte) error {
+	if runtime.dispatcher == nil {
+		return ErrRuntimeClosed
+	}
+	return runtime.dispatcher.dispatchRuntimeOwnedClient(target, envelope)
+}
+
 func (runtime *Runtime) sendFrom(source *serviceInstance, target ServiceID, command CommandID, args ...any) error {
 	if runtime.dispatcher == nil {
 		return ErrRuntimeClosed
@@ -248,6 +258,7 @@ func (dispatcher *localDispatcher) dispatchFromServiceWithSession(source *servic
 		Session: session,
 		Command: command,
 		Args:    append([]any(nil), args...),
+		kind:    messageKindCommand,
 	})
 }
 
@@ -266,6 +277,16 @@ func (dispatcher *localDispatcher) dispatchRuntimeOwnedWithSession(target Servic
 		Session: session,
 		Command: command,
 		Args:    append([]any(nil), args...),
+		kind:    messageKindCommand,
+	})
+}
+
+func (dispatcher *localDispatcher) dispatchRuntimeOwnedClient(target ServiceID, envelope []byte) error {
+	return dispatcher.enqueue(Message{
+		Source:         ServiceID(0),
+		Target:         target,
+		kind:           messageKindClient,
+		clientEnvelope: envelope,
 	})
 }
 
@@ -276,6 +297,7 @@ func (dispatcher *localDispatcher) dispatchTimer(target ServiceID, command Comma
 		Session: 0,
 		Command: command,
 		Args:    append([]any(nil), args...),
+		kind:    messageKindCommand,
 	})
 }
 
@@ -304,6 +326,12 @@ func (dispatcher *localDispatcher) enqueue(message Message) (err error) {
 	runtime.servicesMu.RUnlock()
 	if targetErr := serviceAdmissionError(targetState); targetErr != nil {
 		return targetErr
+	}
+	if message.kind == messageKindClient {
+		if _, supportsClientMessages := targetInstance.service.(ClientMessageHandler); !supportsClientMessages {
+			return ErrClientMessageUnsupported
+		}
+		message.clientEnvelope = append([]byte(nil), message.clientEnvelope...)
 	}
 
 	return targetInstance.mailbox.enqueue(message)
