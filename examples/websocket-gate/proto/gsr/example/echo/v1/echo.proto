@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package gsr.example.echo.v1;
+
+option go_package = "github.com/cnooljaw/gsr/examples/websocket-gate/gen/go/gsr/example/echo/v1;echopb";
+
+import "gsr/protocol/v1/options.proto";
+
+// MsgId 定义 WebSocket 联调示例的业务消息编号，不属于 GSR Core 协议。
+enum MsgId {
+  MSG_ID_UNSPECIFIED = 0;
+
+  C2S_ECHO_REQUEST = 1001 [
+    (gsr.protocol.v1.message_route) = {
+      payload_type: ".gsr.example.echo.v1.EchoRequest"
+      direction: DIRECTION_CLIENT_TO_SERVER
+      kind: KIND_REQUEST
+    }
+  ];
+  S2C_ECHO_RESPONSE = 1002 [
+    (gsr.protocol.v1.message_route) = {
+      payload_type: ".gsr.example.echo.v1.EchoResponse"
+      direction: DIRECTION_SERVER_TO_CLIENT
+      kind: KIND_RESPONSE
+    }
+  ];
+}
+
+// EchoRequest 是客户端发起的回显请求。
+message EchoRequest {
+  string text = 1;
+}
+
+// EchoResponse 是服务端返回的回显结果。
+message EchoResponse {
+  string text = 1;
+}

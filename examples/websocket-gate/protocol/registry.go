@@ -1,319 +1,144 @@
+// Package protocol 提供客户端 Protobuf 消息的解码、分发和响应封装。
 package protocol
 
 import (
 	"errors"
 	"fmt"
+	"reflect"
 
-	clientv1 "github.com/cnooljaw/gsr/examples/websocket-gate/gen/go/gsr/client/v1"
+	"github.com/cnooljaw/gsr/examples/websocket-gate/protocol/catalog"
 	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var (
-	// ErrInvalidRegistry 表示消息注册表定义不完整或彼此冲突。
-	ErrInvalidRegistry = errors.New("invalid client protocol registry")
-	// ErrUnknownMessage 表示 Envelope 的 msg_id 未注册。
-	ErrUnknownMessage = errors.New("unknown client protocol message")
-	// ErrWrongDirection 表示消息方向与当前连接方向不符。
-	ErrWrongDirection = errors.New("wrong client protocol message direction")
-	// ErrInvalidRequestID 表示 request_id 与消息类型的规则不符。
-	ErrInvalidRequestID = errors.New("invalid client request_id")
-	// ErrInvalidPayload 表示 Payload 类型不符或 Protobuf 编解码失败。
-	ErrInvalidPayload = errors.New("invalid client protocol payload")
-	// ErrInvalidResponse 表示响应没有对应有效的客户端请求。
-	ErrInvalidResponse = errors.New("invalid client protocol response")
+	// ErrUnknownMessageID 表示消息编号没有对应的 Protobuf 类型。
+	ErrUnknownMessageID = errors.New("protocol: unknown msg_id")
+	// ErrWrongDirection 表示消息编号的方向不允许当前收发操作。
+	ErrWrongDirection = errors.New("protocol: message direction does not match operation")
+	// ErrPayloadTypeMismatch 表示消息编号与 Protobuf payload 类型不匹配。
+	ErrPayloadTypeMismatch = errors.New("protocol: payload type does not match msg_id")
+	// ErrInvalidPayload 表示消息 payload 不是对应类型的有效 Protobuf 编码。
+	ErrInvalidPayload = errors.New("protocol: invalid payload")
+	// ErrHandlerNotRegistered 表示协议已定义，但业务尚未注册对应处理函数。
+	ErrHandlerNotRegistered = errors.New("protocol: handler not registered")
+	// ErrResponseRequired 表示有 request_id 的请求未得到响应。
+	ErrResponseRequired = errors.New("protocol: request requires a response")
+	// ErrRequestIDMismatch 表示 request_id 与请求或通知类型不匹配。
+	ErrRequestIDMismatch = errors.New("protocol: request_id does not match message kind")
 )
 
-// Direction 表示消息在客户端与服务端之间的传输方向。
-type Direction uint8
-
-const (
-	// ClientToServer 表示从客户端进入服务端。
-	ClientToServer Direction = iota + 1
-	// ServerToClient 表示从服务端发往客户端。
-	ServerToClient
-)
-
-// MessageKind 表示客户端 Envelope 所承载的消息语义。
-type MessageKind uint8
-
-const (
-	// Request 表示需要服务端业务响应的客户端请求。
-	Request MessageKind = iota + 1
-	// Notify 表示不等待响应的客户端通知。
-	Notify
-	// Response 表示服务端对客户端请求的响应。
-	Response
-	// Push 表示服务端主动推送。
-	Push
-)
-
-// MessageDefinition 描述一个客户端消息编号及其 payload 类型。
-//
-// Payload 只用于读取 Protobuf 类型，不会被注册表保留或修改。
-// Request 的 ResponseMsgID 必须指向对应的 Response；专属 Response 的
-// RequestMsgID 必须反向指向该 Request。通用 ErrorResponse 的 RequestMsgID 为零。
-type MessageDefinition struct {
-	MsgID         uint32
-	Direction     Direction
-	Kind          MessageKind
-	Payload       proto.Message
-	ResponseMsgID uint32
-	RequestMsgID  uint32
-}
-
-// Message 是已经按注册表完成方向、request_id 和 payload 校验的协议消息。
-//
-// Encode 对专属 Response 要求 RequestMsgID 指向原始客户端 Request；通用 ErrorResponse 只使用 Envelope 的 RequestID。
-type Message struct {
-	MsgID        uint32
-	RequestID    uint32
-	RequestMsgID uint32
-	Payload      proto.Message
-}
-
-// DecodedMessage 包含解码后的业务 payload 和注册表中的消息关系。
-type DecodedMessage struct {
-	MsgID         uint32
-	RequestID     uint32
-	Kind          MessageKind
-	ResponseMsgID uint32
-	Payload       proto.Message
-}
-
-type registeredMessage struct {
-	definition  MessageDefinition
-	payloadType protoreflect.MessageType
-}
-
-// Registry 是创建后不可变的客户端消息注册表。
+// Registry 汇总由 Protobuf 生成的消息目录，并建立编号与类型的双向索引。
 type Registry struct {
-	messages map[uint32]registeredMessage
+	byID   map[uint32]catalog.Entry
+	byType map[reflect.Type]catalog.Entry
 }
 
-// NewRegistry 校验并复制客户端消息定义。
-func NewRegistry(definitions ...MessageDefinition) (*Registry, error) {
-	if len(definitions) == 0 {
-		return nil, fmt.Errorf("%w: no messages", ErrInvalidRegistry)
+// NewRegistry 合并通用协议和业务协议生成的消息目录。
+func NewRegistry(catalogs ...[]catalog.Entry) (*Registry, error) {
+	registry := &Registry{
+		byID:   make(map[uint32]catalog.Entry),
+		byType: make(map[reflect.Type]catalog.Entry),
 	}
-
-	registry := &Registry{messages: make(map[uint32]registeredMessage, len(definitions))}
-	for _, definition := range definitions {
-		if err := validateDefinition(definition); err != nil {
-			return nil, err
+	for _, entries := range catalogs {
+		for _, entry := range entries {
+			if err := registry.add(entry); err != nil {
+				return nil, err
+			}
 		}
-		if _, exists := registry.messages[definition.MsgID]; exists {
-			return nil, fmt.Errorf("%w: duplicate msg_id %d", ErrInvalidRegistry, definition.MsgID)
-		}
-
-		payloadType := definition.Payload.ProtoReflect().Type()
-		definition.Payload = nil
-		registry.messages[definition.MsgID] = registeredMessage{
-			definition:  definition,
-			payloadType: payloadType,
-		}
-	}
-
-	if err := validateResponseRelations(registry.messages); err != nil {
-		return nil, err
 	}
 	return registry, nil
 }
 
-// Decode 按消息编号查找 payload 类型，并验证方向及 request_id 语义。
-func (registry *Registry) Decode(direction Direction, envelope *clientv1.Envelope) (DecodedMessage, error) {
-	if registry == nil {
-		return DecodedMessage{}, ErrInvalidRegistry
+func (registry *Registry) add(entry catalog.Entry) error {
+	if entry.ID == 0 {
+		return errors.New("protocol: message catalog contains zero msg_id")
 	}
-	if !validDirection(direction) {
-		return DecodedMessage{}, ErrWrongDirection
+	if entry.Direction != catalog.ClientToServer && entry.Direction != catalog.ServerToClient {
+		return fmt.Errorf("protocol: msg_id %d has invalid direction %d", entry.ID, entry.Direction)
 	}
-	if envelope == nil {
-		return DecodedMessage{}, fmt.Errorf("%w: nil Envelope", ErrInvalidPayload)
+	if entry.Direction == catalog.ClientToServer && entry.Kind != catalog.Request && entry.Kind != catalog.Notify {
+		return fmt.Errorf("protocol: client-to-server msg_id %d must be a request or notification", entry.ID)
 	}
-
-	registered, exists := registry.messages[envelope.GetMsgId()]
-	if !exists {
-		return DecodedMessage{}, fmt.Errorf("%w: msg_id %d", ErrUnknownMessage, envelope.GetMsgId())
+	if entry.Direction == catalog.ServerToClient && entry.Kind != catalog.Response && entry.Kind != catalog.Push {
+		return fmt.Errorf("protocol: server-to-client msg_id %d must be a response or push", entry.ID)
 	}
-	if registered.definition.Direction != direction {
-		return DecodedMessage{}, fmt.Errorf("%w: msg_id %d", ErrWrongDirection, envelope.GetMsgId())
+	if entry.NewMessage == nil {
+		return fmt.Errorf("protocol: msg_id %d has no payload constructor", entry.ID)
 	}
-	if err := validateRequestID(registered.definition.Kind, envelope.GetRequestId()); err != nil {
-		return DecodedMessage{}, err
+	if _, exists := registry.byID[entry.ID]; exists {
+		return fmt.Errorf("protocol: duplicate msg_id %d", entry.ID)
 	}
-
-	payload := registered.payloadType.New().Interface()
-	if err := proto.Unmarshal(envelope.GetPayload(), payload); err != nil {
-		return DecodedMessage{}, fmt.Errorf("%w: msg_id %d: %v", ErrInvalidPayload, envelope.GetMsgId(), err)
+	message := entry.NewMessage()
+	if isNil(message) {
+		return fmt.Errorf("protocol: msg_id %d produced a nil payload", entry.ID)
 	}
-
-	return DecodedMessage{
-		MsgID:         registered.definition.MsgID,
-		RequestID:     envelope.GetRequestId(),
-		Kind:          registered.definition.Kind,
-		ResponseMsgID: registered.definition.ResponseMsgID,
-		Payload:       payload,
-	}, nil
+	messageType := reflect.TypeOf(message)
+	if existing, exists := registry.byType[messageType]; exists {
+		return fmt.Errorf("protocol: payload type %s is mapped by msg_id %d and %d", messageType, existing.ID, entry.ID)
+	}
+	registry.byID[entry.ID] = entry
+	registry.byType[messageType] = entry
+	return nil
 }
 
-// Encode 验证方向、消息关系、request_id 和 payload 后构造 Envelope。
-func (registry *Registry) Encode(direction Direction, message Message) (*clientv1.Envelope, error) {
-	if registry == nil {
-		return nil, ErrInvalidRegistry
-	}
-	if !validDirection(direction) {
-		return nil, ErrWrongDirection
-	}
-
-	registered, exists := registry.messages[message.MsgID]
+// Decode 根据 msg_id 创建并解码对应的客户端上行消息，并校验 request_id 语义。
+func (registry *Registry) Decode(msgID, requestID uint32, payload []byte) (proto.Message, error) {
+	entry, exists := registry.byID[msgID]
 	if !exists {
-		return nil, fmt.Errorf("%w: msg_id %d", ErrUnknownMessage, message.MsgID)
+		return nil, fmt.Errorf("%w: %d", ErrUnknownMessageID, msgID)
 	}
-	if registered.definition.Direction != direction {
-		return nil, fmt.Errorf("%w: msg_id %d", ErrWrongDirection, message.MsgID)
+	if entry.Direction != catalog.ClientToServer {
+		return nil, fmt.Errorf("%w: %d is server-to-client", ErrWrongDirection, msgID)
 	}
-	if err := validateRequestID(registered.definition.Kind, message.RequestID); err != nil {
-		return nil, err
+	if (entry.Kind == catalog.Request && requestID == 0) || (entry.Kind == catalog.Notify && requestID != 0) {
+		return nil, fmt.Errorf("%w: msg_id %d", ErrRequestIDMismatch, msgID)
 	}
-	if err := validateResponseRequest(registered.definition, message.RequestMsgID); err != nil {
-		return nil, err
+	message := entry.NewMessage()
+	if err := proto.Unmarshal(payload, message); err != nil {
+		return nil, fmt.Errorf("%w: msg_id %d: %v", ErrInvalidPayload, msgID, err)
 	}
-	if message.Payload == nil || !message.Payload.ProtoReflect().IsValid() {
-		return nil, fmt.Errorf("%w: nil payload", ErrInvalidPayload)
-	}
-	if message.Payload.ProtoReflect().Descriptor().FullName() != registered.payloadType.Descriptor().FullName() {
-		return nil, fmt.Errorf("%w: msg_id %d expects %s, got %s", ErrInvalidPayload, message.MsgID,
-			registered.payloadType.Descriptor().FullName(), message.Payload.ProtoReflect().Descriptor().FullName())
-	}
+	return message, nil
+}
 
-	payload, err := proto.Marshal(message.Payload)
+func (registry *Registry) encodeServerMessage(msgID uint32, kind catalog.Kind, message proto.Message) ([]byte, error) {
+	entry, exists := registry.byID[msgID]
+	if !exists {
+		return nil, fmt.Errorf("%w: %d", ErrUnknownMessageID, msgID)
+	}
+	if entry.Direction != catalog.ServerToClient {
+		return nil, fmt.Errorf("%w: %d is client-to-server", ErrWrongDirection, msgID)
+	}
+	if entry.Kind != kind {
+		return nil, fmt.Errorf("protocol: msg_id %d is %v, not %v", msgID, entry.Kind, kind)
+	}
+	if isNil(message) || reflect.TypeOf(message) != reflect.TypeOf(entry.NewMessage()) {
+		return nil, fmt.Errorf("%w: msg_id %d expects %s", ErrPayloadTypeMismatch, msgID, reflect.TypeOf(entry.NewMessage()))
+	}
+	payload, err := proto.Marshal(message)
 	if err != nil {
-		return nil, fmt.Errorf("%w: msg_id %d: %v", ErrInvalidPayload, message.MsgID, err)
+		return nil, fmt.Errorf("encode msg_id %d payload: %w", msgID, err)
 	}
-	return &clientv1.Envelope{
-		MsgId:     message.MsgID,
-		RequestId: message.RequestID,
-		Payload:   payload,
-	}, nil
+	return payload, nil
 }
 
-func validateDefinition(definition MessageDefinition) error {
-	if definition.MsgID == 0 || !validDirection(definition.Direction) || definition.Payload == nil {
-		return fmt.Errorf("%w: msg_id, direction, or payload is invalid", ErrInvalidRegistry)
-	}
-	if definition.MsgID == uint32(clientv1.MsgId_C2S_KEY_EXCHANGE_REQUEST) ||
-		definition.MsgID == uint32(clientv1.MsgId_S2C_KEY_EXCHANGE_RESPONSE) {
-		return fmt.Errorf("%w: handshake msg_id %d is reserved for Gate", ErrInvalidRegistry, definition.MsgID)
-	}
-	if !validKind(definition.Kind) {
-		return fmt.Errorf("%w: msg_id %d has invalid kind", ErrInvalidRegistry, definition.MsgID)
-	}
-	if !validKindDirection(definition.Kind, definition.Direction) {
-		return fmt.Errorf("%w: msg_id %d has incompatible kind and direction", ErrInvalidRegistry, definition.MsgID)
-	}
-	if definition.Payload.ProtoReflect().Type() == nil {
-		return fmt.Errorf("%w: msg_id %d has invalid payload type", ErrInvalidRegistry, definition.MsgID)
-	}
-	if definition.MsgID == uint32(clientv1.MsgId_S2C_ERROR_RESPONSE) &&
-		(definition.Kind != Response || definition.Direction != ServerToClient || definition.RequestMsgID != 0 ||
-			definition.Payload.ProtoReflect().Descriptor().FullName() != "gsr.client.v1.ErrorResponse") {
-		return fmt.Errorf("%w: msg_id %d is reserved for the generic ErrorResponse", ErrInvalidRegistry, definition.MsgID)
-	}
-
-	switch definition.Kind {
-	case Request:
-		if definition.ResponseMsgID == 0 || definition.RequestMsgID != 0 {
-			return fmt.Errorf("%w: request msg_id %d must define one response", ErrInvalidRegistry, definition.MsgID)
-		}
-	case Response:
-		if definition.ResponseMsgID != 0 {
-			return fmt.Errorf("%w: response msg_id %d cannot define another response", ErrInvalidRegistry, definition.MsgID)
-		}
-		if definition.RequestMsgID == 0 && definition.MsgID != uint32(clientv1.MsgId_S2C_ERROR_RESPONSE) {
-			return fmt.Errorf("%w: response msg_id %d must reference its request", ErrInvalidRegistry, definition.MsgID)
-		}
-	case Notify, Push:
-		if definition.ResponseMsgID != 0 || definition.RequestMsgID != 0 {
-			return fmt.Errorf("%w: one-way msg_id %d cannot define a response relation", ErrInvalidRegistry, definition.MsgID)
-		}
-	}
-	return nil
+func (registry *Registry) entryForType(messageType reflect.Type) (catalog.Entry, bool) {
+	entry, exists := registry.byType[messageType]
+	return entry, exists
 }
 
-func validateResponseRelations(messages map[uint32]registeredMessage) error {
-	for _, registered := range messages {
-		definition := registered.definition
-		switch definition.Kind {
-		case Request:
-			response, exists := messages[definition.ResponseMsgID]
-			if !exists || response.definition.Kind != Response || response.definition.Direction != ServerToClient ||
-				response.definition.RequestMsgID != definition.MsgID {
-				return fmt.Errorf("%w: request msg_id %d has invalid response msg_id %d",
-					ErrInvalidRegistry, definition.MsgID, definition.ResponseMsgID)
-			}
-		case Response:
-			if definition.RequestMsgID == 0 {
-				continue
-			}
-			request, exists := messages[definition.RequestMsgID]
-			if !exists || request.definition.Kind != Request || request.definition.ResponseMsgID != definition.MsgID {
-				return fmt.Errorf("%w: response msg_id %d has invalid request msg_id %d",
-					ErrInvalidRegistry, definition.MsgID, definition.RequestMsgID)
-			}
-		}
-	}
-	return nil
+func (registry *Registry) entryForID(msgID uint32) (catalog.Entry, bool) {
+	entry, exists := registry.byID[msgID]
+	return entry, exists
 }
 
-func validateResponseRequest(definition MessageDefinition, requestMsgID uint32) error {
-	if definition.Kind != Response {
-		if requestMsgID != 0 {
-			return fmt.Errorf("%w: non-response msg_id %d has request msg_id %d", ErrInvalidResponse, definition.MsgID, requestMsgID)
-		}
-		return nil
+func isNil(value any) bool {
+	if value == nil {
+		return true
 	}
-	if definition.RequestMsgID == 0 {
-		if requestMsgID != 0 {
-			return fmt.Errorf("%w: generic response msg_id %d does not use request msg_id", ErrInvalidResponse, definition.MsgID)
-		}
-		return nil
-	}
-	if definition.RequestMsgID != requestMsgID {
-		return fmt.Errorf("%w: response msg_id %d does not match request msg_id %d",
-			ErrInvalidResponse, definition.MsgID, requestMsgID)
-	}
-	return nil
-}
-
-func validateRequestID(kind MessageKind, requestID uint32) error {
-	switch kind {
-	case Request, Response:
-		if requestID == 0 {
-			return ErrInvalidRequestID
-		}
-	case Notify, Push:
-		if requestID != 0 {
-			return ErrInvalidRequestID
-		}
-	}
-	return nil
-}
-
-func validDirection(direction Direction) bool {
-	return direction == ClientToServer || direction == ServerToClient
-}
-
-func validKind(kind MessageKind) bool {
-	return kind >= Request && kind <= Push
-}
-
-func validKindDirection(kind MessageKind, direction Direction) bool {
-	switch kind {
-	case Request, Notify:
-		return direction == ClientToServer
-	case Response, Push:
-		return direction == ServerToClient
+	reflected := reflect.ValueOf(value)
+	switch reflected.Kind() {
+	case reflect.Chan, reflect.Func, reflect.Interface, reflect.Map, reflect.Ptr, reflect.Slice:
+		return reflected.IsNil()
 	default:
 		return false
 	}

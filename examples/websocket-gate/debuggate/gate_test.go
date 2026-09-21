@@ -1,6 +1,7 @@
 package debuggate
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"net/url"
@@ -8,17 +9,15 @@ import (
 	"testing"
 	"time"
 
-	clientv1 "github.com/cnooljaw/gsr/examples/websocket-gate/gen/go/gsr/client/v1"
-	"github.com/cnooljaw/gsr/examples/websocket-gate/protocol"
+	commonv1 "github.com/cnooljaw/gsr/examples/websocket-gate/gen/go/gsr/common/v1"
 	"github.com/cnooljaw/gsr/runtime"
 	"github.com/gorilla/websocket"
 	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // TestDebugGateRoutesClientRequestAndResponse 验证 WebSocket Envelope 经 Runtime 到 Agent 后可按原 request_id 回传。
 func TestDebugGateRoutesClientRequestAndResponse(t *testing.T) {
-	local, gate, registry, agents := startTestGate(t, 8, 4)
+	local, gate, agents := startTestGate(t, 8, 4)
 	connection := dialTestGate(t, gate)
 	defer connection.Close()
 	var agent *testAgent
@@ -28,13 +27,10 @@ func TestDebugGateRoutesClientRequestAndResponse(t *testing.T) {
 		t.Fatal("Gate did not create the connection Agent")
 	}
 
-	request, err := registry.Encode(protocol.ClientToServer, protocol.Message{
-		MsgID:     1001,
-		RequestID: 41,
-		Payload:   &emptypb.Empty{},
-	})
-	if err != nil {
-		t.Fatalf("Encode(request) error = %v", err)
+	request := &commonv1.Envelope{
+		MsgId:     1001,
+		RequestId: 41,
+		Payload:   []byte("opaque test payload"),
 	}
 	requestBytes, err := proto.Marshal(request)
 	if err != nil {
@@ -53,19 +49,15 @@ func TestDebugGateRoutesClientRequestAndResponse(t *testing.T) {
 	if messageType != websocket.BinaryMessage {
 		t.Fatalf("message type = %d, want binary", messageType)
 	}
-	var response clientv1.Envelope
+	var response commonv1.Envelope
 	if err := proto.Unmarshal(responseBytes, &response); err != nil {
 		t.Fatalf("unmarshal response Envelope: %v", err)
 	}
-	decoded, err := registry.Decode(protocol.ServerToClient, &response)
-	if err != nil {
-		t.Fatalf("Decode(response) error = %v", err)
+	if response.GetMsgId() != 1002 || response.GetRequestId() != 41 {
+		t.Fatalf("response = msg_id %d, request_id %d; want 1002, 41", response.GetMsgId(), response.GetRequestId())
 	}
-	if decoded.MsgID != 1002 || decoded.RequestID != 41 {
-		t.Fatalf("response = msg_id %d, request_id %d; want 1002, 41", decoded.MsgID, decoded.RequestID)
-	}
-	if _, ok := decoded.Payload.(*emptypb.Empty); !ok {
-		t.Fatalf("response payload type = %T, want *emptypb.Empty", decoded.Payload)
+	if !bytes.Equal(response.GetPayload(), request.GetPayload()) {
+		t.Fatalf("response payload = %q, want %q", response.GetPayload(), request.GetPayload())
 	}
 
 	if err := connection.Close(); err != nil {
@@ -86,7 +78,7 @@ func TestDebugGateRoutesClientRequestAndResponse(t *testing.T) {
 
 // 验证 Gate runner 创建其他 Agent 时，已有连接的客户端帧仍可直接进入对应 Agent。
 func TestDebugGateDeliversExistingClientFramesWhileCreatingAnotherAgent(t *testing.T) {
-	local, gate, registry, agents := startTestGate(t, 8, 4)
+	local, gate, agents := startTestGate(t, 8, 4)
 	firstClient := dialTestGate(t, gate)
 	defer firstClient.Close()
 	select {
@@ -103,7 +95,7 @@ func TestDebugGateDeliversExistingClientFramesWhileCreatingAnotherAgent(t *testi
 	gate.config.NewAgent = func(client ClientSession) runtime.Service {
 		close(secondAgentStarting)
 		<-releaseSecondAgent
-		return &testAgent{client: client, registry: registry, disconnected: make(chan struct{})}
+		return &testAgent{client: client, disconnected: make(chan struct{})}
 	}
 
 	secondConnection := &clientConnection{
@@ -126,19 +118,14 @@ func TestDebugGateDeliversExistingClientFramesWhileCreatingAnotherAgent(t *testi
 		t.Fatal("Gate did not start creating another Agent")
 	}
 
-	request, err := registry.Encode(protocol.ClientToServer, protocol.Message{
-		MsgID:     1001,
-		RequestID: 42,
-		Payload:   &emptypb.Empty{},
+	request, err := proto.Marshal(&commonv1.Envelope{
+		MsgId:     1001,
+		RequestId: 42,
 	})
-	if err != nil {
-		t.Fatalf("Encode(request) error = %v", err)
-	}
-	requestBytes, err := proto.Marshal(request)
 	if err != nil {
 		t.Fatalf("marshal request Envelope: %v", err)
 	}
-	if err := firstClient.WriteMessage(websocket.BinaryMessage, requestBytes); err != nil {
+	if err := firstClient.WriteMessage(websocket.BinaryMessage, request); err != nil {
 		t.Fatalf("WriteMessage() error = %v", err)
 	}
 	if err := firstClient.SetReadDeadline(time.Now().Add(time.Second)); err != nil {
@@ -151,7 +138,7 @@ func TestDebugGateDeliversExistingClientFramesWhileCreatingAnotherAgent(t *testi
 	if messageType != websocket.BinaryMessage {
 		t.Fatalf("message type = %d, want binary", messageType)
 	}
-	var response clientv1.Envelope
+	var response commonv1.Envelope
 	if err := proto.Unmarshal(responseBytes, &response); err != nil {
 		t.Fatalf("unmarshal response Envelope: %v", err)
 	}
@@ -175,7 +162,7 @@ func TestDebugGateDeliversExistingClientFramesWhileCreatingAnotherAgent(t *testi
 
 // TestDebugGateShutdownClosesActiveClient 验证 Runtime 关闭时 Gate 会关闭活跃连接并等待自己的 I/O 退出。
 func TestDebugGateShutdownClosesActiveClient(t *testing.T) {
-	local, gate, _, _ := startTestGate(t, 8, 4)
+	local, gate, _ := startTestGate(t, 8, 4)
 	connection := dialTestGate(t, gate)
 	defer connection.Close()
 	if err := connection.SetReadDeadline(time.Now().Add(time.Second)); err != nil {
@@ -191,7 +178,7 @@ func TestDebugGateShutdownClosesActiveClient(t *testing.T) {
 
 // TestDebugGateRejectsConnectionAboveLimit 验证达到显式连接上限后 Gate 在 WebSocket 升级前拒绝新连接。
 func TestDebugGateRejectsConnectionAboveLimit(t *testing.T) {
-	_, gate, _, agents := startTestGate(t, 8, 1)
+	_, gate, agents := startTestGate(t, 8, 1)
 	first := dialTestGate(t, gate)
 	defer first.Close()
 	select {
@@ -276,7 +263,6 @@ func TestClientSessionBoundsOutboundQueue(t *testing.T) {
 
 type testAgent struct {
 	client       ClientSession
-	registry     *protocol.Registry
 	disconnected chan struct{}
 	once         sync.Once
 }
@@ -293,29 +279,23 @@ func (agent *testAgent) Handle(commandContext runtime.CommandContext, command ru
 }
 
 func (agent *testAgent) HandleClientMessage(_ runtime.CommandContext, frame []byte) error {
-	var envelope clientv1.Envelope
+	var envelope commonv1.Envelope
 	if err := proto.Unmarshal(frame, &envelope); err != nil {
 		return err
 	}
-	request, err := agent.registry.Decode(protocol.ClientToServer, &envelope)
-	if err != nil {
-		return err
+	if envelope.GetMsgId() != 1001 {
+		return errors.New("unexpected test Agent message id")
 	}
-	response, err := agent.registry.Encode(protocol.ServerToClient, protocol.Message{
-		MsgID:        request.ResponseMsgID,
-		RequestID:    request.RequestID,
-		RequestMsgID: request.MsgID,
-		Payload:      &emptypb.Empty{},
+	return agent.client.Send(&commonv1.Envelope{
+		MsgId:     1002,
+		RequestId: envelope.GetRequestId(),
+		Payload:   envelope.GetPayload(),
 	})
-	if err != nil {
-		return err
-	}
-	return agent.client.Send(response)
 }
 
 func (*testAgent) OnStop(context.Context) error { return nil }
 
-func startTestGate(t *testing.T, mailboxCapacity, maxConnections int) (*runtime.Runtime, *GateService, *protocol.Registry, <-chan *testAgent) {
+func startTestGate(t *testing.T, mailboxCapacity, maxConnections int) (*runtime.Runtime, *GateService, <-chan *testAgent) {
 	t.Helper()
 	local, err := runtime.NewRuntime(runtime.Config{MailboxCapacity: mailboxCapacity, ShutdownTimeout: 2 * time.Second})
 	if err != nil {
@@ -329,20 +309,13 @@ func startTestGate(t *testing.T, mailboxCapacity, maxConnections int) (*runtime.
 			t.Errorf("Runtime.Close() error = %v", err)
 		}
 	})
-	registry, err := protocol.NewRegistry(
-		protocol.MessageDefinition{MsgID: 1001, Direction: protocol.ClientToServer, Kind: protocol.Request, Payload: &emptypb.Empty{}, ResponseMsgID: 1002},
-		protocol.MessageDefinition{MsgID: 1002, Direction: protocol.ServerToClient, Kind: protocol.Response, Payload: &emptypb.Empty{}, RequestMsgID: 1001},
-	)
-	if err != nil {
-		t.Fatalf("NewRegistry() error = %v", err)
-	}
 	agents := make(chan *testAgent, 1)
 	gate, err := NewGateService(local, Config{
 		Address:               "127.0.0.1:0",
 		MaxConnections:        maxConnections,
 		MaxOutboundQueueBytes: 64 << 10,
 		NewAgent: func(clientSession ClientSession) runtime.Service {
-			agent := &testAgent{client: clientSession, registry: registry, disconnected: make(chan struct{})}
+			agent := &testAgent{client: clientSession, disconnected: make(chan struct{})}
 			agents <- agent
 			return agent
 		},
@@ -353,7 +326,7 @@ func startTestGate(t *testing.T, mailboxCapacity, maxConnections int) (*runtime.
 	if _, err := local.CreateService(context.Background(), gate); err != nil {
 		t.Fatalf("CreateService(Gate) error = %v", err)
 	}
-	return local, gate, registry, agents
+	return local, gate, agents
 }
 
 func dialTestGate(t *testing.T, gate *GateService) *websocket.Conn {

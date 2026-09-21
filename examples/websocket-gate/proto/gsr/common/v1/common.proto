@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package gsr.common.v1;
+
+option go_package = "github.com/cnooljaw/gsr/examples/websocket-gate/gen/go/gsr/common/v1;commonv1";
+
+import "gsr/protocol/v1/options.proto";
+
+// MsgId 是通用连接协议使用的消息编号；业务编号由业务协议维护。
+enum MsgId {
+  MSG_ID_UNSPECIFIED = 0;
+
+  C2S_KEY_EXCHANGE_REQUEST = 1 [
+    (gsr.protocol.v1.message_route) = {
+      payload_type: ".gsr.common.v1.KeyExchangeRequest"
+      direction: DIRECTION_CLIENT_TO_SERVER
+      kind: KIND_REQUEST
+    }
+  ];
+  S2C_KEY_EXCHANGE_RESPONSE = 2 [
+    (gsr.protocol.v1.message_route) = {
+      payload_type: ".gsr.common.v1.KeyExchangeResponse"
+      direction: DIRECTION_SERVER_TO_CLIENT
+      kind: KIND_RESPONSE
+    }
+  ];
+
+  S2C_ERROR_RESPONSE = 9001 [
+    (gsr.protocol.v1.message_route) = {
+      payload_type: ".gsr.common.v1.ErrorResponse"
+      direction: DIRECTION_SERVER_TO_CLIENT
+      kind: KIND_RESPONSE
+    }
+  ];
+}
+
+// ErrorCode 表示协议处理未能获得正常业务结果时使用的通用错误类别。
+enum ErrorCode {
+  ERROR_CODE_UNSPECIFIED = 0;
+  ERROR_CODE_INVALID_REQUEST = 1;
+  ERROR_CODE_UNSUPPORTED_MESSAGE = 2;
+  ERROR_CODE_INTERNAL = 3;
+}
+
+// Envelope 是一条完整 C/S 消息的 Protobuf 外层，不包含连接认证字段。
+message Envelope {
+  uint32 msg_id = 1;
+  uint32 request_id = 2;
+  bytes payload = 3;
+}
+
+// KeyExchangeRequest 在连接握手阶段承载客户端临时 X25519 公钥。
+message KeyExchangeRequest {
+  bytes client_public_key = 1;
+}
+
+// KeyExchangeResponse 在连接握手阶段承载服务端临时 X25519 公钥。
+message KeyExchangeResponse {
+  bytes server_public_key = 1;
+}
+
+// ErrorResponse 表示请求未能得到正常业务结果，不表示业务拒绝。
+message ErrorResponse {
+  ErrorCode code = 1;
+  string message = 2;
+}

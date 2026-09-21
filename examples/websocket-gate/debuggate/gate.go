@@ -11,7 +11,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	clientv1 "github.com/cnooljaw/gsr/examples/websocket-gate/gen/go/gsr/client/v1"
+	commonv1 "github.com/cnooljaw/gsr/examples/websocket-gate/gen/go/gsr/common/v1"
 	"github.com/cnooljaw/gsr/runtime"
 	"github.com/gorilla/websocket"
 )
@@ -55,9 +55,9 @@ type ClientSession interface {
 	Close() error
 }
 
-// Envelope 是一条完整客户端消息的 Protobuf 外层。
+// Envelope 是客户端与服务端共用的一条完整 C/S Protobuf 消息外层。
 // 该别名让 Agent 直接使用共享 schema，不增加第二套封包类型。
-type Envelope = clientv1.Envelope
+type Envelope = commonv1.Envelope
 
 // Config 定义仅供本地或可信内网调试的 WebSocket Gate 配置。
 type Config struct {

@@ -387,11 +387,11 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 
 ## Core 之外：WebSocket Gate 联调示例
 
-状态：DebugGate 与 Go 往返集成测试已完成；生产 Gate 与 TypeScript CLI 待实施，不提前加入 Core 或通用测试框架。
+状态：DebugGate 的 Go/TypeScript Echo 往返已完成；生产 Gate 与跨语言认证固定向量待实施，不提前加入 Core 或通用测试框架。
 
 - 在 `examples/websocket-gate/` 提供一个 GSR Go 服务端和一个命令行 TypeScript 客户端，用于验证真实 WebSocket 接入、Envelope 编解码、request_id 关联、业务 Response、业务拒绝、ErrorResponse、服务端 Push 和连接关闭。
-- 示例以 `proto/` 下的 `.proto` 作为唯一协议源，使用 Buf CLI 的单个 `buf generate` 配置调用本地 `protoc-gen-go` 与 `protoc-gen-es`，分别生成 Go 和 TypeScript 消息。客户端使用 `@bufbuild/protobuf` 的类型化消息和二进制 codec，不手写 wire 编码；示例锁定 generator/runtime 版本并跟踪生成源码。
-- `examples/websocket-gate/debuggate` 已覆盖 DebugGate 的内网请求/响应闭环、request_id 回传、连接数量限制、断开通知和 Runtime 关闭回收。它只在示例层显式注入底层 Runtime，不改 `gsr.Run` 或业务 `ServiceContext`；接下来再接入 TypeScript 客户端和生产 Gate 的握手与上行认证，始终复用同一套 Protobuf schema 和 MsgId。
+- 示例以 `proto/` 下的通用协议和业务协议 `.proto` 作为协议源，使用 Buf CLI 的单个 `buf generate` 配置调用本地 `protoc-gen-go`、`protoc-gen-es` 和 `protoc-gen-gsr-registry`，分别生成 Go/TypeScript 消息及 Go 协议目录。每个 MsgId 的 payload、方向和 Request/Notify/Response/Push 种类都显式定义；业务 Handler 按已实现消息逐步手动注册。客户端使用 `@bufbuild/protobuf` 的类型化消息和二进制 codec，不手写 wire 编码；示例锁定 generator/runtime 版本并跟踪生成源码。
+- `examples/websocket-gate` 已覆盖 DebugGate 的内网请求/响应闭环、request_id 回传、连接数量限制、断开通知和 Runtime 关闭回收；Go 服务端与 TypeScript CLI 共用通用协议和 Echo 业务 `.proto`，由 Buf 生成两侧类型及 Go 协议目录，Agent 手动注册 Echo 强类型 Handler，并完成实际 WebSocket 往返。协议目录还提供通用错误回复、Request 必须回复与 Notify 不回复的约束。它只在示例层显式注入底层 Runtime，不改 `gsr.Run` 或业务 `ServiceContext`；接下来先补跨语言认证固定向量，再实现生产 Gate 的握手与上行认证。
 - 在接入生产 Gate 前，先提供 Go 与 TypeScript 共同读取的跨语言密码固定向量，覆盖 X25519、HKDF、seq 大端编码和原始 Envelope 字节 MAC；向量是独立测试夹具，不把测试私钥带入示例运行。
 - 示例 Gate 已使用 `NewAgent func(ClientSession) runtime.Service` 回调；新连接和断开事件由 GateService runner 管理，创建返回的 AgentID 绑定到该客户端连接。读循环对每帧直接调用 `Runtime.DeliverClientMessage`，不经 Gate Mailbox/Core Command 转发；不新增 AgentFactory、Service 管理器或通用依赖注入层。
 - DebugGate 当前限制最大连接数、单帧大小和每连接出站队列；出站按序列化帧字节和每项 64 字节队列开销计费，入站复用 Agent Mailbox，不建立无界中间队列。生产 Gate 再补握手等待与六类容量计数/共享结构化日志。关闭顺序按“停监听 → 停止接纳 → 失效会话 → 关闭连接 → 通知 Agent → 等待 Gate I/O owner”继续验证；不等待或强杀 Agent。

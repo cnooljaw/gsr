@@ -1,6 +1,6 @@
 # WebSocket Gate、客户端协议与 Agent
 
-状态：设计方向已确认；DebugGate 示例的 Go 往返已实现，生产 Gate 与 TypeScript CLI 尚未完成。本文不是完整密码协议或生产安全验收结论。
+状态：设计方向已确认；DebugGate 示例已完成 Go/TypeScript Echo 往返，生产 Gate 与跨语言认证固定向量尚未完成。本文不是完整密码协议或生产安全验收结论。
 
 ## 范围与参考
 
@@ -35,7 +35,21 @@ message Envelope {
 }
 ```
 
-业务 payload 是对应业务消息的 Protobuf。请求、响应、通知和推送各自分配独立的 msg_id；共享协议文件提供跨 Go/TypeScript 的 MsgId 常量，Gate/Agent 注册表声明消息方向和 payload 类型。不维护节点级 Core Command 准入清单。旧打地鼠协议仅作业务样例，不进入 GSR 通用协议定义。
+业务 payload 是对应业务消息的 Protobuf。请求、响应、通知和推送各自分配独立的 msg_id；通用协议文件定义 Envelope 和连接控制消息，业务协议文件定义业务消息编号与 payload。每个非零 MsgId enum 值通过 `message_route` option 显式关联 Protobuf payload 全名、方向和消息种类，生成工具据此产出强类型协议目录；运行时不根据编号范围或命名猜测。Agent 使用目录解码，再按实现进度手动注册强类型 Handler，因此协议可以先定义，Handler 可以逐个完成，不需要为未实现消息放占位函数。Request 必须带非零 request_id，成功处理后必须发送一次 Response；Notify 的 request_id 必须为零，处理完成不回复；Response 和 Push 只能作为服务端下行消息，Push 的 request_id 固定为零。Gate 只负责传输与安全，不判断业务消息类型。不维护节点级 Core Command 准入清单。旧打地鼠协议仅作业务样例，不进入 GSR 通用协议定义。
+
+示例 `.proto` 中的编号和 payload 映射如下：
+
+```protobuf
+C2S_ECHO_REQUEST = 1001 [
+  (gsr.protocol.v1.message_route) = {
+    payload_type: ".gsr.example.echo.v1.EchoRequest"
+    direction: DIRECTION_CLIENT_TO_SERVER
+    kind: KIND_REQUEST
+  }
+];
+```
+
+该映射由 `protoc-gen-gsr-registry` 生成 Go 协议目录；业务侧只需逐步注册已实现的类型，例如 `protocol.Register(dispatcher, agent.OnEcho)`。Handler 注册按 Protobuf payload 类型定位 msg_id，不需要再复制一份 ID 到业务注册代码。
 
 示例协议表：
 
@@ -61,32 +75,76 @@ message KeyExchangeResponse {
 
 握手消息的 request_id 固定为零，不带业务 seq/MAC；不增加应用层版本字段。旧头的 Tag、Length、ver 不进入新协议。
 
-MsgId 常量示例：
+通用协议和业务协议分别维护自己的 MsgId 常量；二者位于不同 Protobuf package：
 
 ```protobuf
+// gsr/common/v1/common.proto
+package gsr.common.v1;
+
 enum MsgId {
   MSG_ID_UNSPECIFIED = 0;
-  C2S_KEY_EXCHANGE_REQUEST = 1;
-  S2C_KEY_EXCHANGE_RESPONSE = 2;
-  C2S_ENTER_ROOM_REQUEST = 1001;
-  S2C_ENTER_ROOM_RESPONSE = 1002;
-  C2S_MOVE_NOTIFY = 2001;
-  S2C_PLAYER_MOVED_PUSH = 3001;
-  S2C_ERROR_RESPONSE = 9001;
+  C2S_KEY_EXCHANGE_REQUEST = 1 [
+    (gsr.protocol.v1.message_route) = {
+      payload_type: ".gsr.common.v1.KeyExchangeRequest"
+      direction: DIRECTION_CLIENT_TO_SERVER
+      kind: KIND_REQUEST
+    }
+  ];
+  S2C_KEY_EXCHANGE_RESPONSE = 2 [
+    (gsr.protocol.v1.message_route) = {
+      payload_type: ".gsr.common.v1.KeyExchangeResponse"
+      direction: DIRECTION_SERVER_TO_CLIENT
+      kind: KIND_RESPONSE
+    }
+  ];
+  S2C_ERROR_RESPONSE = 9001 [
+    (gsr.protocol.v1.message_route) = {
+      payload_type: ".gsr.common.v1.ErrorResponse"
+      direction: DIRECTION_SERVER_TO_CLIENT
+      kind: KIND_RESPONSE
+    }
+  ];
 }
 ```
 
-`Envelope.msg_id` 保持 `uint32`，枚举只提供共享常量。Gate/Agent 的注册表负责校验方向、payload 类型、request_id 规则和响应关系；数字范围只用于人工整理，不能作为运行时猜测语义的依据。该注册表属于客户端接入层，不进入 Core Runtime，也不限制不同 Service 复用内部 `CommandID`。
+```protobuf
+// gsr/example/echo/v1/echo.proto
+package gsr.example.echo.v1;
+
+enum MsgId {
+  MSG_ID_UNSPECIFIED = 0;
+  C2S_ECHO_REQUEST = 1001 [
+    (gsr.protocol.v1.message_route) = {
+      payload_type: ".gsr.example.echo.v1.EchoRequest"
+      direction: DIRECTION_CLIENT_TO_SERVER
+      kind: KIND_REQUEST
+    }
+  ];
+  S2C_ECHO_RESPONSE = 1002 [
+    (gsr.protocol.v1.message_route) = {
+      payload_type: ".gsr.example.echo.v1.EchoResponse"
+      direction: DIRECTION_SERVER_TO_CLIENT
+      kind: KIND_RESPONSE
+    }
+  ];
+}
+```
+
+`Envelope.msg_id` 保持 `uint32`，枚举只提供常量。Agent 的协议分发器根据生成目录选择 Protobuf 类型，并校验方向、消息种类和 request_id；Gate 不解析业务 payload。协议目录由 `.proto` 生成，业务 Handler 仍手动增量注册，二者不要求同时实现。客户端 msg_id 与不同 Service 可复用的内部 `CommandID` 是两套编号。
 
 ## 已确认：生产 Gate 与 DebugGate
 
 - 生产 Gate 负责公网或不可信网络接入：WSS、X25519 握手、上行 seq/MAC、容量和连接生命周期。
-- DebugGate 只面向受信任内网调试：一条 WebSocket 二进制消息就是一份 Protobuf Envelope，不做 X25519 握手、不附加 seq、不校验 MAC。它仍使用同一份 Envelope、MsgId 常量、Gate/Agent 注册表和业务路由。
+- DebugGate 只面向受信任内网调试：一条 WebSocket 二进制消息就是一份 Protobuf Envelope，不做 X25519 握手、不附加 seq、不校验 MAC。它与生产 Gate 共用通用 Envelope 和 Agent 业务处理逻辑。
 - 两者使用不同监听器、端口和显式配置；生产 Gate 不自动降级到 DebugGate，DebugGate 也不根据首包猜测生产格式。DebugGate 默认关闭，启用时应绑定回环地址或明确的内网地址，并由部署防火墙限制访问。
 - DebugGate 没有应用层认证和防重放保证，不能暴露到公网，也不能被当作生产安全模式。业务鉴权仍由 Agent/业务 Service 负责。
-- 两个 Gate 只在 Envelope 解码和 Agent 路由之前共享协议注册表；帧接收和安全校验属于各自适配器，业务路由不复制两套。
+- 两个 Gate 共享 Agent 业务处理逻辑；帧接收和安全校验属于各自适配器。Gate 不解码或分发业务 payload。
 
-`examples/websocket-gate/debuggate` 已实现本地示例闭环：`NewGateService` 显式接收底层 `*runtime.Runtime`，应用通过 `Runtime.CreateService` 启动它；这只是示例组装方式，不扩展 `gsr.Run`、Core 或业务 `ServiceContext`。Gate 只监听字面回环/私有 IP 的 `/ws`，每个连接由 Gate runner 调用 `NewAgent` 创建一个 Agent。创建返回的 AgentID 绑定到该连接，读循环直接调用 `Runtime.DeliverClientMessage` 投递不透明 Envelope 字节，不逐帧经过 Gate Mailbox；Gate runner 中的连接到 Agent 映射只用于断开通知。`ClientSession.Send(Envelope)` 将响应放入有界队列，再由唯一写循环发回。此处 `ClientSession` 表示客户端连接的写回能力，不是 Core `SessionID` 或 Envelope 的 `request_id`。DebugGate 显式限制连接数、帧大小和每连接出站队列，默认帧上限为 4 MiB。出站队列按序列化 Envelope 字节数加每项固定 64 字节队列开销计费，避免空帧或很多小帧绕过内存上限；正在写出的单帧另受 `MaxFrameBytes` 限制。集成测试覆盖请求/响应 request_id、连接上限、正常断开通知、Agent 创建期间既有连接继续收帧和 Runtime 关闭时连接回收。它仍是示例代码，不是稳定的生产 API；没有 TLS、生产握手、MAC、TypeScript 客户端或完整共享日志接线。
+`examples/websocket-gate/debuggate` 已实现本地示例闭环：`NewGateService` 显式接收底层 `*runtime.Runtime`，应用通过 `Runtime.CreateService` 启动它；这只是示例组装方式，不扩展 `gsr.Run`、Core 或业务 `ServiceContext`。Gate 只监听字面回环/私有 IP 的 `/ws`，每个连接由 Gate runner 调用 `NewAgent` 创建一个 Agent。创建返回的 AgentID 绑定到该连接，读循环直接调用 `Runtime.DeliverClientMessage` 投递不透明 Envelope 字节，不逐帧经过 Gate Mailbox；Gate runner 中的连接到 Agent 映射只用于断开通知。`ClientSession.Send(Envelope)` 将响应放入有界队列，再由唯一写循环发回。此处 `ClientSession` 表示客户端连接的写回能力，不是 Core `SessionID` 或 Envelope 的 `request_id`。DebugGate 显式限制连接数、帧大小和每连接出站队列，默认帧上限为 4 MiB。出站队列按序列化 Envelope 字节数加每项固定 64 字节队列开销计费，避免空帧或很多小帧绕过内存上限；正在写出的单帧另受 `MaxFrameBytes` 限制。集成测试覆盖请求/响应 request_id、连接上限、正常断开通知、Agent 创建期间既有连接继续收帧和 Runtime 关闭时连接回收。`examples/websocket-gate` 另提供独立 Echo Agent、Go DebugGate 服务端和 TypeScript CLI；通用 Envelope 与 Echo 业务消息分别定义在 `.proto` 文件中，Go 与 TypeScript 使用同一组协议源生成类型并完成真实请求/响应往返。Go Agent 从生成目录解码 Envelope，再通过手动注册的强类型 Echo Handler 响应；未实现的协议消息无需占位 Handler。示例仍不是稳定生产 API；DebugGate 没有 TLS、生产握手或 MAC，完整共享结构化日志接线仍待实现。
+
+### 后续归属：按需收编为基础设施
+
+`examples/websocket-gate/` 当前用于验证协议、Agent 分发与 Gate 接入流程，仍是示例，不代表最终包布局或稳定公开 API。等用户明确要求收编时，再把已经验证、具有通用性的部分提升为 GSR 基础设施，定位类似 Cluster；具体包边界和 API 在收编时根据实际使用情况裁定。收到该指示之前，示例继续独立放在 `examples/`，不预先迁移或增加包装层。
 
 ## 已确认：业务回复、通用错误与推送
 
@@ -97,11 +155,20 @@ enum MsgId {
 | 服务端主动推送 | Push 编号 | 0 | 对应业务 Push |
 
 ```protobuf
+enum ErrorCode {
+  ERROR_CODE_UNSPECIFIED = 0;
+  ERROR_CODE_INVALID_REQUEST = 1;
+  ERROR_CODE_UNSUPPORTED_MESSAGE = 2;
+  ERROR_CODE_INTERNAL = 3;
+}
+
 message ErrorResponse {
-  int32 code = 1;     // 稳定错误码，供程序判断
+  ErrorCode code = 1; // 稳定通用错误码，供程序判断
   string message = 2; // 安全说明，不包含内部堆栈
 }
 ```
+
+消息文本不参与程序分支，也不包含 Handler 的内部错误内容。
 
 - 业务消息的 msg_id 直接决定 payload 的 Protobuf 类型，不通过尝试解析 payload 猜类型。
 - 业务结果包括业务成功与业务拒绝。余额不足、道具不足、当前状态不允许等业务拒绝，与业务成功一样返回对应业务 Response，用业务自己的 code 或结果字段区分。
@@ -111,7 +178,7 @@ message ErrorResponse {
 - request_id=0 的通知处理失败由服务端记录，不自动生成请求回复；推送使用独立的 Push msg_id。
 - 连接断开时无法保证发送错误回复，由客户端连接事件结束等待。
 - 程序分支依赖稳定 code，不比较 message；不得直接透传内部 error 文本或堆栈。
-- 错误语义已经确认：业务拒绝使用业务 Response，无法取得正常结果时使用 ErrorResponse 并复用原 request_id；具体错误码常量和业务编号由业务协议项目维护，GSR 不建立跨业务的全局错误码表。控制握手编号、payload 和阶段门禁已经确定，消息编号及 Gate/Agent 注册表的归属也保持在客户端接入层。
+- 错误语义已经确认：业务拒绝使用业务 Response，无法取得正常结果时使用 ErrorResponse 并复用原 request_id；通用 `ErrorCode` 只表达无效请求、未支持消息和内部失败，业务响应自己的业务码由业务协议定义，GSR 不建立跨业务领域码表。控制握手编号、payload 和阶段门禁由通用协议定义，业务消息编号由业务协议定义，Agent 负责按 msg_id 处理。
 
 ## 已确认：C/S request_id 与 seq
 
@@ -132,7 +199,7 @@ message ErrorResponse {
 - 双方分别计算 `X25519(client_private_key, server_public_key)` 和 `X25519(server_private_key, client_public_key)`，结果必须一致；拒绝全零 shared secret。不要手工修改私钥位或自行实现曲线运算，交给标准 X25519 实现处理。
 - 握手可信性依赖正确验证服务端身份的 WSS；无额外身份认证的 X25519 不承诺抵御能替换公钥的本机主动代理。TLS 终止位置和之后的信任边界需在部署时明确。
 - 同连接串行执行：检查最小长度 → 读取大端 seq → 使用原始 Envelope 字节校验 MAC → 检查 seq 大于 lastSeq 并立即更新 → 将原始 Envelope 字节投递给 Agent。Agent 负责 Protobuf 解码以及校验 Envelope 结构、msg_id、方向、request_id 和 payload。认证失败不能推进 lastSeq；认证成功但消息未知或不合法时也消费该 seq。投递失败不能回退，序号接纳不代表业务执行成功。
-- 协商前只接受 C2S_KEY_EXCHANGE_REQUEST，服务端只回复 S2C_KEY_EXCHANGE_RESPONSE；完成后 Gate 只接受带 seq/MAC 的业务上行，拒绝重复握手、错误方向和无 MAC 降级。MAC 校验通过后，Envelope 的 msg_id、payload 类型和业务方向交给 Agent/注册表判断；未知 msg_id 不因“未知编号”本身关闭连接。
+- 协商前只接受 C2S_KEY_EXCHANGE_REQUEST，服务端只回复 S2C_KEY_EXCHANGE_RESPONSE；完成后 Gate 只接受带 seq/MAC 的业务上行，拒绝重复握手、错误方向和无 MAC 降级。MAC 校验通过后，Agent 根据 Envelope 的 msg_id 选择业务处理逻辑并解码 payload；未知 msg_id 不因“未知编号”本身关闭连接。
 - 握手失败直接关闭连接，不进入 Agent，也不发送业务 ErrorResponse；握手成功后双方才启用派生的 macKey。
 - 必须设置消息大小、握手等待和接纳容量上限；具体默认值待裁决，Protobuf 不意味着无限消息大小。
 
@@ -234,7 +301,7 @@ Gate 的网络/安全错误使用 Runtime 共享 Logger，按单连接、错误�
 - Gate 仍是连接 owner：持有 WebSocket、握手状态、读写队列和关闭权；Agent 不接触 `net.Conn` 或 Gate 内部连接表。Gate 完成安全接纳后，把已认证 Envelope 投递给对应 Agent；Agent 通过受限的客户端会话能力发送完整的 Envelope。
 - `AgentService` 组合通用客户端会话、request_id 关联、出站 Envelope 组织和断开清理能力，并持有一个具体的 `ProtocolHandler` 组件；`ProtocolHandler` 不是 Service，没有自己的 ServiceID、Mailbox 或生命周期。
 - 例如查询房间人数时，`GameProtocol` 解码 `GetRoomCountRequest`，在当前 Agent Handler 内通过 `self.Call` 调用 `RoomService`，得到结果后返回 `GetRoomCountResponse`；`AgentService` 使用原 request_id 编码并交给客户端会话发送。客户端响应能力不是 Core 的手工 Reply，也不完成 Core Session。
-- Gate 到 Agent 的入站路径使用受信任的 Runtime-owned 单向投递：Gate 完成 WebSocket、握手、MAC 和 seq 校验后，通过 `Runtime.DeliverClientMessage(target, envelope)` 把完整 Protobuf Envelope 字节投递到 AgentService Mailbox；Runtime 在接纳时复制快照，Source、Session 和 Core CommandID 固定为零。目标 Service 必须实现 `runtime.ClientMessageHandler`，否则在 Mailbox admission 前立即返回 `runtime.ErrClientMessageUnsupported`，不入队、不静默丢弃。该类型不属于客户端 `msg_id`、不作为业务 Service 间的 Call/Send，也不作为公开 Gate API。Agent 收到后由 `Requests` 解码并按 Envelope `msg_id` 分发；普通 `Commands` 仍只处理 Core `CommandID`。
+- Gate 到 Agent 的入站路径使用受信任的 Runtime-owned 单向投递：Gate 完成 WebSocket、握手、MAC 和 seq 校验后，通过 `Runtime.DeliverClientMessage(target, envelope)` 把完整 Protobuf Envelope 字节投递到 AgentService Mailbox；Runtime 在接纳时复制快照，Source、Session 和 Core CommandID 固定为零。目标 Service 必须实现 `runtime.ClientMessageHandler`，否则在 Mailbox admission 前立即返回 `runtime.ErrClientMessageUnsupported`，不入队、不静默丢弃。该类型不属于客户端 `msg_id`、不作为业务 Service 间的 Call/Send，也不作为公开 Gate API。Agent 收到后由协议目录解码，再分发给业务手动注册的强类型 Request/Notify Handler；普通 `Commands` 仍只处理 Core `CommandID`。
 - Gate 的 accept/reader goroutine 不保存或调用 `ServiceContext`。新连接和断开事件投递为 GateService 内部 Command，由其 runner 创建 Agent、管理连接到 Agent 的断开映射；创建成功后，读循环使用返回的 AgentID 直接调用 `Runtime.DeliverClientMessage`，不为每帧额外经过 Gate Mailbox/Core Command。Runtime 在 Agent Mailbox 接纳时复制 Envelope 字节。Agent 构造或 `OnStart` 失败时只关闭当前客户端连接并记录原因，不影响 Gate、Runtime 或其它 Agent。
 - Agent 到 Gate 的出站路径使用绑定当前连接的 `ClientSession` 能力，最小接口只有 `Send(Envelope)` 和 `Close`。这里的 `ClientSession` 是客户端连接能力，不是 Runtime `SessionID` 或 Envelope `request_id`。Agent/ProtocolHandler 在调用前负责 `msg_id`、`request_id`、payload 类型以及 Response/Push 方向的协议校验；Response 通过复制原请求的 `request_id` 构造，Push 使用 `request_id == 0`，这些语义不由 Gate 判断，也不重复作为方法参数传递。ClientSession 的 `Send` 不改写或推断 Envelope，只负责检查连接状态、出站大小限制并把完整 Envelope 放入 Gate 的有界写队列；写入 socket 仍由 Gate 的写循环完成。写队列接纳成功不代表客户端已经收到数据。
 - Gate 与 Agent 的连接通知使用单向内部事件；断开时 Gate 先使 ClientSession 失效，再最多通知 Agent 一次，不等待或强杀 Agent。Agent 与 RoomService、PlayerService 等业务 Service 才使用普通 ServiceContext.Send/Call；业务协议代码不需要知道上述 Gate/Agent 连接细节。
@@ -281,8 +348,8 @@ Gate 不等待或强杀 Agent。Runtime 独立停止 Agent runner 并调用 Agen
 
 ## 下一步与验收
 
-Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/通知/推送独立编号，共享 MsgId 常量与客户端协议注册表，控制握手消息，大端 seq 和原始字节 MAC 验证顺序，固定 HKDF 参数，独立 DebugGate，WebSocket 关闭码和 Gate/Agent/业务错误归属，以及“一连接一个业务定义的 AgentService、Runtime 内部消息类型区分客户端消息与普通 Core Command、Service 可选择实现 ClientMessageHandler、业务协议通过 ProtocolHandler 组件组合接入”的边界已确认。Runtime 的单向投递 API 与缺少客户端处理能力时的 admission 拒绝已实现；联调示例包含共享 Envelope/握手 `.proto`、Go 生成类型、typed 消息注册表及 `debuggate` Go 集成闭环。DebugGate 使用示例专用的底层 Runtime 注入，不扩展 Core 或 `gsr.Run`。生产 Gate、TypeScript CLI、跨语言密码固定向量、共享结构化日志接线和更完整的慢客户端/失败压力测试仍待推进。一次讨论一个问题，未确认前不新增公开 API 或通用安全插件框架。
+Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/通知/推送独立编号，通用与业务专用 `.proto` 分开定义；每个 MsgId 通过 option 显式声明 payload、方向和消息种类，协议目录由代码生成，业务 Handler 按实现进度手动注册。控制握手消息、大端 seq 和原始字节 MAC 验证顺序、固定 HKDF 参数、独立 DebugGate、WebSocket 关闭码和 Gate/Agent/业务错误归属，以及“一连接一个业务定义的 AgentService、Runtime 内部消息类型区分客户端消息与普通 Core Command、Service 可选择实现 ClientMessageHandler、业务协议通过 ProtocolHandler 组件组合接入”的边界已确认。Runtime 的单向投递 API 与缺少客户端处理能力时的 admission 拒绝已实现；联调示例包含通用 Envelope 与 Echo 业务 `.proto`、Go/TypeScript 生成类型、强类型 Echo Handler 和 CLI 闭环。DebugGate 使用示例专用的底层 Runtime 注入，不扩展 Core 或 `gsr.Run`。生产 Gate、跨语言密码固定向量、共享结构化日志接线和更完整的慢客户端/失败压力测试仍待推进。一次讨论一个问题，未确认前不新增公开 API 或通用安全插件框架。
 
-联调示例位于 `examples/websocket-gate/`：Go DebugGate、连接 Agent 和 request/response 往返测试已经落地；TypeScript 命令行客户端、业务拒绝、ErrorResponse、服务端 Push 和生产 Gate 尚未实现。示例不定义新的生产协议或框架，只复用业务项目提供的 Protobuf/MsgId。生产 Gate 的 X25519/HKDF/seq/MAC 固定向量验证另列为跨语言测试，不由示例掩盖安全协议审查。
+联调示例位于 `examples/websocket-gate/`：Go DebugGate、连接 Echo Agent、TypeScript 命令行客户端和 request/response 往返已经落地；生成协议目录、逐步注册强类型 Handler、通用协议错误回复也已接入。业务拒绝、示例 Push 和生产 Gate 尚未实现。Echo `.proto` 只属于示例业务协议，不扩展 GSR Core。生产 Gate 的 X25519/HKDF/seq/MAC 固定向量验证另列为跨语言测试，不由示例掩盖安全协议审查。
 
-下一步按共享跨语言客户端 → 生产 Gate 握手及上行认证 → 失败、背压和关闭推进。验证应包含跨语言固定向量、两种 Gate 的边界隔离、跨连接旧包拒绝、同连接重复拒绝、MAC 篡改和失败不推进序号、未知 msg_id、阶段/方向错误、超限、request_id 超时与迟到、编号耗尽、慢客户端和断开回收。测试不替代密码协议审查。
+下一步按跨语言认证固定向量 → 生产 Gate 握手及上行认证 → 失败、背压和关闭推进。验证应包含两种 Gate 的边界隔离、跨连接旧包拒绝、同连接重复拒绝、MAC 篡改和失败不推进序号、未知 msg_id、阶段/方向错误、超限、request_id 超时与迟到、编号耗尽、慢客户端和断开回收。测试不替代密码协议审查。

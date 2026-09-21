@@ -1,16 +1,16 @@
-package clientv1_test
+package commonv1_test
 
 import (
 	"bytes"
 	"testing"
 
-	clientv1 "github.com/cnooljaw/gsr/examples/websocket-gate/gen/go/gsr/client/v1"
+	commonv1 "github.com/cnooljaw/gsr/examples/websocket-gate/gen/go/gsr/common/v1"
 	"google.golang.org/protobuf/proto"
 )
 
 // TestEnvelopeWireFieldsRemainCompatible 验证 Envelope 的字段编号和 Protobuf 编码保持稳定。
 func TestEnvelopeWireFieldsRemainCompatible(t *testing.T) {
-	message := &clientv1.Envelope{
+	message := &commonv1.Envelope{
 		MsgId:     1001,
 		RequestId: 42,
 		Payload:   []byte{0x08, 0x01},
@@ -26,7 +26,7 @@ func TestEnvelopeWireFieldsRemainCompatible(t *testing.T) {
 		t.Fatalf("unexpected wire bytes: got %x, want %x", encoded, want)
 	}
 
-	var decoded clientv1.Envelope
+	var decoded commonv1.Envelope
 	if err := proto.Unmarshal(encoded, &decoded); err != nil {
 		t.Fatalf("unmarshal Envelope: %v", err)
 	}

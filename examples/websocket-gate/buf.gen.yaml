@@ -6,7 +6,13 @@ plugins:
     out: gen/go
     opt:
       - paths=source_relative
+  - local:
+      - go
+      - run
+      - github.com/cnooljaw/gsr/examples/websocket-gate/cmd/protoc-gen-gsr-registry
+    out: gen/go
   - local: protoc-gen-es
     out: client/src/gen
     opt:
       - target=ts
+      - import_extension=js
