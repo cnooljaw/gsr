@@ -24,7 +24,7 @@ npm run test:crypto
 
 固定向量采用 RFC 7748 的公开 X25519 测试密钥；`testdata/generate_client_auth_vector.mjs` 可独立重建共享 JSON 夹具。测试私钥仅用于公开测试向量，禁止用于实际连接。
 
-`prodgate` 目前只包含由固定向量锁定的连接密钥派生和上行帧认证实现，还没有 WebSocket 握手、TLS 监听或 Gate Service 接线；它不能作为生产 Gate 使用。
+`prodgate` 目前实现了首帧握手协议处理、连接密钥派生和上行帧认证，但尚未接入 WebSocket 读写循环、TLS 监听、握手超时或 Gate Service；它不能作为生产 Gate 使用。
 
 终端一启动 GSR 服务端：
 

@@ -222,7 +222,7 @@ macKey = HKDF-Expand-SHA256(prk, info, 32)
 - 不协商算法，不把 `seq`、`request_id` 或业务数据放入 KDF。未来如果增加服务端到客户端的应用 MAC，必须使用不同的 `info` 派生独立密钥。
 - MAC 使用 HMAC-SHA256 的前 16 字节，覆盖大端 seq 原始 8 字节和 Envelope 原始 Protobuf 字节，不包含标签自身。使用常量时间比较，必须在 Protobuf 解码前校验，不能重新序列化 Envelope 后验 MAC；因此不要求 deterministic serialization。
 
-依据：[X25519](https://www.rfc-editor.org/rfc/rfc7748.html)、[HKDF](https://www.rfc-editor.org/rfc/rfc5869.html)、[HMAC](https://www.rfc-editor.org/rfc/rfc2104.html)。这是标准原语的组合设计，仍需完整握手定义与跨语言测试，不能把原语标准当作组合协议已审计的证明。
+依据：[X25519](https://www.rfc-editor.org/rfc/rfc7748.html)、[HKDF](https://www.rfc-editor.org/rfc/rfc5869.html)、[HMAC](https://www.rfc-editor.org/rfc/rfc2104.html)。握手消息和组合参数已固定，并由跨语言向量及服务端握手测试覆盖；这不等于组合协议已通过独立安全审计。
 
 ## 已确认：跨语言固定向量
 
@@ -255,7 +255,7 @@ mac
 - `envelope_bytes` 是参与 MAC 的原始 Protobuf 字节；验证器先对这些原始字节验 MAC，再交给 Protobuf 解码，不允许先解码再重新序列化替代输入。
 - MAC 只取 HMAC-SHA256 前 16 字节；测试覆盖正确 MAC、修改 seq、修改 Envelope、修改 `info`、交换公钥顺序和错误截断长度。
 - Go 和 TypeScript 的测试都直接读取同一份向量，生产实现不依赖测试向量文件；向量生成脚本与运行时实现分开，避免同一错误同时生成“期望值”和实际值。
-- 生产侧 Go 认证原语位于 `examples/websocket-gate/prodgate/security.go`，目前只实现逐连接密钥派生和上行帧认证，尚未接入 WebSocket 握手或 Gate Service。使用 `go test ./examples/websocket-gate/prodgate` 和示例目录下的 `npm run test:crypto` 分别验证 Go 与 TypeScript；重新生成夹具使用 `node testdata/generate_client_auth_vector.mjs`。
+- 生产侧 Go 认证代码位于 `examples/websocket-gate/prodgate/`：`security.go` 实现逐连接密钥派生和上行帧认证，`handshake.go` 校验首个握手 Envelope、生成服务端临时密钥、返回握手 Envelope 并建立连接认证器。握手尚未接入 WebSocket 读循环、5 秒超时、TLS Listener 或 Gate Service。使用 `go test ./examples/websocket-gate/prodgate` 和示例目录下的 `npm run test:crypto` 分别验证 Go 与 TypeScript；重新生成夹具使用 `node testdata/generate_client_auth_vector.mjs`。
 
 ## TypeScript Protobuf 生成方案
 
@@ -355,4 +355,4 @@ Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/
 
 联调示例位于 `examples/websocket-gate/`：Go DebugGate、连接 Echo Agent、TypeScript 命令行客户端和 request/response 往返已经落地；生成协议目录、逐步注册强类型 Handler、通用协议错误回复也已接入。业务拒绝、示例 Push 和生产 Gate 尚未实现。Echo `.proto` 只属于示例业务协议，不扩展 GSR Core。固定向量已作为独立跨语言测试夹具落地，不由示例运行路径加载或掩盖后续生产 Gate 的安全审查。
 
-下一步按生产 Gate 握手及上行认证 → 失败、背压和关闭推进。验证应包含两种 Gate 的边界隔离、跨连接旧包拒绝、同连接重复拒绝、MAC 篡改和失败不推进序号、未知 msg_id、阶段/方向错误、超限、request_id 超时与迟到、编号耗尽、慢客户端和断开回收。测试不替代密码协议审查。
+下一步将握手和上行认证接入独立 WSS Listener：首帧施加 5 秒读取期限，握手成功后才接受 seq/MAC 业务帧，并沿既定路径投递 Agent；随后补齐失败、背压和关闭。验证应包含两种 Gate 的边界隔离、跨连接旧包拒绝、同连接重复拒绝、MAC 篡改和失败不推进序号、未知 msg_id、阶段/方向错误、超限、request_id 超时与迟到、编号耗尽、慢客户端和断开回收。测试不替代密码协议审查。
