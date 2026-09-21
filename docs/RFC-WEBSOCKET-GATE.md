@@ -1,6 +1,6 @@
 # WebSocket Gate、客户端协议与 Agent
 
-状态：设计方向已确认；DebugGate 示例已完成 Go/TypeScript Echo 往返，生产 Gate 与跨语言认证固定向量尚未完成。本文不是完整密码协议或生产安全验收结论。
+状态：设计方向已确认；DebugGate 示例已完成 Go/TypeScript Echo 往返，跨语言认证固定向量已完成，生产 Gate 尚未实现。本文不是完整密码协议或生产安全验收结论。
 
 ## 范围与参考
 
@@ -201,7 +201,7 @@ message ErrorResponse {
 - 同连接串行执行：检查最小长度 → 读取大端 seq → 使用原始 Envelope 字节校验 MAC → 检查 seq 大于 lastSeq 并立即更新 → 将原始 Envelope 字节投递给 Agent。Agent 负责 Protobuf 解码以及校验 Envelope 结构、msg_id、方向、request_id 和 payload。认证失败不能推进 lastSeq；认证成功但消息未知或不合法时也消费该 seq。投递失败不能回退，序号接纳不代表业务执行成功。
 - 协商前只接受 C2S_KEY_EXCHANGE_REQUEST，服务端只回复 S2C_KEY_EXCHANGE_RESPONSE；完成后 Gate 只接受带 seq/MAC 的业务上行，拒绝重复握手、错误方向和无 MAC 降级。MAC 校验通过后，Agent 根据 Envelope 的 msg_id 选择业务处理逻辑并解码 payload；未知 msg_id 不因“未知编号”本身关闭连接。
 - 握手失败直接关闭连接，不进入 Agent，也不发送业务 ErrorResponse；握手成功后双方才启用派生的 macKey。
-- 必须设置消息大小、握手等待和接纳容量上限；具体默认值待裁决，Protobuf 不意味着无限消息大小。
+- 必须设置消息大小、握手等待和接纳容量上限；具体初始值与零值语义见“已确认：Gate 容量与关闭顺序”，Protobuf 不意味着无限消息大小。
 
 已确认的密码参数：
 
@@ -228,6 +228,8 @@ macKey = HKDF-Expand-SHA256(prk, info, 32)
 
 Go 与 TypeScript 必须使用同一组独立生成的测试向量验证客户端上行认证，不以“两个实现互相算出相同结果”代替参考结果。固定向量只用于测试，里面的私钥是公开的测试常量，不得被生产连接复用。
 
+共享夹具位于 `examples/websocket-gate/testdata/client-auth-vector.json`。其中 X25519 私钥、公钥和 shared secret 取自 [RFC 7748 §6.1](https://www.rfc-editor.org/rfc/rfc7748.html#section-6.1) 的 Alice/Bob 测试向量；单独的 `testdata/generate_client_auth_vector.mjs` 校验这些公开 X25519 结果，并生成 salt、HKDF 和 MAC 的逐阶段参考字节。Go 与 TypeScript 测试各自从同一 JSON 读取输入及期望值，不在测试运行时调用生成器。
+
 共享向量使用 JSON 或等价的文本字段承载十六进制字节，至少包含：
 
 ```text
@@ -253,6 +255,7 @@ mac
 - `envelope_bytes` 是参与 MAC 的原始 Protobuf 字节；验证器先对这些原始字节验 MAC，再交给 Protobuf 解码，不允许先解码再重新序列化替代输入。
 - MAC 只取 HMAC-SHA256 前 16 字节；测试覆盖正确 MAC、修改 seq、修改 Envelope、修改 `info`、交换公钥顺序和错误截断长度。
 - Go 和 TypeScript 的测试都直接读取同一份向量，生产实现不依赖测试向量文件；向量生成脚本与运行时实现分开，避免同一错误同时生成“期望值”和实际值。
+- 生产侧 Go 认证原语位于 `examples/websocket-gate/prodgate/security.go`，目前只实现逐连接密钥派生和上行帧认证，尚未接入 WebSocket 握手或 Gate Service。使用 `go test ./examples/websocket-gate/prodgate` 和示例目录下的 `npm run test:crypto` 分别验证 Go 与 TypeScript；重新生成夹具使用 `node testdata/generate_client_auth_vector.mjs`。
 
 ## TypeScript Protobuf 生成方案
 
@@ -348,8 +351,8 @@ Gate 不等待或强杀 Agent。Runtime 独立停止 Agent runner 并调用 Agen
 
 ## 下一步与验收
 
-Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/通知/推送独立编号，通用与业务专用 `.proto` 分开定义；每个 MsgId 通过 option 显式声明 payload、方向和消息种类，协议目录由代码生成，业务 Handler 按实现进度手动注册。控制握手消息、大端 seq 和原始字节 MAC 验证顺序、固定 HKDF 参数、独立 DebugGate、WebSocket 关闭码和 Gate/Agent/业务错误归属，以及“一连接一个业务定义的 AgentService、Runtime 内部消息类型区分客户端消息与普通 Core Command、Service 可选择实现 ClientMessageHandler、业务协议通过 ProtocolHandler 组件组合接入”的边界已确认。Runtime 的单向投递 API 与缺少客户端处理能力时的 admission 拒绝已实现；联调示例包含通用 Envelope 与 Echo 业务 `.proto`、Go/TypeScript 生成类型、强类型 Echo Handler 和 CLI 闭环。DebugGate 使用示例专用的底层 Runtime 注入，不扩展 Core 或 `gsr.Run`。生产 Gate、跨语言密码固定向量、共享结构化日志接线和更完整的慢客户端/失败压力测试仍待推进。一次讨论一个问题，未确认前不新增公开 API 或通用安全插件框架。
+Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/通知/推送独立编号，通用与业务专用 `.proto` 分开定义；每个 MsgId 通过 option 显式声明 payload、方向和消息种类，协议目录由代码生成，业务 Handler 按实现进度手动注册。控制握手消息、大端 seq 和原始字节 MAC 验证顺序、固定 HKDF 参数、独立 DebugGate、WebSocket 关闭码和 Gate/Agent/业务错误归属，以及“一连接一个业务定义的 AgentService、Runtime 内部消息类型区分客户端消息与普通 Core Command、Service 可选择实现 ClientMessageHandler、业务协议通过 ProtocolHandler 组件组合接入”的边界已确认。Runtime 的单向投递 API 与缺少客户端处理能力时的 admission 拒绝已实现；联调示例包含通用 Envelope 与 Echo 业务 `.proto`、Go/TypeScript 生成类型、强类型 Echo Handler 和 CLI 闭环。跨语言认证固定向量已由 Go 与 TypeScript 共用夹具验证。DebugGate 使用示例专用的底层 Runtime 注入，不扩展 Core 或 `gsr.Run`。生产 Gate、共享结构化日志接线和更完整的慢客户端/失败压力测试仍待推进。一次讨论一个问题，未确认前不新增公开 API 或通用安全插件框架。
 
-联调示例位于 `examples/websocket-gate/`：Go DebugGate、连接 Echo Agent、TypeScript 命令行客户端和 request/response 往返已经落地；生成协议目录、逐步注册强类型 Handler、通用协议错误回复也已接入。业务拒绝、示例 Push 和生产 Gate 尚未实现。Echo `.proto` 只属于示例业务协议，不扩展 GSR Core。生产 Gate 的 X25519/HKDF/seq/MAC 固定向量验证另列为跨语言测试，不由示例掩盖安全协议审查。
+联调示例位于 `examples/websocket-gate/`：Go DebugGate、连接 Echo Agent、TypeScript 命令行客户端和 request/response 往返已经落地；生成协议目录、逐步注册强类型 Handler、通用协议错误回复也已接入。业务拒绝、示例 Push 和生产 Gate 尚未实现。Echo `.proto` 只属于示例业务协议，不扩展 GSR Core。固定向量已作为独立跨语言测试夹具落地，不由示例运行路径加载或掩盖后续生产 Gate 的安全审查。
 
-下一步按跨语言认证固定向量 → 生产 Gate 握手及上行认证 → 失败、背压和关闭推进。验证应包含两种 Gate 的边界隔离、跨连接旧包拒绝、同连接重复拒绝、MAC 篡改和失败不推进序号、未知 msg_id、阶段/方向错误、超限、request_id 超时与迟到、编号耗尽、慢客户端和断开回收。测试不替代密码协议审查。
+下一步按生产 Gate 握手及上行认证 → 失败、背压和关闭推进。验证应包含两种 Gate 的边界隔离、跨连接旧包拒绝、同连接重复拒绝、MAC 篡改和失败不推进序号、未知 msg_id、阶段/方向错误、超限、request_id 超时与迟到、编号耗尽、慢客户端和断开回收。测试不替代密码协议审查。

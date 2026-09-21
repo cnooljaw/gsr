@@ -8,6 +8,7 @@
   "scripts": {
     "generate": "buf generate",
     "build": "tsc --project tsconfig.json",
+    "test:crypto": "npm run build && node --test client/dist/auth_vectors.test.js",
     "client": "npm run build && node client/dist/index.js"
   },
   "dependencies": {
