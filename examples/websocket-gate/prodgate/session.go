@@ -3,7 +3,10 @@ package prodgate
 import (
 	"errors"
 	"fmt"
+	"io"
+	"net"
 	"sync"
+	"syscall"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -195,10 +198,19 @@ func (client *clientConnection) closeWith(code int, reason string, deadline time
 			)
 		}
 		client.mu.Lock()
-		client.closeErr = client.connection.Close()
+		client.closeErr = normalizeCloseError(client.connection.Close())
 		client.mu.Unlock()
 	})
 	client.mu.Lock()
 	defer client.mu.Unlock()
 	return client.closeErr
+}
+
+// normalizeCloseError 将对端已经断开时的底层关闭错误视为幂等收尾成功。
+func normalizeCloseError(err error) error {
+	if err == nil || errors.Is(err, net.ErrClosed) || errors.Is(err, io.EOF) || errors.Is(err, io.ErrClosedPipe) ||
+		errors.Is(err, syscall.EPIPE) || errors.Is(err, syscall.ECONNRESET) || errors.Is(err, syscall.ENOTCONN) {
+		return nil
+	}
+	return err
 }
