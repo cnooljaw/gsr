@@ -11,11 +11,17 @@ import {
   EchoResponseSchema,
   MsgId as EchoMsgId,
 } from "./gen/gsr/example/echo/v1/echo_pb.js";
+import {
+  authenticatedFrame,
+  completeClientHandshake,
+  createClientHandshake,
+} from "./secure_auth.js";
 
 interface ClientOptions {
   url: string;
   text: string;
   timeoutMs: number;
+  secure: boolean;
 }
 
 const defaultURL = "ws://127.0.0.1:7888/ws";
@@ -27,6 +33,7 @@ function parseOptions(arguments_: string[]): ClientOptions {
     url: defaultURL,
     text: "hello from TypeScript",
     timeoutMs: responseTimeoutMs,
+    secure: false,
   };
   for (let index = 0; index < arguments_.length; index += 1) {
     const argument = arguments_[index];
@@ -44,6 +51,8 @@ function parseOptions(arguments_: string[]): ClientOptions {
       }
       options.timeoutMs = timeoutMs;
       index += 1;
+    } else if (argument === "--secure") {
+      options.secure = true;
     } else {
       throw new Error(`unknown or incomplete argument: ${argument}`);
     }
@@ -123,8 +132,18 @@ async function run(options: ClientOptions): Promise<void> {
       requestId: requestID,
       payload,
     });
-    const response = waitForMessage(connection, options.timeoutMs);
-    connection.send(toBinary(EnvelopeSchema, request));
+    let response: Promise<Uint8Array>;
+    if (options.secure) {
+      const handshake = createClientHandshake();
+      const handshakeResponse = waitForMessage(connection, options.timeoutMs);
+      connection.send(handshake.frame);
+      const authenticator = completeClientHandshake(handshake, await handshakeResponse);
+      response = waitForMessage(connection, options.timeoutMs);
+      connection.send(authenticatedFrame(authenticator, toBinary(EnvelopeSchema, request)));
+    } else {
+      response = waitForMessage(connection, options.timeoutMs);
+      connection.send(toBinary(EnvelopeSchema, request));
+    }
 
     const responseEnvelope = fromBinary(EnvelopeSchema, await response);
     if (responseEnvelope.requestId !== requestID) {

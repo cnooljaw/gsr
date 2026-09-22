@@ -64,4 +64,10 @@ npm run client -- --text "hello GSR"
 
 服务端默认只监听 `127.0.0.1:7888`。可以通过 `--addr 127.0.0.1:PORT` 指定其它本地端口，并通过客户端 `--url ws://127.0.0.1:PORT/ws` 连接。
 
-TypeScript CLI 当前连接 DebugGate，只演练 Echo Request/Response 的编解码和 `request_id` 回传，不覆盖生产 Gate 的固定二进制握手与上行认证；生产 Gate 的 Go 集成测试覆盖这条路径。
+TypeScript CLI 默认连接 DebugGate，只演练 Echo Request/Response 的编解码和 `request_id` 回传。连接生产 Gate 时增加 `--secure`，客户端会先发送固定 33 字节 X25519 握手，再发送 `seq | Envelope | MAC`：
+
+```bash
+npm run client -- --secure --url wss://127.0.0.1:PORT/ws --text "hello secure GSR"
+```
+
+生产 Gate 的监听地址和证书由业务服务组装；当前 `cmd/debugserver` 仍只启动 DebugGate，生产 Gate 的 Go 集成测试覆盖服务端完整链路。
