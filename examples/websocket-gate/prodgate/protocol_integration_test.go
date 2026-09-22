@@ -301,3 +301,90 @@ func TestProdGateDeliversNotificationPush(t *testing.T) {
 		t.Fatalf("Runtime.Stop() error = %v", err)
 	}
 }
+
+// TestProdGateReturnsErrorForInvalidPayload 验证已知消息编号的坏 payload 由协议层返回通用错误，且不会关闭连接。
+func TestProdGateReturnsErrorForInvalidPayload(t *testing.T) {
+	agents := make(chan *protocolGateAgent, 1)
+	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
+		MailboxCapacity: 8,
+		ShutdownTimeout: 2 * time.Second,
+	}, 1, time.Second, 1<<20, 64<<10, func(client ClientSession) runtime.Service {
+		agent := &protocolGateAgent{client: client, disconnected: make(chan struct{})}
+		agents <- agent
+		return agent
+	})
+	connection, macKey := dialAuthenticatedTestClient(t, gate, clientTLS)
+	defer connection.Close()
+	agent := <-agents
+
+	invalidBytes, err := proto.Marshal(&commonv1.Envelope{
+		MsgId:     uint32(echopb.MsgId_C2S_ECHO_REQUEST),
+		RequestId: 93,
+		Payload:   []byte{0xff},
+	})
+	if err != nil {
+		t.Fatalf("marshal invalid payload Envelope: %v", err)
+	}
+	if err := connection.WriteMessage(websocket.BinaryMessage, makeAuthenticatedTestFrame(t, macKey[:], 1, invalidBytes)); err != nil {
+		t.Fatalf("WriteMessage(invalid payload frame) error = %v", err)
+	}
+	_, responseBytes, err := readTestBinaryMessage(t, connection)
+	if err != nil {
+		t.Fatalf("ReadMessage(invalid payload response) error = %v", err)
+	}
+	var errorEnvelope commonv1.Envelope
+	if err := proto.Unmarshal(responseBytes, &errorEnvelope); err != nil {
+		t.Fatalf("unmarshal ErrorResponse Envelope: %v", err)
+	}
+	if errorEnvelope.GetMsgId() != uint32(commonv1.MsgId_S2C_ERROR_RESPONSE) || errorEnvelope.GetRequestId() != 93 {
+		t.Fatalf("ErrorResponse Envelope = msg_id %d, request_id %d; want %d, 93",
+			errorEnvelope.GetMsgId(), errorEnvelope.GetRequestId(), commonv1.MsgId_S2C_ERROR_RESPONSE)
+	}
+	var errorResponse commonv1.ErrorResponse
+	if err := proto.Unmarshal(errorEnvelope.GetPayload(), &errorResponse); err != nil {
+		t.Fatalf("unmarshal ErrorResponse: %v", err)
+	}
+	if errorResponse.GetCode() != commonv1.ErrorCode_ERROR_CODE_INVALID_REQUEST {
+		t.Fatalf("ErrorResponse code = %v, want invalid request", errorResponse.GetCode())
+	}
+
+	payload, err := proto.Marshal(&echopb.EchoRequest{Text: "after invalid payload"})
+	if err != nil {
+		t.Fatalf("marshal EchoRequest: %v", err)
+	}
+	validBytes, err := proto.Marshal(&commonv1.Envelope{
+		MsgId:     uint32(echopb.MsgId_C2S_ECHO_REQUEST),
+		RequestId: 94,
+		Payload:   payload,
+	})
+	if err != nil {
+		t.Fatalf("marshal valid Envelope: %v", err)
+	}
+	if err := connection.WriteMessage(websocket.BinaryMessage, makeAuthenticatedTestFrame(t, macKey[:], 2, validBytes)); err != nil {
+		t.Fatalf("WriteMessage(valid frame) error = %v", err)
+	}
+	_, responseBytes, err = readTestBinaryMessage(t, connection)
+	if err != nil {
+		t.Fatalf("ReadMessage(valid response) error = %v", err)
+	}
+	var responseEnvelope commonv1.Envelope
+	if err := proto.Unmarshal(responseBytes, &responseEnvelope); err != nil {
+		t.Fatalf("unmarshal valid response Envelope: %v", err)
+	}
+	if responseEnvelope.GetMsgId() != uint32(echopb.MsgId_S2C_ECHO_RESPONSE) || responseEnvelope.GetRequestId() != 94 {
+		t.Fatalf("valid response Envelope = msg_id %d, request_id %d; want %d, 94",
+			responseEnvelope.GetMsgId(), responseEnvelope.GetRequestId(), echopb.MsgId_S2C_ECHO_RESPONSE)
+	}
+
+	if err := connection.Close(); err != nil {
+		t.Fatalf("Close(client) error = %v", err)
+	}
+	select {
+	case <-agent.disconnected:
+	case <-time.After(time.Second):
+		t.Fatal("Agent 未收到客户端断开通知")
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+}
