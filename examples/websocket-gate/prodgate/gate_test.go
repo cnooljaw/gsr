@@ -97,6 +97,29 @@ func TestProdGateAuthenticatesAndDeliversClientFrames(t *testing.T) {
 	}
 }
 
+// TestProdGateRejectsLateAgentResponseAfterDisconnect 验证客户端断开后 Agent 的迟到写回返回稳定关闭错误。
+func TestProdGateRejectsLateAgentResponseAfterDisconnect(t *testing.T) {
+	local, gate, agents, clientTLS := startTestProductionGate(t, 1, time.Second)
+	connection, _ := dialAuthenticatedTestClient(t, gate, clientTLS)
+	defer connection.Close()
+	agent := receiveProductionAgent(t, agents)
+
+	if err := connection.Close(); err != nil {
+		t.Fatalf("Close(client) error = %v", err)
+	}
+	select {
+	case <-agent.disconnected:
+	case <-time.After(time.Second):
+		t.Fatal("Agent 未收到客户端断开通知")
+	}
+	if err := agent.client.Send(&commonv1.Envelope{MsgId: 1002, RequestId: 91}); !errors.Is(err, ErrClientSessionClosed) {
+		t.Fatalf("late ClientSession.Send() error = %v, want %v", err, ErrClientSessionClosed)
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+}
+
 // TestProdGateSupportsIngressTerminatedTLS 验证 Ingress 终止 TLS 后 Pod 仍可用普通 WebSocket 完成同一套应用握手和消息投递。
 func TestProdGateSupportsIngressTerminatedTLS(t *testing.T) {
 	agents := make(chan *productionTestAgent, 1)
