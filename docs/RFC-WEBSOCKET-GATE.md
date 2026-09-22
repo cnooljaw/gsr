@@ -352,6 +352,8 @@ Gate 停止按以下顺序执行：
 
 Gate 不等待或强杀 Agent。Runtime 独立停止 Agent runner 并调用 Agent 的 `OnStop`；ClientSession 的失效和断开通知必须幂等，避免 Gate 与 Agent 并发停止形成相互等待。容量拒绝和关闭不生成业务 `ErrorResponse`，具体原因进入 Gate 结构化日志。
 
+断开通知通过 Gate 的受控 Infrastructure Call 投递；如果 Agent Mailbox 暂时满载，Gate 保留连接映射并在 5 秒上限内重试，不建立第二个无限队列。通知成功、Runtime 停止或达到上限后结束重试。
+
 ## 下一步与验收
 
 Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/通知/推送独立编号，通用与业务专用 `.proto` 分开定义；每个 MsgId 通过 option 显式声明 payload、方向和消息种类，协议目录由代码生成，业务 Handler 按实现进度手动注册。控制握手消息、大端 seq 和原始字节 MAC 验证顺序、固定 HKDF 参数、独立 DebugGate、WebSocket 关闭码和 Gate/Agent/业务错误归属，以及“一连接一个业务定义的 AgentService、Runtime 内部消息类型区分客户端消息与普通 Core Command、Service 可选择实现 ClientMessageHandler、业务协议通过 ProtocolHandler 组件组合接入”的边界已确认。Runtime 的单向投递 API 与缺少客户端处理能力时的 admission 拒绝已实现；联调示例包含通用 Envelope 与 Echo 业务 `.proto`、Go/TypeScript 生成类型、强类型 Echo Handler 和 CLI 闭环。跨语言认证固定向量已由 Go 与 TypeScript 共用夹具验证。DebugGate 使用示例专用的底层 Runtime 注入，不扩展 Core 或 `gsr.Run`。生产 WSS Gate 首个纵向切片和共享 Logger 接线已完成；更完整的慢客户端/失败压力测试仍待推进。一次讨论一个问题，未确认前不新增公开 API 或通用安全插件框架。

@@ -369,6 +369,112 @@ func TestProdGateRejectsNonBinaryAuthenticatedFrame(t *testing.T) {
 	}
 }
 
+// TestProdGateClosesConnectionWhenAgentMailboxIsFull 验证 Agent 正在处理消息时 Mailbox 满载会关闭当前客户端连接并累计计数。
+func TestProdGateClosesConnectionWhenAgentMailboxIsFull(t *testing.T) {
+	release := make(chan struct{})
+	agents := make(chan *blockingInboundAgent, 1)
+	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
+		MailboxCapacity: 1,
+		ShutdownTimeout: 2 * time.Second,
+	}, 1, time.Second, 1<<20, 64<<10, func(client ClientSession) runtime.Service {
+		agent := &blockingInboundAgent{
+			release:      release,
+			started:      make(chan struct{}),
+			disconnected: make(chan struct{}),
+		}
+		agents <- agent
+		return agent
+	})
+	connection, macKey := dialAuthenticatedTestClient(t, gate, clientTLS)
+	defer connection.Close()
+	agent := receiveBlockingInboundAgent(t, agents)
+
+	requestBytes, err := proto.Marshal(&commonv1.Envelope{MsgId: 1001, RequestId: 71})
+	if err != nil {
+		t.Fatalf("marshal request Envelope: %v", err)
+	}
+	if err := connection.WriteMessage(websocket.BinaryMessage, makeAuthenticatedTestFrame(t, macKey[:], 1, requestBytes)); err != nil {
+		t.Fatalf("WriteMessage(first frame) error = %v", err)
+	}
+	select {
+	case <-agent.started:
+	case <-time.After(time.Second):
+		t.Fatal("Agent 未开始处理第一条客户端消息")
+	}
+
+	for sequence := uint64(2); sequence < 10; sequence++ {
+		if err := connection.WriteMessage(websocket.BinaryMessage, makeAuthenticatedTestFrame(t, macKey[:], sequence, requestBytes)); err != nil {
+			break
+		}
+	}
+	_, _, err = readTestBinaryMessage(t, connection)
+	if !websocket.IsCloseError(err, websocket.CloseInternalServerErr) {
+		t.Fatalf("ReadMessage() error = %v, want WebSocket close %d", err, websocket.CloseInternalServerErr)
+	}
+	waitForGateMetric(t, gate, "InboundMailboxFull", func(metrics Metrics) uint64 {
+		return metrics.InboundMailboxFull
+	}, 1)
+	close(release)
+	select {
+	case <-agent.disconnected:
+	case <-time.After(time.Second):
+		t.Fatal("Mailbox 满载后 Agent 未收到断开通知")
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+}
+
+// TestProdGateReportsOutboundQueueFull 验证 Agent 的 ClientSession 在出站队列不足时返回稳定错误并累计计数。
+func TestProdGateReportsOutboundQueueFull(t *testing.T) {
+	agents := make(chan *burstOutboundAgent, 1)
+	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
+		MailboxCapacity: 8,
+		ShutdownTimeout: 2 * time.Second,
+	}, 1, time.Second, 1<<20, queueEntryOverhead+1, func(client ClientSession) runtime.Service {
+		agent := &burstOutboundAgent{
+			client:       client,
+			result:       make(chan error, 1),
+			disconnected: make(chan struct{}),
+		}
+		agents <- agent
+		return agent
+	})
+	connection, macKey := dialAuthenticatedTestClient(t, gate, clientTLS)
+	defer connection.Close()
+	agent := receiveBurstOutboundAgent(t, agents)
+
+	requestBytes, err := proto.Marshal(&commonv1.Envelope{MsgId: 1001, RequestId: 72})
+	if err != nil {
+		t.Fatalf("marshal request Envelope: %v", err)
+	}
+	if err := connection.WriteMessage(websocket.BinaryMessage, makeAuthenticatedTestFrame(t, macKey[:], 1, requestBytes)); err != nil {
+		t.Fatalf("WriteMessage(request frame) error = %v", err)
+	}
+	select {
+	case err := <-agent.result:
+		if !errors.Is(err, ErrClientQueueFull) {
+			t.Fatalf("ClientSession.Send() error = %v, want %v", err, ErrClientQueueFull)
+		}
+	case <-time.After(time.Second):
+		t.Fatal("Agent 未观察到出站队列拒绝")
+	}
+	waitForGateMetric(t, gate, "OutboundQueueFull", func(metrics Metrics) uint64 {
+		return metrics.OutboundQueueFull
+	}, 1)
+	if err := connection.Close(); err != nil {
+		t.Fatalf("Close(client) error = %v", err)
+	}
+	select {
+	case <-agent.disconnected:
+	case <-time.After(time.Second):
+		t.Fatal("出站队列拒绝后 Agent 未收到断开通知")
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+}
+
 // TestProdGateRuntimeCloseReleasesActiveClient 验证 Runtime 关闭时生产 Gate 会关闭已认证连接并等待自己的 I/O goroutine。
 func TestProdGateRuntimeCloseReleasesActiveClient(t *testing.T) {
 	local, gate, agents, clientTLS := startTestProductionGate(t, 2, time.Second)
@@ -566,6 +672,63 @@ func (agent *productionTestAgent) HandleClientMessage(_ runtime.CommandContext, 
 
 func (*productionTestAgent) OnStop(context.Context) error { return nil }
 
+type blockingInboundAgent struct {
+	release      <-chan struct{}
+	started      chan struct{}
+	disconnected chan struct{}
+	startOnce    sync.Once
+	stopOnce     sync.Once
+}
+
+func (*blockingInboundAgent) OnStart(context.Context, runtime.ServiceContext) error { return nil }
+
+func (agent *blockingInboundAgent) Handle(commandContext runtime.CommandContext, command runtime.CommandID, _ ...any) (any, error) {
+	if command != ClientDisconnectedCommand {
+		return nil, errors.New("unexpected blocking inbound Agent command")
+	}
+	agent.stopOnce.Do(func() { close(agent.disconnected) })
+	commandContext.Exit()
+	return nil, nil
+}
+
+func (agent *blockingInboundAgent) HandleClientMessage(_ runtime.CommandContext, _ []byte) error {
+	agent.startOnce.Do(func() { close(agent.started) })
+	<-agent.release
+	return nil
+}
+
+func (*blockingInboundAgent) OnStop(context.Context) error { return nil }
+
+type burstOutboundAgent struct {
+	client       ClientSession
+	result       chan error
+	disconnected chan struct{}
+	resultOnce   sync.Once
+	stopOnce     sync.Once
+}
+
+func (*burstOutboundAgent) OnStart(context.Context, runtime.ServiceContext) error { return nil }
+
+func (agent *burstOutboundAgent) Handle(commandContext runtime.CommandContext, command runtime.CommandID, _ ...any) (any, error) {
+	if command != ClientDisconnectedCommand {
+		return nil, errors.New("unexpected burst outbound Agent command")
+	}
+	agent.stopOnce.Do(func() { close(agent.disconnected) })
+	commandContext.Exit()
+	return nil, nil
+}
+
+func (agent *burstOutboundAgent) HandleClientMessage(_ runtime.CommandContext, _ []byte) error {
+	err := agent.client.Send(&commonv1.Envelope{
+		MsgId:   1002,
+		Payload: bytes.Repeat([]byte{'x'}, 128),
+	})
+	agent.resultOnce.Do(func() { agent.result <- err })
+	return nil
+}
+
+func (*burstOutboundAgent) OnStop(context.Context) error { return nil }
+
 func startTestProductionGate(
 	t *testing.T,
 	maxConnections int,
@@ -573,12 +736,40 @@ func startTestProductionGate(
 	loggers ...*logging.Logger,
 ) (*runtime.Runtime, *GateService, <-chan *productionTestAgent, *tls.Config) {
 	t.Helper()
-	serverTLS, clientTLS := testTLSConfigs(t)
 	var logger *logging.Logger
 	if len(loggers) > 0 {
 		logger = loggers[0]
 	}
-	local, err := runtime.NewRuntime(runtime.Config{Logger: logger, MailboxCapacity: 8, ShutdownTimeout: 2 * time.Second})
+	agents := make(chan *productionTestAgent, maxConnections+1)
+	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
+		Logger:          logger,
+		MailboxCapacity: 8,
+		ShutdownTimeout: 2 * time.Second,
+	}, maxConnections, handshakeTimeout, 1<<20, 64<<10, func(client ClientSession) runtime.Service {
+		agent := &productionTestAgent{
+			client:       client,
+			received:     make(chan []byte, 1),
+			disconnected: make(chan struct{}),
+		}
+		agents <- agent
+		return agent
+	})
+	return local, gate, agents, clientTLS
+}
+
+// startConfiguredProductionGate 使用给定 Runtime 与容量配置启动测试用生产 Gate。
+func startConfiguredProductionGate(
+	t *testing.T,
+	runtimeConfig runtime.Config,
+	maxConnections int,
+	handshakeTimeout time.Duration,
+	maxFrameBytes int,
+	maxOutboundQueueBytes int,
+	newAgent func(ClientSession) runtime.Service,
+) (*runtime.Runtime, *GateService, *tls.Config) {
+	t.Helper()
+	serverTLS, clientTLS := testTLSConfigs(t)
+	local, err := runtime.NewRuntime(runtimeConfig)
 	if err != nil {
 		t.Fatalf("NewRuntime() error = %v", err)
 	}
@@ -590,23 +781,14 @@ func startTestProductionGate(
 			t.Errorf("Runtime.Close() error = %v", err)
 		}
 	})
-	agents := make(chan *productionTestAgent, maxConnections+1)
 	gate, err := NewGateService(local, Config{
 		Address:               "127.0.0.1:0",
 		TLSConfig:             serverTLS,
 		MaxConnections:        maxConnections,
 		HandshakeTimeout:      handshakeTimeout,
-		MaxFrameBytes:         1 << 20,
-		MaxOutboundQueueBytes: 64 << 10,
-		NewAgent: func(client ClientSession) runtime.Service {
-			agent := &productionTestAgent{
-				client:       client,
-				received:     make(chan []byte, 1),
-				disconnected: make(chan struct{}),
-			}
-			agents <- agent
-			return agent
-		},
+		MaxFrameBytes:         maxFrameBytes,
+		MaxOutboundQueueBytes: maxOutboundQueueBytes,
+		NewAgent:              newAgent,
 	})
 	if err != nil {
 		t.Fatalf("NewGateService() error = %v", err)
@@ -614,7 +796,7 @@ func startTestProductionGate(
 	if _, err := local.CreateService(context.Background(), gate); err != nil {
 		t.Fatalf("CreateService(Gate) error = %v", err)
 	}
-	return local, gate, agents, clientTLS
+	return local, gate, clientTLS
 }
 
 func testTLSConfigs(t *testing.T) (*tls.Config, *tls.Config) {
@@ -735,6 +917,28 @@ func receiveProductionAgent(t *testing.T, agents <-chan *productionTestAgent) *p
 		return agent
 	case <-time.After(time.Second):
 		t.Fatal("Gate 未创建连接 Agent")
+		return nil
+	}
+}
+
+func receiveBlockingInboundAgent(t *testing.T, agents <-chan *blockingInboundAgent) *blockingInboundAgent {
+	t.Helper()
+	select {
+	case agent := <-agents:
+		return agent
+	case <-time.After(time.Second):
+		t.Fatal("Gate 未创建 blocking inbound Agent")
+		return nil
+	}
+}
+
+func receiveBurstOutboundAgent(t *testing.T, agents <-chan *burstOutboundAgent) *burstOutboundAgent {
+	t.Helper()
+	select {
+	case agent := <-agents:
+		return agent
+	case <-time.After(time.Second):
+		t.Fatal("Gate 未创建 burst outbound Agent")
 		return nil
 	}
 }

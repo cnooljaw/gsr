@@ -243,11 +243,16 @@ func (gate *GateService) Handle(self runtime.CommandContext, command runtime.Com
 		if !exists {
 			return nil, nil
 		}
-		delete(gate.agentsByConnection, clientConn)
 		if err := self.Send(agentID, ClientDisconnectedCommand); err != nil && !isRuntimeStoppingError(err) {
 			gate.logConnectionFailure(clientConn, "disconnect_notify", websocket.CloseInternalServerErr, err)
+			if errors.Is(err, runtime.ErrMailboxFull) {
+				// 保留映射，让 ServeHTTP 通过有界 Call 重试，避免断开通知被 Agent 背压吞掉。
+				return nil, err
+			}
+			delete(gate.agentsByConnection, clientConn)
 			return nil, fmt.Errorf("prodgate: notify Agent disconnect: %w", err)
 		}
+		delete(gate.agentsByConnection, clientConn)
 		return nil, nil
 
 	default:
@@ -497,8 +502,13 @@ func (gate *GateService) notifyDisconnected(serviceID runtime.ServiceID, clientC
 	defer deadline.Stop()
 	defer ticker.Stop()
 	for {
-		err := gate.runtime.Send(serviceID, gateDisconnectCommand, clientConn)
-		if !errors.Is(err, runtime.ErrMailboxFull) {
+		attemptContext, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+		_, err := gate.runtime.Call(attemptContext, serviceID, gateDisconnectCommand, clientConn)
+		cancel()
+		if err == nil || isRuntimeStoppingError(err) {
+			return
+		}
+		if !errors.Is(err, runtime.ErrMailboxFull) && !errors.Is(err, context.DeadlineExceeded) && !errors.Is(err, runtime.ErrCallTimeout) {
 			return
 		}
 		select {
