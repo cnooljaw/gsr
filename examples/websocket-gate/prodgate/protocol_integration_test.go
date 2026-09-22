@@ -23,6 +23,103 @@ type protocolGateAgent struct {
 	stopOnce     sync.Once
 }
 
+const protocolTimeoutCommand runtime.CommandID = 0x7100
+
+// timeoutProtocolAgent 将 Agent 内部的 Core Call 超时接到客户端协议错误回复，验证超时归属不进入 Gate。
+type timeoutProtocolAgent struct {
+	client       ClientSession
+	target       runtime.ServiceID
+	self         runtime.ServiceContext
+	dispatcher   *protocol.Dispatcher
+	disconnected chan struct{}
+	stopOnce     sync.Once
+}
+
+// blockingProtocolTarget 为测试中的慢目标，释放前不会完成 Core Command。
+type blockingProtocolTarget struct {
+	started     chan struct{}
+	done        chan struct{}
+	release     chan struct{}
+	startOnce   sync.Once
+	doneOnce    sync.Once
+	releaseOnce sync.Once
+}
+
+func (target *blockingProtocolTarget) OnStart(context.Context, runtime.ServiceContext) error {
+	return nil
+}
+
+func (target *blockingProtocolTarget) Handle(_ runtime.CommandContext, command runtime.CommandID, _ ...any) (any, error) {
+	if command != protocolTimeoutCommand {
+		return nil, errors.New("unexpected timeout target command")
+	}
+	target.startOnce.Do(func() { close(target.started) })
+	<-target.release
+	target.doneOnce.Do(func() { close(target.done) })
+	return nil, nil
+}
+
+func (target *blockingProtocolTarget) OnStop(context.Context) error {
+	target.releaseOnce.Do(func() { close(target.release) })
+	return nil
+}
+
+func (agent *timeoutProtocolAgent) OnStart(_ context.Context, self runtime.ServiceContext) error {
+	registry, err := protocol.NewRegistry(
+		commonv1.MessageCatalogGsrCommonV1Common,
+		echopb.MessageCatalogGsrExampleEchoV1Echo,
+	)
+	if err != nil {
+		return err
+	}
+	session, err := protocol.NewSession(registry, agent.client)
+	if err != nil {
+		return err
+	}
+	dispatcher, err := protocol.NewDispatcher(registry, session)
+	if err != nil {
+		return err
+	}
+	if err := protocol.Register(dispatcher, agent.onEcho); err != nil {
+		return err
+	}
+	agent.self = self
+	agent.dispatcher = dispatcher
+	return nil
+}
+
+func (agent *timeoutProtocolAgent) Handle(commandContext runtime.CommandContext, command runtime.CommandID, _ ...any) (any, error) {
+	if command != ClientDisconnectedCommand {
+		return nil, errors.New("unexpected timeout protocol Agent command")
+	}
+	agent.stopOnce.Do(func() { close(agent.disconnected) })
+	commandContext.Exit()
+	return nil, nil
+}
+
+func (agent *timeoutProtocolAgent) HandleClientMessage(_ runtime.CommandContext, frame []byte) error {
+	if agent.dispatcher == nil {
+		return errors.New("timeout protocol Agent dispatcher is not initialized")
+	}
+	return agent.dispatcher.HandleFrame(frame)
+}
+
+func (agent *timeoutProtocolAgent) onEcho(handlerContext protocol.Context, _ *echopb.EchoRequest) error {
+	callContext, cancel := context.WithTimeout(context.Background(), 20*time.Millisecond)
+	defer cancel()
+	if _, err := agent.self.Call(callContext, agent.target, protocolTimeoutCommand); err != nil {
+		return err
+	}
+	return handlerContext.Response(
+		uint32(echopb.MsgId_S2C_ECHO_RESPONSE),
+		&echopb.EchoResponse{Code: echopb.EchoResultCode_ECHO_RESULT_OK},
+	)
+}
+
+func (agent *timeoutProtocolAgent) OnStop(context.Context) error {
+	return agent.client.Close()
+}
+
 func (agent *protocolGateAgent) OnStart(_ context.Context, _ runtime.ServiceContext) error {
 	registry, err := protocol.NewRegistry(
 		commonv1.MessageCatalogGsrCommonV1Common,
@@ -84,6 +181,106 @@ func (agent *protocolGateAgent) onEchoNotify(context protocol.Context, request *
 
 func (agent *protocolGateAgent) OnStop(context.Context) error {
 	return agent.client.Close()
+}
+
+// TestProdGateReturnsErrorAfterAgentCallTimeout 验证 Agent 内部 Core Call 超时后回传通用错误，迟到内部完成不再生成第二条客户端响应。
+func TestProdGateReturnsErrorAfterAgentCallTimeout(t *testing.T) {
+	target := &blockingProtocolTarget{
+		started: make(chan struct{}),
+		done:    make(chan struct{}),
+		release: make(chan struct{}),
+	}
+	t.Cleanup(func() { target.releaseOnce.Do(func() { close(target.release) }) })
+	var targetID runtime.ServiceID
+	agents := make(chan *timeoutProtocolAgent, 1)
+	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
+		MailboxCapacity: 8,
+		ShutdownTimeout: 2 * time.Second,
+	}, 1, time.Second, 1<<20, 64<<10, func(client ClientSession) runtime.Service {
+		agent := &timeoutProtocolAgent{
+			client:       client,
+			target:       targetID,
+			disconnected: make(chan struct{}),
+		}
+		agents <- agent
+		return agent
+	})
+	var err error
+	targetID, err = local.CreateService(context.Background(), target)
+	if err != nil {
+		t.Fatalf("CreateService(timeout target) error = %v", err)
+	}
+	connection, macKey := dialAuthenticatedTestClient(t, gate, clientTLS)
+	defer connection.Close()
+	agent := <-agents
+
+	payload, err := proto.Marshal(&echopb.EchoRequest{Text: "timeout"})
+	if err != nil {
+		t.Fatalf("marshal EchoRequest: %v", err)
+	}
+	requestBytes, err := proto.Marshal(&commonv1.Envelope{
+		MsgId:     uint32(echopb.MsgId_C2S_ECHO_REQUEST),
+		RequestId: 97,
+		Payload:   payload,
+	})
+	if err != nil {
+		t.Fatalf("marshal request Envelope: %v", err)
+	}
+	if err := connection.WriteMessage(websocket.BinaryMessage, makeAuthenticatedTestFrame(t, macKey[:], 1, requestBytes)); err != nil {
+		t.Fatalf("WriteMessage(request frame) error = %v", err)
+	}
+	select {
+	case <-target.started:
+	case <-time.After(time.Second):
+		t.Fatal("timeout target did not start")
+	}
+	_, responseBytes, err := readTestBinaryMessage(t, connection)
+	if err != nil {
+		t.Fatalf("ReadMessage(timeout response) error = %v", err)
+	}
+	var errorEnvelope commonv1.Envelope
+	if err := proto.Unmarshal(responseBytes, &errorEnvelope); err != nil {
+		t.Fatalf("unmarshal timeout ErrorResponse Envelope: %v", err)
+	}
+	if errorEnvelope.GetMsgId() != uint32(commonv1.MsgId_S2C_ERROR_RESPONSE) || errorEnvelope.GetRequestId() != 97 {
+		t.Fatalf("timeout ErrorResponse Envelope = msg_id %d, request_id %d; want %d, 97",
+			errorEnvelope.GetMsgId(), errorEnvelope.GetRequestId(), commonv1.MsgId_S2C_ERROR_RESPONSE)
+	}
+	var errorResponse commonv1.ErrorResponse
+	if err := proto.Unmarshal(errorEnvelope.GetPayload(), &errorResponse); err != nil {
+		t.Fatalf("unmarshal timeout ErrorResponse: %v", err)
+	}
+	if errorResponse.GetCode() != commonv1.ErrorCode_ERROR_CODE_INTERNAL {
+		t.Fatalf("timeout ErrorResponse code = %v, want internal", errorResponse.GetCode())
+	}
+
+	target.releaseOnce.Do(func() { close(target.release) })
+	select {
+	case <-target.done:
+	case <-time.After(time.Second):
+		t.Fatal("timeout target did not finish after release")
+	}
+	if err := connection.SetReadDeadline(time.Now().Add(200 * time.Millisecond)); err != nil {
+		t.Fatalf("SetReadDeadline(late response) error = %v", err)
+	}
+	_, _, err = connection.ReadMessage()
+	if err == nil {
+		t.Fatal("late Core Call completion produced a second client response")
+	}
+	if !isTimeoutError(err) {
+		t.Fatalf("ReadMessage(late response) error = %v, want timeout", err)
+	}
+	if err := connection.Close(); err != nil {
+		t.Fatalf("Close(client) error = %v", err)
+	}
+	select {
+	case <-agent.disconnected:
+	case <-time.After(time.Second):
+		t.Fatal("Agent 未收到客户端断开通知")
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
 }
 
 // TestProdGateKeepsConnectionAfterUnknownMessage 验证合法认证帧中的未知 msg_id 只回业务层 ErrorResponse，连接仍可继续处理后续请求。
