@@ -20,4 +20,16 @@ var MessageCatalogGsrExampleEchoV1Echo = []catalog.Entry{
 		Kind:       catalog.Response,
 		NewMessage: func() proto.Message { return &EchoResponse{} },
 	},
+	{
+		ID:         uint32(MsgId_C2S_ECHO_NOTIFY),
+		Direction:  catalog.ClientToServer,
+		Kind:       catalog.Notify,
+		NewMessage: func() proto.Message { return &EchoNotify{} },
+	},
+	{
+		ID:         uint32(MsgId_S2C_ECHO_PUSH),
+		Direction:  catalog.ServerToClient,
+		Kind:       catalog.Push,
+		NewMessage: func() proto.Message { return &EchoPush{} },
+	},
 }

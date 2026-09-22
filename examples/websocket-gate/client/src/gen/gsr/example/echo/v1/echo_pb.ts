@@ -11,7 +11,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file gsr/example/echo/v1/echo.proto.
  */
 export const file_gsr_example_echo_v1_echo: GenFile = /*@__PURE__*/
-  fileDesc("Ch5nc3IvZXhhbXBsZS9lY2hvL3YxL2VjaG8ucHJvdG8SE2dzci5leGFtcGxlLmVjaG8udjEiGwoLRWNob1JlcXVlc3QSDAoEdGV4dBgBIAEoCSIcCgxFY2hvUmVzcG9uc2USDAoEdGV4dBgBIAEoCSqnAQoFTXNnSWQSFgoSTVNHX0lEX1VOU1BFQ0lGSUVEEAASQQoQQzJTX0VDSE9fUkVRVUVTVBDpBxoqirUYJgogLmdzci5leGFtcGxlLmVjaG8udjEuRWNob1JlcXVlc3QQARgBEkMKEVMyQ19FQ0hPX1JFU1BPTlNFEOoHGiuKtRgnCiEuZ3NyLmV4YW1wbGUuZWNoby52MS5FY2hvUmVzcG9uc2UQAhgDQlNaUWdpdGh1Yi5jb20vY25vb2xqYXcvZ3NyL2V4YW1wbGVzL3dlYnNvY2tldC1nYXRlL2dlbi9nby9nc3IvZXhhbXBsZS9lY2hvL3YxO2VjaG9wYmIGcHJvdG8z", [file_gsr_protocol_v1_options]);
+  fileDesc("Ch5nc3IvZXhhbXBsZS9lY2hvL3YxL2VjaG8ucHJvdG8SE2dzci5leGFtcGxlLmVjaG8udjEiGwoLRWNob1JlcXVlc3QSDAoEdGV4dBgBIAEoCSJgCgxFY2hvUmVzcG9uc2USDAoEdGV4dBgBIAEoCRIxCgRjb2RlGAIgASgOMiMuZ3NyLmV4YW1wbGUuZWNoby52MS5FY2hvUmVzdWx0Q29kZRIPCgdtZXNzYWdlGAMgASgJIhoKCkVjaG9Ob3RpZnkSDAoEdGV4dBgBIAEoCSIYCghFY2hvUHVzaBIMCgR0ZXh0GAEgASgJKqUCCgVNc2dJZBIWChJNU0dfSURfVU5TUEVDSUZJRUQQABJBChBDMlNfRUNIT19SRVFVRVNUEOkHGiqKtRgmCiAuZ3NyLmV4YW1wbGUuZWNoby52MS5FY2hvUmVxdWVzdBABGAESQwoRUzJDX0VDSE9fUkVTUE9OU0UQ6gcaK4q1GCcKIS5nc3IuZXhhbXBsZS5lY2hvLnYxLkVjaG9SZXNwb25zZRACGAMSPwoPQzJTX0VDSE9fTk9USUZZEOsHGimKtRglCh8uZ3NyLmV4YW1wbGUuZWNoby52MS5FY2hvTm90aWZ5EAEYAhI7Cg1TMkNfRUNIT19QVVNIEOwHGieKtRgjCh0uZ3NyLmV4YW1wbGUuZWNoby52MS5FY2hvUHVzaBACGAQqYAoORWNob1Jlc3VsdENvZGUSGwoXRUNIT19SRVNVTFRfVU5TUEVDSUZJRUQQABISCg5FQ0hPX1JFU1VMVF9PSxABEh0KGUVDSE9fUkVTVUxUX1RFWFRfUkVRVUlSRUQQAkJTWlFnaXRodWIuY29tL2Nub29samF3L2dzci9leGFtcGxlcy93ZWJzb2NrZXQtZ2F0ZS9nZW4vZ28vZ3NyL2V4YW1wbGUvZWNoby92MTtlY2hvcGJiBnByb3RvMw", [file_gsr_protocol_v1_options]);
 
 /**
  * EchoRequest 是客户端发起的回显请求。
@@ -42,6 +42,16 @@ export type EchoResponse = Message<"gsr.example.echo.v1.EchoResponse"> & {
    * @generated from field: string text = 1;
    */
   text: string;
+
+  /**
+   * @generated from field: gsr.example.echo.v1.EchoResultCode code = 2;
+   */
+  code: EchoResultCode;
+
+  /**
+   * @generated from field: string message = 3;
+   */
+  message: string;
 };
 
 /**
@@ -50,6 +60,44 @@ export type EchoResponse = Message<"gsr.example.echo.v1.EchoResponse"> & {
  */
 export const EchoResponseSchema: GenMessage<EchoResponse> = /*@__PURE__*/
   messageDesc(file_gsr_example_echo_v1_echo, 1);
+
+/**
+ * EchoNotify 是不要求响应的客户端通知。
+ *
+ * @generated from message gsr.example.echo.v1.EchoNotify
+ */
+export type EchoNotify = Message<"gsr.example.echo.v1.EchoNotify"> & {
+  /**
+   * @generated from field: string text = 1;
+   */
+  text: string;
+};
+
+/**
+ * Describes the message gsr.example.echo.v1.EchoNotify.
+ * Use `create(EchoNotifySchema)` to create a new message.
+ */
+export const EchoNotifySchema: GenMessage<EchoNotify> = /*@__PURE__*/
+  messageDesc(file_gsr_example_echo_v1_echo, 2);
+
+/**
+ * EchoPush 是服务端主动发送的回显推送。
+ *
+ * @generated from message gsr.example.echo.v1.EchoPush
+ */
+export type EchoPush = Message<"gsr.example.echo.v1.EchoPush"> & {
+  /**
+   * @generated from field: string text = 1;
+   */
+  text: string;
+};
+
+/**
+ * Describes the message gsr.example.echo.v1.EchoPush.
+ * Use `create(EchoPushSchema)` to create a new message.
+ */
+export const EchoPushSchema: GenMessage<EchoPush> = /*@__PURE__*/
+  messageDesc(file_gsr_example_echo_v1_echo, 3);
 
 /**
  * MsgId 定义 WebSocket 联调示例的业务消息编号，不属于 GSR Core 协议。
@@ -71,6 +119,16 @@ export enum MsgId {
    * @generated from enum value: S2C_ECHO_RESPONSE = 1002;
    */
   S2C_ECHO_RESPONSE = 1002,
+
+  /**
+   * @generated from enum value: C2S_ECHO_NOTIFY = 1003;
+   */
+  C2S_ECHO_NOTIFY = 1003,
+
+  /**
+   * @generated from enum value: S2C_ECHO_PUSH = 1004;
+   */
+  S2C_ECHO_PUSH = 1004,
 }
 
 /**
@@ -78,3 +136,31 @@ export enum MsgId {
  */
 export const MsgIdSchema: GenEnum<MsgId> = /*@__PURE__*/
   enumDesc(file_gsr_example_echo_v1_echo, 0);
+
+/**
+ * EchoResultCode 表示 Echo 请求本身是否被业务接受；业务拒绝仍属于正常 Response。
+ *
+ * @generated from enum gsr.example.echo.v1.EchoResultCode
+ */
+export enum EchoResultCode {
+  /**
+   * @generated from enum value: ECHO_RESULT_UNSPECIFIED = 0;
+   */
+  ECHO_RESULT_UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: ECHO_RESULT_OK = 1;
+   */
+  ECHO_RESULT_OK = 1,
+
+  /**
+   * @generated from enum value: ECHO_RESULT_TEXT_REQUIRED = 2;
+   */
+  ECHO_RESULT_TEXT_REQUIRED = 2,
+}
+
+/**
+ * Describes the enum gsr.example.echo.v1.EchoResultCode.
+ */
+export const EchoResultCodeSchema: GenEnum<EchoResultCode> = /*@__PURE__*/
+  enumDesc(file_gsr_example_echo_v1_echo, 1);

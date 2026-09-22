@@ -141,6 +141,47 @@ func TestTypedHandlerReturnsResponse(t *testing.T) {
 	}
 }
 
+// TestTypedNotificationCanPush 验证 Notify Handler 可以发送 request_id 为零的服务端 Push。
+func TestTypedNotificationCanPush(t *testing.T) {
+	registry := testRegistry(t)
+	sender := &recordedSender{}
+	dispatcher := testDispatcher(t, registry, sender)
+	if err := Register(dispatcher, func(context Context, notification *echopb.EchoNotify) error {
+		return context.Push(
+			uint32(echopb.MsgId_S2C_ECHO_PUSH),
+			&echopb.EchoPush{Text: notification.GetText()},
+		)
+	}); err != nil {
+		t.Fatalf("Register() error = %v", err)
+	}
+	payload, err := proto.Marshal(&echopb.EchoNotify{Text: "notify"})
+	if err != nil {
+		t.Fatalf("marshal EchoNotify: %v", err)
+	}
+	frame := marshalEnvelope(t, &commonv1.Envelope{
+		MsgId:   uint32(echopb.MsgId_C2S_ECHO_NOTIFY),
+		Payload: payload,
+	})
+	if err := dispatcher.HandleFrame(frame); err != nil {
+		t.Fatalf("HandleFrame() error = %v", err)
+	}
+	if len(sender.envelopes) != 1 {
+		t.Fatalf("sent Envelope count = %d, want 1", len(sender.envelopes))
+	}
+	push := sender.envelopes[0]
+	if push.GetMsgId() != uint32(echopb.MsgId_S2C_ECHO_PUSH) || push.GetRequestId() != 0 {
+		t.Fatalf("push Envelope = msg_id %d, request_id %d; want %d, 0",
+			push.GetMsgId(), push.GetRequestId(), echopb.MsgId_S2C_ECHO_PUSH)
+	}
+	var message echopb.EchoPush
+	if err := proto.Unmarshal(push.GetPayload(), &message); err != nil {
+		t.Fatalf("unmarshal EchoPush: %v", err)
+	}
+	if message.GetText() != "notify" {
+		t.Fatalf("EchoPush text = %q, want notify", message.GetText())
+	}
+}
+
 // TestUnknownMessageReturnsGenericError 验证未知 msg_id 通过通用 ErrorResponse 回传原 request_id。
 func TestUnknownMessageReturnsGenericError(t *testing.T) {
 	registry := testRegistry(t)

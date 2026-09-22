@@ -24,6 +24,27 @@ enum MsgId {
       kind: KIND_RESPONSE
     }
   ];
+  C2S_ECHO_NOTIFY = 1003 [
+    (gsr.protocol.v1.message_route) = {
+      payload_type: ".gsr.example.echo.v1.EchoNotify"
+      direction: DIRECTION_CLIENT_TO_SERVER
+      kind: KIND_NOTIFY
+    }
+  ];
+  S2C_ECHO_PUSH = 1004 [
+    (gsr.protocol.v1.message_route) = {
+      payload_type: ".gsr.example.echo.v1.EchoPush"
+      direction: DIRECTION_SERVER_TO_CLIENT
+      kind: KIND_PUSH
+    }
+  ];
+}
+
+// EchoResultCode 表示 Echo 请求本身是否被业务接受；业务拒绝仍属于正常 Response。
+enum EchoResultCode {
+  ECHO_RESULT_UNSPECIFIED = 0;
+  ECHO_RESULT_OK = 1;
+  ECHO_RESULT_TEXT_REQUIRED = 2;
 }
 
 // EchoRequest 是客户端发起的回显请求。
@@ -33,5 +54,17 @@ message EchoRequest {
 
 // EchoResponse 是服务端返回的回显结果。
 message EchoResponse {
+  string text = 1;
+  EchoResultCode code = 2;
+  string message = 3;
+}
+
+// EchoNotify 是不要求响应的客户端通知。
+message EchoNotify {
+  string text = 1;
+}
+
+// EchoPush 是服务端主动发送的回显推送。
+message EchoPush {
   string text = 1;
 }

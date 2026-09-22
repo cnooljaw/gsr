@@ -7,8 +7,10 @@ import {
   MsgId as CommonMsgId,
 } from "./gen/gsr/common/v1/common_pb.js";
 import {
+  EchoNotifySchema,
   EchoRequestSchema,
   EchoResponseSchema,
+  EchoPushSchema,
   MsgId as EchoMsgId,
 } from "./gen/gsr/example/echo/v1/echo_pb.js";
 import {
@@ -22,6 +24,7 @@ interface ClientOptions {
   text: string;
   timeoutMs: number;
   secure: boolean;
+  notify: boolean;
 }
 
 const defaultURL = "ws://127.0.0.1:7888/ws";
@@ -34,6 +37,7 @@ function parseOptions(arguments_: string[]): ClientOptions {
     text: "hello from TypeScript",
     timeoutMs: responseTimeoutMs,
     secure: false,
+    notify: false,
   };
   for (let index = 0; index < arguments_.length; index += 1) {
     const argument = arguments_[index];
@@ -53,6 +57,8 @@ function parseOptions(arguments_: string[]): ClientOptions {
       index += 1;
     } else if (argument === "--secure") {
       options.secure = true;
+    } else if (argument === "--notify") {
+      options.notify = true;
     } else {
       throw new Error(`unknown or incomplete argument: ${argument}`);
     }
@@ -126,10 +132,12 @@ async function run(options: ClientOptions): Promise<void> {
   try {
     await waitForOpen(connection, options.timeoutMs);
 
-    const payload = toBinary(EchoRequestSchema, create(EchoRequestSchema, { text: options.text }));
+    const payload = options.notify
+      ? toBinary(EchoNotifySchema, create(EchoNotifySchema, { text: options.text }))
+      : toBinary(EchoRequestSchema, create(EchoRequestSchema, { text: options.text }));
     const request = create(EnvelopeSchema, {
-      msgId: EchoMsgId.C2S_ECHO_REQUEST,
-      requestId: requestID,
+      msgId: options.notify ? EchoMsgId.C2S_ECHO_NOTIFY : EchoMsgId.C2S_ECHO_REQUEST,
+      requestId: options.notify ? 0 : requestID,
       payload,
     });
     let response: Promise<Uint8Array>;
@@ -146,6 +154,14 @@ async function run(options: ClientOptions): Promise<void> {
     }
 
     const responseEnvelope = fromBinary(EnvelopeSchema, await response);
+    if (options.notify) {
+      if (responseEnvelope.msgId !== EchoMsgId.S2C_ECHO_PUSH || responseEnvelope.requestId !== 0) {
+        throw new Error(`unexpected push msg_id ${responseEnvelope.msgId} or request_id ${responseEnvelope.requestId}`);
+      }
+      const push = fromBinary(EchoPushSchema, responseEnvelope.payload);
+      console.log(`push=${push.text}`);
+      return;
+    }
     if (responseEnvelope.requestId !== requestID) {
       throw new Error(`response request_id ${responseEnvelope.requestId} does not match ${requestID}`);
     }
@@ -158,7 +174,7 @@ async function run(options: ClientOptions): Promise<void> {
     }
 
     const result = fromBinary(EchoResponseSchema, responseEnvelope.payload);
-    console.log(`request_id=${responseEnvelope.requestId} echo=${result.text}`);
+    console.log(`request_id=${responseEnvelope.requestId} code=${result.code} message=${result.message} echo=${result.text}`);
   } finally {
     if (connection.readyState === WebSocket.OPEN) {
       connection.close(1000, "client done");

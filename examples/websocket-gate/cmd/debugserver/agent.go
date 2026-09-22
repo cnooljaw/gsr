@@ -39,6 +39,9 @@ func (agent *echoAgent) OnStart(_ context.Context, _ runtime.ServiceContext) err
 	if err := protocol.Register(dispatcher, agent.OnEcho); err != nil {
 		return err
 	}
+	if err := protocol.Register(dispatcher, agent.OnEchoNotify); err != nil {
+		return err
+	}
 	agent.dispatcher = dispatcher
 	return nil
 }
@@ -63,9 +66,29 @@ func (agent *echoAgent) HandleClientMessage(_ runtime.CommandContext, frame []by
 }
 
 func (*echoAgent) OnEcho(context protocol.Context, request *echopb.EchoRequest) error {
+	if request.GetText() == "" {
+		return context.Response(
+			uint32(echopb.MsgId_S2C_ECHO_RESPONSE),
+			&echopb.EchoResponse{
+				Code:    echopb.EchoResultCode_ECHO_RESULT_TEXT_REQUIRED,
+				Message: "text is required",
+			},
+		)
+	}
 	return context.Response(
 		uint32(echopb.MsgId_S2C_ECHO_RESPONSE),
-		&echopb.EchoResponse{Text: request.GetText()},
+		&echopb.EchoResponse{
+			Code: echopb.EchoResultCode_ECHO_RESULT_OK,
+			Text: request.GetText(),
+		},
+	)
+}
+
+// OnEchoNotify 将不要求响应的客户端通知转换为一次服务端主动推送。
+func (*echoAgent) OnEchoNotify(context protocol.Context, request *echopb.EchoNotify) error {
+	return context.Push(
+		uint32(echopb.MsgId_S2C_ECHO_PUSH),
+		&echopb.EchoPush{Text: request.GetText()},
 	)
 }
 

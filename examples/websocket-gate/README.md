@@ -84,4 +84,11 @@ npm run client -- --secure --url wss://127.0.0.1:PORT/ws --text "hello secure GS
 npm run client -- --secure --url ws://127.0.0.1:7889/ws --text "hello secure GSR"
 ```
 
+空文本会返回业务自己的 `TEXT_REQUIRED` 结果，不会改成通用 `ErrorResponse`；`--notify` 则发送零 `request_id` 的通知并等待服务端 Push：
+
+```bash
+npm run client -- --secure --url ws://127.0.0.1:7889/ws --text ""
+npm run client -- --secure --notify --url ws://127.0.0.1:7889/ws --text "push me"
+```
+
 生产 Gate 的监听地址和证书由业务服务组装；示例的 `--prod` 仅用于本机或 Ingress 后的 HTTP WebSocket 联调，直连 WSS 仍需业务服务提供 `TLSConfig`。生产 Gate 的 Go 集成测试覆盖服务端完整链路。
