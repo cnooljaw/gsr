@@ -633,6 +633,70 @@ func TestProdGateHandlesConcurrentConnections(t *testing.T) {
 	}
 }
 
+// TestProdGateRejectsClientMessageForAgentWithoutHandler 验证没有客户端处理能力的 Agent 会在入站投递阶段被拒绝并正常断开。
+func TestProdGateRejectsClientMessageForAgentWithoutHandler(t *testing.T) {
+	var output bytes.Buffer
+	logger, err := logging.New(logging.Config{Writer: &output})
+	if err != nil {
+		t.Fatalf("logging.New() error = %v", err)
+	}
+	t.Cleanup(func() { _ = logger.Close(context.Background()) })
+	agents := make(chan *plainTestAgent, 1)
+	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
+		Logger:          logger,
+		MailboxCapacity: 8,
+		ShutdownTimeout: 2 * time.Second,
+	}, 1, time.Second, 1<<20, 64<<10, func(ClientSession) runtime.Service {
+		agent := &plainTestAgent{disconnected: make(chan struct{})}
+		agents <- agent
+		return agent
+	})
+	connection, macKey := dialAuthenticatedTestClient(t, gate, clientTLS)
+	defer connection.Close()
+	agent := receivePlainTestAgent(t, agents)
+
+	requestBytes, err := proto.Marshal(&commonv1.Envelope{MsgId: 1001, RequestId: 74, Payload: []byte("unsupported client message")})
+	if err != nil {
+		t.Fatalf("marshal request Envelope: %v", err)
+	}
+	if err := connection.WriteMessage(websocket.BinaryMessage, makeAuthenticatedTestFrame(t, macKey[:], 1, requestBytes)); err != nil {
+		t.Fatalf("WriteMessage(request frame) error = %v", err)
+	}
+	_, _, err = readTestBinaryMessage(t, connection)
+	if !websocket.IsCloseError(err, websocket.CloseInternalServerErr) {
+		t.Fatalf("ReadMessage() error = %v, want WebSocket close %d", err, websocket.CloseInternalServerErr)
+	}
+	select {
+	case <-agent.disconnected:
+	case <-time.After(time.Second):
+		t.Fatal("不支持客户端消息的 Agent 未收到断开通知")
+	}
+	if err := local.Close(); err != nil {
+		t.Fatalf("Runtime.Close() error = %v", err)
+	}
+	if err := logger.Close(context.Background()); err != nil {
+		t.Fatalf("Logger.Close() error = %v", err)
+	}
+
+	decoder := json.NewDecoder(bytes.NewReader(output.Bytes()))
+	foundDeliveryFailure := false
+	for decoder.More() {
+		var entry struct {
+			Message string         `json:"message"`
+			Fields  map[string]any `json:"fields"`
+		}
+		if err := decoder.Decode(&entry); err != nil {
+			t.Fatalf("decode log entry: %v", err)
+		}
+		if entry.Message == "Gate connection failure" && entry.Fields["category"] == "inbound_delivery" {
+			foundDeliveryFailure = true
+		}
+	}
+	if !foundDeliveryFailure {
+		t.Fatal("missing inbound_delivery Gate failure log")
+	}
+}
+
 // TestProdGateRuntimeCloseReleasesActiveClient 验证 Runtime 关闭时生产 Gate 会关闭已认证连接并等待自己的 I/O goroutine。
 func TestProdGateRuntimeCloseReleasesActiveClient(t *testing.T) {
 	local, gate, agents, clientTLS := startTestProductionGate(t, 2, time.Second)
@@ -945,6 +1009,24 @@ func (agent *loadTestAgent) HandleClientMessage(_ runtime.CommandContext, _ []by
 
 func (*loadTestAgent) OnStop(context.Context) error { return nil }
 
+type plainTestAgent struct {
+	disconnected chan struct{}
+	stopOnce     sync.Once
+}
+
+func (*plainTestAgent) OnStart(context.Context, runtime.ServiceContext) error { return nil }
+
+func (agent *plainTestAgent) Handle(commandContext runtime.CommandContext, command runtime.CommandID, _ ...any) (any, error) {
+	if command != ClientDisconnectedCommand {
+		return nil, errors.New("unexpected plain test Agent command")
+	}
+	agent.stopOnce.Do(func() { close(agent.disconnected) })
+	commandContext.Exit()
+	return nil, nil
+}
+
+func (*plainTestAgent) OnStop(context.Context) error { return nil }
+
 func startTestProductionGate(
 	t *testing.T,
 	maxConnections int,
@@ -1177,6 +1259,17 @@ func receiveLoadTestAgent(t *testing.T, agents <-chan *loadTestAgent) *loadTestA
 		return agent
 	case <-time.After(time.Second):
 		t.Fatal("Gate 未创建 load test Agent")
+		return nil
+	}
+}
+
+func receivePlainTestAgent(t *testing.T, agents <-chan *plainTestAgent) *plainTestAgent {
+	t.Helper()
+	select {
+	case agent := <-agents:
+		return agent
+	case <-time.After(time.Second):
+		t.Fatal("Gate 未创建 plain test Agent")
 		return nil
 	}
 }
