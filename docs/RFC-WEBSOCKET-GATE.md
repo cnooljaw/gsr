@@ -349,4 +349,6 @@ Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/
 
 `TestProdGateKeepsConnectionAfterUnknownMessage` 已补充合法认证帧携带未知 `msg_id` 的真实 Gate 验收：Agent 回传原 `request_id` 的通用 `ErrorResponse`，连接不关闭，后续有效请求仍可完成。请求超时、迟到响应和多连接长时背压仍按后续压力计划推进。
 
+`TestProdGateKeepsConnectionAfterUnknownNotification` 进一步覆盖 `request_id == 0` 的未知通知：Agent 不生成 `ErrorResponse`，连接继续保留并可处理后续请求。
+
 `TestProdGateRejectsLateAgentResponseAfterDisconnect` 已锁定断开后的迟到写回：Gate 先使 `ClientSession` 失效，再通知 Agent；Agent 后续写回得到 `ErrClientSessionClosed`，不会重新进入出站队列。

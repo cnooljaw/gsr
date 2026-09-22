@@ -165,3 +165,67 @@ func TestProdGateKeepsConnectionAfterUnknownMessage(t *testing.T) {
 		t.Fatalf("Runtime.Stop() error = %v", err)
 	}
 }
+
+// TestProdGateKeepsConnectionAfterUnknownNotification 验证未知通知不回 ErrorResponse，且同一连接仍可处理后续请求。
+func TestProdGateKeepsConnectionAfterUnknownNotification(t *testing.T) {
+	agents := make(chan *protocolGateAgent, 1)
+	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
+		MailboxCapacity: 8,
+		ShutdownTimeout: 2 * time.Second,
+	}, 1, time.Second, 1<<20, 64<<10, func(client ClientSession) runtime.Service {
+		agent := &protocolGateAgent{client: client, disconnected: make(chan struct{})}
+		agents <- agent
+		return agent
+	})
+	connection, macKey := dialAuthenticatedTestClient(t, gate, clientTLS)
+	defer connection.Close()
+	agent := <-agents
+
+	unknownBytes, err := proto.Marshal(&commonv1.Envelope{MsgId: 7778})
+	if err != nil {
+		t.Fatalf("marshal unknown notification Envelope: %v", err)
+	}
+	if err := connection.WriteMessage(websocket.BinaryMessage, makeAuthenticatedTestFrame(t, macKey[:], 1, unknownBytes)); err != nil {
+		t.Fatalf("WriteMessage(unknown notification frame) error = %v", err)
+	}
+
+	payload, err := proto.Marshal(&echopb.EchoRequest{Text: "notification ignored"})
+	if err != nil {
+		t.Fatalf("marshal EchoRequest: %v", err)
+	}
+	validBytes, err := proto.Marshal(&commonv1.Envelope{
+		MsgId:     uint32(echopb.MsgId_C2S_ECHO_REQUEST),
+		RequestId: 92,
+		Payload:   payload,
+	})
+	if err != nil {
+		t.Fatalf("marshal valid Envelope: %v", err)
+	}
+	if err := connection.WriteMessage(websocket.BinaryMessage, makeAuthenticatedTestFrame(t, macKey[:], 2, validBytes)); err != nil {
+		t.Fatalf("WriteMessage(valid frame) error = %v", err)
+	}
+	_, responseBytes, err := readTestBinaryMessage(t, connection)
+	if err != nil {
+		t.Fatalf("ReadMessage(valid response) error = %v", err)
+	}
+	var responseEnvelope commonv1.Envelope
+	if err := proto.Unmarshal(responseBytes, &responseEnvelope); err != nil {
+		t.Fatalf("unmarshal valid response Envelope: %v", err)
+	}
+	if responseEnvelope.GetMsgId() != uint32(echopb.MsgId_S2C_ECHO_RESPONSE) || responseEnvelope.GetRequestId() != 92 {
+		t.Fatalf("valid response Envelope = msg_id %d, request_id %d; want %d, 92",
+			responseEnvelope.GetMsgId(), responseEnvelope.GetRequestId(), echopb.MsgId_S2C_ECHO_RESPONSE)
+	}
+
+	if err := connection.Close(); err != nil {
+		t.Fatalf("Close(client) error = %v", err)
+	}
+	select {
+	case <-agent.disconnected:
+	case <-time.After(time.Second):
+		t.Fatal("Agent 未收到客户端断开通知")
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+}
