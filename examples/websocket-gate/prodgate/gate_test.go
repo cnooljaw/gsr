@@ -250,13 +250,9 @@ func TestProdGateAppliesConnectionLimitBeforeTLSHandshake(t *testing.T) {
 	}
 	_ = second.Close()
 
-	deadline := time.Now().Add(time.Second)
-	for gate.Metrics().RejectedConnections == 0 && time.Now().Before(deadline) {
-		time.Sleep(time.Millisecond)
-	}
-	if got := gate.Metrics().RejectedConnections; got != 1 {
-		t.Fatalf("RejectedConnections = %d, want 1", got)
-	}
+	waitForGateMetric(t, gate, "RejectedConnections", func(metrics Metrics) uint64 {
+		return metrics.RejectedConnections
+	}, 1)
 }
 
 // TestProdGateHandshakeTimeoutClosesConnection 验证客户端未发送首个密钥交换包时会按策略关闭并计数。
@@ -269,11 +265,107 @@ func TestProdGateHandshakeTimeoutClosesConnection(t *testing.T) {
 	if !websocket.IsCloseError(err, websocketHandshakeCloseCode) {
 		t.Fatalf("ReadMessage() error = %v, want WebSocket close %d", err, websocketHandshakeCloseCode)
 	}
-	if got := gate.Metrics().HandshakeTimeouts; got != 1 {
-		t.Fatalf("HandshakeTimeouts = %d, want 1", got)
+	waitForGateMetric(t, gate, "HandshakeTimeouts", func(metrics Metrics) uint64 {
+		return metrics.HandshakeTimeouts
+	}, 1)
+	waitForGateMetric(t, gate, "RejectedConnections", func(metrics Metrics) uint64 {
+		return metrics.RejectedConnections
+	}, 1)
+}
+
+// TestProdGateRejectsNonBinaryHandshake 验证应用层握手只接受二进制消息，并且不会创建 Agent。
+func TestProdGateRejectsNonBinaryHandshake(t *testing.T) {
+	_, gate, agents, clientTLS := startTestProductionGate(t, 2, time.Second)
+	connection := dialProductionTestClient(t, gate, clientTLS)
+	defer connection.Close()
+
+	if err := connection.WriteMessage(websocket.TextMessage, []byte("handshake must be binary")); err != nil {
+		t.Fatalf("WriteMessage(text handshake) error = %v", err)
 	}
-	if got := gate.Metrics().RejectedConnections; got != 1 {
-		t.Fatalf("RejectedConnections = %d, want 1", got)
+	_, _, err := readTestBinaryMessage(t, connection)
+	if !websocket.IsCloseError(err, websocket.CloseUnsupportedData) {
+		t.Fatalf("ReadMessage() error = %v, want WebSocket close %d", err, websocket.CloseUnsupportedData)
+	}
+	waitForGateMetric(t, gate, "RejectedConnections", func(metrics Metrics) uint64 {
+		return metrics.RejectedConnections
+	}, 1)
+	select {
+	case agent := <-agents:
+		t.Fatalf("invalid handshake created Agent %#v", agent)
+	case <-time.After(30 * time.Millisecond):
+	}
+}
+
+// TestProdGateRejectsInvalidHandshakeEnvelope 验证无法解析或不符合握手约定的 Envelope 会在 Agent 创建前关闭连接。
+func TestProdGateRejectsInvalidHandshakeEnvelope(t *testing.T) {
+	_, gate, agents, clientTLS := startTestProductionGate(t, 2, time.Second)
+	connection := dialProductionTestClient(t, gate, clientTLS)
+	defer connection.Close()
+
+	if err := connection.WriteMessage(websocket.BinaryMessage, []byte{0xff, 0x00}); err != nil {
+		t.Fatalf("WriteMessage(invalid handshake) error = %v", err)
+	}
+	_, _, err := readTestBinaryMessage(t, connection)
+	if !websocket.IsCloseError(err, websocket.CloseProtocolError) {
+		t.Fatalf("ReadMessage() error = %v, want WebSocket close %d", err, websocket.CloseProtocolError)
+	}
+	waitForGateMetric(t, gate, "RejectedConnections", func(metrics Metrics) uint64 {
+		return metrics.RejectedConnections
+	}, 1)
+	select {
+	case agent := <-agents:
+		t.Fatalf("invalid handshake created Agent %#v", agent)
+	case <-time.After(30 * time.Millisecond):
+	}
+}
+
+// TestProdGateRejectsOversizedHandshake 验证首个握手帧超过上限时返回消息过大并累计帧超限计数。
+func TestProdGateRejectsOversizedHandshake(t *testing.T) {
+	_, gate, agents, clientTLS := startTestProductionGate(t, 2, time.Second)
+	connection := dialProductionTestClient(t, gate, clientTLS)
+	defer connection.Close()
+
+	oversized := bytes.Repeat([]byte{'x'}, (1<<20)+1)
+	if err := connection.WriteMessage(websocket.BinaryMessage, oversized); err != nil {
+		t.Fatalf("WriteMessage(oversized handshake) error = %v", err)
+	}
+	_, _, err := readTestBinaryMessage(t, connection)
+	if !websocket.IsCloseError(err, websocket.CloseMessageTooBig) {
+		t.Fatalf("ReadMessage() error = %v, want WebSocket close %d", err, websocket.CloseMessageTooBig)
+	}
+	waitForGateMetric(t, gate, "FrameTooLarge", func(metrics Metrics) uint64 {
+		return metrics.FrameTooLarge
+	}, 1)
+	select {
+	case agent := <-agents:
+		t.Fatalf("oversized handshake created Agent %#v", agent)
+	case <-time.After(30 * time.Millisecond):
+	}
+}
+
+// TestProdGateRejectsNonBinaryAuthenticatedFrame 验证认证完成后仍只接受二进制业务帧，并通知 Agent 连接断开。
+func TestProdGateRejectsNonBinaryAuthenticatedFrame(t *testing.T) {
+	_, gate, agents, clientTLS := startTestProductionGate(t, 2, time.Second)
+	connection, _ := dialAuthenticatedTestClient(t, gate, clientTLS)
+	defer connection.Close()
+	agent := receiveProductionAgent(t, agents)
+
+	if err := connection.WriteMessage(websocket.TextMessage, []byte("business frame must be binary")); err != nil {
+		t.Fatalf("WriteMessage(text business frame) error = %v", err)
+	}
+	_, _, err := readTestBinaryMessage(t, connection)
+	if !websocket.IsCloseError(err, websocket.CloseUnsupportedData) {
+		t.Fatalf("ReadMessage() error = %v, want WebSocket close %d", err, websocket.CloseUnsupportedData)
+	}
+	select {
+	case frame := <-agent.received:
+		t.Fatalf("non-binary frame reached Agent as %x", frame)
+	case <-time.After(30 * time.Millisecond):
+	}
+	select {
+	case <-agent.disconnected:
+	case <-time.After(time.Second):
+		t.Fatal("Agent 未收到认证连接断开通知")
 	}
 }
 
@@ -645,4 +737,20 @@ func receiveProductionAgent(t *testing.T, agents <-chan *productionTestAgent) *p
 		t.Fatal("Gate 未创建连接 Agent")
 		return nil
 	}
+}
+
+// waitForGateMetric 等待连接处理 goroutine 将一个 Gate 计数写入可观察快照。
+func waitForGateMetric(t *testing.T, gate *GateService, name string, read func(Metrics) uint64, want uint64) {
+	t.Helper()
+	deadline := time.Now().Add(time.Second)
+	for time.Now().Before(deadline) {
+		if got := read(gate.Metrics()); got >= want {
+			if got != want {
+				t.Fatalf("%s = %d, want %d", name, got, want)
+			}
+			return
+		}
+		time.Sleep(time.Millisecond)
+	}
+	t.Fatalf("%s did not reach %d", name, want)
 }
