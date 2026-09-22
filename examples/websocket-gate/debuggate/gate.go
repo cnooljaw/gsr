@@ -11,7 +11,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	commonv1 "github.com/cnooljaw/gsr/examples/websocket-gate/gen/go/gsr/common/v1"
+	gatecontract "github.com/cnooljaw/gsr/examples/websocket-gate/gate"
 	"github.com/cnooljaw/gsr/runtime"
 	"github.com/gorilla/websocket"
 )
@@ -33,8 +33,7 @@ const (
 )
 
 // ClientDisconnectedCommand 是 Gate 通知连接 Agent 已断开的 Core Command。
-// Agent 可以在处理该命令后调用 CommandContext.Exit。
-const ClientDisconnectedCommand runtime.CommandID = 0xffff_ff10
+const ClientDisconnectedCommand = gatecontract.ClientDisconnectedCommand
 
 var (
 	// ErrInvalidConfig 表示 DebugGate 配置不完整或监听地址不安全。
@@ -49,15 +48,11 @@ var (
 
 var debugUpgrader = websocket.Upgrader{EnableCompression: false}
 
-// ClientSession 是绑定单条客户端连接的出站能力，与 Runtime 的 SessionID 无关。
-type ClientSession interface {
-	Send(envelope *Envelope) error
-	Close() error
-}
+// ClientSession 是 Gate-Agent 共用的单连接出站能力。
+type ClientSession = gatecontract.ClientSession
 
-// Envelope 是客户端与服务端共用的一条完整 C/S Protobuf 消息外层。
-// 该别名让 Agent 直接使用共享 schema，不增加第二套封包类型。
-type Envelope = commonv1.Envelope
+// Envelope 是 Gate-Agent 共用的 Protobuf 消息外层。
+type Envelope = gatecontract.Envelope
 
 // Config 定义仅供本地或可信内网调试的 WebSocket Gate 配置。
 type Config struct {

@@ -9,6 +9,7 @@ import (
 	"syscall"
 
 	"github.com/cnooljaw/gsr/examples/websocket-gate/debuggate"
+	"github.com/cnooljaw/gsr/examples/websocket-gate/gate"
 	"github.com/cnooljaw/gsr/runtime"
 )
 
@@ -46,7 +47,7 @@ func run() (result error) {
 		Address:               address,
 		MaxConnections:        128,
 		MaxOutboundQueueBytes: 1 << 20,
-		NewAgent: func(client debuggate.ClientSession) runtime.Service {
+		NewAgent: func(client gate.ClientSession) runtime.Service {
 			return &echoAgent{client: client, registry: registry}
 		},
 	})

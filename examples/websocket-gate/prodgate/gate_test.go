@@ -1,0 +1,533 @@
+package prodgate
+
+import (
+	"bytes"
+	"context"
+	"crypto/ecdh"
+	"crypto/rand"
+	"crypto/tls"
+	"crypto/x509"
+	"encoding/binary"
+	"errors"
+	"net"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
+	"sync"
+	"testing"
+	"time"
+
+	commonv1 "github.com/cnooljaw/gsr/examples/websocket-gate/gen/go/gsr/common/v1"
+	"github.com/cnooljaw/gsr/runtime"
+	"github.com/gorilla/websocket"
+	"google.golang.org/protobuf/proto"
+)
+
+// TestProdGateAuthenticatesAndDeliversClientFrames 验证 WSS 握手、认证帧投递、Envelope 写回和断开通知形成完整链路。
+func TestProdGateAuthenticatesAndDeliversClientFrames(t *testing.T) {
+	local, gate, agents, clientTLS := startTestProductionGate(t, 2, time.Second)
+	connection, macKey := dialAuthenticatedTestClient(t, gate, clientTLS)
+	defer connection.Close()
+
+	var agent *productionTestAgent
+	select {
+	case agent = <-agents:
+	case <-time.After(time.Second):
+		t.Fatal("Gate 未创建连接 Agent")
+	}
+
+	request := &commonv1.Envelope{
+		MsgId:     1001,
+		RequestId: 41,
+		Payload:   []byte("authenticated payload"),
+	}
+	requestBytes, err := proto.Marshal(request)
+	if err != nil {
+		t.Fatalf("marshal request Envelope: %v", err)
+	}
+	if err := connection.WriteMessage(websocket.BinaryMessage, makeAuthenticatedTestFrame(t, macKey[:], 1, requestBytes)); err != nil {
+		t.Fatalf("WriteMessage(authenticated frame) error = %v", err)
+	}
+
+	select {
+	case delivered := <-agent.received:
+		if !bytes.Equal(delivered, requestBytes) {
+			t.Fatalf("Agent 收到 Envelope = %x，want %x", delivered, requestBytes)
+		}
+	case <-time.After(time.Second):
+		t.Fatal("Gate 未将已认证 Envelope 投递给 Agent")
+	}
+
+	responseType, responseBytes, err := readTestBinaryMessage(t, connection)
+	if err != nil {
+		t.Fatalf("ReadMessage(response) error = %v", err)
+	}
+	if responseType != websocket.BinaryMessage {
+		t.Fatalf("response message type = %d, want binary", responseType)
+	}
+	var response commonv1.Envelope
+	if err := proto.Unmarshal(responseBytes, &response); err != nil {
+		t.Fatalf("unmarshal response Envelope: %v", err)
+	}
+	if response.GetMsgId() != 1002 || response.GetRequestId() != request.GetRequestId() {
+		t.Fatalf("response = msg_id %d, request_id %d; want 1002, %d", response.GetMsgId(), response.GetRequestId(), request.GetRequestId())
+	}
+	if !bytes.Equal(response.GetPayload(), request.GetPayload()) {
+		t.Fatalf("response payload = %q, want %q", response.GetPayload(), request.GetPayload())
+	}
+
+	if err := connection.Close(); err != nil {
+		t.Fatalf("Close(client) error = %v", err)
+	}
+	select {
+	case <-agent.disconnected:
+	case <-time.After(time.Second):
+		t.Fatal("Agent 未收到客户端断开通知")
+	}
+	if got := gate.Metrics().AcceptedConnections; got != 1 {
+		t.Fatalf("AcceptedConnections = %d, want 1", got)
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+}
+
+// TestProdGateRejectsInvalidMACBeforeDelivery 验证错误 MAC 在进入 Agent Mailbox 前被拒绝并关闭连接。
+func TestProdGateRejectsInvalidMACBeforeDelivery(t *testing.T) {
+	_, gate, agents, clientTLS := startTestProductionGate(t, 2, time.Second)
+	connection, macKey := dialAuthenticatedTestClient(t, gate, clientTLS)
+	defer connection.Close()
+	agent := receiveProductionAgent(t, agents)
+
+	requestBytes, err := proto.Marshal(&commonv1.Envelope{MsgId: 1001, RequestId: 9})
+	if err != nil {
+		t.Fatalf("marshal request Envelope: %v", err)
+	}
+	frame := makeAuthenticatedTestFrame(t, macKey[:], 1, requestBytes)
+	frame[len(frame)-1] ^= 0xff
+	if err := connection.WriteMessage(websocket.BinaryMessage, frame); err != nil {
+		t.Fatalf("WriteMessage(tampered frame) error = %v", err)
+	}
+
+	_, _, err = readTestBinaryMessage(t, connection)
+	if !websocket.IsCloseError(err, websocket.ClosePolicyViolation) {
+		t.Fatalf("ReadMessage() error = %v, want WebSocket close %d", err, websocket.ClosePolicyViolation)
+	}
+	select {
+	case delivered := <-agent.received:
+		t.Fatalf("invalid MAC reached Agent as %x", delivered)
+	case <-time.After(30 * time.Millisecond):
+	}
+}
+
+// TestProdGateAppliesConnectionLimitBeforeTLSHandshake 验证连接上限也覆盖尚未完成 TLS/HTTP 握手的 TCP 连接。
+func TestProdGateAppliesConnectionLimitBeforeTLSHandshake(t *testing.T) {
+	_, gate, _, _ := startTestProductionGate(t, 1, time.Second)
+	first, err := net.DialTimeout("tcp", gate.Addr().String(), time.Second)
+	if err != nil {
+		t.Fatalf("Dial(first raw TCP) error = %v", err)
+	}
+	defer first.Close()
+
+	second, err := net.DialTimeout("tcp", gate.Addr().String(), time.Second)
+	if err != nil {
+		t.Fatalf("Dial(second raw TCP) error = %v", err)
+	}
+	_ = second.SetReadDeadline(time.Now().Add(time.Second))
+	var response [1]byte
+	if _, err := second.Read(response[:]); err == nil {
+		t.Fatal("超出连接上限的 TCP 连接没有被关闭")
+	}
+	_ = second.Close()
+
+	deadline := time.Now().Add(time.Second)
+	for gate.Metrics().RejectedConnections == 0 && time.Now().Before(deadline) {
+		time.Sleep(time.Millisecond)
+	}
+	if got := gate.Metrics().RejectedConnections; got != 1 {
+		t.Fatalf("RejectedConnections = %d, want 1", got)
+	}
+}
+
+// TestProdGateHandshakeTimeoutClosesConnection 验证客户端未发送首个密钥交换包时会按策略关闭并计数。
+func TestProdGateHandshakeTimeoutClosesConnection(t *testing.T) {
+	_, gate, _, clientTLS := startTestProductionGate(t, 2, 25*time.Millisecond)
+	connection := dialProductionTestClient(t, gate, clientTLS)
+	defer connection.Close()
+
+	_, _, err := readTestBinaryMessage(t, connection)
+	if !websocket.IsCloseError(err, websocketHandshakeCloseCode) {
+		t.Fatalf("ReadMessage() error = %v, want WebSocket close %d", err, websocketHandshakeCloseCode)
+	}
+	if got := gate.Metrics().HandshakeTimeouts; got != 1 {
+		t.Fatalf("HandshakeTimeouts = %d, want 1", got)
+	}
+	if got := gate.Metrics().RejectedConnections; got != 1 {
+		t.Fatalf("RejectedConnections = %d, want 1", got)
+	}
+}
+
+// TestProdGateRuntimeCloseReleasesActiveClient 验证 Runtime 关闭时生产 Gate 会关闭已认证连接并等待自己的 I/O goroutine。
+func TestProdGateRuntimeCloseReleasesActiveClient(t *testing.T) {
+	local, gate, agents, clientTLS := startTestProductionGate(t, 2, time.Second)
+	connection, _ := dialAuthenticatedTestClient(t, gate, clientTLS)
+	defer connection.Close()
+	_ = receiveProductionAgent(t, agents)
+
+	closeResult := make(chan error, 1)
+	go func() {
+		closeResult <- local.Close()
+	}()
+	_, _, readErr := readTestBinaryMessage(t, connection)
+	if readErr == nil {
+		t.Fatal("Runtime.Close() 后客户端连接仍然可读")
+	}
+	select {
+	case err := <-closeResult:
+		if err != nil {
+			t.Fatalf("Runtime.Close() error = %v", err)
+		}
+	case <-time.After(2 * time.Second):
+		t.Fatal("Runtime.Close() 未等待 Gate I/O goroutine 退出")
+	}
+}
+
+// TestProdGateDisconnectsAgentCreatedAfterCallTimeout 验证 Gate Call 超时后迟到创建的 Agent 仍会收到断开事件并退出。
+func TestProdGateDisconnectsAgentCreatedAfterCallTimeout(t *testing.T) {
+	serverTLS, clientTLS := testTLSConfigs(t)
+	local, err := runtime.NewRuntime(runtime.Config{
+		MaxCallWait:     40 * time.Millisecond,
+		MailboxCapacity: 8,
+		ShutdownTimeout: 2 * time.Second,
+	})
+	if err != nil {
+		t.Fatalf("NewRuntime() error = %v", err)
+	}
+	if err := local.Start(); err != nil {
+		t.Fatalf("Runtime.Start() error = %v", err)
+	}
+	t.Cleanup(func() {
+		if err := local.Close(); err != nil {
+			t.Errorf("Runtime.Close() error = %v", err)
+		}
+	})
+
+	agentStarted := make(chan struct{})
+	releaseAgent := make(chan struct{})
+	var releaseOnce sync.Once
+	release := func() { releaseOnce.Do(func() { close(releaseAgent) }) }
+	defer release()
+	agents := make(chan *productionTestAgent, 1)
+	gate, err := NewGateService(local, Config{
+		Address:               "127.0.0.1:0",
+		TLSConfig:             serverTLS,
+		MaxConnections:        1,
+		MaxOutboundQueueBytes: 64 << 10,
+		NewAgent: func(client ClientSession) runtime.Service {
+			agent := &productionTestAgent{client: client, disconnected: make(chan struct{})}
+			agents <- agent
+			close(agentStarted)
+			<-releaseAgent
+			return agent
+		},
+	})
+	if err != nil {
+		t.Fatalf("NewGateService() error = %v", err)
+	}
+	if _, err := local.CreateService(context.Background(), gate); err != nil {
+		t.Fatalf("CreateService(Gate) error = %v", err)
+	}
+	connection, _ := dialAuthenticatedTestClient(t, gate, clientTLS)
+	defer connection.Close()
+	select {
+	case <-agentStarted:
+	case <-time.After(time.Second):
+		t.Fatal("Gate 未开始创建 Agent")
+	}
+	agent := receiveProductionAgent(t, agents)
+	_, _, closeErr := readTestBinaryMessage(t, connection)
+	if !websocket.IsCloseError(closeErr, websocket.CloseInternalServerErr) {
+		t.Fatalf("ReadMessage() error = %v, want WebSocket close %d", closeErr, websocket.CloseInternalServerErr)
+	}
+	release()
+	select {
+	case <-agent.disconnected:
+	case <-time.After(time.Second):
+		t.Fatal("迟到创建的 Agent 未收到断开通知")
+	}
+	if got := gate.Metrics().AcceptedConnections; got != 0 {
+		t.Fatalf("AcceptedConnections = %d, want 0 after timed-out connection", got)
+	}
+	if got := gate.Metrics().RejectedConnections; got != 1 {
+		t.Fatalf("RejectedConnections = %d, want 1", got)
+	}
+}
+
+// TestNewGateServiceRejectsInvalidTLSAndCapacity 验证生产 Gate 要求有效 TLS 身份与有限连接及队列配置。
+func TestNewGateServiceRejectsInvalidTLSAndCapacity(t *testing.T) {
+	local, err := runtime.NewRuntime(runtime.Config{})
+	if err != nil {
+		t.Fatalf("NewRuntime() error = %v", err)
+	}
+	t.Cleanup(func() {
+		if err := local.Close(); err != nil {
+			t.Errorf("Runtime.Close() error = %v", err)
+		}
+	})
+
+	serverTLS, _ := testTLSConfigs(t)
+	base := Config{
+		Address:               "127.0.0.1:0",
+		TLSConfig:             serverTLS,
+		MaxConnections:        1,
+		MaxOutboundQueueBytes: queueEntryOverhead,
+		NewAgent:              func(ClientSession) runtime.Service { return &productionTestAgent{} },
+	}
+	for _, testCase := range []struct {
+		name   string
+		update func(*Config)
+	}{
+		{name: "missing TLS", update: func(config *Config) { config.TLSConfig = nil }},
+		{name: "missing certificate", update: func(config *Config) { config.TLSConfig = &tls.Config{} }},
+		{name: "TLS below 1.2", update: func(config *Config) { config.TLSConfig.MinVersion = tls.VersionTLS10 }},
+		{name: "empty connection limit", update: func(config *Config) { config.MaxConnections = 0 }},
+		{name: "short outbound queue", update: func(config *Config) { config.MaxOutboundQueueBytes = queueEntryOverhead - 1 }},
+		{name: "named port", update: func(config *Config) { config.Address = "127.0.0.1:https" }},
+	} {
+		t.Run(testCase.name, func(t *testing.T) {
+			config := base
+			config.TLSConfig = base.TLSConfig.Clone()
+			testCase.update(&config)
+			if _, err := NewGateService(local, config); !errors.Is(err, ErrInvalidConfig) {
+				t.Fatalf("NewGateService() error = %v, want ErrInvalidConfig", err)
+			}
+		})
+	}
+}
+
+// TestClientSessionBoundsOutboundQueue 验证生产 ClientSession 按帧字节和固定条目开销限制出站队列。
+func TestClientSessionBoundsOutboundQueue(t *testing.T) {
+	client := &clientConnection{
+		maxFrame: 128,
+		maxQueue: queueEntryOverhead + 2,
+		counters: &gateCounters{},
+		wake:     make(chan struct{}, 1),
+		closedCh: make(chan struct{}),
+	}
+	envelope := &Envelope{MsgId: 1}
+	if err := client.Send(envelope); err != nil {
+		t.Fatalf("Send(first) error = %v", err)
+	}
+	if err := client.Send(envelope); !errors.Is(err, ErrClientQueueFull) {
+		t.Fatalf("Send(second) error = %v, want ErrClientQueueFull", err)
+	}
+	if got := client.counters.outboundQueueFull.Load(); got != 1 {
+		t.Fatalf("outbound queue full count = %d, want 1", got)
+	}
+}
+
+type productionTestAgent struct {
+	client       ClientSession
+	received     chan []byte
+	disconnected chan struct{}
+	once         sync.Once
+}
+
+func (*productionTestAgent) OnStart(context.Context, runtime.ServiceContext) error { return nil }
+
+func (agent *productionTestAgent) Handle(commandContext runtime.CommandContext, command runtime.CommandID, _ ...any) (any, error) {
+	if command != ClientDisconnectedCommand {
+		return nil, errors.New("unexpected production test Agent command")
+	}
+	agent.once.Do(func() { close(agent.disconnected) })
+	commandContext.Exit()
+	return nil, nil
+}
+
+func (agent *productionTestAgent) HandleClientMessage(_ runtime.CommandContext, frame []byte) error {
+	if agent.received != nil {
+		agent.received <- append([]byte(nil), frame...)
+	}
+	var envelope commonv1.Envelope
+	if err := proto.Unmarshal(frame, &envelope); err != nil {
+		return err
+	}
+	if agent.client == nil {
+		return nil
+	}
+	return agent.client.Send(&commonv1.Envelope{
+		MsgId:     1002,
+		RequestId: envelope.GetRequestId(),
+		Payload:   envelope.GetPayload(),
+	})
+}
+
+func (*productionTestAgent) OnStop(context.Context) error { return nil }
+
+func startTestProductionGate(
+	t *testing.T,
+	maxConnections int,
+	handshakeTimeout time.Duration,
+) (*runtime.Runtime, *GateService, <-chan *productionTestAgent, *tls.Config) {
+	t.Helper()
+	serverTLS, clientTLS := testTLSConfigs(t)
+	local, err := runtime.NewRuntime(runtime.Config{MailboxCapacity: 8, ShutdownTimeout: 2 * time.Second})
+	if err != nil {
+		t.Fatalf("NewRuntime() error = %v", err)
+	}
+	if err := local.Start(); err != nil {
+		t.Fatalf("Runtime.Start() error = %v", err)
+	}
+	t.Cleanup(func() {
+		if err := local.Close(); err != nil {
+			t.Errorf("Runtime.Close() error = %v", err)
+		}
+	})
+	agents := make(chan *productionTestAgent, maxConnections+1)
+	gate, err := NewGateService(local, Config{
+		Address:               "127.0.0.1:0",
+		TLSConfig:             serverTLS,
+		MaxConnections:        maxConnections,
+		HandshakeTimeout:      handshakeTimeout,
+		MaxFrameBytes:         1 << 20,
+		MaxOutboundQueueBytes: 64 << 10,
+		NewAgent: func(client ClientSession) runtime.Service {
+			agent := &productionTestAgent{
+				client:       client,
+				received:     make(chan []byte, 1),
+				disconnected: make(chan struct{}),
+			}
+			agents <- agent
+			return agent
+		},
+	})
+	if err != nil {
+		t.Fatalf("NewGateService() error = %v", err)
+	}
+	if _, err := local.CreateService(context.Background(), gate); err != nil {
+		t.Fatalf("CreateService(Gate) error = %v", err)
+	}
+	return local, gate, agents, clientTLS
+}
+
+func testTLSConfigs(t *testing.T) (*tls.Config, *tls.Config) {
+	t.Helper()
+	certificateServer := httptest.NewTLSServer(http.NotFoundHandler())
+	t.Cleanup(certificateServer.Close)
+	certificate := certificateServer.TLS.Certificates[0]
+	leaf, err := x509.ParseCertificate(certificate.Certificate[0])
+	if err != nil {
+		t.Fatalf("ParseCertificate() error = %v", err)
+	}
+	roots := x509.NewCertPool()
+	roots.AddCert(leaf)
+	serverName := ""
+	if len(leaf.DNSNames) > 0 {
+		serverName = leaf.DNSNames[0]
+	} else if len(leaf.IPAddresses) > 0 {
+		serverName = leaf.IPAddresses[0].String()
+	} else {
+		t.Fatal("httptest certificate has no usable subject alternative name")
+	}
+	return &tls.Config{Certificates: []tls.Certificate{certificate}, MinVersion: tls.VersionTLS12}, &tls.Config{
+		RootCAs:    roots,
+		ServerName: serverName,
+		MinVersion: tls.VersionTLS12,
+	}
+}
+
+func dialProductionTestClient(t *testing.T, gate *GateService, clientTLS *tls.Config) *websocket.Conn {
+	t.Helper()
+	endpoint := url.URL{Scheme: "wss", Host: gate.Addr().String(), Path: "/ws"}
+	dialer := websocket.Dialer{TLSClientConfig: clientTLS, HandshakeTimeout: time.Second}
+	connection, response, err := dialer.Dial(endpoint.String(), nil)
+	if response != nil && response.Body != nil {
+		_ = response.Body.Close()
+	}
+	if err != nil {
+		t.Fatalf("Dial(%s) error = %v", endpoint.String(), err)
+	}
+	return connection
+}
+
+func dialAuthenticatedTestClient(t *testing.T, gate *GateService, clientTLS *tls.Config) (*websocket.Conn, [clientMACKeySize]byte) {
+	t.Helper()
+	connection := dialProductionTestClient(t, gate, clientTLS)
+	privateKey, err := ecdh.X25519().GenerateKey(rand.Reader)
+	if err != nil {
+		t.Fatalf("GenerateKey() error = %v", err)
+	}
+	clientPublicKey := privateKey.PublicKey().Bytes()
+	requestPayload, err := proto.Marshal(&commonv1.KeyExchangeRequest{ClientPublicKey: clientPublicKey})
+	if err != nil {
+		t.Fatalf("marshal key exchange request: %v", err)
+	}
+	request, err := proto.Marshal(&commonv1.Envelope{
+		MsgId:   uint32(commonv1.MsgId_C2S_KEY_EXCHANGE_REQUEST),
+		Payload: requestPayload,
+	})
+	if err != nil {
+		t.Fatalf("marshal handshake Envelope: %v", err)
+	}
+	if err := connection.WriteMessage(websocket.BinaryMessage, request); err != nil {
+		t.Fatalf("WriteMessage(handshake) error = %v", err)
+	}
+	_, responseBytes, err := readTestBinaryMessage(t, connection)
+	if err != nil {
+		t.Fatalf("ReadMessage(handshake response) error = %v", err)
+	}
+	var response commonv1.Envelope
+	if err := proto.Unmarshal(responseBytes, &response); err != nil {
+		t.Fatalf("unmarshal handshake response: %v", err)
+	}
+	if response.GetMsgId() != uint32(commonv1.MsgId_S2C_KEY_EXCHANGE_RESPONSE) || response.GetRequestId() != 0 {
+		t.Fatalf("handshake response = msg_id %d, request_id %d", response.GetMsgId(), response.GetRequestId())
+	}
+	var keyResponse commonv1.KeyExchangeResponse
+	if err := proto.Unmarshal(response.GetPayload(), &keyResponse); err != nil {
+		t.Fatalf("unmarshal key exchange response: %v", err)
+	}
+	serverPublicKey, err := ecdh.X25519().NewPublicKey(keyResponse.GetServerPublicKey())
+	if err != nil {
+		t.Fatalf("NewPublicKey() error = %v", err)
+	}
+	sharedSecret, err := privateKey.ECDH(serverPublicKey)
+	if err != nil {
+		t.Fatalf("ECDH() error = %v", err)
+	}
+	macKey, err := deriveClientMACKey(sharedSecret, clientPublicKey, keyResponse.GetServerPublicKey())
+	if err != nil {
+		t.Fatalf("deriveClientMACKey() error = %v", err)
+	}
+	return connection, macKey
+}
+
+func makeAuthenticatedTestFrame(t *testing.T, macKey []byte, sequence uint64, envelope []byte) []byte {
+	t.Helper()
+	frame := make([]byte, clientSequenceSize, clientSequenceSize+len(envelope)+clientMACSize)
+	binary.BigEndian.PutUint64(frame, sequence)
+	frame = append(frame, envelope...)
+	mac := hmacSHA256(macKey, frame)
+	return append(frame, mac[:clientMACSize]...)
+}
+
+func readTestBinaryMessage(t *testing.T, connection *websocket.Conn) (int, []byte, error) {
+	t.Helper()
+	if err := connection.SetReadDeadline(time.Now().Add(time.Second)); err != nil {
+		t.Fatalf("SetReadDeadline() error = %v", err)
+	}
+	messageType, message, err := connection.ReadMessage()
+	_ = connection.SetReadDeadline(time.Time{})
+	return messageType, message, err
+}
+
+func receiveProductionAgent(t *testing.T, agents <-chan *productionTestAgent) *productionTestAgent {
+	t.Helper()
+	select {
+	case agent := <-agents:
+		return agent
+	case <-time.After(time.Second):
+		t.Fatal("Gate 未创建连接 Agent")
+		return nil
+	}
+}

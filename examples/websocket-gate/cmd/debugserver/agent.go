@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/cnooljaw/gsr/examples/websocket-gate/debuggate"
+	"github.com/cnooljaw/gsr/examples/websocket-gate/gate"
 	commonv1 "github.com/cnooljaw/gsr/examples/websocket-gate/gen/go/gsr/common/v1"
 	echopb "github.com/cnooljaw/gsr/examples/websocket-gate/gen/go/gsr/example/echo/v1"
 	"github.com/cnooljaw/gsr/examples/websocket-gate/protocol"
@@ -12,7 +12,7 @@ import (
 )
 
 type echoAgent struct {
-	client     debuggate.ClientSession
+	client     gate.ClientSession
 	registry   *protocol.Registry
 	dispatcher *protocol.Dispatcher
 }
@@ -48,7 +48,7 @@ func (*echoAgent) Handle(
 	command runtime.CommandID,
 	_ ...any,
 ) (any, error) {
-	if command != debuggate.ClientDisconnectedCommand {
+	if command != gate.ClientDisconnectedCommand {
 		return nil, runtime.ErrUnknownCommand
 	}
 	commandContext.Exit()
