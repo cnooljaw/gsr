@@ -32,7 +32,7 @@ const (
 )
 
 var (
-	// ErrInvalidConfig 表示生产 Gate 配置缺少 TLS 或有限容量边界。
+	// ErrInvalidConfig 表示生产 Gate 配置或有限容量边界无效。
 	ErrInvalidConfig = errors.New("prodgate: invalid config")
 	// ErrClientQueueFull 表示客户端出站队列达到配置的字节上限。
 	ErrClientQueueFull = errors.New("prodgate: client outbound queue full")
@@ -53,11 +53,12 @@ type Envelope = gatecontract.Envelope
 // ClientDisconnectedCommand 是 Gate 通知连接 Agent 已断开的 Core Command。
 const ClientDisconnectedCommand = gatecontract.ClientDisconnectedCommand
 
-// Config 定义生产 WSS Gate 的监听、容量和连接 Agent。
+// Config 定义生产 WebSocket Gate 的监听、容量和连接 Agent。
 type Config struct {
 	// Address 是 Gate 绑定的 TCP host:port。
 	Address string
-	// TLSConfig 必须提供服务端证书；Gate 会克隆配置并只协商 HTTP/1.1。
+	// TLSConfig 为 nil 时监听普通 HTTP WebSocket，适用于由 K8s Ingress 终止 TLS 的部署；
+	// 非 nil 时直连 TLS，并由 Gate 克隆配置且只协商 HTTP/1.1。
 	TLSConfig *tls.Config
 	// MaxConnections 必须显式设置为正数，并包含尚未完成握手的连接。
 	MaxConnections int
@@ -96,7 +97,7 @@ type gateCounters struct {
 	outboundQueueFull   atomic.Uint64
 }
 
-// GateService 持有生产 WSS Listener、客户端连接和每连接 Agent 映射。
+// GateService 持有生产 WebSocket Listener、客户端连接和每连接 Agent 映射。
 type GateService struct {
 	runtime *runtime.Runtime
 	config  Config
@@ -118,7 +119,7 @@ type GateService struct {
 	agentsByConnection map[*clientConnection]runtime.ServiceID
 }
 
-// NewGateService 校验 TLS 与容量配置并创建生产 WSS Gate Service。
+// NewGateService 校验可选 TLS 与容量配置并创建生产 WebSocket Gate Service。
 func NewGateService(local *runtime.Runtime, config Config) (*GateService, error) {
 	if local == nil {
 		return nil, fmt.Errorf("%w: Runtime is required", ErrInvalidConfig)
@@ -173,7 +174,7 @@ func (gate *GateService) Metrics() Metrics {
 	}
 }
 
-// OnStart 先绑定地址，再启动 Gate 自己拥有的 HTTPS/WebSocket 接入循环。
+// OnStart 先绑定地址，再启动 Gate 自己拥有的 HTTP 或 HTTPS WebSocket 接入循环。
 func (gate *GateService) OnStart(_ context.Context, self runtime.ServiceContext) error {
 	listener, err := net.Listen("tcp", gate.config.Address)
 	if err != nil {
@@ -182,10 +183,9 @@ func (gate *GateService) OnStart(_ context.Context, self runtime.ServiceContext)
 	limitedListener := newConnectionLimitListener(listener, gate.config.MaxConnections, func() {
 		gate.counters.rejectedConnections.Add(1)
 	})
-	server := &http.Server{
-		Handler:           gate,
-		ReadHeaderTimeout: defaultReadHeaderTimeout,
-		TLSConfig:         gate.config.TLSConfig.Clone(),
+	server := &http.Server{Handler: gate, ReadHeaderTimeout: defaultReadHeaderTimeout}
+	if gate.config.TLSConfig != nil {
+		server.TLSConfig = gate.config.TLSConfig.Clone()
 	}
 
 	gate.mu.Lock()
@@ -198,11 +198,17 @@ func (gate *GateService) OnStart(_ context.Context, self runtime.ServiceContext)
 
 	go func() {
 		defer gate.ioWorkers.Done()
-		if err := server.ServeTLS(limitedListener, "", ""); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		var serveErr error
+		if gate.config.TLSConfig != nil {
+			serveErr = server.ServeTLS(limitedListener, "", "")
+		} else {
+			serveErr = server.Serve(limitedListener)
+		}
+		if serveErr != nil && !errors.Is(serveErr, http.ErrServerClosed) {
 			gate.mu.Lock()
-			gate.serveErr = err
+			gate.serveErr = serveErr
 			gate.mu.Unlock()
-			gate.logError("Gate listener failed", "phase", "serve", "error", err)
+			gate.logError("Gate listener failed", "phase", "serve", "error", serveErr)
 		}
 	}()
 	return nil
@@ -296,7 +302,7 @@ func (gate *GateService) OnStop(ctx context.Context) error {
 	return errors.Join(result, serveErr)
 }
 
-// ServeHTTP 只接收 WSS 二进制消息；握手完成后逐帧验证 MAC 和序号再投递给 Agent。
+// ServeHTTP 接收 HTTP 或 HTTPS WebSocket 二进制消息；握手完成后逐帧验证 MAC 和序号再投递给 Agent。
 func (gate *GateService) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	if request.URL.Path != "/ws" {
 		http.NotFound(writer, request)
@@ -657,7 +663,7 @@ func validateListenAddress(address string) error {
 
 func productionTLSConfig(config *tls.Config) (*tls.Config, error) {
 	if config == nil {
-		return nil, fmt.Errorf("%w: TLSConfig is required", ErrInvalidConfig)
+		return nil, nil
 	}
 	if len(config.Certificates) == 0 && config.GetCertificate == nil && config.GetConfigForClient == nil {
 		return nil, fmt.Errorf("%w: TLSConfig must provide a server certificate", ErrInvalidConfig)

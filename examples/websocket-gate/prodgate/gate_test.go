@@ -95,6 +95,59 @@ func TestProdGateAuthenticatesAndDeliversClientFrames(t *testing.T) {
 	}
 }
 
+// TestProdGateSupportsIngressTerminatedTLS 验证 Ingress 终止 TLS 后 Pod 仍可用普通 WebSocket 完成同一套应用握手和消息投递。
+func TestProdGateSupportsIngressTerminatedTLS(t *testing.T) {
+	agents := make(chan *productionTestAgent, 1)
+	_, gate := startConfiguredHTTPProductionGate(t, runtime.Config{
+		MailboxCapacity: 8,
+		ShutdownTimeout: 2 * time.Second,
+	}, 1, time.Second, 1<<20, 64<<10, func(client ClientSession) runtime.Service {
+		agent := &productionTestAgent{
+			client:       client,
+			received:     make(chan []byte, 1),
+			disconnected: make(chan struct{}),
+		}
+		agents <- agent
+		return agent
+	})
+	connection := dialPlainTestClient(t, gate)
+	defer connection.Close()
+	macKey := authenticateTestClient(t, connection)
+	agent := receiveProductionAgent(t, agents)
+
+	request, err := proto.Marshal(&commonv1.Envelope{
+		MsgId:     1001,
+		RequestId: 7,
+		Payload:   []byte("ingress terminated"),
+	})
+	if err != nil {
+		t.Fatalf("marshal request Envelope: %v", err)
+	}
+	if err := connection.WriteMessage(websocket.BinaryMessage, makeAuthenticatedTestFrame(t, macKey[:], 1, request)); err != nil {
+		t.Fatalf("WriteMessage(authenticated frame) error = %v", err)
+	}
+	select {
+	case delivered := <-agent.received:
+		if !bytes.Equal(delivered, request) {
+			t.Fatalf("Agent 收到 Envelope = %x，want %x", delivered, request)
+		}
+	case <-time.After(time.Second):
+		t.Fatal("普通 HTTP WebSocket 未将已认证 Envelope 投递给 Agent")
+	}
+
+	_, responseBytes, err := readTestBinaryMessage(t, connection)
+	if err != nil {
+		t.Fatalf("ReadMessage(response) error = %v", err)
+	}
+	var response commonv1.Envelope
+	if err := proto.Unmarshal(responseBytes, &response); err != nil {
+		t.Fatalf("unmarshal response Envelope: %v", err)
+	}
+	if response.GetMsgId() != 1002 || response.GetRequestId() != 7 {
+		t.Fatalf("response = msg_id %d, request_id %d; want 1002, 7", response.GetMsgId(), response.GetRequestId())
+	}
+}
+
 // TestProdGateRejectsInvalidMACBeforeDelivery 验证错误 MAC 在进入 Agent Mailbox 前被拒绝并关闭连接。
 func TestProdGateRejectsInvalidMACBeforeDelivery(t *testing.T) {
 	_, gate, agents, clientTLS := startTestProductionGate(t, 2, time.Second)
@@ -793,7 +846,7 @@ func TestProdGateDisconnectsAgentCreatedAfterCallTimeout(t *testing.T) {
 	}
 }
 
-// TestNewGateServiceRejectsInvalidTLSAndCapacity 验证生产 Gate 要求有效 TLS 身份与有限连接及队列配置。
+// TestNewGateServiceRejectsInvalidTLSAndCapacity 验证生产 Gate 支持可选 TLS，并拒绝无效容量和 TLS 配置。
 func TestNewGateServiceRejectsInvalidTLSAndCapacity(t *testing.T) {
 	local, err := runtime.NewRuntime(runtime.Config{})
 	if err != nil {
@@ -817,7 +870,6 @@ func TestNewGateServiceRejectsInvalidTLSAndCapacity(t *testing.T) {
 		name   string
 		update func(*Config)
 	}{
-		{name: "missing TLS", update: func(config *Config) { config.TLSConfig = nil }},
 		{name: "missing certificate", update: func(config *Config) { config.TLSConfig = &tls.Config{} }},
 		{name: "TLS below 1.2", update: func(config *Config) { config.TLSConfig.MinVersion = tls.VersionTLS10 }},
 		{name: "empty connection limit", update: func(config *Config) { config.MaxConnections = 0 }},
@@ -832,6 +884,11 @@ func TestNewGateServiceRejectsInvalidTLSAndCapacity(t *testing.T) {
 				t.Fatalf("NewGateService() error = %v, want ErrInvalidConfig", err)
 			}
 		})
+	}
+	noTLS := base
+	noTLS.TLSConfig = nil
+	if _, err := NewGateService(local, noTLS); err != nil {
+		t.Fatalf("NewGateService() without TLS error = %v", err)
 	}
 }
 
@@ -1067,6 +1124,36 @@ func startConfiguredProductionGate(
 ) (*runtime.Runtime, *GateService, *tls.Config) {
 	t.Helper()
 	serverTLS, clientTLS := testTLSConfigs(t)
+	local, gate := startConfiguredProductionGateWithTLS(t, runtimeConfig, maxConnections, handshakeTimeout, maxFrameBytes, maxOutboundQueueBytes, serverTLS, newAgent)
+	return local, gate, clientTLS
+}
+
+// startConfiguredHTTPProductionGate 启动由 Ingress 终止 TLS、Pod 使用普通 HTTP WebSocket 的测试 Gate。
+func startConfiguredHTTPProductionGate(
+	t *testing.T,
+	runtimeConfig runtime.Config,
+	maxConnections int,
+	handshakeTimeout time.Duration,
+	maxFrameBytes int,
+	maxOutboundQueueBytes int,
+	newAgent func(ClientSession) runtime.Service,
+) (*runtime.Runtime, *GateService) {
+	t.Helper()
+	return startConfiguredProductionGateWithTLS(t, runtimeConfig, maxConnections, handshakeTimeout, maxFrameBytes, maxOutboundQueueBytes, nil, newAgent)
+}
+
+// startConfiguredProductionGateWithTLS 使用给定 TLS 配置启动测试用生产 Gate。
+func startConfiguredProductionGateWithTLS(
+	t *testing.T,
+	runtimeConfig runtime.Config,
+	maxConnections int,
+	handshakeTimeout time.Duration,
+	maxFrameBytes int,
+	maxOutboundQueueBytes int,
+	serverTLS *tls.Config,
+	newAgent func(ClientSession) runtime.Service,
+) (*runtime.Runtime, *GateService) {
+	t.Helper()
 	local, err := runtime.NewRuntime(runtimeConfig)
 	if err != nil {
 		t.Fatalf("NewRuntime() error = %v", err)
@@ -1094,7 +1181,7 @@ func startConfiguredProductionGate(
 	if _, err := local.CreateService(context.Background(), gate); err != nil {
 		t.Fatalf("CreateService(Gate) error = %v", err)
 	}
-	return local, gate, clientTLS
+	return local, gate
 }
 
 func testTLSConfigs(t *testing.T) (*tls.Config, *tls.Config) {
@@ -1137,9 +1224,28 @@ func dialProductionTestClient(t *testing.T, gate *GateService, clientTLS *tls.Co
 	return connection
 }
 
+func dialPlainTestClient(t *testing.T, gate *GateService) *websocket.Conn {
+	t.Helper()
+	endpoint := url.URL{Scheme: "ws", Host: gate.Addr().String(), Path: "/ws"}
+	dialer := websocket.Dialer{HandshakeTimeout: time.Second}
+	connection, response, err := dialer.Dial(endpoint.String(), nil)
+	if response != nil && response.Body != nil {
+		_ = response.Body.Close()
+	}
+	if err != nil {
+		t.Fatalf("Dial(%s) error = %v", endpoint.String(), err)
+	}
+	return connection
+}
+
 func dialAuthenticatedTestClient(t *testing.T, gate *GateService, clientTLS *tls.Config) (*websocket.Conn, [clientMACKeySize]byte) {
 	t.Helper()
 	connection := dialProductionTestClient(t, gate, clientTLS)
+	return connection, authenticateTestClient(t, connection)
+}
+
+func authenticateTestClient(t *testing.T, connection *websocket.Conn) [clientMACKeySize]byte {
+	t.Helper()
 	privateKey, err := ecdh.X25519().GenerateKey(rand.Reader)
 	if err != nil {
 		t.Fatalf("GenerateKey() error = %v", err)
@@ -1186,7 +1292,7 @@ func dialAuthenticatedTestClient(t *testing.T, gate *GateService, clientTLS *tls
 	if err != nil {
 		t.Fatalf("deriveClientMACKey() error = %v", err)
 	}
-	return connection, macKey
+	return macKey
 }
 
 func makeAuthenticatedTestFrame(t *testing.T, macKey []byte, sequence uint64, envelope []byte) []byte {

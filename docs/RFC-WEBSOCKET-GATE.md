@@ -1,10 +1,10 @@
 # WebSocket Gate、客户端协议与 Agent
 
-状态：设计方向已确认；DebugGate 示例已完成 Go/TypeScript Echo 往返，跨语言认证固定向量已完成；生产 Gate 已接入独立 WSS Listener、握手、上行认证、Agent 投递、连接写回和 Runtime 共享 Logger。完整失败矩阵与压力验收仍待完成。本文不是完整密码协议或生产安全验收结论。
+状态：设计方向已确认；DebugGate 示例已完成 Go/TypeScript Echo 往返，跨语言认证固定向量已完成；生产 Gate 已接入可选直连 WSS 或 Ingress 终止 TLS 后的 HTTP WebSocket、握手、上行认证、Agent 投递、连接写回和 Runtime 共享 Logger。完整失败矩阵与压力验收仍待完成。本文不是完整密码协议或生产安全验收结论。
 
 ## 范围与参考
 
-首版只支持 WebSocket，公网使用 WSS/TLS，并额外提供显式开启的内网 DebugGate，以最小业务往返验证接入设计。HTTP 入站/出站、Redis、MySQL 是另一组 Core 外能力，后续分别推进。
+首版只支持 WebSocket，公网客户端使用 WSS/TLS；生产 Gate 默认允许由 K8s Ingress 终止 TLS 后以 HTTP/1.1 WebSocket 转发到 Pod，也支持显式配置 TLS 证书的直连 WSS。另提供显式开启的内网 DebugGate，以最小业务往返验证接入设计。HTTP 入站/出站、Redis、MySQL 是另一组 Core 外能力，后续分别推进。
 
 Skynet 的 `lualib/snax/gateserver.lua` 通过 socketdriver 消息及 Lua coroutine 管理监听、连接与数据事件；GSR 借鉴职责分离，不照搬 TCP netpack 和 C/Lua 调度。Go I/O 任务必须有明确 owner 管理容量、取消、关闭和等待。
 
@@ -23,7 +23,7 @@ Skynet 的 `lualib/snax/gateserver.lua` 通过 socketdriver 消息及 Lua corout
 DebugGate 上行/下行：Protobuf Envelope
 ```
 
-生产 Gate 使用 WSS 提供传输保密和完整性，应用层不再使用 DES 加密；仅上行增加连接绑定的认证与序号检查，下行不添加应用 MAC。握手阶段没有 macKey，使用握手 Envelope，不套生产业务上行格式。DebugGate 不做 X25519、seq 或 MAC，直接传输 Envelope。
+直连模式使用 WSS 提供传输保密和完整性；K8s 模式由 Ingress 对客户端提供 WSS，Ingress 到 Pod 使用受信任集群网络上的 HTTP/1.1 WebSocket。两种模式都保留连接级 X25519、上行 seq/MAC 和同一应用协议；应用层不再使用 DES 加密，下行不添加应用 MAC。握手阶段没有 macKey，使用握手 Envelope，不套生产业务上行格式。DebugGate 不做 X25519、seq 或 MAC，直接传输 Envelope。
 
 Envelope 采用 Protobuf 的薄包装，只标识具体消息和请求关联，不把业务字段、Core Command 或 ServiceID 放入其中：
 
@@ -134,7 +134,7 @@ enum MsgId {
 
 ## 已确认：生产 Gate 与 DebugGate
 
-- 生产 Gate 负责公网或不可信网络接入：WSS、X25519 握手、上行 seq/MAC、容量和连接生命周期。
+- 生产 Gate 负责客户端接入：可选择直连 WSS，或接受 Ingress 终止 TLS 后的 HTTP WebSocket；两者都执行 X25519 握手、上行 seq/MAC、容量和连接生命周期。
 - DebugGate 只面向受信任内网调试：一条 WebSocket 二进制消息就是一份 Protobuf Envelope，不做 X25519 握手、不附加 seq、不校验 MAC。它与生产 Gate 共用通用 Envelope 和 Agent 业务处理逻辑。
 - 两者使用不同监听器、端口和显式配置；生产 Gate 不自动降级到 DebugGate，DebugGate 也不根据首包猜测生产格式。DebugGate 默认关闭，启用时应绑定回环地址或明确的内网地址，并由部署防火墙限制访问。
 - DebugGate 没有应用层认证和防重放保证，不能暴露到公网，也不能被当作生产安全模式。业务鉴权仍由 Agent/业务 Service 负责。
@@ -197,13 +197,13 @@ message ErrorResponse {
 
 - 每连接由客户端和服务端分别使用 CSPRNG 生成一对新的 X25519 临时密钥。私钥为 32 字节，仅在本端内存中保存；公钥为原始 32 字节，分别放入握手请求和响应。私钥、shared secret 和 macKey 不发送、不写日志，连接结束后废弃；不按账号或跨连接复用。
 - 双方分别计算 `X25519(client_private_key, server_public_key)` 和 `X25519(server_private_key, client_public_key)`，结果必须一致；拒绝全零 shared secret。不要手工修改私钥位或自行实现曲线运算，交给标准 X25519 实现处理。
-- 握手可信性依赖正确验证服务端身份的 WSS；无额外身份认证的 X25519 不承诺抵御能替换公钥的本机主动代理。TLS 终止位置和之后的信任边界需在部署时明确。
+- 直连模式的握手可信性依赖客户端正确验证服务端身份的 WSS；Ingress 模式则依赖客户端验证 Ingress 的 WSS，以及 Ingress 到 Pod 的受信任集群网络。无额外身份认证的 X25519 不承诺抵御能替换公钥的本机主动代理；若 Ingress 到 Pod 的网络不可信，应另行配置 mTLS，不能把应用层 MAC 当作服务端身份认证。
 - 同连接串行执行：检查最小长度 → 读取大端 seq → 使用原始 Envelope 字节校验 MAC → 检查 seq 大于 lastSeq 并立即更新 → 将原始 Envelope 字节投递给 Agent。Agent 负责 Protobuf 解码以及校验 Envelope 结构、msg_id、方向、request_id 和 payload。认证失败不能推进 lastSeq；认证成功但消息未知或不合法时也消费该 seq。投递失败不能回退，序号接纳不代表业务执行成功。
 - 协商前只接受 C2S_KEY_EXCHANGE_REQUEST，服务端只回复 S2C_KEY_EXCHANGE_RESPONSE；完成后 Gate 只接受带 seq/MAC 的业务上行，拒绝重复握手、错误方向和无 MAC 降级。MAC 校验通过后，Agent 根据 Envelope 的 msg_id 选择业务处理逻辑并解码 payload；未知 msg_id 不因“未知编号”本身关闭连接。
 - 握手失败直接关闭连接，不进入 Agent，也不发送业务 ErrorResponse；握手成功后双方才启用派生的 macKey。
 - 必须设置消息大小、握手等待和接纳容量上限；具体初始值与零值语义见“已确认：Gate 容量与关闭顺序”，Protobuf 不意味着无限消息大小。
 
-当前实现位于 `examples/websocket-gate/prodgate/`：Gate 用 TLS 配置启动 WSS Listener，在 HTTP/WebSocket Handler 前限制已接纳 TCP 连接数；首个二进制 Envelope 完成 X25519 握手后，逐帧校验 MAC 和递增 seq，再将原始 Envelope 字节直接交给目标 Agent 的 `Runtime.DeliverClientMessage`。Agent 的响应通过每连接有界队列进入唯一 WebSocket 写循环。生产 Gate 从 Runtime 借用同一 Logger 并绑定自身 ServiceID；同一连接同一错误类别只记录首条，关闭时补充抑制数量，不记录密钥、MAC 或原始载荷。生产 Gate 使用单独端口和显式 TLS 配置，不会降级成 DebugGate。端到端测试覆盖握手与业务帧往返、错误 MAC 拒绝、首帧超时、握手前连接上限、Mailbox/出站队列满载、基础慢客户端背压、短时多连接并发及 Runtime 关闭回收；这不替代密码协议审查或慢客户端长时压力验收。
+当前实现位于 `examples/websocket-gate/prodgate/`：Gate 在 HTTP/WebSocket Handler 前限制已接纳 TCP 连接数；`TLSConfig` 非空时启动直连 WSS Listener，为 nil 时启动供 Ingress 转发的普通 HTTP WebSocket Listener。首个二进制 Envelope 完成 X25519 握手后，逐帧校验 MAC 和递增 seq，再将原始 Envelope 字节直接交给目标 Agent 的 `Runtime.DeliverClientMessage`。Agent 的响应通过每连接有界队列进入唯一 WebSocket 写循环。生产 Gate 从 Runtime 借用同一 Logger 并绑定自身 ServiceID；同一连接同一错误类别只记录首条，关闭时补充抑制数量，不记录密钥、MAC 或原始载荷。生产 Gate 与 DebugGate 仍使用不同监听器和显式配置，不会根据首包自动降级。端到端测试覆盖直连 TLS、Ingress 终止 TLS 后的普通 WebSocket、握手与业务帧往返、错误 MAC 拒绝、首帧超时、握手前连接上限、Mailbox/出站队列满载、基础慢客户端背压、短时多连接并发及 Runtime 关闭回收；这不替代密码协议审查或慢客户端长时压力验收。
 
 已确认的密码参数：
 
@@ -356,7 +356,7 @@ Gate 不等待或强杀 Agent。Runtime 独立停止 Agent runner 并调用 Agen
 
 ## 下一步与验收
 
-Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/通知/推送独立编号，通用与业务专用 `.proto` 分开定义；每个 MsgId 通过 option 显式声明 payload、方向和消息种类，协议目录由代码生成，业务 Handler 按实现进度手动注册。控制握手消息、大端 seq 和原始字节 MAC 验证顺序、固定 HKDF 参数、独立 DebugGate、WebSocket 关闭码和 Gate/Agent/业务错误归属，以及“一连接一个业务定义的 AgentService、Runtime 内部消息类型区分客户端消息与普通 Core Command、Service 可选择实现 ClientMessageHandler、业务协议通过 ProtocolHandler 组件组合接入”的边界已确认。Runtime 的单向投递 API 与缺少客户端处理能力时的 admission 拒绝已实现；联调示例包含通用 Envelope 与 Echo 业务 `.proto`、Go/TypeScript 生成类型、强类型 Echo Handler 和 CLI 闭环。跨语言认证固定向量已由 Go 与 TypeScript 共用夹具验证。DebugGate 使用示例专用的底层 Runtime 注入，不扩展 Core 或 `gsr.Run`。生产 WSS Gate 首个纵向切片和共享 Logger 接线已完成；更完整的慢客户端/失败压力测试仍待推进。一次讨论一个问题，未确认前不新增公开 API 或通用安全插件框架。
+Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/通知/推送独立编号，通用与业务专用 `.proto` 分开定义；每个 MsgId 通过 option 显式声明 payload、方向和消息种类，协议目录由代码生成，业务 Handler 按实现进度手动注册。控制握手消息、大端 seq 和原始字节 MAC 验证顺序、固定 HKDF 参数、独立 DebugGate、WebSocket 关闭码和 Gate/Agent/业务错误归属，以及“一连接一个业务定义的 AgentService、Runtime 内部消息类型区分客户端消息与普通 Core Command、Service 可选择实现 ClientMessageHandler、业务协议通过 ProtocolHandler 组件组合接入”的边界已确认。Runtime 的单向投递 API 与缺少客户端处理能力时的 admission 拒绝已实现；联调示例包含通用 Envelope 与 Echo 业务 `.proto`、Go/TypeScript 生成类型、强类型 Echo Handler 和 CLI 闭环。跨语言认证固定向量已由 Go 与 TypeScript 共用夹具验证。DebugGate 使用示例专用的底层 Runtime 注入，不扩展 Core 或 `gsr.Run`。生产 Gate 的直连 WSS 与 Ingress 终止 TLS 后的 HTTP WebSocket 纵向切片、共享 Logger 接线已完成；更完整的慢客户端/失败压力测试仍待推进。一次讨论一个问题，未确认前不新增公开 API 或通用安全插件框架。
 
 联调示例位于 `examples/websocket-gate/`：Go DebugGate、连接 Echo Agent、TypeScript 命令行客户端和 request/response 往返已经落地；生成协议目录、逐步注册强类型 Handler、通用协议错误回复也已接入。业务拒绝和示例 Push 尚未实现。Echo `.proto` 只属于示例业务协议，不扩展 GSR Core。固定向量已作为独立跨语言测试夹具落地，不由示例运行路径加载或掩盖后续生产 Gate 的安全审查。
 
