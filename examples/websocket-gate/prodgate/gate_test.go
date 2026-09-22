@@ -873,6 +873,93 @@ func TestProdGateMixedConnectionStress(t *testing.T) {
 	}
 }
 
+// TestProdGateFailurePhaseStress 在显式压力开关下重复坏握手和坏 MAC，验证失败连接不会进入业务处理且失败计数保持可观测。
+func TestProdGateFailurePhaseStress(t *testing.T) {
+	if os.Getenv("GSR_GATE_STRESS") != "1" {
+		t.Skip("显式设置 GSR_GATE_STRESS=1 运行失败阶段压力验收")
+	}
+	attempts := 32
+	if value := os.Getenv("GSR_GATE_FAILURE_ATTEMPTS"); value != "" {
+		parsed, err := strconv.Atoi(value)
+		if err != nil || parsed <= 0 {
+			t.Fatalf("GSR_GATE_FAILURE_ATTEMPTS = %q, want positive integer", value)
+		}
+		attempts = parsed
+	}
+
+	agents := make(chan *productionTestAgent, attempts)
+	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
+		MailboxCapacity: 16,
+		ShutdownTimeout: 3 * time.Second,
+	}, attempts, time.Second, 1<<20, 64<<10, func(client ClientSession) runtime.Service {
+		agent := &productionTestAgent{
+			client:       client,
+			received:     make(chan []byte, 1),
+			disconnected: make(chan struct{}),
+		}
+		agents <- agent
+		return agent
+	})
+	badHandshake, err := proto.Marshal(&commonv1.Envelope{
+		MsgId:   uint32(commonv1.MsgId_C2S_KEY_EXCHANGE_REQUEST),
+		Payload: []byte("invalid key exchange payload"),
+	})
+	if err != nil {
+		t.Fatalf("marshal invalid handshake Envelope: %v", err)
+	}
+	for index := 0; index < attempts; index++ {
+		connection := dialProductionTestClient(t, gate, clientTLS)
+		if err := connection.WriteMessage(websocket.BinaryMessage, badHandshake); err != nil {
+			t.Fatalf("WriteMessage(invalid handshake %d) error = %v", index, err)
+		}
+		_, _, err := readTestBinaryMessage(t, connection)
+		if !websocket.IsCloseError(err, websocket.CloseProtocolError) {
+			t.Fatalf("invalid handshake %d ReadMessage() error = %v, want WebSocket close %d", index, err, websocket.CloseProtocolError)
+		}
+		_ = connection.Close()
+	}
+	if got := gate.Metrics().RejectedConnections; got < uint64(attempts) {
+		t.Fatalf("RejectedConnections after bad handshakes = %d, want at least %d", got, attempts)
+	}
+
+	requestBytes, err := proto.Marshal(&commonv1.Envelope{MsgId: 1001, RequestId: 91})
+	if err != nil {
+		t.Fatalf("marshal bad MAC request Envelope: %v", err)
+	}
+	for index := 0; index < attempts; index++ {
+		connection, macKey := dialAuthenticatedTestClient(t, gate, clientTLS)
+		agent := receiveProductionAgent(t, agents)
+		frame := makeAuthenticatedTestFrame(t, macKey[:], 1, requestBytes)
+		frame[len(frame)-1] ^= 0xff
+		if err := connection.WriteMessage(websocket.BinaryMessage, frame); err != nil {
+			t.Fatalf("WriteMessage(bad MAC %d) error = %v", index, err)
+		}
+		_, _, err := readTestBinaryMessage(t, connection)
+		if !websocket.IsCloseError(err, websocket.ClosePolicyViolation) {
+			t.Fatalf("bad MAC %d ReadMessage() error = %v, want WebSocket close %d", index, err, websocket.ClosePolicyViolation)
+		}
+		select {
+		case delivered := <-agent.received:
+			t.Fatalf("bad MAC %d reached Agent as %x", index, delivered)
+		case <-time.After(10 * time.Millisecond):
+		}
+		select {
+		case <-agent.disconnected:
+		case <-time.After(time.Second):
+			t.Fatalf("bad MAC %d Agent 未收到断开通知", index)
+		}
+		_ = connection.Close()
+	}
+	metrics := gate.Metrics()
+	t.Logf("failure_attempts=%d rejected=%d accepted=%d inbound_mailbox_full=%d", attempts, metrics.RejectedConnections, metrics.AcceptedConnections, metrics.InboundMailboxFull)
+	if metrics.AcceptedConnections < uint64(attempts) {
+		t.Fatalf("AcceptedConnections after bad MAC = %d, want at least %d", metrics.AcceptedConnections, attempts)
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+}
+
 // TestProdGateRejectsClientMessageForAgentWithoutHandler 验证没有客户端处理能力的 Agent 会在入站投递阶段被拒绝并正常断开。
 func TestProdGateRejectsClientMessageForAgentWithoutHandler(t *testing.T) {
 	var output bytes.Buffer

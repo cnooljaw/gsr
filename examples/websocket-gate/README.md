@@ -42,6 +42,14 @@ GSR_GATE_STRESS=1 GSR_GATE_STRESS_SECONDS=10 go test ./prodgate -run '^TestProdG
 GSR_GATE_STRESS=1 GSR_GATE_SLOW_CLIENT_SECONDS=10 go test ./prodgate -run '^TestProdGateLongSlowClientBackpressure$' -v
 ```
 
+坏握手和坏 MAC 的失败阶段样本可以重复运行，默认 32 轮：
+
+```bash
+GSR_GATE_STRESS=1 GSR_GATE_FAILURE_ATTEMPTS=32 go test ./prodgate -run '^TestProdGateFailurePhaseStress$' -v
+```
+
+测试会确认失败连接不进入 Agent 业务处理，并记录失败连接和已接纳连接数量。
+
 终端一启动 GSR 服务端：
 
 ```bash
