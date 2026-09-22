@@ -315,6 +315,7 @@ Gate 只设置四类资源上限：最大连接数、握手最长等待、单条
 - `MaxConnections` 必须由每个部署显式配置为正数；零值不表示无限连接，GSR 不替所有部署猜一个默认连接数。
 - 出站队列按编码后应用消息的字节数及每项固定队列开销计费，而不是按消息条数限制；慢客户端不能仅靠大量小消息或空消息绕过内存上限。DebugGate 示例当前固定收取 64 字节条目开销，部署需配置至少 64 字节队列容量。
 - 入站继续复用 Agent 的 Runtime Mailbox 容量。达到上限时不建立第二个无限队列，当前连接停止接纳并关闭；出站队列满只返回稳定的 `ErrClientQueueFull`。
+- 慢客户端的写循环受 `defaultWriteWait` 限制；底层写超时或 I/O 失败时只关闭当前连接，后续 Agent 写回得到 `ErrClientSessionClosed`。这属于连接资源隔离，不把已关闭连接误报成业务 Handler 错误，也不改变其它连接。
 
 容量边界不生成业务 `ErrorResponse`。生产 Gate 累计 accepted、rejected、handshake timeout、frame too large、inbound mailbox full 和 outbound queue full 六类计数，并通过 Runtime 共享 Logger 记录安全/容量失败；同一连接同一类别只保留首条明细，连接结束时记录抑制汇总。DebugGate 没有应用层握手阶段，因此不产生握手超时计数。日志不得记录原始载荷、密钥或未认证字段。
 

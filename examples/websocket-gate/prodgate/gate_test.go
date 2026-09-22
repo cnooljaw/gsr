@@ -611,7 +611,7 @@ func TestProdGateBoundsSlowClientOutboundQueue(t *testing.T) {
 	}
 }
 
-// TestProdGateLongSlowClientBackpressure 在显式压力开关下验证慢客户端持续不读时出站队列保持有界且 Send 快速拒绝。
+// TestProdGateLongSlowClientBackpressure 在显式压力开关下验证慢客户端持续不读时出站队列有界，写超时关闭也不被误判为业务错误。
 func TestProdGateLongSlowClientBackpressure(t *testing.T) {
 	if os.Getenv("GSR_GATE_STRESS") != "1" {
 		t.Skip("显式设置 GSR_GATE_STRESS=1 运行慢客户端压力验收")
@@ -665,7 +665,7 @@ func TestProdGateLongSlowClientBackpressure(t *testing.T) {
 		if result.sent == 0 || result.queueFull == 0 {
 			t.Fatalf("slow client result = %+v, want sent and queueFull both positive", result)
 		}
-		t.Logf("slow_client_duration=%s sent=%d queue_full=%d", stressDuration, result.sent, result.queueFull)
+		t.Logf("slow_client_duration=%s sent=%d queue_full=%d closed=%t", stressDuration, result.sent, result.queueFull, result.closed)
 	case <-time.After(stressDuration + time.Second):
 		t.Fatal("慢客户端压力 Agent 未在预期时间结束")
 	}
@@ -1336,6 +1336,7 @@ func (*slowOutboundAgent) OnStop(context.Context) error { return nil }
 type longSlowOutboundResult struct {
 	sent      uint64
 	queueFull uint64
+	closed    bool
 	err       error
 }
 
@@ -1377,6 +1378,10 @@ func (agent *longSlowOutboundAgent) HandleClientMessage(_ runtime.CommandContext
 				result.sent++
 			case errors.Is(err, ErrClientQueueFull):
 				result.queueFull++
+			case errors.Is(err, ErrClientSessionClosed):
+				result.closed = true
+				agent.result <- result
+				return nil
 			default:
 				result.err = err
 				agent.result <- result

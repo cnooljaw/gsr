@@ -65,6 +65,8 @@ GSR_CALL_STABILITY=1 go test ./cluster -run '^TestTCPCallServicePanicAndReplacem
 
 2026-09-22 WebSocket Gate 短时压力切片：在 `GSR_GATE_STRESS=1` 下运行 3 秒慢客户端、16 连接持续发送和 8 轮坏握手/坏 MAC。慢客户端发送 12 条、出站队列满载拒绝 2,976 次；16 连接发送与 Agent 处理均为 4,622 条，`InboundMailboxFull=0`、连接拒绝为 0；失败阶段 8 次全部拒绝且 8 条已认证连接均正常回收。命令为 `GSR_GATE_STRESS_SECONDS=3 GSR_GATE_SLOW_CLIENT_SECONDS=3 GSR_GATE_FAILURE_ATTEMPTS=8 go test ./examples/websocket-gate/prodgate -run '^TestProdGate(LongSlowClientBackpressure|MixedConnectionStress|FailurePhaseStress)$' -count=1 -v`。这是本机短样本，只验证有限队列、连接回收和失败阶段的当前行为，不构成多连接长时容量结论。
 
+同日 30 秒长样本：16 条连接发送与 Agent 处理均为 47,586 条，`InboundMailboxFull=0`、连接拒绝为 0；慢客户端样本先观察到队列满载，随后因写超时关闭连接，`ClientSession.Send` 返回 `ErrClientSessionClosed`，按连接隔离契约计为正常终止，不计为业务错误。
+
 后续热点切片新增 TestRuntimeHotMailboxLoad（GSR_LOAD_TEST=1 显式启用）：4 个发送者、10 万次固定尝试、容量 64/1024，逐条核对接纳与处理结果并记录到达延迟分位数。它是短突发测试，不替代下文的持续负载验收；未修改生产实现。
 
 Timer 集中到期切片新增 TestRuntimeTimerBurstLoad，沿用 GSR_LOAD_TEST=1：10,000 个 Timer 同轮到期，校验接纳/拒绝计数、消息唯一性和零 Source。实测见规模基线；使用 fake clock，不代表真实时钟精度或定时业务必达保证。
