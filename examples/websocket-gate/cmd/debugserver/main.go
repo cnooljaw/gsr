@@ -10,6 +10,7 @@ import (
 
 	"github.com/cnooljaw/gsr/examples/websocket-gate/debuggate"
 	"github.com/cnooljaw/gsr/examples/websocket-gate/gate"
+	"github.com/cnooljaw/gsr/examples/websocket-gate/prodgate"
 	"github.com/cnooljaw/gsr/runtime"
 )
 
@@ -36,32 +37,86 @@ func run() (result error) {
 		result = errors.Join(result, local.Close())
 	}()
 
-	address := "127.0.0.1:7888"
-	if len(os.Args) == 3 && os.Args[1] == "--addr" {
-		address = os.Args[2]
-	} else if len(os.Args) != 1 {
-		return errors.New("usage: debugserver [--addr 127.0.0.1:7888]")
+	options, err := parseServerOptions(os.Args[1:])
+	if err != nil {
+		return err
 	}
 
-	gate, err := debuggate.NewGateService(local, debuggate.Config{
-		Address:               address,
-		MaxConnections:        128,
-		MaxOutboundQueueBytes: 1 << 20,
-		NewAgent: func(client gate.ClientSession) runtime.Service {
-			return &echoAgent{client: client, registry: registry}
-		},
-	})
+	var service runtime.Service
+	var label string
+	if options.production {
+		service, err = prodgate.NewGateService(local, prodgate.Config{
+			Address:               options.address,
+			MaxConnections:        128,
+			MaxOutboundQueueBytes: 1 << 20,
+			NewAgent: func(client gate.ClientSession) runtime.Service {
+				return &echoAgent{client: client, registry: registry}
+			},
+		})
+		label = "ProdGate"
+	} else {
+		service, err = debuggate.NewGateService(local, debuggate.Config{
+			Address:               options.address,
+			MaxConnections:        128,
+			MaxOutboundQueueBytes: 1 << 20,
+			NewAgent: func(client gate.ClientSession) runtime.Service {
+				return &echoAgent{client: client, registry: registry}
+			},
+		})
+		label = "DebugGate"
+	}
 	if err != nil {
 		return err
 	}
 	if err := local.Start(); err != nil {
 		return err
 	}
-	if _, err := local.CreateService(context.Background(), gate); err != nil {
+	if _, err := local.CreateService(context.Background(), service); err != nil {
 		return err
 	}
 
-	fmt.Printf("DebugGate listening at ws://%s/ws; press Ctrl-C to stop\n", gate.Addr())
+	fmt.Printf("%s listening at ws://%s/ws; press Ctrl-C to stop\n", label, serviceAddress(service))
 	<-ctx.Done()
 	return nil
+}
+
+type serverOptions struct {
+	address    string
+	production bool
+}
+
+// parseServerOptions 解析示例服务的监听模式和地址，不引入通用配置框架。
+func parseServerOptions(arguments []string) (serverOptions, error) {
+	options := serverOptions{address: "127.0.0.1:7888"}
+	addressSet := false
+	for index := 0; index < len(arguments); index++ {
+		switch arguments[index] {
+		case "--prod":
+			options.production = true
+		case "--addr":
+			if index+1 >= len(arguments) || arguments[index+1] == "" {
+				return serverOptions{}, errors.New("usage: debugserver [--prod] [--addr 127.0.0.1:7888]")
+			}
+			options.address = arguments[index+1]
+			addressSet = true
+			index++
+		default:
+			return serverOptions{}, errors.New("usage: debugserver [--prod] [--addr 127.0.0.1:7888]")
+		}
+	}
+	if options.production && !addressSet {
+		options.address = "127.0.0.1:7889"
+	}
+	return options, nil
+}
+
+func serviceAddress(service runtime.Service) string {
+	switch service := service.(type) {
+	case *debuggate.GateService:
+		return service.Addr().String()
+	case *prodgate.GateService:
+		return service.Addr().String()
+	default:
+		return "unknown"
+	}
 }

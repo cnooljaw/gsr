@@ -50,10 +50,16 @@ GSR_GATE_STRESS=1 GSR_GATE_FAILURE_ATTEMPTS=32 go test ./prodgate -run '^TestPro
 
 测试会确认失败连接不进入 Agent 业务处理，并记录失败连接和已接纳连接数量。
 
-终端一启动 GSR 服务端：
+终端一启动 GSR 服务端，默认是 DebugGate：
 
 ```bash
 go run ./cmd/debugserver
+```
+
+要在本机验证生产 Gate 的固定握手和上行 MAC，启动生产模式。这里不配置 TLS，用来模拟由 Ingress 终止 TLS 后转发普通 WebSocket：
+
+```bash
+go run ./cmd/debugserver --prod
 ```
 
 终端二运行 TypeScript 客户端：
@@ -66,8 +72,16 @@ npm run client -- --text "hello GSR"
 
 TypeScript CLI 默认连接 DebugGate，只演练 Echo Request/Response 的编解码和 `request_id` 回传。连接生产 Gate 时增加 `--secure`，客户端会先发送固定 33 字节 X25519 握手，再发送 `seq | Envelope | MAC`：
 
+直连配置 TLS 的生产 Gate 使用 `wss://` 地址，例如：
+
 ```bash
 npm run client -- --secure --url wss://127.0.0.1:PORT/ws --text "hello secure GSR"
 ```
 
-生产 Gate 的监听地址和证书由业务服务组装；当前 `cmd/debugserver` 仍只启动 DebugGate，生产 Gate 的 Go 集成测试覆盖服务端完整链路。
+本地 `--prod` 默认监听 `127.0.0.1:7889`，因此可用下面的地址连接：
+
+```bash
+npm run client -- --secure --url ws://127.0.0.1:7889/ws --text "hello secure GSR"
+```
+
+生产 Gate 的监听地址和证书由业务服务组装；示例的 `--prod` 仅用于本机或 Ingress 后的 HTTP WebSocket 联调，直连 WSS 仍需业务服务提供 `TLSConfig`。生产 Gate 的 Go 集成测试覆盖服务端完整链路。
