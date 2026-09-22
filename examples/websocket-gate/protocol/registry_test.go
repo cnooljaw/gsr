@@ -166,6 +166,20 @@ func TestUnknownMessageReturnsGenericError(t *testing.T) {
 	}
 }
 
+// TestUnknownNotificationDoesNotGenerateResponse 验证 request_id 为零的未知消息不会伪造 ErrorResponse。
+func TestUnknownNotificationDoesNotGenerateResponse(t *testing.T) {
+	registry := testRegistry(t)
+	sender := &recordedSender{}
+	dispatcher := testDispatcher(t, registry, sender)
+	frame := marshalEnvelope(t, &commonv1.Envelope{MsgId: 7777})
+	if err := dispatcher.HandleFrame(frame); !errors.Is(err, ErrUnknownMessageID) {
+		t.Fatalf("HandleFrame() error = %v, want ErrUnknownMessageID", err)
+	}
+	if len(sender.envelopes) != 0 {
+		t.Fatalf("unknown notification sent %d responses, want none", len(sender.envelopes))
+	}
+}
+
 // TestDefinedMessageWithoutHandlerReturnsUnsupported 验证协议可以先定义，未实现 Handler 时按请求返回通用错误。
 func TestDefinedMessageWithoutHandlerReturnsUnsupported(t *testing.T) {
 	registry := testRegistry(t)
