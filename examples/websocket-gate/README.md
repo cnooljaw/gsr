@@ -36,6 +36,12 @@ GSR_GATE_STRESS=1 GSR_GATE_STRESS_SECONDS=10 go test ./prodgate -run '^TestProdG
 
 测试会输出发送量、Agent 处理量、Mailbox 满载和连接拒绝计数，用于建立机器相关基线，不直接代表最终容量上限。
 
+慢客户端长时出站背压可以单独运行；客户端连接建立后不读取服务端数据，`ClientSession.Send` 预计会稳定返回 `ErrClientQueueFull`，这属于验收目标：
+
+```bash
+GSR_GATE_STRESS=1 GSR_GATE_SLOW_CLIENT_SECONDS=10 go test ./prodgate -run '^TestProdGateLongSlowClientBackpressure$' -v
+```
+
 终端一启动 GSR 服务端：
 
 ```bash

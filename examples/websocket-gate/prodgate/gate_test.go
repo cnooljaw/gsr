@@ -548,7 +548,7 @@ func TestProdGateBoundsSlowClientOutboundQueue(t *testing.T) {
 	})
 	connection, macKey := dialAuthenticatedTestClient(t, gate, clientTLS)
 	defer connection.Close()
-	tcpConnection, ok := connection.NetConn().(*net.TCPConn)
+	tcpConnection, ok := tcpConnectionFromWebSocket(connection)
 	if !ok {
 		t.Skip("测试客户端不是 TCP 连接")
 	}
@@ -582,6 +582,80 @@ func TestProdGateBoundsSlowClientOutboundQueue(t *testing.T) {
 	case <-agent.disconnected:
 	case <-time.After(time.Second):
 		t.Fatal("慢客户端断开后 Agent 未收到通知")
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+}
+
+// TestProdGateLongSlowClientBackpressure 在显式压力开关下验证慢客户端持续不读时出站队列保持有界且 Send 快速拒绝。
+func TestProdGateLongSlowClientBackpressure(t *testing.T) {
+	if os.Getenv("GSR_GATE_STRESS") != "1" {
+		t.Skip("显式设置 GSR_GATE_STRESS=1 运行慢客户端压力验收")
+	}
+	stressDuration := 5 * time.Second
+	if value := os.Getenv("GSR_GATE_SLOW_CLIENT_SECONDS"); value != "" {
+		seconds, err := strconv.Atoi(value)
+		if err != nil || seconds <= 0 {
+			t.Fatalf("GSR_GATE_SLOW_CLIENT_SECONDS = %q, want positive integer", value)
+		}
+		stressDuration = time.Duration(seconds) * time.Second
+	}
+
+	agents := make(chan *longSlowOutboundAgent, 1)
+	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
+		MailboxCapacity: 8,
+		ShutdownTimeout: 3 * time.Second,
+	}, 1, time.Second, 1<<20, 128<<10, func(client ClientSession) runtime.Service {
+		agent := &longSlowOutboundAgent{
+			client:       client,
+			duration:     stressDuration,
+			result:       make(chan longSlowOutboundResult, 1),
+			disconnected: make(chan struct{}),
+		}
+		agents <- agent
+		return agent
+	})
+	connection, macKey := dialAuthenticatedTestClient(t, gate, clientTLS)
+	defer connection.Close()
+	tcpConnection, ok := tcpConnectionFromWebSocket(connection)
+	if !ok {
+		t.Skip("测试客户端不是 TCP 连接")
+	}
+	if err := tcpConnection.SetReadBuffer(1024); err != nil {
+		t.Fatalf("SetReadBuffer() error = %v", err)
+	}
+	agent := receiveLongSlowOutboundAgent(t, agents)
+
+	requestBytes, err := proto.Marshal(&commonv1.Envelope{MsgId: 1001})
+	if err != nil {
+		t.Fatalf("marshal request Envelope: %v", err)
+	}
+	if err := connection.WriteMessage(websocket.BinaryMessage, makeAuthenticatedTestFrame(t, macKey[:], 1, requestBytes)); err != nil {
+		t.Fatalf("WriteMessage(request frame) error = %v", err)
+	}
+	select {
+	case result := <-agent.result:
+		if result.err != nil {
+			t.Fatalf("慢客户端持续发送遇到非预期错误: %v", result.err)
+		}
+		if result.sent == 0 || result.queueFull == 0 {
+			t.Fatalf("slow client result = %+v, want sent and queueFull both positive", result)
+		}
+		t.Logf("slow_client_duration=%s sent=%d queue_full=%d", stressDuration, result.sent, result.queueFull)
+	case <-time.After(stressDuration + time.Second):
+		t.Fatal("慢客户端压力 Agent 未在预期时间结束")
+	}
+	if got := gate.Metrics().OutboundQueueFull; got == 0 {
+		t.Fatal("OutboundQueueFull = 0, want positive count")
+	}
+	if err := connection.Close(); err != nil {
+		t.Fatalf("Close(client) error = %v", err)
+	}
+	select {
+	case <-agent.disconnected:
+	case <-time.After(time.Second):
+		t.Fatal("慢客户端压力结束后 Agent 未收到断开通知")
 	}
 	if err := local.Stop(context.Background()); err != nil {
 		t.Fatalf("Runtime.Stop() error = %v", err)
@@ -1155,6 +1229,61 @@ func (agent *slowOutboundAgent) HandleClientMessage(_ runtime.CommandContext, _ 
 
 func (*slowOutboundAgent) OnStop(context.Context) error { return nil }
 
+type longSlowOutboundResult struct {
+	sent      uint64
+	queueFull uint64
+	err       error
+}
+
+type longSlowOutboundAgent struct {
+	client       ClientSession
+	duration     time.Duration
+	result       chan longSlowOutboundResult
+	disconnected chan struct{}
+	stopOnce     sync.Once
+}
+
+func (*longSlowOutboundAgent) OnStart(context.Context, runtime.ServiceContext) error { return nil }
+
+func (agent *longSlowOutboundAgent) Handle(commandContext runtime.CommandContext, command runtime.CommandID, _ ...any) (any, error) {
+	if command != ClientDisconnectedCommand {
+		return nil, errors.New("unexpected long slow outbound Agent command")
+	}
+	agent.stopOnce.Do(func() { close(agent.disconnected) })
+	commandContext.Exit()
+	return nil, nil
+}
+
+func (agent *longSlowOutboundAgent) HandleClientMessage(_ runtime.CommandContext, _ []byte) error {
+	deadline := time.Now().Add(agent.duration)
+	payload := bytes.Repeat([]byte{'z'}, 64<<10)
+	ticker := time.NewTicker(time.Millisecond)
+	defer ticker.Stop()
+	var result longSlowOutboundResult
+	for {
+		select {
+		case <-ticker.C:
+			if time.Now().After(deadline) {
+				agent.result <- result
+				return nil
+			}
+			err := agent.client.Send(&commonv1.Envelope{MsgId: 1002, Payload: payload})
+			switch {
+			case err == nil:
+				result.sent++
+			case errors.Is(err, ErrClientQueueFull):
+				result.queueFull++
+			default:
+				result.err = err
+				agent.result <- result
+				return nil
+			}
+		}
+	}
+}
+
+func (*longSlowOutboundAgent) OnStop(context.Context) error { return nil }
+
 type loadTestAgent struct {
 	processed    atomic.Uint64
 	disconnected chan struct{}
@@ -1351,6 +1480,15 @@ func dialPlainTestClient(t *testing.T, gate *GateService) *websocket.Conn {
 	return connection
 }
 
+func tcpConnectionFromWebSocket(connection *websocket.Conn) (*net.TCPConn, bool) {
+	netConnection := connection.NetConn()
+	if tlsConnection, ok := netConnection.(*tls.Conn); ok {
+		netConnection = tlsConnection.NetConn()
+	}
+	tcpConnection, ok := netConnection.(*net.TCPConn)
+	return tcpConnection, ok
+}
+
 func dialAuthenticatedTestClient(t *testing.T, gate *GateService, clientTLS *tls.Config) (*websocket.Conn, [clientMACKeySize]byte) {
 	t.Helper()
 	connection := dialProductionTestClient(t, gate, clientTLS)
@@ -1467,6 +1605,17 @@ func receiveSlowOutboundAgent(t *testing.T, agents <-chan *slowOutboundAgent) *s
 		return agent
 	case <-time.After(time.Second):
 		t.Fatal("Gate 未创建 slow outbound Agent")
+		return nil
+	}
+}
+
+func receiveLongSlowOutboundAgent(t *testing.T, agents <-chan *longSlowOutboundAgent) *longSlowOutboundAgent {
+	t.Helper()
+	select {
+	case agent := <-agents:
+		return agent
+	case <-time.After(time.Second):
+		t.Fatal("Gate 未创建 long slow outbound Agent")
 		return nil
 	}
 }
