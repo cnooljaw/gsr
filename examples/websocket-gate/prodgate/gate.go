@@ -13,6 +13,7 @@ import (
 	"time"
 
 	gatecontract "github.com/cnooljaw/gsr/examples/websocket-gate/gate"
+	"github.com/cnooljaw/gsr/logging"
 	"github.com/cnooljaw/gsr/runtime"
 	"github.com/gorilla/websocket"
 )
@@ -110,6 +111,8 @@ type GateService struct {
 	serveErr       error
 	ioWorkers      sync.WaitGroup
 	counters       gateCounters
+	logger         *logging.Logger
+	nextConnection atomic.Uint64
 
 	// agentsByConnection 只在连接断开时定位需要通知的 Agent。
 	agentsByConnection map[*clientConnection]runtime.ServiceID
@@ -147,6 +150,7 @@ func NewGateService(local *runtime.Runtime, config Config) (*GateService, error)
 		config:             config,
 		connections:        make(map[*clientConnection]struct{}),
 		agentsByConnection: make(map[*clientConnection]runtime.ServiceID),
+		logger:             local.Config().Logger,
 	}, nil
 }
 
@@ -187,6 +191,7 @@ func (gate *GateService) OnStart(_ context.Context, self runtime.ServiceContext)
 	gate.mu.Lock()
 	gate.server = server
 	gate.serviceID = self.Self()
+	gate.logger = gate.logger.WithService(uint64(self.Self()))
 	gate.address = listener.Addr()
 	gate.ioWorkers.Add(1)
 	gate.mu.Unlock()
@@ -197,6 +202,7 @@ func (gate *GateService) OnStart(_ context.Context, self runtime.ServiceContext)
 			gate.mu.Lock()
 			gate.serveErr = err
 			gate.mu.Unlock()
+			gate.logError("Gate listener failed", "phase", "serve", "error", err)
 		}
 	}()
 	return nil
@@ -215,12 +221,14 @@ func (gate *GateService) Handle(self runtime.CommandContext, command runtime.Com
 		}
 		agent, err := createAgent(gate.config.NewAgent, clientConn)
 		if err != nil {
+			gate.logConnectionFailure(clientConn, "agent_create", websocket.CloseInternalServerErr, err)
 			return nil, err
 		}
 		startContext, cancel := context.WithTimeout(context.Background(), defaultAgentStartWait)
 		defer cancel()
 		agentID, err := self.CreateService(startContext, agent)
 		if err != nil {
+			gate.logConnectionFailure(clientConn, "agent_create", websocket.CloseInternalServerErr, err)
 			return nil, fmt.Errorf("prodgate: create Agent: %w", err)
 		}
 		gate.agentsByConnection[clientConn] = agentID
@@ -237,6 +245,7 @@ func (gate *GateService) Handle(self runtime.CommandContext, command runtime.Com
 		}
 		delete(gate.agentsByConnection, clientConn)
 		if err := self.Send(agentID, ClientDisconnectedCommand); err != nil && !isRuntimeStoppingError(err) {
+			gate.logConnectionFailure(clientConn, "disconnect_notify", websocket.CloseInternalServerErr, err)
 			return nil, fmt.Errorf("prodgate: notify Agent disconnect: %w", err)
 		}
 		return nil, nil
@@ -274,6 +283,7 @@ func (gate *GateService) OnStop(ctx context.Context) error {
 	}
 	gate.ioWorkers.Wait()
 	clear(gate.agentsByConnection)
+	gate.logError("Gate stopped", "phase", "stop")
 
 	gate.mu.Lock()
 	serveErr := gate.serveErr
@@ -305,6 +315,7 @@ func (gate *GateService) ServeHTTP(writer http.ResponseWriter, request *http.Req
 			gate.finishHandler()
 		} else {
 			clientConn.closeWith(websocket.CloseNormalClosure, "normal", time.Now().Add(closeFrameWait))
+			gate.flushConnectionDiagnostics(clientConn)
 			if agentCreationRequested {
 				gate.notifyDisconnected(serviceID, clientConn)
 			}
@@ -315,10 +326,11 @@ func (gate *GateService) ServeHTTP(writer http.ResponseWriter, request *http.Req
 
 	connection, err := secureUpgrader.Upgrade(writer, request, nil)
 	if err != nil {
+		gate.logError("Gate connection rejected", "reason", "upgrade", "error", err)
 		gate.counters.rejectedConnections.Add(1)
 		return
 	}
-	clientConn = newClientConnection(connection, gate.config.MaxFrameBytes, gate.config.MaxOutboundQueueBytes, &gate.counters)
+	clientConn = newClientConnection(connection, gate.config.MaxFrameBytes, gate.config.MaxOutboundQueueBytes, &gate.counters, gate.nextConnection.Add(1))
 	if !gate.trackConnection(clientConn) {
 		clientConn.closeWith(websocket.CloseGoingAway, "going_away", time.Now().Add(closeFrameWait))
 		return
@@ -337,12 +349,17 @@ func (gate *GateService) ServeHTTP(writer http.ResponseWriter, request *http.Req
 	result, err := gate.createConnectionAgent(connectContext, serviceID, clientConn)
 	cancel()
 	if err != nil {
+		// Handler 内部的创建失败已经由 Gate runner 记录；这里只记录等待创建超时，避免同一失败重复落日志。
+		if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, runtime.ErrCallTimeout) {
+			gate.logConnectionFailure(clientConn, "agent_start_timeout", websocket.CloseInternalServerErr, err)
+		}
 		gate.counters.rejectedConnections.Add(1)
 		clientConn.closeWith(websocket.CloseInternalServerErr, "server_error", time.Now().Add(closeFrameWait))
 		return
 	}
 	createdAgentID, ok := result.(runtime.ServiceID)
 	if !ok || createdAgentID == 0 {
+		gate.logConnectionFailure(clientConn, "agent_result", websocket.CloseInternalServerErr, errors.New("invalid Agent ServiceID"))
 		gate.counters.rejectedConnections.Add(1)
 		clientConn.closeWith(websocket.CloseInternalServerErr, "server_error", time.Now().Add(closeFrameWait))
 		return
@@ -360,12 +377,14 @@ func (gate *GateService) ServeHTTP(writer http.ResponseWriter, request *http.Req
 		messageType, frame, err := connection.ReadMessage()
 		if err != nil {
 			if errors.Is(err, websocket.ErrReadLimit) {
+				gate.logConnectionFailure(clientConn, "frame_too_large", websocket.CloseMessageTooBig, err)
 				gate.counters.frameTooLarge.Add(1)
 				clientConn.closeWith(websocket.CloseMessageTooBig, "message_too_big", time.Now().Add(closeFrameWait))
 			}
 			return
 		}
 		if messageType != websocket.BinaryMessage {
+			gate.logConnectionFailure(clientConn, "unsupported_data", websocket.CloseUnsupportedData, errors.New("non-binary WebSocket message"))
 			clientConn.closeWith(websocket.CloseUnsupportedData, "unsupported_data", time.Now().Add(closeFrameWait))
 			return
 		}
@@ -378,27 +397,35 @@ func (gate *GateService) ServeHTTP(writer http.ResponseWriter, request *http.Req
 func (gate *GateService) performHandshake(clientConn *clientConnection) (*clientAuthenticator, error) {
 	connection := clientConn.connection
 	if err := connection.SetReadDeadline(time.Now().Add(gate.config.HandshakeTimeout)); err != nil {
+		gate.logConnectionFailure(clientConn, "handshake_deadline", websocket.CloseInternalServerErr, err)
 		clientConn.closeWith(websocket.CloseInternalServerErr, "server_error", time.Now().Add(closeFrameWait))
 		return nil, err
 	}
 	messageType, frame, err := connection.ReadMessage()
 	if err != nil {
 		if errors.Is(err, websocket.ErrReadLimit) {
+			gate.logConnectionFailure(clientConn, "frame_too_large", websocket.CloseMessageTooBig, err)
 			gate.counters.frameTooLarge.Add(1)
 			clientConn.closeWith(websocket.CloseMessageTooBig, "message_too_big", time.Now().Add(closeFrameWait))
 		} else if isTimeoutError(err) {
+			gate.logConnectionFailure(clientConn, "handshake_timeout", websocketHandshakeCloseCode, err)
 			gate.counters.handshakeTimeouts.Add(1)
 			clientConn.closeWith(websocketHandshakeCloseCode, "policy_violation", time.Now().Add(closeFrameWait))
+		} else {
+			gate.logConnectionFailure(clientConn, "handshake_read", websocket.CloseInternalServerErr, err)
+			clientConn.closeWith(websocket.CloseInternalServerErr, "server_error", time.Now().Add(closeFrameWait))
 		}
 		return nil, err
 	}
 	if messageType != websocket.BinaryMessage {
+		gate.logConnectionFailure(clientConn, "unsupported_data", websocket.CloseUnsupportedData, errors.New("handshake must be binary"))
 		clientConn.closeWith(websocket.CloseUnsupportedData, "unsupported_data", time.Now().Add(closeFrameWait))
 		return nil, errors.New("prodgate: handshake must be a binary message")
 	}
 
 	response, authenticator, err := acceptClientHandshake(frame, gate.config.MaxFrameBytes)
 	if err != nil {
+		gate.logConnectionFailure(clientConn, handshakeErrorCategory(err), closeCodeForHandshakeError(err), err)
 		switch {
 		case errors.Is(err, errHandshakeFrameTooLarge):
 			gate.counters.frameTooLarge.Add(1)
@@ -411,14 +438,17 @@ func (gate *GateService) performHandshake(clientConn *clientConnection) (*client
 		return nil, err
 	}
 	if err := connection.SetWriteDeadline(time.Now().Add(defaultWriteWait)); err != nil {
+		gate.logConnectionFailure(clientConn, "handshake_write", websocket.CloseInternalServerErr, err)
 		clientConn.closeWith(websocket.CloseInternalServerErr, "server_error", time.Now().Add(closeFrameWait))
 		return nil, err
 	}
 	if err := connection.WriteMessage(websocket.BinaryMessage, response); err != nil {
+		gate.logConnectionFailure(clientConn, "handshake_write", websocket.CloseInternalServerErr, err)
 		clientConn.closeWith(websocket.CloseInternalServerErr, "server_error", time.Now().Add(closeFrameWait))
 		return nil, err
 	}
 	if err := connection.SetReadDeadline(time.Time{}); err != nil {
+		gate.logConnectionFailure(clientConn, "handshake_deadline", websocket.CloseInternalServerErr, err)
 		clientConn.closeWith(websocket.CloseInternalServerErr, "server_error", time.Now().Add(closeFrameWait))
 		return nil, err
 	}
@@ -435,18 +465,23 @@ func (gate *GateService) deliverAuthenticatedFrame(
 	if err != nil {
 		switch {
 		case errors.Is(err, errAuthFrameTooLarge):
+			gate.logConnectionFailure(clientConn, "frame_too_large", websocket.CloseMessageTooBig, err)
 			gate.counters.frameTooLarge.Add(1)
 			clientConn.closeWith(websocket.CloseMessageTooBig, "message_too_big", time.Now().Add(closeFrameWait))
 		case errors.Is(err, errClientMACInvalid), errors.Is(err, errClientSequenceInvalid):
+			gate.logConnectionFailure(clientConn, authErrorCategory(err), websocket.ClosePolicyViolation, err)
 			clientConn.closeWith(websocket.ClosePolicyViolation, "policy_violation", time.Now().Add(closeFrameWait))
 		case errors.Is(err, errMalformedAuthFrame):
+			gate.logConnectionFailure(clientConn, "protocol", websocket.CloseProtocolError, err)
 			clientConn.closeWith(websocket.CloseProtocolError, "protocol_error", time.Now().Add(closeFrameWait))
 		default:
+			gate.logConnectionFailure(clientConn, "authentication", websocket.CloseInternalServerErr, err)
 			clientConn.closeWith(websocket.CloseInternalServerErr, "server_error", time.Now().Add(closeFrameWait))
 		}
 		return err
 	}
 	if err := gate.runtime.DeliverClientMessage(agentID, envelope); err != nil {
+		gate.logConnectionFailure(clientConn, "inbound_delivery", websocket.CloseInternalServerErr, err)
 		if errors.Is(err, runtime.ErrMailboxFull) {
 			gate.counters.inboundMailboxFull.Add(1)
 		}
@@ -472,6 +507,70 @@ func (gate *GateService) notifyDisconnected(serviceID runtime.ServiceID, clientC
 			return
 		}
 	}
+}
+
+func (gate *GateService) logError(message string, fields ...any) {
+	gate.mu.Lock()
+	logger := gate.logger
+	gate.mu.Unlock()
+	if logger != nil {
+		_ = logger.Error(message, fields...)
+	}
+}
+
+func (gate *GateService) logConnectionFailure(clientConn *clientConnection, category string, closeCode int, err error) {
+	if clientConn == nil || clientConn.noteDiagnostic(category) {
+		fields := []any{"category", category, "close_code", closeCode}
+		if clientConn != nil {
+			fields = append(fields, "connection_id", clientConn.connectionID)
+		}
+		if err != nil {
+			fields = append(fields, "error", err)
+		}
+		gate.logError("Gate connection failure", fields...)
+	}
+}
+
+func (gate *GateService) flushConnectionDiagnostics(clientConn *clientConnection) {
+	if clientConn == nil {
+		return
+	}
+	for category, count := range clientConn.takeSuppressedDiagnostics() {
+		gate.logError("Gate repeated failures", "connection_id", clientConn.connectionID,
+			"category", category, "suppressed", count)
+	}
+}
+
+func handshakeErrorCategory(err error) string {
+	switch {
+	case errors.Is(err, errHandshakeFrameTooLarge):
+		return "frame_too_large"
+	case errors.Is(err, errHandshakeKeyGeneration):
+		return "key_generation"
+	default:
+		return "protocol"
+	}
+}
+
+func closeCodeForHandshakeError(err error) int {
+	switch {
+	case errors.Is(err, errHandshakeFrameTooLarge):
+		return websocket.CloseMessageTooBig
+	case errors.Is(err, errHandshakeKeyGeneration):
+		return websocket.CloseInternalServerErr
+	default:
+		return websocket.CloseProtocolError
+	}
+}
+
+func authErrorCategory(err error) string {
+	if errors.Is(err, errClientMACInvalid) {
+		return "mac"
+	}
+	if errors.Is(err, errClientSequenceInvalid) {
+		return "sequence"
+	}
+	return "authentication"
 }
 
 func (gate *GateService) createConnectionAgent(

@@ -8,6 +8,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/binary"
+	"encoding/json"
 	"errors"
 	"net"
 	"net/http"
@@ -18,6 +19,7 @@ import (
 	"time"
 
 	commonv1 "github.com/cnooljaw/gsr/examples/websocket-gate/gen/go/gsr/common/v1"
+	"github.com/cnooljaw/gsr/logging"
 	"github.com/cnooljaw/gsr/runtime"
 	"github.com/gorilla/websocket"
 	"google.golang.org/protobuf/proto"
@@ -117,6 +119,114 @@ func TestProdGateRejectsInvalidMACBeforeDelivery(t *testing.T) {
 	case delivered := <-agent.received:
 		t.Fatalf("invalid MAC reached Agent as %x", delivered)
 	case <-time.After(30 * time.Millisecond):
+	}
+}
+
+// TestProdGateWritesConnectionFailureToRuntimeLogger 验证 Gate 复用 Runtime 的共享 Logger，并记录安全失败而不记录原始载荷。
+func TestProdGateWritesConnectionFailureToRuntimeLogger(t *testing.T) {
+	var output bytes.Buffer
+	logger, err := logging.New(logging.Config{Writer: &output})
+	if err != nil {
+		t.Fatalf("logging.New() error = %v", err)
+	}
+	t.Cleanup(func() { _ = logger.Close(context.Background()) })
+	local, gate, agents, clientTLS := startTestProductionGate(t, 2, time.Second, logger)
+	connection, macKey := dialAuthenticatedTestClient(t, gate, clientTLS)
+	defer connection.Close()
+	agent := receiveProductionAgent(t, agents)
+
+	requestBytes, err := proto.Marshal(&commonv1.Envelope{MsgId: 1001, RequestId: 11, Payload: []byte("secret payload")})
+	if err != nil {
+		t.Fatalf("marshal request Envelope: %v", err)
+	}
+	frame := makeAuthenticatedTestFrame(t, macKey[:], 1, requestBytes)
+	frame[len(frame)-1] ^= 0xff
+	if err := connection.WriteMessage(websocket.BinaryMessage, frame); err != nil {
+		t.Fatalf("WriteMessage(tampered frame) error = %v", err)
+	}
+	_, _, _ = readTestBinaryMessage(t, connection)
+	select {
+	case <-agent.disconnected:
+	case <-time.After(time.Second):
+		t.Fatal("Agent 未收到断开通知")
+	}
+	if err := local.Close(); err != nil {
+		t.Fatalf("Runtime.Close() error = %v", err)
+	}
+	if err := logger.Close(context.Background()); err != nil {
+		t.Fatalf("Logger.Close() error = %v", err)
+	}
+
+	decoder := json.NewDecoder(bytes.NewReader(output.Bytes()))
+	foundFailure := false
+	for decoder.More() {
+		var entry struct {
+			Service uint64         `json:"service"`
+			Message string         `json:"message"`
+			Fields  map[string]any `json:"fields"`
+		}
+		if err := decoder.Decode(&entry); err != nil {
+			t.Fatalf("decode log entry: %v", err)
+		}
+		if entry.Message != "Gate connection failure" {
+			continue
+		}
+		foundFailure = true
+		if entry.Fields["category"] != "mac" {
+			t.Fatalf("Gate failure category = %v, want mac", entry.Fields["category"])
+		}
+		if entry.Service == 0 {
+			t.Fatal("Gate failure log has no Runtime ServiceID")
+		}
+		if _, exists := entry.Fields["connection_id"]; !exists {
+			t.Fatal("Gate failure log has no connection_id")
+		}
+		if _, exists := entry.Fields["secret payload"]; exists {
+			t.Fatal("Gate failure log contains raw payload field")
+		}
+	}
+	if !foundFailure {
+		t.Fatal("missing Gate connection failure log")
+	}
+}
+
+// TestProdGateSuppressesRepeatedConnectionFailures 验证同一连接同一类别只记录首条故障，并在结束时记录抑制数量。
+func TestProdGateSuppressesRepeatedConnectionFailures(t *testing.T) {
+	var output bytes.Buffer
+	logger, err := logging.New(logging.Config{Writer: &output})
+	if err != nil {
+		t.Fatalf("logging.New() error = %v", err)
+	}
+	t.Cleanup(func() { _ = logger.Close(context.Background()) })
+	client := newClientConnection(nil, 128, queueEntryOverhead, &gateCounters{}, 7)
+	gate := &GateService{logger: logger}
+	gate.logConnectionFailure(client, "mac", websocket.ClosePolicyViolation, errClientMACInvalid)
+	gate.logConnectionFailure(client, "mac", websocket.ClosePolicyViolation, errClientMACInvalid)
+	gate.flushConnectionDiagnostics(client)
+	if err := logger.Close(context.Background()); err != nil {
+		t.Fatalf("Logger.Close() error = %v", err)
+	}
+
+	decoder := json.NewDecoder(bytes.NewReader(output.Bytes()))
+	var messages []string
+	var suppressed uint64
+	for decoder.More() {
+		var entry struct {
+			Message string `json:"message"`
+			Fields  struct {
+				Suppressed uint64 `json:"suppressed"`
+			} `json:"fields"`
+		}
+		if err := decoder.Decode(&entry); err != nil {
+			t.Fatalf("decode log entry: %v", err)
+		}
+		messages = append(messages, entry.Message)
+		if entry.Message == "Gate repeated failures" {
+			suppressed = entry.Fields.Suppressed
+		}
+	}
+	if len(messages) != 2 || messages[0] != "Gate connection failure" || messages[1] != "Gate repeated failures" || suppressed != 1 {
+		t.Fatalf("log messages = %v, suppressed = %d", messages, suppressed)
 	}
 }
 
@@ -368,10 +478,15 @@ func startTestProductionGate(
 	t *testing.T,
 	maxConnections int,
 	handshakeTimeout time.Duration,
+	loggers ...*logging.Logger,
 ) (*runtime.Runtime, *GateService, <-chan *productionTestAgent, *tls.Config) {
 	t.Helper()
 	serverTLS, clientTLS := testTLSConfigs(t)
-	local, err := runtime.NewRuntime(runtime.Config{MailboxCapacity: 8, ShutdownTimeout: 2 * time.Second})
+	var logger *logging.Logger
+	if len(loggers) > 0 {
+		logger = loggers[0]
+	}
+	local, err := runtime.NewRuntime(runtime.Config{Logger: logger, MailboxCapacity: 8, ShutdownTimeout: 2 * time.Second})
 	if err != nil {
 		t.Fatalf("NewRuntime() error = %v", err)
 	}

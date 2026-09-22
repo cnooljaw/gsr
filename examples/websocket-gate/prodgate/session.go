@@ -17,29 +17,69 @@ type queuedFrame struct {
 
 // clientConnection 独占一条 WebSocket，并只向 Agent 暴露编码后入队能力。
 type clientConnection struct {
-	connection  *websocket.Conn
-	maxFrame    int
-	maxQueue    int
-	counters    *gateCounters
-	wake        chan struct{}
-	closedCh    chan struct{}
-	closeOnce   sync.Once
-	mu          sync.Mutex
-	queue       []queuedFrame
-	queuedBytes int
-	closed      bool
-	closeErr    error
+	connection           *websocket.Conn
+	connectionID         uint64
+	maxFrame             int
+	maxQueue             int
+	counters             *gateCounters
+	wake                 chan struct{}
+	closedCh             chan struct{}
+	closeOnce            sync.Once
+	mu                   sync.Mutex
+	queue                []queuedFrame
+	queuedBytes          int
+	closed               bool
+	closeErr             error
+	diagnosticMu         sync.Mutex
+	diagnosticSeen       map[string]struct{}
+	diagnosticSuppressed map[string]uint64
+	diagnosticsFlushed   bool
 }
 
-func newClientConnection(connection *websocket.Conn, maxFrame, maxQueue int, counters *gateCounters) *clientConnection {
+func newClientConnection(connection *websocket.Conn, maxFrame, maxQueue int, counters *gateCounters, connectionID uint64) *clientConnection {
 	return &clientConnection{
-		connection: connection,
-		maxFrame:   maxFrame,
-		maxQueue:   maxQueue,
-		counters:   counters,
-		wake:       make(chan struct{}, 1),
-		closedCh:   make(chan struct{}),
+		connection:           connection,
+		connectionID:         connectionID,
+		maxFrame:             maxFrame,
+		maxQueue:             maxQueue,
+		counters:             counters,
+		wake:                 make(chan struct{}, 1),
+		closedCh:             make(chan struct{}),
+		diagnosticSeen:       make(map[string]struct{}),
+		diagnosticSuppressed: make(map[string]uint64),
 	}
+}
+
+// noteDiagnostic 只允许同一连接同一类别的首条故障进入主日志，避免坏帧洪泛拖垮日志队列。
+func (client *clientConnection) noteDiagnostic(category string) bool {
+	client.diagnosticMu.Lock()
+	defer client.diagnosticMu.Unlock()
+	if client.diagnosticSeen == nil {
+		client.diagnosticSeen = make(map[string]struct{})
+	}
+	if client.diagnosticSuppressed == nil {
+		client.diagnosticSuppressed = make(map[string]uint64)
+	}
+	if _, seen := client.diagnosticSeen[category]; seen {
+		client.diagnosticSuppressed[category]++
+		return false
+	}
+	client.diagnosticSeen[category] = struct{}{}
+	return true
+}
+
+func (client *clientConnection) takeSuppressedDiagnostics() map[string]uint64 {
+	client.diagnosticMu.Lock()
+	defer client.diagnosticMu.Unlock()
+	if client.diagnosticsFlushed {
+		return nil
+	}
+	client.diagnosticsFlushed = true
+	suppressed := make(map[string]uint64, len(client.diagnosticSuppressed))
+	for category, count := range client.diagnosticSuppressed {
+		suppressed[category] = count
+	}
+	return suppressed
 }
 
 // Send 将完整 Envelope 编码后放入有界出站队列，不直接写入 WebSocket。

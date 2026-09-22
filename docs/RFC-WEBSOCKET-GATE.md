@@ -1,6 +1,6 @@
 # WebSocket Gate、客户端协议与 Agent
 
-状态：设计方向已确认；DebugGate 示例已完成 Go/TypeScript Echo 往返，跨语言认证固定向量已完成；生产 Gate 已接入独立 WSS Listener、握手、上行认证、Agent 投递和连接写回。共享结构化日志、完整失败矩阵与压力验收仍待完成。本文不是完整密码协议或生产安全验收结论。
+状态：设计方向已确认；DebugGate 示例已完成 Go/TypeScript Echo 往返，跨语言认证固定向量已完成；生产 Gate 已接入独立 WSS Listener、握手、上行认证、Agent 投递、连接写回和 Runtime 共享 Logger。完整失败矩阵与压力验收仍待完成。本文不是完整密码协议或生产安全验收结论。
 
 ## 范围与参考
 
@@ -203,7 +203,7 @@ message ErrorResponse {
 - 握手失败直接关闭连接，不进入 Agent，也不发送业务 ErrorResponse；握手成功后双方才启用派生的 macKey。
 - 必须设置消息大小、握手等待和接纳容量上限；具体初始值与零值语义见“已确认：Gate 容量与关闭顺序”，Protobuf 不意味着无限消息大小。
 
-当前实现位于 `examples/websocket-gate/prodgate/`：Gate 用 TLS 配置启动 WSS Listener，在 HTTP/WebSocket Handler 前限制已接纳 TCP 连接数；首个二进制 Envelope 完成 X25519 握手后，逐帧校验 MAC 和递增 seq，再将原始 Envelope 字节直接交给目标 Agent 的 `Runtime.DeliverClientMessage`。Agent 的响应通过每连接有界队列进入唯一 WebSocket 写循环。生产 Gate 使用单独端口和显式 TLS 配置，不会降级成 DebugGate。端到端测试覆盖握手与业务帧往返、错误 MAC 拒绝、首帧超时、握手前连接上限及 Runtime 关闭回收；这不替代密码协议审查、共享结构化日志或慢客户端压力验收。
+当前实现位于 `examples/websocket-gate/prodgate/`：Gate 用 TLS 配置启动 WSS Listener，在 HTTP/WebSocket Handler 前限制已接纳 TCP 连接数；首个二进制 Envelope 完成 X25519 握手后，逐帧校验 MAC 和递增 seq，再将原始 Envelope 字节直接交给目标 Agent 的 `Runtime.DeliverClientMessage`。Agent 的响应通过每连接有界队列进入唯一 WebSocket 写循环。生产 Gate 从 Runtime 借用同一 Logger 并绑定自身 ServiceID；同一连接同一错误类别只记录首条，关闭时补充抑制数量，不记录密钥、MAC 或原始载荷。生产 Gate 使用单独端口和显式 TLS 配置，不会降级成 DebugGate。端到端测试覆盖握手与业务帧往返、错误 MAC 拒绝、首帧超时、握手前连接上限及 Runtime 关闭回收；这不替代密码协议审查或慢客户端压力验收。
 
 已确认的密码参数：
 
@@ -330,7 +330,7 @@ Gate 只设置四类资源上限：最大连接数、握手最长等待、单条
 - 出站队列按编码后应用消息的字节数及每项固定队列开销计费，而不是按消息条数限制；慢客户端不能仅靠大量小消息或空消息绕过内存上限。DebugGate 示例当前固定收取 64 字节条目开销，部署需配置至少 64 字节队列容量。
 - 入站继续复用 Agent 的 Runtime Mailbox 容量。达到上限时不建立第二个无限队列，当前连接停止接纳并关闭；出站队列满只返回稳定的 `ErrClientQueueFull`。
 
-容量边界不生成业务 `ErrorResponse`。生产 Gate 累计 accepted、rejected、handshake timeout、frame too large、inbound mailbox full 和 outbound queue full 六类计数；DebugGate 没有应用层握手阶段，因此不产生握手超时计数。Runtime 共享结构化日志尚未接入；接入后不得记录原始载荷、密钥或未认证字段。
+容量边界不生成业务 `ErrorResponse`。生产 Gate 累计 accepted、rejected、handshake timeout、frame too large、inbound mailbox full 和 outbound queue full 六类计数，并通过 Runtime 共享 Logger 记录安全/容量失败；同一连接同一类别只保留首条明细，连接结束时记录抑制汇总。DebugGate 没有应用层握手阶段，因此不产生握手超时计数。日志不得记录原始载荷、密钥或未认证字段。
 
 Gate 停止按以下顺序执行：
 
@@ -354,8 +354,8 @@ Gate 不等待或强杀 Agent。Runtime 独立停止 Agent runner 并调用 Agen
 
 ## 下一步与验收
 
-Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/通知/推送独立编号，通用与业务专用 `.proto` 分开定义；每个 MsgId 通过 option 显式声明 payload、方向和消息种类，协议目录由代码生成，业务 Handler 按实现进度手动注册。控制握手消息、大端 seq 和原始字节 MAC 验证顺序、固定 HKDF 参数、独立 DebugGate、WebSocket 关闭码和 Gate/Agent/业务错误归属，以及“一连接一个业务定义的 AgentService、Runtime 内部消息类型区分客户端消息与普通 Core Command、Service 可选择实现 ClientMessageHandler、业务协议通过 ProtocolHandler 组件组合接入”的边界已确认。Runtime 的单向投递 API 与缺少客户端处理能力时的 admission 拒绝已实现；联调示例包含通用 Envelope 与 Echo 业务 `.proto`、Go/TypeScript 生成类型、强类型 Echo Handler 和 CLI 闭环。跨语言认证固定向量已由 Go 与 TypeScript 共用夹具验证。DebugGate 使用示例专用的底层 Runtime 注入，不扩展 Core 或 `gsr.Run`。生产 WSS Gate 首个纵向切片已完成；共享结构化日志接线和更完整的慢客户端/失败压力测试仍待推进。一次讨论一个问题，未确认前不新增公开 API 或通用安全插件框架。
+Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/通知/推送独立编号，通用与业务专用 `.proto` 分开定义；每个 MsgId 通过 option 显式声明 payload、方向和消息种类，协议目录由代码生成，业务 Handler 按实现进度手动注册。控制握手消息、大端 seq 和原始字节 MAC 验证顺序、固定 HKDF 参数、独立 DebugGate、WebSocket 关闭码和 Gate/Agent/业务错误归属，以及“一连接一个业务定义的 AgentService、Runtime 内部消息类型区分客户端消息与普通 Core Command、Service 可选择实现 ClientMessageHandler、业务协议通过 ProtocolHandler 组件组合接入”的边界已确认。Runtime 的单向投递 API 与缺少客户端处理能力时的 admission 拒绝已实现；联调示例包含通用 Envelope 与 Echo 业务 `.proto`、Go/TypeScript 生成类型、强类型 Echo Handler 和 CLI 闭环。跨语言认证固定向量已由 Go 与 TypeScript 共用夹具验证。DebugGate 使用示例专用的底层 Runtime 注入，不扩展 Core 或 `gsr.Run`。生产 WSS Gate 首个纵向切片和共享 Logger 接线已完成；更完整的慢客户端/失败压力测试仍待推进。一次讨论一个问题，未确认前不新增公开 API 或通用安全插件框架。
 
 联调示例位于 `examples/websocket-gate/`：Go DebugGate、连接 Echo Agent、TypeScript 命令行客户端和 request/response 往返已经落地；生成协议目录、逐步注册强类型 Handler、通用协议错误回复也已接入。业务拒绝和示例 Push 尚未实现。Echo `.proto` 只属于示例业务协议，不扩展 GSR Core。固定向量已作为独立跨语言测试夹具落地，不由示例运行路径加载或掩盖后续生产 Gate 的安全审查。
 
-下一步补齐生产 Gate 的共享结构化诊断，并按失败矩阵覆盖无效握手、错误数据类型、帧超限、Agent Mailbox 满载、出站队列满、慢客户端、断开回收和较长时间容量运行。既有认证测试覆盖跨连接旧包、同连接重复序号、MAC 篡改和认证失败不推进序号；未知 `msg_id`、客户端 request_id 超时与迟到、编号耗尽继续由协议/Agent 层测试。测试不替代密码协议审查。
+下一步按失败矩阵覆盖无效握手、错误数据类型、帧超限、Agent Mailbox 满载、出站队列满、慢客户端、断开回收和较长时间容量运行。既有认证测试覆盖跨连接旧包、同连接重复序号、MAC 篡改和认证失败不推进序号；未知 `msg_id`、客户端 request_id 超时与迟到、编号耗尽继续由协议/Agent 层测试。测试不替代密码协议审查。
