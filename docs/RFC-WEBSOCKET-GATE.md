@@ -351,4 +351,6 @@ Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/
 
 `TestProdGateKeepsConnectionAfterUnknownNotification` 进一步覆盖 `request_id == 0` 的未知通知：Agent 不生成 `ErrorResponse`，连接继续保留并可处理后续请求。
 
+`TestProdGateDeliversNotificationPush` 覆盖已注册通知的生产链路：客户端发送零 `request_id` 的 `EchoNotify`，Agent 通过协议上下文发出零 `request_id` 的 `EchoPush`，Gate 原样写回客户端。
+
 `TestProdGateRejectsLateAgentResponseAfterDisconnect` 已锁定断开后的迟到写回：Gate 先使 `ClientSession` 失效，再通知 Agent；Agent 后续写回得到 `ErrClientSessionClosed`，不会重新进入出站队列。

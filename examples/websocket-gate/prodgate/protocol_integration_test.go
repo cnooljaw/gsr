@@ -42,6 +42,9 @@ func (agent *protocolGateAgent) OnStart(_ context.Context, _ runtime.ServiceCont
 	if err := protocol.Register(dispatcher, agent.onEcho); err != nil {
 		return err
 	}
+	if err := protocol.Register(dispatcher, agent.onEchoNotify); err != nil {
+		return err
+	}
 	agent.dispatcher = dispatcher
 	return nil
 }
@@ -69,6 +72,13 @@ func (agent *protocolGateAgent) onEcho(context protocol.Context, request *echopb
 			Code: echopb.EchoResultCode_ECHO_RESULT_OK,
 			Text: request.GetText(),
 		},
+	)
+}
+
+func (agent *protocolGateAgent) onEchoNotify(context protocol.Context, request *echopb.EchoNotify) error {
+	return context.Push(
+		uint32(echopb.MsgId_S2C_ECHO_PUSH),
+		&echopb.EchoPush{Text: request.GetText()},
 	)
 }
 
@@ -215,6 +225,68 @@ func TestProdGateKeepsConnectionAfterUnknownNotification(t *testing.T) {
 	if responseEnvelope.GetMsgId() != uint32(echopb.MsgId_S2C_ECHO_RESPONSE) || responseEnvelope.GetRequestId() != 92 {
 		t.Fatalf("valid response Envelope = msg_id %d, request_id %d; want %d, 92",
 			responseEnvelope.GetMsgId(), responseEnvelope.GetRequestId(), echopb.MsgId_S2C_ECHO_RESPONSE)
+	}
+
+	if err := connection.Close(); err != nil {
+		t.Fatalf("Close(client) error = %v", err)
+	}
+	select {
+	case <-agent.disconnected:
+	case <-time.After(time.Second):
+		t.Fatal("Agent 未收到客户端断开通知")
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+}
+
+// TestProdGateDeliversNotificationPush 验证生产 Gate 能将零 request_id 的客户端通知转换为服务端主动 Push。
+func TestProdGateDeliversNotificationPush(t *testing.T) {
+	agents := make(chan *protocolGateAgent, 1)
+	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
+		MailboxCapacity: 8,
+		ShutdownTimeout: 2 * time.Second,
+	}, 1, time.Second, 1<<20, 64<<10, func(client ClientSession) runtime.Service {
+		agent := &protocolGateAgent{client: client, disconnected: make(chan struct{})}
+		agents <- agent
+		return agent
+	})
+	connection, macKey := dialAuthenticatedTestClient(t, gate, clientTLS)
+	defer connection.Close()
+	agent := <-agents
+
+	payload, err := proto.Marshal(&echopb.EchoNotify{Text: "push from notification"})
+	if err != nil {
+		t.Fatalf("marshal EchoNotify: %v", err)
+	}
+	notificationBytes, err := proto.Marshal(&commonv1.Envelope{
+		MsgId:   uint32(echopb.MsgId_C2S_ECHO_NOTIFY),
+		Payload: payload,
+	})
+	if err != nil {
+		t.Fatalf("marshal notification Envelope: %v", err)
+	}
+	if err := connection.WriteMessage(websocket.BinaryMessage, makeAuthenticatedTestFrame(t, macKey[:], 1, notificationBytes)); err != nil {
+		t.Fatalf("WriteMessage(notification frame) error = %v", err)
+	}
+	_, responseBytes, err := readTestBinaryMessage(t, connection)
+	if err != nil {
+		t.Fatalf("ReadMessage(push) error = %v", err)
+	}
+	var responseEnvelope commonv1.Envelope
+	if err := proto.Unmarshal(responseBytes, &responseEnvelope); err != nil {
+		t.Fatalf("unmarshal push Envelope: %v", err)
+	}
+	if responseEnvelope.GetMsgId() != uint32(echopb.MsgId_S2C_ECHO_PUSH) || responseEnvelope.GetRequestId() != 0 {
+		t.Fatalf("push Envelope = msg_id %d, request_id %d; want %d, 0",
+			responseEnvelope.GetMsgId(), responseEnvelope.GetRequestId(), echopb.MsgId_S2C_ECHO_PUSH)
+	}
+	var response echopb.EchoPush
+	if err := proto.Unmarshal(responseEnvelope.GetPayload(), &response); err != nil {
+		t.Fatalf("unmarshal EchoPush: %v", err)
+	}
+	if response.GetText() != "push from notification" {
+		t.Fatalf("EchoPush text = %q, want push from notification", response.GetText())
 	}
 
 	if err := connection.Close(); err != nil {
