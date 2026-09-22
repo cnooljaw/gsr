@@ -203,7 +203,7 @@ message ErrorResponse {
 - 握手失败直接关闭连接，不进入 Agent，也不发送业务 ErrorResponse；握手成功后双方才启用派生的 macKey。
 - 必须设置消息大小、握手等待和接纳容量上限；具体初始值与零值语义见“已确认：Gate 容量与关闭顺序”，Protobuf 不意味着无限消息大小。
 
-当前实现位于 `examples/websocket-gate/prodgate/`：Gate 用 TLS 配置启动 WSS Listener，在 HTTP/WebSocket Handler 前限制已接纳 TCP 连接数；首个二进制 Envelope 完成 X25519 握手后，逐帧校验 MAC 和递增 seq，再将原始 Envelope 字节直接交给目标 Agent 的 `Runtime.DeliverClientMessage`。Agent 的响应通过每连接有界队列进入唯一 WebSocket 写循环。生产 Gate 从 Runtime 借用同一 Logger 并绑定自身 ServiceID；同一连接同一错误类别只记录首条，关闭时补充抑制数量，不记录密钥、MAC 或原始载荷。生产 Gate 使用单独端口和显式 TLS 配置，不会降级成 DebugGate。端到端测试覆盖握手与业务帧往返、错误 MAC 拒绝、首帧超时、握手前连接上限及 Runtime 关闭回收；这不替代密码协议审查或慢客户端压力验收。
+当前实现位于 `examples/websocket-gate/prodgate/`：Gate 用 TLS 配置启动 WSS Listener，在 HTTP/WebSocket Handler 前限制已接纳 TCP 连接数；首个二进制 Envelope 完成 X25519 握手后，逐帧校验 MAC 和递增 seq，再将原始 Envelope 字节直接交给目标 Agent 的 `Runtime.DeliverClientMessage`。Agent 的响应通过每连接有界队列进入唯一 WebSocket 写循环。生产 Gate 从 Runtime 借用同一 Logger 并绑定自身 ServiceID；同一连接同一错误类别只记录首条，关闭时补充抑制数量，不记录密钥、MAC 或原始载荷。生产 Gate 使用单独端口和显式 TLS 配置，不会降级成 DebugGate。端到端测试覆盖握手与业务帧往返、错误 MAC 拒绝、首帧超时、握手前连接上限、Mailbox/出站队列满载、基础慢客户端背压及 Runtime 关闭回收；这不替代密码协议审查或慢客户端长时压力验收。
 
 已确认的密码参数：
 
@@ -257,7 +257,7 @@ mac
 - `envelope_bytes` 是参与 MAC 的原始 Protobuf 字节；验证器先对这些原始字节验 MAC，再交给 Protobuf 解码，不允许先解码再重新序列化替代输入。
 - MAC 只取 HMAC-SHA256 前 16 字节；测试覆盖正确 MAC、修改 seq、修改 Envelope、修改 `info`、交换公钥顺序和错误截断长度。
 - Go 和 TypeScript 的测试都直接读取同一份向量，生产实现不依赖测试向量文件；向量生成脚本与运行时实现分开，避免同一错误同时生成“期望值”和实际值。
-- 生产侧 Go 认证代码位于 `examples/websocket-gate/prodgate/`：`security.go` 实现逐连接密钥派生和上行帧认证，`handshake.go` 校验首个握手 Envelope、生成服务端临时密钥、返回握手 Envelope 并建立连接认证器。握手尚未接入 WebSocket 读循环、5 秒超时、TLS Listener 或 Gate Service。使用 `go test ./examples/websocket-gate/prodgate` 和示例目录下的 `npm run test:crypto` 分别验证 Go 与 TypeScript；重新生成夹具使用 `node testdata/generate_client_auth_vector.mjs`。
+- 生产侧 Go 认证代码位于 `examples/websocket-gate/prodgate/`：`security.go` 实现逐连接密钥派生和上行帧认证，`handshake.go` 校验首个握手 Envelope、生成服务端临时密钥、返回握手 Envelope 并建立连接认证器；`gate.go` 已将握手接入 5 秒超时、TLS Listener、容量边界和 Gate Service 读写循环。使用 `go test ./examples/websocket-gate/prodgate` 和示例目录下的 `npm run test:crypto` 分别验证 Go 与 TypeScript；重新生成夹具使用 `node testdata/generate_client_auth_vector.mjs`。
 
 ## TypeScript Protobuf 生成方案
 
@@ -360,4 +360,4 @@ Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/
 
 联调示例位于 `examples/websocket-gate/`：Go DebugGate、连接 Echo Agent、TypeScript 命令行客户端和 request/response 往返已经落地；生成协议目录、逐步注册强类型 Handler、通用协议错误回复也已接入。业务拒绝和示例 Push 尚未实现。Echo `.proto` 只属于示例业务协议，不扩展 GSR Core。固定向量已作为独立跨语言测试夹具落地，不由示例运行路径加载或掩盖后续生产 Gate 的安全审查。
 
-下一步按失败矩阵覆盖无效握手、错误数据类型、帧超限、Agent Mailbox 满载、出站队列满、慢客户端、断开回收和较长时间容量运行。既有认证测试覆盖跨连接旧包、同连接重复序号、MAC 篡改和认证失败不推进序号；未知 `msg_id`、客户端 request_id 超时与迟到、编号耗尽继续由协议/Agent 层测试。测试不替代密码协议审查。
+下一步按失败矩阵补充慢客户端长时、多连接背压和不同失败阶段的压力运行。既有认证测试覆盖跨连接旧包、同连接重复序号、MAC 篡改和认证失败不推进序号；未知 `msg_id`、客户端 request_id 超时与迟到、编号耗尽继续由协议/Agent 层测试。测试不替代密码协议审查。
