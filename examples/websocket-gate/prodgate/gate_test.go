@@ -15,6 +15,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -532,6 +533,106 @@ func TestProdGateBoundsSlowClientOutboundQueue(t *testing.T) {
 	}
 }
 
+// TestProdGateHandlesConcurrentConnections 验证多条连接并发发送时消息仍进入各自 Agent，并能在关闭后全部回收。
+func TestProdGateHandlesConcurrentConnections(t *testing.T) {
+	const (
+		connectionCount  = 16
+		messagesPerAgent = 32
+	)
+	agents := make(chan *loadTestAgent, connectionCount)
+	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
+		MailboxCapacity: 64,
+		ShutdownTimeout: 2 * time.Second,
+	}, connectionCount, time.Second, 1<<20, 64<<10, func(ClientSession) runtime.Service {
+		agent := &loadTestAgent{disconnected: make(chan struct{})}
+		agents <- agent
+		return agent
+	})
+
+	clients := make([]*websocket.Conn, 0, connectionCount)
+	keys := make([][clientMACKeySize]byte, 0, connectionCount)
+	testAgents := make([]*loadTestAgent, 0, connectionCount)
+	for index := 0; index < connectionCount; index++ {
+		connection, macKey := dialAuthenticatedTestClient(t, gate, clientTLS)
+		clients = append(clients, connection)
+		keys = append(keys, macKey)
+		testAgents = append(testAgents, receiveLoadTestAgent(t, agents))
+	}
+	defer func() {
+		for _, connection := range clients {
+			_ = connection.Close()
+		}
+	}()
+
+	requestBytes, err := proto.Marshal(&commonv1.Envelope{MsgId: 1001})
+	if err != nil {
+		t.Fatalf("marshal request Envelope: %v", err)
+	}
+	frames := make([][][]byte, connectionCount)
+	for index := range clients {
+		frames[index] = make([][]byte, messagesPerAgent)
+		for messageIndex := range frames[index] {
+			frames[index][messageIndex] = makeAuthenticatedTestFrame(t, keys[index][:], uint64(messageIndex+1), requestBytes)
+		}
+	}
+
+	var writers sync.WaitGroup
+	for index, connection := range clients {
+		writers.Add(1)
+		go func(index int, connection *websocket.Conn) {
+			defer writers.Done()
+			for messageIndex, frame := range frames[index] {
+				if err := connection.WriteMessage(websocket.BinaryMessage, frame); err != nil {
+					t.Errorf("connection %d message %d WriteMessage() error = %v", index, messageIndex, err)
+					return
+				}
+			}
+		}(index, connection)
+	}
+	writers.Wait()
+	for _, connection := range clients {
+		if err := connection.Close(); err != nil {
+			t.Fatalf("Close(client) error = %v", err)
+		}
+	}
+
+	expectedMessages := uint64(connectionCount * messagesPerAgent)
+	deadline := time.Now().Add(time.Second)
+	for time.Now().Before(deadline) {
+		var processed uint64
+		for _, agent := range testAgents {
+			processed += agent.processed.Load()
+		}
+		if processed == expectedMessages {
+			break
+		}
+		time.Sleep(time.Millisecond)
+	}
+	var processed uint64
+	for _, agent := range testAgents {
+		processed += agent.processed.Load()
+	}
+	if processed != expectedMessages {
+		t.Fatalf("processed messages = %d, want %d", processed, expectedMessages)
+	}
+	for _, agent := range testAgents {
+		select {
+		case <-agent.disconnected:
+		case <-time.After(time.Second):
+			t.Fatal("并发连接关闭后 Agent 未全部收到断开通知")
+		}
+	}
+	if got := gate.Metrics().AcceptedConnections; got != connectionCount {
+		t.Fatalf("AcceptedConnections = %d, want %d", got, connectionCount)
+	}
+	if got := gate.Metrics().RejectedConnections; got != 0 {
+		t.Fatalf("RejectedConnections = %d, want 0", got)
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+}
+
 // TestProdGateRuntimeCloseReleasesActiveClient 验证 Runtime 关闭时生产 Gate 会关闭已认证连接并等待自己的 I/O goroutine。
 func TestProdGateRuntimeCloseReleasesActiveClient(t *testing.T) {
 	local, gate, agents, clientTLS := startTestProductionGate(t, 2, time.Second)
@@ -820,6 +921,30 @@ func (agent *slowOutboundAgent) HandleClientMessage(_ runtime.CommandContext, _ 
 
 func (*slowOutboundAgent) OnStop(context.Context) error { return nil }
 
+type loadTestAgent struct {
+	processed    atomic.Uint64
+	disconnected chan struct{}
+	stopOnce     sync.Once
+}
+
+func (*loadTestAgent) OnStart(context.Context, runtime.ServiceContext) error { return nil }
+
+func (agent *loadTestAgent) Handle(commandContext runtime.CommandContext, command runtime.CommandID, _ ...any) (any, error) {
+	if command != ClientDisconnectedCommand {
+		return nil, errors.New("unexpected load test Agent command")
+	}
+	agent.stopOnce.Do(func() { close(agent.disconnected) })
+	commandContext.Exit()
+	return nil, nil
+}
+
+func (agent *loadTestAgent) HandleClientMessage(_ runtime.CommandContext, _ []byte) error {
+	agent.processed.Add(1)
+	return nil
+}
+
+func (*loadTestAgent) OnStop(context.Context) error { return nil }
+
 func startTestProductionGate(
 	t *testing.T,
 	maxConnections int,
@@ -1041,6 +1166,17 @@ func receiveSlowOutboundAgent(t *testing.T, agents <-chan *slowOutboundAgent) *s
 		return agent
 	case <-time.After(time.Second):
 		t.Fatal("Gate 未创建 slow outbound Agent")
+		return nil
+	}
+}
+
+func receiveLoadTestAgent(t *testing.T, agents <-chan *loadTestAgent) *loadTestAgent {
+	t.Helper()
+	select {
+	case agent := <-agents:
+		return agent
+	case <-time.After(time.Second):
+		t.Fatal("Gate 未创建 load test Agent")
 		return nil
 	}
 }
