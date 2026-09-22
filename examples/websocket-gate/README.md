@@ -24,7 +24,7 @@ npm run test:crypto
 
 固定向量采用 RFC 7748 的公开 X25519 测试密钥；`testdata/generate_client_auth_vector.mjs` 可独立重建共享 JSON 夹具。测试私钥仅用于公开测试向量，禁止用于实际连接。
 
-`prodgate` 已接入首帧密钥握手、上行 seq/MAC 校验、认证后向 Agent 投递、每连接有界写队列、连接关闭管理和 Runtime 共享结构化日志。`TLSConfig` 非空时直连 WSS；留空时由 K8s Ingress 终止客户端 TLS，Pod 接收普通 HTTP WebSocket。两种模式共用应用层握手和业务协议，并有本机集成测试。它仍是示例代码，不是经过完整安全审计的生产产品；慢客户端长时压力和完整失败矩阵尚未完成。
+`prodgate` 已接入固定 33 字节首帧密钥握手、上行 seq/MAC 校验、认证后向 Agent 投递、每连接有界写队列、连接关闭管理和 Runtime 共享结构化日志。`TLSConfig` 非空时直连 WSS；留空时由 K8s Ingress 终止客户端 TLS，Pod 接收普通 HTTP WebSocket。两种模式共用固定二进制握手和业务协议，并有本机集成测试。它仍是示例代码，不是经过完整安全审计的生产产品；慢客户端长时压力和完整失败矩阵尚未完成。
 
 K8s 默认部署可以让 Pod 监听 `0.0.0.0:8080`，Gate 不配置 `TLSConfig`；Ingress 持有 TLS Secret，并把 `/ws` 以 HTTP/1.1 WebSocket Upgrade 转发到 Service。Ingress 到 Pod 的网络应属于可信集群边界；如果该链路不可信，需要另外配置 mTLS，不能把应用层 MAC 当作 TLS 身份认证。
 
@@ -64,4 +64,4 @@ npm run client -- --text "hello GSR"
 
 服务端默认只监听 `127.0.0.1:7888`。可以通过 `--addr 127.0.0.1:PORT` 指定其它本地端口，并通过客户端 `--url ws://127.0.0.1:PORT/ws` 连接。
 
-示例只演练 Echo Request/Response 的编解码和 `request_id` 回传，不代表生产 Gate 的握手与认证已实现。
+TypeScript CLI 当前连接 DebugGate，只演练 Echo Request/Response 的编解码和 `request_id` 回传，不覆盖生产 Gate 的固定二进制握手与上行认证；生产 Gate 的 Go 集成测试覆盖这条路径。

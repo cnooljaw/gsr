@@ -4,7 +4,7 @@
 
 ## 阅读顺序
 
-下一阶段见 [WebSocket Gate、客户端协议与 Agent](RFC-WEBSOCKET-GATE.md)：WSS、Protobuf Envelope（msg_id、uint32 request_id、payload）、X25519/HKDF 上行 MAC，以及请求/响应/通知/推送独立编号；首版不实现旧头兼容或 DES。API、schema 与完整握手细节尚待裁决，未实现。
+下一阶段见 [WebSocket Gate、客户端协议与 Agent](RFC-WEBSOCKET-GATE.md)：WSS、固定 33 字节二进制握手、Protobuf Envelope（msg_id、uint32 request_id、payload）、X25519/HKDF 上行 MAC，以及请求/响应/通知/推送独立编号；首版不实现旧头兼容或 DES。生产 Gate 的完整验收仍按 RFC 的失败矩阵和压力计划推进。
 
 应用入口见 [ADR 0011：以 Service 为中心的应用入口与统一 Command](adr/0011-service-first-application-api.md) 和 [双节点示例](../examples/twonode/README.md)：gsr.Run 启动 MainService，业务通过 self.Cluster() 通信，不需要 Host。
 

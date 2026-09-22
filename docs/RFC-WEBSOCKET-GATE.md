@@ -1,6 +1,6 @@
 # WebSocket Gate、客户端协议与 Agent
 
-状态：设计方向已确认；DebugGate 示例已完成 Go/TypeScript Echo 往返，跨语言认证固定向量已完成；生产 Gate 已接入可选直连 WSS 或 Ingress 终止 TLS 后的 HTTP WebSocket、握手、上行认证、Agent 投递、连接写回和 Runtime 共享 Logger。完整失败矩阵与压力验收仍待完成。本文不是完整密码协议或生产安全验收结论。
+状态：设计方向已确认；DebugGate 示例已完成 Go/TypeScript Echo 往返，跨语言认证固定向量已完成；生产 Gate 已接入可选直连 WSS 或 Ingress 终止 TLS 后的 HTTP WebSocket、固定二进制握手、上行认证、Agent 投递、连接写回和 Runtime 共享 Logger。完整失败矩阵与压力验收仍待完成。本文不是完整密码协议或生产安全验收结论。
 
 ## 范围与参考
 
@@ -23,7 +23,9 @@ Skynet 的 `lualib/snax/gateserver.lua` 通过 socketdriver 消息及 Lua corout
 DebugGate 上行/下行：Protobuf Envelope
 ```
 
-直连模式使用 WSS 提供传输保密和完整性；K8s 模式由 Ingress 对客户端提供 WSS，Ingress 到 Pod 使用受信任集群网络上的 HTTP/1.1 WebSocket。两种模式都保留连接级 X25519、上行 seq/MAC 和同一应用协议；应用层不再使用 DES 加密，下行不添加应用 MAC。握手阶段没有 macKey，使用握手 Envelope，不套生产业务上行格式。DebugGate 不做 X25519、seq 或 MAC，直接传输 Envelope。
+生产 Gate 握手固定为两条 33 字节二进制消息：客户端发送 `version(1B) | client_public_key(32B)`，服务端返回 `version(1B) | server_public_key(32B)`；当前 `version` 固定为 `1`。
+
+直连模式使用 WSS 提供传输保密和完整性；K8s 模式由 Ingress 对客户端提供 WSS，Ingress 到 Pod 使用受信任集群网络上的 HTTP/1.1 WebSocket。两种模式都保留连接级 X25519、上行 seq/MAC 和同一应用协议；应用层不再使用 DES 加密，下行不添加应用 MAC。握手阶段没有 macKey，使用固定 33 字节二进制握手，不套生产业务上行格式。DebugGate 不做 X25519、seq 或 MAC，直接传输 Envelope。
 
 Envelope 采用 Protobuf 的薄包装，只标识具体消息和请求关联，不把业务字段、Core Command 或 ServiceID 放入其中：
 
@@ -35,7 +37,7 @@ message Envelope {
 }
 ```
 
-业务 payload 是对应业务消息的 Protobuf。请求、响应、通知和推送各自分配独立的 msg_id；通用协议文件定义 Envelope 和连接控制消息，业务协议文件定义业务消息编号与 payload。每个非零 MsgId enum 值通过 `message_route` option 显式关联 Protobuf payload 全名、方向和消息种类，生成工具据此产出强类型协议目录；运行时不根据编号范围或命名猜测。Agent 使用目录解码，再按实现进度手动注册强类型 Handler，因此协议可以先定义，Handler 可以逐个完成，不需要为未实现消息放占位函数。Request 必须带非零 request_id，成功处理后必须发送一次 Response；Notify 的 request_id 必须为零，处理完成不回复；Response 和 Push 只能作为服务端下行消息，Push 的 request_id 固定为零。Gate 只负责传输与安全，不判断业务消息类型。不维护节点级 Core Command 准入清单。旧打地鼠协议仅作业务样例，不进入 GSR 通用协议定义。
+业务 payload 是对应业务消息的 Protobuf。请求、响应、通知和推送各自分配独立的 msg_id；通用协议文件定义 Envelope 和通用错误，业务协议文件定义业务消息编号与 payload。每个非零 MsgId enum 值通过 `message_route` option 显式关联 Protobuf payload 全名、方向和消息种类，生成工具据此产出强类型协议目录；运行时不根据编号范围或命名猜测。Agent 使用目录解码，再按实现进度手动注册强类型 Handler，因此协议可以先定义，Handler 可以逐个完成，不需要为未实现消息放占位函数。Request 必须带非零 request_id，成功处理后必须发送一次 Response；Notify 的 request_id 必须为零，处理完成不回复；Response 和 Push 只能作为服务端下行消息，Push 的 request_id 固定为零。Gate 只负责传输与安全，不判断业务消息类型。不维护节点级 Core Command 准入清单。旧打地鼠协议仅作业务样例，不进入 GSR 通用协议定义。
 
 示例 `.proto` 中的编号和 payload 映射如下：
 
@@ -61,19 +63,14 @@ C2S_ECHO_REQUEST = 1001 [
 9001  ErrorResponse       S2C error response
 ```
 
-响应使用独立的 msg_id，但回传原 request_id；通知和推送的 request_id 为零。握手使用控制编号 1 和 2，具体 payload 为：
+响应使用独立的 msg_id，但回传原 request_id；通知和推送的 request_id 为零。握手不使用 Protobuf，不占用客户端 `msg_id`，也不进入 `Envelope`：
 
-```protobuf
-message KeyExchangeRequest {
-  bytes client_public_key = 1; // 32 字节 X25519 公钥
-}
-
-message KeyExchangeResponse {
-  bytes server_public_key = 1; // 32 字节 X25519 公钥
-}
+```text
+Client → Server: version(1B) | client_public_key(32B)
+Server → Client: version(1B) | server_public_key(32B)
 ```
 
-握手消息的 request_id 固定为零，不带业务 seq/MAC；不增加应用层版本字段。旧头的 Tag、Length、ver 不进入新协议。
+当前 `version` 固定为 `1`，两方向总长度固定为 33 字节；长度或版本不正确、X25519 公钥非法时直接拒绝。握手不带 request_id、seq 或 MAC；旧头的 Tag、Length、ver 不进入新协议。
 
 通用协议和业务协议分别维护自己的 MsgId 常量；二者位于不同 Protobuf package：
 
@@ -83,20 +80,6 @@ package gsr.common.v1;
 
 enum MsgId {
   MSG_ID_UNSPECIFIED = 0;
-  C2S_KEY_EXCHANGE_REQUEST = 1 [
-    (gsr.protocol.v1.message_route) = {
-      payload_type: ".gsr.common.v1.KeyExchangeRequest"
-      direction: DIRECTION_CLIENT_TO_SERVER
-      kind: KIND_REQUEST
-    }
-  ];
-  S2C_KEY_EXCHANGE_RESPONSE = 2 [
-    (gsr.protocol.v1.message_route) = {
-      payload_type: ".gsr.common.v1.KeyExchangeResponse"
-      direction: DIRECTION_SERVER_TO_CLIENT
-      kind: KIND_RESPONSE
-    }
-  ];
   S2C_ERROR_RESPONSE = 9001 [
     (gsr.protocol.v1.message_route) = {
       payload_type: ".gsr.common.v1.ErrorResponse"
@@ -178,7 +161,7 @@ message ErrorResponse {
 - request_id=0 的通知处理失败由服务端记录，不自动生成请求回复；推送使用独立的 Push msg_id。
 - 连接断开时无法保证发送错误回复，由客户端连接事件结束等待。
 - 程序分支依赖稳定 code，不比较 message；不得直接透传内部 error 文本或堆栈。
-- 错误语义已经确认：业务拒绝使用业务 Response，无法取得正常结果时使用 ErrorResponse 并复用原 request_id；通用 `ErrorCode` 只表达无效请求、未支持消息和内部失败，业务响应自己的业务码由业务协议定义，GSR 不建立跨业务领域码表。控制握手编号、payload 和阶段门禁由通用协议定义，业务消息编号由业务协议定义，Agent 负责按 msg_id 处理。
+- 错误语义已经确认：业务拒绝使用业务 Response，无法取得正常结果时使用 ErrorResponse 并复用原 request_id；通用 `ErrorCode` 只表达无效请求、未支持消息和内部失败，业务响应自己的业务码由业务协议定义，GSR 不建立跨业务领域码表。固定二进制握手格式和阶段门禁由 Gate 定义，业务消息编号和 payload 由业务协议定义，Agent 负责按 msg_id 处理。
 
 ## 已确认：C/S request_id 与 seq
 
@@ -199,11 +182,11 @@ message ErrorResponse {
 - 双方分别计算 `X25519(client_private_key, server_public_key)` 和 `X25519(server_private_key, client_public_key)`，结果必须一致；拒绝全零 shared secret。不要手工修改私钥位或自行实现曲线运算，交给标准 X25519 实现处理。
 - 直连模式的握手可信性依赖客户端正确验证服务端身份的 WSS；Ingress 模式则依赖客户端验证 Ingress 的 WSS，以及 Ingress 到 Pod 的受信任集群网络。无额外身份认证的 X25519 不承诺抵御能替换公钥的本机主动代理；若 Ingress 到 Pod 的网络不可信，应另行配置 mTLS，不能把应用层 MAC 当作服务端身份认证。
 - 同连接串行执行：检查最小长度 → 读取大端 seq → 使用原始 Envelope 字节校验 MAC → 检查 seq 大于 lastSeq 并立即更新 → 将原始 Envelope 字节投递给 Agent。Agent 负责 Protobuf 解码以及校验 Envelope 结构、msg_id、方向、request_id 和 payload。认证失败不能推进 lastSeq；认证成功但消息未知或不合法时也消费该 seq。投递失败不能回退，序号接纳不代表业务执行成功。
-- 协商前只接受 C2S_KEY_EXCHANGE_REQUEST，服务端只回复 S2C_KEY_EXCHANGE_RESPONSE；完成后 Gate 只接受带 seq/MAC 的业务上行，拒绝重复握手、错误方向和无 MAC 降级。MAC 校验通过后，Agent 根据 Envelope 的 msg_id 选择业务处理逻辑并解码 payload；未知 msg_id 不因“未知编号”本身关闭连接。
+- 协商前只接受固定 33 字节的 `version(1) | client_public_key(32)`；服务端只回复固定 33 字节的 `version(1) | server_public_key(32)`。完成后 Gate 只接受带 seq/MAC 的业务上行，拒绝重复握手、错误方向和无 MAC 降级。MAC 校验通过后，Agent 根据 Envelope 的 msg_id 选择业务处理逻辑并解码 payload；未知 msg_id 不因“未知编号”本身关闭连接。
 - 握手失败直接关闭连接，不进入 Agent，也不发送业务 ErrorResponse；握手成功后双方才启用派生的 macKey。
 - 必须设置消息大小、握手等待和接纳容量上限；具体初始值与零值语义见“已确认：Gate 容量与关闭顺序”，Protobuf 不意味着无限消息大小。
 
-当前实现位于 `examples/websocket-gate/prodgate/`：Gate 在 HTTP/WebSocket Handler 前限制已接纳 TCP 连接数；`TLSConfig` 非空时启动直连 WSS Listener，为 nil 时启动供 Ingress 转发的普通 HTTP WebSocket Listener。首个二进制 Envelope 完成 X25519 握手后，逐帧校验 MAC 和递增 seq，再将原始 Envelope 字节直接交给目标 Agent 的 `Runtime.DeliverClientMessage`。Agent 的响应通过每连接有界队列进入唯一 WebSocket 写循环。生产 Gate 从 Runtime 借用同一 Logger 并绑定自身 ServiceID；同一连接同一错误类别只记录首条，关闭时补充抑制数量，不记录密钥、MAC 或原始载荷。生产 Gate 与 DebugGate 仍使用不同监听器和显式配置，不会根据首包自动降级。端到端测试覆盖直连 TLS、Ingress 终止 TLS 后的普通 WebSocket、握手与业务帧往返、错误 MAC 拒绝、首帧超时、握手前连接上限、Mailbox/出站队列满载、基础慢客户端背压、短时多连接并发及 Runtime 关闭回收；这不替代密码协议审查或慢客户端长时压力验收。
+当前实现位于 `examples/websocket-gate/prodgate/`：Gate 在 HTTP/WebSocket Handler 前限制已接纳 TCP 连接数；`TLSConfig` 非空时启动直连 WSS Listener，为 nil 时启动供 Ingress 转发的普通 HTTP WebSocket Listener。首个二进制 WebSocket 消息必须是固定 33 字节握手，完成 X25519 握手后，逐帧校验 MAC 和递增 seq，再将原始 Envelope 字节直接交给目标 Agent 的 `Runtime.DeliverClientMessage`。Agent 的响应通过每连接有界队列进入唯一 WebSocket 写循环。生产 Gate 从 Runtime 借用同一 Logger 并绑定自身 ServiceID；同一连接同一错误类别只记录首条，关闭时补充抑制数量，不记录密钥、MAC 或原始载荷。生产 Gate 与 DebugGate 仍使用不同监听器和显式配置，不会根据首包自动降级。端到端测试覆盖直连 TLS、Ingress 终止 TLS 后的普通 WebSocket、握手与业务帧往返、错误 MAC 拒绝、首帧超时、握手前连接上限、Mailbox/出站队列满载、基础慢客户端背压、短时多连接并发及 Runtime 关闭回收；这不替代密码协议审查或慢客户端长时压力验收。
 
 已确认的密码参数：
 
@@ -224,7 +207,7 @@ macKey = HKDF-Expand-SHA256(prk, info, 32)
 - 不协商算法，不把 `seq`、`request_id` 或业务数据放入 KDF。未来如果增加服务端到客户端的应用 MAC，必须使用不同的 `info` 派生独立密钥。
 - MAC 使用 HMAC-SHA256 的前 16 字节，覆盖大端 seq 原始 8 字节和 Envelope 原始 Protobuf 字节，不包含标签自身。使用常量时间比较，必须在 Protobuf 解码前校验，不能重新序列化 Envelope 后验 MAC；因此不要求 deterministic serialization。
 
-依据：[X25519](https://www.rfc-editor.org/rfc/rfc7748.html)、[HKDF](https://www.rfc-editor.org/rfc/rfc5869.html)、[HMAC](https://www.rfc-editor.org/rfc/rfc2104.html)。握手消息和组合参数已固定，并由跨语言向量及服务端握手测试覆盖；这不等于组合协议已通过独立安全审计。
+依据：[X25519](https://www.rfc-editor.org/rfc/rfc7748.html)、[HKDF](https://www.rfc-editor.org/rfc/rfc5869.html)、[HMAC](https://www.rfc-editor.org/rfc/rfc2104.html)。固定 33 字节握手格式和组合参数已固定，并由服务端握手测试覆盖；这不等于组合协议已通过独立安全审计。
 
 ## 已确认：跨语言固定向量
 
@@ -257,7 +240,7 @@ mac
 - `envelope_bytes` 是参与 MAC 的原始 Protobuf 字节；验证器先对这些原始字节验 MAC，再交给 Protobuf 解码，不允许先解码再重新序列化替代输入。
 - MAC 只取 HMAC-SHA256 前 16 字节；测试覆盖正确 MAC、修改 seq、修改 Envelope、修改 `info`、交换公钥顺序和错误截断长度。
 - Go 和 TypeScript 的测试都直接读取同一份向量，生产实现不依赖测试向量文件；向量生成脚本与运行时实现分开，避免同一错误同时生成“期望值”和实际值。
-- 生产侧 Go 认证代码位于 `examples/websocket-gate/prodgate/`：`security.go` 实现逐连接密钥派生和上行帧认证，`handshake.go` 校验首个握手 Envelope、生成服务端临时密钥、返回握手 Envelope 并建立连接认证器；`gate.go` 已将握手接入 5 秒超时、TLS Listener、容量边界和 Gate Service 读写循环。使用 `go test ./examples/websocket-gate/prodgate` 和示例目录下的 `npm run test:crypto` 分别验证 Go 与 TypeScript；重新生成夹具使用 `node testdata/generate_client_auth_vector.mjs`。
+- 生产侧 Go 认证代码位于 `examples/websocket-gate/prodgate/`：`security.go` 实现逐连接密钥派生和上行帧认证，`handshake.go` 校验固定 33 字节握手、生成服务端临时密钥、返回固定格式公钥并建立连接认证器；`gate.go` 已将握手接入 5 秒超时、TLS Listener、容量边界和 Gate Service 读写循环。使用 `go test ./examples/websocket-gate/prodgate` 和示例目录下的 `npm run test:crypto` 分别验证 Go 与 TypeScript；重新生成夹具使用 `node testdata/generate_client_auth_vector.mjs`。
 
 ## TypeScript Protobuf 生成方案
 
@@ -356,7 +339,7 @@ Gate 不等待或强杀 Agent。Runtime 独立停止 Agent runner 并调用 Agen
 
 ## 下一步与验收
 
-Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/通知/推送独立编号，通用与业务专用 `.proto` 分开定义；每个 MsgId 通过 option 显式声明 payload、方向和消息种类，协议目录由代码生成，业务 Handler 按实现进度手动注册。控制握手消息、大端 seq 和原始字节 MAC 验证顺序、固定 HKDF 参数、独立 DebugGate、WebSocket 关闭码和 Gate/Agent/业务错误归属，以及“一连接一个业务定义的 AgentService、Runtime 内部消息类型区分客户端消息与普通 Core Command、Service 可选择实现 ClientMessageHandler、业务协议通过 ProtocolHandler 组件组合接入”的边界已确认。Runtime 的单向投递 API 与缺少客户端处理能力时的 admission 拒绝已实现；联调示例包含通用 Envelope 与 Echo 业务 `.proto`、Go/TypeScript 生成类型、强类型 Echo Handler 和 CLI 闭环。跨语言认证固定向量已由 Go 与 TypeScript 共用夹具验证。DebugGate 使用示例专用的底层 Runtime 注入，不扩展 Core 或 `gsr.Run`。生产 Gate 的直连 WSS 与 Ingress 终止 TLS 后的 HTTP WebSocket 纵向切片、共享 Logger 接线已完成；更完整的慢客户端/失败压力测试仍待推进。一次讨论一个问题，未确认前不新增公开 API 或通用安全插件框架。
+Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/通知/推送独立编号，通用与业务专用 `.proto` 分开定义；每个 MsgId 通过 option 显式声明 payload、方向和消息种类，协议目录由代码生成，业务 Handler 按实现进度手动注册。固定 33 字节二进制握手、大端 seq 和原始字节 MAC 验证顺序、固定 HKDF 参数、独立 DebugGate、WebSocket 关闭码和 Gate/Agent/业务错误归属，以及“一连接一个业务定义的 AgentService、Runtime 内部消息类型区分客户端消息与普通 Core Command、Service 可选择实现 ClientMessageHandler、业务协议通过 ProtocolHandler 组件组合接入”的边界已确认。Runtime 的单向投递 API 与缺少客户端处理能力时的 admission 拒绝已实现；联调示例包含通用 Envelope 与 Echo 业务 `.proto`、Go/TypeScript 生成类型、强类型 Echo Handler 和 CLI 闭环。跨语言认证固定向量已由 Go 与 TypeScript 共用夹具验证。DebugGate 使用示例专用的底层 Runtime 注入，不扩展 Core 或 `gsr.Run`。生产 Gate 的直连 WSS 与 Ingress 终止 TLS 后的 HTTP WebSocket 纵向切片、共享 Logger 接线已完成；更完整的慢客户端/失败压力测试仍待推进。一次讨论一个问题，未确认前不新增公开 API 或通用安全插件框架。
 
 联调示例位于 `examples/websocket-gate/`：Go DebugGate、连接 Echo Agent、TypeScript 命令行客户端和 request/response 往返已经落地；生成协议目录、逐步注册强类型 Handler、通用协议错误回复也已接入。业务拒绝和示例 Push 尚未实现。Echo `.proto` 只属于示例业务协议，不扩展 GSR Core。固定向量已作为独立跨语言测试夹具落地，不由示例运行路径加载或掩盖后续生产 Gate 的安全审查。
 

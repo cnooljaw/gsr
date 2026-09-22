@@ -352,8 +352,8 @@ func TestProdGateRejectsNonBinaryHandshake(t *testing.T) {
 	}
 }
 
-// TestProdGateRejectsInvalidHandshakeEnvelope 验证无法解析或不符合握手约定的 Envelope 会在 Agent 创建前关闭连接。
-func TestProdGateRejectsInvalidHandshakeEnvelope(t *testing.T) {
+// TestProdGateRejectsInvalidHandshake 验证无法解析或不符合固定握手格式的消息会在 Agent 创建前关闭连接。
+func TestProdGateRejectsInvalidHandshake(t *testing.T) {
 	_, gate, agents, clientTLS := startTestProductionGate(t, 2, time.Second)
 	connection := dialProductionTestClient(t, gate, clientTLS)
 	defer connection.Close()
@@ -900,13 +900,7 @@ func TestProdGateFailurePhaseStress(t *testing.T) {
 		agents <- agent
 		return agent
 	})
-	badHandshake, err := proto.Marshal(&commonv1.Envelope{
-		MsgId:   uint32(commonv1.MsgId_C2S_KEY_EXCHANGE_REQUEST),
-		Payload: []byte("invalid key exchange payload"),
-	})
-	if err != nil {
-		t.Fatalf("marshal invalid handshake Envelope: %v", err)
-	}
+	badHandshake := []byte{handshakeVersion, 0}
 	for index := 0; index < attempts; index++ {
 		connection := dialProductionTestClient(t, gate, clientTLS)
 		if err := connection.WriteMessage(websocket.BinaryMessage, badHandshake); err != nil {
@@ -1589,17 +1583,7 @@ func authenticateTestClient(t *testing.T, connection *websocket.Conn) [clientMAC
 		t.Fatalf("GenerateKey() error = %v", err)
 	}
 	clientPublicKey := privateKey.PublicKey().Bytes()
-	requestPayload, err := proto.Marshal(&commonv1.KeyExchangeRequest{ClientPublicKey: clientPublicKey})
-	if err != nil {
-		t.Fatalf("marshal key exchange request: %v", err)
-	}
-	request, err := proto.Marshal(&commonv1.Envelope{
-		MsgId:   uint32(commonv1.MsgId_C2S_KEY_EXCHANGE_REQUEST),
-		Payload: requestPayload,
-	})
-	if err != nil {
-		t.Fatalf("marshal handshake Envelope: %v", err)
-	}
+	request := marshalHandshakeRequest(t, clientPublicKey)
 	if err := connection.WriteMessage(websocket.BinaryMessage, request); err != nil {
 		t.Fatalf("WriteMessage(handshake) error = %v", err)
 	}
@@ -1607,18 +1591,11 @@ func authenticateTestClient(t *testing.T, connection *websocket.Conn) [clientMAC
 	if err != nil {
 		t.Fatalf("ReadMessage(handshake response) error = %v", err)
 	}
-	var response commonv1.Envelope
-	if err := proto.Unmarshal(responseBytes, &response); err != nil {
-		t.Fatalf("unmarshal handshake response: %v", err)
+	if len(responseBytes) != handshakeFrameSize || responseBytes[0] != handshakeVersion {
+		t.Fatalf("handshake response = %x, want version %d and %d bytes", responseBytes, handshakeVersion, handshakeFrameSize)
 	}
-	if response.GetMsgId() != uint32(commonv1.MsgId_S2C_KEY_EXCHANGE_RESPONSE) || response.GetRequestId() != 0 {
-		t.Fatalf("handshake response = msg_id %d, request_id %d", response.GetMsgId(), response.GetRequestId())
-	}
-	var keyResponse commonv1.KeyExchangeResponse
-	if err := proto.Unmarshal(response.GetPayload(), &keyResponse); err != nil {
-		t.Fatalf("unmarshal key exchange response: %v", err)
-	}
-	serverPublicKey, err := ecdh.X25519().NewPublicKey(keyResponse.GetServerPublicKey())
+	serverPublicKeyBytes := responseBytes[1:]
+	serverPublicKey, err := ecdh.X25519().NewPublicKey(serverPublicKeyBytes)
 	if err != nil {
 		t.Fatalf("NewPublicKey() error = %v", err)
 	}
@@ -1626,7 +1603,7 @@ func authenticateTestClient(t *testing.T, connection *websocket.Conn) [clientMAC
 	if err != nil {
 		t.Fatalf("ECDH() error = %v", err)
 	}
-	macKey, err := deriveClientMACKey(sharedSecret, clientPublicKey, keyResponse.GetServerPublicKey())
+	macKey, err := deriveClientMACKey(sharedSecret, clientPublicKey, serverPublicKeyBytes)
 	if err != nil {
 		t.Fatalf("deriveClientMACKey() error = %v", err)
 	}

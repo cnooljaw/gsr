@@ -4,10 +4,11 @@ import (
 	"crypto/ecdh"
 	"crypto/rand"
 	"errors"
-	"fmt"
+)
 
-	commonv1 "github.com/cnooljaw/gsr/examples/websocket-gate/gen/go/gsr/common/v1"
-	"google.golang.org/protobuf/proto"
+const (
+	handshakeVersion   byte = 1
+	handshakeFrameSize      = 1 + x25519KeySize
 )
 
 var (
@@ -36,21 +37,11 @@ func acceptClientHandshakeWithKeyGenerator(
 	if len(frame) > maxFrameBytes {
 		return nil, nil, errHandshakeFrameTooLarge
 	}
-
-	var envelope commonv1.Envelope
-	if err := proto.Unmarshal(frame, &envelope); err != nil {
-		return nil, nil, errInvalidClientHandshake
-	}
-	if envelope.GetMsgId() != uint32(commonv1.MsgId_C2S_KEY_EXCHANGE_REQUEST) || envelope.GetRequestId() != 0 {
-		return nil, nil, errInvalidClientHandshake
-	}
-
-	var request commonv1.KeyExchangeRequest
-	if err := proto.Unmarshal(envelope.GetPayload(), &request); err != nil || len(request.GetClientPublicKey()) != x25519KeySize {
+	if len(frame) != handshakeFrameSize || frame[0] != handshakeVersion {
 		return nil, nil, errInvalidClientHandshake
 	}
 	curve := ecdh.X25519()
-	clientPublicKey, err := curve.NewPublicKey(request.GetClientPublicKey())
+	clientPublicKey, err := curve.NewPublicKey(frame[1:])
 	if err != nil {
 		return nil, nil, errInvalidClientHandshake
 	}
@@ -63,22 +54,13 @@ func acceptClientHandshakeWithKeyGenerator(
 		return nil, nil, errInvalidClientHandshake
 	}
 	serverPublicKey := serverPrivateKey.PublicKey().Bytes()
-	macKey, err := deriveClientMACKey(sharedSecret, request.GetClientPublicKey(), serverPublicKey)
+	macKey, err := deriveClientMACKey(sharedSecret, frame[1:], serverPublicKey)
 	if err != nil {
 		return nil, nil, errInvalidClientHandshake
 	}
-
-	responsePayload, err := proto.Marshal(&commonv1.KeyExchangeResponse{ServerPublicKey: serverPublicKey})
-	if err != nil {
-		return nil, nil, fmt.Errorf("prodgate: marshal key exchange response: %w", err)
-	}
-	response, err := proto.Marshal(&commonv1.Envelope{
-		MsgId:   uint32(commonv1.MsgId_S2C_KEY_EXCHANGE_RESPONSE),
-		Payload: responsePayload,
-	})
-	if err != nil {
-		return nil, nil, fmt.Errorf("prodgate: marshal handshake Envelope: %w", err)
-	}
+	response := make([]byte, handshakeFrameSize)
+	response[0] = handshakeVersion
+	copy(response[1:], serverPublicKey)
 	if len(response) > maxFrameBytes {
 		return nil, nil, errHandshakeFrameTooLarge
 	}
