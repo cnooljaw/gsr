@@ -28,6 +28,14 @@ npm run test:crypto
 
 K8s 默认部署可以让 Pod 监听 `0.0.0.0:8080`，Gate 不配置 `TLSConfig`；Ingress 持有 TLS Secret，并把 `/ws` 以 HTTP/1.1 WebSocket Upgrade 转发到 Service。Ingress 到 Pod 的网络应属于可信集群边界；如果该链路不可信，需要另外配置 mTLS，不能把应用层 MAC 当作 TLS 身份认证。
 
+生产 Gate 的短时混合连接压力样本默认不运行，避免影响普通测试；需要显式开启并可按秒调整时长：
+
+```bash
+GSR_GATE_STRESS=1 GSR_GATE_STRESS_SECONDS=10 go test ./prodgate -run '^TestProdGateMixedConnectionStress$' -v
+```
+
+测试会输出发送量、Agent 处理量、Mailbox 满载和连接拒绝计数，用于建立机器相关基线，不直接代表最终容量上限。
+
 终端一启动 GSR 服务端：
 
 ```bash

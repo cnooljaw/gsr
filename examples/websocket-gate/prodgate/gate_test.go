@@ -14,6 +14,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"os"
+	"strconv"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -681,6 +683,117 @@ func TestProdGateHandlesConcurrentConnections(t *testing.T) {
 	if got := gate.Metrics().RejectedConnections; got != 0 {
 		t.Fatalf("RejectedConnections = %d, want 0", got)
 	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+}
+
+// TestProdGateMixedConnectionStress 在显式压力开关下验证多连接持续发送期间 Gate 能维持有限队列、串行 Agent 和可观测拒绝计数。
+func TestProdGateMixedConnectionStress(t *testing.T) {
+	if os.Getenv("GSR_GATE_STRESS") != "1" {
+		t.Skip("显式设置 GSR_GATE_STRESS=1 运行生产 Gate 压力验收")
+	}
+	stressDuration := 10 * time.Second
+	if value := os.Getenv("GSR_GATE_STRESS_SECONDS"); value != "" {
+		seconds, err := strconv.Atoi(value)
+		if err != nil || seconds <= 0 {
+			t.Fatalf("GSR_GATE_STRESS_SECONDS = %q, want positive integer", value)
+		}
+		stressDuration = time.Duration(seconds) * time.Second
+	}
+
+	const (
+		connectionCount = 16
+		sendInterval    = 10 * time.Millisecond
+	)
+	agents := make(chan *loadTestAgent, connectionCount)
+	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
+		MailboxCapacity: 256,
+		ShutdownTimeout: 3 * time.Second,
+	}, connectionCount, time.Second, 1<<20, 256<<10, func(ClientSession) runtime.Service {
+		agent := &loadTestAgent{disconnected: make(chan struct{})}
+		agents <- agent
+		return agent
+	})
+
+	clients := make([]*websocket.Conn, 0, connectionCount)
+	keys := make([][clientMACKeySize]byte, 0, connectionCount)
+	testAgents := make([]*loadTestAgent, 0, connectionCount)
+	for index := 0; index < connectionCount; index++ {
+		connection, macKey := dialAuthenticatedTestClient(t, gate, clientTLS)
+		clients = append(clients, connection)
+		keys = append(keys, macKey)
+		testAgents = append(testAgents, receiveLoadTestAgent(t, agents))
+	}
+	defer func() {
+		for _, connection := range clients {
+			_ = connection.Close()
+		}
+	}()
+
+	requestBytes, err := proto.Marshal(&commonv1.Envelope{MsgId: 1001})
+	if err != nil {
+		t.Fatalf("marshal stress Envelope: %v", err)
+	}
+	deadline := time.Now().Add(stressDuration)
+	var sent atomic.Uint64
+	var writers sync.WaitGroup
+	writers.Add(connectionCount)
+	for index, connection := range clients {
+		go func(connection *websocket.Conn, macKey [clientMACKeySize]byte) {
+			defer writers.Done()
+			ticker := time.NewTicker(sendInterval)
+			defer ticker.Stop()
+			var sequence uint64 = 1
+			for {
+				select {
+				case <-ticker.C:
+					if time.Now().After(deadline) {
+						return
+					}
+					frame := makeAuthenticatedTestFrame(t, macKey[:], sequence, requestBytes)
+					if err := connection.WriteMessage(websocket.BinaryMessage, frame); err != nil {
+						return
+					}
+					sent.Add(1)
+					sequence++
+				}
+			}
+		}(connection, keys[index])
+	}
+	writers.Wait()
+
+	accepted := sent.Load()
+	for _, connection := range clients {
+		_ = connection.Close()
+	}
+	processingDeadline := time.Now().Add(2 * time.Second)
+	for time.Now().Before(processingDeadline) {
+		var processed uint64
+		for _, agent := range testAgents {
+			processed += agent.processed.Load()
+		}
+		if processed >= accepted {
+			break
+		}
+		time.Sleep(time.Millisecond)
+	}
+	var processed uint64
+	for _, agent := range testAgents {
+		processed += agent.processed.Load()
+	}
+	if accepted == 0 || processed == 0 {
+		t.Fatalf("stress sent=%d processed=%d, want positive traffic", accepted, processed)
+	}
+	for _, agent := range testAgents {
+		select {
+		case <-agent.disconnected:
+		case <-time.After(time.Second):
+			t.Fatal("压力连接关闭后 Agent 未全部收到断开通知")
+		}
+	}
+	metrics := gate.Metrics()
+	t.Logf("stress_duration=%s connections=%d sent=%d processed=%d inbound_mailbox_full=%d rejected=%d", stressDuration, connectionCount, accepted, processed, metrics.InboundMailboxFull, metrics.RejectedConnections)
 	if err := local.Stop(context.Background()); err != nil {
 		t.Fatalf("Runtime.Stop() error = %v", err)
 	}
