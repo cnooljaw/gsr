@@ -99,7 +99,7 @@ GSR_CALL_STABILITY=1 go test ./cluster -run '^TestTCPCallServicePanicAndReplacem
 
 2026-09-23 Agent 启动失败恢复：Agent `OnStart` 返回错误时 Runtime 执行该实例的 `OnStop` 清理，Gate 拒绝当前连接后仍能接受后续连接并完成请求/响应。定向测试、对应 `-race` 测试和 prodgate 包全测均通过。
 
-2026-09-23 Gate 关闭释放监听端口：`Runtime.Close()` 关闭活动客户端并等待 Gate I/O goroutine 退出后，测试立即成功重绑原监听地址。相关关闭与 Agent 启动失败用例 race 检查、`prodgate` 包全测通过；两类服务端主动关闭连接的 TLS 清理用例重复运行 10 次通过。
+2026-09-23 Gate 关闭资源回收：`Runtime.Close()` 关闭活动客户端并等待 Gate I/O goroutine 退出，之后 Agent 的 `ClientSession.Send` 返回 `ErrClientSessionClosed`，且测试立即成功重绑原监听地址。相关关闭与 Agent 启动失败用例 race 检查、`prodgate` 包全测通过；两类服务端主动关闭连接的 TLS 清理用例重复运行 10 次通过。
 
 2026-09-23 上行序号耗尽边界：Go 服务端接纳一次 `uint64` 最大值序号后拒绝回绕到 1；TypeScript 客户端能生成最大序号帧，之后保持序号不变并返回耗尽错误。Go 专项测试与 `npm run test:crypto`（含 TypeScript 编译）通过。协议规定上限后结束当前连接并重新握手；本切片只补测试和说明，不改生产算法。
 

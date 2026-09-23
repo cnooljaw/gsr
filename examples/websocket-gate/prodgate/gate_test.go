@@ -1834,7 +1834,7 @@ func TestProdGateRuntimeCloseReleasesActiveClient(t *testing.T) {
 	listenerAddress := gate.Addr().String()
 	connection, _ := dialAuthenticatedTestClient(t, gate, clientTLS)
 	defer connection.Close()
-	_ = receiveProductionAgent(t, agents)
+	agent := receiveProductionAgent(t, agents)
 
 	closeResult := make(chan error, 1)
 	go func() {
@@ -1851,6 +1851,9 @@ func TestProdGateRuntimeCloseReleasesActiveClient(t *testing.T) {
 		}
 	case <-time.After(2 * time.Second):
 		t.Fatal("Runtime.Close() 未等待 Gate I/O goroutine 退出")
+	}
+	if err := agent.client.Send(&commonv1.Envelope{MsgId: 1002, RequestId: 92}); !errors.Is(err, ErrClientSessionClosed) {
+		t.Fatalf("ClientSession.Send() after Runtime.Close() error = %v, want %v", err, ErrClientSessionClosed)
 	}
 	listener, err := net.Listen("tcp", listenerAddress)
 	if err != nil {

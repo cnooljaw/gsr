@@ -381,7 +381,7 @@ Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/
 
 `TestProdGateRecoversFromAgentStartFailure` 覆盖 Agent 的 `OnStart` 返回错误：Runtime 调用该实例的 `OnStop` 清理，Gate 拒绝当前连接后仍可接受新连接。
 
-`TestProdGateRuntimeCloseReleasesActiveClient` 除验证关闭活动连接并等待 I/O goroutine 外，还在 `Runtime.Close()` 后立即重绑同一监听地址，确认 Gate 释放了监听端口。
+`TestProdGateRuntimeCloseReleasesActiveClient` 验证关闭活动连接、等待 I/O goroutine、使 `ClientSession` 后续写回返回 `ErrClientSessionClosed`，并在 `Runtime.Close()` 后立即重绑同一监听地址确认端口释放。
 
 `TestProdGateReturnsErrorAfterAgentCallTimeout` 覆盖 Agent 内部 Core Call 超时：客户端收到原 `request_id` 的 `INTERNAL`，目标 Service 之后完成的迟到内部回复不会再生成第二条客户端响应，超时归 Agent/Runtime 而不是 Gate。该测试锁定内部调用的错误归属，不定义客户端业务请求的超时数值或重试策略。
 
