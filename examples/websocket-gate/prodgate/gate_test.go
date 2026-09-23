@@ -347,9 +347,8 @@ func TestProdGateRecoversFromAgentConstructorPanic(t *testing.T) {
 	if !websocket.IsCloseError(err, websocket.CloseInternalServerErr) {
 		t.Fatalf("Agent constructor panic close error = %v, want close %d", err, websocket.CloseInternalServerErr)
 	}
-	if err := failedConnection.Close(); err != nil {
-		t.Fatalf("Close(failed client) error = %v", err)
-	}
+	// 服务端已发关闭帧，TLS close_notify 可能因连接关闭返回 broken pipe，不影响本用例断言。
+	_ = failedConnection.Close()
 
 	connection, macKey := dialAuthenticatedTestClient(t, gate, clientTLS)
 	defer connection.Close()
@@ -428,9 +427,8 @@ func TestProdGateRecoversFromAgentStartFailure(t *testing.T) {
 	case <-time.After(time.Second):
 		t.Fatal("OnStart 失败的 Agent 未执行 OnStop 清理")
 	}
-	if err := failedConnection.Close(); err != nil {
-		t.Fatalf("Close(failed client) error = %v", err)
-	}
+	// 服务端已发关闭帧，TLS close_notify 可能因连接关闭返回 broken pipe，不影响本用例断言。
+	_ = failedConnection.Close()
 
 	connection, macKey := dialAuthenticatedTestClient(t, gate, clientTLS)
 	defer connection.Close()
@@ -1830,9 +1828,10 @@ func TestProdGateRejectsClientMessageForAgentWithoutHandler(t *testing.T) {
 	}
 }
 
-// TestProdGateRuntimeCloseReleasesActiveClient 验证 Runtime 关闭时生产 Gate 会关闭已认证连接并等待自己的 I/O goroutine。
+// TestProdGateRuntimeCloseReleasesActiveClient 验证 Runtime 关闭时生产 Gate 会收尾客户端与 I/O goroutine，并释放监听地址。
 func TestProdGateRuntimeCloseReleasesActiveClient(t *testing.T) {
 	local, gate, agents, clientTLS := startTestProductionGate(t, 2, time.Second)
+	listenerAddress := gate.Addr().String()
 	connection, _ := dialAuthenticatedTestClient(t, gate, clientTLS)
 	defer connection.Close()
 	_ = receiveProductionAgent(t, agents)
@@ -1852,6 +1851,13 @@ func TestProdGateRuntimeCloseReleasesActiveClient(t *testing.T) {
 		}
 	case <-time.After(2 * time.Second):
 		t.Fatal("Runtime.Close() 未等待 Gate I/O goroutine 退出")
+	}
+	listener, err := net.Listen("tcp", listenerAddress)
+	if err != nil {
+		t.Fatalf("Gate listener address %q 在 Runtime.Close() 后仍不可用: %v", listenerAddress, err)
+	}
+	if err := listener.Close(); err != nil {
+		t.Fatalf("Close(rebound listener) error = %v", err)
 	}
 }
 
