@@ -83,6 +83,8 @@ GSR_CALL_STABILITY=1 go test ./cluster -run '^TestTCPCallServicePanicAndReplacem
 
 同日认证后短帧切片：`TestProdGateRejectsMalformedAuthenticatedFrame` 在完成握手后发送短于序号与 MAC 最小长度的二进制帧，确认 Gate 返回 `1002 protocol_error`、不投递 Agent 并通知连接断开。定向测试 `go test ./examples/websocket-gate/prodgate -run '^TestProdGateRejectsMalformedAuthenticatedFrame$'` 通过；本轮只新增独立集成测试，未重复运行全包或全仓验证。
 
+同日慢客户端回压长窗口试验：设置 `GSR_GATE_SLOW_CLIENT_SECONDS=120` 后，慢客户端成功写入 12 条，队列累计拒绝 9,994 次；Gate 在约 15 秒时因写超时关闭连接，Agent 收到稳定关闭结果。定向压力测试 `GSR_GATE_STRESS=1 GSR_GATE_SLOW_CLIENT_SECONDS=120 go test ./examples/websocket-gate/prodgate -run '^TestProdGateLongSlowClientBackpressure$' -timeout=130s -v` 通过。这里的 120 秒是 Agent 压力循环的最长窗口，并非实际 soak 时长；本次验证写超时与有界回压，不代表两分钟慢客户端稳定性验收。
+
 2026-09-23 上行序号耗尽边界：Go 服务端接纳一次 `uint64` 最大值序号后拒绝回绕到 1；TypeScript 客户端能生成最大序号帧，之后保持序号不变并返回耗尽错误。Go 专项测试与 `npm run test:crypto`（含 TypeScript 编译）通过。协议规定上限后结束当前连接并重新握手；本切片只补测试和说明，不改生产算法。
 
 2026-09-23 C/S 请求编号上限：协议分发测试将最大 `uint32 request_id` 编码进 Envelope，确认 Handler 收到原值且 Response 原样回传。该测试、protocol 全包测试和 vet 通过；客户端 request_id 分配器仍由业务客户端实现，示例 CLI 固定使用 1。

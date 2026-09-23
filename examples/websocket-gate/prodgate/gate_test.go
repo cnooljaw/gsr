@@ -1129,6 +1129,7 @@ func TestProdGateLongSlowClientBackpressure(t *testing.T) {
 	if err := connection.WriteMessage(websocket.BinaryMessage, makeAuthenticatedTestFrame(t, macKey[:], 1, requestBytes)); err != nil {
 		t.Fatalf("WriteMessage(request frame) error = %v", err)
 	}
+	stressStartedAt := time.Now()
 	select {
 	case result := <-agent.result:
 		if result.err != nil {
@@ -1137,7 +1138,7 @@ func TestProdGateLongSlowClientBackpressure(t *testing.T) {
 		if result.sent == 0 || result.queueFull == 0 {
 			t.Fatalf("slow client result = %+v, want sent and queueFull both positive", result)
 		}
-		t.Logf("slow_client_duration=%s sent=%d queue_full=%d closed=%t", stressDuration, result.sent, result.queueFull, result.closed)
+		t.Logf("slow_client_max_duration=%s elapsed=%s sent=%d queue_full=%d closed=%t", stressDuration, time.Since(stressStartedAt), result.sent, result.queueFull, result.closed)
 	case <-time.After(stressDuration + time.Second):
 		t.Fatal("慢客户端压力 Agent 未在预期时间结束")
 	}
