@@ -785,7 +785,7 @@ func TestProdGateHandlesConcurrentConnections(t *testing.T) {
 	}
 }
 
-// TestProdGateMixedConnectionStress 在显式压力开关下验证多连接持续发送期间 Gate 能维持有限队列、串行 Agent 和可观测拒绝计数。
+// TestProdGateMixedConnectionStress 验证多连接持续发送期间所有成功写入的请求均由 Agent 处理，且没有 Mailbox 满载或连接拒绝。
 func TestProdGateMixedConnectionStress(t *testing.T) {
 	if os.Getenv("GSR_GATE_STRESS") != "1" {
 		t.Skip("显式设置 GSR_GATE_STRESS=1 运行生产 Gate 压力验收")
@@ -864,9 +864,10 @@ func TestProdGateMixedConnectionStress(t *testing.T) {
 	for _, connection := range clients {
 		_ = connection.Close()
 	}
-	processingDeadline := time.Now().Add(2 * time.Second)
+	processingDeadline := time.Now().Add(5 * time.Second)
+	var processed uint64
 	for time.Now().Before(processingDeadline) {
-		var processed uint64
+		processed = 0
 		for _, agent := range testAgents {
 			processed += agent.processed.Load()
 		}
@@ -875,12 +876,20 @@ func TestProdGateMixedConnectionStress(t *testing.T) {
 		}
 		time.Sleep(time.Millisecond)
 	}
-	var processed uint64
+	processed = 0
 	for _, agent := range testAgents {
 		processed += agent.processed.Load()
 	}
-	if accepted == 0 || processed == 0 {
-		t.Fatalf("stress sent=%d processed=%d, want positive traffic", accepted, processed)
+	metrics := gate.Metrics()
+	t.Logf("stress_duration=%s connections=%d sent=%d processed=%d inbound_mailbox_full=%d rejected=%d", stressDuration, connectionCount, accepted, processed, metrics.InboundMailboxFull, metrics.RejectedConnections)
+	if accepted == 0 {
+		t.Fatal("stress test sent no client messages")
+	}
+	if processed != accepted {
+		t.Fatalf("processed messages = %d, successful client writes = %d", processed, accepted)
+	}
+	if metrics.InboundMailboxFull != 0 || metrics.RejectedConnections != 0 {
+		t.Fatalf("Gate rejected traffic: inbound_mailbox_full=%d rejected=%d", metrics.InboundMailboxFull, metrics.RejectedConnections)
 	}
 	for _, agent := range testAgents {
 		select {
@@ -889,14 +898,12 @@ func TestProdGateMixedConnectionStress(t *testing.T) {
 			t.Fatal("压力连接关闭后 Agent 未全部收到断开通知")
 		}
 	}
-	metrics := gate.Metrics()
-	t.Logf("stress_duration=%s connections=%d sent=%d processed=%d inbound_mailbox_full=%d rejected=%d", stressDuration, connectionCount, accepted, processed, metrics.InboundMailboxFull, metrics.RejectedConnections)
 	if err := local.Stop(context.Background()); err != nil {
 		t.Fatalf("Runtime.Stop() error = %v", err)
 	}
 }
 
-// TestProdGateFailurePhaseStress 在显式压力开关下重复坏握手和坏 MAC，验证失败连接不会进入业务处理且失败计数保持可观测。
+// TestProdGateFailurePhaseStress 验证重复坏握手和坏 MAC 不进入业务处理，且故障连接关闭后新连接仍能正常往返。
 func TestProdGateFailurePhaseStress(t *testing.T) {
 	if os.Getenv("GSR_GATE_STRESS") != "1" {
 		t.Skip("显式设置 GSR_GATE_STRESS=1 运行失败阶段压力验收")
@@ -910,7 +917,7 @@ func TestProdGateFailurePhaseStress(t *testing.T) {
 		attempts = parsed
 	}
 
-	agents := make(chan *productionTestAgent, attempts)
+	agents := make(chan *productionTestAgent, attempts+1)
 	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
 		MailboxCapacity: 16,
 		ShutdownTimeout: 3 * time.Second,
@@ -967,10 +974,45 @@ func TestProdGateFailurePhaseStress(t *testing.T) {
 		}
 		_ = connection.Close()
 	}
+
+	connection, macKey := dialAuthenticatedTestClient(t, gate, clientTLS)
+	defer connection.Close()
+	agent := receiveProductionAgent(t, agents)
+	if err := connection.WriteMessage(websocket.BinaryMessage, makeAuthenticatedTestFrame(t, macKey[:], 1, requestBytes)); err != nil {
+		t.Fatalf("WriteMessage(healthy recovery request) error = %v", err)
+	}
+	select {
+	case received := <-agent.received:
+		if !bytes.Equal(received, requestBytes) {
+			t.Fatalf("recovery Agent received %x, want %x", received, requestBytes)
+		}
+	case <-time.After(time.Second):
+		t.Fatal("healthy connection after failure stress did not reach Agent")
+	}
+	_, responseBytes, err := readTestBinaryMessage(t, connection)
+	if err != nil {
+		t.Fatalf("ReadMessage(healthy recovery response) error = %v", err)
+	}
+	var response commonv1.Envelope
+	if err := proto.Unmarshal(responseBytes, &response); err != nil {
+		t.Fatalf("unmarshal healthy recovery response: %v", err)
+	}
+	if response.GetMsgId() != 1002 || response.GetRequestId() != 91 {
+		t.Fatalf("healthy recovery response = msg_id %d, request_id %d; want 1002, 91", response.GetMsgId(), response.GetRequestId())
+	}
+	if err := connection.Close(); err != nil {
+		t.Fatalf("Close(healthy recovery connection) error = %v", err)
+	}
+	select {
+	case <-agent.disconnected:
+	case <-time.After(time.Second):
+		t.Fatal("healthy recovery connection close did not notify Agent")
+	}
+
 	metrics := gate.Metrics()
 	t.Logf("failure_attempts=%d rejected=%d accepted=%d inbound_mailbox_full=%d", attempts, metrics.RejectedConnections, metrics.AcceptedConnections, metrics.InboundMailboxFull)
-	if metrics.AcceptedConnections < uint64(attempts) {
-		t.Fatalf("AcceptedConnections after bad MAC = %d, want at least %d", metrics.AcceptedConnections, attempts)
+	if metrics.AcceptedConnections < uint64(attempts+1) {
+		t.Fatalf("AcceptedConnections after recovery request = %d, want at least %d", metrics.AcceptedConnections, attempts+1)
 	}
 	if err := local.Stop(context.Background()); err != nil {
 		t.Fatalf("Runtime.Stop() error = %v", err)
