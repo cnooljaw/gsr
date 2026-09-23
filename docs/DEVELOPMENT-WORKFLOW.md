@@ -24,14 +24,27 @@ cd /Users/lijiawang/Documents/cocos/laya/gsr
 git status --short
 ~~~
 
-然后只修改当前任务范围内的文件，并按 AGENTS.md 的验证规则运行最小相关检查。例如 Go 代码切片通常按以下顺序推进：
+然后只修改当前任务范围内的文件，并按变更范围选择验证。小改动不默认升级成全包或全仓检查：
 
 ~~~bash
 gofmt -w path/to/changed.go
-go test ./path/to/affected/package
+go test ./path/to/affected/package -run '^TestSpecificBehavior$'
 git diff --check
 git diff --stat
 ~~~
+
+`-run` 用于先验证本轮直接涉及的行为；测试名替换为实际测试名。形成一个连贯代码切片后，再运行受影响 package 的完整测试。一个独立测试或小改动不要求自动追加全包、全仓、race 和 `vet` 验证。
+
+### 按变更范围选择验证
+
+| 变更范围 | 每轮验证 | 升级条件 |
+| --- | --- | --- |
+| 仅文档 | `git diff --check` | 不运行 Go 测试 |
+| 单个测试或局部行为 | 运行对应测试一次 | 修改共享测试辅助代码、同包多个行为或形成完整切片时，运行受影响 package 全测 |
+| 局部生产代码 | 运行对应测试；切片收尾运行受影响 package 全测 | 影响多个 package 的集成行为时，运行相关集成测试；跨 package 切片完成后再考虑全仓测试和 `vet` |
+| 并发、生命周期或共享状态 | 切片收尾运行受影响 package 的 race 测试 | 改到 Runtime、Scheduler、Mailbox、Cluster 等跨 package 共享并发边界，或重要集成/发布验收时，运行全仓 race |
+
+`go test ./...` 与 `go vet ./...` 是阶段验收工具，不是每轮修改门禁。除非代码发生变化、前次验证未覆盖本次行为，或正在排查 flaky/随机性/并发时序问题，不重复同一验证。默认保留 Go 测试缓存，不习惯性加 `-count=1`。
 
 每个 `Test...` 测试函数前写一句注释，说明它保护的可观察行为，方便审查者从测试入口快速理解契约；不要只重复函数名。
 
