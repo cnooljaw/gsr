@@ -355,6 +355,8 @@ Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/
 
 `TestProdGateDeliversNotificationPush` 覆盖已注册通知的生产链路：客户端发送零 `request_id` 的 `EchoNotify`，Agent 通过协议上下文发出零 `request_id` 的 `EchoPush`，Gate 原样写回客户端。
 
+`TestProdGateRejectsNotificationWithRequestID` 覆盖已注册 Notify 携带非零 `request_id` 的生产链路：协议层返回 `INVALID_REQUEST`，并在通用错误响应中保留原编号。
+
 `TestProdGateReturnsErrorForInvalidPayload` 覆盖已知 `msg_id` 携带非法 Protobuf payload 的链路：Agent 返回 `INVALID_REQUEST` 的通用错误，连接保持可用并能继续处理合法请求。
 
 `TestProdGateReturnsErrorForWrongDirection` 覆盖客户端反向发送服务端 Push 编号的链路：Agent 返回 `INVALID_REQUEST`，不把方向错误当作 WebSocket 坏帧，连接仍可继续处理合法请求。

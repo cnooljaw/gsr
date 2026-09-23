@@ -499,6 +499,69 @@ func TestProdGateDeliversNotificationPush(t *testing.T) {
 	}
 }
 
+// TestProdGateRejectsNotificationWithRequestID 验证 Notify 带非零 request_id 时回传关联的 INVALID_REQUEST。
+func TestProdGateRejectsNotificationWithRequestID(t *testing.T) {
+	agents := make(chan *protocolGateAgent, 1)
+	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
+		MailboxCapacity: 8,
+		ShutdownTimeout: 2 * time.Second,
+	}, 1, time.Second, 1<<20, 64<<10, func(client ClientSession) runtime.Service {
+		agent := &protocolGateAgent{client: client, disconnected: make(chan struct{})}
+		agents <- agent
+		return agent
+	})
+	connection, macKey := dialAuthenticatedTestClient(t, gate, clientTLS)
+	defer connection.Close()
+	agent := <-agents
+
+	payload, err := proto.Marshal(&echopb.EchoNotify{Text: "invalid request id"})
+	if err != nil {
+		t.Fatalf("marshal EchoNotify: %v", err)
+	}
+	requestBytes, err := proto.Marshal(&commonv1.Envelope{
+		MsgId:     uint32(echopb.MsgId_C2S_ECHO_NOTIFY),
+		RequestId: 98,
+		Payload:   payload,
+	})
+	if err != nil {
+		t.Fatalf("marshal invalid notification Envelope: %v", err)
+	}
+	if err := connection.WriteMessage(websocket.BinaryMessage, makeAuthenticatedTestFrame(t, macKey[:], 1, requestBytes)); err != nil {
+		t.Fatalf("WriteMessage(invalid notification frame) error = %v", err)
+	}
+	_, responseBytes, err := readTestBinaryMessage(t, connection)
+	if err != nil {
+		t.Fatalf("ReadMessage(invalid notification response) error = %v", err)
+	}
+	var errorEnvelope commonv1.Envelope
+	if err := proto.Unmarshal(responseBytes, &errorEnvelope); err != nil {
+		t.Fatalf("unmarshal ErrorResponse Envelope: %v", err)
+	}
+	if errorEnvelope.GetMsgId() != uint32(commonv1.MsgId_S2C_ERROR_RESPONSE) || errorEnvelope.GetRequestId() != 98 {
+		t.Fatalf("ErrorResponse Envelope = msg_id %d, request_id %d; want %d, 98",
+			errorEnvelope.GetMsgId(), errorEnvelope.GetRequestId(), commonv1.MsgId_S2C_ERROR_RESPONSE)
+	}
+	var errorResponse commonv1.ErrorResponse
+	if err := proto.Unmarshal(errorEnvelope.GetPayload(), &errorResponse); err != nil {
+		t.Fatalf("unmarshal ErrorResponse: %v", err)
+	}
+	if errorResponse.GetCode() != commonv1.ErrorCode_ERROR_CODE_INVALID_REQUEST {
+		t.Fatalf("ErrorResponse code = %v, want invalid request", errorResponse.GetCode())
+	}
+
+	if err := connection.Close(); err != nil {
+		t.Fatalf("Close(client) error = %v", err)
+	}
+	select {
+	case <-agent.disconnected:
+	case <-time.After(time.Second):
+		t.Fatal("客户端断开后 Agent 未收到通知")
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+}
+
 // TestProdGateReturnsErrorForInvalidPayload 验证已知消息编号的坏 payload 由协议层返回通用错误，且不会关闭连接。
 func TestProdGateReturnsErrorForInvalidPayload(t *testing.T) {
 	agents := make(chan *protocolGateAgent, 1)
