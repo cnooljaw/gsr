@@ -347,9 +347,9 @@ Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/
 
 联调示例位于 `examples/websocket-gate/`：Go DebugGate/ProdGate、连接 Echo Agent、TypeScript 命令行客户端和 request/response 往返已经落地；生成协议目录、逐步注册强类型 Handler、通用协议错误回复、业务拒绝 Response 以及 Notify→Push 往返也已接入。Echo `.proto` 只属于示例业务协议，不扩展 GSR Core。固定向量已作为独立跨语言测试夹具落地，不由示例运行路径加载或掩盖后续生产 Gate 的安全审查。
 
-已增加显式开关的 `GSR_GATE_STRESS=1` 混合连接压力验收，可通过 `GSR_GATE_STRESS_SECONDS` 调整时长，记录持续发送、Agent 处理、Mailbox 满载和连接拒绝计数；同一开关下的 `TestProdGateLongSlowClientBackpressure` 可用 `GSR_GATE_SLOW_CLIENT_SECONDS` 验证慢客户端持续不读时的有界出站队列和快速拒绝；`TestProdGateFailurePhaseStress` 可用 `GSR_GATE_FAILURE_ATTEMPTS` 重复坏握手和坏 MAC，核对失败阶段不进入业务处理且连接回收。它们只提供可重复样本，不把单次机器结果当作容量结论。下一步仍需按失败矩阵补充多连接长时背压以及未知消息、请求超时和迟到回复的压力运行。既有认证测试覆盖跨连接旧包、同连接重复序号、MAC 篡改和认证失败不推进序号；未知 `msg_id`、客户端 request_id 超时与迟到、编号耗尽继续由协议/Agent 层测试。测试不替代密码协议审查。
+已增加显式开关的 `GSR_GATE_STRESS=1` 混合连接压力验收，可通过 `GSR_GATE_STRESS_SECONDS` 调整时长，记录持续发送、Agent 处理、Mailbox 满载和连接拒绝计数；同一开关下的 `TestProdGateLongSlowClientBackpressure` 可用 `GSR_GATE_SLOW_CLIENT_SECONDS` 验证慢客户端持续不读时的有界出站队列和快速拒绝；`TestProdGateFailurePhaseStress` 可用 `GSR_GATE_FAILURE_ATTEMPTS` 重复坏握手和坏 MAC，核对失败阶段不进入业务处理且连接回收。它们只提供可重复样本，不把单次机器结果当作容量结论。下一步仍需按失败矩阵补充多连接长时背压和超时场景的压力运行。既有认证测试覆盖跨连接旧包、同连接重复序号、MAC 篡改和认证失败不推进序号；未知 `msg_id`、编号耗尽继续由协议/Agent 层测试。测试不替代密码协议审查。
 
-`TestProdGateKeepsConnectionAfterUnknownMessage` 已补充合法认证帧携带未知 `msg_id` 的真实 Gate 验收：Agent 回传原 `request_id` 的通用 `ErrorResponse`，连接不关闭，后续有效请求仍可完成。请求超时、迟到响应和多连接长时背压仍按后续压力计划推进。
+`TestProdGateKeepsConnectionAfterUnknownMessage` 已补充合法认证帧携带未知 `msg_id` 的真实 Gate 验收：Agent 回传原 `request_id` 的通用 `ErrorResponse`，连接不关闭，后续有效请求仍可完成。Agent 内部 Core Call 的超时与迟到回复已有独立验收；客户端业务超时策略和多连接长时背压仍按后续压力计划推进。
 
 `TestProdGateKeepsConnectionAfterUnknownNotification` 进一步覆盖 `request_id == 0` 的未知通知：Agent 不生成 `ErrorResponse`，连接继续保留并可处理后续请求。
 
@@ -359,6 +359,6 @@ Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/
 
 `TestProdGateReturnsErrorForWrongDirection` 覆盖客户端反向发送服务端 Push 编号的链路：Agent 返回 `INVALID_REQUEST`，不把方向错误当作 WebSocket 坏帧，连接仍可继续处理合法请求。
 
-`TestProdGateReturnsErrorAfterAgentCallTimeout` 覆盖 Agent 内部 Core Call 超时：客户端收到原 `request_id` 的 `INTERNAL`，目标 Service 之后完成的迟到内部回复不会再生成第二条客户端响应，超时归 Agent/Runtime 而不是 Gate。
+`TestProdGateReturnsErrorAfterAgentCallTimeout` 覆盖 Agent 内部 Core Call 超时：客户端收到原 `request_id` 的 `INTERNAL`，目标 Service 之后完成的迟到内部回复不会再生成第二条客户端响应，超时归 Agent/Runtime 而不是 Gate。该测试锁定内部调用的错误归属，不定义客户端业务请求的超时数值或重试策略。
 
 `TestProdGateRejectsLateAgentResponseAfterDisconnect` 已锁定断开后的迟到写回：Gate 先使 `ClientSession` 失效，再通知 Agent；Agent 后续写回得到 `ErrClientSessionClosed`，不会重新进入出站队列。

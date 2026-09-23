@@ -67,6 +67,8 @@ GSR_CALL_STABILITY=1 go test ./cluster -run '^TestTCPCallServicePanicAndReplacem
 
 同日 30 秒长样本：16 条连接发送与 Agent 处理均为 47,586 条，`InboundMailboxFull=0`、连接拒绝为 0；慢客户端样本先观察到队列满载，随后因写超时关闭连接，`ClientSession.Send` 返回 `ErrClientSessionClosed`，按连接隔离契约计为正常终止，不计为业务错误。
 
+同日 Agent 内部超时切片：`TestProdGateReturnsErrorAfterAgentCallTimeout` 通过真实生产 Gate 验证 Agent 调用本地目标 Service 超时后，客户端收到原 `request_id` 的 `INTERNAL`；目标 Service 释放后产生的迟到 Core 回复不会再次写回客户端。重复运行 5 次、prodgate 全包、vet 和 race 均通过。该切片只确认 Agent/Runtime 的内部 Call 超时归属，不把它扩展为客户端业务请求的统一超时或重试策略。
+
 后续热点切片新增 TestRuntimeHotMailboxLoad（GSR_LOAD_TEST=1 显式启用）：4 个发送者、10 万次固定尝试、容量 64/1024，逐条核对接纳与处理结果并记录到达延迟分位数。它是短突发测试，不替代下文的持续负载验收；未修改生产实现。
 
 Timer 集中到期切片新增 TestRuntimeTimerBurstLoad，沿用 GSR_LOAD_TEST=1：10,000 个 Timer 同轮到期，校验接纳/拒绝计数、消息唯一性和零 Source。实测见规模基线；使用 fake clock，不代表真实时钟精度或定时业务必达保证。
