@@ -12,11 +12,12 @@ import (
 
 type recordedSender struct {
 	envelopes []*commonv1.Envelope
+	sendErr   error
 }
 
 func (sender *recordedSender) Send(envelope *commonv1.Envelope) error {
 	sender.envelopes = append(sender.envelopes, envelope)
-	return nil
+	return sender.sendErr
 }
 
 func testRegistry(t *testing.T) *Registry {
@@ -406,6 +407,44 @@ func TestHandlerErrorDoesNotLeakDetails(t *testing.T) {
 	}
 	if response.GetMessage() != "request could not be processed" {
 		t.Fatalf("ErrorResponse message = %q, want safe generic text", response.GetMessage())
+	}
+}
+
+// TestErrorResponseSendFailurePreservesHandlerError 验证 ErrorResponse 发送失败时原始 Handler 错误仍可供 Runtime 诊断。
+func TestErrorResponseSendFailurePreservesHandlerError(t *testing.T) {
+	handlerErr := errors.New("business dependency unavailable")
+	sendErr := errors.New("client session closed")
+	registry := testRegistry(t)
+	sender := &recordedSender{sendErr: sendErr}
+	dispatcher := testDispatcher(t, registry, sender)
+	if err := Register(dispatcher, func(Context, *echopb.EchoRequest) error {
+		return handlerErr
+	}); err != nil {
+		t.Fatalf("Register() error = %v", err)
+	}
+	frame := marshalEnvelope(t, &commonv1.Envelope{
+		MsgId:     uint32(echopb.MsgId_C2S_ECHO_REQUEST),
+		RequestId: 58,
+	})
+	err := dispatcher.HandleFrame(frame)
+	if !errors.Is(err, handlerErr) || !errors.Is(err, sendErr) {
+		t.Fatalf("HandleFrame() error = %v, want both Handler and response send errors", err)
+	}
+	if len(sender.envelopes) != 1 {
+		t.Fatalf("send attempts = %d, want one generic ErrorResponse", len(sender.envelopes))
+	}
+	errorEnvelope := sender.envelopes[0]
+	if errorEnvelope.GetMsgId() != uint32(commonv1.MsgId_S2C_ERROR_RESPONSE) || errorEnvelope.GetRequestId() != 58 {
+		t.Fatalf("ErrorResponse Envelope = msg_id %d, request_id %d; want %d, 58",
+			errorEnvelope.GetMsgId(), errorEnvelope.GetRequestId(), commonv1.MsgId_S2C_ERROR_RESPONSE)
+	}
+	var errorResponse commonv1.ErrorResponse
+	if err := proto.Unmarshal(errorEnvelope.GetPayload(), &errorResponse); err != nil {
+		t.Fatalf("unmarshal ErrorResponse: %v", err)
+	}
+	if errorResponse.GetCode() != commonv1.ErrorCode_ERROR_CODE_INTERNAL || errorResponse.GetMessage() != "request could not be processed" {
+		t.Fatalf("ErrorResponse = code %v, message %q; want safe generic internal error",
+			errorResponse.GetCode(), errorResponse.GetMessage())
 	}
 }
 
