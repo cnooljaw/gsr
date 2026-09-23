@@ -1864,6 +1864,25 @@ func TestProdGateRuntimeCloseReleasesActiveClient(t *testing.T) {
 	}
 }
 
+// TestProdGateRuntimeStopReleasesListener 验证 Runtime.Stop 会释放 Gate 监听地址，随后 Close 仍可完成最终释放。
+func TestProdGateRuntimeStopReleasesListener(t *testing.T) {
+	local, gate, _, _ := startTestProductionGate(t, 1, time.Second)
+	listenerAddress := gate.Addr().String()
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+	listener, err := net.Listen("tcp", listenerAddress)
+	if err != nil {
+		t.Fatalf("Gate listener address %q 在 Runtime.Stop() 后仍不可用: %v", listenerAddress, err)
+	}
+	if err := listener.Close(); err != nil {
+		t.Fatalf("Close(rebound listener) error = %v", err)
+	}
+	if err := local.Close(); err != nil {
+		t.Fatalf("Runtime.Close() after Stop() error = %v", err)
+	}
+}
+
 // TestProdGateDisconnectsAgentCreatedAfterCallTimeout 验证 Gate Call 超时后迟到创建的 Agent 仍会收到断开事件并退出。
 func TestProdGateDisconnectsAgentCreatedAfterCallTimeout(t *testing.T) {
 	serverTLS, clientTLS := testTLSConfigs(t)
