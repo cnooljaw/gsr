@@ -253,6 +253,30 @@ func TestTypedNotificationCanPush(t *testing.T) {
 	}
 }
 
+// TestNotificationCannotPushResponseMessage 验证 Notify Handler 不能把 Response 编号当作主动 Push 发送。
+func TestNotificationCannotPushResponseMessage(t *testing.T) {
+	registry := testRegistry(t)
+	sender := &recordedSender{}
+	dispatcher := testDispatcher(t, registry, sender)
+	if err := Register(dispatcher, func(context Context, _ *echopb.EchoNotify) error {
+		return context.Push(
+			uint32(echopb.MsgId_S2C_ECHO_RESPONSE),
+			&echopb.EchoResponse{},
+		)
+	}); err != nil {
+		t.Fatalf("Register() error = %v", err)
+	}
+	frame := marshalEnvelope(t, &commonv1.Envelope{
+		MsgId: uint32(echopb.MsgId_C2S_ECHO_NOTIFY),
+	})
+	if err := dispatcher.HandleFrame(frame); err == nil {
+		t.Fatal("HandleFrame() error = nil, want Push kind validation error")
+	}
+	if len(sender.envelopes) != 0 {
+		t.Fatalf("sent Envelope count = %d, want no invalid Push", len(sender.envelopes))
+	}
+}
+
 // TestUnknownMessageReturnsGenericError 验证未知 msg_id 通过通用 ErrorResponse 回传原 request_id。
 func TestUnknownMessageReturnsGenericError(t *testing.T) {
 	registry := testRegistry(t)

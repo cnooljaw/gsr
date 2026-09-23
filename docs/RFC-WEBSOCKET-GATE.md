@@ -359,6 +359,8 @@ Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/
 
 `TestResponseRejectsPayloadTypeMismatch` 验证 Handler 为 Response 提供错误的 Protobuf 类型时不发送错误载荷，改为返回关联的安全通用错误。
 
+`TestNotificationCannotPushResponseMessage` 验证 Notify Handler 不能把 Response 编号作为主动 Push 输出。
+
 `TestErrorResponseSendFailurePreservesHandlerError` 验证通用错误响应发送失败时，Handler 原始错误仍保留在返回错误中供 Runtime 诊断。
 
 `TestProdGateDeliversNotificationPush` 覆盖已注册通知的生产链路：客户端发送零 `request_id` 的 `EchoNotify`，Agent 通过协议上下文发出零 `request_id` 的 `EchoPush`，Gate 原样写回客户端。
