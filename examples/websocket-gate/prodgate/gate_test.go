@@ -498,6 +498,74 @@ func TestProdGateRejectsInvalidHandshake(t *testing.T) {
 	}
 }
 
+// TestProdGateRejectsInvalidX25519KeyAndRecovers 验证非法 X25519 公钥在创建 Agent 前被拒绝，且后续有效连接可继续服务。
+func TestProdGateRejectsInvalidX25519KeyAndRecovers(t *testing.T) {
+	local, gate, agents, clientTLS := startTestProductionGate(t, 2, time.Second)
+	invalidConnection := dialProductionTestClient(t, gate, clientTLS)
+	defer invalidConnection.Close()
+	invalidHandshake := make([]byte, handshakeFrameSize)
+	invalidHandshake[0] = handshakeVersion
+	if err := invalidConnection.WriteMessage(websocket.BinaryMessage, invalidHandshake); err != nil {
+		t.Fatalf("WriteMessage(low-order X25519 key) error = %v", err)
+	}
+	_, _, err := readTestBinaryMessage(t, invalidConnection)
+	if !websocket.IsCloseError(err, websocket.CloseProtocolError) {
+		t.Fatalf("ReadMessage(invalid X25519 key) error = %v, want WebSocket close %d", err, websocket.CloseProtocolError)
+	}
+	waitForGateMetric(t, gate, "RejectedConnections", func(metrics Metrics) uint64 {
+		return metrics.RejectedConnections
+	}, 1)
+	if got := gate.Metrics().AcceptedConnections; got != 0 {
+		t.Fatalf("AcceptedConnections after invalid key = %d, want 0", got)
+	}
+	select {
+	case agent := <-agents:
+		t.Fatalf("invalid X25519 key created Agent %#v", agent)
+	case <-time.After(30 * time.Millisecond):
+	}
+
+	connection, macKey := dialAuthenticatedTestClient(t, gate, clientTLS)
+	defer connection.Close()
+	agent := receiveProductionAgent(t, agents)
+	requestBytes, err := proto.Marshal(&commonv1.Envelope{MsgId: 1001, RequestId: 97})
+	if err != nil {
+		t.Fatalf("marshal recovery request Envelope: %v", err)
+	}
+	if err := connection.WriteMessage(websocket.BinaryMessage, makeAuthenticatedTestFrame(t, macKey[:], 1, requestBytes)); err != nil {
+		t.Fatalf("WriteMessage(recovery frame) error = %v", err)
+	}
+	select {
+	case delivered := <-agent.received:
+		if !bytes.Equal(delivered, requestBytes) {
+			t.Fatalf("recovery Agent 收到 Envelope = %x，want %x", delivered, requestBytes)
+		}
+	case <-time.After(time.Second):
+		t.Fatal("非法握手被拒绝后，Gate 未投递有效请求")
+	}
+	_, responseBytes, err := readTestBinaryMessage(t, connection)
+	if err != nil {
+		t.Fatalf("ReadMessage(recovery response) error = %v", err)
+	}
+	var response commonv1.Envelope
+	if err := proto.Unmarshal(responseBytes, &response); err != nil {
+		t.Fatalf("unmarshal recovery response Envelope: %v", err)
+	}
+	if response.GetMsgId() != 1002 || response.GetRequestId() != 97 {
+		t.Fatalf("recovery response = msg_id %d, request_id %d; want 1002, 97", response.GetMsgId(), response.GetRequestId())
+	}
+	if err := connection.Close(); err != nil {
+		t.Fatalf("Close(recovery client) error = %v", err)
+	}
+	select {
+	case <-agent.disconnected:
+	case <-time.After(time.Second):
+		t.Fatal("有效连接关闭后 Agent 未收到通知")
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+}
+
 // TestProdGateRejectsOversizedHandshake 验证首个握手帧超过上限时返回消息过大并累计帧超限计数。
 func TestProdGateRejectsOversizedHandshake(t *testing.T) {
 	_, gate, agents, clientTLS := startTestProductionGate(t, 2, time.Second)

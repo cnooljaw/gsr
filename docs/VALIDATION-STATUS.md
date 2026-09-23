@@ -75,6 +75,8 @@ GSR_CALL_STABILITY=1 go test ./cluster -run '^TestTCPCallServicePanicAndReplacem
 
 同日跨连接重放切片：`TestProdGateRejectsCrossConnectionReplayBeforeDelivery` 先在源连接发送并成功处理一条认证请求，再将完全相同的 `seq | Envelope | MAC` 帧送到另一条独立握手连接。目标连接以 `1008 policy_violation` 关闭，目标 Agent 未收到该帧；第三条新连接使用自己的密钥和序号 1 成功完成请求/响应。专项重复 10 次、prodgate 全包、全仓测试、全仓 race 和 vet 通过；只验证当前 Gate 实现的连接间帧隔离，不扩展为客户端身份认证或业务防重。
 
+同日非法 X25519 握手集成切片：`TestProdGateRejectsInvalidX25519KeyAndRecovers` 通过真实生产 Listener 发送全零低阶公钥，确认握手以协议错误关闭、Agent 未创建、连接计入拒绝；随后有效客户端仍能完成认证请求/响应。专项重复 10 次、prodgate 全包、全仓测试、全仓 race 和 vet 通过；只验证握手拒绝与服务恢复，不构成密码协议审计。
+
 2026-09-23 上行序号耗尽边界：Go 服务端接纳一次 `uint64` 最大值序号后拒绝回绕到 1；TypeScript 客户端能生成最大序号帧，之后保持序号不变并返回耗尽错误。Go 专项测试与 `npm run test:crypto`（含 TypeScript 编译）通过。协议规定上限后结束当前连接并重新握手；本切片只补测试和说明，不改生产算法。
 
 2026-09-23 C/S 请求编号上限：协议分发测试将最大 `uint32 request_id` 编码进 Envelope，确认 Handler 收到原值且 Response 原样回传。该测试、protocol 全包测试和 vet 通过；客户端 request_id 分配器仍由业务客户端实现，示例 CLI 固定使用 1。
