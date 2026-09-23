@@ -322,6 +322,78 @@ func TestProdGateConcurrentBadMACDoesNotBlockHealthyConnection(t *testing.T) {
 	}
 }
 
+// TestProdGateRecoversFromAgentConstructorPanic 验证 Agent 构造器 panic 只拒绝当前连接，Gate 仍能接受后续连接。
+func TestProdGateRecoversFromAgentConstructorPanic(t *testing.T) {
+	agents := make(chan *productionTestAgent, 1)
+	var constructorCalls atomic.Int32
+	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
+		MailboxCapacity: 8,
+		ShutdownTimeout: 2 * time.Second,
+	}, 2, time.Second, 1<<20, 64<<10, func(client ClientSession) runtime.Service {
+		if constructorCalls.Add(1) == 1 {
+			panic("agent initialization failed")
+		}
+		agent := &productionTestAgent{
+			client:       client,
+			received:     make(chan []byte, 1),
+			disconnected: make(chan struct{}),
+		}
+		agents <- agent
+		return agent
+	})
+
+	failedConnection, _ := dialAuthenticatedTestClient(t, gate, clientTLS)
+	_, _, err := readTestBinaryMessage(t, failedConnection)
+	if !websocket.IsCloseError(err, websocket.CloseInternalServerErr) {
+		t.Fatalf("Agent constructor panic close error = %v, want close %d", err, websocket.CloseInternalServerErr)
+	}
+	if err := failedConnection.Close(); err != nil {
+		t.Fatalf("Close(failed client) error = %v", err)
+	}
+
+	connection, macKey := dialAuthenticatedTestClient(t, gate, clientTLS)
+	defer connection.Close()
+	agent := receiveProductionAgent(t, agents)
+	requestBytes, err := proto.Marshal(&commonv1.Envelope{MsgId: 1001, RequestId: 401})
+	if err != nil {
+		t.Fatalf("marshal healthy request: %v", err)
+	}
+	if err := connection.WriteMessage(websocket.BinaryMessage, makeAuthenticatedTestFrame(t, macKey[:], 1, requestBytes)); err != nil {
+		t.Fatalf("healthy connection WriteMessage() error = %v", err)
+	}
+	_, responseBytes, err := readTestBinaryMessage(t, connection)
+	if err != nil {
+		t.Fatalf("healthy connection ReadMessage() error = %v", err)
+	}
+	var response commonv1.Envelope
+	if err := proto.Unmarshal(responseBytes, &response); err != nil {
+		t.Fatalf("unmarshal healthy response: %v", err)
+	}
+	if response.GetMsgId() != 1002 || response.GetRequestId() != 401 {
+		t.Fatalf("healthy response = msg_id %d, request_id %d; want 1002, 401", response.GetMsgId(), response.GetRequestId())
+	}
+	if got := gate.Metrics().RejectedConnections; got != 1 {
+		t.Fatalf("RejectedConnections = %d, want 1", got)
+	}
+	if got := gate.Metrics().AcceptedConnections; got != 1 {
+		t.Fatalf("AcceptedConnections = %d, want 1", got)
+	}
+	if got := constructorCalls.Load(); got != 2 {
+		t.Fatalf("Agent constructor called %d times, want 2", got)
+	}
+	if err := connection.Close(); err != nil {
+		t.Fatalf("Close(healthy client) error = %v", err)
+	}
+	select {
+	case <-agent.disconnected:
+	case <-time.After(time.Second):
+		t.Fatal("healthy Agent 未收到客户端断开通知")
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+}
+
 // TestProdGateRejectsCrossConnectionReplayBeforeDelivery 验证连接 A 的认证帧不能在连接 B 重放，且新连接仍可正常请求。
 func TestProdGateRejectsCrossConnectionReplayBeforeDelivery(t *testing.T) {
 	local, gate, agents, clientTLS := startTestProductionGate(t, 3, time.Second)
