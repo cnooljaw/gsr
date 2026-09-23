@@ -201,6 +201,106 @@ func TestProdGateRejectsInvalidMACBeforeDelivery(t *testing.T) {
 	}
 }
 
+// TestProdGateRejectsCrossConnectionReplayBeforeDelivery 验证连接 A 的认证帧不能在连接 B 重放，且新连接仍可正常请求。
+func TestProdGateRejectsCrossConnectionReplayBeforeDelivery(t *testing.T) {
+	local, gate, agents, clientTLS := startTestProductionGate(t, 3, time.Second)
+	sourceConnection, sourceMACKey := dialAuthenticatedTestClient(t, gate, clientTLS)
+	defer sourceConnection.Close()
+	sourceAgent := receiveProductionAgent(t, agents)
+	requestBytes, err := proto.Marshal(&commonv1.Envelope{MsgId: 1001, RequestId: 96})
+	if err != nil {
+		t.Fatalf("marshal request Envelope: %v", err)
+	}
+	frameFromSourceConnection := makeAuthenticatedTestFrame(t, sourceMACKey[:], 1, requestBytes)
+	if err := sourceConnection.WriteMessage(websocket.BinaryMessage, frameFromSourceConnection); err != nil {
+		t.Fatalf("WriteMessage(source authenticated frame) error = %v", err)
+	}
+	select {
+	case delivered := <-sourceAgent.received:
+		if !bytes.Equal(delivered, requestBytes) {
+			t.Fatalf("source Agent 收到 Envelope = %x，want %x", delivered, requestBytes)
+		}
+	case <-time.After(time.Second):
+		t.Fatal("Gate 未投递源连接的认证请求")
+	}
+	_, responseBytes, err := readTestBinaryMessage(t, sourceConnection)
+	if err != nil {
+		t.Fatalf("ReadMessage(source response) error = %v", err)
+	}
+	var response commonv1.Envelope
+	if err := proto.Unmarshal(responseBytes, &response); err != nil {
+		t.Fatalf("unmarshal source response Envelope: %v", err)
+	}
+	if response.GetMsgId() != 1002 || response.GetRequestId() != 96 {
+		t.Fatalf("source response = msg_id %d, request_id %d; want 1002, 96", response.GetMsgId(), response.GetRequestId())
+	}
+
+	targetConnection, _ := dialAuthenticatedTestClient(t, gate, clientTLS)
+	defer targetConnection.Close()
+	targetAgent := receiveProductionAgent(t, agents)
+	if err := targetConnection.WriteMessage(websocket.BinaryMessage, frameFromSourceConnection); err != nil {
+		t.Fatalf("WriteMessage(frame replayed across connections) error = %v", err)
+	}
+	_, _, err = readTestBinaryMessage(t, targetConnection)
+	if !websocket.IsCloseError(err, websocket.ClosePolicyViolation) {
+		t.Fatalf("ReadMessage(cross-connection replay) error = %v, want WebSocket close %d", err, websocket.ClosePolicyViolation)
+	}
+	select {
+	case replayed := <-targetAgent.received:
+		t.Fatalf("cross-connection replay reached target Agent as %x", replayed)
+	default:
+	}
+	select {
+	case <-targetAgent.disconnected:
+	case <-time.After(time.Second):
+		t.Fatal("跨连接重放被拒绝后目标 Agent 未收到断开通知")
+	}
+
+	recoveryConnection, recoveryMACKey := dialAuthenticatedTestClient(t, gate, clientTLS)
+	defer recoveryConnection.Close()
+	recoveryAgent := receiveProductionAgent(t, agents)
+	if err := recoveryConnection.WriteMessage(websocket.BinaryMessage, makeAuthenticatedTestFrame(t, recoveryMACKey[:], 1, requestBytes)); err != nil {
+		t.Fatalf("WriteMessage(recovery frame) error = %v", err)
+	}
+	select {
+	case delivered := <-recoveryAgent.received:
+		if !bytes.Equal(delivered, requestBytes) {
+			t.Fatalf("recovery Agent 收到 Envelope = %x，want %x", delivered, requestBytes)
+		}
+	case <-time.After(time.Second):
+		t.Fatal("拒绝跨连接重放后，新连接未接收序号一请求")
+	}
+	_, responseBytes, err = readTestBinaryMessage(t, recoveryConnection)
+	if err != nil {
+		t.Fatalf("ReadMessage(recovery response) error = %v", err)
+	}
+	if err := proto.Unmarshal(responseBytes, &response); err != nil {
+		t.Fatalf("unmarshal recovery response Envelope: %v", err)
+	}
+	if response.GetMsgId() != 1002 || response.GetRequestId() != 96 {
+		t.Fatalf("recovery response = msg_id %d, request_id %d; want 1002, 96", response.GetMsgId(), response.GetRequestId())
+	}
+	if err := recoveryConnection.Close(); err != nil {
+		t.Fatalf("Close(recovery client) error = %v", err)
+	}
+	select {
+	case <-recoveryAgent.disconnected:
+	case <-time.After(time.Second):
+		t.Fatal("新连接断开后 Agent 未收到通知")
+	}
+	if err := sourceConnection.Close(); err != nil {
+		t.Fatalf("Close(source client) error = %v", err)
+	}
+	select {
+	case <-sourceAgent.disconnected:
+	case <-time.After(time.Second):
+		t.Fatal("源连接断开后 Agent 未收到通知")
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+}
+
 // TestProdGateWritesConnectionFailureToRuntimeLogger 验证 Gate 复用 Runtime 的共享 Logger，并记录安全失败而不记录原始载荷。
 func TestProdGateWritesConnectionFailureToRuntimeLogger(t *testing.T) {
 	var output bytes.Buffer
