@@ -101,6 +101,56 @@ func TestGeneratedRegistryDecodesMessageAndChecksRequestID(t *testing.T) {
 	}
 }
 
+// TestNewRegistryRejectsAmbiguousEntries 验证合并协议目录时拒绝重复消息编号和重复 Protobuf 类型。
+func TestNewRegistryRejectsAmbiguousEntries(t *testing.T) {
+	testCases := []struct {
+		name    string
+		entries []catalog.Entry
+	}{
+		{
+			name: "duplicate msg_id",
+			entries: []catalog.Entry{
+				{
+					ID:         1001,
+					Direction:  catalog.ClientToServer,
+					Kind:       catalog.Request,
+					NewMessage: func() proto.Message { return &echopb.EchoRequest{} },
+				},
+				{
+					ID:         1001,
+					Direction:  catalog.ServerToClient,
+					Kind:       catalog.Response,
+					NewMessage: func() proto.Message { return &echopb.EchoResponse{} },
+				},
+			},
+		},
+		{
+			name: "duplicate payload type",
+			entries: []catalog.Entry{
+				{
+					ID:         1002,
+					Direction:  catalog.ClientToServer,
+					Kind:       catalog.Request,
+					NewMessage: func() proto.Message { return &echopb.EchoRequest{} },
+				},
+				{
+					ID:         1003,
+					Direction:  catalog.ClientToServer,
+					Kind:       catalog.Request,
+					NewMessage: func() proto.Message { return &echopb.EchoRequest{} },
+				},
+			},
+		},
+	}
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			if _, err := NewRegistry(testCase.entries); err == nil {
+				t.Fatal("NewRegistry() error = nil, want ambiguous catalog error")
+			}
+		})
+	}
+}
+
 // TestTypedHandlerReturnsResponse 验证业务只注册已实现的强类型 Handler 即可完成解码和响应。
 func TestTypedHandlerReturnsResponse(t *testing.T) {
 	registry := testRegistry(t)
