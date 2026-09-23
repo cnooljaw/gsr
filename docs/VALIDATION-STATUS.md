@@ -95,6 +95,8 @@ GSR_CALL_STABILITY=1 go test ./cluster -run '^TestTCPCallServicePanicAndReplacem
 
 2026-09-23 并发故障隔离：8 条已认证坏 MAC 连接同时发送故障帧期间，健康连接完成 16 次请求/响应，坏帧均未进入 Agent，`inbound_mailbox_full=0`。定向测试与对应 `-race` 测试均通过；此样本验证有限并发下的连接隔离，不代表高并发容量。
 
+2026-09-23 并发非法握手隔离：8 条连接同时提交全零低阶 X25519 公钥并按协议错误关闭时，健康连接完成 8 次认证请求/响应；无效握手未创建 Agent，`rejected=8`、`inbound_mailbox_full=0`。专项重复 5 次、对应 `-race` 测试和 prodgate 包全测通过；只验证有限并发下握手失败的连接隔离，不代表高并发容量或密码协议审计。
+
 2026-09-23 Agent 构造器 panic 恢复：构造器 panic 只拒绝当前连接并返回 WebSocket 内部错误关闭；后续连接成功创建 Agent 并完成请求/响应。定向测试和对应 `-race` 测试均通过。
 
 2026-09-23 Agent 启动失败恢复：Agent `OnStart` 返回错误时 Runtime 执行该实例的 `OnStop` 清理，Gate 拒绝当前连接后仍能接受后续连接并完成请求/响应。定向测试、对应 `-race` 测试和 prodgate 包全测均通过。

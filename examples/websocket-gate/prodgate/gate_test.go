@@ -322,6 +322,113 @@ func TestProdGateConcurrentBadMACDoesNotBlockHealthyConnection(t *testing.T) {
 	}
 }
 
+// TestProdGateConcurrentBadHandshakeDoesNotBlockHealthyConnection 验证多条无效 X25519 握手并发失败时健康连接仍能完成请求。
+func TestProdGateConcurrentBadHandshakeDoesNotBlockHealthyConnection(t *testing.T) {
+	const (
+		badClientCount  = 8
+		healthyMessages = 8
+		connectionLimit = badClientCount + 1
+	)
+	agents := make(chan *productionTestAgent, connectionLimit)
+	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
+		MailboxCapacity: 32,
+		ShutdownTimeout: 2 * time.Second,
+	}, connectionLimit, time.Second, 1<<20, 64<<10, func(client ClientSession) runtime.Service {
+		agent := &productionTestAgent{
+			client:       client,
+			received:     make(chan []byte, healthyMessages),
+			disconnected: make(chan struct{}),
+		}
+		agents <- agent
+		return agent
+	})
+
+	healthyConnection, healthyMACKey := dialAuthenticatedTestClient(t, gate, clientTLS)
+	defer healthyConnection.Close()
+	healthyAgent := receiveProductionAgent(t, agents)
+	badConnections := make([]*websocket.Conn, badClientCount)
+	for index := range badConnections {
+		badConnections[index] = dialProductionTestClient(t, gate, clientTLS)
+		if err := badConnections[index].SetReadDeadline(time.Now().Add(time.Second)); err != nil {
+			t.Fatalf("SetReadDeadline(bad handshake %d) error = %v", index, err)
+		}
+	}
+	defer func() {
+		for _, connection := range badConnections {
+			_ = connection.Close()
+		}
+	}()
+
+	invalidHandshake := make([]byte, handshakeFrameSize)
+	invalidHandshake[0] = handshakeVersion
+	start := make(chan struct{})
+	var failures sync.WaitGroup
+	for index, connection := range badConnections {
+		failures.Add(1)
+		go func(index int, connection *websocket.Conn) {
+			defer failures.Done()
+			<-start
+			if err := connection.WriteMessage(websocket.BinaryMessage, invalidHandshake); err != nil {
+				t.Errorf("bad handshake connection %d WriteMessage() error = %v", index, err)
+				return
+			}
+			_, _, err := connection.ReadMessage()
+			if !websocket.IsCloseError(err, websocket.CloseProtocolError) {
+				t.Errorf("bad handshake connection %d ReadMessage() error = %v, want close %d", index, err, websocket.CloseProtocolError)
+			}
+		}(index, connection)
+	}
+	close(start)
+
+	for index := 0; index < healthyMessages; index++ {
+		requestID := uint32(600 + index)
+		requestBytes, err := proto.Marshal(&commonv1.Envelope{MsgId: 1001, RequestId: requestID})
+		if err != nil {
+			t.Fatalf("marshal healthy request %d: %v", index, err)
+		}
+		frame := makeAuthenticatedTestFrame(t, healthyMACKey[:], uint64(index+1), requestBytes)
+		if err := healthyConnection.WriteMessage(websocket.BinaryMessage, frame); err != nil {
+			t.Fatalf("healthy connection WriteMessage(%d) error = %v", index, err)
+		}
+		_, responseBytes, err := readTestBinaryMessage(t, healthyConnection)
+		if err != nil {
+			t.Fatalf("healthy connection ReadMessage(%d) error = %v", index, err)
+		}
+		var response commonv1.Envelope
+		if err := proto.Unmarshal(responseBytes, &response); err != nil {
+			t.Fatalf("unmarshal healthy response %d: %v", index, err)
+		}
+		if response.GetMsgId() != 1002 || response.GetRequestId() != requestID {
+			t.Fatalf("healthy response %d = msg_id %d, request_id %d; want 1002, %d",
+				index, response.GetMsgId(), response.GetRequestId(), requestID)
+		}
+	}
+	failures.Wait()
+	if got := gate.Metrics().RejectedConnections; got != badClientCount {
+		t.Fatalf("RejectedConnections = %d, want %d", got, badClientCount)
+	}
+	if got := len(agents); got != 0 {
+		t.Fatalf("invalid handshakes created %d extra Agent services", got)
+	}
+	if got := len(healthyAgent.received); got != healthyMessages {
+		t.Fatalf("healthy Agent processed %d messages, want %d", got, healthyMessages)
+	}
+	if got := gate.Metrics().InboundMailboxFull; got != 0 {
+		t.Fatalf("InboundMailboxFull = %d, want 0", got)
+	}
+	if err := healthyConnection.Close(); err != nil {
+		t.Fatalf("Close(healthy client) error = %v", err)
+	}
+	select {
+	case <-healthyAgent.disconnected:
+	case <-time.After(time.Second):
+		t.Fatal("健康 Agent 未收到客户端断开通知")
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+}
+
 // TestProdGateRecoversFromAgentConstructorPanic 验证 Agent 构造器 panic 只拒绝当前连接，Gate 仍能接受后续连接。
 func TestProdGateRecoversFromAgentConstructorPanic(t *testing.T) {
 	agents := make(chan *productionTestAgent, 1)
