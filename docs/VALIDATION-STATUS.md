@@ -87,6 +87,8 @@ GSR_CALL_STABILITY=1 go test ./cluster -run '^TestTCPCallServicePanicAndReplacem
 
 同日失败阶段压力扩展：设置 `GSR_GATE_FAILURE_ATTEMPTS=100`，连续执行 100 次坏握手和 100 次坏 MAC；故障连接未投递坏帧，随后健康连接仍完成请求/响应。测试耗时约 1.52 秒，指标为 `rejected=100`、`accepted=101`、`inbound_mailbox_full=0`。定向测试 `GSR_GATE_STRESS=1 GSR_GATE_FAILURE_ATTEMPTS=100 go test ./examples/websocket-gate/prodgate -run '^TestProdGateFailurePhaseStress$' -timeout=90s -v` 通过；这是短时恢复压力样本，不代表长时故障洪泛容量验收。
 
+同日失败阶段 1,000 轮扩展：连续执行 1,000 次坏握手和 1,000 次坏 MAC 后，健康连接仍完成请求/响应，指标为 `rejected=1000`、`accepted=1001`、`inbound_mailbox_full=0`；测试耗时约 15.38 秒。定向测试 `GSR_GATE_STRESS=1 GSR_GATE_FAILURE_ATTEMPTS=1000 go test ./examples/websocket-gate/prodgate -run '^TestProdGateFailurePhaseStress$' -timeout=90s -v` 通过。连接按序执行，本结果不代表并发故障洪泛容量或长时稳定性。
+
 2026-09-23 上行序号耗尽边界：Go 服务端接纳一次 `uint64` 最大值序号后拒绝回绕到 1；TypeScript 客户端能生成最大序号帧，之后保持序号不变并返回耗尽错误。Go 专项测试与 `npm run test:crypto`（含 TypeScript 编译）通过。协议规定上限后结束当前连接并重新握手；本切片只补测试和说明，不改生产算法。
 
 2026-09-23 C/S 请求编号上限：协议分发测试将最大 `uint32 request_id` 编码进 Envelope，确认 Handler 收到原值且 Response 原样回传。该测试、protocol 全包测试和 vet 通过；客户端 request_id 分配器仍由业务客户端实现，示例 CLI 固定使用 1。
