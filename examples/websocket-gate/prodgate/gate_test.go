@@ -885,9 +885,9 @@ func TestProdGateRejectsInvalidHandshake(t *testing.T) {
 	}
 }
 
-// TestProdGateRejectsInvalidX25519KeyAndRecovers 验证非法 X25519 公钥在创建 Agent 前被拒绝，且后续有效连接可继续服务。
+// TestProdGateRejectsInvalidX25519KeyAndRecovers 验证非法 X25519 公钥被拒绝并归还唯一连接名额，后续有效连接仍可服务。
 func TestProdGateRejectsInvalidX25519KeyAndRecovers(t *testing.T) {
-	local, gate, agents, clientTLS := startTestProductionGate(t, 2, time.Second)
+	local, gate, agents, clientTLS := startTestProductionGate(t, 1, time.Second)
 	invalidConnection := dialProductionTestClient(t, gate, clientTLS)
 	defer invalidConnection.Close()
 	invalidHandshake := make([]byte, handshakeFrameSize)
