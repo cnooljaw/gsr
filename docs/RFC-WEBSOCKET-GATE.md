@@ -357,6 +357,8 @@ Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/
 
 `TestDefinedNotificationWithoutHandlerDoesNotRespond` 验证协议目录已定义、但业务尚未注册 Handler 的 Notify 不生成无法关联的响应。
 
+`TestResponseRejectsPayloadTypeMismatch` 验证 Handler 为 Response 提供错误的 Protobuf 类型时不发送错误载荷，改为返回关联的安全通用错误。
+
 `TestProdGateDeliversNotificationPush` 覆盖已注册通知的生产链路：客户端发送零 `request_id` 的 `EchoNotify`，Agent 通过协议上下文发出零 `request_id` 的 `EchoPush`，Gate 原样写回客户端。
 
 `TestProdGateRejectsNotificationWithRequestID` 覆盖已注册 Notify 携带非零 `request_id` 的生产链路：协议层返回 `INVALID_REQUEST`，并在通用错误响应中保留原编号。

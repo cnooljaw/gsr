@@ -141,6 +141,44 @@ func TestTypedHandlerReturnsResponse(t *testing.T) {
 	}
 }
 
+// TestResponseRejectsPayloadTypeMismatch 验证 Response 的 msg_id 与 Protobuf 类型不匹配时不会发送错误载荷。
+func TestResponseRejectsPayloadTypeMismatch(t *testing.T) {
+	registry := testRegistry(t)
+	sender := &recordedSender{}
+	dispatcher := testDispatcher(t, registry, sender)
+	if err := Register(dispatcher, func(context Context, _ *echopb.EchoRequest) error {
+		return context.Response(
+			uint32(echopb.MsgId_S2C_ECHO_RESPONSE),
+			&echopb.EchoNotify{Text: "wrong payload type"},
+		)
+	}); err != nil {
+		t.Fatalf("Register() error = %v", err)
+	}
+	frame := marshalEnvelope(t, &commonv1.Envelope{
+		MsgId:     uint32(echopb.MsgId_C2S_ECHO_REQUEST),
+		RequestId: 57,
+	})
+	if err := dispatcher.HandleFrame(frame); !errors.Is(err, ErrPayloadTypeMismatch) {
+		t.Fatalf("HandleFrame() error = %v, want ErrPayloadTypeMismatch", err)
+	}
+	if len(sender.envelopes) != 1 {
+		t.Fatalf("sent Envelope count = %d, want one generic ErrorResponse", len(sender.envelopes))
+	}
+	errorEnvelope := sender.envelopes[0]
+	if errorEnvelope.GetMsgId() != uint32(commonv1.MsgId_S2C_ERROR_RESPONSE) || errorEnvelope.GetRequestId() != 57 {
+		t.Fatalf("ErrorResponse Envelope = msg_id %d, request_id %d; want %d, 57",
+			errorEnvelope.GetMsgId(), errorEnvelope.GetRequestId(), commonv1.MsgId_S2C_ERROR_RESPONSE)
+	}
+	var errorResponse commonv1.ErrorResponse
+	if err := proto.Unmarshal(errorEnvelope.GetPayload(), &errorResponse); err != nil {
+		t.Fatalf("unmarshal ErrorResponse: %v", err)
+	}
+	if errorResponse.GetCode() != commonv1.ErrorCode_ERROR_CODE_INTERNAL || errorResponse.GetMessage() != "request could not be processed" {
+		t.Fatalf("ErrorResponse = code %v, message %q; want safe generic internal error",
+			errorResponse.GetCode(), errorResponse.GetMessage())
+	}
+}
+
 // TestMaximumRequestIDReturnsUnchanged 验证最大 uint32 request_id 可被处理并原样写回响应。
 func TestMaximumRequestIDReturnsUnchanged(t *testing.T) {
 	const maximumRequestID uint32 = ^uint32(0)
