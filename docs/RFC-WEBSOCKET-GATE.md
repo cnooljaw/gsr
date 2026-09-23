@@ -357,6 +357,8 @@ Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/
 
 `TestProdGateRejectsNotificationWithRequestID` 覆盖已注册 Notify 携带非零 `request_id` 的生产链路：协议层返回 `INVALID_REQUEST`，并在通用错误响应中保留原编号。
 
+`TestProdGateRejectsRequestWithoutRequestID` 覆盖已注册 Request 缺少 `request_id` 的生产链路：不发送无法关联的错误响应，连接仍可处理后续合法请求。
+
 `TestProdGateReturnsErrorForInvalidPayload` 覆盖已知 `msg_id` 携带非法 Protobuf payload 的链路：Agent 返回 `INVALID_REQUEST` 的通用错误，连接保持可用并能继续处理合法请求。
 
 `TestProdGateReturnsErrorForWrongDirection` 覆盖客户端反向发送服务端 Push 编号的链路：Agent 返回 `INVALID_REQUEST`，不把方向错误当作 WebSocket 坏帧，连接仍可继续处理合法请求。
