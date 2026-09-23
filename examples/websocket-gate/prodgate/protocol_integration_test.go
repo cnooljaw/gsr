@@ -640,6 +640,74 @@ func TestProdGateRejectsRequestWithoutRequestID(t *testing.T) {
 	}
 }
 
+// TestProdGateKeepsConnectionAfterMalformedEnvelope 验证无法解码的 Envelope 不生成无关联响应，且连接可继续处理请求。
+func TestProdGateKeepsConnectionAfterMalformedEnvelope(t *testing.T) {
+	agents := make(chan *protocolGateAgent, 1)
+	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
+		MailboxCapacity: 8,
+		ShutdownTimeout: 2 * time.Second,
+	}, 1, time.Second, 1<<20, 64<<10, func(client ClientSession) runtime.Service {
+		agent := &protocolGateAgent{client: client, disconnected: make(chan struct{})}
+		agents <- agent
+		return agent
+	})
+	connection, macKey := dialAuthenticatedTestClient(t, gate, clientTLS)
+	defer connection.Close()
+	agent := <-agents
+
+	malformedEnvelope := []byte{0x0a, 0x05, 0x01}
+	if err := connection.WriteMessage(websocket.BinaryMessage, makeAuthenticatedTestFrame(t, macKey[:], 1, malformedEnvelope)); err != nil {
+		t.Fatalf("WriteMessage(malformed Envelope) error = %v", err)
+	}
+
+	requestPayload, err := proto.Marshal(&echopb.EchoRequest{Text: "envelope decode recovered"})
+	if err != nil {
+		t.Fatalf("marshal EchoRequest: %v", err)
+	}
+	requestBytes, err := proto.Marshal(&commonv1.Envelope{
+		MsgId:     uint32(echopb.MsgId_C2S_ECHO_REQUEST),
+		RequestId: 100,
+		Payload:   requestPayload,
+	})
+	if err != nil {
+		t.Fatalf("marshal valid Envelope: %v", err)
+	}
+	if err := connection.WriteMessage(websocket.BinaryMessage, makeAuthenticatedTestFrame(t, macKey[:], 2, requestBytes)); err != nil {
+		t.Fatalf("WriteMessage(valid Envelope) error = %v", err)
+	}
+	_, responseBytes, err := readTestBinaryMessage(t, connection)
+	if err != nil {
+		t.Fatalf("ReadMessage(valid response) error = %v", err)
+	}
+	var responseEnvelope commonv1.Envelope
+	if err := proto.Unmarshal(responseBytes, &responseEnvelope); err != nil {
+		t.Fatalf("unmarshal valid response Envelope: %v", err)
+	}
+	if responseEnvelope.GetMsgId() != uint32(echopb.MsgId_S2C_ECHO_RESPONSE) || responseEnvelope.GetRequestId() != 100 {
+		t.Fatalf("response Envelope = msg_id %d, request_id %d; want %d, 100",
+			responseEnvelope.GetMsgId(), responseEnvelope.GetRequestId(), echopb.MsgId_S2C_ECHO_RESPONSE)
+	}
+	var response echopb.EchoResponse
+	if err := proto.Unmarshal(responseEnvelope.GetPayload(), &response); err != nil {
+		t.Fatalf("unmarshal EchoResponse: %v", err)
+	}
+	if response.GetText() != "envelope decode recovered" {
+		t.Fatalf("EchoResponse text = %q, want envelope decode recovered", response.GetText())
+	}
+
+	if err := connection.Close(); err != nil {
+		t.Fatalf("Close(client) error = %v", err)
+	}
+	select {
+	case <-agent.disconnected:
+	case <-time.After(time.Second):
+		t.Fatal("客户端断开后 Agent 未收到通知")
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+}
+
 // TestProdGateReturnsErrorForInvalidPayload 验证已知消息编号的坏 payload 由协议层返回通用错误，且不会关闭连接。
 func TestProdGateReturnsErrorForInvalidPayload(t *testing.T) {
 	agents := make(chan *protocolGateAgent, 1)
