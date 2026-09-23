@@ -1981,6 +1981,64 @@ func TestNewGateServiceRejectsInvalidTLSAndCapacity(t *testing.T) {
 	}
 }
 
+// TestProdGateListenFailureLeavesRuntimeAvailable 验证监听地址被占用时 Gate 创建失败不会停止 Runtime，释放地址后可创建新 Gate。
+func TestProdGateListenFailureLeavesRuntimeAvailable(t *testing.T) {
+	blockedListener, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatalf("net.Listen(blocked address) error = %v", err)
+	}
+	t.Cleanup(func() { _ = blockedListener.Close() })
+
+	local, err := runtime.NewRuntime(runtime.Config{
+		MailboxCapacity: 8,
+		ShutdownTimeout: 2 * time.Second,
+	})
+	if err != nil {
+		t.Fatalf("NewRuntime() error = %v", err)
+	}
+	t.Cleanup(func() {
+		if err := local.Close(); err != nil {
+			t.Errorf("Runtime.Close() error = %v", err)
+		}
+	})
+	if err := local.Start(); err != nil {
+		t.Fatalf("Runtime.Start() error = %v", err)
+	}
+
+	config := Config{
+		Address:               blockedListener.Addr().String(),
+		MaxConnections:        1,
+		HandshakeTimeout:      time.Second,
+		MaxFrameBytes:         1 << 20,
+		MaxOutboundQueueBytes: 64 << 10,
+		NewAgent:              func(ClientSession) runtime.Service { return &productionTestAgent{} },
+	}
+	failedGate, err := NewGateService(local, config)
+	if err != nil {
+		t.Fatalf("NewGateService(occupied address) error = %v", err)
+	}
+	if id, err := local.CreateService(context.Background(), failedGate); id != 0 || err == nil {
+		t.Fatalf("CreateService(occupied address) = (%d, %v), want zero ID and listen error", id, err)
+	}
+	if err := blockedListener.Close(); err != nil {
+		t.Fatalf("Close(blocked listener) error = %v", err)
+	}
+
+	gate, err := NewGateService(local, config)
+	if err != nil {
+		t.Fatalf("NewGateService(released address) error = %v", err)
+	}
+	if id, err := local.CreateService(context.Background(), gate); err != nil || id == 0 {
+		t.Fatalf("CreateService(released address) = (%d, %v), want nonzero ID and success", id, err)
+	}
+	if address := gate.Addr(); address == nil || address.String() != config.Address {
+		t.Fatalf("Gate.Addr() = %v, want %q", address, config.Address)
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+}
+
 // TestClientSessionBoundsOutboundQueue 验证生产 ClientSession 按帧字节和固定条目开销限制出站队列。
 func TestClientSessionBoundsOutboundQueue(t *testing.T) {
 	client := &clientConnection{
