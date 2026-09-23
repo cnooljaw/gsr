@@ -892,13 +892,34 @@ func TestProdGateAppliesConnectionLimitBeforeTLSHandshake(t *testing.T) {
 	_ = recovered.Close()
 }
 
-// TestProdGateHandshakeTimeoutClosesConnection 验证应用握手超时会关闭连接并归还名额，使后续客户端仍可接入。
+// TestProdGateHandshakeTimeoutClosesConnection 验证未完成的应用握手占用连接名额，超时关闭后名额可供后续客户端使用。
 func TestProdGateHandshakeTimeoutClosesConnection(t *testing.T) {
 	local, gate, agents, clientTLS := startTestProductionGate(t, 1, 250*time.Millisecond)
 	connection := dialProductionTestClient(t, gate, clientTLS)
 	defer connection.Close()
+	if got := gate.Metrics().AcceptedConnections; got != 0 {
+		t.Fatalf("AcceptedConnections before client handshake = %d, want 0", got)
+	}
 
-	_, _, err := readTestBinaryMessage(t, connection)
+	second, err := net.DialTimeout("tcp", gate.Addr().String(), time.Second)
+	if err != nil {
+		t.Fatalf("Dial(second raw TCP) error = %v", err)
+	}
+	if err := second.SetReadDeadline(time.Now().Add(time.Second)); err != nil {
+		t.Fatalf("SetReadDeadline(second raw TCP) error = %v", err)
+	}
+	var rawByte [1]byte
+	if _, err := second.Read(rawByte[:]); err == nil {
+		t.Fatal("未完成应用握手时，超出连接上限的 TCP 连接没有被关闭")
+	}
+	if err := second.Close(); err != nil {
+		t.Fatalf("Close(second raw TCP) error = %v", err)
+	}
+	if got := gate.Metrics().RejectedConnections; got != 1 {
+		t.Fatalf("RejectedConnections while application handshake is pending = %d, want 1", got)
+	}
+
+	_, _, err = readTestBinaryMessage(t, connection)
 	if !websocket.IsCloseError(err, websocketHandshakeCloseCode) {
 		t.Fatalf("ReadMessage() error = %v, want WebSocket close %d", err, websocketHandshakeCloseCode)
 	}
@@ -907,10 +928,31 @@ func TestProdGateHandshakeTimeoutClosesConnection(t *testing.T) {
 	}, 1)
 	waitForGateMetric(t, gate, "RejectedConnections", func(metrics Metrics) uint64 {
 		return metrics.RejectedConnections
-	}, 1)
+	}, 2)
+	if got := gate.Metrics().AcceptedConnections; got != 0 {
+		t.Fatalf("AcceptedConnections after handshake timeout = %d, want 0", got)
+	}
 
-	recovered, macKey := dialAuthenticatedTestClient(t, gate, clientTLS)
+	endpoint := url.URL{Scheme: "wss", Host: gate.Addr().String(), Path: "/ws"}
+	dialer := websocket.Dialer{TLSClientConfig: clientTLS, HandshakeTimeout: time.Second}
+	dialDeadline := time.Now().Add(time.Second)
+	var recovered *websocket.Conn
+	for recovered == nil && time.Now().Before(dialDeadline) {
+		candidate, response, dialErr := dialer.Dial(endpoint.String(), nil)
+		if response != nil && response.Body != nil {
+			_ = response.Body.Close()
+		}
+		if dialErr == nil {
+			recovered = candidate
+			break
+		}
+		time.Sleep(5 * time.Millisecond)
+	}
+	if recovered == nil {
+		t.Fatal("应用握手超时后，Gate 未归还连接名额")
+	}
 	defer recovered.Close()
+	macKey := authenticateTestClient(t, recovered)
 	agent := receiveProductionAgent(t, agents)
 	requestBytes, err := proto.Marshal(&commonv1.Envelope{MsgId: 1001, RequestId: 411})
 	if err != nil {
