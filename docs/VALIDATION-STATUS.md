@@ -71,6 +71,8 @@ GSR_CALL_STABILITY=1 go test ./cluster -run '^TestTCPCallServicePanicAndReplacem
 
 2026-09-23 Gate 压力验收断言收紧：多连接测试现在等候最多 5 秒排空，并要求客户端成功写入数与 Agent 处理数相等、Mailbox 满载和连接拒绝均为零；失败阶段测试在坏握手与坏 MAC 后额外执行一次健康请求/响应。3 秒短样本中非 race 处理 4,784 条、race 处理 4,783 条，均与各自成功写入数相等；两轮 Mailbox 满载与连接拒绝均为零。失败阶段各重复 3 次坏握手与坏 MAC，计数为 `rejected=3`、`accepted=4`，随后健康往返成功。目标测试、对应 race、prodgate 全包和 vet 通过；这次仅加固验收，不改生产 Gate。
 
+同日慢连接隔离切片：`TestProdGateSlowClientDoesNotBlockHealthyConnection` 持续向不读取数据的客户端发送，确认出站队列已发生满载后，在压力窗口内通过另一条真实 WebSocket 连接完成认证请求、Agent 投递及 Protobuf 响应往返；慢连接持续发送至测试结束，校验其成功发送和队列拒绝计数均大于零、连接未提前关闭。专项重复 10 次、prodgate 全包和全仓 race 通过；只验证短时双连接隔离，不作为慢网络长时或容量测试，未修改生产 Gate。
+
 2026-09-23 上行序号耗尽边界：Go 服务端接纳一次 `uint64` 最大值序号后拒绝回绕到 1；TypeScript 客户端能生成最大序号帧，之后保持序号不变并返回耗尽错误。Go 专项测试与 `npm run test:crypto`（含 TypeScript 编译）通过。协议规定上限后结束当前连接并重新握手；本切片只补测试和说明，不改生产算法。
 
 2026-09-23 C/S 请求编号上限：协议分发测试将最大 `uint32 request_id` 编码进 Envelope，确认 Handler 收到原值且 Response 原样回传。该测试、protocol 全包测试和 vet 通过；客户端 request_id 分配器仍由业务客户端实现，示例 CLI 固定使用 1。
