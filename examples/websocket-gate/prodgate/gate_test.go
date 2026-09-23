@@ -672,6 +672,100 @@ func TestProdGateRejectsNonBinaryAuthenticatedFrame(t *testing.T) {
 	}
 }
 
+// TestProdGateRejectsOversizedAuthenticatedFrame 验证认证后的超限消息在投递 Agent 前关闭当前连接，且后续连接可正常服务。
+func TestProdGateRejectsOversizedAuthenticatedFrame(t *testing.T) {
+	const maxFrameBytes = 256
+	agents := make(chan *productionTestAgent, 2)
+	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
+		MailboxCapacity: 8,
+		ShutdownTimeout: 2 * time.Second,
+	}, 2, time.Second, maxFrameBytes, 64<<10, func(client ClientSession) runtime.Service {
+		agent := &productionTestAgent{
+			client:       client,
+			received:     make(chan []byte, 1),
+			disconnected: make(chan struct{}),
+		}
+		agents <- agent
+		return agent
+	})
+	connection, macKey := dialAuthenticatedTestClient(t, gate, clientTLS)
+	defer connection.Close()
+	agent := receiveProductionAgent(t, agents)
+	oversizedRequestBytes, err := proto.Marshal(&commonv1.Envelope{
+		MsgId:     1001,
+		RequestId: 99,
+		Payload:   bytes.Repeat([]byte{'x'}, maxFrameBytes),
+	})
+	if err != nil {
+		t.Fatalf("marshal oversized request Envelope: %v", err)
+	}
+	oversizedFrame := makeAuthenticatedTestFrame(t, macKey[:], 1, oversizedRequestBytes)
+	if len(oversizedFrame) <= maxFrameBytes {
+		t.Fatalf("authenticated frame length = %d, want greater than %d", len(oversizedFrame), maxFrameBytes)
+	}
+	if err := connection.WriteMessage(websocket.BinaryMessage, oversizedFrame); err != nil {
+		t.Fatalf("WriteMessage(oversized authenticated frame) error = %v", err)
+	}
+	_, _, err = readTestBinaryMessage(t, connection)
+	if !websocket.IsCloseError(err, websocket.CloseMessageTooBig) {
+		t.Fatalf("ReadMessage(oversized authenticated frame) error = %v, want WebSocket close %d", err, websocket.CloseMessageTooBig)
+	}
+	waitForGateMetric(t, gate, "FrameTooLarge", func(metrics Metrics) uint64 {
+		return metrics.FrameTooLarge
+	}, 1)
+	select {
+	case delivered := <-agent.received:
+		t.Fatalf("oversized authenticated frame reached Agent as %x", delivered)
+	case <-time.After(30 * time.Millisecond):
+	}
+	select {
+	case <-agent.disconnected:
+	case <-time.After(time.Second):
+		t.Fatal("超限帧关闭连接后 Agent 未收到断开通知")
+	}
+
+	recoveryConnection, recoveryMACKey := dialAuthenticatedTestClient(t, gate, clientTLS)
+	defer recoveryConnection.Close()
+	recoveryAgent := receiveProductionAgent(t, agents)
+	requestBytes, err := proto.Marshal(&commonv1.Envelope{MsgId: 1001, RequestId: 100})
+	if err != nil {
+		t.Fatalf("marshal recovery request Envelope: %v", err)
+	}
+	if err := recoveryConnection.WriteMessage(websocket.BinaryMessage, makeAuthenticatedTestFrame(t, recoveryMACKey[:], 1, requestBytes)); err != nil {
+		t.Fatalf("WriteMessage(recovery frame) error = %v", err)
+	}
+	select {
+	case delivered := <-recoveryAgent.received:
+		if !bytes.Equal(delivered, requestBytes) {
+			t.Fatalf("recovery Agent 收到 Envelope = %x，want %x", delivered, requestBytes)
+		}
+	case <-time.After(time.Second):
+		t.Fatal("超限帧拒绝后，Gate 未投递有效请求")
+	}
+	_, responseBytes, err := readTestBinaryMessage(t, recoveryConnection)
+	if err != nil {
+		t.Fatalf("ReadMessage(recovery response) error = %v", err)
+	}
+	var response commonv1.Envelope
+	if err := proto.Unmarshal(responseBytes, &response); err != nil {
+		t.Fatalf("unmarshal recovery response Envelope: %v", err)
+	}
+	if response.GetMsgId() != 1002 || response.GetRequestId() != 100 {
+		t.Fatalf("recovery response = msg_id %d, request_id %d; want 1002, 100", response.GetMsgId(), response.GetRequestId())
+	}
+	if err := recoveryConnection.Close(); err != nil {
+		t.Fatalf("Close(recovery client) error = %v", err)
+	}
+	select {
+	case <-recoveryAgent.disconnected:
+	case <-time.After(time.Second):
+		t.Fatal("健康连接断开后 Agent 未收到通知")
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+}
+
 // TestProdGateClosesConnectionWhenAgentMailboxIsFull 验证 Agent 正在处理消息时 Mailbox 满载会关闭当前客户端连接并累计计数。
 func TestProdGateClosesConnectionWhenAgentMailboxIsFull(t *testing.T) {
 	release := make(chan struct{})
