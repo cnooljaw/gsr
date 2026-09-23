@@ -375,6 +375,8 @@ Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/
 
 `TestProdGateReturnsErrorForWrongDirection` 覆盖客户端反向发送服务端 Push 编号的链路：Agent 返回 `INVALID_REQUEST`，不把方向错误当作 WebSocket 坏帧，连接仍可继续处理合法请求。
 
+`TestProdGateConcurrentBadMACDoesNotBlockHealthyConnection` 覆盖 8 条坏 MAC 连接并发失败期间健康连接继续完成 16 次请求/响应，并确认坏帧未进入 Agent。
+
 `TestProdGateReturnsErrorAfterAgentCallTimeout` 覆盖 Agent 内部 Core Call 超时：客户端收到原 `request_id` 的 `INTERNAL`，目标 Service 之后完成的迟到内部回复不会再生成第二条客户端响应，超时归 Agent/Runtime 而不是 Gate。该测试锁定内部调用的错误归属，不定义客户端业务请求的超时数值或重试策略。
 
 `TestProdGateRejectsLateAgentResponseAfterDisconnect` 已锁定断开后的迟到写回：Gate 先使 `ClientSession` 失效，再通知 Agent；Agent 后续写回得到 `ErrClientSessionClosed`，不会重新进入出站队列。
