@@ -188,7 +188,7 @@ message ErrorResponse {
 - 握手失败直接关闭连接，不进入 Agent，也不发送业务 ErrorResponse；握手成功后双方才启用派生的 macKey。
 - 必须设置消息大小、握手等待和接纳容量上限；具体初始值与零值语义见“已确认：Gate 容量与关闭顺序”，Protobuf 不意味着无限消息大小。
 
-当前实现位于 `examples/websocket-gate/prodgate/`：Gate 在 HTTP/WebSocket Handler 前限制已接纳 TCP 连接数；`TLSConfig` 非空时启动直连 WSS Listener，为 nil 时启动供 Ingress 转发的普通 HTTP WebSocket Listener。首个二进制 WebSocket 消息必须是固定 33 字节握手，完成 X25519 握手后，逐帧校验 MAC 和递增 seq，再将原始 Envelope 字节直接交给目标 Agent 的 `Runtime.DeliverClientMessage`。Agent 的响应通过每连接有界队列进入唯一 WebSocket 写循环。生产 Gate 从 Runtime 借用同一 Logger 并绑定自身 ServiceID；同一连接同一错误类别只记录首条，关闭时补充抑制数量，不记录密钥、MAC 或原始载荷。生产 Gate 与 DebugGate 仍使用不同监听器和显式配置，不会根据首包自动降级。端到端测试覆盖直连 TLS、Ingress 终止 TLS 后的普通 WebSocket、握手与业务帧往返、错误 MAC 拒绝、首帧超时、握手前连接上限、Mailbox/出站队列满载、基础慢客户端背压、短时多连接并发及 Runtime 关闭回收；这不替代密码协议审查或慢客户端长时压力验收。
+当前实现位于 `examples/websocket-gate/prodgate/`：Gate 在 HTTP/WebSocket Handler 前限制已接纳 TCP 连接数；`TLSConfig` 非空时启动直连 WSS Listener，为 nil 时启动供 Ingress 转发的普通 HTTP WebSocket Listener。首个二进制 WebSocket 消息必须是固定 33 字节握手，完成 X25519 握手后，逐帧校验 MAC 和递增 seq，再将原始 Envelope 字节直接交给目标 Agent 的 `Runtime.DeliverClientMessage`。Agent 的响应通过每连接有界队列进入唯一 WebSocket 写循环。生产 Gate 从 Runtime 借用同一 Logger 并绑定自身 ServiceID；同一连接同一错误类别只记录首条，关闭时补充抑制数量，不记录密钥、MAC 或原始载荷。生产 Gate 与 DebugGate 仍使用不同监听器和显式配置，不会根据首包自动降级。端到端测试覆盖直连 TLS、Ingress 终止 TLS 后的普通 WebSocket、握手与业务帧往返、错误 MAC 拒绝、首帧超时、握手前连接上限与断开后名额回收、Mailbox/出站队列满载、基础慢客户端背压、短时多连接并发及 Runtime 关闭回收；这不替代密码协议审查或慢客户端长时压力验收。
 
 已确认的密码参数：
 

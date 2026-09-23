@@ -105,6 +105,8 @@ GSR_CALL_STABILITY=1 go test ./cluster -run '^TestTCPCallServicePanicAndReplacem
 
 2026-09-23 Gate Stop 资源释放：单独调用 `Runtime.Stop()` 后可立即重绑 Gate 原监听地址，再调用 `Runtime.Close()` 完成最终释放。定向测试、对应 `-race` 测试和 prodgate 包全测均通过。
 
+2026-09-23 Gate 连接容量回收：连接上限为 1 时，未完成 TLS 握手的 TCP 连接占用名额，超限连接被关闭；占用连接关闭后，新的 WSS 连接可完成 HTTP Upgrade。定向测试重复运行 10 次、对应 `-race` 测试和 prodgate 包全测均通过。
+
 2026-09-23 上行序号耗尽边界：Go 服务端接纳一次 `uint64` 最大值序号后拒绝回绕到 1；TypeScript 客户端能生成最大序号帧，之后保持序号不变并返回耗尽错误。Go 专项测试与 `npm run test:crypto`（含 TypeScript 编译）通过。协议规定上限后结束当前连接并重新握手；本切片只补测试和说明，不改生产算法。
 
 2026-09-23 C/S 请求编号上限：协议分发测试将最大 `uint32 request_id` 编码进 Envelope，确认 Handler 收到原值且 Response 原样回传。该测试、protocol 全包测试和 vet 通过；客户端 request_id 分配器仍由业务客户端实现，示例 CLI 固定使用 1。

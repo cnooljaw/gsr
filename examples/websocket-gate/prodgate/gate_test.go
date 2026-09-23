@@ -737,9 +737,9 @@ func TestProdGateSuppressesRepeatedConnectionFailures(t *testing.T) {
 	}
 }
 
-// TestProdGateAppliesConnectionLimitBeforeTLSHandshake 验证连接上限也覆盖尚未完成 TLS/HTTP 握手的 TCP 连接。
+// TestProdGateAppliesConnectionLimitBeforeTLSHandshake 验证连接上限覆盖未完成 TLS 握手的 TCP 连接，且断开后会归还名额。
 func TestProdGateAppliesConnectionLimitBeforeTLSHandshake(t *testing.T) {
-	_, gate, _, _ := startTestProductionGate(t, 1, time.Second)
+	_, gate, _, clientTLS := startTestProductionGate(t, 1, time.Second)
 	first, err := net.DialTimeout("tcp", gate.Addr().String(), time.Second)
 	if err != nil {
 		t.Fatalf("Dial(first raw TCP) error = %v", err)
@@ -760,6 +760,29 @@ func TestProdGateAppliesConnectionLimitBeforeTLSHandshake(t *testing.T) {
 	waitForGateMetric(t, gate, "RejectedConnections", func(metrics Metrics) uint64 {
 		return metrics.RejectedConnections
 	}, 1)
+	if err := first.Close(); err != nil {
+		t.Fatalf("Close(first raw TCP) error = %v", err)
+	}
+
+	endpoint := url.URL{Scheme: "wss", Host: gate.Addr().String(), Path: "/ws"}
+	dialer := websocket.Dialer{TLSClientConfig: clientTLS, HandshakeTimeout: time.Second}
+	deadline := time.Now().Add(time.Second)
+	var recovered *websocket.Conn
+	for recovered == nil && time.Now().Before(deadline) {
+		connection, response, dialErr := dialer.Dial(endpoint.String(), nil)
+		if response != nil && response.Body != nil {
+			_ = response.Body.Close()
+		}
+		if dialErr == nil {
+			recovered = connection
+			break
+		}
+		time.Sleep(5 * time.Millisecond)
+	}
+	if recovered == nil {
+		t.Fatal("首条 TCP 连接断开后，Gate 未归还连接名额")
+	}
+	_ = recovered.Close()
 }
 
 // TestProdGateHandshakeTimeoutClosesConnection 验证客户端未发送首个密钥交换包时会按策略关闭并计数。
