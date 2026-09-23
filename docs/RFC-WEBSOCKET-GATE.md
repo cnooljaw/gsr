@@ -353,6 +353,8 @@ Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/
 
 `TestProdGateKeepsConnectionAfterUnknownNotification` 进一步覆盖 `request_id == 0` 的未知通知：Agent 不生成 `ErrorResponse`，连接继续保留并可处理后续请求。
 
+`TestDefinedNotificationWithoutHandlerDoesNotRespond` 验证协议目录已定义、但业务尚未注册 Handler 的 Notify 不生成无法关联的响应。
+
 `TestProdGateDeliversNotificationPush` 覆盖已注册通知的生产链路：客户端发送零 `request_id` 的 `EchoNotify`，Agent 通过协议上下文发出零 `request_id` 的 `EchoPush`，Gate 原样写回客户端。
 
 `TestProdGateRejectsNotificationWithRequestID` 覆盖已注册 Notify 携带非零 `request_id` 的生产链路：协议层返回 `INVALID_REQUEST`，并在通用错误响应中保留原编号。

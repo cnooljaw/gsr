@@ -270,6 +270,22 @@ func TestDefinedMessageWithoutHandlerReturnsUnsupported(t *testing.T) {
 	}
 }
 
+// TestDefinedNotificationWithoutHandlerDoesNotRespond 验证已定义但未注册 Handler 的 Notify 不产生无法关联的响应。
+func TestDefinedNotificationWithoutHandlerDoesNotRespond(t *testing.T) {
+	registry := testRegistry(t)
+	sender := &recordedSender{}
+	dispatcher := testDispatcher(t, registry, sender)
+	frame := marshalEnvelope(t, &commonv1.Envelope{
+		MsgId: uint32(echopb.MsgId_C2S_ECHO_NOTIFY),
+	})
+	if err := dispatcher.HandleFrame(frame); !errors.Is(err, ErrHandlerNotRegistered) {
+		t.Fatalf("HandleFrame() error = %v, want ErrHandlerNotRegistered", err)
+	}
+	if len(sender.envelopes) != 0 {
+		t.Fatalf("unimplemented notification sent %d responses, want none", len(sender.envelopes))
+	}
+}
+
 // TestRequestWithoutHandlerResponseGetsError 验证 Request Handler 忘记响应时不会让客户端无限等待。
 func TestRequestWithoutHandlerResponseGetsError(t *testing.T) {
 	registry := testRegistry(t)
