@@ -785,9 +785,9 @@ func TestProdGateAppliesConnectionLimitBeforeTLSHandshake(t *testing.T) {
 	_ = recovered.Close()
 }
 
-// TestProdGateHandshakeTimeoutClosesConnection 验证客户端未发送首个密钥交换包时会按策略关闭并计数。
+// TestProdGateHandshakeTimeoutClosesConnection 验证应用握手超时会关闭连接并归还名额，使后续客户端仍可接入。
 func TestProdGateHandshakeTimeoutClosesConnection(t *testing.T) {
-	_, gate, _, clientTLS := startTestProductionGate(t, 2, 25*time.Millisecond)
+	local, gate, agents, clientTLS := startTestProductionGate(t, 1, 250*time.Millisecond)
 	connection := dialProductionTestClient(t, gate, clientTLS)
 	defer connection.Close()
 
@@ -801,6 +801,42 @@ func TestProdGateHandshakeTimeoutClosesConnection(t *testing.T) {
 	waitForGateMetric(t, gate, "RejectedConnections", func(metrics Metrics) uint64 {
 		return metrics.RejectedConnections
 	}, 1)
+
+	recovered, macKey := dialAuthenticatedTestClient(t, gate, clientTLS)
+	defer recovered.Close()
+	agent := receiveProductionAgent(t, agents)
+	requestBytes, err := proto.Marshal(&commonv1.Envelope{MsgId: 1001, RequestId: 411})
+	if err != nil {
+		t.Fatalf("marshal recovered connection request: %v", err)
+	}
+	if err := recovered.WriteMessage(websocket.BinaryMessage, makeAuthenticatedTestFrame(t, macKey[:], 1, requestBytes)); err != nil {
+		t.Fatalf("recovered connection WriteMessage() error = %v", err)
+	}
+	_, responseBytes, err := readTestBinaryMessage(t, recovered)
+	if err != nil {
+		t.Fatalf("recovered connection ReadMessage() error = %v", err)
+	}
+	var response commonv1.Envelope
+	if err := proto.Unmarshal(responseBytes, &response); err != nil {
+		t.Fatalf("unmarshal recovered connection response: %v", err)
+	}
+	if response.GetMsgId() != 1002 || response.GetRequestId() != 411 {
+		t.Fatalf("recovered response = msg_id %d, request_id %d; want 1002, 411", response.GetMsgId(), response.GetRequestId())
+	}
+	if got := gate.Metrics().AcceptedConnections; got != 1 {
+		t.Fatalf("AcceptedConnections = %d, want 1", got)
+	}
+	if err := recovered.Close(); err != nil {
+		t.Fatalf("Close(recovered client) error = %v", err)
+	}
+	select {
+	case <-agent.disconnected:
+	case <-time.After(time.Second):
+		t.Fatal("recovered Agent 未收到客户端断开通知")
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
 }
 
 // TestProdGateRejectsNonBinaryHandshake 验证应用层握手只接受二进制消息，并且不会创建 Agent。

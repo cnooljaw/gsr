@@ -377,6 +377,8 @@ Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/
 
 `TestProdGateConcurrentBadMACDoesNotBlockHealthyConnection` 覆盖 8 条坏 MAC 连接并发失败期间健康连接继续完成 16 次请求/响应，并确认坏帧未进入 Agent。
 
+`TestProdGateHandshakeTimeoutClosesConnection` 覆盖应用握手超时后的容量恢复：首个连接被关闭并计数后，连接上限为 1 的 Gate 仍允许新客户端完成握手和请求/响应。
+
 `TestProdGateRecoversFromAgentConstructorPanic` 覆盖 Agent 构造器 panic：当前连接收到内部错误关闭，后续连接仍能创建 Agent 并完成请求/响应。
 
 `TestProdGateRecoversFromAgentStartFailure` 覆盖 Agent 的 `OnStart` 返回错误：Runtime 调用该实例的 `OnStop` 清理，Gate 拒绝当前连接后仍可接受新连接。
