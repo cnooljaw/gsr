@@ -161,57 +161,57 @@ Runtime 不应隐式决定：
 
 ## 5. 验证门禁
 
-验证采用分层策略。下一层只在上一层通过、风险需要或功能切片收尾时执行。
+验证按变更范围和风险分层；不要求每个小编辑都逐层跑完。选择能覆盖本轮行为的最小检查，形成连贯切片后再升级验证。纯文档修改不运行 Go 测试。
 
-### 5.1 L0：格式与编译
+### 5.1 L0：格式与快速反馈
 
-每次编辑后先处理修改文件，并编译受影响 package：
+Go 文件修改后运行 `gofmt`。如果有相关测试，直接用定向测试获得编译和行为反馈，不必再额外运行一次仅编译命令：
 
 ```text
-gofmt -w <modified-go-files>
-go test ./path/to/package -run '^$'
+gofmt -w <changed-go-files>
+go test ./path/to/package -run '^TestSpecificBehavior$'
 ```
 
-目标耗时不超过 30 秒。纯文档修改只检查文档结构和链接，不运行无关 Go 测试。
+仅在没有适合的测试或需要单独确认编译时，才使用 `go test ./path/to/package -run '^$'`。文档修改只检查 diff、格式和改动涉及的链接，不运行无关 Go 测试。
 
 ### 5.2 L1：相关行为
 
-开发循环只运行当前行为相关的测试：
+开发循环优先只运行本轮行为相关的测试，一般运行一次：
 
 ```text
-go test ./runtime -run 'Test(Call|Reply|Timeout)' -timeout=2m
+go test ./path/to/package -run '^TestSpecificBehavior$'
 ```
 
-相关测试默认在 2 分钟内完成。不要在每次小编辑后运行全仓验证。
+测试名替换为实际名称。只有排查 flaky、随机性或并发时序问题时，才重复运行或使用 `-count=1`。相关测试默认在 2 分钟内完成。
 
 ### 5.3 L2：受影响 package
 
-功能在局部完成后运行受影响 package 的完整测试和静态检查：
+一个局部功能切片完成、共享测试辅助代码变更或同包多个行为彼此相关时，运行受影响 package 全测；只有静态分析对本次生产代码变更有价值时，再运行该 package 的 `go vet`：
 
 ```text
-go test ./runtime -timeout=5m
-go vet ./runtime
+go test ./path/to/package -timeout=5m
+go vet ./path/to/package
 ```
 
-默认预算为 5 分钟。`go test -timeout` 限制的是各测试二进制的执行时间；总体命令仍需观察实际进度。
+默认预算为 5 分钟。`go test -timeout` 限制的是各测试二进制的执行时间；总体命令仍需观察实际进度。单个独立测试或小改动不因惯例追加全包验证。
 
-### 5.4 L3：功能切片收尾
+### 5.4 L3：跨 package 或阶段验收
 
-功能切片完成、准备提交或公开契约变化后执行：
+跨 package 功能切片完成、重要集成节点或发布前，根据改动范围执行全仓测试和静态分析：
 
 ```text
 go test ./...
 go vet ./...
 ```
 
-全仓验证只在收尾执行一次，不在 L1/L2 每一步重复执行。
+全仓验证不是每轮小改动的门禁；对同一份未变化代码，已由更完整的验证覆盖后不重复执行。
 
 ### 5.5 L4：高风险验证
 
-涉及 goroutine、生命周期、锁、channel、Timer、Scheduler、Transport 或共享状态时，在收尾执行：
+涉及并发、生命周期或共享状态时，优先在切片收尾对受影响 package 运行 race 测试。只有改动影响 Runtime、Scheduler、Mailbox、Cluster 等跨 package 共享并发边界，或处于重要集成/发布验收时，才运行全仓 race：
 
 ```text
-go test -race ./...
+go test -race ./path/to/affected/package
 ```
 
 压力、泄漏、跨进程和外部依赖测试可以独立为 slow/integration 测试集，由 CI、阶段收尾或明确需求触发；不得为了缩短日常验证而把普通正确性测试移出默认测试集。

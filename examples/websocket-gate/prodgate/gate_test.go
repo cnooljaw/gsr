@@ -672,6 +672,34 @@ func TestProdGateRejectsNonBinaryAuthenticatedFrame(t *testing.T) {
 	}
 }
 
+// TestProdGateRejectsMalformedAuthenticatedFrame 验证短于序号和 MAC 最小长度的认证帧以协议错误关闭且不会投递给 Agent。
+func TestProdGateRejectsMalformedAuthenticatedFrame(t *testing.T) {
+	_, gate, agents, clientTLS := startTestProductionGate(t, 1, time.Second)
+	connection, _ := dialAuthenticatedTestClient(t, gate, clientTLS)
+	defer connection.Close()
+	agent := receiveProductionAgent(t, agents)
+
+	malformedFrame := make([]byte, authenticatedFrameOverhead-1)
+	if err := connection.WriteMessage(websocket.BinaryMessage, malformedFrame); err != nil {
+		t.Fatalf("WriteMessage(short authenticated frame) error = %v", err)
+	}
+	_, _, err := readTestBinaryMessage(t, connection)
+	if !websocket.IsCloseError(err, websocket.CloseProtocolError) {
+		t.Fatalf("ReadMessage(short authenticated frame) error = %v, want WebSocket close %d", err, websocket.CloseProtocolError)
+	}
+
+	select {
+	case frame := <-agent.received:
+		t.Fatalf("malformed authenticated frame reached Agent as %x", frame)
+	case <-time.After(30 * time.Millisecond):
+	}
+	select {
+	case <-agent.disconnected:
+	case <-time.After(time.Second):
+		t.Fatal("拒绝短认证帧后 Agent 未收到连接断开通知")
+	}
+}
+
 // TestProdGateRejectsOversizedAuthenticatedFrame 验证认证后的超限消息在投递 Agent 前关闭当前连接，且后续连接可正常服务。
 func TestProdGateRejectsOversizedAuthenticatedFrame(t *testing.T) {
 	const maxFrameBytes = 256
