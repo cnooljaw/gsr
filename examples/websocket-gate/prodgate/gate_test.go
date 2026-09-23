@@ -301,6 +301,62 @@ func TestProdGateRejectsCrossConnectionReplayBeforeDelivery(t *testing.T) {
 	}
 }
 
+// TestProdGateRejectsSameConnectionReplayBeforeDelivery 验证已处理过的认证帧不能在同一连接再次投递给 Agent。
+func TestProdGateRejectsSameConnectionReplayBeforeDelivery(t *testing.T) {
+	local, gate, agents, clientTLS := startTestProductionGate(t, 1, time.Second)
+	connection, macKey := dialAuthenticatedTestClient(t, gate, clientTLS)
+	defer connection.Close()
+	agent := receiveProductionAgent(t, agents)
+	requestBytes, err := proto.Marshal(&commonv1.Envelope{MsgId: 1001, RequestId: 98})
+	if err != nil {
+		t.Fatalf("marshal request Envelope: %v", err)
+	}
+	frame := makeAuthenticatedTestFrame(t, macKey[:], 1, requestBytes)
+	if err := connection.WriteMessage(websocket.BinaryMessage, frame); err != nil {
+		t.Fatalf("WriteMessage(first authenticated frame) error = %v", err)
+	}
+	select {
+	case delivered := <-agent.received:
+		if !bytes.Equal(delivered, requestBytes) {
+			t.Fatalf("Agent 收到 Envelope = %x，want %x", delivered, requestBytes)
+		}
+	case <-time.After(time.Second):
+		t.Fatal("Gate 未投递首次认证请求")
+	}
+	_, responseBytes, err := readTestBinaryMessage(t, connection)
+	if err != nil {
+		t.Fatalf("ReadMessage(first response) error = %v", err)
+	}
+	var response commonv1.Envelope
+	if err := proto.Unmarshal(responseBytes, &response); err != nil {
+		t.Fatalf("unmarshal first response Envelope: %v", err)
+	}
+	if response.GetMsgId() != 1002 || response.GetRequestId() != 98 {
+		t.Fatalf("first response = msg_id %d, request_id %d; want 1002, 98", response.GetMsgId(), response.GetRequestId())
+	}
+
+	if err := connection.WriteMessage(websocket.BinaryMessage, frame); err != nil {
+		t.Fatalf("WriteMessage(replayed authenticated frame) error = %v", err)
+	}
+	_, _, err = readTestBinaryMessage(t, connection)
+	if !websocket.IsCloseError(err, websocket.ClosePolicyViolation) {
+		t.Fatalf("ReadMessage(replayed frame) error = %v, want WebSocket close %d", err, websocket.ClosePolicyViolation)
+	}
+	select {
+	case duplicate := <-agent.received:
+		t.Fatalf("replayed frame reached Agent as %x", duplicate)
+	case <-time.After(30 * time.Millisecond):
+	}
+	select {
+	case <-agent.disconnected:
+	case <-time.After(time.Second):
+		t.Fatal("同连接重放被拒绝后 Agent 未收到断开通知")
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+}
+
 // TestProdGateWritesConnectionFailureToRuntimeLogger 验证 Gate 复用 Runtime 的共享 Logger，并记录安全失败而不记录原始载荷。
 func TestProdGateWritesConnectionFailureToRuntimeLogger(t *testing.T) {
 	var output bytes.Buffer
