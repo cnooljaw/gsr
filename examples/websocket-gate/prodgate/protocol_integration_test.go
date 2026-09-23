@@ -17,10 +17,11 @@ import (
 
 // protocolGateAgent 将真实协议分发器接入生产 Gate 测试，验证未知消息不会破坏连接。
 type protocolGateAgent struct {
-	client       ClientSession
-	dispatcher   *protocol.Dispatcher
-	disconnected chan struct{}
-	stopOnce     sync.Once
+	client                 ClientSession
+	dispatcher             *protocol.Dispatcher
+	disconnected           chan struct{}
+	omitEchoRequestHandler bool
+	stopOnce               sync.Once
 }
 
 const protocolTimeoutCommand runtime.CommandID = 0x7100
@@ -136,8 +137,10 @@ func (agent *protocolGateAgent) OnStart(_ context.Context, _ runtime.ServiceCont
 	if err != nil {
 		return err
 	}
-	if err := protocol.Register(dispatcher, agent.onEcho); err != nil {
-		return err
+	if !agent.omitEchoRequestHandler {
+		if err := protocol.Register(dispatcher, agent.onEcho); err != nil {
+			return err
+		}
 	}
 	if err := protocol.Register(dispatcher, agent.onEchoNotify); err != nil {
 		return err
@@ -367,6 +370,75 @@ func TestProdGateKeepsConnectionAfterUnknownMessage(t *testing.T) {
 	case <-agent.disconnected:
 	case <-time.After(time.Second):
 		t.Fatal("Agent 未收到客户端断开通知")
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+}
+
+// TestProdGateReturnsUnsupportedForUnimplementedRequest 验证已定义但未注册 Handler 的 Request 返回关联错误且连接仍可用。
+func TestProdGateReturnsUnsupportedForUnimplementedRequest(t *testing.T) {
+	agents := make(chan *protocolGateAgent, 1)
+	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
+		MailboxCapacity: 8,
+		ShutdownTimeout: 2 * time.Second,
+	}, 1, time.Second, 1<<20, 64<<10, func(client ClientSession) runtime.Service {
+		agent := &protocolGateAgent{
+			client:                 client,
+			disconnected:           make(chan struct{}),
+			omitEchoRequestHandler: true,
+		}
+		agents <- agent
+		return agent
+	})
+	connection, macKey := dialAuthenticatedTestClient(t, gate, clientTLS)
+	defer connection.Close()
+	agent := <-agents
+
+	requestPayload, err := proto.Marshal(&echopb.EchoRequest{Text: "handler not registered"})
+	if err != nil {
+		t.Fatalf("marshal EchoRequest: %v", err)
+	}
+	for index, requestID := range []uint32{101, 102} {
+		requestBytes, err := proto.Marshal(&commonv1.Envelope{
+			MsgId:     uint32(echopb.MsgId_C2S_ECHO_REQUEST),
+			RequestId: requestID,
+			Payload:   requestPayload,
+		})
+		if err != nil {
+			t.Fatalf("marshal Request Envelope: %v", err)
+		}
+		if err := connection.WriteMessage(websocket.BinaryMessage, makeAuthenticatedTestFrame(t, macKey[:], uint64(index+1), requestBytes)); err != nil {
+			t.Fatalf("WriteMessage(unimplemented Request) error = %v", err)
+		}
+		_, responseBytes, err := readTestBinaryMessage(t, connection)
+		if err != nil {
+			t.Fatalf("ReadMessage(ErrorResponse) error = %v", err)
+		}
+		var errorEnvelope commonv1.Envelope
+		if err := proto.Unmarshal(responseBytes, &errorEnvelope); err != nil {
+			t.Fatalf("unmarshal ErrorResponse Envelope: %v", err)
+		}
+		if errorEnvelope.GetMsgId() != uint32(commonv1.MsgId_S2C_ERROR_RESPONSE) || errorEnvelope.GetRequestId() != requestID {
+			t.Fatalf("ErrorResponse Envelope = msg_id %d, request_id %d; want %d, %d",
+				errorEnvelope.GetMsgId(), errorEnvelope.GetRequestId(), commonv1.MsgId_S2C_ERROR_RESPONSE, requestID)
+		}
+		var errorResponse commonv1.ErrorResponse
+		if err := proto.Unmarshal(errorEnvelope.GetPayload(), &errorResponse); err != nil {
+			t.Fatalf("unmarshal ErrorResponse: %v", err)
+		}
+		if errorResponse.GetCode() != commonv1.ErrorCode_ERROR_CODE_UNSUPPORTED_MESSAGE {
+			t.Fatalf("ErrorResponse code = %v, want unsupported message", errorResponse.GetCode())
+		}
+	}
+
+	if err := connection.Close(); err != nil {
+		t.Fatalf("Close(client) error = %v", err)
+	}
+	select {
+	case <-agent.disconnected:
+	case <-time.After(time.Second):
+		t.Fatal("客户端断开后 Agent 未收到通知")
 	}
 	if err := local.Stop(context.Background()); err != nil {
 		t.Fatalf("Runtime.Stop() error = %v", err)

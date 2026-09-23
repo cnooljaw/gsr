@@ -351,6 +351,8 @@ Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/
 
 `TestProdGateKeepsConnectionAfterUnknownMessage` 已补充合法认证帧携带未知 `msg_id` 的真实 Gate 验收：Agent 回传原 `request_id` 的通用 `ErrorResponse`，连接不关闭，后续有效请求仍可完成。Agent 内部 Core Call 的超时与迟到回复已有独立验收；客户端业务超时策略和多连接长时背压仍按后续压力计划推进。
 
+`TestProdGateReturnsUnsupportedForUnimplementedRequest` 覆盖协议目录已定义但 Agent 尚未注册 Handler 的 Request：连续请求均返回保留原 `request_id` 的 `UNSUPPORTED_MESSAGE`，连接保持可用。
+
 `TestProdGateKeepsConnectionAfterUnknownNotification` 进一步覆盖 `request_id == 0` 的未知通知：Agent 不生成 `ErrorResponse`，连接继续保留并可处理后续请求。
 
 `TestDefinedNotificationWithoutHandlerDoesNotRespond` 验证协议目录已定义、但业务尚未注册 Handler 的 Notify 不生成无法关联的响应。
