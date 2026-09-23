@@ -360,7 +360,9 @@ func TestRequestRequiresIDAndOnlyOneResponse(t *testing.T) {
 	registry := testRegistry(t)
 	sender := &recordedSender{}
 	dispatcher := testDispatcher(t, registry, sender)
+	handlerCalls := 0
 	if err := Register(dispatcher, func(context Context, _ *echopb.EchoRequest) error {
+		handlerCalls++
 		if err := context.Response(uint32(echopb.MsgId_S2C_ECHO_RESPONSE), &echopb.EchoResponse{}); err != nil {
 			return err
 		}
@@ -374,12 +376,18 @@ func TestRequestRequiresIDAndOnlyOneResponse(t *testing.T) {
 	if err := dispatcher.HandleFrame(requestWithoutID); !errors.Is(err, ErrRequestIDMismatch) {
 		t.Fatalf("request without ID HandleFrame() error = %v, want ErrRequestIDMismatch", err)
 	}
+	if handlerCalls != 0 {
+		t.Fatalf("Handler calls after request without ID = %d, want 0", handlerCalls)
+	}
 	request := marshalEnvelope(t, &commonv1.Envelope{
 		MsgId:     uint32(echopb.MsgId_C2S_ECHO_REQUEST),
 		RequestId: 48,
 	})
 	if err := dispatcher.HandleFrame(request); !errors.Is(err, ErrDuplicateResponse) {
 		t.Fatalf("request HandleFrame() error = %v, want ErrDuplicateResponse", err)
+	}
+	if handlerCalls != 1 {
+		t.Fatalf("Handler calls after valid request = %d, want 1", handlerCalls)
 	}
 	if len(sender.envelopes) != 1 {
 		t.Fatalf("sent Envelope count = %d, want exactly one", len(sender.envelopes))
