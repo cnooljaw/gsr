@@ -141,6 +141,38 @@ func TestTypedHandlerReturnsResponse(t *testing.T) {
 	}
 }
 
+// TestMaximumRequestIDReturnsUnchanged 验证最大 uint32 request_id 可被处理并原样写回响应。
+func TestMaximumRequestIDReturnsUnchanged(t *testing.T) {
+	const maximumRequestID uint32 = ^uint32(0)
+	registry := testRegistry(t)
+	sender := &recordedSender{}
+	dispatcher := testDispatcher(t, registry, sender)
+	if err := Register(dispatcher, func(context Context, _ *echopb.EchoRequest) error {
+		if got := context.RequestID(); got != maximumRequestID {
+			return errors.New("Handler received a changed request_id")
+		}
+		return context.Response(
+			uint32(echopb.MsgId_S2C_ECHO_RESPONSE),
+			&echopb.EchoResponse{Text: "maximum request_id"},
+		)
+	}); err != nil {
+		t.Fatalf("Register() error = %v", err)
+	}
+	frame := marshalEnvelope(t, &commonv1.Envelope{
+		MsgId:     uint32(echopb.MsgId_C2S_ECHO_REQUEST),
+		RequestId: maximumRequestID,
+	})
+	if err := dispatcher.HandleFrame(frame); err != nil {
+		t.Fatalf("HandleFrame() error = %v", err)
+	}
+	if len(sender.envelopes) != 1 {
+		t.Fatalf("sent Envelope count = %d, want 1", len(sender.envelopes))
+	}
+	if got := sender.envelopes[0].GetRequestId(); got != maximumRequestID {
+		t.Fatalf("response request_id = %d, want %d", got, maximumRequestID)
+	}
+}
+
 // TestTypedNotificationCanPush 验证 Notify Handler 可以发送 request_id 为零的服务端 Push。
 func TestTypedNotificationCanPush(t *testing.T) {
 	registry := testRegistry(t)

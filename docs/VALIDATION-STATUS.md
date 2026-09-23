@@ -73,6 +73,8 @@ GSR_CALL_STABILITY=1 go test ./cluster -run '^TestTCPCallServicePanicAndReplacem
 
 2026-09-23 上行序号耗尽边界：Go 服务端接纳一次 `uint64` 最大值序号后拒绝回绕到 1；TypeScript 客户端能生成最大序号帧，之后保持序号不变并返回耗尽错误。Go 专项测试与 `npm run test:crypto`（含 TypeScript 编译）通过。协议规定上限后结束当前连接并重新握手；本切片只补测试和说明，不改生产算法。
 
+2026-09-23 C/S 请求编号上限：协议分发测试将最大 `uint32 request_id` 编码进 Envelope，确认 Handler 收到原值且 Response 原样回传。该测试、protocol 全包测试和 vet 通过；客户端 request_id 分配器仍由业务客户端实现，示例 CLI 固定使用 1。
+
 同日 Agent 内部超时切片：`TestProdGateReturnsErrorAfterAgentCallTimeout` 通过真实生产 Gate 验证 Agent 调用本地目标 Service 超时后，客户端收到原 `request_id` 的 `INTERNAL`；目标 Service 释放后产生的迟到 Core 回复不会再次写回客户端。重复运行 5 次、prodgate 全包、vet 和 race 均通过。该切片只确认 Agent/Runtime 的内部 Call 超时归属，不把它扩展为客户端业务请求的统一超时或重试策略。
 
 后续热点切片新增 TestRuntimeHotMailboxLoad（GSR_LOAD_TEST=1 显式启用）：4 个发送者、10 万次固定尝试、容量 64/1024，逐条核对接纳与处理结果并记录到达延迟分位数。它是短突发测试，不替代下文的持续负载验收；未修改生产实现。
