@@ -71,6 +71,8 @@ GSR_CALL_STABILITY=1 go test ./cluster -run '^TestTCPCallServicePanicAndReplacem
 
 2026-09-23 Gate 压力验收断言收紧：多连接测试现在等候最多 5 秒排空，并要求客户端成功写入数与 Agent 处理数相等、Mailbox 满载和连接拒绝均为零；失败阶段测试在坏握手与坏 MAC 后额外执行一次健康请求/响应。3 秒短样本中非 race 处理 4,784 条、race 处理 4,783 条，均与各自成功写入数相等；两轮 Mailbox 满载与连接拒绝均为零。失败阶段各重复 3 次坏握手与坏 MAC，计数为 `rejected=3`、`accepted=4`，随后健康往返成功。目标测试、对应 race、prodgate 全包和 vet 通过；这次仅加固验收，不改生产 Gate。
 
+2026-09-23 上行序号耗尽边界：Go 服务端接纳一次 `uint64` 最大值序号后拒绝回绕到 1；TypeScript 客户端能生成最大序号帧，之后保持序号不变并返回耗尽错误。Go 专项测试与 `npm run test:crypto`（含 TypeScript 编译）通过。协议规定上限后结束当前连接并重新握手；本切片只补测试和说明，不改生产算法。
+
 同日 Agent 内部超时切片：`TestProdGateReturnsErrorAfterAgentCallTimeout` 通过真实生产 Gate 验证 Agent 调用本地目标 Service 超时后，客户端收到原 `request_id` 的 `INTERNAL`；目标 Service 释放后产生的迟到 Core 回复不会再次写回客户端。重复运行 5 次、prodgate 全包、vet 和 race 均通过。该切片只确认 Agent/Runtime 的内部 Call 超时归属，不把它扩展为客户端业务请求的统一超时或重试策略。
 
 后续热点切片新增 TestRuntimeHotMailboxLoad（GSR_LOAD_TEST=1 显式启用）：4 个发送者、10 万次固定尝试、容量 64/1024，逐条核对接纳与处理结果并记录到达延迟分位数。它是短突发测试，不替代下文的持续负载验收；未修改生产实现。

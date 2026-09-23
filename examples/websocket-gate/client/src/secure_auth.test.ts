@@ -78,3 +78,18 @@ test("生产握手拒绝错误长度和版本", () => {
   const invalidPublicKey = Buffer.concat([Buffer.from([handshakeVersion]), Buffer.alloc(32)]);
   assert.throws(() => completeClientHandshake(handshake, invalidPublicKey));
 });
+
+// TestClientSequenceExhaustionDoesNotWrap 验证客户端发出 uint64 最大序号后拒绝继续发送。
+test("客户端序号耗尽后不回绕", () => {
+  const maximumSequence = 0xffff_ffff_ffff_ffffn;
+  const authenticator = {
+    macKey: Buffer.alloc(32, 1),
+    nextSequence: maximumSequence - 1n,
+  };
+
+  const finalFrame = authenticatedFrame(authenticator, new Uint8Array());
+  assert.deepEqual(finalFrame.subarray(0, 8), Buffer.alloc(8, 0xff));
+  assert.equal(authenticator.nextSequence, maximumSequence);
+  assert.throws(() => authenticatedFrame(authenticator, new Uint8Array()), /client sequence exhausted/);
+  assert.equal(authenticator.nextSequence, maximumSequence);
+});

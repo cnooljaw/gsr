@@ -171,7 +171,7 @@ message ErrorResponse {
 - 每连接从 1 单调分配，不回绕、不复用；超时移除等待但不回收编号，迟到响应丢弃。耗尽时通过正常重连建立新的编号空间，不自动重放旧请求。
 - 新连接可重新从 1 开始，旧连接等待不能迁移到新连接。按每秒 10 次 Request，编号约 4971 天（13.6 年）耗尽；通知和推送不消耗 request_id。
 - C/S request_id 与 Core SessionID、ClusterSessionID 分离；Agent 以连接和 request_id 关联客户端等待，不把它当身份凭据或业务幂等键。
-- seq 是独立的 uint64 连接序号，所有上行业务包均消耗，包括 request_id=0 的通知。单连接从 1 单调递增，不回绕；Gateway 接受 seq > lastSeq。这个规则额外拒绝同连接重复旧包。
+- seq 是独立的 uint64 连接序号，所有上行业务包均消耗，包括 request_id=0 的通知。单连接从 1 单调递增，不回绕；到达最大值后客户端关闭并重新握手，Gateway 接受 seq > lastSeq。这个规则额外拒绝同连接重复旧包。
 - seq 在线上使用 8 字节大端序。Laya/TypeScript 实现不得用普通 number 表示完整 uint64，应采用 BigInt 或等效无损表示；uint32 request_id 可以精确表示。
 
 ## 生产 Gate 的连接认证与接收边界
@@ -347,7 +347,7 @@ Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/
 
 联调示例位于 `examples/websocket-gate/`：Go DebugGate/ProdGate、连接 Echo Agent、TypeScript 命令行客户端和 request/response 往返已经落地；生成协议目录、逐步注册强类型 Handler、通用协议错误回复、业务拒绝 Response 以及 Notify→Push 往返也已接入。Echo `.proto` 只属于示例业务协议，不扩展 GSR Core。固定向量已作为独立跨语言测试夹具落地，不由示例运行路径加载或掩盖后续生产 Gate 的安全审查。
 
-已增加显式开关的 `GSR_GATE_STRESS=1` 混合连接压力验收，可通过 `GSR_GATE_STRESS_SECONDS` 调整时长，记录持续发送、Agent 处理、Mailbox 满载和连接拒绝计数；测试等待队列排空并要求成功写入数与 Agent 处理数一致、Mailbox 满载和连接拒绝均为零。同一开关下的 `TestProdGateLongSlowClientBackpressure` 可用 `GSR_GATE_SLOW_CLIENT_SECONDS` 验证慢客户端持续不读时的有界出站队列和快速拒绝；`TestProdGateFailurePhaseStress` 可用 `GSR_GATE_FAILURE_ATTEMPTS` 重复坏握手和坏 MAC，确认失败帧未进入 Agent、故障连接回收后健康连接仍可请求/响应。已完成一次 16 连接、2 分钟的混合样本，但这些测试只提供可重复证据，不把单次机器结果当作容量结论；仍需按目标部署继续观察更长时长、慢客户端和故障组合。既有认证测试覆盖跨连接旧包、同连接重复序号、MAC 篡改和认证失败不推进序号；未知 `msg_id`、编号耗尽继续由协议/Agent 层测试。测试不替代密码协议审查。
+已增加显式开关的 `GSR_GATE_STRESS=1` 混合连接压力验收，可通过 `GSR_GATE_STRESS_SECONDS` 调整时长，记录持续发送、Agent 处理、Mailbox 满载和连接拒绝计数；测试等待队列排空并要求成功写入数与 Agent 处理数一致、Mailbox 满载和连接拒绝均为零。同一开关下的 `TestProdGateLongSlowClientBackpressure` 可用 `GSR_GATE_SLOW_CLIENT_SECONDS` 验证慢客户端持续不读时的有界出站队列和快速拒绝；`TestProdGateFailurePhaseStress` 可用 `GSR_GATE_FAILURE_ATTEMPTS` 重复坏握手和坏 MAC，确认失败帧未进入 Agent、故障连接回收后健康连接仍可请求/响应。已完成一次 16 连接、2 分钟的混合样本，但这些测试只提供可重复证据，不把单次机器结果当作容量结论；仍需按目标部署继续观察更长时长、慢客户端和故障组合。既有认证测试覆盖跨连接旧包、同连接重复序号、MAC 篡改和认证失败不推进序号；新增 Go/TypeScript 测试覆盖 `uint64` 序号上限不回绕。未知 `msg_id` 由协议/Agent 测试覆盖；C/S `request_id` 的编号分配与耗尽由客户端管理，当前示例只使用固定编号，不包含并发分配器验收。测试不替代密码协议审查。
 
 `TestProdGateKeepsConnectionAfterUnknownMessage` 已补充合法认证帧携带未知 `msg_id` 的真实 Gate 验收：Agent 回传原 `request_id` 的通用 `ErrorResponse`，连接不关闭，后续有效请求仍可完成。Agent 内部 Core Call 的超时与迟到回复已有独立验收；客户端业务超时策略和多连接长时背压仍按后续压力计划推进。
 

@@ -188,6 +188,34 @@ func TestClientAuthenticatorRejectsTampering(t *testing.T) {
 	}
 }
 
+// TestClientAuthenticatorRejectsSequenceWrap 验证服务端可接纳 uint64 最大序号，但拒绝随后回绕到一的帧。
+func TestClientAuthenticatorRejectsSequenceWrap(t *testing.T) {
+	key := [clientMACKeySize]byte{1}
+	envelope := []byte{0x08, 0x01}
+	makeFrame := func(sequence uint64) []byte {
+		sequenceBytes := make([]byte, clientSequenceSize)
+		binary.BigEndian.PutUint64(sequenceBytes, sequence)
+		mac := testHMACSHA256(key[:], append(append([]byte(nil), sequenceBytes...), envelope...))
+		return makeVectorFrame(t, sequenceBytes, envelope, mac[:clientMACSize])
+	}
+
+	const maximumSequence = ^uint64(0)
+	auth := newClientAuthenticator(key)
+	frame := makeFrame(maximumSequence)
+	sequence, _, err := auth.verifyFrame(frame, len(frame))
+	if err != nil {
+		t.Fatalf("verifyFrame(maximum sequence) error = %v", err)
+	}
+	if sequence != maximumSequence {
+		t.Fatalf("verified sequence = %d, want %d", sequence, maximumSequence)
+	}
+
+	wrappedFrame := makeFrame(1)
+	if _, _, err := auth.verifyFrame(wrappedFrame, len(wrappedFrame)); !errors.Is(err, errClientSequenceInvalid) {
+		t.Fatalf("verifyFrame(wrapped sequence) error = %v, want %v", err, errClientSequenceInvalid)
+	}
+}
+
 // TestClientMACKeyRejectsInvalidMaterial 验证派生密钥只接受完整且非全零的 X25519 shared secret 与公钥。
 func TestClientMACKeyRejectsInvalidMaterial(t *testing.T) {
 	vector := readClientAuthVector(t)
