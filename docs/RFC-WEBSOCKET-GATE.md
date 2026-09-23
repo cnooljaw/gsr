@@ -379,6 +379,8 @@ Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/
 
 `TestProdGateRecoversFromAgentConstructorPanic` 覆盖 Agent 构造器 panic：当前连接收到内部错误关闭，后续连接仍能创建 Agent 并完成请求/响应。
 
+`TestProdGateRecoversFromAgentStartFailure` 覆盖 Agent 的 `OnStart` 返回错误：Runtime 调用该实例的 `OnStop` 清理，Gate 拒绝当前连接后仍可接受新连接。
+
 `TestProdGateReturnsErrorAfterAgentCallTimeout` 覆盖 Agent 内部 Core Call 超时：客户端收到原 `request_id` 的 `INTERNAL`，目标 Service 之后完成的迟到内部回复不会再生成第二条客户端响应，超时归 Agent/Runtime 而不是 Gate。该测试锁定内部调用的错误归属，不定义客户端业务请求的超时数值或重试策略。
 
 `TestProdGateRejectsLateAgentResponseAfterDisconnect` 已锁定断开后的迟到写回：Gate 先使 `ClientSession` 失效，再通知 Agent；Agent 后续写回得到 `ErrClientSessionClosed`，不会重新进入出站队列。
