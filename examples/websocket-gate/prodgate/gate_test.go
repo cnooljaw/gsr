@@ -2340,11 +2340,15 @@ func TestProdGateClientDisconnectOverlapsRuntimeStop(t *testing.T) {
 	}
 }
 
-// TestProdGateStopReportsClientCloseFailure 验证 Gate 停机返回真实客户端连接关闭错误。
+// TestProdGateStopReportsClientCloseFailure 验证 Gate 停机保留每条连接的 Close 帧和 socket 关闭错误。
 func TestProdGateStopReportsClientCloseFailure(t *testing.T) {
 	closeFailures := []error{
 		errors.New("first test socket close failure"),
 		errors.New("second test socket close failure"),
+	}
+	closeFrameFailures := []error{
+		errors.New("first test close frame write failure"),
+		errors.New("second test close frame write failure"),
 	}
 	var closeCount atomic.Int32
 	serverConnections := make(chan *websocket.Conn, len(closeFailures))
@@ -2384,6 +2388,11 @@ func TestProdGateStopReportsClientCloseFailure(t *testing.T) {
 		case <-time.After(time.Second):
 			t.Fatalf("测试服务器未建立第 %d 条 WebSocket 连接", index+1)
 		}
+		serverSocket, ok := serverConnection.UnderlyingConn().(*closeErrorTestConn)
+		if !ok {
+			t.Fatalf("UnderlyingConn() 类型 = %T, want *closeErrorTestConn", serverConnection.UnderlyingConn())
+		}
+		serverSocket.failWrites(closeFrameFailures[index])
 		connection := newClientConnection(serverConnection, 1<<20, 64<<10, &gateCounters{}, uint64(index+1))
 		connections[connection] = struct{}{}
 	}
@@ -2393,6 +2402,11 @@ func TestProdGateStopReportsClientCloseFailure(t *testing.T) {
 	for _, closeFailure := range closeFailures {
 		if !errors.Is(stopErr, closeFailure) {
 			t.Errorf("Gate.OnStop() error = %v, want to preserve %v", stopErr, closeFailure)
+		}
+	}
+	for _, closeFrameFailure := range closeFrameFailures {
+		if !errors.Is(stopErr, closeFrameFailure) {
+			t.Errorf("Gate.OnStop() error = %v, want to preserve %v", stopErr, closeFrameFailure)
 		}
 	}
 	if got := closeCount.Load(); got != int32(len(closeFailures)) {
