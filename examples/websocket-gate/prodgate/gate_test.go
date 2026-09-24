@@ -2269,6 +2269,77 @@ func TestProdGateAgentStopAfterClientDisconnectKeepsServing(t *testing.T) {
 	}
 }
 
+// TestProdGateClientDisconnectOverlapsRuntimeStop 验证客户端断开与 Runtime.Stop 并发时会话仍关闭且 Agent 只执行一次清理。
+func TestProdGateClientDisconnectOverlapsRuntimeStop(t *testing.T) {
+	agents := make(chan *stopClosingProductionTestAgent, 1)
+	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
+		MailboxCapacity: 8,
+		ShutdownTimeout: 2 * time.Second,
+	}, 1, time.Second, 1<<20, 64<<10, func(client ClientSession) runtime.Service {
+		base := &productionTestAgent{
+			client:       client,
+			received:     make(chan []byte, 1),
+			disconnected: make(chan struct{}),
+		}
+		agent := &stopClosingProductionTestAgent{
+			productionTestAgent: base,
+			stopResult:          make(chan error, 2),
+		}
+		agents <- agent
+		return agent
+	})
+	connection, _ := dialAuthenticatedTestClient(t, gate, clientTLS)
+	agent := receiveStoppingProductionTestAgent(t, agents)
+
+	start := make(chan struct{})
+	clientCloseResult := make(chan error, 1)
+	stopResult := make(chan error, 1)
+	stopContext, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	go func() {
+		<-start
+		clientCloseResult <- connection.Close()
+	}()
+	go func() {
+		<-start
+		stopResult <- local.Stop(stopContext)
+	}()
+	close(start)
+
+	select {
+	case err := <-stopResult:
+		if err != nil {
+			t.Fatalf("Runtime.Stop() error = %v", err)
+		}
+	case <-stopContext.Done():
+		t.Fatalf("Runtime.Stop() 未完成: %v", stopContext.Err())
+	}
+	select {
+	case <-clientCloseResult:
+	case <-time.After(time.Second):
+		t.Fatal("客户端 Close() 未完成")
+	}
+	select {
+	case err := <-agent.stopResult:
+		if err != nil {
+			t.Fatalf("Agent.OnStop ClientSession.Close() error = %v", err)
+		}
+	default:
+		t.Fatal("Runtime.Stop() 完成前未调用 Agent.OnStop")
+	}
+	select {
+	case err := <-agent.stopResult:
+		t.Fatalf("Agent.OnStop 被重复调用，额外结果 = %v", err)
+	default:
+	}
+	if err := agent.client.Send(&commonv1.Envelope{MsgId: 1002, RequestId: 94}); !errors.Is(err, ErrClientSessionClosed) {
+		t.Fatalf("ClientSession.Send() after concurrent shutdown error = %v, want %v", err, ErrClientSessionClosed)
+	}
+	if err := local.Close(); err != nil {
+		t.Fatalf("Runtime.Close() after Stop() error = %v", err)
+	}
+}
+
 // TestProdGateRuntimeStopReleasesListener 验证 Runtime.Stop 会释放 Gate 监听地址，随后 Close 仍可完成最终释放。
 func TestProdGateRuntimeStopReleasesListener(t *testing.T) {
 	local, gate, _, _ := startTestProductionGate(t, 1, time.Second)

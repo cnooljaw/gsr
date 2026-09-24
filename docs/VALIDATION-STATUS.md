@@ -170,3 +170,5 @@ TestRuntimePacedMultiServiceLoad 已补 8 个真实 Service 共享文件 Logger 
 这一步先证明框架能被应用清楚地组装和运行，不引入通用配置框架、发现服务、网关或新 Runtime 生命周期 API。自动化跨进程正常停机、强杀与重启恢复门禁已补充；持续负载、实际部署和其它故障场景仍需独立验收，不宣称生产验收完成。
 
 2026-09-24 Gate 断开收尾切片：新增 `TestProdGateAgentStopAfterClientDisconnectKeepsServing`，验证客户端先断开后 Gate 关闭 `ClientSession`、Agent 收到断开通知并在 `OnStop` 再次关闭时不报错；随后第二个客户端仍能完成认证、请求/响应往返。定向测试重复 5 次、定向 race 重复 3 次及 `go test ./examples/websocket-gate/prodgate` 均通过；只增加测试和文档，未修改生产实现或运行全仓验证。
+
+2026-09-24 Gate 并发停机切片：新增 `TestProdGateClientDisconnectOverlapsRuntimeStop`，并发触发客户端断开和 Runtime.Stop，验证运行时停机完成、Agent.OnStop 只执行一次、重复关闭后写回返回 `ErrClientSessionClosed`。定向测试重复 10 次、定向 race 重复 5 次、`go test ./examples/websocket-gate/prodgate` 与该 package 全量 race 均通过；只增加测试和文档，未修改生产实现或运行全仓验证。
