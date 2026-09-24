@@ -2128,6 +2128,58 @@ func TestProdGateRuntimeStopClosesAllActiveClients(t *testing.T) {
 	}
 }
 
+// TestProdGateAgentAndRuntimeStopCloseSessionIdempotently 验证 Agent.OnStop 与 Gate 停止重复关闭同一 ClientSession 时均正常完成。
+func TestProdGateAgentAndRuntimeStopCloseSessionIdempotently(t *testing.T) {
+	agents := make(chan *stopClosingProductionTestAgent, 1)
+	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
+		MailboxCapacity: 8,
+		ShutdownTimeout: 2 * time.Second,
+	}, 1, time.Second, 1<<20, 64<<10, func(client ClientSession) runtime.Service {
+		base := &productionTestAgent{
+			client:       client,
+			received:     make(chan []byte, 1),
+			disconnected: make(chan struct{}),
+		}
+		agent := &stopClosingProductionTestAgent{
+			productionTestAgent: base,
+			stopResult:          make(chan error, 1),
+		}
+		agents <- agent
+		return agent
+	})
+	connection, _ := dialAuthenticatedTestClient(t, gate, clientTLS)
+	defer connection.Close()
+	var agent *stopClosingProductionTestAgent
+	select {
+	case agent = <-agents:
+	case <-time.After(time.Second):
+		t.Fatal("Gate 未创建连接 Agent")
+	}
+
+	stopContext, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	if err := local.Stop(stopContext); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+	select {
+	case err := <-agent.stopResult:
+		if err != nil {
+			t.Fatalf("Agent.OnStop ClientSession.Close() error = %v", err)
+		}
+	case <-time.After(time.Second):
+		t.Fatal("Runtime.Stop() 完成前未调用 Agent.OnStop")
+	}
+	if _, _, err := readTestBinaryMessage(t, connection); err == nil {
+		t.Fatal("Runtime.Stop() 后客户端连接仍可读")
+	}
+	if err := agent.client.Close(); err != nil {
+		t.Fatalf("重复 ClientSession.Close() error = %v", err)
+	}
+	if err := local.Close(); err != nil {
+		t.Fatalf("Runtime.Close() after Stop() error = %v", err)
+	}
+}
+
 // TestProdGateRuntimeStopReleasesListener 验证 Runtime.Stop 会释放 Gate 监听地址，随后 Close 仍可完成最终释放。
 func TestProdGateRuntimeStopReleasesListener(t *testing.T) {
 	local, gate, _, _ := startTestProductionGate(t, 1, time.Second)
@@ -2499,6 +2551,17 @@ func (agent *productionTestAgent) HandleClientMessage(_ runtime.CommandContext, 
 }
 
 func (*productionTestAgent) OnStop(context.Context) error { return nil }
+
+type stopClosingProductionTestAgent struct {
+	*productionTestAgent
+	stopResult chan error
+}
+
+func (agent *stopClosingProductionTestAgent) OnStop(context.Context) error {
+	err := agent.client.Close()
+	agent.stopResult <- err
+	return err
+}
 
 type blockingInboundAgent struct {
 	release      <-chan struct{}

@@ -113,6 +113,8 @@ GSR_CALL_STABILITY=1 go test ./cluster -run '^TestTCPCallServicePanicAndReplacem
 
 2026-09-24 并发活动客户端 Stop：8 条已认证连接由 `Runtime.Stop()` 同时关闭，每条都收到 `going_away`，对应 `ClientSession.Send` 均返回 `ErrClientSessionClosed`；指标为 `AcceptedConnections=8`、`RejectedConnections=0`。专项重复 3 次、对应 `-race` 测试和 prodgate 包全测通过。
 
+2026-09-24 Agent/Gate 幂等关闭：活动连接关闭时，Gate 的 `OnStop` 和 Agent 的 `OnStop` 均关闭同一个 `ClientSession`；`Runtime.Stop()` 成功完成，客户端连接关闭，重复调用 `ClientSession.Close()` 返回成功。专项重复 5 次、对应 `-race` 测试和 prodgate 包全测通过。
+
 2026-09-23 Gate 连接容量回收：连接上限为 1 时，未完成 TLS 握手的 TCP 连接占用名额，超限连接被关闭；占用连接关闭后，新的 WSS 连接可完成 HTTP Upgrade。定向测试重复运行 10 次、对应 `-race` 测试和 prodgate 包全测均通过。
 
 2026-09-23 握手超时容量回收：连接上限为 1 时，已完成 WebSocket Upgrade 但未完成应用握手的连接继续占用名额，期间第二条 TCP 连接被拒绝；首条握手超时关闭后，后续 WSS 客户端完成认证和请求/响应。专项重复 5 次、对应 `-race` 测试和 prodgate 包全测均通过。
