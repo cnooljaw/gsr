@@ -190,15 +190,21 @@ func (client *clientConnection) closeWith(code int, reason string, deadline time
 		close(client.closedCh)
 		client.mu.Unlock()
 
+		var closeErr error
 		if deadline.After(time.Now()) {
-			_ = client.connection.WriteControl(
+			if err := normalizeCloseError(client.connection.WriteControl(
 				websocket.CloseMessage,
 				websocket.FormatCloseMessage(code, reason),
 				deadline,
-			)
+			)); err != nil {
+				closeErr = fmt.Errorf("write WebSocket close frame: %w", err)
+			}
+		}
+		if err := normalizeCloseError(client.connection.Close()); err != nil {
+			closeErr = errors.Join(closeErr, fmt.Errorf("close WebSocket connection: %w", err))
 		}
 		client.mu.Lock()
-		client.closeErr = normalizeCloseError(client.connection.Close())
+		client.closeErr = closeErr
 		client.mu.Unlock()
 	})
 	client.mu.Lock()

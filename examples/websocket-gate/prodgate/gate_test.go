@@ -3229,6 +3229,7 @@ type closeErrorTestListener struct {
 	net.Listener
 	closeErrors []error
 	closeCount  *atomic.Int32
+	accepted    chan *closeErrorTestConn
 	mu          sync.Mutex
 	next        int
 }
@@ -3245,7 +3246,11 @@ func (listener *closeErrorTestListener) Accept() (net.Conn, error) {
 		listener.next++
 	}
 	listener.mu.Unlock()
-	return &closeErrorTestConn{Conn: connection, closeErr: closeErr, closeCount: listener.closeCount}, nil
+	wrapped := &closeErrorTestConn{Conn: connection, closeErr: closeErr, closeCount: listener.closeCount}
+	if listener.accepted != nil {
+		listener.accepted <- wrapped
+	}
+	return wrapped, nil
 }
 
 type closeErrorTestConn struct {
@@ -3253,6 +3258,24 @@ type closeErrorTestConn struct {
 	closeErr   error
 	closeCount *atomic.Int32
 	once       sync.Once
+	mu         sync.Mutex
+	writeErr   error
+}
+
+func (connection *closeErrorTestConn) Write(data []byte) (int, error) {
+	connection.mu.Lock()
+	writeErr := connection.writeErr
+	connection.mu.Unlock()
+	if writeErr != nil {
+		return 0, writeErr
+	}
+	return connection.Conn.Write(data)
+}
+
+func (connection *closeErrorTestConn) failWrites(err error) {
+	connection.mu.Lock()
+	connection.writeErr = err
+	connection.mu.Unlock()
 }
 
 func (connection *closeErrorTestConn) Close() error {

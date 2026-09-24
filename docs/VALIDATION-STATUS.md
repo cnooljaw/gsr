@@ -176,3 +176,5 @@ TestRuntimePacedMultiServiceLoad 已补 8 个真实 Service 共享文件 Logger 
 2026-09-24 Gate 停机错误切片：生产 Gate 与 DebugGate 原先都会忽略 `ClientSession` 底层真实关闭失败，导致 Runtime.Stop 无法报告该资源错误。两处 OnStop 现在聚合并返回各连接的关闭错误，继续处理后续清理；新增 `TestProdGateStopReportsClientCloseFailure` 和 `TestDebugGateStopReportsClientCloseFailure` 通过注入返回关闭错误的测试连接验证。定向测试重复 3 次，`go test ./examples/websocket-gate/prodgate ./examples/websocket-gate/debuggate`、对应两包全量 race 与 `go vet` 均通过；不改变正常断开错误归一化规则，未运行全仓验证。
 
 2026-09-24 Gate 多连接错误聚合切片：扩展两个停机测试，为两条连接分别注入不同 socket close 错误，确认 Gate 关闭所有连接且 `OnStop` 返回的错误同时保留两种原因。定向测试重复 3 次、`go test ./examples/websocket-gate/prodgate ./examples/websocket-gate/debuggate` 与对应两包全量 race 均通过。只强化测试与文档，没有生产代码改动。
+
+2026-09-24 Gate Close 帧错误切片：生产 Gate 和 DebugGate 现在同时保留 WebSocket Close 帧写入与底层 socket 关闭的真实错误；对端已断开错误仍归一化为正常收尾。两个定向测试注入 Close 帧写失败，确认底层 socket 成功关闭不会掩盖该错误。
