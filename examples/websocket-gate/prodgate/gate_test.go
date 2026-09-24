@@ -404,9 +404,9 @@ func TestProdGateConcurrentBadHandshakeDoesNotBlockHealthyConnection(t *testing.
 		}
 	}
 	failures.Wait()
-	if got := gate.Metrics().RejectedConnections; got != badClientCount {
-		t.Fatalf("RejectedConnections = %d, want %d", got, badClientCount)
-	}
+	waitForGateMetric(t, gate, "RejectedConnections", func(metrics Metrics) uint64 {
+		return metrics.RejectedConnections
+	}, badClientCount)
 	if got := len(agents); got != 0 {
 		t.Fatalf("invalid handshakes created %d extra Agent services", got)
 	}

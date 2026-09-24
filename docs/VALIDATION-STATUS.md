@@ -190,3 +190,5 @@ TestRuntimePacedMultiServiceLoad 已补 8 个真实 Service 共享文件 Logger 
 2026-09-24 Gate 握手读 deadline 测试：新增定向测试模拟底层读 deadline 设置失败，确认握手保留错误并立即以内部错误码关闭连接。prodgate 全包测试及全包 race 均通过。
 
 2026-09-24 Gate 握手 deadline 清理测试：注入握手响应发送后的读 deadline 清除失败，确认 33 字节响应先送达，随后连接以内部错误码关闭，避免遗留握手 deadline 影响业务读循环。prodgate 全包测试和新增用例 race 通过；全包 race 在既有并发坏握手测试中读到 7/8 条拒绝计数后失败，待单独核对该测试的计数观察时序。
+
+2026-09-24 Gate 并发握手计数同步：客户端读到关闭帧时，ServeHTTP 可能尚未更新拒绝计数；测试改为通过现有等待辅助函数观察稳定计数。定向 race 与 prodgate 全包 race 均通过。
