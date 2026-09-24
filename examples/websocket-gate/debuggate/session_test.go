@@ -11,15 +11,20 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-// TestDebugClientSessionCloseReturnsCloseFrameWriteFailure 验证 Close 帧写失败不会被底层连接关闭成功掩盖。
-func TestDebugClientSessionCloseReturnsCloseFrameWriteFailure(t *testing.T) {
+// TestDebugClientSessionCloseAggregatesCloseFailures 验证 Close 帧写入与 socket 关闭同时失败时都能被识别。
+func TestDebugClientSessionCloseAggregatesCloseFailures(t *testing.T) {
 	serverConnection, clientConnection, serverSocket := newDebugWriteFailureWebSocketPair(t)
 	closeFrameFailure := errors.New("test close frame write failure")
+	socketCloseFailure := errors.New("test socket close failure")
 	serverSocket.failWrites(closeFrameFailure)
+	serverSocket.closeErr = socketCloseFailure
 
 	client := newClientConnection(serverConnection, 1024, 2048, &gateCounters{})
-	if err := client.Close(); !errors.Is(err, closeFrameFailure) {
-		t.Fatalf("ClientSession.Close() error = %v, want to preserve %v", err, closeFrameFailure)
+	closeErr := client.Close()
+	for _, expected := range []error{closeFrameFailure, socketCloseFailure} {
+		if !errors.Is(closeErr, expected) {
+			t.Errorf("ClientSession.Close() error = %v, want to preserve %v", closeErr, expected)
+		}
 	}
 	if err := clientConnection.Close(); err != nil {
 		t.Fatalf("Close(client WebSocket) error = %v", err)
