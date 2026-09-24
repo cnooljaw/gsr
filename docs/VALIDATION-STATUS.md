@@ -196,3 +196,5 @@ TestRuntimePacedMultiServiceLoad 已补 8 个真实 Service 共享文件 Logger 
 2026-09-24 Gate 握手响应写失败测试：注入底层 socket 写错误，确认握手返回原始错误且客户端收不到响应帧。定向测试、prodgate 全包测试及定向 race 均通过。
 
 2026-09-24 Gate 超大握手计数断言：超限握手集成测试现在同时确认帧超限、连接拒绝、未接纳且未创建 Agent。定向测试、prodgate 全包测试及该用例 race 均通过。
+
+2026-09-24 Gate 非法握手接纳计数：非二进制及格式非法握手测试也明确断言连接未计入接纳数。两个定向测试、prodgate 全包测试及定向 race 均通过。

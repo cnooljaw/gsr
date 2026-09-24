@@ -1004,6 +1004,9 @@ func TestProdGateRejectsNonBinaryHandshake(t *testing.T) {
 	waitForGateMetric(t, gate, "RejectedConnections", func(metrics Metrics) uint64 {
 		return metrics.RejectedConnections
 	}, 1)
+	if got := gate.Metrics().AcceptedConnections; got != 0 {
+		t.Fatalf("AcceptedConnections after non-binary handshake = %d, want 0", got)
+	}
 	select {
 	case agent := <-agents:
 		t.Fatalf("invalid handshake created Agent %#v", agent)
@@ -1027,6 +1030,9 @@ func TestProdGateRejectsInvalidHandshake(t *testing.T) {
 	waitForGateMetric(t, gate, "RejectedConnections", func(metrics Metrics) uint64 {
 		return metrics.RejectedConnections
 	}, 1)
+	if got := gate.Metrics().AcceptedConnections; got != 0 {
+		t.Fatalf("AcceptedConnections after invalid handshake = %d, want 0", got)
+	}
 	select {
 	case agent := <-agents:
 		t.Fatalf("invalid handshake created Agent %#v", agent)
