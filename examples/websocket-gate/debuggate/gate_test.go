@@ -4,6 +4,9 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"net"
+	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"sync"
 	"testing"
@@ -73,6 +76,45 @@ func TestDebugGateRoutesClientRequestAndResponse(t *testing.T) {
 	}
 	if err := local.Stop(context.Background()); err != nil {
 		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+}
+
+// TestDebugGateStopReportsClientCloseFailure 验证 DebugGate 停机返回真实客户端连接关闭错误。
+func TestDebugGateStopReportsClientCloseFailure(t *testing.T) {
+	closeFailure := errors.New("test socket close failure")
+	serverConnections := make(chan *websocket.Conn, 1)
+	server := httptest.NewUnstartedServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		connection, err := debugUpgrader.Upgrade(writer, request, nil)
+		if err != nil {
+			t.Errorf("Upgrade() error = %v", err)
+			return
+		}
+		serverConnections <- connection
+	}))
+	server.Listener = &closeErrorTestListener{
+		Listener: server.Listener,
+		closeErr: closeFailure,
+	}
+	server.Start()
+	t.Cleanup(server.Close)
+
+	endpoint := url.URL{Scheme: "ws", Host: server.Listener.Addr().String(), Path: "/"}
+	clientSocket, _, err := websocket.DefaultDialer.Dial(endpoint.String(), nil)
+	if err != nil {
+		t.Fatalf("Dial(test WebSocket) error = %v", err)
+	}
+	defer clientSocket.Close()
+	var serverConnection *websocket.Conn
+	select {
+	case serverConnection = <-serverConnections:
+	case <-time.After(time.Second):
+		t.Fatal("测试服务器未建立 WebSocket 连接")
+	}
+
+	connection := newClientConnection(serverConnection, 1<<20, 64<<10, &gateCounters{})
+	gate := &GateService{connections: map[*clientConnection]struct{}{connection: {}}}
+	if err := gate.OnStop(context.Background()); !errors.Is(err, closeFailure) {
+		t.Fatalf("Gate.OnStop() error = %v, want wrapped close failure", err)
 	}
 }
 
@@ -294,6 +336,32 @@ func (agent *testAgent) HandleClientMessage(_ runtime.CommandContext, frame []by
 }
 
 func (*testAgent) OnStop(context.Context) error { return nil }
+
+type closeErrorTestListener struct {
+	net.Listener
+	closeErr error
+}
+
+func (listener *closeErrorTestListener) Accept() (net.Conn, error) {
+	connection, err := listener.Listener.Accept()
+	if err != nil {
+		return nil, err
+	}
+	return &closeErrorTestConn{Conn: connection, closeErr: listener.closeErr}, nil
+}
+
+type closeErrorTestConn struct {
+	net.Conn
+	closeErr error
+	once     sync.Once
+}
+
+func (connection *closeErrorTestConn) Close() error {
+	connection.once.Do(func() {
+		_ = connection.Conn.Close()
+	})
+	return connection.closeErr
+}
 
 func startTestGate(t *testing.T, mailboxCapacity, maxConnections int) (*runtime.Runtime, *GateService, <-chan *testAgent) {
 	t.Helper()

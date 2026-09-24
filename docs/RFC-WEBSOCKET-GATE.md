@@ -295,7 +295,7 @@ Gate 的网络/安全错误使用 Runtime 共享 Logger，按单连接、错误�
 - Gate 到 Agent 的入站路径使用受信任的 Runtime-owned 单向投递：Gate 完成 WebSocket、握手、MAC 和 seq 校验后，通过 `Runtime.DeliverClientMessage(target, envelope)` 把完整 Protobuf Envelope 字节投递到 AgentService Mailbox；Runtime 在接纳时复制快照，Source、Session 和 Core CommandID 固定为零。目标 Service 必须实现 `runtime.ClientMessageHandler`，否则在 Mailbox admission 前立即返回 `runtime.ErrClientMessageUnsupported`，不入队、不静默丢弃。该类型不属于客户端 `msg_id`、不作为业务 Service 间的 Call/Send，也不作为公开 Gate API。Agent 收到后由协议目录解码，再分发给业务手动注册的强类型 Request/Notify Handler；普通 `Commands` 仍只处理 Core `CommandID`。
 - Gate 的 accept/reader goroutine 不保存或调用 `ServiceContext`。新连接和断开事件投递为 GateService 内部 Command，由其 runner 创建 Agent、管理连接到 Agent 的断开映射；创建成功后，读循环使用返回的 AgentID 直接调用 `Runtime.DeliverClientMessage`，不为每帧额外经过 Gate Mailbox/Core Command。Runtime 在 Agent Mailbox 接纳时复制 Envelope 字节。Agent 构造或 `OnStart` 失败时只关闭当前客户端连接并记录原因，不影响 Gate、Runtime 或其它 Agent。
 - Agent 到 Gate 的出站路径使用绑定当前连接的 `ClientSession` 能力，最小接口只有 `Send(Envelope)` 和 `Close`。这里的 `ClientSession` 是客户端连接能力，不是 Runtime `SessionID` 或 Envelope `request_id`。Agent/ProtocolHandler 在调用前负责 `msg_id`、`request_id`、payload 类型以及 Response/Push 方向的协议校验；Response 通过复制原请求的 `request_id` 构造，Push 使用 `request_id == 0`，这些语义不由 Gate 判断，也不重复作为方法参数传递。ClientSession 的 `Send` 不改写或推断 Envelope，只负责检查连接状态、出站大小限制并把完整 Envelope 放入 Gate 的有界写队列；写入 socket 仍由 Gate 的写循环完成。写队列接纳成功不代表客户端已经收到数据。
-- `ClientSession.Close` 是幂等的；对端已经断开时底层的 EOF、broken pipe、connection reset 等收尾错误视为关闭完成，不把正常断开升级为 Agent 或 Runtime 停止错误。其它真实关闭失败仍按错误返回。
+- `ClientSession.Close` 是幂等的；对端已经断开时底层的 EOF、broken pipe、connection reset 等收尾错误视为关闭完成，不把正常断开升级为 Agent 或 Runtime 停止错误。其它真实关闭失败仍按错误返回；Gate 停止会聚合这些连接关闭错误，同时继续关闭其它连接并等待自身 I/O owner 退出。
 - Gate 与 Agent 的连接通知使用单向内部事件；断开时 Gate 先使 ClientSession 失效，再最多通知 Agent 一次，不等待或强杀 Agent。Agent 与 RoomService、PlayerService 等业务 Service 才使用普通 ServiceContext.Send/Call；业务协议代码不需要知道上述 Gate/Agent 连接细节。
 - 具体 `GameProtocol`、`KickProtocol` 等协议组件由业务项目实现，只实现自己的 msg_id、Protobuf 类型、请求校验、简单收发和业务 Service 路由，不了解 WebSocket、seq、MAC、关闭码或 Runtime 内部调度。Agent/协议组件可以持有连接私有的少量会话状态，例如 playerID、登录状态、roomID、seatIndex、客户端版本和临时流程状态；但不拥有跨连接共享、需要恢复或需要持久化的房间、玩家资产、战斗等权威业务状态，也不承担复杂业务流程。后者应由业务 Service 负责，Agent 使用 Send/Call 访问，不把两个 Service 嵌套成一个运行单元。
 - Agent 内的会话状态只由该 Agent 串行读写；roomID、playerID 等引用可以作为当前连接的缓存，但不能被当作业务事实来源。断线或重连后，需要从拥有状态的业务 Service 重新确认。
@@ -402,6 +402,8 @@ Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/
 `TestProdGateAgentStopAfterClientDisconnectKeepsServing` 验证客户端先断开后，Agent 的 `OnStop` 再关闭会话不会产生停止错误；随后新客户端仍能完成认证、请求投递和响应写回。
 
 `TestProdGateClientDisconnectOverlapsRuntimeStop` 并发触发客户端断开与 `Runtime.Stop()`，验证双方关闭同一会话后停止成功、Agent 的 `OnStop` 仅执行一次且会话拒绝后续写回。
+
+`TestProdGateStopReportsClientCloseFailure` 与 `TestDebugGateStopReportsClientCloseFailure` 验证生产 Gate 和 DebugGate 的停机都会返回未被归一化的真实 socket close 错误。
 
 `TestProdGateReturnsErrorAfterAgentCallTimeout` 覆盖 Agent 内部 Core Call 超时：客户端收到原 `request_id` 的 `INTERNAL`，目标 Service 之后完成的迟到内部回复不会再生成第二条客户端响应，超时归 Agent/Runtime 而不是 Gate。该测试锁定内部调用的错误归属，不定义客户端业务请求的超时数值或重试策略。
 

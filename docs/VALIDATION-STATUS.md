@@ -172,3 +172,5 @@ TestRuntimePacedMultiServiceLoad 已补 8 个真实 Service 共享文件 Logger 
 2026-09-24 Gate 断开收尾切片：新增 `TestProdGateAgentStopAfterClientDisconnectKeepsServing`，验证客户端先断开后 Gate 关闭 `ClientSession`、Agent 收到断开通知并在 `OnStop` 再次关闭时不报错；随后第二个客户端仍能完成认证、请求/响应往返。定向测试重复 5 次、定向 race 重复 3 次及 `go test ./examples/websocket-gate/prodgate` 均通过；只增加测试和文档，未修改生产实现或运行全仓验证。
 
 2026-09-24 Gate 并发停机切片：新增 `TestProdGateClientDisconnectOverlapsRuntimeStop`，并发触发客户端断开和 Runtime.Stop，验证运行时停机完成、Agent.OnStop 只执行一次、重复关闭后写回返回 `ErrClientSessionClosed`。定向测试重复 10 次、定向 race 重复 5 次、`go test ./examples/websocket-gate/prodgate` 与该 package 全量 race 均通过；只增加测试和文档，未修改生产实现或运行全仓验证。
+
+2026-09-24 Gate 停机错误切片：生产 Gate 与 DebugGate 原先都会忽略 `ClientSession` 底层真实关闭失败，导致 Runtime.Stop 无法报告该资源错误。两处 OnStop 现在聚合并返回各连接的关闭错误，继续处理后续清理；新增 `TestProdGateStopReportsClientCloseFailure` 和 `TestDebugGateStopReportsClientCloseFailure` 通过注入返回关闭错误的测试连接验证。定向测试重复 3 次，`go test ./examples/websocket-gate/prodgate ./examples/websocket-gate/debuggate`、对应两包全量 race 与 `go vet` 均通过；不改变正常断开错误归一化规则，未运行全仓验证。

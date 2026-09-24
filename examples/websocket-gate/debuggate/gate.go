@@ -257,7 +257,9 @@ func (gate *GateService) OnStop(ctx context.Context) error {
 		closeDeadline = deadline
 	}
 	for _, clientConn := range clientConnections {
-		clientConn.closeWith(websocket.CloseGoingAway, "going_away", closeDeadline)
+		if err := clientConn.closeWith(websocket.CloseGoingAway, "going_away", closeDeadline); err != nil {
+			result = errors.Join(result, fmt.Errorf("debuggate: close client connection: %w", err))
+		}
 	}
 	gate.ioWorkers.Wait()
 	clear(gate.agentsByConnection)
