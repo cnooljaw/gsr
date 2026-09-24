@@ -403,7 +403,7 @@ Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/
 
 `TestProdGateClientDisconnectOverlapsRuntimeStop` 并发触发客户端断开与 `Runtime.Stop()`，验证双方关闭同一会话后停止成功、Agent 的 `OnStop` 仅执行一次且会话拒绝后续写回。
 
-`TestProdGateStopReportsClientCloseFailure` 与 `TestDebugGateStopReportsClientCloseFailure` 验证生产 Gate 和 DebugGate 的停机都会返回未被归一化的真实 socket close 错误。
+`TestProdGateStopReportsClientCloseFailure` 与 `TestDebugGateStopReportsClientCloseFailure` 使用两个独立 socket close 错误，验证生产 Gate 和 DebugGate 停机都会尝试关闭全部客户端连接并保留全部关闭错误。
 
 `TestProdGateReturnsErrorAfterAgentCallTimeout` 覆盖 Agent 内部 Core Call 超时：客户端收到原 `request_id` 的 `INTERNAL`，目标 Service 之后完成的迟到内部回复不会再生成第二条客户端响应，超时归 Agent/Runtime 而不是 Gate。该测试锁定内部调用的错误归属，不定义客户端业务请求的超时数值或重试策略。
 

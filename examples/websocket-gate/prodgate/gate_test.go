@@ -2342,8 +2342,12 @@ func TestProdGateClientDisconnectOverlapsRuntimeStop(t *testing.T) {
 
 // TestProdGateStopReportsClientCloseFailure 验证 Gate 停机返回真实客户端连接关闭错误。
 func TestProdGateStopReportsClientCloseFailure(t *testing.T) {
-	closeFailure := errors.New("test socket close failure")
-	serverConnections := make(chan *websocket.Conn, 1)
+	closeFailures := []error{
+		errors.New("first test socket close failure"),
+		errors.New("second test socket close failure"),
+	}
+	var closeCount atomic.Int32
+	serverConnections := make(chan *websocket.Conn, len(closeFailures))
 	server := httptest.NewUnstartedServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		connection, err := secureUpgrader.Upgrade(writer, request, nil)
 		if err != nil {
@@ -2353,29 +2357,46 @@ func TestProdGateStopReportsClientCloseFailure(t *testing.T) {
 		serverConnections <- connection
 	}))
 	server.Listener = &closeErrorTestListener{
-		Listener: server.Listener,
-		closeErr: closeFailure,
+		Listener:    server.Listener,
+		closeErrors: closeFailures,
+		closeCount:  &closeCount,
 	}
 	server.Start()
 	t.Cleanup(server.Close)
 
 	endpoint := url.URL{Scheme: "ws", Host: server.Listener.Addr().String(), Path: "/"}
-	clientSocket, _, err := websocket.DefaultDialer.Dial(endpoint.String(), nil)
-	if err != nil {
-		t.Fatalf("Dial(test WebSocket) error = %v", err)
-	}
-	defer clientSocket.Close()
-	var serverConnection *websocket.Conn
-	select {
-	case serverConnection = <-serverConnections:
-	case <-time.After(time.Second):
-		t.Fatal("测试服务器未建立 WebSocket 连接")
+	connections := make(map[*clientConnection]struct{}, len(closeFailures))
+	clientSockets := make([]*websocket.Conn, 0, len(closeFailures))
+	defer func() {
+		for _, clientSocket := range clientSockets {
+			_ = clientSocket.Close()
+		}
+	}()
+	for index := range closeFailures {
+		clientSocket, _, err := websocket.DefaultDialer.Dial(endpoint.String(), nil)
+		if err != nil {
+			t.Fatalf("Dial(test WebSocket %d) error = %v", index, err)
+		}
+		clientSockets = append(clientSockets, clientSocket)
+		var serverConnection *websocket.Conn
+		select {
+		case serverConnection = <-serverConnections:
+		case <-time.After(time.Second):
+			t.Fatalf("测试服务器未建立第 %d 条 WebSocket 连接", index+1)
+		}
+		connection := newClientConnection(serverConnection, 1<<20, 64<<10, &gateCounters{}, uint64(index+1))
+		connections[connection] = struct{}{}
 	}
 
-	connection := newClientConnection(serverConnection, 1<<20, 64<<10, &gateCounters{}, 7)
-	gate := &GateService{connections: map[*clientConnection]struct{}{connection: {}}}
-	if err := gate.OnStop(context.Background()); !errors.Is(err, closeFailure) {
-		t.Fatalf("Gate.OnStop() error = %v, want wrapped close failure", err)
+	gate := &GateService{connections: connections}
+	stopErr := gate.OnStop(context.Background())
+	for _, closeFailure := range closeFailures {
+		if !errors.Is(stopErr, closeFailure) {
+			t.Errorf("Gate.OnStop() error = %v, want to preserve %v", stopErr, closeFailure)
+		}
+	}
+	if got := closeCount.Load(); got != int32(len(closeFailures)) {
+		t.Fatalf("socket Close() calls = %d, want %d despite close errors", got, len(closeFailures))
 	}
 }
 
@@ -3206,7 +3227,10 @@ func receiveStoppingProductionTestAgent(t *testing.T, agents <-chan *stopClosing
 
 type closeErrorTestListener struct {
 	net.Listener
-	closeErr error
+	closeErrors []error
+	closeCount  *atomic.Int32
+	mu          sync.Mutex
+	next        int
 }
 
 func (listener *closeErrorTestListener) Accept() (net.Conn, error) {
@@ -3214,18 +3238,29 @@ func (listener *closeErrorTestListener) Accept() (net.Conn, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &closeErrorTestConn{Conn: connection, closeErr: listener.closeErr}, nil
+	listener.mu.Lock()
+	var closeErr error
+	if listener.next < len(listener.closeErrors) {
+		closeErr = listener.closeErrors[listener.next]
+		listener.next++
+	}
+	listener.mu.Unlock()
+	return &closeErrorTestConn{Conn: connection, closeErr: closeErr, closeCount: listener.closeCount}, nil
 }
 
 type closeErrorTestConn struct {
 	net.Conn
-	closeErr error
-	once     sync.Once
+	closeErr   error
+	closeCount *atomic.Int32
+	once       sync.Once
 }
 
 func (connection *closeErrorTestConn) Close() error {
 	connection.once.Do(func() {
 		_ = connection.Conn.Close()
+		if connection.closeCount != nil {
+			connection.closeCount.Add(1)
+		}
 	})
 	return connection.closeErr
 }
