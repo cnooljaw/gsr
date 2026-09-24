@@ -5,6 +5,7 @@ import (
 	"crypto/ecdh"
 	"errors"
 	"testing"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -164,6 +165,25 @@ func TestProdGateHandshakeStopsWhenSocketWriteDeadlineFails(t *testing.T) {
 	}
 	if _, _, err := clientConnection.ReadMessage(); err == nil {
 		t.Fatal("客户端在握手响应 deadline 设置失败后仍能读取 WebSocket 消息")
+	}
+}
+
+// TestProdGateHandshakeStopsWhenSocketReadDeadlineFails 验证底层读 deadline 设置失败时握手立即返回并关闭连接。
+func TestProdGateHandshakeStopsWhenSocketReadDeadlineFails(t *testing.T) {
+	serverConnection, clientConnection, serverSocket := newProdWriteFailureWebSocketPair(t)
+	deadlineFailure := errors.New("test handshake read deadline failure")
+	serverSocket.failReadDeadline(deadlineFailure)
+	clientSession := newClientConnection(serverConnection, 4<<20, 8<<20, &gateCounters{}, 1)
+	gate := &GateService{config: Config{HandshakeTimeout: defaultHandshakeTimeout, MaxFrameBytes: 4 << 20}}
+
+	if _, err := gate.performHandshake(clientSession); !errors.Is(err, deadlineFailure) {
+		t.Fatalf("performHandshake() error = %v, want to preserve %v", err, deadlineFailure)
+	}
+	if err := clientConnection.SetReadDeadline(time.Now().Add(time.Second)); err != nil {
+		t.Fatalf("SetReadDeadline(client WebSocket) error = %v", err)
+	}
+	if _, _, err := clientConnection.ReadMessage(); !websocket.IsCloseError(err, websocket.CloseInternalServerErr) {
+		t.Fatalf("ReadMessage() error = %v, want WebSocket close %d", err, websocket.CloseInternalServerErr)
 	}
 }
 
