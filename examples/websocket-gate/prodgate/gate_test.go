@@ -1119,6 +1119,12 @@ func TestProdGateRejectsOversizedHandshake(t *testing.T) {
 	waitForGateMetric(t, gate, "FrameTooLarge", func(metrics Metrics) uint64 {
 		return metrics.FrameTooLarge
 	}, 1)
+	waitForGateMetric(t, gate, "RejectedConnections", func(metrics Metrics) uint64 {
+		return metrics.RejectedConnections
+	}, 1)
+	if got := gate.Metrics().AcceptedConnections; got != 0 {
+		t.Fatalf("AcceptedConnections after oversized handshake = %d, want 0", got)
+	}
 	select {
 	case agent := <-agents:
 		t.Fatalf("oversized handshake created Agent %#v", agent)
