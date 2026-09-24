@@ -187,6 +187,33 @@ func TestProdGateHandshakeStopsWhenSocketReadDeadlineFails(t *testing.T) {
 	}
 }
 
+// TestProdGateHandshakeClosesWhenReadDeadlineCannotBeCleared 验证握手响应后无法清除临时读 deadline 时连接会按错误结束。
+func TestProdGateHandshakeClosesWhenReadDeadlineCannotBeCleared(t *testing.T) {
+	serverConnection, clientConnection, serverSocket := newProdWriteFailureWebSocketPair(t)
+	deadlineFailure := errors.New("test handshake read deadline reset failure")
+	serverSocket.failReadDeadlineOnCall(2, deadlineFailure)
+	vector := readClientAuthVector(t)
+	request := marshalHandshakeRequest(t, decodeVectorHex(t, "client public key", vector.ClientPublic))
+	if err := clientConnection.WriteMessage(websocket.BinaryMessage, request); err != nil {
+		t.Fatalf("WriteMessage(handshake request) error = %v", err)
+	}
+
+	clientSession := newClientConnection(serverConnection, 4<<20, 8<<20, &gateCounters{}, 1)
+	gate := &GateService{config: Config{HandshakeTimeout: defaultHandshakeTimeout, MaxFrameBytes: 4 << 20}}
+	if _, err := gate.performHandshake(clientSession); !errors.Is(err, deadlineFailure) {
+		t.Fatalf("performHandshake() error = %v, want to preserve %v", err, deadlineFailure)
+	}
+	if err := clientConnection.SetReadDeadline(time.Now().Add(time.Second)); err != nil {
+		t.Fatalf("SetReadDeadline(client WebSocket) error = %v", err)
+	}
+	if messageType, response, err := clientConnection.ReadMessage(); err != nil || messageType != websocket.BinaryMessage || len(response) != handshakeFrameSize {
+		t.Fatalf("ReadMessage(handshake response) = type %d, bytes %d, error %v", messageType, len(response), err)
+	}
+	if _, _, err := clientConnection.ReadMessage(); !websocket.IsCloseError(err, websocket.CloseInternalServerErr) {
+		t.Fatalf("ReadMessage() after handshake response error = %v, want WebSocket close %d", err, websocket.CloseInternalServerErr)
+	}
+}
+
 func marshalHandshakeRequest(t *testing.T, clientPublicKey []byte) []byte {
 	t.Helper()
 	frame := make([]byte, handshakeFrameSize)

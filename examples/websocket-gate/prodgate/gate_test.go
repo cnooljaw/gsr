@@ -3269,13 +3269,15 @@ func (listener *closeErrorTestListener) Accept() (net.Conn, error) {
 
 type closeErrorTestConn struct {
 	net.Conn
-	closeErr        error
-	closeCount      *atomic.Int32
-	once            sync.Once
-	mu              sync.Mutex
-	writeErr        error
-	deadlineErr     error
-	readDeadlineErr error
+	closeErr              error
+	closeCount            *atomic.Int32
+	once                  sync.Once
+	mu                    sync.Mutex
+	writeErr              error
+	deadlineErr           error
+	readDeadlineErr       error
+	readDeadlineErrOnCall int
+	readDeadlineCalls     int
 }
 
 func (connection *closeErrorTestConn) Write(data []byte) (int, error) {
@@ -3314,17 +3316,24 @@ func (connection *closeErrorTestConn) failWriteDeadline(err error) {
 // SetReadDeadline 允许测试模拟底层 socket 设置读截止时间失败。
 func (connection *closeErrorTestConn) SetReadDeadline(deadline time.Time) error {
 	connection.mu.Lock()
+	connection.readDeadlineCalls++
+	shouldFail := connection.readDeadlineCalls == connection.readDeadlineErrOnCall
 	readDeadlineErr := connection.readDeadlineErr
 	connection.mu.Unlock()
-	if readDeadlineErr != nil {
+	if shouldFail {
 		return readDeadlineErr
 	}
 	return connection.Conn.SetReadDeadline(deadline)
 }
 
 func (connection *closeErrorTestConn) failReadDeadline(err error) {
+	connection.failReadDeadlineOnCall(1, err)
+}
+
+func (connection *closeErrorTestConn) failReadDeadlineOnCall(call int, err error) {
 	connection.mu.Lock()
 	connection.readDeadlineErr = err
+	connection.readDeadlineErrOnCall = connection.readDeadlineCalls + call
 	connection.mu.Unlock()
 }
 
