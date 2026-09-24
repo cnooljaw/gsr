@@ -2091,6 +2091,52 @@ func TestProdGateRuntimeStopReleasesListener(t *testing.T) {
 	}
 }
 
+// TestProdGateRuntimeStopClosesPendingHandshake 验证 Runtime.Stop 会关闭仍在等待客户端应用握手的连接，而不等握手超时。
+func TestProdGateRuntimeStopClosesPendingHandshake(t *testing.T) {
+	local, gate, agents, clientTLS := startTestProductionGate(t, 1, 30*time.Second)
+	connection := dialProductionTestClient(t, gate, clientTLS)
+	defer connection.Close()
+
+	stopContext, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	stopResult := make(chan error, 1)
+	go func() {
+		stopResult <- local.Stop(stopContext)
+	}()
+	select {
+	case err := <-stopResult:
+		if err != nil {
+			t.Fatalf("Runtime.Stop() error = %v", err)
+		}
+	case <-stopContext.Done():
+		_ = connection.Close()
+		select {
+		case <-stopResult:
+		case <-time.After(time.Second):
+		}
+		t.Fatalf("Runtime.Stop() 等待应用握手超时后才返回: %v", stopContext.Err())
+	}
+
+	_, _, err := readTestBinaryMessage(t, connection)
+	if !websocket.IsCloseError(err, websocket.CloseGoingAway) {
+		t.Fatalf("client ReadMessage() error = %v, want Gate close %d", err, websocket.CloseGoingAway)
+	}
+	if got := gate.Metrics().HandshakeTimeouts; got != 0 {
+		t.Fatalf("HandshakeTimeouts after Runtime.Stop() = %d, want 0", got)
+	}
+	if got := gate.Metrics().AcceptedConnections; got != 0 {
+		t.Fatalf("AcceptedConnections after Runtime.Stop() = %d, want 0", got)
+	}
+	select {
+	case agent := <-agents:
+		t.Fatalf("pending handshake created Agent %#v", agent)
+	default:
+	}
+	if err := local.Close(); err != nil {
+		t.Fatalf("Runtime.Close() after Stop() error = %v", err)
+	}
+}
+
 // TestProdGateDisconnectsAgentCreatedAfterCallTimeout 验证 Gate Call 超时后迟到创建的 Agent 仍会收到断开事件并退出。
 func TestProdGateDisconnectsAgentCreatedAfterCallTimeout(t *testing.T) {
 	serverTLS, clientTLS := testTLSConfigs(t)

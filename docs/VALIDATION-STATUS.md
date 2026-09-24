@@ -107,6 +107,8 @@ GSR_CALL_STABILITY=1 go test ./cluster -run '^TestTCPCallServicePanicAndReplacem
 
 2026-09-23 Gate Stop 资源释放：单独调用 `Runtime.Stop()` 后可立即重绑 Gate 原监听地址，再调用 `Runtime.Close()` 完成最终释放。定向测试、对应 `-race` 测试和 prodgate 包全测均通过。
 
+2026-09-23 Stop 中断待握手连接：Gate 握手超时设为 30 秒、客户端完成 WebSocket Upgrade 后不发送应用握手；`Runtime.Stop()` 在 2 秒门限内主动发送 `going_away` 并完成收尾，握手超时数和已接受连接数均为零，Agent 未创建。专项重复 3 次、对应 `-race` 测试和 prodgate 包全测通过。
+
 2026-09-23 Gate 连接容量回收：连接上限为 1 时，未完成 TLS 握手的 TCP 连接占用名额，超限连接被关闭；占用连接关闭后，新的 WSS 连接可完成 HTTP Upgrade。定向测试重复运行 10 次、对应 `-race` 测试和 prodgate 包全测均通过。
 
 2026-09-23 握手超时容量回收：连接上限为 1 时，已完成 WebSocket Upgrade 但未完成应用握手的连接继续占用名额，期间第二条 TCP 连接被拒绝；首条握手超时关闭后，后续 WSS 客户端完成认证和请求/响应。专项重复 5 次、对应 `-race` 测试和 prodgate 包全测均通过。
