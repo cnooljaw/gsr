@@ -5,6 +5,8 @@ import (
 	"crypto/ecdh"
 	"errors"
 	"testing"
+
+	"github.com/gorilla/websocket"
 )
 
 // TestAcceptClientHandshakeReturnsServerKeyAndAuthenticator 验证固定二进制握手、X25519 派生密钥和后续上行认证使用同一结果。
@@ -137,6 +139,31 @@ func TestAcceptClientHandshakeGeneratesRandomServerKey(t *testing.T) {
 	frame := makeVectorFrame(t, sequence, envelope, mac[:clientMACSize])
 	if _, gotEnvelope, err := authenticator.verifyFrame(frame, len(frame)); err != nil || !bytes.Equal(gotEnvelope, envelope) {
 		t.Fatalf("verify dynamically authenticated frame: Envelope=%x error=%v", gotEnvelope, err)
+	}
+}
+
+// TestProdGateHandshakeStopsWhenSocketWriteDeadlineFails 验证握手响应无法设置底层写 deadline 时会返回错误并关闭连接。
+func TestProdGateHandshakeStopsWhenSocketWriteDeadlineFails(t *testing.T) {
+	serverConnection, clientConnection, serverSocket := newProdWriteFailureWebSocketPair(t)
+	deadlineFailure := errors.New("test handshake write deadline failure")
+	serverSocket.failWriteDeadline(deadlineFailure)
+
+	vector := readClientAuthVector(t)
+	request := marshalHandshakeRequest(t, decodeVectorHex(t, "client public key", vector.ClientPublic))
+	if err := clientConnection.WriteMessage(websocket.BinaryMessage, request); err != nil {
+		t.Fatalf("WriteMessage(handshake request) error = %v", err)
+	}
+
+	clientSession := newClientConnection(serverConnection, 4<<20, 8<<20, &gateCounters{}, 1)
+	gate := &GateService{config: Config{HandshakeTimeout: defaultHandshakeTimeout, MaxFrameBytes: 4 << 20}}
+	if _, err := gate.performHandshake(clientSession); !errors.Is(err, deadlineFailure) {
+		t.Fatalf("performHandshake() error = %v, want to preserve %v", err, deadlineFailure)
+	}
+	if err := clientSession.Close(); !errors.Is(err, deadlineFailure) {
+		t.Fatalf("ClientSession.Close() error = %v, want to preserve %v", err, deadlineFailure)
+	}
+	if _, _, err := clientConnection.ReadMessage(); err == nil {
+		t.Fatal("客户端在握手响应 deadline 设置失败后仍能读取 WebSocket 消息")
 	}
 }
 

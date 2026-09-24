@@ -184,3 +184,5 @@ TestRuntimePacedMultiServiceLoad 已补 8 个真实 Service 共享文件 Logger 
 2026-09-24 Gate 出站写失败可观测性：生产 Gate 的连接写循环现在将 deadline 设置和 WebSocket 写入错误返回给 Gate，由现有连接级错误日志记录；不改变 `ClientSession.Send` 仅表示队列接纳的语义。定向测试、prodgate 全包测试和全量 race 均通过，日志字段保留错误原因。
 
 2026-09-24 Gate 写 deadline 错误复核：Gorilla `Conn.SetWriteDeadline` 只保存 deadline 并始终返回 nil，内部写入时底层 deadline 错误也会被忽略。生产 Gate 现在在 WebSocket 握手、客户端写循环和 Close 帧写入前显式检查底层连接的 deadline 设置结果；DebugGate 的写循环和 Close 帧也检查该结果。失败会关闭连接，生产 Gate 还会记录连接故障。定向测试分别注入底层 deadline 与消息写入错误，prodgate、debuggate 全包测试及两包 race 均通过；未运行全仓。
+
+2026-09-24 Gate 握手写 deadline 测试：新增生产握手路径定向测试，注入底层 socket 写 deadline 失败，确认握手响应不再尝试写入，错误保留且连接关闭。定向测试及对应 race 测试通过。
