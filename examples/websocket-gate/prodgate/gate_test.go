@@ -2137,6 +2137,65 @@ func TestProdGateRuntimeStopClosesPendingHandshake(t *testing.T) {
 	}
 }
 
+// TestProdGateRuntimeStopClosesAllPendingHandshakes 验证 Runtime.Stop 会关闭全部并发等待应用握手的连接并等待它们退出。
+func TestProdGateRuntimeStopClosesAllPendingHandshakes(t *testing.T) {
+	const pendingConnections = 8
+	local, gate, agents, clientTLS := startTestProductionGate(t, pendingConnections, 30*time.Second)
+	connections := make([]*websocket.Conn, pendingConnections)
+	for index := range connections {
+		connections[index] = dialProductionTestClient(t, gate, clientTLS)
+	}
+	defer func() {
+		for _, connection := range connections {
+			_ = connection.Close()
+		}
+	}()
+
+	stopContext, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	stopResult := make(chan error, 1)
+	go func() {
+		stopResult <- local.Stop(stopContext)
+	}()
+	select {
+	case err := <-stopResult:
+		if err != nil {
+			t.Fatalf("Runtime.Stop() error = %v", err)
+		}
+	case <-stopContext.Done():
+		for _, connection := range connections {
+			_ = connection.Close()
+		}
+		select {
+		case <-stopResult:
+		case <-time.After(time.Second):
+		}
+		t.Fatalf("Runtime.Stop() 未关闭全部待握手连接: %v", stopContext.Err())
+	}
+
+	for index, connection := range connections {
+		_, _, err := readTestBinaryMessage(t, connection)
+		if !websocket.IsCloseError(err, websocket.CloseGoingAway) {
+			t.Errorf("pending connection %d ReadMessage() error = %v, want Gate close %d", index, err, websocket.CloseGoingAway)
+		}
+	}
+	metrics := gate.Metrics()
+	if metrics.HandshakeTimeouts != 0 || metrics.AcceptedConnections != 0 {
+		t.Fatalf("metrics after Runtime.Stop() = %+v, want no timeout or accepted clients", metrics)
+	}
+	if metrics.RejectedConnections != pendingConnections {
+		t.Fatalf("RejectedConnections after Runtime.Stop() = %d, want %d", metrics.RejectedConnections, pendingConnections)
+	}
+	select {
+	case agent := <-agents:
+		t.Fatalf("pending handshakes created Agent %#v", agent)
+	default:
+	}
+	if err := local.Close(); err != nil {
+		t.Fatalf("Runtime.Close() after Stop() error = %v", err)
+	}
+}
+
 // TestProdGateDisconnectsAgentCreatedAfterCallTimeout 验证 Gate Call 超时后迟到创建的 Agent 仍会收到断开事件并退出。
 func TestProdGateDisconnectsAgentCreatedAfterCallTimeout(t *testing.T) {
 	serverTLS, clientTLS := testTLSConfigs(t)
