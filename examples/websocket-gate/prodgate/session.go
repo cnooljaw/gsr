@@ -134,20 +134,28 @@ func (client *clientConnection) Close() error {
 	return client.closeWith(websocket.CloseNormalClosure, "normal", time.Now().Add(closeFrameWait))
 }
 
-// writeLoop 是该连接唯一的 WebSocket 数据写入者。
-func (client *clientConnection) writeLoop() {
+// writeLoop 是该连接唯一的 WebSocket 数据写入者，并返回终止写循环的错误。
+func (client *clientConnection) writeLoop() error {
 	for {
 		frame, ok := client.nextFrame()
 		if !ok {
-			return
+			return nil
 		}
 		if err := client.connection.SetWriteDeadline(time.Now().Add(defaultWriteWait)); err != nil {
-			client.closeWith(websocket.CloseGoingAway, "going_away", time.Now().Add(closeFrameWait))
-			return
+			writeErr := normalizeCloseError(err)
+			if writeErr != nil {
+				writeErr = fmt.Errorf("set WebSocket write deadline: %w", writeErr)
+			}
+			closeErr := client.closeWith(websocket.CloseGoingAway, "going_away", time.Now().Add(closeFrameWait))
+			return errors.Join(writeErr, closeErr)
 		}
 		if err := client.connection.WriteMessage(websocket.BinaryMessage, frame); err != nil {
-			client.closeWith(websocket.CloseGoingAway, "going_away", time.Now().Add(closeFrameWait))
-			return
+			writeErr := normalizeCloseError(err)
+			if writeErr != nil {
+				writeErr = fmt.Errorf("write WebSocket message: %w", writeErr)
+			}
+			closeErr := client.closeWith(websocket.CloseGoingAway, "going_away", time.Now().Add(closeFrameWait))
+			return errors.Join(writeErr, closeErr)
 		}
 	}
 }

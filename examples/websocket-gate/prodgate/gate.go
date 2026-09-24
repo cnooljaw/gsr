@@ -380,11 +380,7 @@ func (gate *GateService) ServeHTTP(writer http.ResponseWriter, request *http.Req
 	agentID = createdAgentID
 	gate.counters.acceptedConnections.Add(1)
 
-	gate.ioWorkers.Add(1)
-	go func() {
-		defer gate.ioWorkers.Done()
-		clientConn.writeLoop()
-	}()
+	gate.startClientWriter(clientConn)
 
 	for {
 		messageType, frame, err := connection.ReadMessage()
@@ -405,6 +401,16 @@ func (gate *GateService) ServeHTTP(writer http.ResponseWriter, request *http.Req
 			return
 		}
 	}
+}
+
+func (gate *GateService) startClientWriter(clientConn *clientConnection) {
+	gate.ioWorkers.Add(1)
+	go func() {
+		defer gate.ioWorkers.Done()
+		if err := clientConn.writeLoop(); err != nil {
+			gate.logConnectionFailure(clientConn, "write", websocket.CloseGoingAway, err)
+		}
+	}()
 }
 
 func (gate *GateService) performHandshake(clientConn *clientConnection) (*clientAuthenticator, error) {
