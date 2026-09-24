@@ -168,6 +168,30 @@ func TestProdGateHandshakeStopsWhenSocketWriteDeadlineFails(t *testing.T) {
 	}
 }
 
+// TestProdGateHandshakeStopsWhenResponseWriteFails 验证握手响应写入失败时不会继续认证并会关闭连接。
+func TestProdGateHandshakeStopsWhenResponseWriteFails(t *testing.T) {
+	serverConnection, clientConnection, serverSocket := newProdWriteFailureWebSocketPair(t)
+	writeFailure := errors.New("test handshake response write failure")
+	serverSocket.failWrites(writeFailure)
+	vector := readClientAuthVector(t)
+	request := marshalHandshakeRequest(t, decodeVectorHex(t, "client public key", vector.ClientPublic))
+	if err := clientConnection.WriteMessage(websocket.BinaryMessage, request); err != nil {
+		t.Fatalf("WriteMessage(handshake request) error = %v", err)
+	}
+
+	clientSession := newClientConnection(serverConnection, 4<<20, 8<<20, &gateCounters{}, 1)
+	gate := &GateService{config: Config{HandshakeTimeout: defaultHandshakeTimeout, MaxFrameBytes: 4 << 20}}
+	if _, err := gate.performHandshake(clientSession); !errors.Is(err, writeFailure) {
+		t.Fatalf("performHandshake() error = %v, want to preserve %v", err, writeFailure)
+	}
+	if err := clientConnection.SetReadDeadline(time.Now().Add(time.Second)); err != nil {
+		t.Fatalf("SetReadDeadline(client WebSocket) error = %v", err)
+	}
+	if _, _, err := clientConnection.ReadMessage(); err == nil || isTimeoutError(err) {
+		t.Fatalf("ReadMessage() after handshake response write failure = %v, want connection close without a response", err)
+	}
+}
+
 // TestProdGateHandshakeStopsWhenSocketReadDeadlineFails 验证底层读 deadline 设置失败时握手立即返回并关闭连接。
 func TestProdGateHandshakeStopsWhenSocketReadDeadlineFails(t *testing.T) {
 	serverConnection, clientConnection, serverSocket := newProdWriteFailureWebSocketPair(t)
