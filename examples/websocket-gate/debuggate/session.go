@@ -100,7 +100,7 @@ func (client *clientConnection) writeLoop() {
 		if !ok {
 			return
 		}
-		if err := client.connection.SetWriteDeadline(time.Now().Add(defaultWriteWait)); err != nil {
+		if err := setWebSocketWriteDeadline(client.connection, time.Now().Add(defaultWriteWait)); err != nil {
 			client.closeWith(websocket.CloseGoingAway, "going_away", time.Now().Add(closeFrameWait))
 			return
 		}
@@ -151,7 +151,11 @@ func (client *clientConnection) closeWith(code int, reason string, deadline time
 
 		var closeErr error
 		if deadline.After(time.Now()) {
-			if err := normalizeCloseError(client.connection.WriteControl(
+			if err := client.connection.UnderlyingConn().SetWriteDeadline(deadline); err != nil {
+				if err := normalizeCloseError(err); err != nil {
+					closeErr = fmt.Errorf("set WebSocket close write deadline: %w", err)
+				}
+			} else if err := normalizeCloseError(client.connection.WriteControl(
 				websocket.CloseMessage,
 				websocket.FormatCloseMessage(code, reason),
 				deadline,
@@ -169,6 +173,12 @@ func (client *clientConnection) closeWith(code int, reason string, deadline time
 	client.mu.Lock()
 	defer client.mu.Unlock()
 	return client.closeErr
+}
+
+// setWebSocketWriteDeadline 设置 Gorilla 后续数据写入的截止时间，并检查会被其写入路径忽略的底层错误。
+func setWebSocketWriteDeadline(connection *websocket.Conn, deadline time.Time) error {
+	connection.SetWriteDeadline(deadline)
+	return connection.UnderlyingConn().SetWriteDeadline(deadline)
 }
 
 // normalizeCloseError 将对端已经断开时的底层关闭错误视为幂等收尾成功。

@@ -31,6 +31,34 @@ func TestDebugClientSessionCloseAggregatesCloseFailures(t *testing.T) {
 	}
 }
 
+// TestDebugClientWriterClosesAfterDeadlineFailure 验证底层 deadline 设置失败时 DebugGate 会关闭连接并结束写循环。
+func TestDebugClientWriterClosesAfterDeadlineFailure(t *testing.T) {
+	serverConnection, clientConnection, serverSocket := newDebugWriteFailureWebSocketPair(t)
+	deadlineFailure := errors.New("test WebSocket write deadline failure")
+	serverSocket.failWriteDeadline(deadlineFailure)
+	client := newClientConnection(serverConnection, 1024, 2048, &gateCounters{})
+	if err := client.Send(&Envelope{MsgId: 1002}); err != nil {
+		t.Fatalf("ClientSession.Send() error = %v", err)
+	}
+
+	writerDone := make(chan struct{})
+	go func() {
+		client.writeLoop()
+		close(writerDone)
+	}()
+	select {
+	case <-writerDone:
+	case <-time.After(time.Second):
+		t.Fatal("DebugGate 写循环未在 deadline 设置失败后退出")
+	}
+	if err := client.Close(); !errors.Is(err, deadlineFailure) {
+		t.Fatalf("ClientSession.Close() error = %v, want to preserve %v", err, deadlineFailure)
+	}
+	if err := clientConnection.Close(); err != nil {
+		t.Fatalf("Close(client WebSocket) error = %v", err)
+	}
+}
+
 func newDebugWriteFailureWebSocketPair(t *testing.T) (*websocket.Conn, *websocket.Conn, *closeErrorTestConn) {
 	t.Helper()
 

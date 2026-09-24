@@ -456,7 +456,7 @@ func (gate *GateService) performHandshake(clientConn *clientConnection) (*client
 		}
 		return nil, err
 	}
-	if err := connection.SetWriteDeadline(time.Now().Add(defaultWriteWait)); err != nil {
+	if err := setWebSocketWriteDeadline(connection, time.Now().Add(defaultWriteWait)); err != nil {
 		gate.logConnectionFailure(clientConn, "handshake_write", websocket.CloseInternalServerErr, err)
 		clientConn.closeWith(websocket.CloseInternalServerErr, "server_error", time.Now().Add(closeFrameWait))
 		return nil, err

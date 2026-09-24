@@ -403,11 +403,12 @@ func (listener *closeErrorTestListener) Accept() (net.Conn, error) {
 
 type closeErrorTestConn struct {
 	net.Conn
-	closeErr   error
-	closeCount *atomic.Int32
-	once       sync.Once
-	mu         sync.Mutex
-	writeErr   error
+	closeErr    error
+	closeCount  *atomic.Int32
+	once        sync.Once
+	mu          sync.Mutex
+	writeErr    error
+	deadlineErr error
 }
 
 func (connection *closeErrorTestConn) Write(data []byte) (int, error) {
@@ -423,6 +424,23 @@ func (connection *closeErrorTestConn) Write(data []byte) (int, error) {
 func (connection *closeErrorTestConn) failWrites(err error) {
 	connection.mu.Lock()
 	connection.writeErr = err
+	connection.mu.Unlock()
+}
+
+// SetWriteDeadline 允许测试模拟底层 socket 设置写截止时间失败。
+func (connection *closeErrorTestConn) SetWriteDeadline(deadline time.Time) error {
+	connection.mu.Lock()
+	deadlineErr := connection.deadlineErr
+	connection.mu.Unlock()
+	if deadlineErr != nil {
+		return deadlineErr
+	}
+	return connection.Conn.SetWriteDeadline(deadline)
+}
+
+func (connection *closeErrorTestConn) failWriteDeadline(err error) {
+	connection.mu.Lock()
+	connection.deadlineErr = err
 	connection.mu.Unlock()
 }
 
