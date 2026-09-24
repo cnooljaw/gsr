@@ -2180,6 +2180,95 @@ func TestProdGateAgentAndRuntimeStopCloseSessionIdempotently(t *testing.T) {
 	}
 }
 
+// TestProdGateAgentStopAfterClientDisconnectKeepsServing 验证客户端先断开后 Agent.OnStop 关闭会话不会报错或影响后续连接。
+func TestProdGateAgentStopAfterClientDisconnectKeepsServing(t *testing.T) {
+	agents := make(chan *stopClosingProductionTestAgent, 2)
+	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
+		MailboxCapacity: 8,
+		ShutdownTimeout: 2 * time.Second,
+	}, 2, time.Second, 1<<20, 64<<10, func(client ClientSession) runtime.Service {
+		base := &productionTestAgent{
+			client:       client,
+			received:     make(chan []byte, 1),
+			disconnected: make(chan struct{}),
+		}
+		agent := &stopClosingProductionTestAgent{
+			productionTestAgent: base,
+			stopResult:          make(chan error, 1),
+		}
+		agents <- agent
+		return agent
+	})
+
+	firstConnection, _ := dialAuthenticatedTestClient(t, gate, clientTLS)
+	firstAgent := receiveStoppingProductionTestAgent(t, agents)
+	if err := firstConnection.Close(); err != nil {
+		t.Fatalf("Close(first client) error = %v", err)
+	}
+	select {
+	case <-firstAgent.disconnected:
+	case <-time.After(time.Second):
+		t.Fatal("第一个 Agent 未收到客户端断开通知")
+	}
+	select {
+	case err := <-firstAgent.stopResult:
+		if err != nil {
+			t.Fatalf("断开后的 Agent.OnStop ClientSession.Close() error = %v", err)
+		}
+	case <-time.After(time.Second):
+		t.Fatal("客户端断开后 Agent.OnStop 未完成")
+	}
+
+	secondConnection, macKey := dialAuthenticatedTestClient(t, gate, clientTLS)
+	defer secondConnection.Close()
+	secondAgent := receiveStoppingProductionTestAgent(t, agents)
+	requestBytes, err := proto.Marshal(&commonv1.Envelope{
+		MsgId:     1001,
+		RequestId: 93,
+		Payload:   []byte("gate remains available"),
+	})
+	if err != nil {
+		t.Fatalf("marshal second request Envelope: %v", err)
+	}
+	if err := secondConnection.WriteMessage(websocket.BinaryMessage, makeAuthenticatedTestFrame(t, macKey[:], 1, requestBytes)); err != nil {
+		t.Fatalf("WriteMessage(second request) error = %v", err)
+	}
+	select {
+	case delivered := <-secondAgent.received:
+		if !bytes.Equal(delivered, requestBytes) {
+			t.Fatalf("second Agent received Envelope = %x, want %x", delivered, requestBytes)
+		}
+	case <-time.After(time.Second):
+		t.Fatal("第一个客户端断开后 Gate 未向新 Agent 投递请求")
+	}
+	_, responseBytes, err := readTestBinaryMessage(t, secondConnection)
+	if err != nil {
+		t.Fatalf("ReadMessage(second response) error = %v", err)
+	}
+	var response commonv1.Envelope
+	if err := proto.Unmarshal(responseBytes, &response); err != nil {
+		t.Fatalf("unmarshal second response Envelope: %v", err)
+	}
+	if response.GetMsgId() != 1002 || response.GetRequestId() != 93 || !bytes.Equal(response.GetPayload(), []byte("gate remains available")) {
+		t.Fatalf("second response = %+v, want msg_id 1002, request_id 93 and echoed payload", &response)
+	}
+
+	if err := secondConnection.Close(); err != nil {
+		t.Fatalf("Close(second client) error = %v", err)
+	}
+	select {
+	case err := <-secondAgent.stopResult:
+		if err != nil {
+			t.Fatalf("第二个 Agent.OnStop ClientSession.Close() error = %v", err)
+		}
+	case <-time.After(time.Second):
+		t.Fatal("第二个 Agent.OnStop 未完成")
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+}
+
 // TestProdGateRuntimeStopReleasesListener 验证 Runtime.Stop 会释放 Gate 监听地址，随后 Close 仍可完成最终释放。
 func TestProdGateRuntimeStopReleasesListener(t *testing.T) {
 	local, gate, _, _ := startTestProductionGate(t, 1, time.Second)
@@ -2984,6 +3073,17 @@ func readTestBinaryMessage(t *testing.T, connection *websocket.Conn) (int, []byt
 }
 
 func receiveProductionAgent(t *testing.T, agents <-chan *productionTestAgent) *productionTestAgent {
+	t.Helper()
+	select {
+	case agent := <-agents:
+		return agent
+	case <-time.After(time.Second):
+		t.Fatal("Gate 未创建连接 Agent")
+		return nil
+	}
+}
+
+func receiveStoppingProductionTestAgent(t *testing.T, agents <-chan *stopClosingProductionTestAgent) *stopClosingProductionTestAgent {
 	t.Helper()
 	select {
 	case agent := <-agents:
