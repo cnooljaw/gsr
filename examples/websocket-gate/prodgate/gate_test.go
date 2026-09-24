@@ -2072,6 +2072,62 @@ func TestProdGateRuntimeCloseReleasesActiveClient(t *testing.T) {
 	}
 }
 
+// TestProdGateRuntimeStopClosesAllActiveClients 验证 Runtime.Stop 会关闭所有已认证连接并使对应 ClientSession 失效。
+func TestProdGateRuntimeStopClosesAllActiveClients(t *testing.T) {
+	const activeConnections = 8
+	local, gate, agents, clientTLS := startTestProductionGate(t, activeConnections, time.Second)
+	connections := make([]*websocket.Conn, activeConnections)
+	clientSessions := make([]*productionTestAgent, activeConnections)
+	for index := range connections {
+		connections[index], _ = dialAuthenticatedTestClient(t, gate, clientTLS)
+		clientSessions[index] = receiveProductionAgent(t, agents)
+	}
+	defer func() {
+		for _, connection := range connections {
+			_ = connection.Close()
+		}
+	}()
+
+	stopContext, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	stopResult := make(chan error, 1)
+	go func() {
+		stopResult <- local.Stop(stopContext)
+	}()
+	select {
+	case err := <-stopResult:
+		if err != nil {
+			t.Fatalf("Runtime.Stop() error = %v", err)
+		}
+	case <-stopContext.Done():
+		for _, connection := range connections {
+			_ = connection.Close()
+		}
+		select {
+		case <-stopResult:
+		case <-time.After(time.Second):
+		}
+		t.Fatalf("Runtime.Stop() 未关闭全部活动客户端: %v", stopContext.Err())
+	}
+
+	for index, connection := range connections {
+		_, _, err := readTestBinaryMessage(t, connection)
+		if !websocket.IsCloseError(err, websocket.CloseGoingAway) {
+			t.Errorf("active connection %d ReadMessage() error = %v, want Gate close %d", index, err, websocket.CloseGoingAway)
+		}
+		if err := clientSessions[index].client.Send(&commonv1.Envelope{MsgId: 1002, RequestId: uint32(index + 1)}); !errors.Is(err, ErrClientSessionClosed) {
+			t.Errorf("ClientSession.Send() after Runtime.Stop() error = %v, want %v", err, ErrClientSessionClosed)
+		}
+	}
+	metrics := gate.Metrics()
+	if metrics.AcceptedConnections != activeConnections || metrics.RejectedConnections != 0 {
+		t.Fatalf("metrics after Runtime.Stop() = %+v, want %d accepted and no rejected connections", metrics, activeConnections)
+	}
+	if err := local.Close(); err != nil {
+		t.Fatalf("Runtime.Close() after Stop() error = %v", err)
+	}
+}
+
 // TestProdGateRuntimeStopReleasesListener 验证 Runtime.Stop 会释放 Gate 监听地址，随后 Close 仍可完成最终释放。
 func TestProdGateRuntimeStopReleasesListener(t *testing.T) {
 	local, gate, _, _ := startTestProductionGate(t, 1, time.Second)

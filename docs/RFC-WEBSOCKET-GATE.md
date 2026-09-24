@@ -395,6 +395,8 @@ Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/
 
 `TestProdGateRuntimeStopClosesAllPendingHandshakes` 覆盖 8 条并发等待应用握手的连接：`Runtime.Stop()` 关闭全部连接并等待处理 goroutine 退出，不创建 Agent。
 
+`TestProdGateRuntimeStopClosesAllActiveClients` 覆盖 8 条已认证活动连接：`Runtime.Stop()` 关闭全部连接，每个 `ClientSession` 后续写回均返回 `ErrClientSessionClosed`。
+
 `TestProdGateReturnsErrorAfterAgentCallTimeout` 覆盖 Agent 内部 Core Call 超时：客户端收到原 `request_id` 的 `INTERNAL`，目标 Service 之后完成的迟到内部回复不会再生成第二条客户端响应，超时归 Agent/Runtime 而不是 Gate。该测试锁定内部调用的错误归属，不定义客户端业务请求的超时数值或重试策略。
 
 `TestProdGateRejectsLateAgentResponseAfterDisconnect` 已锁定断开后的迟到写回：Gate 先使 `ClientSession` 失效，再通知 Agent；Agent 后续写回得到 `ErrClientSessionClosed`，不会重新进入出站队列。
