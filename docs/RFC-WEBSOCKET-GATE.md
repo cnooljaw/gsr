@@ -330,16 +330,16 @@ Gate 停止按以下顺序执行：
         ↓
 关闭 WebSocket，解除 reader/writer 阻塞
         ↓
-每条连接最多通知 Agent 一次
-        ↓
-丢弃未发送的出站队列并记录统计
-        ↓
 等待 Gate 自己的 I/O owner 退出
+        ↓
+通知仍有映射的 Agent（只等 Mailbox 接纳，不等 Handler 执行）
+        ↓
+清理连接映射并记录未发送的出站队列统计
 ```
 
-Gate 不等待或强杀 Agent。Runtime 独立停止 Agent runner 并调用 Agent 的 `OnStop`；ClientSession 的失效和断开通知必须幂等，避免 Gate 与 Agent 并发停止形成相互等待。容量拒绝和关闭不生成业务 `ErrorResponse`，具体原因进入 Gate 结构化日志。
+Gate 不等待或强杀 Agent Handler。单独停止 Gate 时，Gate 在自己的 `OnStop` 上下文期限内重试断开通知，直到 Agent Mailbox 接纳或停止上下文结束；整个 Runtime 正在停止时，Runtime 的停止错误视为终止条件。通知只保证入队，不等待 Agent 处理完成。ClientSession 的失效和断开通知必须幂等，避免 Gate 与 Agent 并发停止形成相互等待。容量拒绝和关闭不生成业务 `ErrorResponse`，具体原因进入 Gate 结构化日志。
 
-断开通知通过 Gate 的受控 Infrastructure Call 投递；如果 Agent Mailbox 暂时满载，Gate 保留连接映射并在 5 秒上限内重试，不建立第二个无限队列。通知成功、Runtime 停止或达到上限后结束重试。
+断开通知通过 Gate 的受控 Infrastructure Call 投递，使 Gate 能确认 Agent Mailbox 是否接纳。若 Mailbox 满载，Gate 保留连接映射并由当前连接处理协程按固定间隔重试；连接处理协程在通知完成前继续占用 `MaxConnections` 接纳名额，因此待处理数量天然有界，无需再维护一份独立重试队列。正常连接断开后，重试持续到通知被接纳或 Runtime/目标 Service 停止；Gate 单独停止时由 `OnStop` 使用自己的有界上下文收尾。DebugGate 同样使用 Call，而不是仅确认断开事件进入 Gate Mailbox 的 Send。
 
 ## 下一步与验收
 

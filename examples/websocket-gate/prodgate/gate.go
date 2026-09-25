@@ -23,6 +23,7 @@ const (
 	defaultHandshakeTimeout                       = 5 * time.Second
 	defaultReadHeaderTimeout                      = 5 * time.Second
 	defaultAgentStartWait                         = 5 * time.Second
+	disconnectRetryInterval                       = 5 * time.Millisecond
 	defaultWriteWait                              = 10 * time.Second
 	closeFrameWait                                = 100 * time.Millisecond
 	queueEntryOverhead                            = 64
@@ -252,7 +253,7 @@ func (gate *GateService) Handle(self runtime.CommandContext, command runtime.Com
 		if err := self.Send(agentID, ClientDisconnectedCommand); err != nil && !isRuntimeStoppingError(err) {
 			gate.logConnectionFailure(clientConn, "disconnect_notify", websocket.CloseInternalServerErr, err)
 			if errors.Is(err, runtime.ErrMailboxFull) {
-				// 保留映射，让 ServeHTTP 通过有界 Call 重试，避免断开通知被 Agent 背压吞掉。
+				// 保留映射，让连接处理协程重试，避免断开通知被 Agent 背压吞掉。
 				return nil, err
 			}
 			delete(gate.agentsByConnection, clientConn)
@@ -268,6 +269,9 @@ func (gate *GateService) Handle(self runtime.CommandContext, command runtime.Com
 
 // OnStop 停止接纳、关闭客户端连接，并等待 Gate 自己的 I/O goroutine 退出。
 func (gate *GateService) OnStop(ctx context.Context) error {
+	if ctx == nil {
+		ctx = context.Background()
+	}
 	gate.mu.Lock()
 	gate.stopping = true
 	server := gate.server
@@ -295,6 +299,7 @@ func (gate *GateService) OnStop(ctx context.Context) error {
 		}
 	}
 	gate.ioWorkers.Wait()
+	result = errors.Join(result, gate.notifyMappedAgentsOnStop(ctx))
 	clear(gate.agentsByConnection)
 	gate.logError("Gate stopped", "phase", "stop")
 
@@ -328,10 +333,10 @@ func (gate *GateService) ServeHTTP(writer http.ResponseWriter, request *http.Req
 			gate.finishHandler()
 		} else {
 			clientConn.closeWith(websocket.CloseNormalClosure, "normal", time.Now().Add(closeFrameWait))
-			gate.flushConnectionDiagnostics(clientConn)
 			if agentCreationRequested {
 				gate.notifyDisconnected(serviceID, clientConn)
 			}
+			gate.flushConnectionDiagnostics(clientConn)
 			gate.untrackConnection(clientConn)
 		}
 		gate.ioWorkers.Done()
@@ -511,9 +516,7 @@ func (gate *GateService) deliverAuthenticatedFrame(
 }
 
 func (gate *GateService) notifyDisconnected(serviceID runtime.ServiceID, clientConn *clientConnection) {
-	deadline := time.NewTimer(defaultAgentStartWait)
-	ticker := time.NewTicker(5 * time.Millisecond)
-	defer deadline.Stop()
+	ticker := time.NewTicker(disconnectRetryInterval)
 	defer ticker.Stop()
 	for {
 		attemptContext, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
@@ -522,15 +525,54 @@ func (gate *GateService) notifyDisconnected(serviceID runtime.ServiceID, clientC
 		if err == nil || isRuntimeStoppingError(err) {
 			return
 		}
-		if !errors.Is(err, runtime.ErrMailboxFull) && !errors.Is(err, context.DeadlineExceeded) && !errors.Is(err, runtime.ErrCallTimeout) {
+		if !isDisconnectRetryableError(err) {
 			return
 		}
 		select {
 		case <-ticker.C:
-		case <-deadline.C:
-			return
 		}
 	}
+}
+
+func (gate *GateService) notifyMappedAgentsOnStop(ctx context.Context) error {
+	var result error
+	for _, agentID := range gate.agentsByConnection {
+		if err := gate.notifyAgentOnStop(ctx, agentID); err != nil {
+			result = errors.Join(result, fmt.Errorf("prodgate: notify Agent %d on Gate stop: %w", agentID, err))
+		}
+		if ctx.Err() != nil {
+			break
+		}
+	}
+	return result
+}
+
+func (gate *GateService) notifyAgentOnStop(ctx context.Context, agentID runtime.ServiceID) error {
+	ticker := time.NewTicker(disconnectRetryInterval)
+	defer ticker.Stop()
+	for {
+		if err := ctx.Err(); err != nil {
+			return err
+		}
+		err := gate.runtime.Send(agentID, ClientDisconnectedCommand)
+		if err == nil || isRuntimeStoppingError(err) {
+			return nil
+		}
+		if !errors.Is(err, runtime.ErrMailboxFull) {
+			return err
+		}
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-ticker.C:
+		}
+	}
+}
+
+func isDisconnectRetryableError(err error) bool {
+	return errors.Is(err, runtime.ErrMailboxFull) ||
+		errors.Is(err, context.DeadlineExceeded) ||
+		errors.Is(err, runtime.ErrCallTimeout)
 }
 
 func (gate *GateService) logError(message string, fields ...any) {

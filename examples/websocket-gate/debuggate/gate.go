@@ -17,11 +17,12 @@ import (
 )
 
 const (
-	defaultMaxFrameBytes  = 4 << 20
-	defaultReadHeaderWait = 5 * time.Second
-	defaultAgentStartWait = 5 * time.Second
-	defaultWriteWait      = 10 * time.Second
-	closeFrameWait        = 100 * time.Millisecond
+	defaultMaxFrameBytes    = 4 << 20
+	defaultReadHeaderWait   = 5 * time.Second
+	defaultAgentStartWait   = 5 * time.Second
+	disconnectRetryInterval = 5 * time.Millisecond
+	defaultWriteWait        = 10 * time.Second
+	closeFrameWait          = 100 * time.Millisecond
 
 	queueEntryOverhead = 64
 )
@@ -219,16 +220,19 @@ func (gate *GateService) Handle(self runtime.CommandContext, command runtime.Com
 		if !exists {
 			return nil, nil
 		}
-		delete(gate.agentsByConnection, clientConn)
-		if err := self.Send(agentID, ClientDisconnectedCommand); err != nil &&
-			!errors.Is(err, runtime.ErrServiceNotFound) &&
-			!errors.Is(err, runtime.ErrServiceClosed) &&
-			!errors.Is(err, runtime.ErrServiceStopping) &&
-			!errors.Is(err, runtime.ErrRuntimeStopping) &&
-			!errors.Is(err, runtime.ErrRuntimeStopped) &&
-			!errors.Is(err, runtime.ErrRuntimeClosed) {
+		if err := self.Send(agentID, ClientDisconnectedCommand); err != nil {
+			if isRuntimeStoppingError(err) {
+				delete(gate.agentsByConnection, clientConn)
+				return nil, nil
+			}
+			if errors.Is(err, runtime.ErrMailboxFull) {
+				// 保留映射，让连接处理协程重试，避免断开通知被 Agent 背压吞掉。
+				return nil, err
+			}
+			delete(gate.agentsByConnection, clientConn)
 			return nil, fmt.Errorf("debuggate: notify Agent disconnect: %w", err)
 		}
+		delete(gate.agentsByConnection, clientConn)
 		return nil, nil
 	default:
 		return nil, fmt.Errorf("debuggate: unknown internal command %d", command)
@@ -237,6 +241,9 @@ func (gate *GateService) Handle(self runtime.CommandContext, command runtime.Com
 
 // OnStop 关闭监听与所有 WebSocket，再等待 Gate 自己的接入和 I/O goroutine 退出。
 func (gate *GateService) OnStop(ctx context.Context) error {
+	if ctx == nil {
+		ctx = context.Background()
+	}
 	gate.mu.Lock()
 	gate.stopping = true
 	server := gate.server
@@ -262,6 +269,7 @@ func (gate *GateService) OnStop(ctx context.Context) error {
 		}
 	}
 	gate.ioWorkers.Wait()
+	result = errors.Join(result, gate.notifyMappedAgentsOnStop(ctx))
 	clear(gate.agentsByConnection)
 
 	gate.mu.Lock()
@@ -359,22 +367,69 @@ func (gate *GateService) ServeHTTP(writer http.ResponseWriter, request *http.Req
 }
 
 func (gate *GateService) notifyDisconnected(serviceID runtime.ServiceID, clientConn *clientConnection) {
-	deadline := time.NewTimer(defaultAgentStartWait)
-	ticker := time.NewTicker(5 * time.Millisecond)
-	defer deadline.Stop()
+	ticker := time.NewTicker(disconnectRetryInterval)
 	defer ticker.Stop()
 	for {
-		err := gate.runtime.Send(serviceID, gateDisconnectCommand, clientConn)
-		if !errors.Is(err, runtime.ErrMailboxFull) {
+		attemptContext, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+		_, err := gate.runtime.Call(attemptContext, serviceID, gateDisconnectCommand, clientConn)
+		cancel()
+		if err == nil || isRuntimeStoppingError(err) || !isDisconnectRetryableError(err) {
 			return
 		}
-		gate.counters.inboundMailboxFull.Add(1)
 		select {
 		case <-ticker.C:
-		case <-deadline.C:
-			return
 		}
 	}
+}
+
+func (gate *GateService) notifyMappedAgentsOnStop(ctx context.Context) error {
+	var result error
+	for _, agentID := range gate.agentsByConnection {
+		if err := gate.notifyAgentOnStop(ctx, agentID); err != nil {
+			result = errors.Join(result, fmt.Errorf("debuggate: notify Agent %d on Gate stop: %w", agentID, err))
+		}
+		if ctx.Err() != nil {
+			break
+		}
+	}
+	return result
+}
+
+func (gate *GateService) notifyAgentOnStop(ctx context.Context, agentID runtime.ServiceID) error {
+	ticker := time.NewTicker(disconnectRetryInterval)
+	defer ticker.Stop()
+	for {
+		if err := ctx.Err(); err != nil {
+			return err
+		}
+		err := gate.runtime.Send(agentID, ClientDisconnectedCommand)
+		if err == nil || isRuntimeStoppingError(err) {
+			return nil
+		}
+		if !errors.Is(err, runtime.ErrMailboxFull) {
+			return err
+		}
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-ticker.C:
+		}
+	}
+}
+
+func isRuntimeStoppingError(err error) bool {
+	return errors.Is(err, runtime.ErrServiceNotFound) ||
+		errors.Is(err, runtime.ErrServiceClosed) ||
+		errors.Is(err, runtime.ErrServiceStopping) ||
+		errors.Is(err, runtime.ErrRuntimeStopping) ||
+		errors.Is(err, runtime.ErrRuntimeStopped) ||
+		errors.Is(err, runtime.ErrRuntimeClosed)
+}
+
+func isDisconnectRetryableError(err error) bool {
+	return errors.Is(err, runtime.ErrMailboxFull) ||
+		errors.Is(err, context.DeadlineExceeded) ||
+		errors.Is(err, runtime.ErrCallTimeout)
 }
 
 func (gate *GateService) beginHandler() (runtime.ServiceID, bool) {

@@ -1286,9 +1286,12 @@ func TestProdGateRejectsOversizedAuthenticatedFrame(t *testing.T) {
 	}
 }
 
-// TestProdGateClosesConnectionWhenAgentMailboxIsFull 验证 Agent 正在处理消息时 Mailbox 满载会关闭当前客户端连接并累计计数。
+// TestProdGateClosesConnectionWhenAgentMailboxIsFull 验证 Mailbox 满载会关闭连接并在超过原重试上限后补交通知。
 func TestProdGateClosesConnectionWhenAgentMailboxIsFull(t *testing.T) {
 	release := make(chan struct{})
+	var releaseOnce sync.Once
+	releaseAgent := func() { releaseOnce.Do(func() { close(release) }) }
+	defer releaseAgent()
 	agents := make(chan *blockingInboundAgent, 1)
 	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
 		MailboxCapacity: 1,
@@ -1331,11 +1334,56 @@ func TestProdGateClosesConnectionWhenAgentMailboxIsFull(t *testing.T) {
 	waitForGateMetric(t, gate, "InboundMailboxFull", func(metrics Metrics) uint64 {
 		return metrics.InboundMailboxFull
 	}, 1)
-	close(release)
+	select {
+	case <-agent.disconnected:
+		t.Fatal("Agent 在 Mailbox 仍满载时收到断开通知")
+	case <-time.After(defaultAgentStartWait + 100*time.Millisecond):
+	}
+	releaseAgent()
 	select {
 	case <-agent.disconnected:
 	case <-time.After(time.Second):
 		t.Fatal("Mailbox 满载后 Agent 未收到断开通知")
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+}
+
+// TestProdGateStopNotifiesMappedAgent 验证单独停止 Gate 时仍会通知所有保留映射的 Agent。
+func TestProdGateStopNotifiesMappedAgent(t *testing.T) {
+	local, err := runtime.NewRuntime(runtime.Config{ShutdownTimeout: time.Second})
+	if err != nil {
+		t.Fatalf("NewRuntime() error = %v", err)
+	}
+	if err := local.Start(); err != nil {
+		t.Fatalf("Runtime.Start() error = %v", err)
+	}
+	t.Cleanup(func() {
+		if err := local.Close(); err != nil {
+			t.Errorf("Runtime.Close() error = %v", err)
+		}
+	})
+	agent := &plainTestAgent{disconnected: make(chan struct{})}
+	agentID, err := local.CreateService(context.Background(), agent)
+	if err != nil {
+		t.Fatalf("CreateService(Agent) error = %v", err)
+	}
+	clientConn := &clientConnection{}
+	gate := &GateService{
+		runtime:            local,
+		connections:        make(map[*clientConnection]struct{}),
+		agentsByConnection: map[*clientConnection]runtime.ServiceID{clientConn: agentID},
+	}
+	stopContext, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	if err := gate.OnStop(stopContext); err != nil {
+		t.Fatalf("Gate.OnStop() error = %v", err)
+	}
+	select {
+	case <-agent.disconnected:
+	case <-time.After(time.Second):
+		t.Fatal("Gate 单独停止后 Agent 未收到断开通知")
 	}
 	if err := local.Stop(context.Background()); err != nil {
 		t.Fatalf("Runtime.Stop() error = %v", err)

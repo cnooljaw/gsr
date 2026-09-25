@@ -80,6 +80,129 @@ func TestDebugGateRoutesClientRequestAndResponse(t *testing.T) {
 	}
 }
 
+// TestDebugGateRetriesDisconnectAfterAgentMailboxRecovers 验证 DebugGate 能观察 Agent Mailbox 满载，并在容量恢复后补交通知。
+func TestDebugGateRetriesDisconnectAfterAgentMailboxRecovers(t *testing.T) {
+	release := make(chan struct{})
+	var releaseOnce sync.Once
+	releaseAgent := func() { releaseOnce.Do(func() { close(release) }) }
+	defer releaseAgent()
+	agents := make(chan *blockingDebugAgent, 1)
+	local, err := runtime.NewRuntime(runtime.Config{MailboxCapacity: 1, ShutdownTimeout: 2 * time.Second})
+	if err != nil {
+		t.Fatalf("NewRuntime() error = %v", err)
+	}
+	if err := local.Start(); err != nil {
+		t.Fatalf("Runtime.Start() error = %v", err)
+	}
+	t.Cleanup(func() {
+		if err := local.Close(); err != nil {
+			t.Errorf("Runtime.Close() error = %v", err)
+		}
+	})
+	gate, err := NewGateService(local, Config{
+		Address:               "127.0.0.1:0",
+		MaxConnections:        1,
+		MaxOutboundQueueBytes: 64 << 10,
+		NewAgent: func(ClientSession) runtime.Service {
+			agent := &blockingDebugAgent{release: release, started: make(chan struct{}), disconnected: make(chan struct{})}
+			agents <- agent
+			return agent
+		},
+	})
+	if err != nil {
+		t.Fatalf("NewGateService() error = %v", err)
+	}
+	if _, err := local.CreateService(context.Background(), gate); err != nil {
+		t.Fatalf("CreateService(Gate) error = %v", err)
+	}
+	connection := dialTestGate(t, gate)
+	defer connection.Close()
+	var agent *blockingDebugAgent
+	select {
+	case agent = <-agents:
+	case <-time.After(time.Second):
+		t.Fatal("Gate 未创建连接 Agent")
+	}
+	frame, err := proto.Marshal(&commonv1.Envelope{MsgId: 1001, RequestId: 1})
+	if err != nil {
+		t.Fatalf("marshal test Envelope: %v", err)
+	}
+	if err := connection.WriteMessage(websocket.BinaryMessage, frame); err != nil {
+		t.Fatalf("WriteMessage(first frame) error = %v", err)
+	}
+	select {
+	case <-agent.started:
+	case <-time.After(time.Second):
+		t.Fatal("Agent 未开始处理客户端消息")
+	}
+	for range 2 {
+		if err := connection.WriteMessage(websocket.BinaryMessage, frame); err != nil {
+			break
+		}
+	}
+	if err := connection.SetReadDeadline(time.Now().Add(time.Second)); err != nil {
+		t.Fatalf("SetReadDeadline() error = %v", err)
+	}
+	_, _, err = connection.ReadMessage()
+	if !websocket.IsCloseError(err, websocket.CloseInternalServerErr) {
+		t.Fatalf("ReadMessage() error = %v, want WebSocket close %d", err, websocket.CloseInternalServerErr)
+	}
+	select {
+	case <-agent.disconnected:
+		t.Fatal("Agent 在 Mailbox 仍满载时收到断开通知")
+	case <-time.After(20 * time.Millisecond):
+	}
+	releaseAgent()
+	select {
+	case <-agent.disconnected:
+	case <-time.After(time.Second):
+		t.Fatal("Agent Mailbox 恢复后未收到断开通知")
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+}
+
+// TestDebugGateStopNotifiesMappedAgent 验证单独停止 DebugGate 时仍会通知所有保留映射的 Agent。
+func TestDebugGateStopNotifiesMappedAgent(t *testing.T) {
+	local, err := runtime.NewRuntime(runtime.Config{ShutdownTimeout: time.Second})
+	if err != nil {
+		t.Fatalf("NewRuntime() error = %v", err)
+	}
+	if err := local.Start(); err != nil {
+		t.Fatalf("Runtime.Start() error = %v", err)
+	}
+	t.Cleanup(func() {
+		if err := local.Close(); err != nil {
+			t.Errorf("Runtime.Close() error = %v", err)
+		}
+	})
+	agent := &testAgent{disconnected: make(chan struct{})}
+	agentID, err := local.CreateService(context.Background(), agent)
+	if err != nil {
+		t.Fatalf("CreateService(Agent) error = %v", err)
+	}
+	clientConn := &clientConnection{}
+	gate := &GateService{
+		runtime:            local,
+		connections:        make(map[*clientConnection]struct{}),
+		agentsByConnection: map[*clientConnection]runtime.ServiceID{clientConn: agentID},
+	}
+	stopContext, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	if err := gate.OnStop(stopContext); err != nil {
+		t.Fatalf("Gate.OnStop() error = %v", err)
+	}
+	select {
+	case <-agent.disconnected:
+	case <-time.After(time.Second):
+		t.Fatal("DebugGate 单独停止后 Agent 未收到断开通知")
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+}
+
 // TestDebugGateStopReportsClientCloseFailure 验证 DebugGate 停机保留每条连接的 Close 帧和 socket 关闭错误。
 func TestDebugGateStopReportsClientCloseFailure(t *testing.T) {
 	closeFailures := []error{
@@ -372,6 +495,33 @@ func (agent *testAgent) HandleClientMessage(_ runtime.CommandContext, frame []by
 }
 
 func (*testAgent) OnStop(context.Context) error { return nil }
+
+type blockingDebugAgent struct {
+	release      <-chan struct{}
+	started      chan struct{}
+	disconnected chan struct{}
+	startOnce    sync.Once
+	stopOnce     sync.Once
+}
+
+func (*blockingDebugAgent) OnStart(context.Context, runtime.ServiceContext) error { return nil }
+
+func (agent *blockingDebugAgent) Handle(commandContext runtime.CommandContext, command runtime.CommandID, _ ...any) (any, error) {
+	if command != ClientDisconnectedCommand {
+		return nil, errors.New("unexpected blocking DebugGate Agent command")
+	}
+	agent.stopOnce.Do(func() { close(agent.disconnected) })
+	commandContext.Exit()
+	return nil, nil
+}
+
+func (agent *blockingDebugAgent) HandleClientMessage(runtime.CommandContext, []byte) error {
+	agent.startOnce.Do(func() { close(agent.started) })
+	<-agent.release
+	return nil
+}
+
+func (*blockingDebugAgent) OnStop(context.Context) error { return nil }
 
 type closeErrorTestListener struct {
 	net.Listener
