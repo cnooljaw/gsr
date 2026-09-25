@@ -203,6 +203,44 @@ func TestDebugGateStopNotifiesMappedAgent(t *testing.T) {
 	}
 }
 
+// TestDebugGateStopsClientMessageAdmissionBeforeClosingConnections 验证 DebugGate 标记停机后不会再把客户端帧送入 Agent Mailbox。
+func TestDebugGateStopsClientMessageAdmissionBeforeClosingConnections(t *testing.T) {
+	release := make(chan struct{})
+	defer close(release)
+	local, err := runtime.NewRuntime(runtime.Config{MailboxCapacity: 1, ShutdownTimeout: time.Second})
+	if err != nil {
+		t.Fatalf("NewRuntime() error = %v", err)
+	}
+	if err := local.Start(); err != nil {
+		t.Fatalf("Runtime.Start() error = %v", err)
+	}
+	t.Cleanup(func() {
+		if err := local.Close(); err != nil {
+			t.Errorf("Runtime.Close() error = %v", err)
+		}
+	})
+	agent := &blockingDebugAgent{release: release, started: make(chan struct{}), disconnected: make(chan struct{})}
+	agentID, err := local.CreateService(context.Background(), agent)
+	if err != nil {
+		t.Fatalf("CreateService(Agent) error = %v", err)
+	}
+	gate := &GateService{runtime: local}
+	if err := gate.OnStop(context.Background()); err != nil {
+		t.Fatalf("Gate.OnStop() error = %v", err)
+	}
+	if err := gate.deliverClientMessage(agentID, []byte("client frame")); !errors.Is(err, errGateStopping) {
+		t.Fatalf("deliverClientMessage() error = %v, want %v", err, errGateStopping)
+	}
+	select {
+	case <-agent.started:
+		t.Fatal("Gate 停机后仍有客户端消息进入 Agent")
+	default:
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+}
+
 // TestDebugGateStopNotifiesHealthyAgentWhileAnotherMailboxIsFull 验证一个满载 Agent 不会挡住其他 Agent 的停机通知。
 func TestDebugGateStopNotifiesHealthyAgentWhileAnotherMailboxIsFull(t *testing.T) {
 	release := make(chan struct{})

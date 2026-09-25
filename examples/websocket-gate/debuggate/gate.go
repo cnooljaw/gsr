@@ -46,6 +46,7 @@ var (
 	ErrClientSessionClosed = errors.New("debuggate: client session closed")
 	// ErrFrameTooLarge 表示 Protobuf Envelope 超过单帧大小上限。
 	ErrFrameTooLarge = errors.New("debuggate: frame too large")
+	errGateStopping  = errors.New("debuggate: Gate is stopping")
 )
 
 var debugUpgrader = websocket.Upgrader{EnableCompression: false}
@@ -97,7 +98,7 @@ type GateService struct {
 	runtime *runtime.Runtime
 	config  Config
 
-	mu             sync.Mutex
+	mu             sync.RWMutex
 	server         *http.Server
 	serviceID      runtime.ServiceID
 	address        net.Addr
@@ -357,7 +358,11 @@ func (gate *GateService) ServeHTTP(writer http.ResponseWriter, request *http.Req
 			clientConn.closeWith(websocket.CloseUnsupportedData, "unsupported_data", time.Now().Add(closeFrameWait))
 			return
 		}
-		if err := gate.runtime.DeliverClientMessage(agentID, frame); err != nil {
+		if err := gate.deliverClientMessage(agentID, frame); err != nil {
+			if errors.Is(err, errGateStopping) {
+				<-clientConn.closedCh
+				return
+			}
 			if errors.Is(err, runtime.ErrMailboxFull) {
 				gate.counters.inboundMailboxFull.Add(1)
 			}
@@ -365,6 +370,15 @@ func (gate *GateService) ServeHTTP(writer http.ResponseWriter, request *http.Req
 			return
 		}
 	}
+}
+
+func (gate *GateService) deliverClientMessage(agentID runtime.ServiceID, frame []byte) error {
+	gate.mu.RLock()
+	defer gate.mu.RUnlock()
+	if gate.stopping {
+		return errGateStopping
+	}
+	return gate.runtime.DeliverClientMessage(agentID, frame)
 }
 
 func (gate *GateService) notifyDisconnected(serviceID runtime.ServiceID, clientConn *clientConnection) {
