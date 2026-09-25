@@ -200,3 +200,5 @@ TestRuntimePacedMultiServiceLoad 已补 8 个真实 Service 共享文件 Logger 
 2026-09-24 Gate 非法握手接纳计数：非二进制及格式非法握手测试也明确断言连接未计入接纳数。两个定向测试、prodgate 全包测试及定向 race 均通过。
 
 2026-09-24 Gate 断开通知持续重试：生产 Gate 不再因 5 秒上限放弃 Agent Mailbox 满载时的断开通知；连接处理协程在通知入队前继续占用 `MaxConnections` 名额，使待处理数量有界。DebugGate 改用 Infrastructure Call 确认 Agent Mailbox 接纳，并保留满载时的连接映射；单独停止 Gate 时，`OnStop` 在其生命周期上下文内重试通知剩余 Agent。生产回归测试将 Mailbox 满载保持超过旧 5 秒上限后再恢复，DebugGate 集成测试覆盖 Mailbox 恢复后收到通知。两 Gate package 全测与对应 race 均通过；未运行全仓验证。
+
+2026-09-25 Gate 停机通知公平性：修复 Gate 单独停止时逐个等待 Agent 的队头阻塞；现在每轮都会尝试所有待通知 Agent，仅将 Mailbox 满载者留到下一轮。生产 Gate 与 DebugGate 新增双 Agent 测试，确认一个 Agent 卡住时健康 Agent 仍及时收到断开通知，随后满载 Agent 恢复也能完成收尾。两个 package 全量测试与 race 均通过；未运行全仓验证。

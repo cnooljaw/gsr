@@ -203,6 +203,84 @@ func TestDebugGateStopNotifiesMappedAgent(t *testing.T) {
 	}
 }
 
+// TestDebugGateStopNotifiesHealthyAgentWhileAnotherMailboxIsFull 验证一个满载 Agent 不会挡住其他 Agent 的停机通知。
+func TestDebugGateStopNotifiesHealthyAgentWhileAnotherMailboxIsFull(t *testing.T) {
+	release := make(chan struct{})
+	var releaseOnce sync.Once
+	releaseAgent := func() { releaseOnce.Do(func() { close(release) }) }
+	defer releaseAgent()
+	local, err := runtime.NewRuntime(runtime.Config{MailboxCapacity: 1, ShutdownTimeout: 2 * time.Second})
+	if err != nil {
+		t.Fatalf("NewRuntime() error = %v", err)
+	}
+	if err := local.Start(); err != nil {
+		t.Fatalf("Runtime.Start() error = %v", err)
+	}
+	t.Cleanup(func() {
+		if err := local.Close(); err != nil {
+			t.Errorf("Runtime.Close() error = %v", err)
+		}
+	})
+	blocked := &blockingDebugAgent{release: release, started: make(chan struct{}), disconnected: make(chan struct{})}
+	blockedID, err := local.CreateService(context.Background(), blocked)
+	if err != nil {
+		t.Fatalf("CreateService(blocked Agent) error = %v", err)
+	}
+	if err := local.DeliverClientMessage(blockedID, []byte("active")); err != nil {
+		t.Fatalf("DeliverClientMessage(active) error = %v", err)
+	}
+	select {
+	case <-blocked.started:
+	case <-time.After(time.Second):
+		t.Fatal("blocked Agent 未开始处理消息")
+	}
+	if err := local.DeliverClientMessage(blockedID, []byte("queued")); err != nil {
+		t.Fatalf("DeliverClientMessage(queued) error = %v", err)
+	}
+	healthy := &testAgent{disconnected: make(chan struct{})}
+	healthyID, err := local.CreateService(context.Background(), healthy)
+	if err != nil {
+		t.Fatalf("CreateService(healthy Agent) error = %v", err)
+	}
+	blockedConnection := &clientConnection{}
+	healthyConnection := &clientConnection{}
+	gate := &GateService{
+		runtime:     local,
+		connections: make(map[*clientConnection]struct{}),
+		agentsByConnection: map[*clientConnection]runtime.ServiceID{
+			blockedConnection: blockedID,
+			healthyConnection: healthyID,
+		},
+	}
+	stopContext, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	stopDone := make(chan error, 1)
+	go func() { stopDone <- gate.OnStop(stopContext) }()
+	select {
+	case <-healthy.disconnected:
+	case <-time.After(time.Second):
+		releaseAgent()
+		select {
+		case <-stopDone:
+		case <-time.After(time.Second):
+			t.Error("Gate.OnStop() 在测试释放阻塞 Agent 后仍未返回")
+		}
+		t.Fatal("满载 Agent 阻塞时，健康 Agent 未及时收到停机通知")
+	}
+	releaseAgent()
+	select {
+	case <-blocked.disconnected:
+	case <-time.After(time.Second):
+		t.Fatal("Mailbox 恢复后，阻塞 Agent 未收到停机通知")
+	}
+	if err := <-stopDone; err != nil {
+		t.Fatalf("Gate.OnStop() error = %v", err)
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+}
+
 // TestDebugGateStopReportsClientCloseFailure 验证 DebugGate 停机保留每条连接的 Close 帧和 socket 关闭错误。
 func TestDebugGateStopReportsClientCloseFailure(t *testing.T) {
 	closeFailures := []error{

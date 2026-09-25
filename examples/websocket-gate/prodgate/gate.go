@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"sort"
 	"strconv"
 	"sync"
 	"sync/atomic"
@@ -535,38 +536,43 @@ func (gate *GateService) notifyDisconnected(serviceID runtime.ServiceID, clientC
 }
 
 func (gate *GateService) notifyMappedAgentsOnStop(ctx context.Context) error {
-	var result error
+	pending := make([]runtime.ServiceID, 0, len(gate.agentsByConnection))
 	for _, agentID := range gate.agentsByConnection {
-		if err := gate.notifyAgentOnStop(ctx, agentID); err != nil {
-			result = errors.Join(result, fmt.Errorf("prodgate: notify Agent %d on Gate stop: %w", agentID, err))
-		}
-		if ctx.Err() != nil {
-			break
-		}
+		pending = append(pending, agentID)
 	}
-	return result
-}
-
-func (gate *GateService) notifyAgentOnStop(ctx context.Context, agentID runtime.ServiceID) error {
+	sort.Slice(pending, func(left, right int) bool { return pending[left] < pending[right] })
+	retry := make([]runtime.ServiceID, 0, len(pending))
 	ticker := time.NewTicker(disconnectRetryInterval)
 	defer ticker.Stop()
-	for {
-		if err := ctx.Err(); err != nil {
-			return err
+	var result error
+	for len(pending) > 0 {
+		retry = retry[:0]
+		for _, agentID := range pending {
+			if err := ctx.Err(); err != nil {
+				return errors.Join(result, err)
+			}
+			err := gate.runtime.Send(agentID, ClientDisconnectedCommand)
+			if err == nil || isRuntimeStoppingError(err) {
+				continue
+			}
+			if errors.Is(err, runtime.ErrMailboxFull) {
+				retry = append(retry, agentID)
+				continue
+			}
+			result = errors.Join(result, fmt.Errorf("prodgate: notify Agent %d on Gate stop: %w", agentID, err))
 		}
-		err := gate.runtime.Send(agentID, ClientDisconnectedCommand)
-		if err == nil || isRuntimeStoppingError(err) {
-			return nil
-		}
-		if !errors.Is(err, runtime.ErrMailboxFull) {
-			return err
+		// 交换两个缓冲切片，避免每轮重试重新分配 ServiceID 列表。
+		pending, retry = retry, pending
+		if len(pending) == 0 {
+			return result
 		}
 		select {
 		case <-ctx.Done():
-			return ctx.Err()
+			return errors.Join(result, ctx.Err())
 		case <-ticker.C:
 		}
 	}
+	return result
 }
 
 func isDisconnectRetryableError(err error) bool {
