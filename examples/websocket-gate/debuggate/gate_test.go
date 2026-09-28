@@ -691,6 +691,54 @@ func TestDebugGateLogsAgentCreationFailure(t *testing.T) {
 	}
 }
 
+// TestDebugGateHTTPServerErrorUsesSharedLogger 验证 HTTP 内部错误进入共享日志且不泄露原始文本。
+func TestDebugGateHTTPServerErrorUsesSharedLogger(t *testing.T) {
+	var output bytes.Buffer
+	logger, err := logging.New(logging.Config{Writer: &output})
+	if err != nil {
+		t.Fatalf("logging.New() error = %v", err)
+	}
+	t.Cleanup(func() {
+		if err := logger.Close(context.Background()); err != nil {
+			t.Errorf("Logger.Close() error = %v", err)
+		}
+	})
+	local, gate, _ := startTestGateWithLogger(t, 8, 1, logger)
+	if gate.server.ErrorLog == nil {
+		t.Fatal("DebugGate HTTP server has no shared error logger")
+	}
+	gate.server.ErrorLog.Print("http: panic serving 127.0.0.1:12345: private-client-data")
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+	if err := logger.Close(context.Background()); err != nil {
+		t.Fatalf("Logger.Close() error = %v", err)
+	}
+	if bytes.Contains(output.Bytes(), []byte("private-client-data")) {
+		t.Fatal("DebugGate log contains raw HTTP server error")
+	}
+	var matches int
+	for _, line := range bytes.Split(bytes.TrimSpace(output.Bytes()), []byte{'\n'}) {
+		var entry struct {
+			Message string         `json:"message"`
+			Service uint64         `json:"service"`
+			Fields  map[string]any `json:"fields"`
+		}
+		if err := json.Unmarshal(line, &entry); err != nil {
+			t.Fatalf("decode log entry: %v", err)
+		}
+		if entry.Message == "Gate HTTP server error" && entry.Fields["category"] == "handler_panic" {
+			matches++
+			if entry.Service != uint64(gate.serviceID) {
+				t.Fatalf("HTTP error service = %d, want %d", entry.Service, gate.serviceID)
+			}
+		}
+	}
+	if matches != 1 {
+		t.Fatalf("HTTP server error logs = %d, want 1", matches)
+	}
+}
+
 // TestDebugGateLogsUnsupportedFrameWithoutClientText 验证非二进制帧的诊断不泄露客户端原文。
 func TestDebugGateLogsUnsupportedFrameWithoutClientText(t *testing.T) {
 	var output bytes.Buffer

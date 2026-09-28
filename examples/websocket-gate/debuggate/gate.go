@@ -179,6 +179,7 @@ func (gate *GateService) OnStart(_ context.Context, self runtime.ServiceContext)
 	gate.server = server
 	gate.serviceID = self.Self()
 	gate.logger = gate.logger.WithService(uint64(self.Self()))
+	server.ErrorLog = gatecommon.NewHTTPServerErrorLog(gate.logger)
 	gate.address = listener.Addr()
 	gate.ioWorkers.Add(1)
 	gate.mu.Unlock()

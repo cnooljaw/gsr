@@ -24,6 +24,7 @@ import (
 	"time"
 
 	commonv1 "github.com/cnooljaw/gsr/examples/websocket-gate/gen/go/gsr/common/v1"
+	"github.com/cnooljaw/gsr/examples/websocket-gate/internal/gatecommon"
 	"github.com/cnooljaw/gsr/logging"
 	"github.com/cnooljaw/gsr/runtime"
 	"github.com/gorilla/websocket"
@@ -1301,7 +1302,7 @@ func TestProdGateHTTPServerErrorLogRedactsRawText(t *testing.T) {
 		}
 	})
 	const rawError = "http: panic serving 127.0.0.1:12345: private-client-data\nstack"
-	writer := httpServerErrorWriter{logger: logger}
+	writer := gatecommon.NewHTTPServerErrorLog(logger).Writer()
 	if written, err := writer.Write([]byte(rawError)); err != nil || written != len(rawError) {
 		t.Fatalf("Write(server error) = %d, %v; want %d, nil", written, err, len(rawError))
 	}

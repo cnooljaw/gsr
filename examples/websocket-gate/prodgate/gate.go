@@ -1,12 +1,10 @@
 package prodgate
 
 import (
-	"bytes"
 	"context"
 	"crypto/tls"
 	"errors"
 	"fmt"
-	"log"
 	"net"
 	"net/http"
 	"strconv"
@@ -206,7 +204,7 @@ func (gate *GateService) OnStart(_ context.Context, self runtime.ServiceContext)
 	gate.server = server
 	gate.serviceID = self.Self()
 	gate.logger = gate.logger.WithService(uint64(self.Self()))
-	server.ErrorLog = log.New(httpServerErrorWriter{logger: gate.logger}, "", 0)
+	server.ErrorLog = gatecommon.NewHTTPServerErrorLog(gate.logger)
 	gate.address = listener.Addr()
 	gate.ioWorkers.Add(1)
 	gate.mu.Unlock()
@@ -567,29 +565,6 @@ func (gate *GateService) logError(message string, fields ...any) {
 	if logger != nil {
 		_ = logger.Error(message, fields...)
 	}
-}
-
-// httpServerErrorWriter 只保留 net/http 错误类别，不复制可能含未认证输入的原始日志行。
-type httpServerErrorWriter struct {
-	logger *logging.Logger
-}
-
-func (writer httpServerErrorWriter) Write(data []byte) (int, error) {
-	category := "http_server"
-	switch {
-	case bytes.HasPrefix(data, []byte("http: TLS handshake error")):
-		category = "tls_handshake"
-	case bytes.HasPrefix(data, []byte("http: Accept error")):
-		category = "accept"
-	case bytes.HasPrefix(data, []byte("http: panic serving")):
-		category = "handler_panic"
-	}
-	if writer.logger != nil {
-		_ = writer.logger.Error("Gate HTTP server error", "category", category)
-	} else {
-		log.Printf("Gate HTTP server error: category=%s", category)
-	}
-	return len(data), nil
 }
 
 func (gate *GateService) logConnectionFailure(clientConn *clientConnection, category string, closeCode int, err error) {
