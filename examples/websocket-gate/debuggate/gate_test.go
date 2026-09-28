@@ -739,6 +739,40 @@ func TestDebugGateHTTPServerErrorUsesSharedLogger(t *testing.T) {
 	}
 }
 
+// TestDebugGateCloseErrorLogRedactsReason 验证连接诊断保留对端 Close 码而不记录对端文本。
+func TestDebugGateCloseErrorLogRedactsReason(t *testing.T) {
+	var output bytes.Buffer
+	logger, err := logging.New(logging.Config{Writer: &output})
+	if err != nil {
+		t.Fatalf("logging.New() error = %v", err)
+	}
+	t.Cleanup(func() {
+		if err := logger.Close(context.Background()); err != nil {
+			t.Errorf("Logger.Close() error = %v", err)
+		}
+	})
+	gate := &GateService{logger: logger}
+	gate.logConnectionFailure("write", websocket.CloseGoingAway, &websocket.CloseError{
+		Code: websocket.CloseNormalClosure, Text: "private-client-close-reason-do-not-log",
+	})
+	if err := logger.Close(context.Background()); err != nil {
+		t.Fatalf("Logger.Close() error = %v", err)
+	}
+	if bytes.Contains(output.Bytes(), []byte("private-client-close-reason-do-not-log")) {
+		t.Fatal("DebugGate log contains client-supplied Close reason")
+	}
+	var entry struct {
+		Message string         `json:"message"`
+		Fields  map[string]any `json:"fields"`
+	}
+	if err := json.Unmarshal(bytes.TrimSpace(output.Bytes()), &entry); err != nil {
+		t.Fatalf("decode log entry: %v", err)
+	}
+	if entry.Message != "DebugGate connection failure" || entry.Fields["peer_close_code"] != float64(websocket.CloseNormalClosure) {
+		t.Fatalf("DebugGate close log = %q, %v; want peer close code", entry.Message, entry.Fields)
+	}
+}
+
 // TestDebugGateLogsUnsupportedFrameWithoutClientText 验证非二进制帧的诊断不泄露客户端原文。
 func TestDebugGateLogsUnsupportedFrameWithoutClientText(t *testing.T) {
 	var output bytes.Buffer

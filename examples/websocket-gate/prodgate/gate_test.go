@@ -1289,6 +1289,68 @@ func TestProdGateRecordsTLSHandshakeErrorInSharedLogger(t *testing.T) {
 	}
 }
 
+// TestProdGateHandshakeCloseReasonIsNotLogged 验证客户端在应用握手前发送的 Close 文本不会进入服务端日志。
+func TestProdGateHandshakeCloseReasonIsNotLogged(t *testing.T) {
+	var output bytes.Buffer
+	logger, err := logging.New(logging.Config{Writer: &output})
+	if err != nil {
+		t.Fatalf("logging.New() error = %v", err)
+	}
+	t.Cleanup(func() {
+		if err := logger.Close(context.Background()); err != nil {
+			t.Errorf("Logger.Close() error = %v", err)
+		}
+	})
+	local, gate, agents, clientTLS := startTestProductionGate(t, 1, time.Second, logger)
+	connection := dialProductionTestClient(t, gate, clientTLS)
+	defer connection.Close()
+	const untrusted = "private-client-close-reason-do-not-log"
+	closeFrame := websocket.FormatCloseMessage(websocket.CloseNormalClosure, untrusted)
+	if err := connection.WriteControl(websocket.CloseMessage, closeFrame, time.Now().Add(time.Second)); err != nil {
+		t.Fatalf("WriteControl(client close) error = %v", err)
+	}
+	if err := connection.SetReadDeadline(time.Now().Add(time.Second)); err != nil {
+		t.Fatalf("SetReadDeadline(client close) error = %v", err)
+	}
+	if _, _, err := connection.ReadMessage(); err == nil {
+		t.Fatal("client Close did not end application handshake")
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+	if err := logger.Close(context.Background()); err != nil {
+		t.Fatalf("Logger.Close() error = %v", err)
+	}
+	if bytes.Contains(output.Bytes(), []byte(untrusted)) {
+		t.Fatal("Gate log contains client-supplied Close reason")
+	}
+	var found bool
+	decoder := json.NewDecoder(bytes.NewReader(output.Bytes()))
+	for decoder.More() {
+		var entry struct {
+			Message string         `json:"message"`
+			Fields  map[string]any `json:"fields"`
+		}
+		if err := decoder.Decode(&entry); err != nil {
+			t.Fatalf("decode log entry: %v", err)
+		}
+		if entry.Message == "Gate connection failure" && entry.Fields["category"] == "handshake_read" {
+			found = true
+			if entry.Fields["peer_close_code"] != float64(websocket.CloseNormalClosure) {
+				t.Fatalf("handshake close fields = %v, want peer close code", entry.Fields)
+			}
+		}
+	}
+	if !found {
+		t.Fatal("Gate did not record the handshake close category")
+	}
+	select {
+	case <-agents:
+		t.Fatal("client Close before handshake created an Agent")
+	default:
+	}
+}
+
 // TestProdGateHTTPServerErrorLogRedactsRawText 验证 HTTP 服务器错误只保留类别，不复制可能含敏感信息的原始行。
 func TestProdGateHTTPServerErrorLogRedactsRawText(t *testing.T) {
 	var output bytes.Buffer

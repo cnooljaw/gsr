@@ -250,3 +250,5 @@ TestRuntimePacedMultiServiceLoad 已补 8 个真实 Service 共享文件 Logger 
 2026-09-28 Gate HTTP 内部日志满载：阻塞底层日志写入并填满容量为 1 的共享队列后，HTTP 错误日志适配器立即返回，丢弃计数增加 1；日志输出恢复后能正常关闭 Logger。定向测试及其 race 测试通过；本轮只验证满载 admission，不修改 Gate 或 Logger 的生产实现。
 
 2026-09-28 生产 Gate 失败阶段压力样本扩展：`TestProdGateFailurePhaseStress` 在原应用握手/MAC 失败前加入坏 TLS 首包，确认 TLS 阶段没有创建 Agent，三类故障之后健康连接仍可请求/响应。显式开关下默认每阶段 32 次样本通过；每阶段 8 次样本及其定向 race 通过。坏 TLS 首包本身不计入应用层拒绝数，独立的 TCP 容量拒绝仍会计数；这是本机短时样本，不代表目标部署容量或完整故障矩阵。本轮不修改生产实现。
+
+2026-09-28 客户端 WebSocket Close 原因脱敏：真实生产 Gate 握手前 Close 帧测试先复现客户端自填文本进入结构化日志；修复后连接故障诊断保留 `peer_close_code`，不记录对端文本。DebugGate 的相同日志边界用定向测试覆盖。两种 Gate 共用安全字段选择，受影响包测试和定向 race 测试通过；不改变关闭或 Agent 投递语义。

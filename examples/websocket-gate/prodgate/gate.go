@@ -573,9 +573,7 @@ func (gate *GateService) logConnectionFailure(clientConn *clientConnection, cate
 		if clientConn != nil {
 			fields = append(fields, "connection_id", clientConn.connectionID)
 		}
-		if err != nil {
-			fields = append(fields, "error", err)
-		}
+		fields = append(fields, gatecommon.SafeWebSocketErrorFields(err)...)
 		gate.logError("Gate connection failure", fields...)
 	}
 }

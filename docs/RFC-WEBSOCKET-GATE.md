@@ -284,7 +284,7 @@ Gate 只使用标准 WebSocket 关闭码，不新增当前客户端必须理解�
 - **Agent** 负责已认证 Envelope 的 `msg_id`、`request_id`、payload 解码、方向和路由。未知 `msg_id` 或合法载荷的协议不支持，有 request_id 时返回通用 `ErrorResponse`，无 request_id 时丢弃并记录；不把未知编号本身当作 WebSocket 坏帧。
 - **业务 Service** 负责余额不足、房间不存在、状态不允许等业务拒绝，按对应业务 Response 返回，不改用 WebSocket Close。
 
-生产 Gate 的网络/安全错误（包括客户端出站写循环和底层写 deadline 设置失败）使用 Runtime 共享 Logger，按单连接、错误类别限频：保留首条结构化明细，重复项只累计数量，连接结束时补一条汇总。日志可包含连接 ID、Gate 模式、阶段、远端地址、关闭码和内部错误分类；只有在完成认证和解码后才记录可信的 msg_id/request_id。不得记录私钥、shared secret、macKey、原始 payload 或未认证 Envelope 字段。业务日志不做这类去重，也不由 Gate 重复记录。
+生产 Gate 的网络/安全错误（包括客户端出站写循环和底层写 deadline 设置失败）使用 Runtime 共享 Logger，按单连接、错误类别限频：保留首条结构化明细，重复项只累计数量，连接结束时补一条汇总。日志可包含连接 ID、Gate 模式、阶段、远端地址、关闭码和内部错误分类；只有在完成认证和解码后才记录可信的 msg_id/request_id。对端 WebSocket Close 帧只记录关闭码，不记录其可由客户端填写的原因文本。不得记录私钥、shared secret、macKey、原始 payload 或未认证 Envelope 字段。业务日志不做这类去重，也不由 Gate 重复记录。
 
 在 HTTP/WebSocket 升级前，`net/http` 的 TLS 握手、Accept 和内部 Handler 错误尚无 `ClientSession`，无法使用连接 ID 与连接级去重。生产 Gate 和 DebugGate 共用 `http.Server.ErrorLog` 的安全分类入口：配置 Runtime Logger 时写入同一有界日志队列，未配置时仅向 Go 标准日志输出类别（默认目标为标准错误输出）；不转录可能包含未认证输入或 panic 文本的原始行。此阶段的日志不保证每条都成功落盘，也不伪造已认证的客户端身份。
 

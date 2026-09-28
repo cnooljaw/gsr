@@ -402,7 +402,9 @@ func (gate *GateService) logError(message string, fields ...any) {
 }
 
 func (gate *GateService) logConnectionFailure(category string, closeCode int, err error) {
-	gate.logError("DebugGate connection failure", "category", category, "close_code", closeCode, "error", err)
+	fields := []any{"category", category, "close_code", closeCode}
+	fields = append(fields, gatecommon.SafeWebSocketErrorFields(err)...)
+	gate.logError("DebugGate connection failure", fields...)
 }
 
 func (gate *GateService) deliverClientMessage(agentID runtime.ServiceID, frame []byte) error {
