@@ -2831,6 +2831,33 @@ func TestNewGateServiceRejectsInvalidTLSAndCapacity(t *testing.T) {
 	}
 }
 
+// TestNewGateServiceRequiresFrameLimitForHandshake 验证生产 Gate 拒绝小于固定握手帧的上限，同时允许恰好容纳握手的配置。
+func TestNewGateServiceRequiresFrameLimitForHandshake(t *testing.T) {
+	local, err := runtime.NewRuntime(runtime.Config{})
+	if err != nil {
+		t.Fatalf("NewRuntime() error = %v", err)
+	}
+	t.Cleanup(func() {
+		if err := local.Close(); err != nil {
+			t.Errorf("Runtime.Close() error = %v", err)
+		}
+	})
+	config := Config{
+		Address:               "127.0.0.1:0",
+		MaxConnections:        1,
+		MaxFrameBytes:         handshakeFrameSize - 1,
+		MaxOutboundQueueBytes: queueEntryOverhead,
+		NewAgent:              func(ClientSession) runtime.Service { return &productionTestAgent{} },
+	}
+	if _, err := NewGateService(local, config); !errors.Is(err, ErrInvalidConfig) {
+		t.Fatalf("NewGateService(frame limit %d) error = %v, want ErrInvalidConfig", config.MaxFrameBytes, err)
+	}
+	config.MaxFrameBytes = handshakeFrameSize
+	if _, err := NewGateService(local, config); err != nil {
+		t.Fatalf("NewGateService(frame limit %d) error = %v, want success", config.MaxFrameBytes, err)
+	}
+}
+
 // TestProdGateListenFailureLeavesRuntimeAvailable 验证监听地址被占用时 Gate 创建失败不会停止 Runtime，释放地址后可创建新 Gate。
 func TestProdGateListenFailureLeavesRuntimeAvailable(t *testing.T) {
 	blockedListener, err := net.Listen("tcp", "127.0.0.1:0")

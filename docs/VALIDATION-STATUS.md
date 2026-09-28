@@ -204,3 +204,5 @@ TestRuntimePacedMultiServiceLoad 已补 8 个真实 Service 共享文件 Logger 
 2026-09-25 Gate 停机通知公平性：修复 Gate 单独停止时逐个等待 Agent 的队头阻塞；现在每轮都会尝试所有待通知 Agent，仅将 Mailbox 满载者留到下一轮。生产 Gate 与 DebugGate 新增双 Agent 测试，确认一个 Agent 卡住时健康 Agent 仍及时收到断开通知，随后满载 Agent 恢复也能完成收尾。两个 package 全量测试与 race 均通过；未运行全仓验证。
 
 2026-09-25 Gate 停机入站屏障：客户端帧接纳现在与 Gate 的停机状态切换共享读写锁；停机标记生效后，生产 Gate 与 DebugGate 都拒绝继续投递帧，避免逐条关闭连接期间仍有新消息进入 Agent Mailbox。两个定向测试、两包全量测试及仓库级 `go test -race ./...` 均通过。
+
+2026-09-25 生产 Gate 握手帧配置下限：配置的 `MaxFrameBytes` 小于 33 字节时无法容纳固定客户端握手帧；`NewGateService` 现在在启动前返回 `ErrInvalidConfig`，并增加边界测试覆盖 32 字节拒绝、33 字节接受。定向测试和 prodgate 全包测试通过。

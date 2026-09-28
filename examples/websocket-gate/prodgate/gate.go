@@ -133,7 +133,7 @@ func NewGateService(local *runtime.Runtime, config Config) (*GateService, error)
 	if config.MaxFrameBytes == 0 {
 		config.MaxFrameBytes = defaultMaxFrameBytes
 	}
-	if config.MaxConnections <= 0 || config.HandshakeTimeout < 0 || config.MaxFrameBytes < 0 ||
+	if config.MaxConnections <= 0 || config.HandshakeTimeout < 0 || config.MaxFrameBytes < handshakeFrameSize ||
 		config.MaxOutboundQueueBytes < queueEntryOverhead {
 		return nil, fmt.Errorf("%w: connection, handshake, frame, or outbound queue limit is invalid", ErrInvalidConfig)
 	}
