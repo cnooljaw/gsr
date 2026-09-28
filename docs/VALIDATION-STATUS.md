@@ -232,3 +232,5 @@ TestRuntimePacedMultiServiceLoad 已补 8 个真实 Service 共享文件 Logger 
 2026-09-28 生产 Gate 不完整 HTTP 请求头回收：普通 HTTP WebSocket 入口的唯一 TCP 名额由只发部分请求头的客户端占用，额外连接被拒绝并计数；约 5 秒 `ReadHeaderTimeout` 后该连接关闭，新的 HTTP 请求恢复得到 404。定向测试和对应 race 测试通过；本轮只验证已有超时配置，不修改生产实现，也不等同于公网 Slowloris 防护验收。
 
 2026-09-28 DebugGate 不完整 HTTP 请求头回收：只发部分请求头的 TCP 连接约 5 秒后由 `ReadHeaderTimeout` 关闭；在其等待期间，另一条 WebSocket 连接仍成功创建 Agent 并收到断开通知。计数为 `AcceptedConnections=1`、`RejectedConnections=0`，确认 DebugGate 的连接上限只覆盖进入 `/ws` Handler 的请求，不覆盖原始 TCP 接纳。定向测试及对应 race 测试通过，本轮未修改生产实现。
+
+2026-09-28 双 Gate 停机中断不完整 HTTP 请求头：生产 Gate 的普通 HTTP 入口与 DebugGate 均先确认连接正等待剩余请求头，再调用带 2 秒期限的 `Runtime.Stop`；两者都在期限内返回，客户端随后读到 EOF，无需等待 5 秒 `ReadHeaderTimeout`。两条定向测试及对应 race 测试通过；本轮未修改生产实现，不覆盖 TLS 握手中的原始 TCP 连接。

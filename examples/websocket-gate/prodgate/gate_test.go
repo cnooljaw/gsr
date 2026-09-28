@@ -302,6 +302,44 @@ func TestProdGateReadHeaderTimeoutReleasesConnectionSlot(t *testing.T) {
 	}
 }
 
+// TestProdGateStopClosesPartialHTTPHeader 验证停机立即关闭未完成请求头的连接，不等待请求头超时。
+func TestProdGateStopClosesPartialHTTPHeader(t *testing.T) {
+	local, gate := startConfiguredHTTPProductionGate(t, runtime.Config{
+		MailboxCapacity: 8,
+		ShutdownTimeout: 2 * time.Second,
+	}, 1, time.Second, 1<<20, 64<<10, func(ClientSession) runtime.Service {
+		return &plainTestAgent{disconnected: make(chan struct{})}
+	})
+	partial, err := net.DialTimeout("tcp", gate.Addr().String(), time.Second)
+	if err != nil {
+		t.Fatalf("Dial(partial HTTP) error = %v", err)
+	}
+	defer partial.Close()
+	if _, err := io.WriteString(partial, "GET /ws HTTP/1.1\r\nHost: "+gate.Addr().String()+"\r\n"); err != nil {
+		t.Fatalf("Write(partial HTTP header) error = %v", err)
+	}
+	if err := partial.SetReadDeadline(time.Now().Add(50 * time.Millisecond)); err != nil {
+		t.Fatalf("SetReadDeadline(pending header) error = %v", err)
+	}
+	var byteRead [1]byte
+	_, err = partial.Read(byteRead[:])
+	var timeout net.Error
+	if !errors.As(err, &timeout) || !timeout.Timeout() {
+		t.Fatalf("Read(partial HTTP) error = %v, want pending request timeout", err)
+	}
+	stopContext, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	if err := local.Stop(stopContext); err != nil {
+		t.Fatalf("Runtime.Stop(partial HTTP) error = %v", err)
+	}
+	if err := partial.SetReadDeadline(time.Now().Add(time.Second)); err != nil {
+		t.Fatalf("SetReadDeadline(closed header) error = %v", err)
+	}
+	if _, err := partial.Read(byteRead[:]); !errors.Is(err, io.EOF) {
+		t.Fatalf("Read(after Runtime.Stop) error = %v, want EOF", err)
+	}
+}
+
 // TestProdGateRejectsInvalidMACBeforeDelivery 验证错误 MAC 在进入 Agent Mailbox 前被拒绝并关闭连接。
 func TestProdGateRejectsInvalidMACBeforeDelivery(t *testing.T) {
 	_, gate, agents, clientTLS := startTestProductionGate(t, 2, time.Second)

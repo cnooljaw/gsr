@@ -834,6 +834,39 @@ func TestDebugGateReadHeaderTimeoutDoesNotConsumeWebSocketCapacity(t *testing.T)
 	}
 }
 
+// TestDebugGateStopClosesPartialHTTPHeader 验证停机立即关闭未完成请求头的连接，不等待请求头超时。
+func TestDebugGateStopClosesPartialHTTPHeader(t *testing.T) {
+	local, gate, _ := startTestGate(t, 8, 1)
+	partial, err := net.DialTimeout("tcp", gate.Addr().String(), time.Second)
+	if err != nil {
+		t.Fatalf("Dial(partial HTTP) error = %v", err)
+	}
+	defer partial.Close()
+	if _, err := io.WriteString(partial, "GET /ws HTTP/1.1\r\nHost: "+gate.Addr().String()+"\r\n"); err != nil {
+		t.Fatalf("Write(partial HTTP header) error = %v", err)
+	}
+	if err := partial.SetReadDeadline(time.Now().Add(50 * time.Millisecond)); err != nil {
+		t.Fatalf("SetReadDeadline(pending header) error = %v", err)
+	}
+	var byteRead [1]byte
+	_, err = partial.Read(byteRead[:])
+	var timeout net.Error
+	if !errors.As(err, &timeout) || !timeout.Timeout() {
+		t.Fatalf("Read(partial HTTP) error = %v, want pending request timeout", err)
+	}
+	stopContext, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	if err := local.Stop(stopContext); err != nil {
+		t.Fatalf("Runtime.Stop(partial HTTP) error = %v", err)
+	}
+	if err := partial.SetReadDeadline(time.Now().Add(time.Second)); err != nil {
+		t.Fatalf("SetReadDeadline(closed header) error = %v", err)
+	}
+	if _, err := partial.Read(byteRead[:]); !errors.Is(err, io.EOF) {
+		t.Fatalf("Read(after Runtime.Stop) error = %v, want EOF", err)
+	}
+}
+
 // TestNewGateServiceRejectsPublicAndUnboundedConfig 验证 DebugGate 不接受公网监听或缺少有限容量的配置。
 func TestNewGateServiceRejectsPublicAndUnboundedConfig(t *testing.T) {
 	local, err := runtime.NewRuntime(runtime.Config{})
