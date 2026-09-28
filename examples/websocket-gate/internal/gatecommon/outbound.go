@@ -202,8 +202,9 @@ func SetWebSocketWriteDeadline(connection *websocket.Conn, deadline time.Time) e
 }
 
 func normalizeCloseError(err error) error {
-	if err == nil || errors.Is(err, net.ErrClosed) || errors.Is(err, io.EOF) || errors.Is(err, io.ErrClosedPipe) ||
-		errors.Is(err, syscall.EPIPE) || errors.Is(err, syscall.ECONNRESET) || errors.Is(err, syscall.ENOTCONN) {
+	if err == nil || errors.Is(err, websocket.ErrCloseSent) || errors.Is(err, net.ErrClosed) ||
+		errors.Is(err, io.EOF) || errors.Is(err, io.ErrClosedPipe) || errors.Is(err, syscall.EPIPE) ||
+		errors.Is(err, syscall.ECONNRESET) || errors.Is(err, syscall.ENOTCONN) {
 		return nil
 	}
 	return err

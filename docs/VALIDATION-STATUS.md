@@ -254,3 +254,5 @@ TestRuntimePacedMultiServiceLoad 已补 8 个真实 Service 共享文件 Logger 
 2026-09-28 客户端 WebSocket Close 原因脱敏：真实生产 Gate 握手前 Close 帧测试先复现客户端自填文本进入结构化日志；修复后连接故障诊断保留 `peer_close_code`，不记录对端文本。DebugGate 的相同日志边界用定向测试覆盖。两种 Gate 共用安全字段选择，受影响包测试和定向 race 测试通过；不改变关闭或 Agent 投递语义。
 
 2026-09-28 ProdGate TLS 配置收口：构造测试先复现 `GetConfigForClient` 可替换根配置，现在启动前以 `ErrInvalidConfig` 拒绝；`GetCertificate` 动态选证书的真实 TLS 握手仍成功，Gate 最低版本为 TLS 1.2，实际协商 HTTP/1.1。定向测试和 `go test ./examples/websocket-gate/prodgate -timeout=2m` 通过，未运行全仓验证。首次包测试中既有的客户端 Close/停机竞态使一次运行返回 `websocket: close sent`，该用例单独运行及包测试复核通过；本轮未修改该关闭路径。
+
+2026-09-28 Gate 重复关闭收尾：公共出站路径在客户端 Close 后可能再次尝试发送 Close，Gorilla 返回 `ErrCloseSent`；现在与 EOF、连接已关闭等情况一样视为关闭完成，仍保留其它真实 Close 帧和 socket 关闭错误。定向回归测试先复现错误归类，再验证生产 Gate 的客户端 Close/停机以及两 Gate 的注入关闭错误；公共包、ProdGate、DebugGate 包测试通过。未修改数据帧协议或关闭顺序，未运行全仓和 race 验证。
