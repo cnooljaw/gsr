@@ -577,6 +577,37 @@ func TestDebugGateRejectsConnectionAboveLimit(t *testing.T) {
 	}
 }
 
+// TestDebugGateKeepsOriginHostUpgradePolicy 验证调试 Gate 也按 Origin 与请求 Host 是否相同决定升级。
+func TestDebugGateKeepsOriginHostUpgradePolicy(t *testing.T) {
+	_, gate, _ := startTestGate(t, 8, 2)
+	endpoint := "ws://" + gate.Addr().String() + "/ws"
+	connection, response, err := websocket.DefaultDialer.Dial(endpoint, http.Header{
+		"Origin": []string{"https://another.example"},
+	})
+	if connection != nil {
+		_ = connection.Close()
+	}
+	if response != nil && response.Body != nil {
+		_ = response.Body.Close()
+	}
+	if err == nil || response == nil || response.StatusCode != http.StatusForbidden {
+		t.Fatalf("cross-origin Dial() = response %v, error %v; want HTTP 403", response, err)
+	}
+
+	connection, response, err = websocket.DefaultDialer.Dial(endpoint, http.Header{
+		"Origin": []string{"https://" + gate.Addr().String()},
+	})
+	if response != nil && response.Body != nil {
+		_ = response.Body.Close()
+	}
+	if err != nil {
+		t.Fatalf("same-origin Dial() error = %v", err)
+	}
+	if err := connection.Close(); err != nil {
+		t.Fatalf("same-origin Close() error = %v", err)
+	}
+}
+
 // TestDebugGateCountsAgentCreationRejectionOnce 验证一次 Agent 创建失败只计入一条被拒绝连接。
 func TestDebugGateCountsAgentCreationRejectionOnce(t *testing.T) {
 	for _, test := range []struct {

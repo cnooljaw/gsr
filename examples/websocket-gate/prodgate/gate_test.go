@@ -175,6 +175,42 @@ func TestProdGateSupportsIngressTerminatedTLS(t *testing.T) {
 	}
 }
 
+// TestProdGateKeepsOriginHostUpgradePolicy 验证 Origin 与请求 Host 不同时拒绝升级，相同时允许升级。
+func TestProdGateKeepsOriginHostUpgradePolicy(t *testing.T) {
+	_, gate := startConfiguredHTTPProductionGate(t, runtime.Config{
+		MailboxCapacity: 8,
+		ShutdownTimeout: 2 * time.Second,
+	}, 2, time.Second, 1<<20, 64<<10, func(ClientSession) runtime.Service {
+		return &plainTestAgent{disconnected: make(chan struct{})}
+	})
+	endpoint := "ws://" + gate.Addr().String() + "/ws"
+	connection, response, err := websocket.DefaultDialer.Dial(endpoint, http.Header{
+		"Origin": []string{"https://another.example"},
+	})
+	if connection != nil {
+		_ = connection.Close()
+	}
+	if response != nil && response.Body != nil {
+		_ = response.Body.Close()
+	}
+	if err == nil || response == nil || response.StatusCode != http.StatusForbidden {
+		t.Fatalf("cross-origin Dial() = response %v, error %v; want HTTP 403", response, err)
+	}
+
+	connection, response, err = websocket.DefaultDialer.Dial(endpoint, http.Header{
+		"Origin": []string{"https://" + gate.Addr().String()},
+	})
+	if response != nil && response.Body != nil {
+		_ = response.Body.Close()
+	}
+	if err != nil {
+		t.Fatalf("same-origin Dial() error = %v", err)
+	}
+	if err := connection.Close(); err != nil {
+		t.Fatalf("same-origin Close() error = %v", err)
+	}
+}
+
 // TestProdGateClosesIdleNonWebSocketHTTPConnections 验证普通 HTTP 请求的 keep-alive 空闲连接会超时释放 Gate 容量。
 func TestProdGateClosesIdleNonWebSocketHTTPConnections(t *testing.T) {
 	_, gate := startConfiguredHTTPProductionGate(t, runtime.Config{

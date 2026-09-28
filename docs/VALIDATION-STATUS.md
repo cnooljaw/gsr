@@ -214,3 +214,5 @@ TestRuntimePacedMultiServiceLoad 已补 8 个真实 Service 共享文件 Logger 
 2026-09-28 Gate 停机断线通知交接：两种 Gate 的连接处理协程原先在 Agent Mailbox 满载时无限重试断线通知，`OnStop` 等待协程退出便可能越过自身 context 期限。两条受控测试先复现该阻塞；现在停机标记生效后连接协程结束重试，由 `OnStop` 对剩余映射按有界上下文补发。定向测试、两 Gate 包全测及对应包的 race 测试均通过；满载 Agent 在期限内仍不接纳时，`OnStop` 按预期返回 deadline 错误。
 
 2026-09-28 DebugGate 连接拒绝计数：Agent 构造失败时，Gate 内部创建路径与 HTTP 入口原先各计数一次，一条连接得到 `RejectedConnections=2`。回归测试先复现，再验证构造返回 nil 和 Agent `OnStart` 失败都只计一次；定向测试与 DebugGate 包测试通过。
+
+2026-09-28 Gate Origin 部署约束：生产 Gate 与 DebugGate 的真实 WebSocket 升级测试确认，浏览器式跨主机 `Origin` 收到 HTTP 403，同 Host 的 `Origin` 可以升级；这是当前 WebSocket 库的默认策略，非应用密钥握手错误。RFC 已记录两种 Gate 的 Host 比较限制。两条定向测试及两 Gate 包测试通过；跨域放行策略尚未裁决，未新增配置或放开来源。
