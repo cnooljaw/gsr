@@ -837,6 +837,9 @@ func TestProdGateWritesConnectionFailureToRuntimeLogger(t *testing.T) {
 	if err := logger.Close(context.Background()); err != nil {
 		t.Fatalf("Logger.Close() error = %v", err)
 	}
+	if bytes.Contains(output.Bytes(), []byte("secret payload")) {
+		t.Fatal("Gate failure log contains unauthenticated client payload")
+	}
 
 	decoder := json.NewDecoder(bytes.NewReader(output.Bytes()))
 	foundFailure := false
@@ -862,12 +865,64 @@ func TestProdGateWritesConnectionFailureToRuntimeLogger(t *testing.T) {
 		if _, exists := entry.Fields["connection_id"]; !exists {
 			t.Fatal("Gate failure log has no connection_id")
 		}
-		if _, exists := entry.Fields["secret payload"]; exists {
-			t.Fatal("Gate failure log contains raw payload field")
-		}
 	}
 	if !foundFailure {
 		t.Fatal("missing Gate connection failure log")
+	}
+}
+
+// TestProdGateLogsPreHandshakeCapacityRejection 验证握手前的 TCP 容量拒绝进入共享日志并绑定 Gate 来源。
+func TestProdGateLogsPreHandshakeCapacityRejection(t *testing.T) {
+	var output bytes.Buffer
+	logger, err := logging.New(logging.Config{Writer: &output})
+	if err != nil {
+		t.Fatalf("logging.New() error = %v", err)
+	}
+	t.Cleanup(func() {
+		if err := logger.Close(context.Background()); err != nil {
+			t.Errorf("Logger.Close() error = %v", err)
+		}
+	})
+	local, gate, _, _ := startTestProductionGate(t, 1, time.Second, logger)
+	first, err := net.DialTimeout("tcp", gate.Addr().String(), time.Second)
+	if err != nil {
+		t.Fatalf("Dial(first) error = %v", err)
+	}
+	defer first.Close()
+	second, err := net.DialTimeout("tcp", gate.Addr().String(), time.Second)
+	if err != nil {
+		t.Fatalf("Dial(second) error = %v", err)
+	}
+	defer second.Close()
+	waitForGateMetric(t, gate, "RejectedConnections", func(metrics Metrics) uint64 {
+		return metrics.RejectedConnections
+	}, 1)
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+	if err := logger.Close(context.Background()); err != nil {
+		t.Fatalf("Logger.Close() error = %v", err)
+	}
+	var matches int
+	decoder := json.NewDecoder(bytes.NewReader(output.Bytes()))
+	for decoder.More() {
+		var entry struct {
+			Service uint64         `json:"service"`
+			Message string         `json:"message"`
+			Fields  map[string]any `json:"fields"`
+		}
+		if err := decoder.Decode(&entry); err != nil {
+			t.Fatalf("decode log entry: %v", err)
+		}
+		if entry.Message == "Gate connection rejected" && entry.Fields["reason"] == "capacity" {
+			matches++
+			if entry.Service != uint64(gate.serviceID) {
+				t.Fatalf("capacity rejection service = %d, want %d", entry.Service, gate.serviceID)
+			}
+		}
+	}
+	if matches != 1 {
+		t.Fatalf("capacity rejection logs = %d, want 1", matches)
 	}
 }
 

@@ -189,6 +189,7 @@ func (gate *GateService) OnStart(_ context.Context, self runtime.ServiceContext)
 	}
 	limitedListener := newConnectionLimitListener(listener, gate.config.MaxConnections, func() {
 		gate.counters.rejectedConnections.Add(1)
+		gate.logError("Gate connection rejected", "reason", "capacity")
 	})
 	server := &http.Server{
 		Handler:           gate,
