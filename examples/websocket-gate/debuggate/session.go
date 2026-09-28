@@ -50,8 +50,8 @@ func (client *clientConnection) Close() error {
 	return client.closeWith(websocket.CloseNormalClosure, "normal", time.Now().Add(closeFrameWait))
 }
 
-func (client *clientConnection) writeLoop() {
-	_ = client.outbound.WriteLoop(defaultWriteWait, closeFrameWait)
+func (client *clientConnection) writeLoop() error {
+	return client.outbound.WriteLoop(defaultWriteWait, closeFrameWait)
 }
 
 func (client *clientConnection) closeWith(code int, reason string, deadline time.Time) error {

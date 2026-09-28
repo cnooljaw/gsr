@@ -41,13 +41,15 @@ func TestDebugClientWriterClosesAfterDeadlineFailure(t *testing.T) {
 		t.Fatalf("ClientSession.Send() error = %v", err)
 	}
 
-	writerDone := make(chan struct{})
+	writerDone := make(chan error, 1)
 	go func() {
-		client.writeLoop()
-		close(writerDone)
+		writerDone <- client.writeLoop()
 	}()
 	select {
-	case <-writerDone:
+	case err := <-writerDone:
+		if !errors.Is(err, deadlineFailure) {
+			t.Fatalf("writeLoop() error = %v, want %v", err, deadlineFailure)
+		}
 	case <-time.After(time.Second):
 		t.Fatal("DebugGate 写循环未在 deadline 设置失败后退出")
 	}

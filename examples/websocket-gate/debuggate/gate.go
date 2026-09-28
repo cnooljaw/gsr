@@ -13,6 +13,7 @@ import (
 
 	gatecontract "github.com/cnooljaw/gsr/examples/websocket-gate/gate"
 	"github.com/cnooljaw/gsr/examples/websocket-gate/internal/gatecommon"
+	"github.com/cnooljaw/gsr/logging"
 	"github.com/cnooljaw/gsr/runtime"
 	"github.com/gorilla/websocket"
 )
@@ -100,6 +101,7 @@ type gateCounters struct {
 type GateService struct {
 	runtime *runtime.Runtime
 	config  Config
+	logger  *logging.Logger
 
 	mu             sync.RWMutex
 	server         *http.Server
@@ -137,6 +139,7 @@ func NewGateService(local *runtime.Runtime, config Config) (*GateService, error)
 	return &GateService{
 		runtime:            local,
 		config:             config,
+		logger:             local.Config().Logger,
 		connections:        make(map[*clientConnection]struct{}),
 		agentsByConnection: make(map[*clientConnection]runtime.ServiceID),
 	}, nil
@@ -175,6 +178,7 @@ func (gate *GateService) OnStart(_ context.Context, self runtime.ServiceContext)
 	gate.mu.Lock()
 	gate.server = server
 	gate.serviceID = self.Self()
+	gate.logger = gate.logger.WithService(uint64(self.Self()))
 	gate.address = listener.Addr()
 	gate.ioWorkers.Add(1)
 	gate.mu.Unlock()
@@ -185,6 +189,7 @@ func (gate *GateService) OnStart(_ context.Context, self runtime.ServiceContext)
 			gate.mu.Lock()
 			gate.serveErr = err
 			gate.mu.Unlock()
+			gate.logError("DebugGate listener failed", "phase", "serve", "error", err)
 		}
 	}()
 	return nil
@@ -203,12 +208,14 @@ func (gate *GateService) Handle(self runtime.CommandContext, command runtime.Com
 		}
 		agent, err := gatecommon.CreateAgent(gate.config.NewAgent, clientConn, "debuggate")
 		if err != nil {
+			gate.logConnectionFailure("agent_create", websocket.CloseInternalServerErr, err)
 			return nil, err
 		}
 		startContext, cancel := context.WithTimeout(context.Background(), defaultAgentStartWait)
 		defer cancel()
 		agentID, err := self.CreateService(startContext, agent)
 		if err != nil {
+			gate.logConnectionFailure("agent_create", websocket.CloseInternalServerErr, err)
 			return nil, fmt.Errorf("debuggate: create Agent: %w", err)
 		}
 		gate.agentsByConnection[clientConn] = agentID
@@ -234,6 +241,7 @@ func (gate *GateService) Handle(self runtime.CommandContext, command runtime.Com
 				return nil, err
 			}
 			delete(gate.agentsByConnection, clientConn)
+			gate.logConnectionFailure("disconnect_notify", websocket.CloseInternalServerErr, err)
 			return nil, fmt.Errorf("debuggate: notify Agent disconnect: %w", err)
 		}
 		delete(gate.agentsByConnection, clientConn)
@@ -294,6 +302,7 @@ func (gate *GateService) ServeHTTP(writer http.ResponseWriter, request *http.Req
 	}
 	serviceID, admitted := gate.beginHandler()
 	if !admitted {
+		gate.logError("DebugGate connection rejected", "reason", "unavailable")
 		http.Error(writer, "debug gate unavailable", http.StatusServiceUnavailable)
 		return
 	}
@@ -311,10 +320,12 @@ func (gate *GateService) ServeHTTP(writer http.ResponseWriter, request *http.Req
 	connection, err := debugUpgrader.Upgrade(writer, request, nil)
 	if err != nil {
 		gate.counters.rejectedConnections.Add(1)
+		gate.logError("DebugGate connection rejected", "reason", "upgrade", "error", err)
 		return
 	}
 	clientConn = newClientConnection(connection, gate.config.MaxFrameBytes, gate.config.MaxOutboundQueueBytes, &gate.counters)
 	if !gate.trackConnection(clientConn) {
+		gate.logError("DebugGate connection rejected", "reason", "stopping")
 		clientConn.closeWith(websocket.CloseGoingAway, "going_away", time.Now().Add(closeFrameWait))
 		return
 	}
@@ -329,12 +340,16 @@ func (gate *GateService) ServeHTTP(writer http.ResponseWriter, request *http.Req
 	cancel()
 	if err != nil {
 		gate.counters.rejectedConnections.Add(1)
+		if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, runtime.ErrCallTimeout) {
+			gate.logConnectionFailure("agent_start_timeout", websocket.CloseInternalServerErr, err)
+		}
 		clientConn.closeWith(websocket.CloseInternalServerErr, "server_error", time.Now().Add(closeFrameWait))
 		return
 	}
 	createdAgentID, ok := result.(runtime.ServiceID)
 	if !ok || createdAgentID == 0 {
 		gate.counters.rejectedConnections.Add(1)
+		gate.logConnectionFailure("agent_result", websocket.CloseInternalServerErr, errors.New("invalid Agent ServiceID"))
 		clientConn.closeWith(websocket.CloseInternalServerErr, "server_error", time.Now().Add(closeFrameWait))
 		return
 	}
@@ -343,7 +358,9 @@ func (gate *GateService) ServeHTTP(writer http.ResponseWriter, request *http.Req
 	gate.ioWorkers.Add(1)
 	go func() {
 		defer gate.ioWorkers.Done()
-		clientConn.writeLoop()
+		if err := clientConn.writeLoop(); err != nil {
+			gate.logConnectionFailure("write", websocket.CloseGoingAway, err)
+		}
 	}()
 
 	connection.SetReadLimit(int64(gate.config.MaxFrameBytes))
@@ -352,11 +369,13 @@ func (gate *GateService) ServeHTTP(writer http.ResponseWriter, request *http.Req
 		if err != nil {
 			if errors.Is(err, websocket.ErrReadLimit) {
 				gate.counters.frameTooLarge.Add(1)
+				gate.logConnectionFailure("frame_too_large", websocket.CloseMessageTooBig, err)
 				clientConn.closeWith(websocket.CloseMessageTooBig, "message_too_big", time.Now().Add(closeFrameWait))
 			}
 			return
 		}
 		if messageType != websocket.BinaryMessage {
+			gate.logConnectionFailure("unsupported_data", websocket.CloseUnsupportedData, errors.New("non-binary WebSocket message"))
 			clientConn.closeWith(websocket.CloseUnsupportedData, "unsupported_data", time.Now().Add(closeFrameWait))
 			return
 		}
@@ -368,10 +387,21 @@ func (gate *GateService) ServeHTTP(writer http.ResponseWriter, request *http.Req
 			if errors.Is(err, runtime.ErrMailboxFull) {
 				gate.counters.inboundMailboxFull.Add(1)
 			}
+			gate.logConnectionFailure("inbound_delivery", websocket.CloseInternalServerErr, err)
 			clientConn.closeWith(websocket.CloseInternalServerErr, "server_error", time.Now().Add(closeFrameWait))
 			return
 		}
 	}
+}
+
+func (gate *GateService) logError(message string, fields ...any) {
+	if gate.logger != nil {
+		_ = gate.logger.Error(message, fields...)
+	}
+}
+
+func (gate *GateService) logConnectionFailure(category string, closeCode int, err error) {
+	gate.logError("DebugGate connection failure", "category", category, "close_code", closeCode, "error", err)
 }
 
 func (gate *GateService) deliverClientMessage(agentID runtime.ServiceID, frame []byte) error {

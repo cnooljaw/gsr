@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"io"
 	"net"
@@ -16,6 +17,7 @@ import (
 	"time"
 
 	commonv1 "github.com/cnooljaw/gsr/examples/websocket-gate/gen/go/gsr/common/v1"
+	"github.com/cnooljaw/gsr/logging"
 	"github.com/cnooljaw/gsr/runtime"
 	"github.com/gorilla/websocket"
 	"google.golang.org/protobuf/proto"
@@ -613,6 +615,79 @@ func TestDebugGateCountsAgentCreationRejectionOnce(t *testing.T) {
 				t.Fatalf("RejectedConnections = %d, want 1", got)
 			}
 		})
+	}
+}
+
+// TestDebugGateLogsAgentCreationFailure 验证 Agent 创建失败只产生一条绑定 Gate 来源的结构化故障日志。
+func TestDebugGateLogsAgentCreationFailure(t *testing.T) {
+	var output bytes.Buffer
+	logger, err := logging.New(logging.Config{Writer: &output})
+	if err != nil {
+		t.Fatalf("logging.New() error = %v", err)
+	}
+	local, err := runtime.NewRuntime(runtime.Config{Logger: logger, ShutdownTimeout: time.Second})
+	if err != nil {
+		t.Fatalf("NewRuntime() error = %v", err)
+	}
+	t.Cleanup(func() {
+		if err := local.Close(); err != nil {
+			t.Errorf("Runtime.Close() error = %v", err)
+		}
+		if err := logger.Close(context.Background()); err != nil {
+			t.Errorf("Logger.Close() error = %v", err)
+		}
+	})
+	if err := local.Start(); err != nil {
+		t.Fatalf("Runtime.Start() error = %v", err)
+	}
+	gate, err := NewGateService(local, Config{
+		Address: "127.0.0.1:0", MaxConnections: 1, MaxOutboundQueueBytes: 1024,
+		NewAgent: func(ClientSession) runtime.Service { return nil },
+	})
+	if err != nil {
+		t.Fatalf("NewGateService() error = %v", err)
+	}
+	gateID, err := local.CreateService(context.Background(), gate)
+	if err != nil {
+		t.Fatalf("CreateService(Gate) error = %v", err)
+	}
+	connection := dialTestGate(t, gate)
+	defer connection.Close()
+	if err := connection.SetReadDeadline(time.Now().Add(time.Second)); err != nil {
+		t.Fatalf("SetReadDeadline() error = %v", err)
+	}
+	if _, _, err := connection.ReadMessage(); !websocket.IsCloseError(err, websocket.CloseInternalServerErr) {
+		t.Fatalf("ReadMessage() error = %v, want internal error close", err)
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+	if err := logger.Close(context.Background()); err != nil {
+		t.Fatalf("Logger.Close() error = %v", err)
+	}
+	var matches int
+	for _, line := range bytes.Split(bytes.TrimSpace(output.Bytes()), []byte{'\n'}) {
+		var entry struct {
+			Message string         `json:"message"`
+			Service uint64         `json:"service"`
+			Fields  map[string]any `json:"fields"`
+		}
+		if err := json.Unmarshal(line, &entry); err != nil {
+			t.Fatalf("decode log entry: %v", err)
+		}
+		if entry.Message != "DebugGate connection failure" {
+			continue
+		}
+		matches++
+		if entry.Service != uint64(gateID) {
+			t.Fatalf("Gate log service = %d, want %d", entry.Service, gateID)
+		}
+		if entry.Fields["category"] != "agent_create" || entry.Fields["close_code"] != float64(websocket.CloseInternalServerErr) {
+			t.Fatalf("Gate log fields = %v, want Agent creation failure", entry.Fields)
+		}
+	}
+	if matches != 1 {
+		t.Fatalf("Gate failure logs = %d, want 1", matches)
 	}
 }
 
