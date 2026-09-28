@@ -248,3 +248,5 @@ TestRuntimePacedMultiServiceLoad 已补 8 个真实 Service 共享文件 Logger 
 2026-09-28 生产 Gate 在共享 Logger 已关闭时的 TLS 错误：真实坏 TLS 首包触发 `net/http` 错误日志后，连接仍关闭并归还容量；随后健康 TLS 连接仍可建立，Runtime 停机正常。定向测试及其 race 测试通过，验证日志失败不会把单条坏连接扩大为 Gate 接入故障；本轮不修改生产实现。
 
 2026-09-28 Gate HTTP 内部日志满载：阻塞底层日志写入并填满容量为 1 的共享队列后，HTTP 错误日志适配器立即返回，丢弃计数增加 1；日志输出恢复后能正常关闭 Logger。定向测试及其 race 测试通过；本轮只验证满载 admission，不修改 Gate 或 Logger 的生产实现。
+
+2026-09-28 生产 Gate 失败阶段压力样本扩展：`TestProdGateFailurePhaseStress` 在原应用握手/MAC 失败前加入坏 TLS 首包，确认 TLS 阶段没有创建 Agent，三类故障之后健康连接仍可请求/响应。显式开关下默认每阶段 32 次样本通过；每阶段 8 次样本及其定向 race 通过。坏 TLS 首包本身不计入应用层拒绝数，独立的 TCP 容量拒绝仍会计数；这是本机短时样本，不代表目标部署容量或完整故障矩阵。本轮不修改生产实现。

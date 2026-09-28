@@ -2775,7 +2775,7 @@ func TestProdGateMixedConnectionStress(t *testing.T) {
 	}
 }
 
-// TestProdGateFailurePhaseStress 验证重复坏握手和坏 MAC 不进入业务处理，且故障连接关闭后新连接仍能正常往返。
+// TestProdGateFailurePhaseStress 验证重复坏 TLS、应用握手和 MAC 均不进入业务处理，故障后新连接仍能正常往返。
 func TestProdGateFailurePhaseStress(t *testing.T) {
 	if os.Getenv("GSR_GATE_STRESS") != "1" {
 		t.Skip("显式设置 GSR_GATE_STRESS=1 运行失败阶段压力验收")
@@ -2802,6 +2802,34 @@ func TestProdGateFailurePhaseStress(t *testing.T) {
 		agents <- agent
 		return agent
 	})
+	for index := 0; index < attempts; index++ {
+		connection, err := net.DialTimeout("tcp", gate.Addr().String(), time.Second)
+		if err != nil {
+			t.Fatalf("Dial(invalid TLS %d) error = %v", index, err)
+		}
+		if _, err := io.WriteString(connection, "not-a-tls-client-hello"); err != nil {
+			_ = connection.Close()
+			t.Fatalf("Write(invalid TLS %d) error = %v", index, err)
+		}
+		if err := connection.SetReadDeadline(time.Now().Add(time.Second)); err != nil {
+			_ = connection.Close()
+			t.Fatalf("SetReadDeadline(invalid TLS %d) error = %v", index, err)
+		}
+		_, readErr := io.Copy(io.Discard, connection)
+		_ = connection.Close()
+		var timeout net.Error
+		if errors.As(readErr, &timeout) && timeout.Timeout() {
+			t.Fatalf("invalid TLS %d did not close: %v", index, readErr)
+		}
+	}
+	if got := gate.Metrics().AcceptedConnections; got != 0 {
+		t.Fatalf("AcceptedConnections after invalid TLS = %d, want 0", got)
+	}
+	select {
+	case <-agents:
+		t.Fatal("invalid TLS reached Agent creation")
+	default:
+	}
 	badHandshake := []byte{handshakeVersion, 0}
 	for index := 0; index < attempts; index++ {
 		connection := dialProductionTestClient(t, gate, clientTLS)
