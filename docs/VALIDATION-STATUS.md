@@ -236,3 +236,5 @@ TestRuntimePacedMultiServiceLoad 已补 8 个真实 Service 共享文件 Logger 
 2026-09-28 双 Gate 停机中断不完整 HTTP 请求头：生产 Gate 的普通 HTTP 入口与 DebugGate 均先确认连接正等待剩余请求头，再调用带 2 秒期限的 `Runtime.Stop`；两者都在期限内返回，客户端随后读到 EOF，无需等待 5 秒 `ReadHeaderTimeout`。两条定向测试及对应 race 测试通过；本轮未修改生产实现，不覆盖 TLS 握手中的原始 TCP 连接。
 
 2026-09-28 生产 Gate 停机中断原始 TLS 握手：直连 WSS 入口接纳 TCP 连接后客户端不发送 ClientHello；确认连接仍等待握手，再以 2 秒期限停止 Runtime。停机完成后客户端读到 EOF，未创建 Agent，也未进入应用握手超时计数。定向测试及对应 race 测试通过；本轮未修改生产实现，不证明任意网络半开连接的跨机器行为。
+
+2026-09-28 生产 Gate 原始 TLS 握手自然超时：直连 WSS 入口的唯一 TCP 名额由不发送 ClientHello 的连接占用，额外 TCP 连接被拒绝；约 5 秒后该握手连接关闭，新的 TLS 握手成功，说明容量名额已释放。定向测试及对应 race 测试通过；本轮只验证已有 `ReadHeaderTimeout` 的 TLS 阶段效果，不修改生产实现，也不把它混同于 WebSocket 升级后的应用握手超时计数。

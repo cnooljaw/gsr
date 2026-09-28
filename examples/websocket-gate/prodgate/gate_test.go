@@ -1165,6 +1165,66 @@ func TestProdGateSuppressesRepeatedConnectionFailures(t *testing.T) {
 	}
 }
 
+// TestProdGateTLSHandshakeTimeoutReleasesConnectionSlot 验证未发送 ClientHello 的连接超时后归还 TCP 名额。
+func TestProdGateTLSHandshakeTimeoutReleasesConnectionSlot(t *testing.T) {
+	local, gate, _, clientTLS := startTestProductionGate(t, 1, time.Second)
+	pending, err := net.DialTimeout("tcp", gate.Addr().String(), time.Second)
+	if err != nil {
+		t.Fatalf("Dial(pending TLS) error = %v", err)
+	}
+	defer pending.Close()
+	started := time.Now()
+	if err := pending.SetReadDeadline(started.Add(50 * time.Millisecond)); err != nil {
+		t.Fatalf("SetReadDeadline(pending TLS) error = %v", err)
+	}
+	var byteRead [1]byte
+	_, err = pending.Read(byteRead[:])
+	var timeout net.Error
+	if !errors.As(err, &timeout) || !timeout.Timeout() {
+		t.Fatalf("Read(pending TLS) error = %v, want pending handshake timeout", err)
+	}
+	extra, err := net.DialTimeout("tcp", gate.Addr().String(), time.Second)
+	if err != nil {
+		t.Fatalf("Dial(over-capacity TLS) error = %v", err)
+	}
+	defer extra.Close()
+	waitForGateMetric(t, gate, "RejectedConnections", func(metrics Metrics) uint64 {
+		return metrics.RejectedConnections
+	}, 1)
+	if err := pending.SetReadDeadline(started.Add(defaultReadHeaderTimeout + 2*time.Second)); err != nil {
+		t.Fatalf("SetReadDeadline(TLS timeout) error = %v", err)
+	}
+	if _, err := io.Copy(io.Discard, pending); err != nil {
+		if errors.As(err, &timeout) && timeout.Timeout() {
+			t.Fatalf("pending TLS connection did not close by handshake timeout: %v", err)
+		}
+	}
+	if elapsed := time.Since(started); elapsed < defaultReadHeaderTimeout-time.Second {
+		t.Fatalf("pending TLS connection closed after %v, before handshake timeout", elapsed)
+	}
+
+	recoveryDeadline := time.Now().Add(time.Second)
+	for {
+		connection, err := tls.DialWithDialer(&net.Dialer{Timeout: time.Second}, "tcp", gate.Addr().String(), clientTLS)
+		if err == nil {
+			if err := connection.Close(); err != nil {
+				t.Fatalf("Close(recovered TLS) error = %v", err)
+			}
+			break
+		}
+		if time.Now().After(recoveryDeadline) {
+			t.Fatalf("TLS connection did not recover after handshake timeout: %v", err)
+		}
+		time.Sleep(5 * time.Millisecond)
+	}
+	if got := gate.Metrics().AcceptedConnections; got != 0 {
+		t.Fatalf("AcceptedConnections = %d, want no application handshake", got)
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+}
+
 // TestProdGateAppliesConnectionLimitBeforeTLSHandshake 验证连接上限覆盖未完成 TLS 握手的 TCP 连接，且断开后会归还名额。
 func TestProdGateAppliesConnectionLimitBeforeTLSHandshake(t *testing.T) {
 	_, gate, _, clientTLS := startTestProductionGate(t, 1, time.Second)
