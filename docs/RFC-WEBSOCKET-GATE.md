@@ -163,6 +163,8 @@ message ErrorResponse {
 - 例如扣款余额不足，返回 DeductResponse 的独立 msg_id、原 request_id 和业务码 INSUFFICIENT_FUNDS；业务 Handler 返回响应数据，不把预期业务拒绝作为普通 Go error 返回。
 - ErrorResponse 表示本次调用未能取得正常业务结果。目标服务不可用、调用超时、无法识别消息或内部异常等使用 ErrorResponse 的独立 msg_id；客户端按 msg_id 选择错误解码。
 - 超时只说明未及时取得结果，不能据此判断业务没有执行、扣款没有发生或状态已回滚；是否重试及如何防止重复操作由业务决定，不自动重放请求。
+- Gate 只限制握手、网络写入和连接资源，不为每个客户端业务 Request 设置统一超时，不代发超时 `ErrorResponse`，也不声称能取消已经进入 Agent 的 Handler。
+- 客户端自行决定等待某个 `request_id` 的期限；超时后移除本地等待，保留连接时按 `request_id` 丢弃迟到响应，不复用该编号。Agent/业务 Service 根据操作语义为内部 `Call` 选择有限等待；若内部等待失败，由 Agent 按既有协议返回关联的 `ErrorResponse`。
 - request_id=0 的通知处理失败由服务端记录，不自动生成请求回复；推送使用独立的 Push msg_id。
 - 连接断开时无法保证发送错误回复，由客户端连接事件结束等待。
 - 程序分支依赖稳定 code，不比较 message；不得直接透传内部 error 文本或堆栈。
@@ -356,7 +358,7 @@ Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/
 
 已增加显式开关的 `GSR_GATE_STRESS=1` 混合连接压力验收，可通过 `GSR_GATE_STRESS_SECONDS` 调整时长，记录持续发送、Agent 处理、Mailbox 满载和连接拒绝计数；测试等待队列排空并要求成功写入数与 Agent 处理数一致、Mailbox 满载和连接拒绝均为零。同一开关下的 `TestProdGateLongSlowClientBackpressure` 可用 `GSR_GATE_SLOW_CLIENT_SECONDS` 验证慢客户端持续不读时的有界出站队列和快速拒绝；`TestProdGateFailurePhaseStress` 可用 `GSR_GATE_FAILURE_ATTEMPTS` 重复坏握手和坏 MAC，确认失败帧未进入 Agent、故障连接回收后健康连接仍可请求/响应。已完成一次 16 连接、2 分钟的混合样本，但这些测试只提供可重复证据，不把单次机器结果当作容量结论；仍需按目标部署继续观察更长时长、慢客户端和故障组合。既有认证测试覆盖跨连接旧包、同连接重复序号、MAC 篡改和认证失败不推进序号；新增 Go/TypeScript 测试覆盖 `uint64` 序号上限不回绕，协议分发测试覆盖最大 `uint32 request_id` 原样回传。未知 `msg_id` 由协议/Agent 测试覆盖；C/S `request_id` 的编号分配与耗尽由客户端管理，当前示例只使用固定编号，不包含并发分配器验收。测试不替代密码协议审查。
 
-`TestProdGateKeepsConnectionAfterUnknownMessage` 已补充合法认证帧携带未知 `msg_id` 的真实 Gate 验收：Agent 回传原 `request_id` 的通用 `ErrorResponse`，连接不关闭，后续有效请求仍可完成。Agent 内部 Core Call 的超时与迟到回复已有独立验收；客户端业务超时策略和多连接长时背压仍按后续压力计划推进。
+`TestProdGateKeepsConnectionAfterUnknownMessage` 已补充合法认证帧携带未知 `msg_id` 的真实 Gate 验收：Agent 回传原 `request_id` 的通用 `ErrorResponse`，连接不关闭，后续有效请求仍可完成。Agent 内部 Core Call 的超时与迟到回复已有独立验收；`TestProdGateKeepsConnectionAfterClientRequestTimeout` 另以业务 Agent 延迟首个请求，验证客户端结束该请求的等待后忽略迟到响应，仍可在同一连接完成下一请求。业务专属超时数值不由 Gate 定义；多连接长时背压仍按后续压力计划推进。
 
 `TestProdGateReturnsUnsupportedForUnimplementedRequest` 覆盖协议目录已定义但 Agent 尚未注册 Handler 的 Request：连续请求均返回保留原 `request_id` 的 `UNSUPPORTED_MESSAGE`，连接保持可用。
 

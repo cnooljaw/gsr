@@ -22,6 +22,9 @@ type protocolGateAgent struct {
 	disconnected           chan struct{}
 	omitEchoRequestHandler bool
 	stopOnce               sync.Once
+	echoStarted            chan struct{}
+	releaseEcho            chan struct{}
+	echoBlockOnce          sync.Once
 }
 
 const protocolTimeoutCommand runtime.CommandID = 0x7100
@@ -166,6 +169,12 @@ func (agent *protocolGateAgent) HandleClientMessage(_ runtime.CommandContext, fr
 }
 
 func (agent *protocolGateAgent) onEcho(context protocol.Context, request *echopb.EchoRequest) error {
+	if agent.echoStarted != nil {
+		agent.echoBlockOnce.Do(func() {
+			close(agent.echoStarted)
+			<-agent.releaseEcho
+		})
+	}
 	return context.Response(
 		uint32(echopb.MsgId_S2C_ECHO_RESPONSE),
 		&echopb.EchoResponse{
@@ -184,6 +193,106 @@ func (agent *protocolGateAgent) onEchoNotify(context protocol.Context, request *
 
 func (agent *protocolGateAgent) OnStop(context.Context) error {
 	return agent.client.Close()
+}
+
+// TestProdGateKeepsConnectionAfterClientRequestTimeout 验证客户端放弃首个等待后可忽略迟到响应，并在同一连接完成新请求。
+func TestProdGateKeepsConnectionAfterClientRequestTimeout(t *testing.T) {
+	agents := make(chan *protocolGateAgent, 1)
+	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
+		MailboxCapacity: 8,
+		ShutdownTimeout: 2 * time.Second,
+	}, 1, time.Second, 1<<20, 64<<10, func(client ClientSession) runtime.Service {
+		agent := &protocolGateAgent{
+			client:       client,
+			disconnected: make(chan struct{}),
+			echoStarted:  make(chan struct{}),
+			releaseEcho:  make(chan struct{}),
+		}
+		agents <- agent
+		return agent
+	})
+	connection, macKey := dialAuthenticatedTestClient(t, gate, clientTLS)
+	defer connection.Close()
+	agent := <-agents
+	var releaseOnce sync.Once
+	release := func() { releaseOnce.Do(func() { close(agent.releaseEcho) }) }
+	t.Cleanup(release)
+
+	sendRequest := func(requestID uint32, sequence uint64, text string) {
+		t.Helper()
+		payload, err := proto.Marshal(&echopb.EchoRequest{Text: text})
+		if err != nil {
+			t.Fatalf("marshal EchoRequest: %v", err)
+		}
+		frame, err := proto.Marshal(&commonv1.Envelope{
+			MsgId:     uint32(echopb.MsgId_C2S_ECHO_REQUEST),
+			RequestId: requestID,
+			Payload:   payload,
+		})
+		if err != nil {
+			t.Fatalf("marshal Envelope: %v", err)
+		}
+		if err := connection.WriteMessage(websocket.BinaryMessage, makeAuthenticatedTestFrame(t, macKey[:], sequence, frame)); err != nil {
+			t.Fatalf("WriteMessage(request %d) error = %v", requestID, err)
+		}
+	}
+
+	pending := map[uint32]bool{1: true}
+	sendRequest(1, 1, "slow")
+	select {
+	case <-agent.echoStarted:
+	case <-time.After(time.Second):
+		t.Fatal("首个业务请求没有开始处理")
+	}
+	clientWait, cancel := context.WithTimeout(context.Background(), 20*time.Millisecond)
+	defer cancel()
+	<-clientWait.Done()
+	delete(pending, 1)
+
+	pending[2] = true
+	sendRequest(2, 2, "next")
+	release()
+	for _, expectedID := range []uint32{1, 2} {
+		_, frame, err := readTestBinaryMessage(t, connection)
+		if err != nil {
+			t.Fatalf("ReadMessage(response %d) error = %v", expectedID, err)
+		}
+		var envelope commonv1.Envelope
+		if err := proto.Unmarshal(frame, &envelope); err != nil {
+			t.Fatalf("unmarshal response Envelope: %v", err)
+		}
+		if envelope.GetRequestId() != expectedID || envelope.GetMsgId() != uint32(echopb.MsgId_S2C_ECHO_RESPONSE) {
+			t.Fatalf("response = msg_id %d, request_id %d; want EchoResponse, %d", envelope.GetMsgId(), envelope.GetRequestId(), expectedID)
+		}
+		if !pending[envelope.GetRequestId()] {
+			if expectedID != 1 {
+				t.Fatalf("unexpected response request_id %d", expectedID)
+			}
+			continue // 客户端已超时，迟到响应不能重新完成已结束的等待。
+		}
+		var response echopb.EchoResponse
+		if err := proto.Unmarshal(envelope.GetPayload(), &response); err != nil {
+			t.Fatalf("unmarshal EchoResponse: %v", err)
+		}
+		if response.GetText() != "next" {
+			t.Fatalf("new request response text = %q, want next", response.GetText())
+		}
+		delete(pending, envelope.GetRequestId())
+	}
+	if len(pending) != 0 {
+		t.Fatalf("pending client requests = %v, want none", pending)
+	}
+	if err := connection.Close(); err != nil {
+		t.Fatalf("Close(client) error = %v", err)
+	}
+	select {
+	case <-agent.disconnected:
+	case <-time.After(time.Second):
+		t.Fatal("客户端断开后 Agent 未收到通知")
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
 }
 
 // TestProdGateReturnsErrorAfterAgentCallTimeout 验证 Agent 内部 Core Call 超时后回传通用错误，迟到内部完成不再生成第二条客户端响应。
