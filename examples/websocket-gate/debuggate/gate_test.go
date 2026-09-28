@@ -787,6 +787,53 @@ func TestDebugGateClosesIdleHTTPConnection(t *testing.T) {
 	}
 }
 
+// TestDebugGateReadHeaderTimeoutDoesNotConsumeWebSocketCapacity 验证部分 HTTP 请求头会超时，且不占用 DebugGate 的 WebSocket 名额。
+func TestDebugGateReadHeaderTimeoutDoesNotConsumeWebSocketCapacity(t *testing.T) {
+	local, gate, agents := startTestGate(t, 8, 1)
+	partial, err := net.DialTimeout("tcp", gate.Addr().String(), time.Second)
+	if err != nil {
+		t.Fatalf("Dial(partial HTTP) error = %v", err)
+	}
+	defer partial.Close()
+	started := time.Now()
+	if _, err := io.WriteString(partial, "GET /ws HTTP/1.1\r\nHost: "+gate.Addr().String()+"\r\n"); err != nil {
+		t.Fatalf("Write(partial HTTP header) error = %v", err)
+	}
+
+	client := dialTestGate(t, gate)
+	defer client.Close()
+	var agent *testAgent
+	select {
+	case agent = <-agents:
+	case <-time.After(time.Second):
+		t.Fatal("partial HTTP request blocked a WebSocket Agent")
+	}
+	if err := client.Close(); err != nil {
+		t.Fatalf("Close(WebSocket client) error = %v", err)
+	}
+	select {
+	case <-agent.disconnected:
+	case <-time.After(time.Second):
+		t.Fatal("Agent did not receive disconnect")
+	}
+	if err := partial.SetReadDeadline(started.Add(defaultReadHeaderWait + 2*time.Second)); err != nil {
+		t.Fatalf("SetReadDeadline(partial HTTP) error = %v", err)
+	}
+	if _, err := io.Copy(io.Discard, partial); err != nil {
+		t.Fatalf("partial HTTP connection did not close after header timeout: %v", err)
+	}
+	if elapsed := time.Since(started); elapsed < defaultReadHeaderWait-time.Second {
+		t.Fatalf("partial HTTP connection closed after %v, before header timeout", elapsed)
+	}
+	metrics := gate.Metrics()
+	if metrics.AcceptedConnections != 1 || metrics.RejectedConnections != 0 {
+		t.Fatalf("Gate metrics = accepted %d, rejected %d; want 1, 0", metrics.AcceptedConnections, metrics.RejectedConnections)
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+}
+
 // TestNewGateServiceRejectsPublicAndUnboundedConfig 验证 DebugGate 不接受公网监听或缺少有限容量的配置。
 func TestNewGateServiceRejectsPublicAndUnboundedConfig(t *testing.T) {
 	local, err := runtime.NewRuntime(runtime.Config{})
