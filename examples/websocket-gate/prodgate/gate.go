@@ -7,13 +7,13 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	"sort"
 	"strconv"
 	"sync"
 	"sync/atomic"
 	"time"
 
 	gatecontract "github.com/cnooljaw/gsr/examples/websocket-gate/gate"
+	"github.com/cnooljaw/gsr/examples/websocket-gate/internal/gatecommon"
 	"github.com/cnooljaw/gsr/logging"
 	"github.com/cnooljaw/gsr/runtime"
 	"github.com/gorilla/websocket"
@@ -25,7 +25,6 @@ const (
 	defaultReadHeaderTimeout                      = 5 * time.Second
 	defaultHTTPIdleTimeout                        = 5 * time.Second
 	defaultAgentStartWait                         = 5 * time.Second
-	disconnectRetryInterval                       = 5 * time.Millisecond
 	defaultWriteWait                              = 10 * time.Second
 	closeFrameWait                                = 100 * time.Millisecond
 	queueEntryOverhead                            = 64
@@ -237,7 +236,7 @@ func (gate *GateService) Handle(self runtime.CommandContext, command runtime.Com
 		if _, exists := gate.agentsByConnection[clientConn]; exists {
 			return nil, errors.New("prodgate: duplicate client connection")
 		}
-		agent, err := createAgent(gate.config.NewAgent, clientConn)
+		agent, err := gatecommon.CreateAgent(gate.config.NewAgent, clientConn, "prodgate")
 		if err != nil {
 			gate.logConnectionFailure(clientConn, "agent_create", websocket.CloseInternalServerErr, err)
 			return nil, err
@@ -261,7 +260,7 @@ func (gate *GateService) Handle(self runtime.CommandContext, command runtime.Com
 		if !exists {
 			return nil, nil
 		}
-		if err := self.Send(agentID, ClientDisconnectedCommand); err != nil && !isRuntimeStoppingError(err) {
+		if err := self.Send(agentID, ClientDisconnectedCommand); err != nil && !gatecommon.IsRuntimeStoppingError(err) {
 			gate.logConnectionFailure(clientConn, "disconnect_notify", websocket.CloseInternalServerErr, err)
 			if errors.Is(err, runtime.ErrMailboxFull) {
 				// 保留映射，让连接处理协程重试，避免断开通知被 Agent 背压吞掉。
@@ -542,29 +541,11 @@ func (gate *GateService) deliverClientMessage(agentID runtime.ServiceID, frame [
 }
 
 func (gate *GateService) notifyDisconnected(serviceID runtime.ServiceID, clientConn *clientConnection) {
-	ticker := time.NewTicker(disconnectRetryInterval)
-	defer ticker.Stop()
-	for {
+	gatecommon.RetryDisconnect(gate.runtime, serviceID, gateDisconnectCommand, clientConn, func() bool {
 		gate.mu.RLock()
-		stopping := gate.stopping
-		gate.mu.RUnlock()
-		if stopping {
-			// 停机后的剩余映射由 OnStop 使用有界 context 统一补发。
-			return
-		}
-		attemptContext, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
-		_, err := gate.runtime.Call(attemptContext, serviceID, gateDisconnectCommand, clientConn)
-		cancel()
-		if err == nil || isRuntimeStoppingError(err) {
-			return
-		}
-		if !isDisconnectRetryableError(err) {
-			return
-		}
-		select {
-		case <-ticker.C:
-		}
-	}
+		defer gate.mu.RUnlock()
+		return gate.stopping
+	})
 }
 
 func (gate *GateService) notifyMappedAgentsOnStop(ctx context.Context) error {
@@ -572,45 +553,7 @@ func (gate *GateService) notifyMappedAgentsOnStop(ctx context.Context) error {
 	for _, agentID := range gate.agentsByConnection {
 		pending = append(pending, agentID)
 	}
-	sort.Slice(pending, func(left, right int) bool { return pending[left] < pending[right] })
-	retry := make([]runtime.ServiceID, 0, len(pending))
-	ticker := time.NewTicker(disconnectRetryInterval)
-	defer ticker.Stop()
-	var result error
-	for len(pending) > 0 {
-		retry = retry[:0]
-		for _, agentID := range pending {
-			if err := ctx.Err(); err != nil {
-				return errors.Join(result, err)
-			}
-			err := gate.runtime.Send(agentID, ClientDisconnectedCommand)
-			if err == nil || isRuntimeStoppingError(err) {
-				continue
-			}
-			if errors.Is(err, runtime.ErrMailboxFull) {
-				retry = append(retry, agentID)
-				continue
-			}
-			result = errors.Join(result, fmt.Errorf("prodgate: notify Agent %d on Gate stop: %w", agentID, err))
-		}
-		// 交换两个缓冲切片，避免每轮重试重新分配 ServiceID 列表。
-		pending, retry = retry, pending
-		if len(pending) == 0 {
-			return result
-		}
-		select {
-		case <-ctx.Done():
-			return errors.Join(result, ctx.Err())
-		case <-ticker.C:
-		}
-	}
-	return result
-}
-
-func isDisconnectRetryableError(err error) bool {
-	return errors.Is(err, runtime.ErrMailboxFull) ||
-		errors.Is(err, context.DeadlineExceeded) ||
-		errors.Is(err, runtime.ErrCallTimeout)
+	return gatecommon.NotifyMappedAgentsOnStop(ctx, gate.runtime, pending, "prodgate")
 }
 
 func (gate *GateService) logError(message string, fields ...any) {
@@ -777,29 +720,6 @@ func clientConnArgument(args []any) (*clientConnection, error) {
 		return nil, errors.New("prodgate: invalid client connection")
 	}
 	return clientConn, nil
-}
-
-func createAgent(factory func(ClientSession) runtime.Service, clientSession ClientSession) (service runtime.Service, err error) {
-	defer func() {
-		if recovered := recover(); recovered != nil {
-			service = nil
-			err = fmt.Errorf("prodgate: Agent constructor panicked: %v", recovered)
-		}
-	}()
-	service = factory(clientSession)
-	if service == nil {
-		return nil, errors.New("prodgate: Agent constructor returned nil")
-	}
-	return service, nil
-}
-
-func isRuntimeStoppingError(err error) bool {
-	return errors.Is(err, runtime.ErrServiceNotFound) ||
-		errors.Is(err, runtime.ErrServiceClosed) ||
-		errors.Is(err, runtime.ErrServiceStopping) ||
-		errors.Is(err, runtime.ErrRuntimeStopping) ||
-		errors.Is(err, runtime.ErrRuntimeStopped) ||
-		errors.Is(err, runtime.ErrRuntimeClosed)
 }
 
 func isTimeoutError(err error) bool {

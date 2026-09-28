@@ -218,3 +218,5 @@ TestRuntimePacedMultiServiceLoad 已补 8 个真实 Service 共享文件 Logger 
 2026-09-28 Gate Origin 部署约束（历史记录，已由下一条裁决取代）：生产 Gate 与 DebugGate 的真实 WebSocket 升级测试确认，浏览器式跨主机 `Origin` 收到 HTTP 403，同 Host 的 `Origin` 可以升级；这是当时 WebSocket 库的默认策略，非应用密钥握手错误。两条定向测试及两 Gate 包测试通过；当时尚未新增配置或放开来源。
 
 2026-09-28 Gate Origin 接入裁决：用户决定不以 `Origin` 作为安全边界，两种 Gate 均显式允许任意来源，保留原生、小程序和 Web 客户端一致的接入语义。业务 token 鉴权仍归 Agent，Echo 示例不声称已实现登录。两条跨主机 Origin 测试先复现旧 403，修改后验证升级成功；生产 Gate 还完成应用密钥握手。两 Gate 包测试通过。
+
+2026-09-28 双 Gate 公共流程重构：示例内部 `gatecommon` 统一 Agent 构造 panic/空值处理、正常断线重试、停机时公平补发和 Runtime 停止错误判断；生产与调试 Gate 保留各自的 WebSocket 入口、监听、认证、容量及日志行为。相关定向测试、两 Gate 包测试及两包 race 测试通过，未运行全仓验证。
