@@ -3678,6 +3678,11 @@ func TestNewGateServiceRejectsInvalidTLSAndCapacity(t *testing.T) {
 	}{
 		{name: "missing certificate", update: func(config *Config) { config.TLSConfig = &tls.Config{} }},
 		{name: "TLS below 1.2", update: func(config *Config) { config.TLSConfig.MinVersion = tls.VersionTLS10 }},
+		{name: "replacement TLS config", update: func(config *Config) {
+			config.TLSConfig.GetConfigForClient = func(*tls.ClientHelloInfo) (*tls.Config, error) {
+				return &tls.Config{MinVersion: tls.VersionTLS10}, nil
+			}
+		}},
 		{name: "empty connection limit", update: func(config *Config) { config.MaxConnections = 0 }},
 		{name: "short outbound queue", update: func(config *Config) { config.MaxOutboundQueueBytes = queueEntryOverhead - 1 }},
 		{name: "named port", update: func(config *Config) { config.Address = "127.0.0.1:https" }},
@@ -3695,6 +3700,39 @@ func TestNewGateServiceRejectsInvalidTLSAndCapacity(t *testing.T) {
 	noTLS.TLSConfig = nil
 	if _, err := NewGateService(local, noTLS); err != nil {
 		t.Fatalf("NewGateService() without TLS error = %v", err)
+	}
+}
+
+// TestProdGateAllowsDynamicCertificate 验证动态选证书仍能完成握手，且 Gate 固定最低 TLS 版本和 HTTP/1.1 协商。
+func TestProdGateAllowsDynamicCertificate(t *testing.T) {
+	serverTLS, clientTLS := testTLSConfigs(t)
+	certificate := serverTLS.Certificates[0]
+	serverTLS.Certificates = nil
+	serverTLS.MinVersion = 0
+	serverTLS.NextProtos = []string{"h2"}
+	var certificateCalls atomic.Int32
+	serverTLS.GetCertificate = func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
+		certificateCalls.Add(1)
+		return &certificate, nil
+	}
+	clientTLS.NextProtos = []string{"h2", "http/1.1"}
+
+	_, gate := startConfiguredProductionGateWithTLS(t, runtime.Config{}, 1, time.Second, 1024, 64<<10, serverTLS,
+		func(ClientSession) runtime.Service { return &productionTestAgent{} })
+	if got := gate.config.TLSConfig.MinVersion; got != tls.VersionTLS12 {
+		t.Fatalf("Gate TLS minimum = %x, want TLS 1.2", got)
+	}
+	connection, err := tls.DialWithDialer(&net.Dialer{Timeout: time.Second}, "tcp", gate.Addr().String(), clientTLS)
+	if err != nil {
+		t.Fatalf("TLS handshake with GetCertificate error = %v", err)
+	}
+	defer connection.Close()
+	state := connection.ConnectionState()
+	if state.Version < tls.VersionTLS12 || state.NegotiatedProtocol != "http/1.1" {
+		t.Fatalf("TLS state = version %x, protocol %q; want TLS 1.2+ and http/1.1", state.Version, state.NegotiatedProtocol)
+	}
+	if got := certificateCalls.Load(); got != 1 {
+		t.Fatalf("GetCertificate calls = %d, want 1", got)
 	}
 }
 

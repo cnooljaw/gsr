@@ -64,8 +64,9 @@ const ClientDisconnectedCommand = gatecontract.ClientDisconnectedCommand
 type Config struct {
 	// Address 是 Gate 绑定的 TCP host:port。
 	Address string
-	// TLSConfig 为 nil 时监听普通 HTTP WebSocket，适用于由 K8s Ingress 终止 TLS 的部署；
-	// 非 nil 时直连 TLS，并由 Gate 克隆配置且只协商 HTTP/1.1。
+	// TLSConfig 为 nil 时监听普通 HTTP WebSocket，适用于可信内网或由 Ingress 终止 TLS 的部署；
+	// 公网直连由部署方提供 TLS 配置。Gate 克隆非 nil 配置，只协商 HTTP/1.1，
+	// 并拒绝可能替换整份 TLS 配置的 GetConfigForClient；GetCertificate 可用于动态选证书。
 	TLSConfig *tls.Config
 	// MaxConnections 必须显式设置为正数，并包含尚未完成握手的连接。
 	MaxConnections int
@@ -696,7 +697,10 @@ func productionTLSConfig(config *tls.Config) (*tls.Config, error) {
 	if config == nil {
 		return nil, nil
 	}
-	if len(config.Certificates) == 0 && config.GetCertificate == nil && config.GetConfigForClient == nil {
+	if config.GetConfigForClient != nil {
+		return nil, fmt.Errorf("%w: GetConfigForClient cannot replace Gate TLS constraints", ErrInvalidConfig)
+	}
+	if len(config.Certificates) == 0 && config.GetCertificate == nil {
 		return nil, fmt.Errorf("%w: TLSConfig must provide a server certificate", ErrInvalidConfig)
 	}
 	clone := config.Clone()
