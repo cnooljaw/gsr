@@ -1941,6 +1941,155 @@ func TestProdGateLongSlowClientBackpressure(t *testing.T) {
 	}
 }
 
+// TestProdGateMultipleSlowClientsDoNotBlockHealthyRequests 验证多条持续背压的连接不会拖住同节点健康连接的请求与回复。
+func TestProdGateMultipleSlowClientsDoNotBlockHealthyRequests(t *testing.T) {
+	if os.Getenv("GSR_GATE_STRESS") != "1" {
+		t.Skip("显式设置 GSR_GATE_STRESS=1 运行多慢连接压力验收")
+	}
+	stressDuration := 5 * time.Second
+	if value := os.Getenv("GSR_GATE_SLOW_CLIENT_SECONDS"); value != "" {
+		seconds, err := strconv.Atoi(value)
+		if err != nil || seconds <= 0 {
+			t.Fatalf("GSR_GATE_SLOW_CLIENT_SECONDS = %q, want positive integer", value)
+		}
+		stressDuration = time.Duration(seconds) * time.Second
+	}
+
+	const slowConnectionCount = 4
+	slowAgents := make(chan *longSlowOutboundAgent, slowConnectionCount)
+	healthyAgents := make(chan *productionTestAgent, 1)
+	var createdAgents atomic.Uint32
+	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
+		MailboxCapacity: 16,
+		ShutdownTimeout: 3 * time.Second,
+	}, slowConnectionCount+1, time.Second, 1<<20, 128<<10, func(client ClientSession) runtime.Service {
+		if createdAgents.Add(1) <= slowConnectionCount {
+			agent := &longSlowOutboundAgent{
+				client:            client,
+				duration:          stressDuration,
+				result:            make(chan longSlowOutboundResult, 1),
+				disconnected:      make(chan struct{}),
+				queueFullObserved: make(chan struct{}),
+			}
+			slowAgents <- agent
+			return agent
+		}
+		agent := &productionTestAgent{client: client, disconnected: make(chan struct{})}
+		healthyAgents <- agent
+		return agent
+	})
+
+	slowConnections := make([]*websocket.Conn, 0, slowConnectionCount)
+	testSlowAgents := make([]*longSlowOutboundAgent, 0, slowConnectionCount)
+	defer func() {
+		for _, connection := range slowConnections {
+			_ = connection.Close()
+		}
+	}()
+	for index := 0; index < slowConnectionCount; index++ {
+		connection, macKey := dialAuthenticatedTestClient(t, gate, clientTLS)
+		slowConnections = append(slowConnections, connection)
+		tcpConnection, ok := tcpConnectionFromWebSocket(connection)
+		if !ok {
+			t.Skip("测试客户端不是 TCP 连接")
+		}
+		if err := tcpConnection.SetReadBuffer(1024); err != nil {
+			t.Fatalf("SetReadBuffer(slow client %d) error = %v", index, err)
+		}
+		testSlowAgents = append(testSlowAgents, receiveLongSlowOutboundAgent(t, slowAgents))
+		request, err := proto.Marshal(&commonv1.Envelope{MsgId: 1001, RequestId: uint32(index + 1)})
+		if err != nil {
+			t.Fatalf("marshal slow request %d: %v", index, err)
+		}
+		if err := connection.WriteMessage(websocket.BinaryMessage, makeAuthenticatedTestFrame(t, macKey[:], 1, request)); err != nil {
+			t.Fatalf("WriteMessage(slow request %d) error = %v", index, err)
+		}
+	}
+	stressStartedAt := time.Now()
+	for index, agent := range testSlowAgents {
+		select {
+		case <-agent.queueFullObserved:
+		case <-time.After(2 * time.Second):
+			t.Fatalf("慢客户端 %d 未触发有界出站队列拒绝", index)
+		}
+	}
+
+	healthyConnection, healthyMACKey := dialAuthenticatedTestClient(t, gate, clientTLS)
+	defer healthyConnection.Close()
+	healthyAgent := receiveProductionAgent(t, healthyAgents)
+	deadline := stressStartedAt.Add(stressDuration)
+	var healthyResponses uint32
+	for time.Now().Before(deadline) {
+		healthyResponses++
+		request := &commonv1.Envelope{MsgId: 1001, RequestId: healthyResponses, Payload: []byte("healthy")}
+		requestBytes, err := proto.Marshal(request)
+		if err != nil {
+			t.Fatalf("marshal healthy request: %v", err)
+		}
+		if err := healthyConnection.WriteMessage(websocket.BinaryMessage, makeAuthenticatedTestFrame(t, healthyMACKey[:], uint64(healthyResponses), requestBytes)); err != nil {
+			t.Fatalf("WriteMessage(healthy request %d) error = %v", healthyResponses, err)
+		}
+		messageType, responseBytes, err := readTestBinaryMessage(t, healthyConnection)
+		if err != nil {
+			t.Fatalf("ReadMessage(healthy response %d) error = %v", healthyResponses, err)
+		}
+		var response commonv1.Envelope
+		if err := proto.Unmarshal(responseBytes, &response); err != nil {
+			t.Fatalf("unmarshal healthy response: %v", err)
+		}
+		if messageType != websocket.BinaryMessage || response.GetMsgId() != 1002 || response.GetRequestId() != healthyResponses ||
+			!bytes.Equal(response.GetPayload(), request.GetPayload()) {
+			t.Fatalf("healthy response %d = type %d, msg_id %d, request_id %d, payload %q", healthyResponses,
+				messageType, response.GetMsgId(), response.GetRequestId(), response.GetPayload())
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+	if healthyResponses < 2 {
+		t.Fatalf("healthy responses = %d, want at least 2 during slow-client backpressure", healthyResponses)
+	}
+
+	for index, agent := range testSlowAgents {
+		select {
+		case result := <-agent.result:
+			if result.err != nil || result.sent == 0 || result.queueFull == 0 {
+				t.Fatalf("slow client %d result = %+v, want sent and queueFull without unexpected error", index, result)
+			}
+			t.Logf("slow_client=%d sent=%d queue_full=%d closed=%t", index, result.sent, result.queueFull, result.closed)
+		case <-time.After(2 * time.Second):
+			t.Fatalf("慢客户端 %d 的压力 Agent 未按时结束", index)
+		}
+	}
+	metrics := gate.Metrics()
+	t.Logf("slow_connections=%d duration=%s healthy_responses=%d outbound_queue_full=%d rejected=%d inbound_mailbox_full=%d",
+		slowConnectionCount, stressDuration, healthyResponses, metrics.OutboundQueueFull, metrics.RejectedConnections, metrics.InboundMailboxFull)
+	if metrics.OutboundQueueFull < slowConnectionCount || metrics.RejectedConnections != 0 || metrics.InboundMailboxFull != 0 {
+		t.Fatalf("Gate metrics = %+v, want slow-client queue rejections only", metrics)
+	}
+	for index, connection := range slowConnections {
+		if err := connection.Close(); err != nil {
+			t.Fatalf("Close(slow client %d) error = %v", index, err)
+		}
+	}
+	if err := healthyConnection.Close(); err != nil {
+		t.Fatalf("Close(healthy client) error = %v", err)
+	}
+	for index, agent := range testSlowAgents {
+		select {
+		case <-agent.disconnected:
+		case <-time.After(time.Second):
+			t.Fatalf("慢客户端 %d 断开后 Agent 未收到通知", index)
+		}
+	}
+	select {
+	case <-healthyAgent.disconnected:
+	case <-time.After(time.Second):
+		t.Fatal("健康客户端断开后 Agent 未收到通知")
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+}
+
 // TestProdGateHandlesConcurrentConnections 验证多条连接并发发送时消息仍进入各自 Agent，并能在关闭后全部回收。
 func TestProdGateHandlesConcurrentConnections(t *testing.T) {
 	const (
