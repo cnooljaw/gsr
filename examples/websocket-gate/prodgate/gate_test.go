@@ -240,6 +240,68 @@ func TestProdGateClosesIdleNonWebSocketHTTPConnections(t *testing.T) {
 	}
 }
 
+// TestProdGateReadHeaderTimeoutReleasesConnectionSlot 验证未完成 HTTP 请求头的连接超时后归还 TCP 名额。
+func TestProdGateReadHeaderTimeoutReleasesConnectionSlot(t *testing.T) {
+	local, gate := startConfiguredHTTPProductionGate(t, runtime.Config{
+		MailboxCapacity: 8,
+		ShutdownTimeout: 2 * time.Second,
+	}, 1, time.Second, 1<<20, 64<<10, func(ClientSession) runtime.Service {
+		return &plainTestAgent{disconnected: make(chan struct{})}
+	})
+	partial, err := net.DialTimeout("tcp", gate.Addr().String(), time.Second)
+	if err != nil {
+		t.Fatalf("Dial(partial HTTP) error = %v", err)
+	}
+	defer partial.Close()
+	started := time.Now()
+	if _, err := io.WriteString(partial, "GET /ws HTTP/1.1\r\nHost: "+gate.Addr().String()+"\r\n"); err != nil {
+		t.Fatalf("Write(partial HTTP header) error = %v", err)
+	}
+
+	extra, err := net.DialTimeout("tcp", gate.Addr().String(), time.Second)
+	if err != nil {
+		t.Fatalf("Dial(over-capacity HTTP) error = %v", err)
+	}
+	defer extra.Close()
+	waitForGateMetric(t, gate, "RejectedConnections", func(metrics Metrics) uint64 {
+		return metrics.RejectedConnections
+	}, 1)
+	if err := partial.SetReadDeadline(started.Add(defaultReadHeaderTimeout + 2*time.Second)); err != nil {
+		t.Fatalf("SetReadDeadline(partial HTTP) error = %v", err)
+	}
+	if _, err := io.Copy(io.Discard, partial); err != nil {
+		t.Fatalf("partial HTTP connection did not close after header timeout: %v", err)
+	}
+	if elapsed := time.Since(started); elapsed < defaultReadHeaderTimeout-time.Second {
+		t.Fatalf("partial HTTP connection closed after %v, before header timeout", elapsed)
+	}
+
+	client := &http.Client{
+		Transport: &http.Transport{DisableKeepAlives: true},
+		Timeout:   time.Second,
+	}
+	recoveryDeadline := time.Now().Add(time.Second)
+	for {
+		response, err := client.Get("http://" + gate.Addr().String() + "/not-ws")
+		if err == nil {
+			if err := response.Body.Close(); err != nil {
+				t.Fatalf("Close(recovered HTTP body) error = %v", err)
+			}
+			if response.StatusCode != http.StatusNotFound {
+				t.Fatalf("HTTP status after header timeout = %d, want 404", response.StatusCode)
+			}
+			break
+		}
+		if time.Now().After(recoveryDeadline) {
+			t.Fatalf("HTTP request did not recover after header timeout: %v", err)
+		}
+		time.Sleep(5 * time.Millisecond)
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+}
+
 // TestProdGateRejectsInvalidMACBeforeDelivery 验证错误 MAC 在进入 Agent Mailbox 前被拒绝并关闭连接。
 func TestProdGateRejectsInvalidMACBeforeDelivery(t *testing.T) {
 	_, gate, agents, clientTLS := startTestProductionGate(t, 2, time.Second)

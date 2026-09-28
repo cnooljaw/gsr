@@ -228,3 +228,5 @@ TestRuntimePacedMultiServiceLoad 已补 8 个真实 Service 共享文件 Logger 
 2026-09-28 生产 Gate 日志故障隔离：在 Gate 运行中提前关闭共享 Logger 后，握手前 TCP 连接上限仍拒绝超额连接、`RejectedConnections` 仍准确增加，`Runtime.Stop` 正常完成。新增定向测试及对应 race 测试通过；本轮未修改生产实现，也不改变应用通常应在 Runtime 停止后再关闭 Logger 的资源顺序。
 
 2026-09-28 生产 Gate 容量拒绝与健康流量组合：一条已认证连接占用唯一连接名额，四轮共 16 条额外原始 TCP 连接被拒绝；每轮拒绝后同一健康连接仍完成一次认证请求/响应，Agent 收到的请求字节匹配，`AcceptedConnections=1`、`RejectedConnections=16`、`InboundMailboxFull=0`。定向测试及对应 race 测试通过；本轮只增加验收，不修改生产实现，也不代表持续故障洪泛容量结论。
+
+2026-09-28 生产 Gate 不完整 HTTP 请求头回收：普通 HTTP WebSocket 入口的唯一 TCP 名额由只发部分请求头的客户端占用，额外连接被拒绝并计数；约 5 秒 `ReadHeaderTimeout` 后该连接关闭，新的 HTTP 请求恢复得到 404。定向测试和对应 race 测试通过；本轮只验证已有超时配置，不修改生产实现，也不等同于公网 Slowloris 防护验收。
