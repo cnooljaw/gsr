@@ -166,6 +166,7 @@ func (gate *GateService) OnStart(_ context.Context, self runtime.ServiceContext)
 	server := &http.Server{
 		Handler:           gate,
 		ReadHeaderTimeout: defaultReadHeaderWait,
+		IdleTimeout:       defaultReadHeaderWait,
 	}
 
 	gate.mu.Lock()

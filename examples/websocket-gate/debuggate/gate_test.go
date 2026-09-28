@@ -1,9 +1,11 @@
 package debuggate
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"errors"
+	"io"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -517,6 +519,42 @@ func TestDebugGateRejectsConnectionAboveLimit(t *testing.T) {
 	}
 	if got := gate.Metrics().RejectedConnections; got != 1 {
 		t.Fatalf("RejectedConnections = %d, want 1", got)
+	}
+}
+
+// TestDebugGateClosesIdleHTTPConnection 验证未升级的 HTTP keep-alive 连接不会无限占用 socket。
+func TestDebugGateClosesIdleHTTPConnection(t *testing.T) {
+	_, gate, _ := startTestGate(t, 8, 1)
+	connection, err := net.Dial("tcp", gate.Addr().String())
+	if err != nil {
+		t.Fatalf("Dial(Gate) error = %v", err)
+	}
+	defer connection.Close()
+
+	request, err := http.NewRequest(http.MethodGet, "http://"+gate.Addr().String()+"/not-ws", nil)
+	if err != nil {
+		t.Fatalf("NewRequest() error = %v", err)
+	}
+	if err := request.Write(connection); err != nil {
+		t.Fatalf("Write(HTTP request) error = %v", err)
+	}
+	reader := bufio.NewReader(connection)
+	response, err := http.ReadResponse(reader, request)
+	if err != nil {
+		t.Fatalf("ReadResponse() error = %v", err)
+	}
+	defer response.Body.Close()
+	if response.StatusCode != http.StatusNotFound || response.Close {
+		t.Fatalf("HTTP response = status %d, close %t; want 404 with keep-alive", response.StatusCode, response.Close)
+	}
+	if _, err := io.Copy(io.Discard, response.Body); err != nil {
+		t.Fatalf("drain HTTP response body: %v", err)
+	}
+	if err := connection.SetReadDeadline(time.Now().Add(defaultReadHeaderWait + time.Second)); err != nil {
+		t.Fatalf("SetReadDeadline() error = %v", err)
+	}
+	if _, err := reader.ReadByte(); !errors.Is(err, io.EOF) {
+		t.Fatalf("idle HTTP connection read error = %v, want EOF after the idle timeout", err)
 	}
 }
 

@@ -208,3 +208,5 @@ TestRuntimePacedMultiServiceLoad 已补 8 个真实 Service 共享文件 Logger 
 2026-09-25 生产 Gate 握手帧配置下限：配置的 `MaxFrameBytes` 小于 33 字节时无法容纳固定客户端握手帧；`NewGateService` 现在在启动前返回 `ErrInvalidConfig`，并增加边界测试覆盖 32 字节拒绝、33 字节接受。定向测试和 prodgate 全包测试通过。
 
 2026-09-28 Gate HTTP 空闲连接回收：普通 HTTP 请求返回 404/405 后，keep-alive 连接此前可能无限占住 `MaxConnections` 名额。生产 Gate 为未升级 HTTP 连接设置 5 秒 idle timeout；新增真实 TCP 测试确认 404 响应仍可 keep-alive，随后连接按时关闭。定向测试与 `go test ./examples/websocket-gate/prodgate` 通过；WebSocket 升级连接不受该 idle timeout 影响。
+
+2026-09-28 DebugGate HTTP 空闲连接回收：真实 TCP 回归测试先确认 404 后的 keep-alive 连接超过 5 秒仍不关闭，再验证设置 5 秒 idle timeout 后按时关闭。定向测试与 `go test ./examples/websocket-gate/debuggate` 通过。DebugGate 的 `MaxConnections` 只统计进入 `/ws` GET Handler 的连接，仍不限制原始 TCP 接纳数；它只供受信任环境调试。
