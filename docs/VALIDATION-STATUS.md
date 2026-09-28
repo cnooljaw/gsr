@@ -224,3 +224,5 @@ TestRuntimePacedMultiServiceLoad 已补 8 个真实 Service 共享文件 Logger 
 2026-09-28 双 Gate 公共流程重构：示例内部 `gatecommon` 统一 Agent 构造 panic/空值处理、正常断线重试、停机时公平补发和 Runtime 停止错误判断；生产与调试 Gate 保留各自的 WebSocket 入口、监听、认证、容量及日志行为。相关定向测试、两 Gate 包测试及两包 race 测试通过，未运行全仓验证。
 
 2026-09-28 生产 Gate 握手前容量诊断：TCP 接纳上限拒绝连接时，原先只有 `RejectedConnections` 计数、没有共享 Logger 记录。定向测试先复现日志缺失；现在每次拒绝都会尝试向共享 Logger 接纳一条绑定 Gate ServiceID 的 `reason=capacity` 结构化日志，Logger 满载时仍遵守有界非阻塞与丢弃计数契约，不读取或记录未认证帧。同步收紧既有坏 MAC 日志测试，直接检查完整输出不含原始 payload。生产 Gate 包测试与容量诊断定向 race 测试通过，未运行全仓验证。
+
+2026-09-28 生产 Gate 日志故障隔离：在 Gate 运行中提前关闭共享 Logger 后，握手前 TCP 连接上限仍拒绝超额连接、`RejectedConnections` 仍准确增加，`Runtime.Stop` 正常完成。新增定向测试及对应 race 测试通过；本轮未修改生产实现，也不改变应用通常应在 Runtime 停止后再关闭 Logger 的资源顺序。

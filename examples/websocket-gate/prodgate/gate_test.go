@@ -926,6 +926,39 @@ func TestProdGateLogsPreHandshakeCapacityRejection(t *testing.T) {
 	}
 }
 
+// TestProdGateCapacityRejectionSurvivesClosedLogger 验证日志入口不可用时连接上限、拒绝计数和停机仍正常。
+func TestProdGateCapacityRejectionSurvivesClosedLogger(t *testing.T) {
+	logger, err := logging.New(logging.Config{Writer: io.Discard})
+	if err != nil {
+		t.Fatalf("logging.New() error = %v", err)
+	}
+	t.Cleanup(func() {
+		if err := logger.Close(context.Background()); err != nil {
+			t.Errorf("Logger.Close() error = %v", err)
+		}
+	})
+	local, gate, _, _ := startTestProductionGate(t, 1, time.Second, logger)
+	if err := logger.Close(context.Background()); err != nil {
+		t.Fatalf("Logger.Close() error = %v", err)
+	}
+	first, err := net.DialTimeout("tcp", gate.Addr().String(), time.Second)
+	if err != nil {
+		t.Fatalf("Dial(first) error = %v", err)
+	}
+	defer first.Close()
+	second, err := net.DialTimeout("tcp", gate.Addr().String(), time.Second)
+	if err != nil {
+		t.Fatalf("Dial(second) error = %v", err)
+	}
+	defer second.Close()
+	waitForGateMetric(t, gate, "RejectedConnections", func(metrics Metrics) uint64 {
+		return metrics.RejectedConnections
+	}, 1)
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+}
+
 // TestProdGateSuppressesRepeatedConnectionFailures 验证同一连接同一类别只记录首条故障，并在结束时记录抑制数量。
 func TestProdGateSuppressesRepeatedConnectionFailures(t *testing.T) {
 	var output bytes.Buffer
