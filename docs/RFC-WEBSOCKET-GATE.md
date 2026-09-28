@@ -195,6 +195,8 @@ message ErrorResponse {
 
 当前实现位于 `examples/websocket-gate/prodgate/`：Gate 在 HTTP/WebSocket Handler 前限制已接纳 TCP 连接数；HTTP 请求头和普通 keep-alive 空闲连接有 5 秒超时，避免未升级连接长期占用名额。`TLSConfig` 非空时启动直连 WSS Listener，为 nil 时启动供 Ingress 转发的普通 HTTP WebSocket Listener。首个二进制 WebSocket 消息必须是固定 33 字节握手，完成 X25519 握手后，逐帧校验 MAC 和递增 seq，再将原始 Envelope 字节直接交给目标 Agent 的 `Runtime.DeliverClientMessage`。Agent 的响应通过每连接有界队列进入唯一 WebSocket 写循环。生产 Gate 从 Runtime 借用同一 Logger 并绑定自身 ServiceID；同一连接同一错误类别只记录首条，关闭时补充抑制数量，不记录密钥、MAC 或原始载荷。生产 Gate 与 DebugGate 仍使用不同监听器和显式配置，不会根据首包自动降级。端到端测试覆盖直连 TLS、Ingress 终止 TLS 后的普通 WebSocket、握手与业务帧往返、错误 MAC 拒绝、首帧超时、握手前连接上限与断开后名额回收、Mailbox/出站队列满载、基础慢客户端背压、短时多连接并发及 Runtime 关闭回收；这不替代密码协议审查或慢客户端长时压力验收。
 
+待裁决：当前 `productionTLSConfig` 只校验并固定根 `tls.Config` 的最低 TLS 版本与 `NextProtos`，同时允许 `GetConfigForClient` 返回另一份连接级配置。Go 会在握手中用该返回值替换根配置，因此这两项约束不能保证覆盖回调返回的配置。第一版可选择拒绝 `GetConfigForClient`（仍保留 `GetCertificate` 动态选证书），或为回调返回值增加逐连接约束；后一种方案增加校验与维护成本。用户裁决前不将任一方案视为已接受契约，直连 TLS 部署也不应依赖未经约束的该回调。
+
 生产 Gate 与 DebugGate 的 WebSocket 升级均允许任意 `Origin`，不使用域名白名单，也不把 `Origin` 当作客户端身份或权限依据；原生客户端、小程序和 Web 客户端使用同一接入语义。直连或 Ingress 的 WSS、X25519、HMAC 和 seq 分别保护传输、连接密钥、上行帧完整性及顺序，但不等于玩家登录鉴权。业务 Agent 必须显式校验 token 后才赋予玩家权限；当前 Echo 示例尚未实现这项业务鉴权。若将来让浏览器自动携带的 Cookie 直接赋予连接权限，必须重新审查跨站 WebSocket 劫持风险，不能用上行 MAC 替代身份校验。
 
 已确认的密码参数：
