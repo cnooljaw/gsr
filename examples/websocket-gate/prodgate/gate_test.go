@@ -1324,6 +1324,60 @@ func TestProdGateHTTPServerErrorLogRedactsRawText(t *testing.T) {
 	}
 }
 
+// TestProdGateTLSHandshakeErrorSurvivesClosedLogger 验证共享 Logger 已关闭时，坏握手不会阻断后续健康 TLS 连接。
+func TestProdGateTLSHandshakeErrorSurvivesClosedLogger(t *testing.T) {
+	logger, err := logging.New(logging.Config{Writer: io.Discard})
+	if err != nil {
+		t.Fatalf("logging.New() error = %v", err)
+	}
+	t.Cleanup(func() {
+		if err := logger.Close(context.Background()); err != nil {
+			t.Errorf("Logger.Close() error = %v", err)
+		}
+	})
+	local, gate, _, clientTLS := startTestProductionGate(t, 1, time.Second, logger)
+	if err := logger.Close(context.Background()); err != nil {
+		t.Fatalf("Logger.Close() error = %v", err)
+	}
+	bad, err := net.DialTimeout("tcp", gate.Addr().String(), time.Second)
+	if err != nil {
+		t.Fatalf("Dial(bad TLS) error = %v", err)
+	}
+	defer bad.Close()
+	if _, err := io.WriteString(bad, "not-a-tls-client-hello"); err != nil {
+		t.Fatalf("Write(bad TLS) error = %v", err)
+	}
+	if err := bad.SetReadDeadline(time.Now().Add(time.Second)); err != nil {
+		t.Fatalf("SetReadDeadline(bad TLS) error = %v", err)
+	}
+	if _, err := io.Copy(io.Discard, bad); err != nil {
+		var timeout net.Error
+		if errors.As(err, &timeout) && timeout.Timeout() {
+			t.Fatalf("bad TLS connection did not close: %v", err)
+		}
+	}
+
+	deadline := time.Now().Add(time.Second)
+	var healthy *tls.Conn
+	for healthy == nil && time.Now().Before(deadline) {
+		connection, dialErr := tls.DialWithDialer(&net.Dialer{Timeout: time.Second}, "tcp", gate.Addr().String(), clientTLS)
+		if dialErr == nil {
+			healthy = connection
+			break
+		}
+		time.Sleep(5 * time.Millisecond)
+	}
+	if healthy == nil {
+		t.Fatal("Gate did not accept a healthy TLS connection after logging failed")
+	}
+	if err := healthy.Close(); err != nil {
+		t.Fatalf("Close(healthy TLS) error = %v", err)
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+}
+
 // TestProdGateAppliesConnectionLimitBeforeTLSHandshake 验证连接上限覆盖未完成 TLS 握手的 TCP 连接，且断开后会归还名额。
 func TestProdGateAppliesConnectionLimitBeforeTLSHandshake(t *testing.T) {
 	_, gate, _, clientTLS := startTestProductionGate(t, 1, time.Second)
