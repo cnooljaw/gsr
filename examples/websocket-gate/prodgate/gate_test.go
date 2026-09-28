@@ -3139,6 +3139,40 @@ func TestProdGateRuntimeStopReleasesListener(t *testing.T) {
 	}
 }
 
+// TestProdGateRuntimeStopClosesPendingTLSHandshake 验证停机关闭尚未发送 TLS ClientHello 的原始 TCP 连接。
+func TestProdGateRuntimeStopClosesPendingTLSHandshake(t *testing.T) {
+	local, gate, _, _ := startTestProductionGate(t, 1, time.Second)
+	pending, err := net.DialTimeout("tcp", gate.Addr().String(), time.Second)
+	if err != nil {
+		t.Fatalf("Dial(pending TLS) error = %v", err)
+	}
+	defer pending.Close()
+	if err := pending.SetReadDeadline(time.Now().Add(50 * time.Millisecond)); err != nil {
+		t.Fatalf("SetReadDeadline(pending TLS) error = %v", err)
+	}
+	var byteRead [1]byte
+	_, err = pending.Read(byteRead[:])
+	var timeout net.Error
+	if !errors.As(err, &timeout) || !timeout.Timeout() {
+		t.Fatalf("Read(pending TLS) error = %v, want pending handshake timeout", err)
+	}
+	stopContext, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	if err := local.Stop(stopContext); err != nil {
+		t.Fatalf("Runtime.Stop(pending TLS) error = %v", err)
+	}
+	if err := pending.SetReadDeadline(time.Now().Add(time.Second)); err != nil {
+		t.Fatalf("SetReadDeadline(closed TLS) error = %v", err)
+	}
+	if _, err := pending.Read(byteRead[:]); !errors.Is(err, io.EOF) {
+		t.Fatalf("Read(after Runtime.Stop) error = %v, want EOF", err)
+	}
+	metrics := gate.Metrics()
+	if metrics.AcceptedConnections != 0 || metrics.HandshakeTimeouts != 0 {
+		t.Fatalf("Gate metrics after pending TLS stop = %+v, want no Agent or application handshake timeout", metrics)
+	}
+}
+
 // TestProdGateRuntimeStopClosesPendingHandshake 验证 Runtime.Stop 会关闭仍在等待客户端应用握手的连接，而不等握手超时。
 func TestProdGateRuntimeStopClosesPendingHandshake(t *testing.T) {
 	local, gate, agents, clientTLS := startTestProductionGate(t, 1, 30*time.Second)
