@@ -1225,6 +1225,104 @@ func TestProdGateTLSHandshakeTimeoutReleasesConnectionSlot(t *testing.T) {
 	}
 }
 
+// TestProdGateRecordsTLSHandshakeErrorInSharedLogger 验证坏 TLS 首包进入共享日志且不复制未认证原文。
+func TestProdGateRecordsTLSHandshakeErrorInSharedLogger(t *testing.T) {
+	var output bytes.Buffer
+	logger, err := logging.New(logging.Config{Writer: &output})
+	if err != nil {
+		t.Fatalf("logging.New() error = %v", err)
+	}
+	t.Cleanup(func() {
+		if err := logger.Close(context.Background()); err != nil {
+			t.Errorf("Logger.Close() error = %v", err)
+		}
+	})
+	local, gate, _, _ := startTestProductionGate(t, 1, time.Second, logger)
+	connection, err := net.DialTimeout("tcp", gate.Addr().String(), time.Second)
+	if err != nil {
+		t.Fatalf("Dial(bad TLS) error = %v", err)
+	}
+	defer connection.Close()
+	const untrusted = "private-not-a-tls-client-hello"
+	if _, err := io.WriteString(connection, untrusted); err != nil {
+		t.Fatalf("Write(bad TLS) error = %v", err)
+	}
+	if err := connection.SetReadDeadline(time.Now().Add(time.Second)); err != nil {
+		t.Fatalf("SetReadDeadline(bad TLS) error = %v", err)
+	}
+	if _, err := io.Copy(io.Discard, connection); err != nil {
+		var timeout net.Error
+		if errors.As(err, &timeout) && timeout.Timeout() {
+			t.Fatalf("bad TLS connection did not close: %v", err)
+		}
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+	if err := logger.Close(context.Background()); err != nil {
+		t.Fatalf("Logger.Close() error = %v", err)
+	}
+	if bytes.Contains(output.Bytes(), []byte(untrusted)) {
+		t.Fatal("Gate log contains untrusted TLS input")
+	}
+	var matches int
+	decoder := json.NewDecoder(bytes.NewReader(output.Bytes()))
+	for decoder.More() {
+		var entry struct {
+			Service uint64         `json:"service"`
+			Message string         `json:"message"`
+			Fields  map[string]any `json:"fields"`
+		}
+		if err := decoder.Decode(&entry); err != nil {
+			t.Fatalf("decode log entry: %v", err)
+		}
+		if entry.Message == "Gate HTTP server error" && entry.Fields["category"] == "tls_handshake" {
+			matches++
+			if entry.Service != uint64(gate.serviceID) {
+				t.Fatalf("TLS error service = %d, want %d", entry.Service, gate.serviceID)
+			}
+		}
+	}
+	if matches != 1 {
+		t.Fatalf("TLS handshake error logs = %d, want 1", matches)
+	}
+}
+
+// TestProdGateHTTPServerErrorLogRedactsRawText 验证 HTTP 服务器错误只保留类别，不复制可能含敏感信息的原始行。
+func TestProdGateHTTPServerErrorLogRedactsRawText(t *testing.T) {
+	var output bytes.Buffer
+	logger, err := logging.New(logging.Config{Writer: &output})
+	if err != nil {
+		t.Fatalf("logging.New() error = %v", err)
+	}
+	t.Cleanup(func() {
+		if err := logger.Close(context.Background()); err != nil {
+			t.Errorf("Logger.Close() error = %v", err)
+		}
+	})
+	const rawError = "http: panic serving 127.0.0.1:12345: private-client-data\nstack"
+	writer := httpServerErrorWriter{logger: logger}
+	if written, err := writer.Write([]byte(rawError)); err != nil || written != len(rawError) {
+		t.Fatalf("Write(server error) = %d, %v; want %d, nil", written, err, len(rawError))
+	}
+	if err := logger.Close(context.Background()); err != nil {
+		t.Fatalf("Logger.Close() error = %v", err)
+	}
+	if bytes.Contains(output.Bytes(), []byte("private-client-data")) {
+		t.Fatal("HTTP server log contains raw panic text")
+	}
+	var entry struct {
+		Message string         `json:"message"`
+		Fields  map[string]any `json:"fields"`
+	}
+	if err := json.Unmarshal(bytes.TrimSpace(output.Bytes()), &entry); err != nil {
+		t.Fatalf("decode log entry: %v", err)
+	}
+	if entry.Message != "Gate HTTP server error" || entry.Fields["category"] != "handler_panic" {
+		t.Fatalf("HTTP server log = %q, %v; want handler_panic", entry.Message, entry.Fields)
+	}
+}
+
 // TestProdGateAppliesConnectionLimitBeforeTLSHandshake 验证连接上限覆盖未完成 TLS 握手的 TCP 连接，且断开后会归还名额。
 func TestProdGateAppliesConnectionLimitBeforeTLSHandshake(t *testing.T) {
 	_, gate, _, clientTLS := startTestProductionGate(t, 1, time.Second)
