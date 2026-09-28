@@ -215,4 +215,6 @@ TestRuntimePacedMultiServiceLoad 已补 8 个真实 Service 共享文件 Logger 
 
 2026-09-28 DebugGate 连接拒绝计数：Agent 构造失败时，Gate 内部创建路径与 HTTP 入口原先各计数一次，一条连接得到 `RejectedConnections=2`。回归测试先复现，再验证构造返回 nil 和 Agent `OnStart` 失败都只计一次；定向测试与 DebugGate 包测试通过。
 
-2026-09-28 Gate Origin 部署约束：生产 Gate 与 DebugGate 的真实 WebSocket 升级测试确认，浏览器式跨主机 `Origin` 收到 HTTP 403，同 Host 的 `Origin` 可以升级；这是当前 WebSocket 库的默认策略，非应用密钥握手错误。RFC 已记录两种 Gate 的 Host 比较限制。两条定向测试及两 Gate 包测试通过；跨域放行策略尚未裁决，未新增配置或放开来源。
+2026-09-28 Gate Origin 部署约束（历史记录，已由下一条裁决取代）：生产 Gate 与 DebugGate 的真实 WebSocket 升级测试确认，浏览器式跨主机 `Origin` 收到 HTTP 403，同 Host 的 `Origin` 可以升级；这是当时 WebSocket 库的默认策略，非应用密钥握手错误。两条定向测试及两 Gate 包测试通过；当时尚未新增配置或放开来源。
+
+2026-09-28 Gate Origin 接入裁决：用户决定不以 `Origin` 作为安全边界，两种 Gate 均显式允许任意来源，保留原生、小程序和 Web 客户端一致的接入语义。业务 token 鉴权仍归 Agent，Echo 示例不声称已实现登录。两条跨主机 Origin 测试先复现旧 403，修改后验证升级成功；生产 Gate 还完成应用密钥握手。两 Gate 包测试通过。

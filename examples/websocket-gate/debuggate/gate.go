@@ -49,7 +49,11 @@ var (
 	errGateStopping  = errors.New("debuggate: Gate is stopping")
 )
 
-var debugUpgrader = websocket.Upgrader{EnableCompression: false}
+var debugUpgrader = websocket.Upgrader{
+	EnableCompression: false,
+	// Origin 不限制原生、小程序和 Web 客户端接入；DebugGate 仍只能部署在受信任网络。
+	CheckOrigin: func(*http.Request) bool { return true },
+}
 
 // ClientSession 是 Gate-Agent 共用的单连接出站能力。
 type ClientSession = gatecontract.ClientSession

@@ -46,7 +46,11 @@ var (
 	errGateStopping  = errors.New("prodgate: Gate is stopping")
 )
 
-var secureUpgrader = websocket.Upgrader{EnableCompression: false}
+var secureUpgrader = websocket.Upgrader{
+	EnableCompression: false,
+	// Origin 不是客户端身份；业务 Agent 仍须显式完成 token 鉴权。
+	CheckOrigin: func(*http.Request) bool { return true },
+}
 
 // ClientSession 是生产 Gate 和 DebugGate 共用的单连接出站能力。
 type ClientSession = gatecontract.ClientSession
