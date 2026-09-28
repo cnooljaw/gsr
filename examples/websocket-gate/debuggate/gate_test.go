@@ -691,6 +691,66 @@ func TestDebugGateLogsAgentCreationFailure(t *testing.T) {
 	}
 }
 
+// TestDebugGateLogsUnsupportedFrameWithoutClientText 验证非二进制帧的诊断不泄露客户端原文。
+func TestDebugGateLogsUnsupportedFrameWithoutClientText(t *testing.T) {
+	var output bytes.Buffer
+	logger, err := logging.New(logging.Config{Writer: &output})
+	if err != nil {
+		t.Fatalf("logging.New() error = %v", err)
+	}
+	t.Cleanup(func() {
+		if err := logger.Close(context.Background()); err != nil {
+			t.Errorf("Logger.Close() error = %v", err)
+		}
+	})
+	local, gate, agents := startTestGateWithLogger(t, 8, 1, logger)
+	connection := dialTestGate(t, gate)
+	defer connection.Close()
+	select {
+	case <-agents:
+	case <-time.After(time.Second):
+		t.Fatal("Gate did not create the connection Agent")
+	}
+	const clientText = "private-client-content-do-not-log"
+	if err := connection.WriteMessage(websocket.TextMessage, []byte(clientText)); err != nil {
+		t.Fatalf("WriteMessage(text) error = %v", err)
+	}
+	if err := connection.SetReadDeadline(time.Now().Add(time.Second)); err != nil {
+		t.Fatalf("SetReadDeadline() error = %v", err)
+	}
+	if _, _, err := connection.ReadMessage(); !websocket.IsCloseError(err, websocket.CloseUnsupportedData) {
+		t.Fatalf("ReadMessage() error = %v, want unsupported data close", err)
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+	if err := logger.Close(context.Background()); err != nil {
+		t.Fatalf("Logger.Close() error = %v", err)
+	}
+	if bytes.Contains(output.Bytes(), []byte(clientText)) {
+		t.Fatal("DebugGate log contains client text")
+	}
+	var matches int
+	for _, line := range bytes.Split(bytes.TrimSpace(output.Bytes()), []byte{'\n'}) {
+		var entry struct {
+			Message string         `json:"message"`
+			Fields  map[string]any `json:"fields"`
+		}
+		if err := json.Unmarshal(line, &entry); err != nil {
+			t.Fatalf("decode log entry: %v", err)
+		}
+		if entry.Message == "DebugGate connection failure" && entry.Fields["category"] == "unsupported_data" {
+			matches++
+			if entry.Fields["close_code"] != float64(websocket.CloseUnsupportedData) {
+				t.Fatalf("close_code = %v, want %d", entry.Fields["close_code"], websocket.CloseUnsupportedData)
+			}
+		}
+	}
+	if matches != 1 {
+		t.Fatalf("unsupported_data logs = %d, want 1", matches)
+	}
+}
+
 // TestDebugGateClosesIdleHTTPConnection 验证未升级的 HTTP keep-alive 连接不会无限占用 socket。
 func TestDebugGateClosesIdleHTTPConnection(t *testing.T) {
 	_, gate, _ := startTestGate(t, 8, 1)
@@ -924,7 +984,12 @@ func (connection *closeErrorTestConn) Close() error {
 
 func startTestGate(t *testing.T, mailboxCapacity, maxConnections int) (*runtime.Runtime, *GateService, <-chan *testAgent) {
 	t.Helper()
-	local, err := runtime.NewRuntime(runtime.Config{MailboxCapacity: mailboxCapacity, ShutdownTimeout: 2 * time.Second})
+	return startTestGateWithLogger(t, mailboxCapacity, maxConnections, nil)
+}
+
+func startTestGateWithLogger(t *testing.T, mailboxCapacity, maxConnections int, logger *logging.Logger) (*runtime.Runtime, *GateService, <-chan *testAgent) {
+	t.Helper()
+	local, err := runtime.NewRuntime(runtime.Config{MailboxCapacity: mailboxCapacity, ShutdownTimeout: 2 * time.Second, Logger: logger})
 	if err != nil {
 		t.Fatalf("NewRuntime() error = %v", err)
 	}
