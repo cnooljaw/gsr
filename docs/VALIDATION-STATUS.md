@@ -63,6 +63,8 @@ GSR_CALL_STABILITY=1 go test ./cluster -run '^TestTCPCallServicePanicAndReplacem
 
 2026-09-15 规模切片：已实际运行现有空闲 Service/Timer 规模测试及固定次数 benchmark，结果见 [本地规模基线](PERFORMANCE-BASELINE.md)。这是单机小样本，不替代持续负载或生产验收；该切片未修改 Go 代码。
 
+2026-09-28 Gate 多慢连接背压样本：`TestProdGateMultipleSlowClientsDoNotBlockHealthyRequests` 在本机以四条不读取数据的客户端和一条健康连接运行 5 秒。四条慢连接均成功写入 12 条后持续遇到有界队列拒绝，健康连接完成 50 次请求/响应；合计 `OutboundQueueFull=19857`，`RejectedConnections=0`、`InboundMailboxFull=0`，五个 Agent 均收到断开通知。定向测试与对应 `-race` 检查通过；这是短时行为验收，不是目标部署容量或长时稳定性结论。
+
 2026-09-22 WebSocket Gate 短时压力切片：在 `GSR_GATE_STRESS=1` 下运行 3 秒慢客户端、16 连接持续发送和 8 轮坏握手/坏 MAC。慢客户端发送 12 条、出站队列满载拒绝 2,976 次；16 连接发送与 Agent 处理均为 4,622 条，`InboundMailboxFull=0`、连接拒绝为 0；失败阶段 8 次全部拒绝且 8 条已认证连接均正常回收。命令为 `GSR_GATE_STRESS_SECONDS=3 GSR_GATE_SLOW_CLIENT_SECONDS=3 GSR_GATE_FAILURE_ATTEMPTS=8 go test ./examples/websocket-gate/prodgate -run '^TestProdGate(LongSlowClientBackpressure|MixedConnectionStress|FailurePhaseStress)$' -count=1 -v`。这是本机短样本，只验证有限队列、连接回收和失败阶段的当前行为，不构成多连接长时容量结论。
 
 同日 30 秒长样本：16 条连接发送与 Agent 处理均为 47,586 条，`InboundMailboxFull=0`、连接拒绝为 0；慢客户端样本先观察到队列满载，随后因写超时关闭连接，`ClientSession.Send` 返回 `ErrClientSessionClosed`，按连接隔离契约计为正常终止，不计为业务错误。
