@@ -321,6 +321,61 @@ func TestDebugGateStopNotifiesHealthyAgentWhileAnotherMailboxIsFull(t *testing.T
 	}
 }
 
+// TestDebugGateStopBoundsPendingDisconnectRetry 验证 Agent Mailbox 满载时 Gate 停机仍按自己的期限完成。
+func TestDebugGateStopBoundsPendingDisconnectRetry(t *testing.T) {
+	release := make(chan struct{})
+	var releaseOnce sync.Once
+	releaseAgent := func() { releaseOnce.Do(func() { close(release) }) }
+	defer releaseAgent()
+	local, gate, _ := startTestGate(t, 1, 1)
+	blocked := &blockingDebugAgent{release: release, started: make(chan struct{}), disconnected: make(chan struct{})}
+	agentID, err := local.CreateService(context.Background(), blocked)
+	if err != nil {
+		t.Fatalf("CreateService(Agent) error = %v", err)
+	}
+	if err := local.DeliverClientMessage(agentID, []byte("active")); err != nil {
+		t.Fatalf("DeliverClientMessage(active) error = %v", err)
+	}
+	select {
+	case <-blocked.started:
+	case <-time.After(time.Second):
+		t.Fatal("Agent 未开始处理第一条消息")
+	}
+	if err := local.DeliverClientMessage(agentID, []byte("queued")); err != nil {
+		t.Fatalf("DeliverClientMessage(queued) error = %v", err)
+	}
+	clientConn := &clientConnection{}
+	gate.agentsByConnection[clientConn] = agentID
+	gate.ioWorkers.Add(1)
+	go func() {
+		defer gate.ioWorkers.Done()
+		gate.notifyDisconnected(gate.serviceID, clientConn)
+	}()
+
+	stopContext, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
+	defer cancel()
+	stopDone := make(chan error, 1)
+	go func() { stopDone <- gate.OnStop(stopContext) }()
+	select {
+	case stopErr := <-stopDone:
+		if !errors.Is(stopErr, context.DeadlineExceeded) {
+			t.Fatalf("Gate.OnStop() error = %v, want deadline exceeded while Agent remains full", stopErr)
+		}
+	case <-time.After(time.Second):
+		releaseAgent()
+		select {
+		case <-stopDone:
+		case <-time.After(time.Second):
+			t.Error("释放 Agent 后 Gate.OnStop() 仍未完成")
+		}
+		t.Fatal("Gate.OnStop() 被连接协程的断开通知重试挡住")
+	}
+	releaseAgent()
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+}
+
 // TestDebugGateStopReportsClientCloseFailure 验证 DebugGate 停机保留每条连接的 Close 帧和 socket 关闭错误。
 func TestDebugGateStopReportsClientCloseFailure(t *testing.T) {
 	closeFailures := []error{

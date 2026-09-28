@@ -386,6 +386,13 @@ func (gate *GateService) notifyDisconnected(serviceID runtime.ServiceID, clientC
 	ticker := time.NewTicker(disconnectRetryInterval)
 	defer ticker.Stop()
 	for {
+		gate.mu.RLock()
+		stopping := gate.stopping
+		gate.mu.RUnlock()
+		if stopping {
+			// 停机后的剩余映射由 OnStop 使用有界 context 统一补发。
+			return
+		}
 		attemptContext, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 		_, err := gate.runtime.Call(attemptContext, serviceID, gateDisconnectCommand, clientConn)
 		cancel()

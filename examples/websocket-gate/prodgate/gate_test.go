@@ -1551,6 +1551,66 @@ func TestProdGateStopNotifiesHealthyAgentWhileAnotherMailboxIsFull(t *testing.T)
 	}
 }
 
+// TestProdGateStopBoundsPendingDisconnectRetry 验证 Agent Mailbox 满载时 Gate 停机仍按自己的期限完成。
+func TestProdGateStopBoundsPendingDisconnectRetry(t *testing.T) {
+	release := make(chan struct{})
+	var releaseOnce sync.Once
+	releaseAgent := func() { releaseOnce.Do(func() { close(release) }) }
+	defer releaseAgent()
+	local, gate := startConfiguredHTTPProductionGate(t, runtime.Config{
+		MailboxCapacity: 1,
+		ShutdownTimeout: time.Second,
+	}, 1, time.Second, 1<<20, 64<<10, func(ClientSession) runtime.Service {
+		return &plainTestAgent{disconnected: make(chan struct{})}
+	})
+	blocked := &blockingInboundAgent{release: release, started: make(chan struct{}), disconnected: make(chan struct{})}
+	agentID, err := local.CreateService(context.Background(), blocked)
+	if err != nil {
+		t.Fatalf("CreateService(Agent) error = %v", err)
+	}
+	if err := local.DeliverClientMessage(agentID, []byte("active")); err != nil {
+		t.Fatalf("DeliverClientMessage(active) error = %v", err)
+	}
+	select {
+	case <-blocked.started:
+	case <-time.After(time.Second):
+		t.Fatal("Agent 未开始处理第一条消息")
+	}
+	if err := local.DeliverClientMessage(agentID, []byte("queued")); err != nil {
+		t.Fatalf("DeliverClientMessage(queued) error = %v", err)
+	}
+	clientConn := &clientConnection{connectionID: 1}
+	gate.agentsByConnection[clientConn] = agentID
+	gate.ioWorkers.Add(1)
+	go func() {
+		defer gate.ioWorkers.Done()
+		gate.notifyDisconnected(gate.serviceID, clientConn)
+	}()
+
+	stopContext, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
+	defer cancel()
+	stopDone := make(chan error, 1)
+	go func() { stopDone <- gate.OnStop(stopContext) }()
+	select {
+	case stopErr := <-stopDone:
+		if !errors.Is(stopErr, context.DeadlineExceeded) {
+			t.Fatalf("Gate.OnStop() error = %v, want deadline exceeded while Agent remains full", stopErr)
+		}
+	case <-time.After(time.Second):
+		releaseAgent()
+		select {
+		case <-stopDone:
+		case <-time.After(time.Second):
+			t.Error("释放 Agent 后 Gate.OnStop() 仍未完成")
+		}
+		t.Fatal("Gate.OnStop() 被连接协程的断开通知重试挡住")
+	}
+	releaseAgent()
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+}
+
 // TestProdGateReportsOutboundQueueFull 验证 Agent 的 ClientSession 在出站队列不足时返回稳定错误并累计计数。
 func TestProdGateReportsOutboundQueueFull(t *testing.T) {
 	agents := make(chan *burstOutboundAgent, 1)
