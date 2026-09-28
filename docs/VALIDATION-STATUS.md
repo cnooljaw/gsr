@@ -242,3 +242,5 @@ TestRuntimePacedMultiServiceLoad 已补 8 个真实 Service 共享文件 Logger 
 2026-09-28 生产 Gate 的 HTTP/TLS 内部日志收口：真实坏 TLS 首包先复现 `net/http` 将握手错误写到标准日志、共享 Logger 没有对应记录；现通过 `http.Server.ErrorLog` 将安全的错误类别写入 Gate 来源绑定的共享 Logger，未配置 Logger 时标准错误也只输出类别。适配器不转录原始错误行，合成 panic 文本测试确认未认证内容不会出现在结构化日志。定向测试、生产 Gate 包测试和定向 race 测试通过；本轮未改 DebugGate 的 `net/http` 内部日志入口。
 
 2026-09-28 DebugGate 的 HTTP 内部日志入口：测试先确认其 `http.Server.ErrorLog` 为空；现与生产 Gate 共用安全类别适配器，保持各自 Gate 来源绑定。定向测试覆盖 DebugGate 的接线与敏感文本过滤，并复验生产 Gate 的真实坏 TLS 首包和合成 panic 文本。两种 Gate 的受影响包测试通过；本轮未改变业务或客户端帧协议。
+
+2026-09-28 无共享 Logger 的 Gate HTTP 内部日志：共用适配器的定向测试覆盖 TLS、Accept、Handler panic 和未知错误类别；Go 标准日志中只保留类别，不包含测试中的未认证原文。文档澄清标准日志默认写标准错误，但可由宿主重定向；本轮不改变生产实现。
