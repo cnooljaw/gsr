@@ -472,13 +472,7 @@ func TestDebugGateDeliversExistingClientFramesWhileCreatingAnotherAgent(t *testi
 		return &testAgent{client: client, disconnected: make(chan struct{})}
 	}
 
-	secondConnection := &clientConnection{
-		maxFrame: gate.config.MaxFrameBytes,
-		maxQueue: gate.config.MaxOutboundQueueBytes,
-		counters: &gate.counters,
-		wake:     make(chan struct{}, 1),
-		closedCh: make(chan struct{}),
-	}
+	secondConnection := newClientConnection(nil, gate.config.MaxFrameBytes, gate.config.MaxOutboundQueueBytes, &gate.counters)
 	connectResult := make(chan error, 1)
 	go func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
@@ -697,13 +691,7 @@ func TestNewGateServiceRejectsPublicAndUnboundedConfig(t *testing.T) {
 
 // TestClientSessionBoundsOutboundQueue 验证序列化帧和队列条目开销合计不能超过出站字节上限。
 func TestClientSessionBoundsOutboundQueue(t *testing.T) {
-	client := &clientConnection{
-		maxFrame: 128,
-		maxQueue: queueEntryOverhead + 2,
-		counters: &gateCounters{},
-		wake:     make(chan struct{}, 1),
-		closedCh: make(chan struct{}),
-	}
+	client := newClientConnection(nil, 128, queueEntryOverhead+2, &gateCounters{})
 	envelope := &Envelope{MsgId: 1}
 	if err := client.Send(envelope); err != nil {
 		t.Fatalf("Send(first) error = %v", err)

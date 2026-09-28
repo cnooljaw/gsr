@@ -122,7 +122,7 @@ enum MsgId {
 - 两者使用不同监听器、端口和显式配置；生产 Gate 不自动降级到 DebugGate，DebugGate 也不根据首包猜测生产格式。DebugGate 默认关闭，启用时应绑定回环地址或明确的内网地址，并由部署防火墙限制访问。
 - DebugGate 没有应用层认证和防重放保证，不能暴露到公网，也不能被当作生产安全模式。业务鉴权仍由 Agent/业务 Service 负责。
 - 两个 Gate 共享 Agent 业务处理逻辑；帧接收和安全校验属于各自适配器。Gate 不解码或分发业务 payload。
-- 两个接入入口保留各自的监听、握手、帧验证、容量和日志行为；相同的 Agent 构造保护、断线重试与停机补发放在示例内部的 `gatecommon`，不以模式开关合并成一个 Gate。
+- 两个接入入口保留各自的监听、握手、帧验证、容量计数和日志行为；相同的 Agent 构造保护、断线重试、停机补发，以及单连接有界出站队列、写循环和关闭机制放在示例内部的 `gatecommon`，不以模式开关合并成一个 Gate。
 
 `examples/websocket-gate/debuggate` 已实现本地示例闭环：`NewGateService` 显式接收底层 `*runtime.Runtime`，应用通过 `Runtime.CreateService` 启动它；这只是示例组装方式，不扩展 `gsr.Run`、Core 或业务 `ServiceContext`。Gate 只监听字面回环/私有 IP 的 `/ws`，每个连接由 Gate runner 调用 `NewAgent` 创建一个 Agent。创建返回的 AgentID 绑定到该连接，读循环直接调用 `Runtime.DeliverClientMessage` 投递不透明 Envelope 字节，不逐帧经过 Gate Mailbox；Gate runner 中的连接到 Agent 映射只用于断开通知。`ClientSession.Send(Envelope)` 将响应放入有界队列，再由唯一写循环发回。此处 `ClientSession` 表示客户端连接的写回能力，不是 Core `SessionID` 或 Envelope 的 `request_id`。DebugGate 显式限制连接数、帧大小和每连接出站队列，默认帧上限为 4 MiB。出站队列按序列化 Envelope 字节数加每项固定 64 字节队列开销计费，避免空帧或很多小帧绕过内存上限；正在写出的单帧另受 `MaxFrameBytes` 限制。集成测试覆盖请求/响应 request_id、连接上限、正常断开通知、Agent 创建期间既有连接继续收帧和 Runtime 关闭时连接回收。`examples/websocket-gate` 另提供独立 Echo Agent、Go DebugGate 服务端和 TypeScript CLI；通用 Envelope 与 Echo 业务消息分别定义在 `.proto` 文件中，Go 与 TypeScript 使用同一组协议源生成类型并完成真实请求/响应往返。Go Agent 从生成目录解码 Envelope，再通过手动注册的强类型 Echo Handler 响应；未实现的协议消息无需占位 Handler。示例仍不是稳定生产 API；DebugGate 没有 TLS、生产握手或 MAC，完整共享结构化日志接线仍待实现。
 

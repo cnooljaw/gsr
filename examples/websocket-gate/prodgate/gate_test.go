@@ -3045,13 +3045,7 @@ func TestProdGateListenFailureLeavesRuntimeAvailable(t *testing.T) {
 
 // TestClientSessionBoundsOutboundQueue 验证生产 ClientSession 按帧字节和固定条目开销限制出站队列。
 func TestClientSessionBoundsOutboundQueue(t *testing.T) {
-	client := &clientConnection{
-		maxFrame: 128,
-		maxQueue: queueEntryOverhead + 2,
-		counters: &gateCounters{},
-		wake:     make(chan struct{}, 1),
-		closedCh: make(chan struct{}),
-	}
+	client := newClientConnection(nil, 128, queueEntryOverhead+2, &gateCounters{}, 0)
 	envelope := &Envelope{MsgId: 1}
 	if err := client.Send(envelope); err != nil {
 		t.Fatalf("Send(first) error = %v", err)

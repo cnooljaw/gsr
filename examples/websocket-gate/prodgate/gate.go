@@ -27,7 +27,7 @@ const (
 	defaultAgentStartWait                         = 5 * time.Second
 	defaultWriteWait                              = 10 * time.Second
 	closeFrameWait                                = 100 * time.Millisecond
-	queueEntryOverhead                            = 64
+	queueEntryOverhead                            = gatecommon.QueueEntryOverhead
 	gateConnectCommand          runtime.CommandID = 0xffff_ff00
 	gateDisconnectCommand       runtime.CommandID = 0xffff_ff01
 	websocketHandshakeCloseCode                   = websocket.ClosePolicyViolation
@@ -414,7 +414,7 @@ func (gate *GateService) ServeHTTP(writer http.ResponseWriter, request *http.Req
 		}
 		if err := gate.deliverAuthenticatedFrame(agentID, clientConn, authenticator, frame); err != nil {
 			if errors.Is(err, errGateStopping) {
-				<-clientConn.closedCh
+				<-clientConn.outbound.Done()
 			}
 			return
 		}
@@ -474,7 +474,7 @@ func (gate *GateService) performHandshake(clientConn *clientConnection) (*client
 		}
 		return nil, err
 	}
-	if err := setWebSocketWriteDeadline(connection, time.Now().Add(defaultWriteWait)); err != nil {
+	if err := gatecommon.SetWebSocketWriteDeadline(connection, time.Now().Add(defaultWriteWait)); err != nil {
 		gate.logConnectionFailure(clientConn, "handshake_write", websocket.CloseInternalServerErr, err)
 		clientConn.closeWith(websocket.CloseInternalServerErr, "server_error", time.Now().Add(closeFrameWait))
 		return nil, err

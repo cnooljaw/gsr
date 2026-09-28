@@ -24,7 +24,7 @@ const (
 	defaultWriteWait      = 10 * time.Second
 	closeFrameWait        = 100 * time.Millisecond
 
-	queueEntryOverhead = 64
+	queueEntryOverhead = gatecommon.QueueEntryOverhead
 )
 
 // Gate Service 的命令只处理连接建立和断开；客户端帧直接投递给 Agent。
@@ -362,7 +362,7 @@ func (gate *GateService) ServeHTTP(writer http.ResponseWriter, request *http.Req
 		}
 		if err := gate.deliverClientMessage(agentID, frame); err != nil {
 			if errors.Is(err, errGateStopping) {
-				<-clientConn.closedCh
+				<-clientConn.outbound.Done()
 				return
 			}
 			if errors.Is(err, runtime.ErrMailboxFull) {
