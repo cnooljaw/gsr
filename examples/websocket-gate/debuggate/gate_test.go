@@ -577,6 +577,35 @@ func TestDebugGateRejectsConnectionAboveLimit(t *testing.T) {
 	}
 }
 
+// TestDebugGateCountsAgentCreationRejectionOnce 验证一次 Agent 创建失败只计入一条被拒绝连接。
+func TestDebugGateCountsAgentCreationRejectionOnce(t *testing.T) {
+	for _, test := range []struct {
+		name     string
+		newAgent func(ClientSession) runtime.Service
+	}{
+		{name: "constructor returns nil", newAgent: func(ClientSession) runtime.Service { return nil }},
+		{name: "Agent start fails", newAgent: func(ClientSession) runtime.Service {
+			return &testAgent{startErr: errors.New("start failed")}
+		}},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			_, gate, _ := startTestGate(t, 8, 1)
+			gate.config.NewAgent = test.newAgent
+			connection := dialTestGate(t, gate)
+			defer connection.Close()
+			if err := connection.SetReadDeadline(time.Now().Add(time.Second)); err != nil {
+				t.Fatalf("SetReadDeadline() error = %v", err)
+			}
+			if _, _, err := connection.ReadMessage(); !websocket.IsCloseError(err, websocket.CloseInternalServerErr) {
+				t.Fatalf("ReadMessage() error = %v, want WebSocket close %d", err, websocket.CloseInternalServerErr)
+			}
+			if got := gate.Metrics().RejectedConnections; got != 1 {
+				t.Fatalf("RejectedConnections = %d, want 1", got)
+			}
+		})
+	}
+}
+
 // TestDebugGateClosesIdleHTTPConnection 验证未升级的 HTTP keep-alive 连接不会无限占用 socket。
 func TestDebugGateClosesIdleHTTPConnection(t *testing.T) {
 	_, gate, _ := startTestGate(t, 8, 1)
@@ -675,9 +704,10 @@ type testAgent struct {
 	client       ClientSession
 	disconnected chan struct{}
 	once         sync.Once
+	startErr     error
 }
 
-func (*testAgent) OnStart(context.Context, runtime.ServiceContext) error { return nil }
+func (agent *testAgent) OnStart(context.Context, runtime.ServiceContext) error { return agent.startErr }
 
 func (agent *testAgent) Handle(commandContext runtime.CommandContext, command runtime.CommandID, _ ...any) (any, error) {
 	if command != ClientDisconnectedCommand {

@@ -200,14 +200,12 @@ func (gate *GateService) Handle(self runtime.CommandContext, command runtime.Com
 		}
 		agent, err := createAgent(gate.config.NewAgent, clientConn)
 		if err != nil {
-			gate.counters.rejectedConnections.Add(1)
 			return nil, err
 		}
 		startContext, cancel := context.WithTimeout(context.Background(), defaultAgentStartWait)
 		defer cancel()
 		agentID, err := self.CreateService(startContext, agent)
 		if err != nil {
-			gate.counters.rejectedConnections.Add(1)
 			return nil, fmt.Errorf("debuggate: create Agent: %w", err)
 		}
 		gate.agentsByConnection[clientConn] = agentID

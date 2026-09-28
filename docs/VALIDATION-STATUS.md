@@ -212,3 +212,5 @@ TestRuntimePacedMultiServiceLoad 已补 8 个真实 Service 共享文件 Logger 
 2026-09-28 DebugGate HTTP 空闲连接回收：真实 TCP 回归测试先确认 404 后的 keep-alive 连接超过 5 秒仍不关闭，再验证设置 5 秒 idle timeout 后按时关闭。定向测试与 `go test ./examples/websocket-gate/debuggate` 通过。DebugGate 的 `MaxConnections` 只统计进入 `/ws` GET Handler 的连接，仍不限制原始 TCP 接纳数；它只供受信任环境调试。
 
 2026-09-28 Gate 停机断线通知交接：两种 Gate 的连接处理协程原先在 Agent Mailbox 满载时无限重试断线通知，`OnStop` 等待协程退出便可能越过自身 context 期限。两条受控测试先复现该阻塞；现在停机标记生效后连接协程结束重试，由 `OnStop` 对剩余映射按有界上下文补发。定向测试、两 Gate 包全测及对应包的 race 测试均通过；满载 Agent 在期限内仍不接纳时，`OnStop` 按预期返回 deadline 错误。
+
+2026-09-28 DebugGate 连接拒绝计数：Agent 构造失败时，Gate 内部创建路径与 HTTP 入口原先各计数一次，一条连接得到 `RejectedConnections=2`。回归测试先复现，再验证构造返回 nil 和 Agent `OnStart` 失败都只计一次；定向测试与 DebugGate 包测试通过。
