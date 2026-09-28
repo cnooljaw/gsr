@@ -959,6 +959,72 @@ func TestProdGateCapacityRejectionSurvivesClosedLogger(t *testing.T) {
 	}
 }
 
+// TestProdGateCapacityRejectionsKeepExistingClientResponsive 验证握手前容量拒绝不会阻塞已接纳连接的业务往返。
+func TestProdGateCapacityRejectionsKeepExistingClientResponsive(t *testing.T) {
+	const (
+		rounds          = 4
+		rejectsPerRound = 4
+	)
+	local, gate, agents, clientTLS := startTestProductionGate(t, 1, time.Second)
+	connection, macKey := dialAuthenticatedTestClient(t, gate, clientTLS)
+	defer connection.Close()
+	agent := receiveProductionAgent(t, agents)
+
+	for round := 0; round < rounds; round++ {
+		for attempt := 0; attempt < rejectsPerRound; attempt++ {
+			extra, err := net.DialTimeout("tcp", gate.Addr().String(), time.Second)
+			if err != nil {
+				t.Fatalf("Dial(over-capacity %d/%d) error = %v", round, attempt, err)
+			}
+			if err := extra.Close(); err != nil {
+				t.Fatalf("Close(over-capacity %d/%d) error = %v", round, attempt, err)
+			}
+		}
+		wantRejected := uint64((round + 1) * rejectsPerRound)
+		waitForGateMetric(t, gate, "RejectedConnections", func(metrics Metrics) uint64 {
+			return metrics.RejectedConnections
+		}, wantRejected)
+
+		requestID := uint32(round + 1)
+		requestBytes, err := proto.Marshal(&commonv1.Envelope{MsgId: 1001, RequestId: requestID})
+		if err != nil {
+			t.Fatalf("marshal request %d: %v", round, err)
+		}
+		frame := makeAuthenticatedTestFrame(t, macKey[:], uint64(round+1), requestBytes)
+		if err := connection.WriteMessage(websocket.BinaryMessage, frame); err != nil {
+			t.Fatalf("WriteMessage(request %d) error = %v", round, err)
+		}
+		_, responseBytes, err := readTestBinaryMessage(t, connection)
+		if err != nil {
+			t.Fatalf("ReadMessage(response %d) error = %v", round, err)
+		}
+		var response commonv1.Envelope
+		if err := proto.Unmarshal(responseBytes, &response); err != nil {
+			t.Fatalf("unmarshal response %d: %v", round, err)
+		}
+		if response.GetMsgId() != 1002 || response.GetRequestId() != requestID {
+			t.Fatalf("response %d = msg_id %d, request_id %d", round, response.GetMsgId(), response.GetRequestId())
+		}
+		select {
+		case delivered := <-agent.received:
+			if !bytes.Equal(delivered, requestBytes) {
+				t.Fatalf("Agent request %d = %x, want %x", round, delivered, requestBytes)
+			}
+		case <-time.After(time.Second):
+			t.Fatalf("Agent did not receive request %d", round)
+		}
+	}
+	if got := gate.Metrics().AcceptedConnections; got != 1 {
+		t.Fatalf("AcceptedConnections = %d, want 1", got)
+	}
+	if got := gate.Metrics().InboundMailboxFull; got != 0 {
+		t.Fatalf("InboundMailboxFull = %d, want 0", got)
+	}
+	if err := local.Stop(context.Background()); err != nil {
+		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+}
+
 // TestProdGateSuppressesRepeatedConnectionFailures 验证同一连接同一类别只记录首条故障，并在结束时记录抑制数量。
 func TestProdGateSuppressesRepeatedConnectionFailures(t *testing.T) {
 	var output bytes.Buffer
