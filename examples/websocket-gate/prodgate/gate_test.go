@@ -1,6 +1,7 @@
 package prodgate
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"crypto/ecdh"
@@ -10,6 +11,7 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"errors"
+	"io"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -170,6 +172,49 @@ func TestProdGateSupportsIngressTerminatedTLS(t *testing.T) {
 	}
 	if response.GetMsgId() != 1002 || response.GetRequestId() != 7 {
 		t.Fatalf("response = msg_id %d, request_id %d; want 1002, 7", response.GetMsgId(), response.GetRequestId())
+	}
+}
+
+// TestProdGateClosesIdleNonWebSocketHTTPConnections 验证普通 HTTP 请求的 keep-alive 空闲连接会超时释放 Gate 容量。
+func TestProdGateClosesIdleNonWebSocketHTTPConnections(t *testing.T) {
+	_, gate := startConfiguredHTTPProductionGate(t, runtime.Config{
+		MailboxCapacity: 8,
+		ShutdownTimeout: 2 * time.Second,
+	}, 1, time.Second, 1<<20, 64<<10, func(ClientSession) runtime.Service {
+		return &plainTestAgent{disconnected: make(chan struct{})}
+	})
+
+	connection, err := net.Dial("tcp", gate.Addr().String())
+	if err != nil {
+		t.Fatalf("Dial(Gate) error = %v", err)
+	}
+	defer connection.Close()
+	request, err := http.NewRequest(http.MethodGet, "http://"+gate.Addr().String()+"/not-ws", nil)
+	if err != nil {
+		t.Fatalf("NewRequest() error = %v", err)
+	}
+	if err := request.Write(connection); err != nil {
+		t.Fatalf("Write(HTTP request) error = %v", err)
+	}
+	reader := bufio.NewReader(connection)
+	response, err := http.ReadResponse(reader, request)
+	if err != nil {
+		t.Fatalf("ReadResponse() error = %v", err)
+	}
+	if response.StatusCode != http.StatusNotFound || response.Close {
+		t.Fatalf("HTTP response = status %d, close %t; want 404 with keep-alive", response.StatusCode, response.Close)
+	}
+	if _, err := io.Copy(io.Discard, response.Body); err != nil {
+		t.Fatalf("drain HTTP response body: %v", err)
+	}
+	if err := response.Body.Close(); err != nil {
+		t.Fatalf("Close(HTTP response body) error = %v", err)
+	}
+	if err := connection.SetReadDeadline(time.Now().Add(defaultHTTPIdleTimeout + time.Second)); err != nil {
+		t.Fatalf("SetReadDeadline() error = %v", err)
+	}
+	if _, err := reader.ReadByte(); !errors.Is(err, io.EOF) {
+		t.Fatalf("idle HTTP connection read error = %v, want EOF after the idle timeout", err)
 	}
 }
 

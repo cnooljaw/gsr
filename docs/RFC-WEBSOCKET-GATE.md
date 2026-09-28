@@ -188,7 +188,7 @@ message ErrorResponse {
 - 握手失败直接关闭连接，不进入 Agent，也不发送业务 ErrorResponse；握手成功后双方才启用派生的 macKey。
 - 必须设置消息大小、握手等待和接纳容量上限；具体初始值与零值语义见“已确认：Gate 容量与关闭顺序”，Protobuf 不意味着无限消息大小。
 
-当前实现位于 `examples/websocket-gate/prodgate/`：Gate 在 HTTP/WebSocket Handler 前限制已接纳 TCP 连接数；`TLSConfig` 非空时启动直连 WSS Listener，为 nil 时启动供 Ingress 转发的普通 HTTP WebSocket Listener。首个二进制 WebSocket 消息必须是固定 33 字节握手，完成 X25519 握手后，逐帧校验 MAC 和递增 seq，再将原始 Envelope 字节直接交给目标 Agent 的 `Runtime.DeliverClientMessage`。Agent 的响应通过每连接有界队列进入唯一 WebSocket 写循环。生产 Gate 从 Runtime 借用同一 Logger 并绑定自身 ServiceID；同一连接同一错误类别只记录首条，关闭时补充抑制数量，不记录密钥、MAC 或原始载荷。生产 Gate 与 DebugGate 仍使用不同监听器和显式配置，不会根据首包自动降级。端到端测试覆盖直连 TLS、Ingress 终止 TLS 后的普通 WebSocket、握手与业务帧往返、错误 MAC 拒绝、首帧超时、握手前连接上限与断开后名额回收、Mailbox/出站队列满载、基础慢客户端背压、短时多连接并发及 Runtime 关闭回收；这不替代密码协议审查或慢客户端长时压力验收。
+当前实现位于 `examples/websocket-gate/prodgate/`：Gate 在 HTTP/WebSocket Handler 前限制已接纳 TCP 连接数；HTTP 请求头和普通 keep-alive 空闲连接有 5 秒超时，避免未升级连接长期占用名额。`TLSConfig` 非空时启动直连 WSS Listener，为 nil 时启动供 Ingress 转发的普通 HTTP WebSocket Listener。首个二进制 WebSocket 消息必须是固定 33 字节握手，完成 X25519 握手后，逐帧校验 MAC 和递增 seq，再将原始 Envelope 字节直接交给目标 Agent 的 `Runtime.DeliverClientMessage`。Agent 的响应通过每连接有界队列进入唯一 WebSocket 写循环。生产 Gate 从 Runtime 借用同一 Logger 并绑定自身 ServiceID；同一连接同一错误类别只记录首条，关闭时补充抑制数量，不记录密钥、MAC 或原始载荷。生产 Gate 与 DebugGate 仍使用不同监听器和显式配置，不会根据首包自动降级。端到端测试覆盖直连 TLS、Ingress 终止 TLS 后的普通 WebSocket、握手与业务帧往返、错误 MAC 拒绝、首帧超时、握手前连接上限与断开后名额回收、Mailbox/出站队列满载、基础慢客户端背压、短时多连接并发及 Runtime 关闭回收；这不替代密码协议审查或慢客户端长时压力验收。
 
 已确认的密码参数：
 
@@ -314,6 +314,7 @@ Gate 只设置四类资源上限：最大连接数、握手最长等待、单条
 - `MaxFrameBytes` 默认 `4 MiB`，按完整 WebSocket 二进制消息计算；生产消息包含 8 字节 seq、Envelope 和 16 字节 MAC，DebugGate 消息包含完整 Envelope。
 - 生产 Gate 的 `MaxFrameBytes` 不得小于固定 33 字节密钥握手帧；更小的值会使所有生产客户端握手都无法成功，因此在创建 Gate 时直接拒绝。
 - `MaxConnections` 必须由每个部署显式配置为正数；零值不表示无限连接，GSR 不替所有部署猜一个默认连接数。
+- Gate 的普通 HTTP 请求头和非 WebSocket keep-alive 空闲连接都受 5 秒超时约束，避免访问其它路径的 HTTP 客户端长期占用连接名额；升级后的 WebSocket 连接不受 HTTP idle timeout 影响。
 - 出站队列按编码后应用消息的字节数及每项固定队列开销计费，而不是按消息条数限制；慢客户端不能仅靠大量小消息或空消息绕过内存上限。DebugGate 示例当前固定收取 64 字节条目开销，部署需配置至少 64 字节队列容量。
 - 入站继续复用 Agent 的 Runtime Mailbox 容量。达到上限时不建立第二个无限队列，当前连接停止接纳并关闭；出站队列满只返回稳定的 `ErrClientQueueFull`。
 - 慢客户端的写循环受 `defaultWriteWait` 限制；底层写超时或 I/O 失败时只关闭当前连接，后续 Agent 写回得到 `ErrClientSessionClosed`。这属于连接资源隔离，不把已关闭连接误报成业务 Handler 错误，也不改变其它连接。

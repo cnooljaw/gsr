@@ -206,3 +206,5 @@ TestRuntimePacedMultiServiceLoad 已补 8 个真实 Service 共享文件 Logger 
 2026-09-25 Gate 停机入站屏障：客户端帧接纳现在与 Gate 的停机状态切换共享读写锁；停机标记生效后，生产 Gate 与 DebugGate 都拒绝继续投递帧，避免逐条关闭连接期间仍有新消息进入 Agent Mailbox。两个定向测试、两包全量测试及仓库级 `go test -race ./...` 均通过。
 
 2026-09-25 生产 Gate 握手帧配置下限：配置的 `MaxFrameBytes` 小于 33 字节时无法容纳固定客户端握手帧；`NewGateService` 现在在启动前返回 `ErrInvalidConfig`，并增加边界测试覆盖 32 字节拒绝、33 字节接受。定向测试和 prodgate 全包测试通过。
+
+2026-09-28 Gate HTTP 空闲连接回收：普通 HTTP 请求返回 404/405 后，keep-alive 连接此前可能无限占住 `MaxConnections` 名额。生产 Gate 为未升级 HTTP 连接设置 5 秒 idle timeout；新增真实 TCP 测试确认 404 响应仍可 keep-alive，随后连接按时关闭。定向测试与 `go test ./examples/websocket-gate/prodgate` 通过；WebSocket 升级连接不受该 idle timeout 影响。

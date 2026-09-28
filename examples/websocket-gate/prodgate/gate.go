@@ -23,6 +23,7 @@ const (
 	defaultMaxFrameBytes                          = 4 << 20
 	defaultHandshakeTimeout                       = 5 * time.Second
 	defaultReadHeaderTimeout                      = 5 * time.Second
+	defaultHTTPIdleTimeout                        = 5 * time.Second
 	defaultAgentStartWait                         = 5 * time.Second
 	disconnectRetryInterval                       = 5 * time.Millisecond
 	defaultWriteWait                              = 10 * time.Second
@@ -186,7 +187,11 @@ func (gate *GateService) OnStart(_ context.Context, self runtime.ServiceContext)
 	limitedListener := newConnectionLimitListener(listener, gate.config.MaxConnections, func() {
 		gate.counters.rejectedConnections.Add(1)
 	})
-	server := &http.Server{Handler: gate, ReadHeaderTimeout: defaultReadHeaderTimeout}
+	server := &http.Server{
+		Handler:           gate,
+		ReadHeaderTimeout: defaultReadHeaderTimeout,
+		IdleTimeout:       defaultHTTPIdleTimeout,
+	}
 	if gate.config.TLSConfig != nil {
 		server.TLSConfig = gate.config.TLSConfig.Clone()
 	}
