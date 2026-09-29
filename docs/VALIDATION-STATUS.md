@@ -43,6 +43,7 @@ Counter 入口统一切片：最小本地示例也改用 gsr.Run 和应用层 Se
 | 坏帧、超限与残帧隔离 | [协议故障](../cluster/open_protocol_test.go)、[响应读取](../cluster/response_reader_test.go) | 合法后续调用继续运行；不可恢复帧边界关闭连接，不把残帧送入 Handler |
 | 重复坏帧诊断与日志 | [双连接日志](../cluster/open_logging_test.go)、[入站连接](../cluster/inbound_connection_test.go) | 每连接同类首条、抑制计数和结束汇总；不是全局限流或可靠审计 |
 | FIFO 日志、文件滚动及失败收尾 | [日志顺序](../logging/logger_test.go)、[文件](../logging/file_test.go)、[输出器生命周期](../logging/writer_lifecycle_test.go) | 覆盖短写、Flush 故障、保留历史和借用所有权；不保证 fsync、磁盘崩溃恢复或云端收到 |
+| Service 内 MySQL 产品 CRUD 示例 | [业务 Service 测试](../examples/mysql-product/service_test.go)、[入口与可选真实 MySQL 测试](../examples/mysql-product/main_test.go) | 默认使用 SQL mock；显式启用的本机专用库测试已完成真实驱动的创建、查询、更新和删除，不覆盖生产部署、并发库存一致性或断线后写入结果判定 |
 
 ## 当前检查结果
 
