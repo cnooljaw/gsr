@@ -10,7 +10,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 )
 
-// TestProductExampleRunsThroughService 验证可运行入口创建业务 Service 并完成一次产品 CRUD，而不在 main 中执行 SQL。
+// TestProductExampleRunsThroughService 验证入口通过业务 Service 完成产品 CRUD，成功路径不再故意查询已删除的记录。
 func TestProductExampleRunsThroughService(t *testing.T) {
 	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	if err != nil {
@@ -29,8 +29,6 @@ func TestProductExampleRunsThroughService(t *testing.T) {
 		AddRow(int64(42), "高级药水", int64(299), int64(8)))
 	mock.ExpectExec("DELETE FROM products WHERE id = ?").
 		WithArgs(int64(42)).WillReturnResult(sqlmock.NewResult(0, 1))
-	mock.ExpectQuery("SELECT id, name, price_cents, stock FROM products WHERE id = ?").
-		WithArgs(int64(42)).WillReturnRows(sqlmock.NewRows([]string{"id", "name", "price_cents", "stock"}))
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	var output bytes.Buffer

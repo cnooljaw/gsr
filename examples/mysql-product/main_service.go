@@ -60,9 +60,6 @@ func (service *productMainService) OnStart(ctx context.Context, self gsr.Service
 	if _, err := self.Call(ctx, id, deleteProductCommand, created.ID); err != nil {
 		return err
 	}
-	if value, err := self.Call(ctx, id, getProductCommand, created.ID); value != nil || !errors.Is(err, errProductNotFound) {
-		return fmt.Errorf("verify product deletion = %v, %v; want not found", value, err)
-	}
 	if _, err := fmt.Fprintf(service.output, "product %d: create/read/update/delete ok\n", created.ID); err != nil {
 		return err
 	}
