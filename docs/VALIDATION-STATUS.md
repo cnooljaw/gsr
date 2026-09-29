@@ -1,6 +1,6 @@
 # 当前阶段验证清单
 
-本清单整理 Core、Cluster 与日志当前已有的验证证据，不替代 API 契约，也不表示生产发布或兼容性冻结。实施路线图保留各轮历史切片；判断当前覆盖范围时先看这里，再进入对应测试。
+本清单整理 Core、Cluster、日志及已落地外围示例的验证证据，不替代 API 契约，也不表示生产发布或兼容性冻结。实施路线图保留各轮历史切片；判断当前覆盖范围时先看这里，再进入对应测试。
 
 ## 已覆盖的运行链
 
@@ -44,6 +44,9 @@ Counter 入口统一切片：最小本地示例也改用 gsr.Run 和应用层 Se
 | 重复坏帧诊断与日志 | [双连接日志](../cluster/open_logging_test.go)、[入站连接](../cluster/inbound_connection_test.go) | 每连接同类首条、抑制计数和结束汇总；不是全局限流或可靠审计 |
 | FIFO 日志、文件滚动及失败收尾 | [日志顺序](../logging/logger_test.go)、[文件](../logging/file_test.go)、[输出器生命周期](../logging/writer_lifecycle_test.go) | 覆盖短写、Flush 故障、保留历史和借用所有权；不保证 fsync、磁盘崩溃恢复或云端收到 |
 | Service 内 MySQL 产品 CRUD 示例 | [业务 Service 测试](../examples/mysql-product/service_test.go)、[入口与可选真实 MySQL 测试](../examples/mysql-product/main_test.go) | 默认使用 SQL mock；显式启用的本机专用库测试已完成真实驱动的创建、查询、更新和删除，不覆盖生产部署、并发库存一致性或断线后写入结果判定 |
+| Service 内 Redis Hash 缓存示例 | [缓存测试](../examples/redis-user-cache/cache_test.go)、[业务 Service 测试](../examples/redis-user-cache/service_test.go) | 使用自动启动的本机临时 Redis 验证 Hash、TTL、故障和 Service 隔离；缓存不是权威数据源，不覆盖跨节点一致性 |
+| Service 内 HTTP 出站示例 | [资料刷新测试](../examples/http-outbound/service_test.go) | 使用本机测试 HTTP 服务验证有界等待、错误映射和状态保留；不覆盖真实第三方服务或自动重试策略 |
+| 基础设施 HTTP 入站示例 | [房间人数接口测试](../examples/http-inbound/handler_test.go) | 使用本机测试 HTTP 服务验证只读查询、有界 Call 和安全错误响应；不提供认证、监听生命周期或公网接入能力 |
 
 ## 当前检查结果
 
