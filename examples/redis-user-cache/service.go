@@ -1,4 +1,4 @@
-package redisusercache
+package main
 
 import (
 	"context"

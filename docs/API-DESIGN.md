@@ -81,7 +81,7 @@ Skynet 的接口形状是 API 设计的重要参照，但 GSR 的具体契约由
 
 - 需要独立状态、异步处理、排队背压、串行执行或独立生命周期的功能，优先考虑 Service；还须确认其启动、停止、排队与故障语义适合由 Runtime 管理。
 - 普通计算、编码和工具函数直接调用，不为分类而包装成 JsonService、RuleService 等。
-- Redis、HTTP 等 I/O 可以直接调用，但必须设置有限超时，并接受等待期间当前 Service 不处理后续消息；不能接受时，再考虑独立 Service 或职责明确的有界外部 worker，不因依赖某项技术就自动 Service 化。用户信息 Redis Hash 缓存的最小示例见 [`examples/redis-user-cache`](../examples/redis-user-cache/README.md)，缓存对象不是 Service，也不改变权威数据归属。
+- Redis、HTTP 等 I/O 可以直接调用，但必须设置有限超时，并接受等待期间当前 Service 不处理后续消息；不能接受时，再考虑独立 Service 或职责明确的有界外部 worker，不因依赖某项技术就自动 Service 化。用户信息 Redis Hash 缓存的可运行 Service 示例见 [`examples/redis-user-cache`](../examples/redis-user-cache/README.md)，缓存对象不是 Service，也不改变权威数据归属。
 - Service 提供运行边界，不等于进程级隔离，也不能强杀阻塞代码；状态所有权与禁止业务自行启动 goroutine 的规则不变。
 - 为 Runtime 自身提供启动、收尾或故障支撑的基础设施，若普通 Service 不能满足其生命周期，可以保留职责明确、数量有界的独立运行组件。例外必须说明具体原因，并负责取消、关闭、等待、并发上限、panic 与错误归属，不能成为随意自建运行框架的理由。
 - 通用能力优先通过组合和窄能力接口提供，不建立继承式的公开基类；尤其不要用不断增长的 `BaseAgent`、`BaseService` 承载不同业务的协议和生命周期。只有真实的多实现、测试隔离或边界依赖倒置需要时，才提取接口。

@@ -1,4 +1,4 @@
-package redisusercache
+package main
 
 import (
 	"context"
@@ -82,5 +82,5 @@ func (cache *userHashCache) Get(ctx context.Context, id uint64) (userInfo, bool,
 }
 
 func userHashKey(id uint64) string {
-	return "user:" + strconv.FormatUint(id, 10)
+	return "gsr:example:user:" + strconv.FormatUint(id, 10)
 }
