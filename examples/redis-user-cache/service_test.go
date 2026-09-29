@@ -200,7 +200,9 @@ type redisCommandStartHook struct {
 	completed chan<- struct{}
 }
 
-func (hook redisCommandStartHook) DialHook(next redis.DialHook) redis.DialHook { return next }
+func (hook redisCommandStartHook) DialHook(next redis.DialHook) redis.DialHook {
+	return next
+}
 
 func (hook redisCommandStartHook) ProcessHook(next redis.ProcessHook) redis.ProcessHook {
 	return func(ctx context.Context, command redis.Cmder) error {
@@ -223,16 +225,20 @@ const redisIndependentCommand runtime.CommandID = 1
 
 type redisIndependentService struct{}
 
-func (*redisIndependentService) OnStart(context.Context, gsr.ServiceContext) error { return nil }
+func (service *redisIndependentService) OnStart(_ context.Context, _ gsr.ServiceContext) error {
+	return nil
+}
 
-func (*redisIndependentService) Handle(_ gsr.CommandContext, command runtime.CommandID, _ ...any) (any, error) {
+func (service *redisIndependentService) Handle(_ gsr.CommandContext, command runtime.CommandID, _ ...any) (any, error) {
 	if command != redisIndependentCommand {
 		return nil, runtime.ErrUnknownCommand
 	}
 	return "ready", nil
 }
 
-func (*redisIndependentService) OnStop(context.Context) error { return nil }
+func (service *redisIndependentService) OnStop(_ context.Context) error {
+	return nil
+}
 
 func runUserProfileScenario(cache *userHashCache, check func(context.Context, gsr.ServiceContext, runtime.ServiceID) error) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
