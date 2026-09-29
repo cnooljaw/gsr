@@ -156,6 +156,45 @@ func TestSlowRedisDoesNotBlockOtherService(t *testing.T) {
 	}
 }
 
+// TestUserProfileServiceRecoversAfterRedisTimeout 验证 Redis 超时只使当前请求失败，恢复后同一 Service 仍能读取缓存。
+func TestUserProfileServiceRecoversAfterRedisTimeout(t *testing.T) {
+	client := startTestRedis(t)
+	cache, err := newUserHashCache(client, time.Minute, 250*time.Millisecond)
+	if err != nil {
+		t.Fatalf("newUserHashCache() error = %v", err)
+	}
+	user := userInfo{ID: 42, Name: "小明", Level: 7}
+	if err := cache.Put(context.Background(), user); err != nil {
+		t.Fatalf("Put() error = %v", err)
+	}
+	if err := client.Do(context.Background(), "CLIENT", "PAUSE", "1500").Err(); err != nil {
+		t.Fatalf("CLIENT PAUSE error = %v", err)
+	}
+	err = runUserProfileScenario(cache, func(ctx context.Context, self gsr.ServiceContext, id runtime.ServiceID) error {
+		value, callErr := self.Call(ctx, id, loadUserCommand, user.ID)
+		if value != nil || !errors.Is(callErr, errUserCacheUnavailable) {
+			return fmt.Errorf("Call(load during pause) = %v, %v; want cache unavailable", value, callErr)
+		}
+		for {
+			if err := client.Ping(ctx).Err(); err == nil {
+				break
+			}
+			if err := ctx.Err(); err != nil {
+				return fmt.Errorf("wait for Redis recovery: %w", err)
+			}
+			time.Sleep(20 * time.Millisecond)
+		}
+		value, callErr = self.Call(ctx, id, loadUserCommand, user.ID)
+		if callErr != nil || value != (userLookup{User: user, Found: true}) {
+			return fmt.Errorf("Call(load after recovery) = %+v, %v; want cached user", value, callErr)
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 type redisCommandStartHook struct {
 	started   chan<- struct{}
 	completed chan<- struct{}
