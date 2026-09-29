@@ -34,4 +34,11 @@ mysql -u root -p gsr_product_demo -e 'SELECT COUNT(*) FROM products'
 go test ./examples/mysql-product
 ```
 
-自动测试使用 SQL mock 检查 Service 的 SQL、参数和错误语义，不启动 MySQL；真实 MySQL 联调需要执行上面的手工步骤。
+默认测试使用 SQL mock 检查 Service 的 SQL、参数和错误语义，不启动 MySQL。需要重复验证真实驱动和数据库时，先配置上述专用测试账号和 `.env.local`，再显式运行：
+
+```sh
+source .env.local
+GSR_MYSQL_INTEGRATION=1 go test ./examples/mysql-product -run '^TestProductExampleLiveMySQL$' -count=1
+```
+
+集成测试会写入并删除自己创建的产品；它在执行前核对账号、地址和库名，只允许使用本机 `gsr_demo` 与 `gsr_product_demo`，避免误指向其它数据库。

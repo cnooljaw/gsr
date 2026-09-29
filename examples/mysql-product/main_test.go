@@ -3,11 +3,13 @@ package main
 import (
 	"bytes"
 	"context"
+	"os"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/go-sql-driver/mysql"
 )
 
 // TestProductExampleRunsThroughService 验证入口通过业务 Service 完成产品 CRUD，成功路径不再故意查询已删除的记录。
@@ -54,5 +56,30 @@ func TestProductExampleRejectsMissingConfiguration(t *testing.T) {
 	}
 	if err := runProductDemo(context.Background(), nil, &output); err == nil {
 		t.Fatal("runProductDemo(nil database) error = nil; want invalid dependency")
+	}
+}
+
+// TestProductExampleLiveMySQL 验证专用本机测试账号能够通过真实 MySQL 完成产品 CRUD。
+func TestProductExampleLiveMySQL(t *testing.T) {
+	if os.Getenv("GSR_MYSQL_INTEGRATION") != "1" {
+		t.Skip("set GSR_MYSQL_INTEGRATION=1 to use the dedicated local MySQL database")
+	}
+	dsn := os.Getenv("GSR_MYSQL_DSN")
+	config, err := mysql.ParseDSN(dsn)
+	if err != nil {
+		t.Fatalf("parse test DSN: %v", err)
+	}
+	if config.User != "gsr_demo" || config.Net != "tcp" || config.Addr != "127.0.0.1:3306" ||
+		config.DBName != "gsr_product_demo" {
+		t.Fatal("live test requires gsr_demo on the dedicated local gsr_product_demo database")
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	var output bytes.Buffer
+	if err := run(ctx, dsn, &output); err != nil {
+		t.Fatalf("run(live MySQL) error = %v", err)
+	}
+	if !strings.Contains(output.String(), "create/read/update/delete ok\n") {
+		t.Fatalf("output = %q; want CRUD confirmation", output.String())
 	}
 }
