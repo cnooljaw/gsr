@@ -12,4 +12,6 @@ go test ./examples/http-outbound
 
 HTTP 等待期间，当前 `profileService` 不处理下一条消息，但另一个 Service 仍能响应。调用者的 `Call` 截止时间只限制调用者等待，不会强杀正在执行的 Handler；所以 HTTP Client 自身必须设置有限超时。示例不自动重试，请求是否适合重试由具体业务决定。
 
+构造时要求 HTTP Client 已设置有限超时，资料接口地址为绝对 HTTP(S) URL；配置错误在创建 Service 前返回，不伪装成一次运行期上游故障。
+
 测试使用 `Runtime.Call` 作为宿主注入入口；实际业务 Service 之间通信仍使用 `ServiceContext.Send/Call`。注入的 HTTP Client 由应用持有，Service 不关闭其 Transport。

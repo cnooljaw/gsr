@@ -30,8 +30,15 @@ type profileService struct {
 }
 
 func newProfileService(client *http.Client, profileURL string) (*profileService, error) {
-	if client == nil || client.Timeout <= 0 || profileURL == "" {
-		return nil, errors.New("profile service requires an HTTP Client with finite timeout and a URL")
+	if client == nil || client.Timeout <= 0 {
+		return nil, errors.New("profile service requires an HTTP Client with finite timeout")
+	}
+	request, err := http.NewRequest(http.MethodGet, profileURL, nil)
+	if err != nil {
+		return nil, errors.New("profile URL must be an absolute HTTP(S) URL")
+	}
+	if request.URL.Host == "" || (request.URL.Scheme != "http" && request.URL.Scheme != "https") {
+		return nil, errors.New("profile URL must be an absolute HTTP(S) URL")
 	}
 	return &profileService{client: client, profileURL: profileURL}, nil
 }

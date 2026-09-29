@@ -176,6 +176,21 @@ func TestProfileServiceRequiresBoundedClient(t *testing.T) {
 	}
 }
 
+// TestProfileServiceRejectsInvalidURL 验证构造时接受绝对 HTTP(S) 地址并拒绝错误地址，而非延迟到首次刷新。
+func TestProfileServiceRejectsInvalidURL(t *testing.T) {
+	client := &http.Client{Timeout: time.Second}
+	for _, profileURL := range []string{"", "/profile", "ftp://example.test/profile", "http://"} {
+		if _, err := newProfileService(client, profileURL); err == nil {
+			t.Fatalf("newProfileService(URL=%q) error = nil, want invalid URL rejection", profileURL)
+		}
+	}
+	for _, profileURL := range []string{"http://example.test/profile", "https://example.test/profile"} {
+		if _, err := newProfileService(client, profileURL); err != nil {
+			t.Fatalf("newProfileService(URL=%q) error = %v, want valid URL", profileURL, err)
+		}
+	}
+}
+
 // TestProfileServiceRejectsInvalidCommands 验证未知命令与已知命令的非法参数返回各自稳定错误。
 func TestProfileServiceRejectsInvalidCommands(t *testing.T) {
 	service, err := newProfileService(&http.Client{Timeout: time.Second}, "http://example.test/profile")
