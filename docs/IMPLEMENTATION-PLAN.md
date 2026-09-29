@@ -403,6 +403,8 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 
 状态：已记录，暂不进入 Core v0.1，也不提前实现通用网关框架。
 
+`examples/http-outbound` 与 `examples/http-inbound` 分别验证 Service 内有界 HTTP 出站调用、HTTP 基础设施经有限 `Runtime.Call` 查询本地 Service；后者只是无认证的只读联调示例，不是通用反向代理或新的客户端协议。
+
 - L4/TCP 网关属于 Transport/ConnectionAgent 层的字节转发能力，不进入 Core Message，也不使用业务 Redirect。
 - L7/HTTP 反向代理属于 Core 之外的 Adapter/业务能力：解析并限制请求后，以 typed request 调用本地或远端 Service，使用新的 Call-through 获取 typed response，再由连接 owner 写回客户端。
 - 普通 HTTP 请求/响应不使用 Redirect 转移 Call 的 Session 或 PendingCall；Redirect 只保留给受信任的单向基础设施 relay。
