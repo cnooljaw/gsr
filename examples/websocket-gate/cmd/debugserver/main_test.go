@@ -46,6 +46,30 @@ func TestParseServerOptionsKeepsExplicitDebugPort(t *testing.T) {
 	}
 }
 
+// TestParseServerOptionsAcceptsDirectTLS 验证生产示例可显式指定直连 WSS 的证书和私钥文件。
+func TestParseServerOptionsAcceptsDirectTLS(t *testing.T) {
+	options, err := parseServerOptions([]string{"--prod", "--tls-cert", "server.crt", "--tls-key", "server.key"})
+	if err != nil {
+		t.Fatalf("parseServerOptions(TLS files) error = %v", err)
+	}
+	if !options.production || options.certificateFile != "server.crt" || options.privateKeyFile != "server.key" {
+		t.Fatalf("TLS options = %#v, want ProdGate with both certificate files", options)
+	}
+}
+
+// TestParseServerOptionsRejectsIncompleteTLS 验证证书与私钥必须成对提供，且不能用于 DebugGate。
+func TestParseServerOptionsRejectsIncompleteTLS(t *testing.T) {
+	for _, arguments := range [][]string{
+		{"--prod", "--tls-cert", "server.crt"},
+		{"--prod", "--tls-key", "server.key"},
+		{"--tls-cert", "server.crt", "--tls-key", "server.key"},
+	} {
+		if _, err := parseServerOptions(arguments); err == nil {
+			t.Fatalf("parseServerOptions(%q) error = nil, want usage error", arguments)
+		}
+	}
+}
+
 // TestParseServerOptionsRejectsUnknownArguments 验证示例命令不会静默接受拼写错误的启动参数。
 func TestParseServerOptionsRejectsUnknownArguments(t *testing.T) {
 	if _, err := parseServerOptions([]string{"--secure"}); err == nil {

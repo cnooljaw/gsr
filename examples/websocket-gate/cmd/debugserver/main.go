@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"os"
@@ -44,9 +45,20 @@ func run() (result error) {
 
 	var service runtime.Service
 	var label string
+	scheme := "ws"
 	if options.production {
+		var tlsConfig *tls.Config
+		if options.certificateFile != "" {
+			certificate, err := tls.LoadX509KeyPair(options.certificateFile, options.privateKeyFile)
+			if err != nil {
+				return fmt.Errorf("load server TLS certificate: %w", err)
+			}
+			tlsConfig = &tls.Config{Certificates: []tls.Certificate{certificate}}
+			scheme = "wss"
+		}
 		service, err = prodgate.NewGateService(local, prodgate.Config{
 			Address:               options.address,
+			TLSConfig:             tlsConfig,
 			MaxConnections:        128,
 			MaxOutboundQueueBytes: 1 << 20,
 			NewAgent: func(client gate.ClientSession) runtime.Service {
@@ -75,15 +87,19 @@ func run() (result error) {
 		return err
 	}
 
-	fmt.Printf("%s listening at ws://%s/ws; press Ctrl-C to stop\n", label, serviceAddress(service))
+	fmt.Printf("%s listening at %s://%s/ws; press Ctrl-C to stop\n", label, scheme, serviceAddress(service))
 	<-ctx.Done()
 	return nil
 }
 
 type serverOptions struct {
-	address    string
-	production bool
+	address         string
+	production      bool
+	certificateFile string
+	privateKeyFile  string
 }
+
+const serverUsage = "usage: debugserver [--prod] [--addr 127.0.0.1:7888] [--tls-cert FILE --tls-key FILE]"
 
 // parseServerOptions 解析示例服务的监听模式和地址，不引入通用配置框架。
 func parseServerOptions(arguments []string) (serverOptions, error) {
@@ -95,14 +111,30 @@ func parseServerOptions(arguments []string) (serverOptions, error) {
 			options.production = true
 		case "--addr":
 			if index+1 >= len(arguments) || arguments[index+1] == "" {
-				return serverOptions{}, errors.New("usage: debugserver [--prod] [--addr 127.0.0.1:7888]")
+				return serverOptions{}, errors.New(serverUsage)
 			}
 			options.address = arguments[index+1]
 			addressSet = true
 			index++
+		case "--tls-cert":
+			if index+1 >= len(arguments) || arguments[index+1] == "" {
+				return serverOptions{}, errors.New(serverUsage)
+			}
+			options.certificateFile = arguments[index+1]
+			index++
+		case "--tls-key":
+			if index+1 >= len(arguments) || arguments[index+1] == "" {
+				return serverOptions{}, errors.New(serverUsage)
+			}
+			options.privateKeyFile = arguments[index+1]
+			index++
 		default:
-			return serverOptions{}, errors.New("usage: debugserver [--prod] [--addr 127.0.0.1:7888]")
+			return serverOptions{}, errors.New(serverUsage)
 		}
+	}
+	if (options.certificateFile == "") != (options.privateKeyFile == "") ||
+		(!options.production && options.certificateFile != "") {
+		return serverOptions{}, errors.New(serverUsage)
 	}
 	if options.production && !addressSet {
 		options.address = "127.0.0.1:7889"

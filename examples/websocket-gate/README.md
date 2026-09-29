@@ -93,4 +93,11 @@ npm run client -- --secure --url ws://127.0.0.1:7889/ws --text ""
 npm run client -- --secure --notify --url ws://127.0.0.1:7889/ws --text "push me"
 ```
 
-生产 Gate 的监听地址和证书由业务服务组装；示例的 `--prod` 仅用于本机或 Ingress 后的 HTTP WebSocket 联调，直连 WSS 仍需业务服务提供 `TLSConfig`。生产 Gate 的 Go 集成测试覆盖服务端完整链路。
+示例的 `--prod` 默认使用普通 WS，适合本机或 Ingress 终止 TLS 后的内段联调。要用示例直接监听 WSS，显式提供成对的 PEM 证书和私钥文件：
+
+```bash
+go run ./cmd/debugserver --prod --addr 127.0.0.1:7889 --tls-cert /path/to/server.crt --tls-key /path/to/server.key
+npm run client -- --secure --url wss://127.0.0.1:7889/ws --text "hello WSS"
+```
+
+客户端必须信任证书且证书的 SAN 包含连接地址；本机自签名测试证书可通过 `NODE_EXTRA_CA_CERTS=/path/to/server.crt` 交给 Node.js 信任，不要关闭 TLS 验证。证书文件参数不能用于 DebugGate。正式部署仍由业务应用决定证书来源和监听配置；示例不提供证书管理或自动续期。
