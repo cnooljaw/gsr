@@ -12,11 +12,20 @@ LC_ALL=C redis-server --bind 127.0.0.1 --port 6380 --save '' --appendonly no --d
 然后运行示例（终端二）：
 
 ```sh
+redis-cli -h 127.0.0.1 -p 6380 PING
+# PONG
 go run ./examples/redis-user-cache -redis-addr 127.0.0.1:6380
 # user 42: 小明 (level 7)
+
+redis-cli -h 127.0.0.1 -p 6380 TYPE gsr:example:user:42
+# hash
+redis-cli -h 127.0.0.1 -p 6380 HGETALL gsr:example:user:42
+# 包含 name=小明、level=7；字段顺序不保证固定
+redis-cli -h 127.0.0.1 -p 6380 TTL gsr:example:user:42
+# 剩余秒数；过期后为 -2
 ```
 
-终端一按 Ctrl+C 停止测试 Redis。示例只写入 `gsr:example:user:42`，TTL 为一分钟；若端口 6380 已被使用，两个命令一起换成其它空闲端口。不要将无认证的测试启动方式用于生产部署。
+终端一按 Ctrl+C 停止测试 Redis。示例只写入 `gsr:example:user:42`，TTL 为一分钟；过期后 `TYPE` 返回 `none`，`HGETALL` 返回空结果。若端口 6380 已被使用，以上命令中的端口要一起换成其它空闲端口。不要将无认证的测试启动方式用于生产部署。
 
 [`main.go`](main.go) 创建并在 `gsr.Run` 返回后关闭 Redis Client；[`main_service.go`](main_service.go) 是普通应用入口；[`service.go`](service.go) 在业务 Handler 中调用 [`cache.go`](cache.go)。Client 由宿主持有，Service 和缓存对象都不关闭它。无需额外的 `RedisService`、Runtime Redis API 或 worker。
 
