@@ -3736,64 +3736,74 @@ func TestProdGateAllowsDynamicCertificate(t *testing.T) {
 	}
 }
 
-// TestProdGateCertificateSelectionFailureIsolated 验证动态证书选择失败只关闭当前 TLS 握手，后续连接仍可建立。
+// TestProdGateCertificateSelectionFailureIsolated 验证动态证书选择返回错误或 panic 后，后续连接仍可建立。
 func TestProdGateCertificateSelectionFailureIsolated(t *testing.T) {
-	var output bytes.Buffer
-	logger, err := logging.New(logging.Config{Writer: &output})
-	if err != nil {
-		t.Fatalf("logging.New() error = %v", err)
-	}
-	t.Cleanup(func() {
-		if err := logger.Close(context.Background()); err != nil {
-			t.Errorf("Logger.Close() error = %v", err)
-		}
-	})
-
-	serverTLS, clientTLS := testTLSConfigs(t)
-	certificate := serverTLS.Certificates[0]
-	serverTLS.Certificates = nil
-	var certificateCalls atomic.Int32
 	const privateError = "private-certificate-selection-detail"
-	serverTLS.GetCertificate = func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
-		if certificateCalls.Add(1) == 1 {
-			return nil, errors.New(privateError)
-		}
-		return &certificate, nil
-	}
-	local, gate := startConfiguredProductionGateWithTLS(t, runtime.Config{Logger: logger}, 1, time.Second, 1024, 64<<10, serverTLS,
-		func(ClientSession) runtime.Service { return &productionTestAgent{} })
-	if connection, err := tls.DialWithDialer(&net.Dialer{Timeout: time.Second}, "tcp", gate.Addr().String(), clientTLS); err == nil {
-		connection.Close()
-		t.Fatal("TLS handshake unexpectedly succeeded without a certificate")
-	}
+	for _, testCase := range []struct {
+		name string
+		fail func() (*tls.Certificate, error)
+	}{
+		{name: "error", fail: func() (*tls.Certificate, error) { return nil, errors.New(privateError) }},
+		{name: "panic", fail: func() (*tls.Certificate, error) { panic(privateError) }},
+	} {
+		t.Run(testCase.name, func(t *testing.T) {
+			var output bytes.Buffer
+			logger, err := logging.New(logging.Config{Writer: &output})
+			if err != nil {
+				t.Fatalf("logging.New() error = %v", err)
+			}
+			t.Cleanup(func() {
+				if err := logger.Close(context.Background()); err != nil {
+					t.Errorf("Logger.Close() error = %v", err)
+				}
+			})
 
-	deadline := time.Now().Add(time.Second)
-	var healthy *tls.Conn
-	for healthy == nil && time.Now().Before(deadline) {
-		connection, err := tls.DialWithDialer(&net.Dialer{Timeout: time.Second}, "tcp", gate.Addr().String(), clientTLS)
-		if err == nil {
-			healthy = connection
-			break
-		}
-		time.Sleep(5 * time.Millisecond)
-	}
-	if healthy == nil {
-		t.Fatal("Gate did not accept a healthy TLS connection after certificate selection failed")
-	}
-	if err := healthy.Close(); err != nil {
-		t.Fatalf("Close(healthy TLS) error = %v", err)
-	}
-	if got := certificateCalls.Load(); got != 2 {
-		t.Fatalf("GetCertificate calls = %d, want 2", got)
-	}
-	if err := local.Stop(context.Background()); err != nil {
-		t.Fatalf("Runtime.Stop() error = %v", err)
-	}
-	if err := logger.Close(context.Background()); err != nil {
-		t.Fatalf("Logger.Close() error = %v", err)
-	}
-	if bytes.Contains(output.Bytes(), []byte(privateError)) {
-		t.Fatal("Gate log contains the private certificate selection error")
+			serverTLS, clientTLS := testTLSConfigs(t)
+			certificate := serverTLS.Certificates[0]
+			serverTLS.Certificates = nil
+			var certificateCalls atomic.Int32
+			serverTLS.GetCertificate = func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
+				if certificateCalls.Add(1) == 1 {
+					return testCase.fail()
+				}
+				return &certificate, nil
+			}
+			local, gate := startConfiguredProductionGateWithTLS(t, runtime.Config{Logger: logger}, 1, time.Second, 1024, 64<<10, serverTLS,
+				func(ClientSession) runtime.Service { return &productionTestAgent{} })
+			if connection, err := tls.DialWithDialer(&net.Dialer{Timeout: time.Second}, "tcp", gate.Addr().String(), clientTLS); err == nil {
+				connection.Close()
+				t.Fatal("TLS handshake unexpectedly succeeded without a certificate")
+			}
+
+			deadline := time.Now().Add(time.Second)
+			var healthy *tls.Conn
+			for healthy == nil && time.Now().Before(deadline) {
+				connection, err := tls.DialWithDialer(&net.Dialer{Timeout: time.Second}, "tcp", gate.Addr().String(), clientTLS)
+				if err == nil {
+					healthy = connection
+					break
+				}
+				time.Sleep(5 * time.Millisecond)
+			}
+			if healthy == nil {
+				t.Fatal("Gate did not accept a healthy TLS connection after certificate selection failed")
+			}
+			if err := healthy.Close(); err != nil {
+				t.Fatalf("Close(healthy TLS) error = %v", err)
+			}
+			if got := certificateCalls.Load(); got != 2 {
+				t.Fatalf("GetCertificate calls = %d, want 2", got)
+			}
+			if err := local.Stop(context.Background()); err != nil {
+				t.Fatalf("Runtime.Stop() error = %v", err)
+			}
+			if err := logger.Close(context.Background()); err != nil {
+				t.Fatalf("Logger.Close() error = %v", err)
+			}
+			if bytes.Contains(output.Bytes(), []byte(privateError)) {
+				t.Fatal("Gate log contains the private certificate selection error")
+			}
+		})
 	}
 }
 

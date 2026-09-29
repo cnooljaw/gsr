@@ -258,3 +258,5 @@ TestRuntimePacedMultiServiceLoad 已补 8 个真实 Service 共享文件 Logger 
 2026-09-28 Gate 重复关闭收尾：公共出站路径在客户端 Close 后可能再次尝试发送 Close，Gorilla 返回 `ErrCloseSent`；现在与 EOF、连接已关闭等情况一样视为关闭完成，仍保留其它真实 Close 帧和 socket 关闭错误。定向回归测试先复现错误归类，再验证生产 Gate 的客户端 Close/停机以及两 Gate 的注入关闭错误；公共包、ProdGate、DebugGate 包测试通过。未修改数据帧协议或关闭顺序，未运行全仓和 race 验证。
 
 2026-09-28 动态证书失败隔离：新增真实 TLS 测试，让 `GetCertificate` 首次返回错误、第二次返回有效证书；首条握手失败后健康连接仍成功，Runtime 正常停止，共享日志不包含回调错误原文。定向测试和 ProdGate 包测试通过；本轮只新增验收与 RFC 说明，未修改生产实现，也未运行全仓或 race 验证。
+
+2026-09-29 动态证书 panic 隔离：把同一真实 TLS 回归测试扩展为返回错误和 panic 两种子场景。证书回调首次 panic 时仅当前握手失败，下一条健康连接成功，Runtime 正常停止，Gate 日志不含 panic 原文。定向测试、定向 race 和 ProdGate 包测试通过；本轮只扩展验收与契约说明，未修改生产实现，也未运行全仓验证。
