@@ -3,12 +3,17 @@ package main
 import (
 	"bytes"
 	"context"
+	"database/sql"
+	"errors"
+	"fmt"
 	"os"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/cnooljaw/gsr"
+	"github.com/cnooljaw/gsr/runtime"
 	"github.com/go-sql-driver/mysql"
 )
 
@@ -59,7 +64,7 @@ func TestProductExampleRejectsMissingConfiguration(t *testing.T) {
 	}
 }
 
-// TestProductExampleLiveMySQL 验证专用本机测试账号能够通过真实 MySQL 完成产品 CRUD。
+// TestProductExampleLiveMySQL 验证专用本机测试账号能完成产品 CRUD，并区分相同值更新与不存在的产品。
 func TestProductExampleLiveMySQL(t *testing.T) {
 	if os.Getenv("GSR_MYSQL_INTEGRATION") != "1" {
 		t.Skip("set GSR_MYSQL_INTEGRATION=1 to use the dedicated local MySQL database")
@@ -81,5 +86,43 @@ func TestProductExampleLiveMySQL(t *testing.T) {
 	}
 	if !strings.Contains(output.String(), "create/read/update/delete ok\n") {
 		t.Fatalf("output = %q; want CRUD confirmation", output.String())
+	}
+	connector, err := mysql.NewConnector(config)
+	if err != nil {
+		t.Fatalf("configure live MySQL connector: %v", err)
+	}
+	db := sql.OpenDB(connector)
+	t.Cleanup(func() { _ = db.Close() })
+	err = runProductScenario(db, time.Second, func(ctx context.Context, self gsr.ServiceContext, id runtime.ServiceID) (result error) {
+		value, err := self.Call(ctx, id, createProductCommand, product{Name: "原样更新测试", PriceCents: 100, Stock: 1})
+		if err != nil {
+			return fmt.Errorf("create unchanged-update fixture: %w", err)
+		}
+		created, ok := value.(product)
+		if !ok || created.ID <= 0 {
+			return fmt.Errorf("created product = %v; want valid ID", value)
+		}
+		deleted := false
+		// 断言中途失败时，仍尽量通过同一 Service 删除测试创建的记录。
+		defer func() {
+			if !deleted {
+				_, cleanupErr := self.Call(ctx, id, deleteProductCommand, created.ID)
+				result = errors.Join(result, cleanupErr)
+			}
+		}()
+		if _, err := self.Call(ctx, id, updateProductCommand, created); err != nil {
+			return fmt.Errorf("update unchanged product: %w", err)
+		}
+		if _, err := self.Call(ctx, id, deleteProductCommand, created.ID); err != nil {
+			return fmt.Errorf("delete unchanged-update fixture: %w", err)
+		}
+		deleted = true
+		if _, err := self.Call(ctx, id, updateProductCommand, created); !errors.Is(err, errProductNotFound) {
+			return fmt.Errorf("update deleted product = %v; want not found", err)
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatal(err)
 	}
 }

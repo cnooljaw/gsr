@@ -41,4 +41,4 @@ source .env.local
 GSR_MYSQL_INTEGRATION=1 go test ./examples/mysql-product -run '^TestProductExampleLiveMySQL$' -count=1
 ```
 
-集成测试会写入并删除自己创建的产品；它在执行前核对账号、地址和库名，只允许使用本机 `gsr_demo` 与 `gsr_product_demo`，避免误指向其它数据库。
+集成测试会通过产品 Service 写入并删除自己创建的产品，还会验证相同值更新成功、删除后的更新返回未找到；它在执行前核对账号、地址和库名，只允许使用本机 `gsr_demo` 与 `gsr_product_demo`，避免误指向其它数据库。
