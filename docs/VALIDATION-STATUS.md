@@ -260,3 +260,5 @@ TestRuntimePacedMultiServiceLoad 已补 8 个真实 Service 共享文件 Logger 
 2026-09-28 动态证书失败隔离：新增真实 TLS 测试，让 `GetCertificate` 首次返回错误、第二次返回有效证书；首条握手失败后健康连接仍成功，Runtime 正常停止，共享日志不包含回调错误原文。定向测试和 ProdGate 包测试通过；本轮只新增验收与 RFC 说明，未修改生产实现，也未运行全仓或 race 验证。
 
 2026-09-29 动态证书 panic 隔离：把同一真实 TLS 回归测试扩展为返回错误和 panic 两种子场景。证书回调首次 panic 时仅当前握手失败，下一条健康连接成功，Runtime 正常停止，Gate 日志不含 panic 原文。定向测试、定向 race 和 ProdGate 包测试通过；本轮只扩展验收与契约说明，未修改生产实现，也未运行全仓验证。
+
+2026-09-29 Go/TypeScript 生产 Gate 联调：以 `go run ./cmd/debugserver --prod --addr 127.0.0.1:0` 启动现有示例，TypeScript CLI 使用 `--secure` 实际完成固定 X25519 握手及上行 MAC。普通 Echo 请求返回原 `request_id=1` 和文本，Notify 返回 Push，空文本返回业务 `TEXT_REQUIRED` 对应响应；三次 CLI 运行均成功，服务端停止后回环端口释放。本次走 `ws://`，模拟 Ingress 已终止 TLS 的内段，不是跨语言直连 WSS 或目标部署验收；未修改生产代码或客户端协议。
