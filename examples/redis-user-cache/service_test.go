@@ -107,6 +107,94 @@ func TestUserProfileServiceRejectsInvalidCommand(t *testing.T) {
 	}
 }
 
+// TestSlowRedisDoesNotBlockOtherService 验证一个 Service 等待 Redis 时，另一个 Service 仍能及时回复。
+func TestSlowRedisDoesNotBlockOtherService(t *testing.T) {
+	admin := startTestRedis(t)
+	options := *admin.Options()
+	options.ReadTimeout = time.Second
+	client := redis.NewClient(&options)
+	t.Cleanup(func() { _ = client.Close() })
+	started := make(chan struct{}, 1)
+	completed := make(chan struct{})
+	client.AddHook(redisCommandStartHook{started: started, completed: completed})
+	cache, err := newUserHashCache(client, time.Minute, 900*time.Millisecond)
+	if err != nil {
+		t.Fatalf("newUserHashCache() error = %v", err)
+	}
+	// Redis 6.0 支持不带模式参数的 CLIENT PAUSE，命令会立即确认暂停请求。
+	if err := admin.Do(context.Background(), "CLIENT", "PAUSE", "2000").Err(); err != nil {
+		t.Fatalf("CLIENT PAUSE error = %v", err)
+	}
+	err = runUserProfileScenario(cache, func(ctx context.Context, self gsr.ServiceContext, userID runtime.ServiceID) error {
+		otherID, err := self.CreateService(ctx, &redisIndependentService{})
+		if err != nil {
+			return fmt.Errorf("CreateService(independent): %w", err)
+		}
+		if err := self.Send(userID, loadUserCommand, uint64(42)); err != nil {
+			return fmt.Errorf("Send(load user): %w", err)
+		}
+		select {
+		case <-started:
+		case <-ctx.Done():
+			return fmt.Errorf("wait for Redis read: %w", ctx.Err())
+		}
+		quick, cancel := context.WithTimeout(ctx, 300*time.Millisecond)
+		defer cancel()
+		value, err := self.Call(quick, otherID, redisIndependentCommand)
+		if err != nil || value != "ready" {
+			return fmt.Errorf("Call(independent) = %v, %v; want ready while Redis is paused", value, err)
+		}
+		select {
+		case <-completed:
+			return errors.New("Redis read finished before the independent Service replied")
+		default:
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+type redisCommandStartHook struct {
+	started   chan<- struct{}
+	completed chan<- struct{}
+}
+
+func (hook redisCommandStartHook) DialHook(next redis.DialHook) redis.DialHook { return next }
+
+func (hook redisCommandStartHook) ProcessHook(next redis.ProcessHook) redis.ProcessHook {
+	return func(ctx context.Context, command redis.Cmder) error {
+		if command.Name() == "hgetall" {
+			defer close(hook.completed)
+			select {
+			case hook.started <- struct{}{}:
+			default:
+			}
+		}
+		return next(ctx, command)
+	}
+}
+
+func (hook redisCommandStartHook) ProcessPipelineHook(next redis.ProcessPipelineHook) redis.ProcessPipelineHook {
+	return next
+}
+
+const redisIndependentCommand runtime.CommandID = 1
+
+type redisIndependentService struct{}
+
+func (*redisIndependentService) OnStart(context.Context, gsr.ServiceContext) error { return nil }
+
+func (*redisIndependentService) Handle(_ gsr.CommandContext, command runtime.CommandID, _ ...any) (any, error) {
+	if command != redisIndependentCommand {
+		return nil, runtime.ErrUnknownCommand
+	}
+	return "ready", nil
+}
+
+func (*redisIndependentService) OnStop(context.Context) error { return nil }
+
 func runUserProfileScenario(cache *userHashCache, check func(context.Context, gsr.ServiceContext, runtime.ServiceID) error) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
