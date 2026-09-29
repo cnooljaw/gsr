@@ -6,6 +6,7 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -117,6 +118,52 @@ func TestProfileRefreshFailurePreservesState(t *testing.T) {
 	}
 	if name, err := local.Call(context.Background(), profileID, getProfileCommand); err != nil || name != "原名字" {
 		t.Fatalf("Call(get profile) = %v, %v; want unchanged name", name, err)
+	}
+}
+
+// TestProfileRefreshRejectsUntrustedResponse 验证畸形或超限的外部响应不会覆盖资料，后续正常刷新仍可成功。
+func TestProfileRefreshRejectsUntrustedResponse(t *testing.T) {
+	var requests atomic.Int32
+	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, _ *http.Request) {
+		switch requests.Add(1) {
+		case 1:
+			_ = json.NewEncoder(writer).Encode(map[string]string{"display_name": "原名字"})
+		case 2:
+			_, _ = writer.Write([]byte("{broken"))
+		case 3:
+			_ = json.NewEncoder(writer).Encode(map[string]string{
+				"display_name": strings.Repeat("x", maxProfileBodyBytes),
+			})
+		default:
+			_ = json.NewEncoder(writer).Encode(map[string]string{"display_name": "新名字"})
+		}
+	}))
+	t.Cleanup(server.Close)
+	profile, err := newProfileService(&http.Client{Timeout: time.Second}, server.URL)
+	if err != nil {
+		t.Fatalf("newProfileService() error = %v", err)
+	}
+	local := startTestRuntime(t)
+	profileID, err := local.CreateService(context.Background(), profile)
+	if err != nil {
+		t.Fatalf("CreateService(profile) error = %v", err)
+	}
+	if _, err := local.Call(context.Background(), profileID, refreshProfileCommand); err != nil {
+		t.Fatalf("initial Call(refresh) error = %v", err)
+	}
+	for _, response := range []string{"invalid JSON", "oversized body"} {
+		if _, err := local.Call(context.Background(), profileID, refreshProfileCommand); !errors.Is(err, errProfileUnavailable) {
+			t.Fatalf("Call(refresh with %s) error = %v, want profile unavailable", response, err)
+		}
+		if name, err := local.Call(context.Background(), profileID, getProfileCommand); err != nil || name != "原名字" {
+			t.Fatalf("Call(get after %s) = %v, %v; want unchanged name", response, name, err)
+		}
+	}
+	if _, err := local.Call(context.Background(), profileID, refreshProfileCommand); err != nil {
+		t.Fatalf("recovery Call(refresh) error = %v", err)
+	}
+	if name, err := local.Call(context.Background(), profileID, getProfileCommand); err != nil || name != "新名字" {
+		t.Fatalf("Call(get after recovery) = %v, %v; want 新名字", name, err)
 	}
 }
 
