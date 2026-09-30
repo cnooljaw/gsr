@@ -3923,6 +3923,10 @@ func (*startFailingProductionTestAgent) OnStart(context.Context, runtime.Service
 	return errors.New("agent startup failed")
 }
 
+func (agent *startFailingProductionTestAgent) Handle(ctx runtime.CommandContext, command runtime.CommandID, args ...any) (any, error) {
+	return agent.productionTestAgent.Handle(ctx, command, args...)
+}
+
 func (agent *startFailingProductionTestAgent) OnStop(context.Context) error {
 	close(agent.stopCalled)
 	return nil

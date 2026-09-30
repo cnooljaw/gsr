@@ -99,7 +99,7 @@ type mainService struct {
 func (service *mainService) OnStart(ctx context.Context, self gsr.ServiceContext) error {
 	cluster := self.Cluster()
 	if service.cfg.Role == "server" {
-		id, err := self.CreateService(ctx, &echoService{})
+		id, err := self.CreateService(ctx, newEchoService())
 		if err != nil {
 			return err
 		}
@@ -110,9 +110,7 @@ func (service *mainService) OnStart(ctx context.Context, self gsr.ServiceContext
 			return err
 		}
 	} else {
-		if _, err := self.CreateService(ctx, &callerService{
-			target: service.cfg.Target,
-		}); err != nil {
+		if _, err := self.CreateService(ctx, newCallerService(service.cfg.Target)); err != nil {
 			return err
 		}
 	}
@@ -131,19 +129,37 @@ func (service *mainService) OnStop(_ context.Context) error {
 	return nil
 }
 
-type echoService struct{}
+type echoService struct {
+	dispatcher *gsr.Dispatcher
+}
+
+func newEchoService() *echoService {
+	service := &echoService{}
+	service.dispatcher = gsr.MustDispatcher(map[runtime.CommandID]any{
+		notifyCommand: service.handleNotify,
+		echoCommand:   service.handleEcho,
+	})
+	return service
+}
 
 func (service *echoService) OnStart(_ context.Context, _ gsr.ServiceContext) error {
 	return nil
 }
 
 func (service *echoService) Handle(ctx gsr.CommandContext, command runtime.CommandID, args ...any) (any, error) {
-	if command != notifyCommand && command != echoCommand {
-		return nil, runtime.ErrUnknownCommand
-	}
+	return service.dispatcher.Handle(ctx, command, args...)
+}
+
+func (service *echoService) handleNotify(ctx gsr.CommandContext, operation uint64) error {
 	// 日志输出故障不替换业务结果；Logger.Err/Close 负责保留输出故障。
-	_ = ctx.Logger().Info("received", "command", command, "args", args)
-	return args, nil
+	_ = ctx.Logger().Info("received", "command", notifyCommand, "args", []any{operation})
+	return nil
+}
+
+func (service *echoService) handleEcho(ctx gsr.CommandContext, operation uint64) (uint64, error) {
+	// 日志输出故障不替换业务结果；Logger.Err/Close 负责保留输出故障。
+	_ = ctx.Logger().Info("received", "command", echoCommand, "args", []any{operation})
+	return operation, nil
 }
 
 func (service *echoService) OnStop(context.Context) error {
@@ -151,8 +167,17 @@ func (service *echoService) OnStop(context.Context) error {
 }
 
 type callerService struct {
-	target    cluster.NodeID
-	operation uint64
+	dispatcher *gsr.Dispatcher
+	target     cluster.NodeID
+	operation  uint64
+}
+
+func newCallerService(target cluster.NodeID) *callerService {
+	service := &callerService{target: target}
+	service.dispatcher = gsr.MustDispatcher(map[runtime.CommandID]any{
+		tickCommand: service.handleTick,
+	})
+	return service
 }
 
 func (service *callerService) OnStart(_ context.Context, self gsr.ServiceContext) error {
@@ -160,10 +185,11 @@ func (service *callerService) OnStart(_ context.Context, self gsr.ServiceContext
 	return err
 }
 
-func (service *callerService) Handle(ctx gsr.CommandContext, command runtime.CommandID, _ ...any) (any, error) {
-	if command != tickCommand {
-		return nil, runtime.ErrUnknownCommand
-	}
+func (service *callerService) Handle(ctx gsr.CommandContext, command runtime.CommandID, args ...any) (any, error) {
+	return service.dispatcher.Handle(ctx, command, args...)
+}
+
+func (service *callerService) handleTick(ctx gsr.CommandContext) error {
 	service.operation++
 	cluster := ctx.Cluster()
 	// 每轮是新的示例操作，不重试上一轮失败或结果不确定的业务请求。
@@ -174,7 +200,7 @@ func (service *callerService) Handle(ctx gsr.CommandContext, command runtime.Com
 	cancel()
 	_ = ctx.Logger().Info("Call result", "operation", service.operation, "result", value, "error", callErr)
 	_, err = ctx.After(3*time.Second, tickCommand)
-	return nil, err
+	return err
 }
 
 func (service *callerService) OnStop(context.Context) error {

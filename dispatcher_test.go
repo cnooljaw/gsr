@@ -15,8 +15,8 @@ const (
 	dispatcherNotifyCommand runtime.CommandID = 2
 )
 
-// 验证应用 Service 嵌入 Dispatcher 后可按强类型参数处理 Call 和 Send。
-func TestDispatcherEmbedsInApplicationService(t *testing.T) {
+// TestDispatcherRoutesApplicationService 验证显式 Handle 委托强类型分发后仍正确处理 Call 和 Send。
+func TestDispatcherRoutesApplicationService(t *testing.T) {
 	service := newDispatcherTestService()
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -128,10 +128,10 @@ func TestDispatcherPreservesHandlerResults(t *testing.T) {
 	}
 }
 
-// 验证 Service 可只手写一个热点命令，其余命令仍交给嵌入的 Dispatcher。
+// TestDispatcherFallbackFromCustomHandle 验证 Service 只对热点命令直调强类型 Handler，其余仍交给 Dispatcher。
 func TestDispatcherFallbackFromCustomHandle(t *testing.T) {
 	service := &dispatcherOverrideService{}
-	service.Dispatcher = MustDispatcher(map[runtime.CommandID]any{
+	service.dispatcher = MustDispatcher(map[runtime.CommandID]any{
 		dispatcherEchoCommand: func(_ CommandContext, text string) (string, error) {
 			return text, nil
 		},
@@ -140,6 +140,11 @@ func TestDispatcherFallbackFromCustomHandle(t *testing.T) {
 	result, err := service.Handle(current, dispatcherHotCommand, 7)
 	if err != nil || result != 14 {
 		t.Fatalf("hot Handle result=%v error=%v", result, err)
+	}
+	for _, args := range [][]any{nil, {"not an int"}} {
+		if _, err := service.Handle(current, dispatcherHotCommand, args...); !errors.Is(err, runtime.ErrInvalidCommandArguments) {
+			t.Fatalf("hot Handle(%v) error=%v, want ErrInvalidCommandArguments", args, err)
+		}
 	}
 	result, err = service.Handle(current, dispatcherEchoCommand, "ordinary")
 	if err != nil || result != "ordinary" {
@@ -180,7 +185,7 @@ func BenchmarkDispatcher(b *testing.B) {
 
 // BenchmarkDispatcherHotOverride 测量同一 Service 手写热点分支的局部分发开销。
 func BenchmarkDispatcherHotOverride(b *testing.B) {
-	service := &dispatcherOverrideService{Dispatcher: MustDispatcher(nil)}
+	service := &dispatcherOverrideService{dispatcher: MustDispatcher(nil)}
 	current := dispatcherTestContext{}
 	b.ReportAllocs()
 	for range b.N {
@@ -198,7 +203,7 @@ type dispatcherTestContext struct{ CommandContext }
 
 const dispatcherHotCommand runtime.CommandID = 3
 
-type dispatcherOverrideService struct{ *Dispatcher }
+type dispatcherOverrideService struct{ dispatcher *Dispatcher }
 
 func (service *dispatcherOverrideService) Handle(ctx CommandContext, command runtime.CommandID, args ...any) (any, error) {
 	if command == dispatcherHotCommand {
@@ -209,24 +214,32 @@ func (service *dispatcherOverrideService) Handle(ctx CommandContext, command run
 		if !ok {
 			return nil, runtime.ErrInvalidCommandArguments
 		}
-		return value * 2, nil
+		return service.handleHot(ctx, value)
 	}
-	return service.Dispatcher.Handle(ctx, command, args...)
+	return service.dispatcher.Handle(ctx, command, args...)
+}
+
+func (service *dispatcherOverrideService) handleHot(_ CommandContext, value int) (int, error) {
+	return value * 2, nil
 }
 
 type dispatcherTestService struct {
-	*Dispatcher
+	dispatcher   *Dispatcher
 	notification string
 	lastSource   runtime.ServiceID
 }
 
 func newDispatcherTestService() *dispatcherTestService {
 	service := &dispatcherTestService{}
-	service.Dispatcher = MustDispatcher(map[runtime.CommandID]any{
+	service.dispatcher = MustDispatcher(map[runtime.CommandID]any{
 		dispatcherEchoCommand:   service.echo,
 		dispatcherNotifyCommand: service.notify,
 	})
 	return service
+}
+
+func (service *dispatcherTestService) Handle(ctx CommandContext, command runtime.CommandID, args ...any) (any, error) {
+	return service.dispatcher.Handle(ctx, command, args...)
 }
 
 func (*dispatcherTestService) OnStart(context.Context, ServiceContext) error {

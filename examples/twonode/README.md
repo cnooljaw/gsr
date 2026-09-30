@@ -6,6 +6,8 @@ main 只调用 `gsr.Run(ctx, config, mainService)`。MainService 创建 Echo 或
 
 Cluster 内建统一 ValueCodec，无需 Command 清单。Echo 创建后即可工作，Caller 用 Timer 驱动业务，不强制 Start Command。
 
+Echo 和 Caller 均显式实现 `Handle`，普通命令交给各自的具名 Dispatcher：Notify 接收一个 `uint64` 操作编号且不返回结果，Echo 返回该编号；多余或错误类型的参数由 Dispatcher 拒绝。
+
 从仓库根目录构建一次：
 
 ```sh
