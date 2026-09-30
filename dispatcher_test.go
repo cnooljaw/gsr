@@ -81,6 +81,41 @@ func TestDispatcherHandlerPanicIsolation(t *testing.T) {
 	}
 }
 
+// TestDispatcherTypedNilError 验证反射分发保留带类型 nil error，交由 Runtime 安全归一化且不停止 Service。
+func TestDispatcherTypedNilError(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	var typedNil *runtime.StatusError
+	target := &dispatcherTestService{dispatcher: MustDispatcher(map[runtime.CommandID]any{
+		dispatcherNotifyCommand: func(CommandContext) (string, error) {
+			return "ignored", typedNil
+		},
+		dispatcherEchoCommand: func(CommandContext) (string, error) {
+			return "healthy", nil
+		},
+	})}
+	entry := &probeService{start: func(ctx context.Context, self ServiceContext) error {
+		id, err := self.CreateService(ctx, target)
+		if err != nil {
+			return err
+		}
+		result, err := self.Call(ctx, id, dispatcherNotifyCommand)
+		if result != nil || !errors.Is(err, runtime.ErrHandlerFailed) {
+			return errors.New("typed nil Handler error was not normalized")
+		}
+		result, err = self.Call(ctx, id, dispatcherEchoCommand)
+		if err != nil || result != "healthy" {
+			return errors.New("typed nil Handler error stopped the Service")
+		}
+		self.Exit()
+		cancel()
+		return nil
+	}}
+	if err := Run(ctx, Config{Logging: logging.Config{Writer: io.Discard}}, entry); err != nil {
+		t.Fatal(err)
+	}
+}
+
 // 验证 Dispatcher 在构造时拒绝非法签名，并在调用时拒绝未知命令或不匹配参数。
 func TestDispatcherRejectsInvalidHandlersAndArguments(t *testing.T) {
 	for _, handler := range []any{
