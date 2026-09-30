@@ -847,7 +847,11 @@ Service 不提供额外 `Close` 钩子；本地资源释放属于 `OnStop`。`Ru
 
 Run 内部固定按 Cluster.Quiesce → Runtime.Close → Cluster.Close → 最终日志 → Logger.Close 收尾，聚合错误且不跳过后续步骤。Cluster/Logger 每阶段预算五秒，Runtime 沿用自身预算，不强杀 Handler/Writer。Logging 创建的 Logger 由运行环境独占关闭，组件配置中的外部 Logger 被拒绝。Commands 清单已移除，Cluster 统一使用默认编码，合法命令是否支持由目标判断。
 
-`self.Register(name, id)` 发布节点内名称，供本地 `self.SendName/CallName` 和远端 `self.Cluster().Send/Call(node, name, ...)` 共用目标节点的同一张表。空名/零 ID 拒绝，重复名返回 ErrServiceNameRegistered，不静默替换、不自动注销或重绑，不负责业务资源所有权或发现。`Open(nodeName)` 从 Config.Cluster.Nodes 取端口绑定 0.0.0.0，由共享 Cluster 管理唯一监听；未知名称报错，不 Open 仍可主动 Send/Call。`ListenAddress()` 供日志观测实际绑定地址，不等于外部可达地址。应用配置允许端口零用于测试动态监听，这类节点不进入出站路由；正常部署使用非零固定端口。底层 cluster.Open(Runtime, ListenConfig) 仍是基础设施接口，Cluster 本身不管理 Runtime 生命周期。
+`self.Register(name, id)` 发布节点内名称，供本地 `self.SendName/CallName` 和远端 `self.Cluster().Send/Call(node, name, ...)` 共用目标节点的同一张表。空名、零 ID 或不属于当前应用尚未收尾 Service 的 ID 返回 ErrServiceNotFound；重复名返回 ErrServiceNameRegistered，不静默替换。
+
+名称归目标 ServiceID：该 Service 启动失败、Exit、停止或 panic 后，应用层在调用其业务 OnStop 前清理全部对应名称；发布它的 MainService 先退出不影响该映射。清理后新实例可注册同名；运行中的名称不支持直接改绑，也不负责业务资源所有权或发现。
+
+`Open(nodeName)` 从 Config.Cluster.Nodes 取端口绑定 0.0.0.0，由共享 Cluster 管理唯一监听；未知名称报错，不 Open 仍可主动 Send/Call。`ListenAddress()` 供日志观测实际绑定地址，不等于外部可达地址。应用配置允许端口零用于测试动态监听，这类节点不进入出站路由；正常部署使用非零固定端口。底层 cluster.Open(Runtime, ListenConfig) 仍是基础设施接口，Cluster 本身不管理 Runtime 生命周期。
 
 Service 创建成功后即可工作；`OnStart` 是 Runtime 生命周期钩子，`Start` Command 则是 Service 自行定义的可选业务协议，二者不同。Counter 等简单 Service 不增加 Start Command；需要分阶段启动参数或业务准备的 Service 才定义它。
 

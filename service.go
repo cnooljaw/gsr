@@ -43,6 +43,7 @@ type CommandContext interface {
 type serviceAdapter struct {
 	service Service
 	node    *application
+	id      runtime.ServiceID
 	cluster *Cluster
 	logger  *logging.Logger
 }
@@ -62,6 +63,8 @@ func (node *application) wrap(service Service) (*serviceAdapter, error) {
 }
 
 func (adapter *serviceAdapter) OnStart(ctx context.Context, self runtime.ServiceContext) error {
+	adapter.id = self.Self()
+	adapter.node.activateID(adapter.id)
 	client, err := adapter.node.cluster.Client(self.Self())
 	if err != nil {
 		return err
@@ -78,6 +81,7 @@ func (adapter *serviceAdapter) Handle(ctx runtime.CommandContext, command runtim
 }
 
 func (adapter *serviceAdapter) OnStop(ctx context.Context) error {
+	adapter.node.unregisterID(adapter.id)
 	return adapter.service.OnStop(ctx)
 }
 

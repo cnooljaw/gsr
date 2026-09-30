@@ -28,7 +28,7 @@
 | `ShutdownTimeout` | Core 0.5 | Skynet 主退出路径主要 join 线程，没有 GSR 同等的统一 Runtime deadline | GSR 新增约束 | GSR 的内部关闭预算用于 `Close()` 触发的停止；`Stop(ctx)` 的调用方 context 只控制当前等待。Go 不能强杀不响应取消的 Handler/`OnStop`。 |
 | `Service`、`CreateService(ctx, service)` | 已实现 | `skynet_context`、Lua service、`skynet.newservice()`、`.launcher` | 借鉴后重构 | 宿主创建普通 MainService；任何 Service 都可通过 ServiceContext.CreateService 创建实例，复用 Runtime，不新增 Launcher、工厂或自动 Bootstrap。创建经过 OnStart，失败只回滚当前实例；已成功创建的子 Service 仍归 Runtime 管理。 |
 | `ServiceID uint64` | Core 0 已定 | `skynet_context` 的 32 位 handle；远端 handle 还可能带 harbor 位 | 借鉴后重构 | GSR ServiceID 只在当前 Runtime 有效，不编码 Node、Epoch、Generation，也不作为远端地址。 |
-| `ServiceName`、外层 Registry/Discovery | 应用层静态注册和本地按名调用已实现；动态发现未实现 | `skynet.register()`、`skynet.localname()`、`.service`、`cluster.register()` | 借鉴后重构 | GSR 稳定逻辑名称不属于 Core ServiceID；`self.Register` 发布本节点名称，供本地 SendName/CallName 与跨节点入站共用，不自动注销或重绑。动态发现仍属外层能力。 |
+| `ServiceName`、外层 Registry/Discovery | 应用层静态注册和本地按名调用已实现；动态发现未实现 | `skynet.register()`、`skynet.localname()`、`.service`、`cluster.register()` | 借鉴后重构 | GSR 稳定逻辑名称不属于 Core ServiceID；`self.Register` 发布本节点名称，供本地 SendName/CallName 与跨节点入站共用；目标 Service 停止时清理，运行中不改绑。动态发现仍属外层能力。 |
 | `Service.OnStart` / `OnStop` | Core 1 已实现 | `skynet.start(func)`、`skynet.init_service()`、`skynet.exit()` | 借鉴后重构 | Skynet 的 `start` 是单个 Lua service 的初始化入口；GSR 把 Runtime 基础设施启动和 Service 生命周期分开，OnStart 接收协作 context 并显式返回 error。 |
 | `ServiceContext.Exit()` | 已实现 | `skynet.exit()` | 借鉴后重构 | Skynet 通过协程 QUIT 离开执行；Go 只标记退出，必须正常 return。当前 Call 按返回值完成，再停止自身；不停止新建的 Service 或 Runtime。 |
 | Runtime `Stop(ctx)` / `Close()` | Core 0.5 | `skynet_handle_retireall()` 与进程退出清理 | 职责相近而非直接对应 | 面向整个 Runtime；有序停止与最终释放分为两个幂等阶段，有 deadline 但不能强杀，Stop 后不允许重启。不等同于单 Service 的 exit/kill。 |

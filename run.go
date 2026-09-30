@@ -35,7 +35,10 @@ func Run(ctx context.Context, config Config, entry Service) (result error) {
 	if config.Runtime.Logger != nil || config.Cluster.Logger != nil {
 		return errors.New("gsr: configure shared logger through Logging")
 	}
-	node := &application{names: make(map[cluster.ServiceName]runtime.ServiceID)}
+	node := &application{
+		names:  make(map[cluster.ServiceName]runtime.ServiceID),
+		active: make(map[runtime.ServiceID]struct{}),
+	}
 	defer func() { result = errors.Join(result, node.close()) }()
 	var err error
 	node.nodes, config.Cluster.Nodes, err = splitNodeAddresses(config.Cluster.Nodes)
@@ -78,6 +81,7 @@ type application struct {
 	nodes         map[cluster.NodeID]string
 	mu            sync.RWMutex
 	names         map[cluster.ServiceName]runtime.ServiceID
+	active        map[runtime.ServiceID]struct{}
 	listenAddress string
 }
 
@@ -90,11 +94,20 @@ func (node *application) register(name cluster.ServiceName, id runtime.ServiceID
 	}
 	node.mu.Lock()
 	defer node.mu.Unlock()
+	if _, exists := node.active[id]; !exists {
+		return runtime.ErrServiceNotFound
+	}
 	if _, exists := node.names[name]; exists {
 		return ErrServiceNameRegistered
 	}
 	node.names[name] = id
 	return nil
+}
+
+func (node *application) activateID(id runtime.ServiceID) {
+	node.mu.Lock()
+	node.active[id] = struct{}{}
+	node.mu.Unlock()
 }
 
 func (node *application) resolve(name cluster.ServiceName) (runtime.ServiceID, error) {
@@ -105,6 +118,17 @@ func (node *application) resolve(name cluster.ServiceName) (runtime.ServiceID, e
 		return 0, runtime.ErrServiceNotFound
 	}
 	return id, nil
+}
+
+func (node *application) unregisterID(id runtime.ServiceID) {
+	node.mu.Lock()
+	defer node.mu.Unlock()
+	delete(node.active, id)
+	for name, target := range node.names {
+		if target == id {
+			delete(node.names, name)
+		}
+	}
 }
 
 func (node *application) close() error {

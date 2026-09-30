@@ -25,7 +25,7 @@
 - **统一日志服务**：logging.Logger 提供共享 FIFO 队列和单写入者；记录处采集时间、位置和内容快照，按成功入队序号输出。业务、Runtime、Cluster 注入同一 Logger，框架直接记录，不通过 Diagnostics 转发。应用最后关闭它；支持终端、借用 Writer 和 Directory 选择的滚动文件，内部文件由 Logger 管理。输出失败后拒绝接纳，Err() 与 Close 保留首次故障；SLS 外部采集待后续。
 
 - **ServiceID**：`uint64` 形式的 Runtime 局部 Service 地址，只在当前 Runtime 生命周期内有效，不包含 Node、Epoch 或 Generation，也不是可持久化业务身份。
-- **ServiceName**：由 Core 外层管理的稳定逻辑名称。应用层 `self.Register(name, id)` 发布本节点映射；本地 `self.SendName/CallName` 与 Cluster 入站共用该表，每次解析成当前节点的 ServiceID。当前不自动注销或重绑；跨节点动态发现仍属外层能力。
+- **ServiceName**：由 Core 外层管理的稳定逻辑名称。应用层 `self.Register(name, id)` 只接受当前应用仍存活的目标 ServiceID；本地 `self.SendName/CallName` 与 Cluster 入站共用该表，每次解析成当前节点的 ServiceID。名称归目标 ServiceID，目标启动失败或停止时在业务 OnStop 前自动清理，之后可由新实例复用；运行中的名称不直接改绑。跨节点动态发现仍属外层能力。
 - **NodeID**：Cluster 用于选择远端节点和连接的路由名称，不属于 Core ServiceID。仅出站调用不要求本地 NodeID 或监听；入站不持有来源 NodeID，Call 回复沿原连接返回。主动 Send/Call 与 open 接受新调用是独立能力，NodeID 不是认证凭据。
 - **SessionID**：`uint64` 形式的 Core 本地请求关联号；零表示 Send、不需要 Reply，非零表示 Call、等待一次 Reply。它只负责关联，在当前 Runtime 内单调分配且不回绕复用。
 - **TimerID**：`uint64` 形式的 Runtime 局部 Timer 标识，只在当前 Runtime 生命周期内有效；零值无效，已发放的 ID 不回绕复用。

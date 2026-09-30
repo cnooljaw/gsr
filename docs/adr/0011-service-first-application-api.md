@@ -57,3 +57,7 @@ value, err = cluster.Call(ctx, "battle", "echo", echoCommand, "hello")
 4. 验证多 Service 并发来源隔离、仅出站节点、初始化回滚、有序关闭，以及双进程恢复。
 
 实施进度：已移除 app.Host、app.Config.Commands、CommandCodecRegistry，统一默认编码并由目标解释 Command。gsr.Run、self.Cluster()、self.Logger()、self.Register()、本地 SendName/CallName 和按节点名 Open 已落地；双节点示例不再持有 Host 或手工绑定 Client。底层 Runtime/Cluster 仍保留基础设施 API，应用层通过最小 Service 适配器复用 Core 生命周期，不增加 ServiceManager。
+
+## 后续裁决：名称生命周期（2026-09-30）
+
+名称映射归目标 ServiceID，而非调用 Register 的 Service。Register 只接受当前应用内仍存活的目标 ID，避免目标退出后重新发布陈旧地址。目标 Service 启动失败、Exit 或停止时，应用层在调用其业务 OnStop 前删除全部对应名称；发布名称的 MainService 先退出，不会撤销仍存活的目标 Service。清理后允许新实例注册同名，但不在目标存活期间静默改绑。Core 不持有名称表；无法强杀不返回的 Handler，因此 Handler 尚未返回时不能保证名称已经清理。

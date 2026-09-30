@@ -276,6 +276,9 @@ func TestServiceContextCallsLocalServiceByName(t *testing.T) {
 		if err := self.Register("zero", 0); !errors.Is(err, runtime.ErrServiceNotFound) {
 			return errors.New("zero service ID accepted")
 		}
+		if err := self.Register("unknown", runtime.ServiceID(999999)); !errors.Is(err, runtime.ErrServiceNotFound) {
+			return errors.New("unknown service ID accepted")
+		}
 		if err := self.SendName("missing", 1); !errors.Is(err, runtime.ErrServiceNotFound) {
 			return errors.New("unknown send name accepted")
 		}
@@ -363,5 +366,107 @@ func TestCommandContextCallsLocalServiceByName(t *testing.T) {
 		}
 	default:
 		t.Fatal("handler did not complete named calls")
+	}
+}
+
+// 验证启动失败且 OnStop panic 时仍清理名称，后续实例可复用同名入口。
+func TestServiceNameClearedAfterStartupFailure(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	startFailure := errors.New("start failed")
+	entry := &probeService{start: func(ctx context.Context, self ServiceContext) error {
+		_, err := self.CreateService(ctx, &probeService{
+			start: func(_ context.Context, child ServiceContext) error {
+				if err := child.Register("echo", child.Self()); err != nil {
+					return err
+				}
+				return startFailure
+			},
+			stop: func(context.Context) error {
+				panic("stop failed")
+			},
+		})
+		if !errors.Is(err, startFailure) || !errors.Is(err, runtime.ErrServicePanicked) {
+			return errors.New("startup failure was not preserved")
+		}
+		id, err := self.CreateService(ctx, &probeService{handle: func(CommandContext) (any, error) {
+			return "replacement", nil
+		}})
+		if err != nil {
+			return err
+		}
+		if err := self.Register("echo", id); err != nil {
+			return err
+		}
+		value, err := self.CallName(ctx, "echo", 1)
+		if err != nil || value != "replacement" {
+			return errors.New("replacement did not receive named call")
+		}
+		cancel()
+		return nil
+	}}
+	if err := Run(ctx, Config{Logging: logging.Config{Writer: io.Discard}}, entry); err != nil {
+		t.Fatal(err)
+	}
+}
+
+// 验证目标 Service 退出后移除它的全部名称，后续实例可以复用这些名称。
+func TestServiceNameClearedAfterExit(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	stopped := make(chan struct{})
+	entry := &probeService{start: func(ctx context.Context, self ServiceContext) error {
+		stoppedID, err := self.CreateService(ctx, &probeService{
+			start: func(_ context.Context, child ServiceContext) error {
+				if err := child.Register("echo", child.Self()); err != nil {
+					return err
+				}
+				return child.Register("alias", child.Self())
+			},
+			handle: func(current CommandContext) (any, error) {
+				current.Exit()
+				return "stopped", nil
+			},
+			stop: func(context.Context) error {
+				close(stopped)
+				return nil
+			},
+		})
+		if err != nil {
+			return err
+		}
+		value, err := self.CallName(ctx, "echo", 1)
+		if err != nil || value != "stopped" {
+			return errors.New("original named call failed")
+		}
+		select {
+		case <-stopped:
+		case <-ctx.Done():
+			return ctx.Err()
+		}
+		id, err := self.CreateService(ctx, &probeService{handle: func(CommandContext) (any, error) {
+			return "replacement", nil
+		}})
+		if err != nil {
+			return err
+		}
+		if err := self.Register("echo", id); err != nil {
+			return err
+		}
+		if err := self.Register("alias", id); err != nil {
+			return err
+		}
+		if err := self.Register("stale", stoppedID); !errors.Is(err, runtime.ErrServiceNotFound) {
+			return errors.New("stopped service ID was registered again")
+		}
+		value, err = self.CallName(ctx, "echo", 1)
+		if err != nil || value != "replacement" {
+			return errors.New("replacement did not receive named call")
+		}
+		cancel()
+		return nil
+	}}
+	if err := Run(ctx, Config{Logging: logging.Config{Writer: io.Discard}}, entry); err != nil {
+		t.Fatal(err)
 	}
 }
