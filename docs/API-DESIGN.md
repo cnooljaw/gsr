@@ -851,6 +851,8 @@ Run 内部固定按 Cluster.Quiesce → Runtime.Close → Cluster.Close → 最�
 
 名称归目标 ServiceID：该 Service 启动失败、Exit、停止或 panic 后，应用层在调用其业务 OnStop 前清理全部对应名称；发布它的 MainService 先退出不影响该映射。清理后新实例可注册同名；运行中的名称不支持直接改绑，也不负责业务资源所有权或发现。
 
+推荐由创建者（通常是 MainService）在 `CreateService` 成功返回后再调用 `Register(name, id)`。目标 Service 不在自己的 `OnStart` 中提前发布名称：Runtime 要等 `OnStart` 成功返回才正式接纳该 Service，提前注册会出现名称可解析、目标却尚不可投递的短暂窗口。业务 `OnStop` 无需手工注销，应用层在调用它之前已完成清理。
+
 `Open(nodeName)` 从 Config.Cluster.Nodes 取端口绑定 0.0.0.0，由共享 Cluster 管理唯一监听；未知名称报错，不 Open 仍可主动 Send/Call。`ListenAddress()` 供日志观测实际绑定地址，不等于外部可达地址。应用配置允许端口零用于测试动态监听，这类节点不进入出站路由；正常部署使用非零固定端口。底层 cluster.Open(Runtime, ListenConfig) 仍是基础设施接口，Cluster 本身不管理 Runtime 生命周期。
 
 Service 创建成功后即可工作；`OnStart` 是 Runtime 生命周期钩子，`Start` Command 则是 Service 自行定义的可选业务协议，二者不同。Counter 等简单 Service 不增加 Start Command；需要分阶段启动参数或业务准备的 Service 才定义它。

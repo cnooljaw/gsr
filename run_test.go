@@ -377,6 +377,7 @@ func TestServiceNameClearedAfterStartupFailure(t *testing.T) {
 	entry := &probeService{start: func(ctx context.Context, self ServiceContext) error {
 		_, err := self.CreateService(ctx, &probeService{
 			start: func(_ context.Context, child ServiceContext) error {
+				// 故意在正式发布前注册，用于验证异常启动时的防御性清理。
 				if err := child.Register("echo", child.Self()); err != nil {
 					return err
 				}

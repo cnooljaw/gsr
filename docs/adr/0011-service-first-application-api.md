@@ -61,3 +61,5 @@ value, err = cluster.Call(ctx, "battle", "echo", echoCommand, "hello")
 ## 后续裁决：名称生命周期（2026-09-30）
 
 名称映射归目标 ServiceID，而非调用 Register 的 Service。Register 只接受当前应用内仍存活的目标 ID，避免目标退出后重新发布陈旧地址。目标 Service 启动失败、Exit 或停止时，应用层在调用其业务 OnStop 前删除全部对应名称；发布名称的 MainService 先退出，不会撤销仍存活的目标 Service。清理后允许新实例注册同名，但不在目标存活期间静默改绑。Core 不持有名称表；无法强杀不返回的 Handler，因此 Handler 尚未返回时不能保证名称已经清理。
+
+业务组装推荐先 `CreateService`，成功返回后由创建者（通常是 MainService）`Register`；不要求目标 Service 在 OnStart 自行注册。后者会在 Runtime 正式发布目标 Service 前暴露名称，调用方可能在这个窗口解析到尚不可投递的 ID。业务 OnStop 不手写注销。
