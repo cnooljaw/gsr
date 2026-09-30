@@ -17,7 +17,7 @@ Runtime 需要保持一个清晰的业务入口：它只把本地 Message 投递
 ## Decision
 
 - `Service.Handle(CommandContext, CommandID, ...any) (any, error)` 是 Runtime 唯一调用的业务入口。
-- `gsr` 应用层提供唯一可选的 `Dispatcher`；Core `runtime` 不维护对应分发表。Dispatcher 属于单个应用 Service，不是全局 Registry；普通 Service 可以嵌入它，需要特殊组合或热点优化的 Service 可以直接实现 `Handle`。
+- `gsr` 应用层提供唯一可选的 `Dispatcher`；Core `runtime` 不维护对应分发表。Dispatcher 属于单个应用 Service，不是全局 Registry；普通业务 Service 默认嵌入它。基础设施的特殊入口可以直接实现 `Handle`；业务只在真实压测证实分发瓶颈、手写版本有收益时，对个别热点 Command 手写 `Handle` 快速分支，并把其它命令交回 Dispatcher。
 - `NewDispatcher(map[runtime.CommandID]any)` 在构造阶段复制命令表、校验 Handler 签名并准备参数绑定；`MustDispatcher` 仅为静态定义的命令表提供 fail-fast。运行期不提供 `Register`、`Unregister` 或其它可变注册入口，也不引入额外的 `CommandHandlers` 类型。
 - `CommandID` 固定为 `uint32`，与协议命令字段同宽以保留现有命令值兼容性；它由业务/协议包维护静态常量或生成代码，Runtime 不分配。
 - 标准 typed Handler 只允许：
@@ -28,7 +28,7 @@ Runtime 需要保持一个清晰的业务入口：它只把本地 Message 投递
   ```
 
   Handler 不使用 Go variadic 签名；一个稳定 CommandID 的参数数量和类型在构造时固定。外部 `Send/Call(...args)` 的 variadic 只是消息装配形式。
-- 构造时用反射校验签名并保存绑定信息，运行时仍使用 `reflect.Call`，不得在每条消息上重新解析签名。真实压测若证明个别 Service 受此限制，优先由该 Service 手写无反射 `Handle`；不要求全项目使用生成代码。
+- 构造时用反射校验签名并保存绑定信息，运行时仍使用 `reflect.Call`，不得在每条消息上重新解析签名。真实压测若证明个别 Command 受此限制，优先由所属 Service 手写该命令的快速分支并对照验证收益；其余命令仍走 Dispatcher，不要求全项目使用生成代码。
 - Dispatcher 负责参数数量和类型校验，返回 `ErrInvalidCommandArguments`；非法 Handler 定义返回 `ErrInvalidCommandHandler`；命令不存在返回 `ErrUnknownCommand`。这些错误使用稳定的 ErrorClass/ErrorCode，Message 只用于安全诊断。
 - Runtime 不做 per-Service Command 预检查。未知 Command、Timer Command 与其它 Message 一样进入目标 Mailbox，再由 Dispatcher 或 Service.Handle 返回 `ErrUnknownCommand`。
 - Dispatcher 只返回 `(any, error)`，不得调用 `CommandContext.Reply()`。Runtime 根据 SessionID 自动完成 Reply：Send 忽略结果，Call 获取结果或结构化错误。`CommandContext` 不提供手工或异步 Reply API。
@@ -38,7 +38,7 @@ Runtime 需要保持一个清晰的业务入口：它只把本地 Message 投递
 
 - 普通 Service 获得统一的 typed 参数绑定，底层仍只有一个 Handle/Message/Mailbox 路径。
 - Runtime 不知道 Service 支持哪些命令，因而不会把命令表变成第二个路由或 admission 系统。
-- 直接实现 `Handle` 仍保留为扩展口，避免 Dispatcher 限制 Decorator、动态模块和基础设施端点。
+- 直接实现 `Handle` 仍保留为扩展口，供基础设施特殊入口和经实测确认的业务热点使用；业务热点仅手写需要的分支，普通命令仍委托 Dispatcher，它不是普通业务的并列默认写法。
 - 返回值 Reply 路径只有 Runtime 一条，避免手工 Reply、重复 Reply 和异步 Reply 的状态竞争。
 - 反射实现有热路径成本；保留分发基准用于观察，不因单个合成基准引入全局代码生成框架。
 - `ErrUnknownCommand` 等命令错误会成为新的稳定 Core ErrorCode；发布后不能仅因文案或实现重构而改变其程序身份。

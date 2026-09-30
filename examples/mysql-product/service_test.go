@@ -166,7 +166,16 @@ func TestProductServiceRecoversAfterSQLTimeout(t *testing.T) {
 
 // TestProductServiceRejectsInvalidCommands 验证非法产品、ID 和未知命令在访问数据库前被拒绝。
 func TestProductServiceRejectsInvalidCommands(t *testing.T) {
-	service := &productService{}
+	db, _, err := sqlmock.New()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = db.Close() })
+	service, err := newProductService(db, time.Second)
+	if err != nil {
+		t.Fatal(err)
+	}
+	current := productTestCommandContext{}
 	for _, check := range []struct {
 		command runtime.CommandID
 		args    []any
@@ -180,11 +189,13 @@ func TestProductServiceRejectsInvalidCommands(t *testing.T) {
 		{deleteProductCommand, []any{"42"}, runtime.ErrInvalidCommandArguments},
 		{runtime.CommandID(99), nil, runtime.ErrUnknownCommand},
 	} {
-		if _, err := service.Handle(nil, check.command, check.args...); !errors.Is(err, check.want) {
+		if _, err := service.Handle(current, check.command, check.args...); !errors.Is(err, check.want) {
 			t.Fatalf("Handle(%d, %v) error = %v; want %v", check.command, check.args, err, check.want)
 		}
 	}
 }
+
+type productTestCommandContext struct{ gsr.CommandContext }
 
 // TestProductServiceRequiresBoundedDatabase 验证产品 Service 拒绝空数据库和无限等待配置。
 func TestProductServiceRequiresBoundedDatabase(t *testing.T) {

@@ -128,6 +128,28 @@ func TestDispatcherPreservesHandlerResults(t *testing.T) {
 	}
 }
 
+// 验证 Service 可只手写一个热点命令，其余命令仍交给嵌入的 Dispatcher。
+func TestDispatcherFallbackFromCustomHandle(t *testing.T) {
+	service := &dispatcherOverrideService{}
+	service.Dispatcher = MustDispatcher(map[runtime.CommandID]any{
+		dispatcherEchoCommand: func(_ CommandContext, text string) (string, error) {
+			return text, nil
+		},
+	})
+	current := dispatcherTestContext{}
+	result, err := service.Handle(current, dispatcherHotCommand, 7)
+	if err != nil || result != 14 {
+		t.Fatalf("hot Handle result=%v error=%v", result, err)
+	}
+	result, err = service.Handle(current, dispatcherEchoCommand, "ordinary")
+	if err != nil || result != "ordinary" {
+		t.Fatalf("fallback result=%v error=%v", result, err)
+	}
+	if _, err := service.Handle(current, 99); !errors.Is(err, runtime.ErrUnknownCommand) {
+		t.Fatalf("unknown command error=%v, want ErrUnknownCommand", err)
+	}
+}
+
 // 验证 MustDispatcher 只在静态命令定义无效时 panic。
 func TestMustDispatcherPanicsOnInvalidDefinition(t *testing.T) {
 	defer func() {
@@ -156,6 +178,24 @@ func BenchmarkDispatcher(b *testing.B) {
 }
 
 type dispatcherTestContext struct{ CommandContext }
+
+const dispatcherHotCommand runtime.CommandID = 3
+
+type dispatcherOverrideService struct{ *Dispatcher }
+
+func (service *dispatcherOverrideService) Handle(ctx CommandContext, command runtime.CommandID, args ...any) (any, error) {
+	if command == dispatcherHotCommand {
+		if len(args) != 1 {
+			return nil, runtime.ErrInvalidCommandArguments
+		}
+		value, ok := args[0].(int)
+		if !ok {
+			return nil, runtime.ErrInvalidCommandArguments
+		}
+		return value * 2, nil
+	}
+	return service.Dispatcher.Handle(ctx, command, args...)
+}
 
 type dispatcherTestService struct {
 	*Dispatcher

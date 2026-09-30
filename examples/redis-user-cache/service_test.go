@@ -91,7 +91,8 @@ func TestUserProfileServiceRejectsCorruptHash(t *testing.T) {
 
 // TestUserProfileServiceRejectsInvalidCommand 验证非法参数和未知命令在访问 Redis 前被拒绝。
 func TestUserProfileServiceRejectsInvalidCommand(t *testing.T) {
-	service := &userProfileService{}
+	service := newUserProfileService(nil)
+	current := userProfileTestCommandContext{}
 	for _, check := range []struct {
 		command runtime.CommandID
 		args    []any
@@ -101,11 +102,13 @@ func TestUserProfileServiceRejectsInvalidCommand(t *testing.T) {
 		{loadUserCommand, []any{uint64(0)}, runtime.ErrInvalidCommandArguments},
 		{runtime.CommandID(99), nil, runtime.ErrUnknownCommand},
 	} {
-		if _, err := service.Handle(nil, check.command, check.args...); !errors.Is(err, check.want) {
+		if _, err := service.Handle(current, check.command, check.args...); !errors.Is(err, check.want) {
 			t.Fatalf("Handle(%d, %v) error = %v; want %v", check.command, check.args, err, check.want)
 		}
 	}
 }
+
+type userProfileTestCommandContext struct{ gsr.CommandContext }
 
 // TestSlowRedisDoesNotBlockOtherService 验证一个 Service 等待 Redis 时，另一个 Service 仍能及时回复。
 func TestSlowRedisDoesNotBlockOtherService(t *testing.T) {
@@ -254,7 +257,7 @@ type redisTestMainService struct {
 }
 
 func (service *redisTestMainService) OnStart(ctx context.Context, self gsr.ServiceContext) error {
-	id, err := self.CreateService(ctx, &userProfileService{cache: service.cache})
+	id, err := self.CreateService(ctx, newUserProfileService(service.cache))
 	if err != nil {
 		return err
 	}

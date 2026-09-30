@@ -44,6 +44,7 @@ type product struct {
 
 // productService 独占产品命令的执行路径，直接借用应用管理的数据库连接池。
 type productService struct {
+	*gsr.Dispatcher
 	db      *sql.DB
 	timeout time.Duration
 }
@@ -52,74 +53,75 @@ func newProductService(db *sql.DB, timeout time.Duration) (*productService, erro
 	if db == nil || timeout <= 0 {
 		return nil, errors.New("product service requires a database and finite timeout")
 	}
-	return &productService{db: db, timeout: timeout}, nil
+	service := &productService{db: db, timeout: timeout}
+	service.Dispatcher = gsr.MustDispatcher(map[runtime.CommandID]any{
+		createProductCommand: service.handleCreate,
+		getProductCommand:    service.handleGet,
+		updateProductCommand: service.handleUpdate,
+		deleteProductCommand: service.handleDelete,
+	})
+	return service, nil
 }
 
 func (service *productService) OnStart(_ context.Context, _ gsr.ServiceContext) error {
 	return nil
 }
 
-// Handle 在同一 Service runner 中串行执行产品命令；每次 SQL 操作有独立的有限等待。
-func (service *productService) Handle(ctx gsr.CommandContext, command runtime.CommandID, args ...any) (any, error) {
-	switch command {
-	case createProductCommand:
-		if len(args) != 1 {
-			return nil, runtime.ErrInvalidCommandArguments
-		}
-		value, ok := args[0].(product)
-		if !ok || value.ID != 0 || !validProductDetails(value) {
-			return nil, runtime.ErrInvalidCommandArguments
-		}
-		created, err := service.create(value)
-		if err != nil {
-			return nil, service.storeFailure(ctx, "create", err)
-		}
-		return created, nil
-	case getProductCommand:
-		id, ok := productIDArg(args)
-		if !ok {
-			return nil, runtime.ErrInvalidCommandArguments
-		}
-		found, err := service.get(id)
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, errProductNotFound
-		}
-		if err != nil {
-			return nil, service.storeFailure(ctx, "get", err)
-		}
-		return found, nil
-	case updateProductCommand:
-		if len(args) != 1 {
-			return nil, runtime.ErrInvalidCommandArguments
-		}
-		value, ok := args[0].(product)
-		if !ok || value.ID <= 0 || !validProductDetails(value) {
-			return nil, runtime.ErrInvalidCommandArguments
-		}
-		err := service.update(value)
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, errProductNotFound
-		}
-		if err != nil {
-			return nil, service.storeFailure(ctx, "update", err)
-		}
-		return nil, nil
-	case deleteProductCommand:
-		id, ok := productIDArg(args)
-		if !ok {
-			return nil, runtime.ErrInvalidCommandArguments
-		}
-		err := service.delete(id)
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, errProductNotFound
-		}
-		if err != nil {
-			return nil, service.storeFailure(ctx, "delete", err)
-		}
-		return nil, nil
-	default:
-		return nil, runtime.ErrUnknownCommand
+// handleCreate 校验产品详情后写入数据库；命令参数类型由 Dispatcher 校验。
+func (service *productService) handleCreate(ctx gsr.CommandContext, value product) (product, error) {
+	if value.ID != 0 || !validProductDetails(value) {
+		return product{}, runtime.ErrInvalidCommandArguments
 	}
+	created, err := service.create(value)
+	if err != nil {
+		return product{}, service.storeFailure(ctx, "create", err)
+	}
+	return created, nil
+}
+
+// handleGet 保留“未找到”和数据库故障的不同业务结果。
+func (service *productService) handleGet(ctx gsr.CommandContext, id int64) (product, error) {
+	if id <= 0 {
+		return product{}, runtime.ErrInvalidCommandArguments
+	}
+	found, err := service.get(id)
+	if errors.Is(err, sql.ErrNoRows) {
+		return product{}, errProductNotFound
+	}
+	if err != nil {
+		return product{}, service.storeFailure(ctx, "get", err)
+	}
+	return found, nil
+}
+
+// handleUpdate 校验业务字段，并区分相同值更新与产品不存在。
+func (service *productService) handleUpdate(ctx gsr.CommandContext, value product) error {
+	if value.ID <= 0 || !validProductDetails(value) {
+		return runtime.ErrInvalidCommandArguments
+	}
+	err := service.update(value)
+	if errors.Is(err, sql.ErrNoRows) {
+		return errProductNotFound
+	}
+	if err != nil {
+		return service.storeFailure(ctx, "update", err)
+	}
+	return nil
+}
+
+// handleDelete 只接受有效 ID，并保留产品不存在的业务错误。
+func (service *productService) handleDelete(ctx gsr.CommandContext, id int64) error {
+	if id <= 0 {
+		return runtime.ErrInvalidCommandArguments
+	}
+	err := service.delete(id)
+	if errors.Is(err, sql.ErrNoRows) {
+		return errProductNotFound
+	}
+	if err != nil {
+		return service.storeFailure(ctx, "delete", err)
+	}
+	return nil
 }
 
 // OnStop 不关闭借用的数据库连接池；应用在 Runtime 收尾后负责关闭它。
@@ -198,14 +200,6 @@ func (service *productService) storeFailure(ctx gsr.CommandContext, operation st
 		_ = ctx.Logger().Error("product database operation failed", "operation", operation, "error", err.Error())
 	}
 	return errProductStoreUnavailable
-}
-
-func productIDArg(args []any) (int64, bool) {
-	if len(args) != 1 {
-		return 0, false
-	}
-	id, ok := args[0].(int64)
-	return id, ok && id > 0
 }
 
 func validProductDetails(value product) bool {

@@ -1,6 +1,6 @@
 # GSR Service 调用 Redis Hash
 
-这个可运行示例展示：`mainService` 用 `CreateService/Call` 访问业务 `userProfileService`，后者在自己的 Handler 中同步调用普通的 `userHashCache`。缓存对象不是另一个 Service，也不是权威用户数据源。
+这个可运行示例展示：`mainService` 用 `CreateService/Call` 访问业务 `userProfileService`，后者用 `gsr.Dispatcher` 绑定强类型 Handler，并在自身 Handler 中同步调用普通的 `userHashCache`。缓存对象不是另一个 Service，也不是权威用户数据源。
 
 从仓库根目录启动一个隔离的测试 Redis（终端一）：
 

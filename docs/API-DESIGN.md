@@ -251,9 +251,9 @@ type Handler interface {
 
 Source、Call 上限和自动 Reply 的完整取舍见 [ADR 0007](adr/0007-command-context-call-and-timeout-stop.md)；受控 Redirect/Relay 见 [ADR 0009](adr/0009-controlled-redirect-and-source.md)。
 
-### 4.4 应用 Service 的 Dispatcher（可选）
+### 4.4 业务 Service 默认使用 Dispatcher
 
-`Service.Handle` 仍是 Runtime 唯一调用的业务入口。为了避免普通应用 Service 重复编写 `switch`、`[]any` 参数数量检查和类型断言，`gsr` 包提供一个可选的、每 Service 独立且不可变的 `Dispatcher`。它匹配应用层的 `gsr.CommandContext`；Core `runtime` 不另设一套同名分发器：
+`Service.Handle` 仍是 Runtime 唯一调用的业务入口。普通业务 Service 默认使用 `gsr.Dispatcher`，不重复编写 `switch`、`[]any` 参数数量检查和类型断言。它是可选的每 Service 不可变能力，匹配应用层的 `gsr.CommandContext`；Core `runtime` 不另设一套同名分发器：
 
 ```go
 func NewDispatcher(map[runtime.CommandID]any) (*Dispatcher, error)
@@ -296,11 +296,11 @@ func(CommandContext, A, B, ...) (R, error)
 
 命令表只是构造输入，不是 Runtime Registry。业务只绑定已实现的命令，协议定义不要求同步实现全部 Handler。运行期不提供 `Register`、`Unregister` 或 per-Service 命令预检查；未知 Command 仍作为普通 Message 进入目标 Mailbox，由 Dispatcher 或 Service.Handle 自己返回 `ErrUnknownCommand`。Timer 也不预检查命令。
 
-Dispatcher 只返回 `(any, error)`，不调用 `CommandContext.Reply()`。Runtime 根据 Message 的 SessionID 自动完成 Reply：Send 丢弃返回值，Call 获取返回值或结构化错误。需要 Decorator、动态模块组合或特殊入口的 Service 可以直接实现 `Handle`，不强制使用 dispatcher。
+Dispatcher 只返回 `(any, error)`，不调用 `CommandContext.Reply()`。Runtime 根据 Message 的 SessionID 自动完成 Reply：Send 丢弃返回值，Call 获取返回值或结构化错误。基础设施的特殊消息入口可以直接实现 `Handle`；普通业务 Service 不因代码形式偏好改回手写分发。
 
 CommandID 由业务/协议包维护静态常量或生成代码；Runtime 不分配 CommandID，也不从命令表推断 Service 能力。一个 CommandID 的参数数量和类型在其对应的 typed Handler 中固定，外层 `Send/Call(...args)` 的 variadic 只表示消息装配便利，不表示 Handler 可以使用 Go variadic 签名。
 
-普通业务默认使用强类型 Dispatcher；若真实压测证明某个纯计算 Service 的反射分发成为瓶颈，该 Service 可以直接实现无反射 `Handle`。不把代码生成作为所有 Service 的构建前提。
+只有真实压测证明个别 Command 的反射分发已经成为瓶颈，且手写版本在相同负载下确有收益，才由该 Service 显式实现 `Handle`：热点 Command 手写快速分支，其余命令继续调用 `service.Dispatcher.Handle(ctx, command, args...)`。不把普通命令改回大 `switch`。这是局部优化，不改变 Runtime 的消息、Mailbox、Reply 或错误语义，也不把代码生成作为所有 Service 的构建前提。
 
 ## 5. Source 语义
 

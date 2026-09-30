@@ -26,7 +26,17 @@ type userLookup struct {
 
 // userProfileService 处理用户资料业务命令，直接调用 Redis 缓存，而非另建 RedisService。
 type userProfileService struct {
+	*gsr.Dispatcher
 	cache *userHashCache
+}
+
+func newUserProfileService(cache *userHashCache) *userProfileService {
+	service := &userProfileService{cache: cache}
+	service.Dispatcher = gsr.MustDispatcher(map[runtime.CommandID]any{
+		cacheUserCommand: service.handleCache,
+		loadUserCommand:  service.handleLoad,
+	})
+	return service
 }
 
 // OnStart 只校验注入的依赖；Redis Client 的生命周期归应用所有。
@@ -37,40 +47,30 @@ func (service *userProfileService) OnStart(_ context.Context, _ gsr.ServiceConte
 	return nil
 }
 
-// Handle 串行处理业务命令；Redis I/O 有缓存对象设置的有限等待时间。
-func (service *userProfileService) Handle(_ gsr.CommandContext, command runtime.CommandID, args ...any) (any, error) {
-	switch command {
-	case cacheUserCommand:
-		if len(args) != 1 {
-			return nil, runtime.ErrInvalidCommandArguments
-		}
-		user, ok := args[0].(userInfo)
-		if !ok || user.ID == 0 || user.Name == "" || user.Level < 0 {
-			return nil, runtime.ErrInvalidCommandArguments
-		}
-		if err := service.cache.Put(context.Background(), user); err != nil {
-			return nil, errUserCacheUnavailable
-		}
-		return nil, nil
-	case loadUserCommand:
-		if len(args) != 1 {
-			return nil, runtime.ErrInvalidCommandArguments
-		}
-		id, ok := args[0].(uint64)
-		if !ok || id == 0 {
-			return nil, runtime.ErrInvalidCommandArguments
-		}
-		user, found, err := service.cache.Get(context.Background(), id)
-		if errors.Is(err, errInvalidUserHash) {
-			return nil, errUserCacheCorrupt
-		}
-		if err != nil {
-			return nil, errUserCacheUnavailable
-		}
-		return userLookup{User: user, Found: found}, nil
-	default:
-		return nil, runtime.ErrUnknownCommand
+// handleCache 校验用户业务字段后写入缓存；命令参数类型由 Dispatcher 校验。
+func (service *userProfileService) handleCache(_ gsr.CommandContext, user userInfo) error {
+	if user.ID == 0 || user.Name == "" || user.Level < 0 {
+		return runtime.ErrInvalidCommandArguments
 	}
+	if err := service.cache.Put(context.Background(), user); err != nil {
+		return errUserCacheUnavailable
+	}
+	return nil
+}
+
+// handleLoad 将缓存未命中与损坏、不可用分开返回。
+func (service *userProfileService) handleLoad(_ gsr.CommandContext, id uint64) (userLookup, error) {
+	if id == 0 {
+		return userLookup{}, runtime.ErrInvalidCommandArguments
+	}
+	user, found, err := service.cache.Get(context.Background(), id)
+	if errors.Is(err, errInvalidUserHash) {
+		return userLookup{}, errUserCacheCorrupt
+	}
+	if err != nil {
+		return userLookup{}, errUserCacheUnavailable
+	}
+	return userLookup{User: user, Found: found}, nil
 }
 
 // OnStop 不关闭借用的 Redis Client；应用在 Runtime 收尾后关闭它。
