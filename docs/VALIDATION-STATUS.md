@@ -52,6 +52,8 @@ Counter 入口统一切片：最小本地示例也改用 gsr.Run 和应用层 Se
 
 2026-10-01 应用名称表跨节点收尾：`TestRunNodesCommunicateWithoutSingleton` 增加真实 TCP 调用后的目标 Service 退出检查；远端首次按名 Call 正常返回，目标 `OnStop` 完成后再次按同名 Call 得到 `ErrServiceNotFound`，不再解析到旧 ServiceID。该定向测试的 race 检查通过；本轮只扩展验收，不修改生产实现，也不代表动态发现或在途请求迁移。
 
+同日补充同名重绑定：旧目标退出且远端确认名称失效后，仍在运行的 Service 创建并注册新目标；远端在原连接上再次按名称 Call，得到新实例回复。定向 race 测试通过；只验证后续请求重新解析，不迁移已经发出的请求。
+
 2026-09-15 名称映射切片：权限恢复后 TestClusterNameRebindingAfterServiceFailure 的真实 TCP 测试及 race 均通过，关闭此前审核服务容量故障造成的未验证项。通过公开 Open 的外层 ResolveService 和 ClusterClient.Call 验证故障实例、未更新映射的错误、新实例映射发布及旧 ID 不误投。仅测试使用原子值模拟外层注册表，不新增发现能力，不承诺映射变更会迁移在途请求；也不将该正确性验证当作名称查询的性能测量。
 
 2026-09-15 Mailbox 背压切片：TestTCPCallMailboxFullAndRecovery 使用真实 TCP Call，确定性填满默认容量 Mailbox，检查满载结构化错误、健康目标隔离、已接纳消息按序排空、拒绝消息不执行、原目标恢复，以及两端 PendingCall 清理。Runtime admission 拒绝计数恰为一次，不改容量、不自动重试、不修改生产实现。

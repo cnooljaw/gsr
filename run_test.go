@@ -173,7 +173,7 @@ func TestConcurrentServiceClusterBindings(t *testing.T) {
 	}
 }
 
-// 验证两个 Run 的名称及连接独立，目标退出后远端名称失效，纯调用节点无需 Open。
+// 验证两个 Run 的名称及连接独立，目标退出后同名新实例可供远端调用，纯调用节点无需 Open。
 func TestRunNodesCommunicateWithoutSingleton(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -194,6 +194,23 @@ func TestRunNodesCommunicateWithoutSingleton(t *testing.T) {
 			return err
 		}
 		if err := self.Register("echo", id); err != nil {
+			return err
+		}
+		managerID, err := self.CreateService(ctx, &probeService{handle: func(current CommandContext) (any, error) {
+			createContext, cancelCreate := context.WithTimeout(context.Background(), time.Second)
+			defer cancelCreate()
+			replacementID, err := current.CreateService(createContext, &probeService{handle: func(CommandContext) (any, error) {
+				return "replacement", nil
+			}})
+			if err != nil {
+				return nil, err
+			}
+			return nil, current.Register("echo", replacementID)
+		}})
+		if err != nil {
+			return err
+		}
+		if err := self.Register("manager", managerID); err != nil {
 			return err
 		}
 		if err := self.Register("echo", id); !errors.Is(err, ErrServiceNameRegistered) {
@@ -252,6 +269,13 @@ func TestRunNodesCommunicateWithoutSingleton(t *testing.T) {
 		}
 		if _, err := self.Cluster().Call(ctx, "server", "echo", 1); !errors.Is(err, runtime.ErrServiceNotFound) {
 			return errors.New("stopped service name remained remotely resolvable")
+		}
+		if _, err := self.Cluster().Call(ctx, "server", "manager", 2); err != nil {
+			return err
+		}
+		value, err = self.Cluster().Call(ctx, "server", "echo", 1)
+		if err != nil || value != "replacement" {
+			return errors.New("remote name did not reach replacement service")
 		}
 		stopCaller()
 		return nil
