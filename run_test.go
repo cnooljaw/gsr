@@ -6,6 +6,7 @@ import (
 	"errors"
 	"io"
 	"net"
+	"strconv"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -519,5 +520,59 @@ func TestServiceNameClearedAfterExit(t *testing.T) {
 	}}
 	if err := Run(ctx, Config{Logging: logging.Config{Writer: io.Discard}}, entry); err != nil {
 		t.Fatal(err)
+	}
+}
+
+// 验证并发注册与目标退出竞争后不会留下名称或重新发布已退出的 ServiceID。
+func TestServiceNameRegistrationRacesCleanup(t *testing.T) {
+	const registrations = 128
+	node := &application{
+		names:     make(map[cluster.ServiceName]runtime.ServiceID),
+		namesByID: make(map[runtime.ServiceID][]cluster.ServiceName),
+		active:    make(map[runtime.ServiceID]struct{}),
+	}
+	id := runtime.ServiceID(1)
+	node.activateID(id)
+	if err := node.register("initial", id); err != nil {
+		t.Fatal(err)
+	}
+	start := make(chan struct{})
+	errorsSeen := make(chan error, registrations)
+	var workers sync.WaitGroup
+	for i := range registrations {
+		workers.Add(1)
+		go func() {
+			defer workers.Done()
+			<-start
+			errorsSeen <- node.register(cluster.ServiceName(strconv.Itoa(i)), id)
+		}()
+	}
+	workers.Add(1)
+	go func() {
+		defer workers.Done()
+		<-start
+		node.unregisterID(id)
+	}()
+	close(start)
+	workers.Wait()
+	close(errorsSeen)
+	for err := range errorsSeen {
+		if err != nil && !errors.Is(err, runtime.ErrServiceNotFound) {
+			t.Fatalf("concurrent Register error = %v", err)
+		}
+	}
+	for i := range registrations {
+		if _, err := node.resolve(cluster.ServiceName(strconv.Itoa(i))); !errors.Is(err, runtime.ErrServiceNotFound) {
+			t.Fatalf("name %d remained after cleanup: %v", i, err)
+		}
+	}
+	if _, err := node.resolve("initial"); !errors.Is(err, runtime.ErrServiceNotFound) {
+		t.Fatalf("initial name remained after cleanup: %v", err)
+	}
+	if len(node.namesByID) != 0 {
+		t.Fatalf("reverse index retained stopped ServiceID: %d entries", len(node.namesByID))
+	}
+	if err := node.register("late", id); !errors.Is(err, runtime.ErrServiceNotFound) {
+		t.Fatalf("stopped ServiceID registered again: %v", err)
 	}
 }
