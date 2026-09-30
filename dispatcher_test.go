@@ -116,6 +116,10 @@ func TestDispatcherRejectsInvalidHandlersAndArguments(t *testing.T) {
 	if _, err := dispatcher.Handle(nil, 1, "ok", nil); !errors.Is(err, runtime.ErrInvalidCommandArguments) {
 		t.Fatalf("nil context error=%v, want ErrInvalidCommandArguments", err)
 	}
+	var typedNilContext *dispatcherTestContext
+	if _, err := dispatcher.Handle(typedNilContext, 1, "ok", nil); !errors.Is(err, runtime.ErrInvalidCommandArguments) {
+		t.Fatalf("typed nil context error=%v, want ErrInvalidCommandArguments", err)
+	}
 	if _, err := dispatcher.Handle(nil, 99); !errors.Is(err, runtime.ErrUnknownCommand) {
 		t.Fatalf("unknown command error=%v, want ErrUnknownCommand", err)
 	}

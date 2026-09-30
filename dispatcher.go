@@ -101,11 +101,12 @@ func (handler compiledHandler) call(ctx CommandContext, command runtime.CommandI
 			runtime.ErrInvalidCommandArguments, command, len(handler.arguments), len(args),
 		)
 	}
-	if ctx == nil {
+	contextValue := reflect.ValueOf(ctx)
+	if !contextValue.IsValid() || (commandArgumentCanBeNil(contextValue.Type()) && contextValue.IsNil()) {
 		return nil, fmt.Errorf("%w: CommandContext is nil", runtime.ErrInvalidCommandArguments)
 	}
 	values := make([]reflect.Value, len(args)+1)
-	values[0] = reflect.ValueOf(ctx)
+	values[0] = contextValue
 	for index, argument := range args {
 		value, err := commandArgumentValue(command, index, argument, handler.arguments[index])
 		if err != nil {
