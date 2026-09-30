@@ -320,3 +320,16 @@ go test ./runtime -run '^$' -bench '^BenchmarkRuntimeCallRoundTrip$' -benchtime=
 | `BenchmarkDispatcherHotOverride` | 23.37 | 16 | 1 |
 
 复现命令：`go test . -run '^$' -bench '^BenchmarkDispatcher($|HotOverride$)' -benchmem -benchtime=2s`。手写分支在这种极轻的单条消息基准中明显便宜，但未包含 Mailbox、runner、业务计算、I/O、日志或 GC 全局开销，也不能据此要求所有 Service 放弃默认 Dispatcher。是否为真实热点手写分支，仍须先在代表性负载中证明分发占比，再用相同负载确认端到端收益。
+
+## 应用名称查找小基准：2026-10-01
+
+在 `6a299c7` 基础上新增 `BenchmarkServiceNameResolve`；Go 1.24.13、darwin/arm64、Apple M2。预先注册名称后，只计量应用名称表的查找，不包含 Send/Call、Mailbox、网络或 Handler。单次运行结果：
+
+| 名称数 | 查找方式 | ns/op | B/op | allocs/op |
+| ---: | --- | ---: | ---: | ---: |
+| 100 | 串行 | 22.12 | 0 | 0 |
+| 100 | 并行 | 72.70 | 0 | 0 |
+| 10,000 | 串行 | 28.18 | 0 | 0 |
+| 10,000 | 并行 | 86.59 | 0 | 0 |
+
+复现命令：`go test . -run '^$' -bench '^BenchmarkServiceNameResolve$' -benchtime=500ms -benchmem -count=1`。并行项使用 Go benchmark 的 `RunParallel`，不是端到端并发 Service 负载。当前量级不支持为了查找再增加缓存或额外索引；如将来真实负载显示名称锁成为热点，应先用 profile 确认。

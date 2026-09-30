@@ -34,3 +34,45 @@ func BenchmarkServiceNameCleanup(b *testing.B) {
 		})
 	}
 }
+
+// BenchmarkServiceNameResolve 衡量大量名称下串行和并行解析 ServiceID 的成本。
+func BenchmarkServiceNameResolve(b *testing.B) {
+	for _, count := range []int{100, 10000} {
+		b.Run(strconv.Itoa(count), func(b *testing.B) {
+			node := &application{
+				names:     make(map[cluster.ServiceName]runtime.ServiceID, count),
+				namesByID: make(map[runtime.ServiceID][]cluster.ServiceName, count),
+				active:    make(map[runtime.ServiceID]struct{}, count),
+			}
+			names := make([]cluster.ServiceName, count)
+			for i := range count {
+				id := runtime.ServiceID(i + 1)
+				names[i] = cluster.ServiceName(strconv.Itoa(i))
+				node.activateID(id)
+				if err := node.register(names[i], id); err != nil {
+					b.Fatal(err)
+				}
+			}
+			b.Run("serial", func(b *testing.B) {
+				b.ReportAllocs()
+				for i := range b.N {
+					if _, err := node.resolve(names[i%count]); err != nil {
+						b.Fatal(err)
+					}
+				}
+			})
+			b.Run("parallel", func(b *testing.B) {
+				b.ReportAllocs()
+				b.RunParallel(func(pb *testing.PB) {
+					i := 0
+					for pb.Next() {
+						if _, err := node.resolve(names[i%count]); err != nil {
+							b.Fatal(err)
+						}
+						i++
+					}
+				})
+			})
+		})
+	}
+}
