@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 	"testing"
+	"time"
 
 	"github.com/cnooljaw/gsr/logging"
 	"github.com/cnooljaw/gsr/runtime"
@@ -36,6 +37,40 @@ func TestDispatcherRoutesApplicationService(t *testing.T) {
 		result, err = self.Call(ctx, id, dispatcherEchoCommand, "again")
 		if err != nil || result != "again" || service.notification != "ready" {
 			return errors.New("dispatcher did not preserve FIFO execution")
+		}
+		self.Exit()
+		cancel()
+		return nil
+	}}
+	if err := Run(ctx, Config{Logging: logging.Config{Writer: io.Discard}}, entry); err != nil {
+		t.Fatal(err)
+	}
+}
+
+// TestDispatcherHandlerPanicIsolation 验证强类型 Handler 经反射调用发生 panic 时，只终止目标 Service。
+func TestDispatcherHandlerPanicIsolation(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	panicking := &dispatcherTestService{dispatcher: MustDispatcher(map[runtime.CommandID]any{
+		dispatcherEchoCommand: func(CommandContext) (string, error) {
+			panic("dispatcher handler panic")
+		},
+	})}
+	entry := &probeService{start: func(ctx context.Context, self ServiceContext) error {
+		panickingID, err := self.CreateService(ctx, panicking)
+		if err != nil {
+			return err
+		}
+		healthyID, err := self.CreateService(ctx, newDispatcherTestService())
+		if err != nil {
+			return err
+		}
+		if _, err := self.Call(ctx, panickingID, dispatcherEchoCommand); !errors.Is(err, runtime.ErrServicePanicked) {
+			return errors.New("panicking Handler did not return ErrServicePanicked")
+		}
+		result, err := self.Call(ctx, healthyID, dispatcherEchoCommand, "healthy")
+		if err != nil || result != "healthy" {
+			return errors.New("healthy Service stopped after another Handler panicked")
 		}
 		self.Exit()
 		cancel()
