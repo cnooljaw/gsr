@@ -173,17 +173,22 @@ func TestConcurrentServiceClusterBindings(t *testing.T) {
 	}
 }
 
-// 验证两个 Run 的名称及连接独立，入口退出后监听继续服务，纯调用节点无需 Open。
+// 验证两个 Run 的名称及连接独立，目标退出后远端名称失效，纯调用节点无需 Open。
 func TestRunNodesCommunicateWithoutSingleton(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	ready, serverDone := make(chan string, 1), make(chan error, 1)
+	stopped := make(chan struct{})
 	server := &probeService{start: func(ctx context.Context, self ServiceContext) error {
 		id, err := self.CreateService(ctx, &probeService{handle: func(current CommandContext) (any, error) {
 			if current.Source() != 0 {
 				return nil, errors.New("remote source must remain zero")
 			}
+			current.Exit()
 			return "remote", nil
+		}, stop: func(context.Context) error {
+			close(stopped)
+			return nil
 		}})
 		if err != nil {
 			return err
@@ -239,6 +244,14 @@ func TestRunNodesCommunicateWithoutSingleton(t *testing.T) {
 		}
 		if value != "remote" {
 			return errors.New("node registry leaked")
+		}
+		select {
+		case <-stopped:
+		case <-ctx.Done():
+			return ctx.Err()
+		}
+		if _, err := self.Cluster().Call(ctx, "server", "echo", 1); !errors.Is(err, runtime.ErrServiceNotFound) {
+			return errors.New("stopped service name remained remotely resolvable")
 		}
 		stopCaller()
 		return nil
