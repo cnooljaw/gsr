@@ -2,7 +2,7 @@
 
 本文把已接受的 API 和 ADR 拆成可验证的纵向切片。每个切片只引入完成当前运行链所需的能力；Core 完成后再开始 Cluster。
 
-当前应用入口及编码契约以 [ADR 0011](adr/0011-service-first-application-api.md) 为准：gsr.Run 统一管理运行环境，业务使用 self.Cluster()/self.Logger()；已移除 CommandCodecRegistry，合法未知命令由目标 Service 判断。下方历史切片中的 registry、未知 Command 坏帧及 Node/Host 组装描述不作为当前实施要求。
+当前应用入口及编码契约以 [ADR 0011](adr/0011-service-first-application-api.md) 为准：gsr.Run 统一管理运行环境，业务使用 self.Cluster()/self.Logger()；已移除 CommandCodecRegistry，合法未知命令由目标 Service 判断。下方历史切片中的 Node/Host 组装描述不作为当前实施要求。
 
 本文保留历次切片记录，部分“本轮未实现”描述仅代表当时范围。当前能力与证据汇总见 [当前阶段验证清单](VALIDATION-STATUS.md)，不要将历史切片的非目标误读为当前缺失。
 
@@ -287,7 +287,7 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 
 ### Cluster 0：协议与内存传输
 
-状态：Cluster 0 已完成，Cluster 1 正在推进。`cluster` package 已提供 `NodeID`、`ClusterSessionID`、`FrameKind`、`ServiceTarget`、`ClusterEnvelope` 的值类型与结构校验、受限的 `ValueCodec`、启动期不可变的 Command codec registry、长度前缀 `FrameCodec`，以及确定性的 `InMemoryTransport`。Cluster 1 已新增 `NodeSender` 的基础出站 admission；逻辑 `ConnectionAgent` 已具备，TCP stream I/O、连接合并和自动重连仍按后续子切片推进。
+状态：Cluster 0 已完成；后续已落地 NodeSender、ConnectionAgent、TCP 出入站、按需重连和公开静态组装。`cluster` package 已提供 `NodeID`、`ClusterSessionID`、`FrameKind`、`ServiceTarget`、`ClusterEnvelope` 的值类型与结构校验、受限的 `ValueCodec`、统一 `PayloadCodec`、长度前缀 `FrameCodec`，以及确定性的 `InMemoryTransport`。
 
 - `NodeID`、`ClusterSessionID`、`ClusterEnvelope`。
 - 显式 Request、Response、Error frame。
@@ -295,7 +295,7 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 - 远端地址只使用 NodeID 与 ServiceName/Discovery 或当前远端临时 ServiceID；Runtime 只负责路由、投递和连接恢复，不负责业务所有权、一致性或过期判断。
 - `ClusterEnvelope.Validate` 在进入任意 Transport 前检查 frame kind、Session、目标和结构化错误；`Clone` 在 admission 边界隔离 payload 与错误值。
 - 默认 `ValueCodec` 只支持 nil、bool、规范化整数/浮点、string、`[]byte`、list 和 string-key map；解码分别得到 `int64`、`uint64`、`float64`，并限制嵌套深度与 payload 大小。
-- Command codec registry 在启动期一次性校验、复制并冻结 `CommandID -> CommandCodec` 映射；重复注册、零 CommandID 或 nil codec 直接失败，运行期不提供注册和覆盖。
+- 所有 Command 共用 `ClusterConfig.Codec`；默认使用 `ValueCodec`，不按 CommandID 注册 codec 或预检查命令。
 - 帧长、容器深度和 payload 上限。
 - `InMemoryTransport` 以同步回调连接两个节点，作为测试和后续 sender/agent 的可替换边界；本地路径不执行 Cluster 编码。
 - `ClusterEnvelope` 不携带业务或 wire version；未来版本兼容由 Transport/Codec 的 framing 或连接握手单独负责。
@@ -303,13 +303,13 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 
 ### Cluster 1：远程 Send
 
-- 状态：进行中（基础子切片已完成）。
+- 状态：远程 Send、公开静态出站组装和 TCP 按需重连已实现；动态路由未实现。
 - 每个远端 Node 唯一 outbound `NodeSender`，使用固定容量队列和单一 owner worker。
 - `Send` 在本地 Clone 后执行非阻塞 admission；队列满返回 `ErrOutboundQueueFull`，nil 只代表本地 Cluster admission 成功。
 - admission 后的 Transport error/panic 和关闭丢弃进入有界、非阻塞的 `Failures()` stream；慢消费者不阻塞 sender，溢出由 `DroppedFailureCount()` 计数，事件不携带业务 payload。
 - Send 不返回远端 Handler 结果；A 记录自己的 admission/传输诊断，B 记录自己的 Handler error。需要远端处理结果时使用 Call。
-- 当前 NodeSender 直接调用注入的 Transport；并发建连合并、TCP stream 和自动重连留在后续 Connection/Transport 子切片。
-- 已实现初始化绑定 Source ServiceID、NodeSenderResolver、CommandCodecRegistry、共享 ClusterCallRegistry 和有限 MaxCallWait 的 per-Service ClusterClient；client 不拥有 sender/连接。
+- NodeSender 使用有界队列和单一 worker；公开 Cluster 以 outboundPeer 完成单目标 TCP 连接复用、有限 Dial 与按需重连，不自动重放。
+- 已实现绑定 Source ServiceID、NodeSenderResolver、统一 PayloadCodec、共享 ClusterCallRegistry 和有限 MaxCallWait 的 per-Service ClusterClient；client 不拥有 sender/连接。
 - 普通远程 Send/Call 不暴露 source 参数；只有明确的基础设施 relay 才能转发 Runtime-owned Message，且不转移 Call session/PendingCall。
 - admission 前的无本地路由/sender、编码失败、队列满和关闭错误由 `Send` 立即返回；admission 后的节点不可达、断线及网络/I/O 错误进入 NodeSender 诊断 stream。
 
@@ -336,7 +336,7 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 - 状态：逻辑 ConnectionAgent、内部单连接 I/O 封装、出站响应读循环、有界并发入站请求循环、单 listener 入站连接 owner 和单目标按需出站连接 owner 已完成；公开静态出站组装已完成，Open 已实现，认证与动态路由仍待后续切片。
 - 已裁决并实现基础设施 Runtime.Call：Source 固定为零，经普通 Mailbox 执行，复用有限等待与停止收尾；ServiceContext.Call 仍绑定真实 Service。取舍见 [Cluster 入站 Call 方案](RFC-CLUSTER-INBOUND-CALL.md)。
 - 已用 ConnectionAgent 测试适配器接通真实 Runtime，覆盖成功/领域错误回复、零 Source，以及本地 Session 与 ClusterSession 分离；网络入站并发管理和正式适配器组装仍待接入。
-- 已实现内部 localRequestAdapter 并接入 inboundConnection：查找 Command codec、解码参数列表、按 ID 或外层名称解析目标，再直接经 Runtime.Send/Call 执行；未知 Command/坏载荷仅返回接收侧诊断错误，不产生响应。Send 接纳错误归接收侧，Call 通过与逻辑 ConnectionAgent 共用的响应函数回包，写回故障保留 I/O 错误链。已删除临时 ConnectionAgent 和闭包错误回传；保留解析后取消检查、编码与写入双重失败原因。适配器不管理并发或连接生命周期，公开 ConnectionAgent 保持不变。
+- 已实现内部 localRequestAdapter 并接入 inboundConnection：使用统一 PayloadCodec 解码参数列表、按 ID 或外层名称解析目标，再直接经 Runtime.Send/Call 执行；坏载荷在投递前作为接收侧诊断错误丢弃，合法未知 Command 由目标 Service 判断，Send 不回包、Call 返回 ErrUnknownCommand。Send 接纳错误归接收侧，Call 通过与逻辑 ConnectionAgent 共用的响应函数回包，写回故障保留 I/O 错误链。已删除临时 ConnectionAgent 和闭包错误回传；保留解析后取消检查、编码与写入双重失败原因。适配器不管理并发或连接生命周期，公开 ConnectionAgent 保持不变。
 - 入站并发方案已获确认并实现为内部 inboundConnection：单读循环、显式 Call 名额上限、满载暂停读取、顺序 Send、有界非阻塞诊断；详见 [入站并发方案](RFC-CLUSTER-INBOUND-CONCURRENCY.md)。关闭取消基础设施等待并等待连接任务退出，不强杀目标 Handler。
 - 已用 net.Pipe 验证慢 Call 隔离、满载背压、连续 Send 顺序、满载时取消、诊断溢出、codec/名称解析 panic 和重复启动拒绝。响应编码失败也返回接收侧诊断；这些测试不等于真实 TCP 或节点级资源上限验证。
 - 真实 TCP 回环集成门禁 `tcp_integration_test.go` 已改用内部 `outboundPeer` 与 `tcpListener`，删除预建 socket 和测试专用 Transport，连接 ClusterClient、NodeSender、帧编解码、入站连接、目标 Runtime 和响应读循环。覆盖 Send/Call、领域错误、慢 Call 隔离、断线完成等待和下一 Call 按需恢复；通过 Handler 执行计数验证旧请求不重放。A 不配置 NodeID 或监听，B 接受匿名入站并沿原连接回复。夹具仍负责静态目标与生命周期组装，不代表公开 TCP API、生产认证或路由管理已完成。
@@ -362,7 +362,7 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 - 已确认易用性方向、`NewCluster(config)`、`Client(source ServiceID)` 两个签名及首轮 ClusterConfig 字段与默认值：显式 Cluster 对象统一出站组装，业务继续使用 source-bound ClusterClient，不手工接线内部组件。见 [公开组装入口方案](RFC-CLUSTER-ASSEMBLY.md)。两阶段关闭已确认，统一诊断入口也已确认，公开出站组装已实现。
 - 生命周期已确认，见 [两阶段关闭方案](RFC-CLUSTER-SHUTDOWN.md)：Quiesce 停止接纳，Close(ctx) 最终释放与等待；已绑定 Call 保留回复机会，未发送请求按停止策略收尾。统一诊断入口也已确认，公开出站组装代码与对应生命周期测试已实现。
 - 统一诊断出口已确认，见 [诊断方案](RFC-CLUSTER-DIAGNOSTICS.md)：每 Cluster 单一 256 容量的非阻塞 Diagnostics 与丢弃计数，内部直接上报，不执行外部 callback 或创建每目标转发任务。创建/绑定、配置、关闭与诊断契约均已收口，已实现最小公开出站组装及其测试；Open、认证和动态路由不纳入本轮。
-- NodeSender 自动重连，但不自动重放已经失败或结果不确定的请求。
+- outboundPeer 在后续新请求上按需重连，不自动重放已经失败或结果不确定的请求。
 
 ### Cluster 4：故障与资源收尾
 
@@ -371,7 +371,7 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 - 已补充公开 Open 的真实 TCP 协议故障回归：完整坏载荷丢弃后同连接继续处理合法 Call；超限长度只发送四字节前缀即断连，不等待正文、不填充不可信请求关联字段，且监听继续服务其它连接。新增双连接日志回归：每连接同类坏帧只保留首条，合法 Call 继续完成，Cluster.Close 后各连接输出一条抑制数量汇总；Diagnostics 和 JSON 日志同时验证，关闭后累计计数仍可读取。这些测试不代表认证或全部故障注入门禁已经完成。
 
 - FaultTransport 注入半写入、断线、重复响应、损坏帧和出站队列满。
-- 边界可信的完整帧格式错误、未知 Command、载荷解码失败和错误入站请求类型丢弃；同连接同类只记录首条，重复计数并在连接结束汇总。当前 wire 不包含 Version 字段。
+- 边界可信的完整帧格式错误、载荷解码失败和错误入站请求类型丢弃；合法未知 Command 不属于坏帧，由目标 Service 判断。同连接同类坏帧只记录首条，重复计数并在连接结束汇总。当前 wire 不包含 Version 字段。
 - 非法长度、越界、认证失败或无法恢复帧边界时关闭连接。
 - 双节点集成、race、关闭和连接泄漏门禁。
 
