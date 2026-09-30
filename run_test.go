@@ -174,12 +174,13 @@ func TestConcurrentServiceClusterBindings(t *testing.T) {
 	}
 }
 
-// 验证两个 Run 的名称及连接独立，目标退出后同名新实例可供远端调用，纯调用节点无需 Open。
+// 验证两个 Run 的名称及连接独立，目标退出后远端 Send/Call 均能到达同名新实例。
 func TestRunNodesCommunicateWithoutSingleton(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	ready, serverDone := make(chan string, 1), make(chan error, 1)
 	stopped := make(chan struct{})
+	delivered := make(chan runtime.ServiceID, 1)
 	server := &probeService{start: func(ctx context.Context, self ServiceContext) error {
 		id, err := self.CreateService(ctx, &probeService{handle: func(current CommandContext) (any, error) {
 			if current.Source() != 0 {
@@ -200,7 +201,8 @@ func TestRunNodesCommunicateWithoutSingleton(t *testing.T) {
 		managerID, err := self.CreateService(ctx, &probeService{handle: func(current CommandContext) (any, error) {
 			createContext, cancelCreate := context.WithTimeout(context.Background(), time.Second)
 			defer cancelCreate()
-			replacementID, err := current.CreateService(createContext, &probeService{handle: func(CommandContext) (any, error) {
+			replacementID, err := current.CreateService(createContext, &probeService{handle: func(current CommandContext) (any, error) {
+				delivered <- current.Self()
 				return "replacement", nil
 			}})
 			if err != nil {
@@ -273,6 +275,17 @@ func TestRunNodesCommunicateWithoutSingleton(t *testing.T) {
 		}
 		if _, err := self.Cluster().Call(ctx, "server", "manager", 2); err != nil {
 			return err
+		}
+		if err := self.Cluster().Send("server", "echo", 3); err != nil {
+			return err
+		}
+		select {
+		case id := <-delivered:
+			if id == 0 {
+				return errors.New("remote Send reached invalid service")
+			}
+		case <-ctx.Done():
+			return ctx.Err()
 		}
 		value, err = self.Cluster().Call(ctx, "server", "echo", 1)
 		if err != nil || value != "replacement" {
