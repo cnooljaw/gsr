@@ -99,21 +99,21 @@ GSR 只用 `SessionID == 0` 或 `SessionID > 0` 区分 Send/Call；Skynet 还把
 
 | GSR 概念/API | GSR 阶段 | Skynet 对应概念 | 关系 | 关键区别 |
 | --- | --- | --- | --- | --- |
-| Cluster（Core 之外） | Cluster 0 基础子切片已完成，1–4 计划 | Harbor、`skynet.cluster`、`clusterd`、`clusterproxy`、`clustersender`、`clusteragent` | 直接对应架构方向 | GSR 先锁定 Envelope/Transport 值边界，再逐步接入 sender、agent 和 TCP；明确禁止 NodeID、Envelope、Transport 进入 Core Message 或 ServiceID。 |
-| `NodeID` | Cluster 0 | `cluster.call(node, address, ...)` 的 node 名称、Harbor 编号 | 直接对应 | GSR NodeID 是独立路由维度，不能从 ServiceID 推断；远端目标必须由 Cluster 层解析。 |
-| `ClusterClient`（绑定 Source ServiceID） | Cluster 1/2 基础子切片已完成 | `cluster.call()`、`cluster.send()`，以及按 node 缓存 sender | 借鉴后重构 | GSR 由应用适配器从 Self 自动绑定底层 client，业务使用 self.Cluster()；client 共享统一 codec、sender 与等待表。禁止全局变量、goroutine-local 或调用栈推断当前 Service；回复沿原连接返回并关联本地 Session。 |
-| `ClusterEnvelope` | Cluster 0 | `cluster.packrequest/packresponse`、`PTYPE_HARBOR`、socket channel 帧 | 借鉴后重构 | GSR Envelope 显式区分 request/response/error、ClusterSessionID、ServiceTarget、Command 和结构化错误；本地 Message 不变成网络包，并在 Transport admission 前校验和 Clone。版本兼容留给未来 framing/握手。 |
-| `ClusterSessionID` | Cluster 0/Cluster 2 基础子切片 | cluster sender 的 session、`cluster.unpackresponse()` 返回的关联号 | 直接对应但独立 | GSR ClusterSessionID 与 Core SessionID 分属不同 owner，不要求数值相同；零值仍表示 Send，非零值由发起节点的 PendingCall 表关联 Source/Node/Target/Command。 |
-| `ClusterCallRegistry` / `ClusterPendingCall` | Cluster 2 基础子切片已完成 | `clustersender` 的 session 等待与 `clusteragent` 的 response 回传 | 借鉴后重构 | GSR 用一个 Cluster 级 registry 为全部 per-Service client 分配 Session；只在发起节点保存 Source 和等待句柄，response 必须匹配 Node/Target/Command，未知、迟到、重复和错路由 frame 不会完成其它 Session。 |
-| `ValueCodec` | Cluster 0 | `skynet.pack()` / `skynet.unpack()` | 借鉴后重构 | GSR 只允许有限、可边界检查的值集合，并将数字解码为规范 Go 类型；不编码任意 pointer、函数、句柄或循环引用。业务结构需显式转换为支持的值；特殊编码可配置统一 PayloadCodec，不按 Command 登记。 |
+| Cluster（Core 之外） | 静态出入站链路已实现；发现/认证未实现 | Harbor、`skynet.cluster`、`clusterd`、`clusterproxy`、`clustersender`、`clusteragent` | 直接对应架构方向 | GSR 已接入 Envelope、sender、agent 和 TCP，但 NodeID、Envelope、Transport 不进入 Core Message 或 ServiceID；动态发现与认证不属于现有静态链路。 |
+| `NodeID` | 已实现 | `cluster.call(node, address, ...)` 的 node 名称、Harbor 编号 | 直接对应 | GSR NodeID 是独立路由维度，不能从 ServiceID 推断；远端目标必须由 Cluster 层解析。 |
+| `ClusterClient`（绑定 Source ServiceID） | 已实现 | `cluster.call()`、`cluster.send()`，以及按 node 缓存 sender | 借鉴后重构 | GSR 由应用适配器从 Self 自动绑定底层 client，业务使用 self.Cluster()；client 共享统一 codec、sender 与等待表。禁止全局变量、goroutine-local 或调用栈推断当前 Service；回复沿原连接返回并关联本地 Session。 |
+| `ClusterEnvelope` | 已实现 | `cluster.packrequest/packresponse`、`PTYPE_HARBOR`、socket channel 帧 | 借鉴后重构 | GSR Envelope 显式区分 request/response/error、ClusterSessionID、ServiceTarget、Command 和结构化错误；本地 Message 不变成网络包，并在 Transport admission 前校验和 Clone。版本兼容留给未来 framing/握手。 |
+| `ClusterSessionID` | 已实现 | cluster sender 的 session、`cluster.unpackresponse()` 返回的关联号 | 直接对应但独立 | GSR ClusterSessionID 与 Core SessionID 分属不同 owner，不要求数值相同；零值仍表示 Send，非零值由发起节点的 PendingCall 表关联 Source/Node/Target/Command。 |
+| `ClusterCallRegistry` / `ClusterPendingCall` | 已实现 | `clustersender` 的 session 等待与 `clusteragent` 的 response 回传 | 借鉴后重构 | GSR 用一个 Cluster 级 registry 为全部 per-Service client 分配 Session；只在发起节点保存 Source 和等待句柄，response 必须匹配 Node/Target/Command，未知、迟到、重复和错路由 frame 不会完成其它 Session。 |
+| `ValueCodec` | 已实现 | `skynet.pack()` / `skynet.unpack()` | 借鉴后重构 | GSR 只允许有限、可边界检查的值集合，并将数字解码为规范 Go 类型；不编码任意 pointer、函数、句柄或循环引用。业务结构需显式转换为支持的值；特殊编码可配置统一 PayloadCodec，不按 Command 登记。 |
 | 统一 `PayloadCodec` | 已实现 | Cluster 的 `skynet.pack/unpack` | 借鉴后重构 | 默认 ValueCodec，所有 Command 共用编码，不登记节点级命令清单。合法载荷中的 Command 由目标 Service 解释，不同 Service 可复用编号；本地仍走未编码 Message。 |
-| `FrameCodec` | Cluster 0 | `lua-cluster.c` 的 `fill_header`、socket channel 帧 | 借鉴后重构 | GSR 先用四字节大端长度前缀界定一个完整 frame；Envelope 不携带 version，stream I/O、握手和重连由后续 Transport/ConnectionAgent 负责。 |
-| `InMemoryTransport` | Cluster 0 | Skynet 的 socket channel 测试替身/节点间连接 | 借鉴后重构 | GSR 提供同步、可确定的进程内 Transport 作为测试边界；它不模拟 TCP、重连、队列或远端执行成功，真实 TCP 由独立网络实现负责，不能由该测试替身推断生产语义。 |
-| `NodeSender` | Cluster 1 基础子切片已完成 | `clusterd.lua` 的 `node_sender[node]` + `clustersender.lua` | 直接对应但分阶段实现 | GSR 每个远端 Node 一个 sender，当前以固定有界队列和单一 worker 完成本地 admission/顺序投递；底层失败进入非阻塞诊断 stream，不在 worker 中运行外部 callback。底层 outboundPeer 已实现 TCP 连接复用与按需重连，不自动重放结果不确定的业务请求。 |
+| `FrameCodec` | 已实现 | `lua-cluster.c` 的 `fill_header`、socket channel 帧 | 借鉴后重构 | GSR 用四字节大端长度前缀界定完整 frame；Envelope 不携带 version，stream I/O 与按需重连由连接 owner 负责，版本协商仍未实现。 |
+| `InMemoryTransport` | 已实现 | Skynet 的 socket channel 测试替身/节点间连接 | 借鉴后重构 | GSR 提供同步、可确定的进程内 Transport 作为测试边界；它不模拟 TCP、重连、队列或远端执行成功，真实 TCP 由独立网络实现负责，不能由该测试替身推断生产语义。 |
+| `NodeSender` | 已实现 | `clusterd.lua` 的 `node_sender[node]` + `clustersender.lua` | 直接对应但分阶段实现 | GSR 每个远端 Node 一个 sender，当前以固定有界队列和单一 worker 完成本地 admission/顺序投递；底层失败进入非阻塞诊断 stream，不在 worker 中运行外部 callback。底层 outboundPeer 已实现 TCP 连接复用与按需重连，不自动重放结果不确定的业务请求。 |
 | `ConnectionAgent` | Cluster 2 与 TCP owner 已实现 | `clusterd.lua` 为每条 inbound fd 创建的 `clusteragent` | 直接对应 | GSR `Handle` 只接收已解码 Request、调用窄的本地适配器并沿所属 writer 回写 Call Response/Error；每条入站 socket 仍由外层独立 agent 管理，不与同一 Node 的 outbound sender 混成一个所有者。 |
-| 远端 Service 地址 | Cluster 计划 | 远端 handle、`@name`、`cluster.proxy(node, name)` | 有意不照搬 | GSR 的 ServiceID 永远是本地临时地址；远端稳定身份使用 NodeID + ServiceName/Discovery，具体实例解析留在 Cluster；不引入 Epoch/Lease/Generation，也不由 Runtime 判断业务资源所有权、一致性或过期。 |
-| 断线、重连和重放 | Cluster 计划 | `socketchannel` 的 reconnect/changehost、`clusterd` sender 重建 | 借鉴后重构 | GSR 重连只恢复未来通信，不宣称 exactly-once，也不自动重放业务 Call/Send；幂等、RequestID 和补偿属于业务。 |
-| Cluster 关闭顺序 | Cluster 计划 | socket close/free、cluster sender/agent service 退出、Harbor release | 借鉴后重构 | gsr.Run 内部先 Quiesce，再 Runtime.Close、Cluster.Close，最后记录停止日志并关闭 Logger；业务不持有 Host。 |
+| 远端 Service 地址 | 静态名称路由已实现；动态发现未实现 | 远端 handle、`@name`、`cluster.proxy(node, name)` | 有意不照搬 | GSR 的 ServiceID 永远是本地临时地址；业务使用 NodeID + ServiceName，目标进程的应用注册表解析当前 ServiceID。动态 Discovery 属于外层能力；Runtime 不判断业务资源所有权、一致性或过期。 |
+| 断线、重连和重放 | 按需重连已实现；不重放 | `socketchannel` 的 reconnect/changehost、`clusterd` sender 重建 | 借鉴后重构 | GSR 重连只恢复未来通信，不宣称 exactly-once，也不自动重放业务 Call/Send；幂等、RequestID 和补偿属于业务。 |
+| Cluster 关闭顺序 | 已实现 | socket close/free、cluster sender/agent service 退出、Harbor release | 借鉴后重构 | gsr.Run 内部先 Quiesce，再 Runtime.Close、Cluster.Close，最后记录停止日志并关闭 Logger；业务不持有 Host。 |
 
 主动 `cluster.call/send` 与 `cluster.open` 是独立能力：Skynet 按目标创建 sender，不要求调用方先 open；open 只开启入站监听。GSR 沿用这个边界，删除 LocalNode 和入站来源 NodeID。A→B 与 B→A 的主动请求分别使用各自的出站连接，各自回复沿原连接返回；TCP 本身仍是全双工，不是每次调用创建 socket。GSR 已实现应用层 self.Cluster().Open(name)，从共同节点表取端口绑定 0.0.0.0；底层 Open(Runtime, ListenConfig) 仅供基础设施接线。入口 Exit 不关闭共享监听，Run 统一收尾。
 
