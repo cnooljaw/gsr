@@ -26,17 +26,22 @@ type userLookup struct {
 
 // userProfileService 处理用户资料业务命令，直接调用 Redis 缓存，而非另建 RedisService。
 type userProfileService struct {
-	*gsr.Dispatcher
-	cache *userHashCache
+	dispatcher *gsr.Dispatcher
+	cache      *userHashCache
 }
 
 func newUserProfileService(cache *userHashCache) *userProfileService {
 	service := &userProfileService{cache: cache}
-	service.Dispatcher = gsr.MustDispatcher(map[runtime.CommandID]any{
+	service.dispatcher = gsr.MustDispatcher(map[runtime.CommandID]any{
 		cacheUserCommand: service.handleCache,
 		loadUserCommand:  service.handleLoad,
 	})
 	return service
+}
+
+// Handle 是业务 Service 的命令入口，具体命令由 dispatcher 分发。
+func (service *userProfileService) Handle(ctx gsr.CommandContext, command runtime.CommandID, args ...any) (any, error) {
+	return service.dispatcher.Handle(ctx, command, args...)
 }
 
 // OnStart 只校验注入的依赖；Redis Client 的生命周期归应用所有。

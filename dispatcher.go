@@ -12,10 +12,10 @@ var (
 	dispatcherErrorType   = reflect.TypeOf((*error)(nil)).Elem()
 )
 
-// Dispatcher 是应用 Service 可嵌入的不可变强类型命令分发器。
+// Dispatcher 是应用 Service 可持有的不可变强类型命令分发器。
 //
-// 构造完成后可以直接作为 Service.Handle 使用；一个 Service 只需维护自己已实现的命令表。
-// 不需要该能力的 Service 可以自行实现 Handle。
+// Service 应显式实现 Handle 并转发到 Dispatcher.Handle，避免匿名嵌入隐藏消息入口。
+// 一个 Service 只需维护自己已实现的命令表；不需要该能力的 Service 可以自行分发。
 type Dispatcher struct {
 	handlers map[runtime.CommandID]compiledHandler
 }

@@ -310,4 +310,13 @@ go test ./runtime -run '^$' -bench '^BenchmarkRuntimeCallRoundTrip$' -benchtime=
 
 ## 应用层 Dispatcher 小基准：2026-09-30
 
-本次应用层 `gsr.Dispatcher` 切片，Go 1.24.13、darwin/arm64、Apple M2：已构造命令表，一个 `int` 参数、一个 `int` 返回值、无业务计算和 Runtime/网络路径。运行 `go test . -run '^$' -bench '^BenchmarkDispatcher$' -benchmem -benchtime=2s`，单次结果为 699.6 ns/op、152 B/op、6 allocs/op。构造阶段反射校验不计入；运行阶段包含命令查找、参数绑定和 `reflect.Call`。这是小样本量级，不与本页 Go 1.23.3 的完整 Send/Call 基准直接比较，也不证明生产 Handler 延迟或容量。真实压测若证实热点 Service 受反射影响，该 Service 可以直接实现无反射 `Handle`。
+本次应用层 `gsr.Dispatcher` 切片，Go 1.24.13、darwin/arm64、Apple M2：已构造命令表，一个 `int` 参数、一个 `int` 返回值、无业务计算和 Runtime/网络路径。运行 `go test . -run '^$' -bench '^BenchmarkDispatcher$' -benchmem -benchtime=2s`，单次结果为 699.6 ns/op、152 B/op、6 allocs/op。构造阶段反射校验不计入；运行阶段包含命令查找、参数绑定和 `reflect.Call`。这是小样本量级，不与本页 Go 1.23.3 的完整 Send/Call 基准直接比较，也不证明生产 Handler 延迟或容量。真实压测若证实个别热点 Command 受反射影响，其 Service 可手写该命令的快速分支，其余命令继续交给 Dispatcher。
+
+同日又将两个基准统一为“一个 `int` 参数，返回其两倍”，并把结果写入同一个可观察 sink，在同一轮进程中比较默认分发与 Service 手写热点分支：
+
+| 基准 | ns/op | B/op | allocs/op |
+| --- | ---: | ---: | ---: |
+| `BenchmarkDispatcher` | 693.6 | 152 | 6 |
+| `BenchmarkDispatcherHotOverride` | 23.37 | 16 | 1 |
+
+复现命令：`go test . -run '^$' -bench '^BenchmarkDispatcher($|HotOverride$)' -benchmem -benchtime=2s`。手写分支在这种极轻的单条消息基准中明显便宜，但未包含 Mailbox、runner、业务计算、I/O、日志或 GC 全局开销，也不能据此要求所有 Service 放弃默认 Dispatcher。是否为真实热点手写分支，仍须先在代表性负载中证明分发占比，再用相同负载确认端到端收益。

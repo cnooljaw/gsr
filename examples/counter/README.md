@@ -13,7 +13,7 @@ count = 5
 count = 0
 ```
 
-`service.go` 定义一个只拥有整数计数的应用 Service；构造时把 Add(n)、Get()、Reset() 绑定到可嵌入的 `gsr.Dispatcher`，业务方法直接使用强类型参数，不手写 `switch` 和参数断言。示例不调用 Timer、Cluster、数据库或网关，也不手写 goroutine。
+`service.go` 定义一个只拥有整数计数的应用 Service；构造时把 Add(n)、Get()、Reset() 绑定到具名 `gsr.Dispatcher` 字段，并显式用 `Handle` 转发到它。业务方法直接使用强类型参数，不手写 `switch` 和参数断言。示例不调用 Timer、Cluster、数据库或网关，也不手写 goroutine。
 
 `main.go` 使用统一的 gsr.Run(ctx, config, mainService)，不手工创建或关闭 Runtime。有限演示向入口提供完成通知，OnStop 通知 main 取消应用等待；服务器通常改为等待进程退出信号。MainService 的 Exit 本身仍不关闭 Runtime，通知只是此演示的应用完成约定。框架日志写到 io.Discard，使输出只保留两行计数。
 

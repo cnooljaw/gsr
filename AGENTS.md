@@ -25,7 +25,8 @@
 
 - 先完成最小、可验证的纵向切片，不提前建设尚无调用者的通用框架。
 - Service 是运行单元，不是代码分类方式；需要独立运行时优先 Service，普通调用不额外包装，基础设施例外必须说明具体理由。见 [Service 化原则](docs/API-DESIGN.md#11-service-化原则)。
-- 普通业务 Service 默认在构造时嵌入 `gsr.Dispatcher`，把已实现的 `CommandID` 绑定到强类型 Handler；只有真实压测确认分发成本成为个别热点的瓶颈时，才手写该命令的 `Handle` 快速分支，其余命令继续委托 Dispatcher。基础设施的特殊消息入口不机械套用业务默认写法。见 [Dispatcher 契约](docs/API-DESIGN.md#44-业务-service-默认使用-dispatcher)。
+- 每个 Service 在自身类型上显式实现 `Handle`，让 Runtime → Service 的消息入口可见；这是项目编码规则，不能仅靠 Go 接口检查强制。不得靠匿名嵌入 Dispatcher 的方法提升隐式获得 `Handle`。
+- 普通业务 Service 默认在构造时用具名字段持有 `gsr.Dispatcher`，把已实现的 `CommandID` 绑定到强类型 Handler，并在 `Handle` 中转发；不使用 Dispatcher 的 Service 不必持有它。只有真实 benchmark/profile 确认个别命令的分发成本成为瓶颈时，才在 `Handle` 中校验参数并直接调用强类型 Handler，其余命令继续委托 Dispatcher。不引入 Fast Handler 注册机制、默认代码生成或额外分发层。见 [Dispatcher 契约](docs/API-DESIGN.md#44-业务-service-默认使用-dispatcher)。
 - 应用由普通 MainService 发起业务：Service 内通过 ServiceContext.CreateService/Send/Call/Exit 创建、通信和自身退出；宿主管 Runtime。Runtime.Send/Call 仅作基础设施或测试注入，不作为业务通信捷径；不新增 Launcher/ServiceManager，不强制业务 Start Command。
 - 应用启动使用 gsr.Run；业务通过 self.Cluster() / self.Logger() 取得自身来源绑定能力，不手工注入 Host 或创建 ClusterClient。Core 的 runtime.ServiceContext 不反向依赖 Cluster；禁止用全局单例的“当前 Service”或 goroutine-local 推断来源。
 - 修改范围必须能够追溯到当前任务；不顺手重构无关代码。

@@ -165,17 +165,34 @@ func TestMustDispatcherPanicsOnInvalidDefinition(t *testing.T) {
 // BenchmarkDispatcher 测量已构造的强类型命令表每条消息的分发和参数绑定开销。
 func BenchmarkDispatcher(b *testing.B) {
 	dispatcher := MustDispatcher(map[runtime.CommandID]any{
-		1: func(_ CommandContext, value int) (int, error) { return value + 1, nil },
+		1: func(_ CommandContext, value int) (int, error) { return value * 2, nil },
 	})
 	current := dispatcherTestContext{}
 	b.ReportAllocs()
 	for range b.N {
-		_, err := dispatcher.Handle(current, 1, 1)
+		result, err := dispatcher.Handle(current, 1, 1)
 		if err != nil {
 			b.Fatal(err)
 		}
+		dispatcherBenchmarkResult = result
 	}
 }
+
+// BenchmarkDispatcherHotOverride 测量同一 Service 手写热点分支的局部分发开销。
+func BenchmarkDispatcherHotOverride(b *testing.B) {
+	service := &dispatcherOverrideService{Dispatcher: MustDispatcher(nil)}
+	current := dispatcherTestContext{}
+	b.ReportAllocs()
+	for range b.N {
+		result, err := service.Handle(current, dispatcherHotCommand, 1)
+		if err != nil {
+			b.Fatal(err)
+		}
+		dispatcherBenchmarkResult = result
+	}
+}
+
+var dispatcherBenchmarkResult any
 
 type dispatcherTestContext struct{ CommandContext }
 

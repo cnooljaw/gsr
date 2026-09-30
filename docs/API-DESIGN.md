@@ -62,7 +62,7 @@ Close
 | `skynet.call()` | `ServiceContext.Call(ctx, ...)` | 保持 run-to-completion，并强制受 Runtime 最大等待时间约束。 |
 | `skynet.timeout()` | `ServiceContext.After()` | Timer 只投递 Command，不执行业务回调；Timer 消息的 Source 固定为零值。 |
 | `skynet.newservice()` | `ServiceContext.CreateService()`；宿主使用 `Runtime.CreateService()` | 同一 Runtime 创建路径，传入 Go Service 实例，不经过 Launcher。 |
-| `skynet.dispatch()` | `Service.Handle()`，应用 Service 可选嵌入 `gsr.Dispatcher` | Runtime 只调用一个 Service.Handle 入口；不可变的 per-Service typed dispatcher 负责参数绑定，普通消息的 Source 由 Runtime 填入，Timer 消息可为零值。 |
+| `skynet.dispatch()` | `Service.Handle()`，应用 Service 可选持有 `gsr.Dispatcher` | Runtime 只调用一个显式的 Service.Handle 入口；不可变的 per-Service typed dispatcher 负责参数绑定，普通消息的 Source 由 Runtime 填入，Timer 消息可为零值。 |
 | `skynet.ret()/response()` | Handler 返回值 | GSR 不暴露手工或异步 Reply API。 |
 | `skynet.exit()` | `ServiceContext.Exit()` | 标记自身退出，当前 OnStart/Handler 正常返回后收尾；不终止 Go 控制流，不停止整个 Runtime。 |
 | `skynet.kill()` | 不提供对应的业务强杀 API | Runtime.Stop/Close 面向整个 Runtime 的有序停止和资源释放，不等同于 kill 单个 Service。 |
@@ -262,19 +262,23 @@ func MustDispatcher(map[runtime.CommandID]any) *Dispatcher
 func (d *Dispatcher) Handle(CommandContext, runtime.CommandID, ...any) (any, error)
 ```
 
-业务 Service 可以在构造时嵌入该 dispatcher：
+每个 Service 都在自身类型上显式实现 `Handle`；这是项目编码规范，Go 的接口机制本身不能禁止匿名嵌入的方法提升。普通业务 Service 在构造时用具名字段持有 dispatcher，并从 `Handle` 转发。这样从 Service 类型即可找到 Runtime 调用的入口：
 
 ```go
 type GreeterService struct {
-	*gsr.Dispatcher
+	dispatcher *gsr.Dispatcher
 }
 
 func NewGreeterService() *GreeterService {
 	service := &GreeterService{}
-	service.Dispatcher = gsr.MustDispatcher(map[runtime.CommandID]any{
+	service.dispatcher = gsr.MustDispatcher(map[runtime.CommandID]any{
 		cmdGreet: service.greet,
 	})
 	return service
+}
+
+func (service *GreeterService) Handle(ctx gsr.CommandContext, command runtime.CommandID, args ...any) (any, error) {
+	return service.dispatcher.Handle(ctx, command, args...)
 }
 
 func (service *GreeterService) greet(
@@ -300,7 +304,25 @@ Dispatcher 只返回 `(any, error)`，不调用 `CommandContext.Reply()`。Runti
 
 CommandID 由业务/协议包维护静态常量或生成代码；Runtime 不分配 CommandID，也不从命令表推断 Service 能力。一个 CommandID 的参数数量和类型在其对应的 typed Handler 中固定，外层 `Send/Call(...args)` 的 variadic 只表示消息装配便利，不表示 Handler 可以使用 Go variadic 签名。
 
-只有真实压测证明个别 Command 的反射分发已经成为瓶颈，且手写版本在相同负载下确有收益，才由该 Service 显式实现 `Handle`：热点 Command 手写快速分支，其余命令继续调用 `service.Dispatcher.Handle(ctx, command, args...)`。不把普通命令改回大 `switch`。这是局部优化，不改变 Runtime 的消息、Mailbox、Reply 或错误语义，也不把代码生成作为所有 Service 的构建前提。
+只有 benchmark/profile 证明个别 Command 的反射分发已经成为瓶颈，且手写版本在相同负载下确有收益，才在该 Service 已有的 `Handle` 中增加热点 Command 的快速分支；其余命令继续调用 `service.dispatcher.Handle(ctx, command, args...)`。快速分支必须在 `Handle` 内校验参数数量和类型，再直接调用原本的强类型业务 Handler；不能把 `[]any` 交给业务 Handler，也不能改变该命令的错误、返回值和 Reply 语义。例如：
+
+```go
+func (service *userService) Handle(ctx gsr.CommandContext, command runtime.CommandID, args ...any) (any, error) {
+	if command == cmdHot {
+		if len(args) != 1 {
+			return nil, runtime.ErrInvalidCommandArguments
+		}
+		request, ok := args[0].(HotRequest)
+		if !ok {
+			return nil, runtime.ErrInvalidCommandArguments
+		}
+		return service.handleHot(ctx, request)
+	}
+	return service.dispatcher.Handle(ctx, command, args...)
+}
+```
+
+不把普通命令改回大 `switch`，不增加 `RegisterFastHandler` 等机制，也不把代码生成作为所有 Service 的构建前提。不使用 Dispatcher 的特殊 Service 无需持有它。
 
 ## 5. Source 语义
 

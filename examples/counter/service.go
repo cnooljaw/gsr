@@ -15,18 +15,23 @@ const (
 
 // CounterService 独占计数状态；只能通过 Command 读写，不需要业务锁或 goroutine。
 type CounterService struct {
-	*gsr.Dispatcher
-	count int
+	dispatcher *gsr.Dispatcher
+	count      int
 }
 
 func newCounterService() *CounterService {
 	service := &CounterService{}
-	service.Dispatcher = gsr.MustDispatcher(map[runtime.CommandID]any{
+	service.dispatcher = gsr.MustDispatcher(map[runtime.CommandID]any{
 		addCommand:   service.add,
 		getCommand:   service.get,
 		resetCommand: service.reset,
 	})
 	return service
+}
+
+// Handle 是 CounterService 的命令入口，具体命令由 dispatcher 分发。
+func (service *CounterService) Handle(ctx gsr.CommandContext, command runtime.CommandID, args ...any) (any, error) {
+	return service.dispatcher.Handle(ctx, command, args...)
 }
 
 // OnStart 无外部资源需要初始化。

@@ -44,9 +44,9 @@ type product struct {
 
 // productService 独占产品命令的执行路径，直接借用应用管理的数据库连接池。
 type productService struct {
-	*gsr.Dispatcher
-	db      *sql.DB
-	timeout time.Duration
+	dispatcher *gsr.Dispatcher
+	db         *sql.DB
+	timeout    time.Duration
 }
 
 func newProductService(db *sql.DB, timeout time.Duration) (*productService, error) {
@@ -54,13 +54,18 @@ func newProductService(db *sql.DB, timeout time.Duration) (*productService, erro
 		return nil, errors.New("product service requires a database and finite timeout")
 	}
 	service := &productService{db: db, timeout: timeout}
-	service.Dispatcher = gsr.MustDispatcher(map[runtime.CommandID]any{
+	service.dispatcher = gsr.MustDispatcher(map[runtime.CommandID]any{
 		createProductCommand: service.handleCreate,
 		getProductCommand:    service.handleGet,
 		updateProductCommand: service.handleUpdate,
 		deleteProductCommand: service.handleDelete,
 	})
 	return service, nil
+}
+
+// Handle 是产品 Service 的命令入口，具体命令由 dispatcher 分发。
+func (service *productService) Handle(ctx gsr.CommandContext, command runtime.CommandID, args ...any) (any, error) {
+	return service.dispatcher.Handle(ctx, command, args...)
 }
 
 func (service *productService) OnStart(_ context.Context, _ gsr.ServiceContext) error {
