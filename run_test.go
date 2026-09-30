@@ -188,10 +188,10 @@ func TestRunNodesCommunicateWithoutSingleton(t *testing.T) {
 		if err != nil {
 			return err
 		}
-		if err := self.Cluster().Register("echo", id); err != nil {
+		if err := self.Register("echo", id); err != nil {
 			return err
 		}
-		if err := self.Cluster().Register("echo", id); !errors.Is(err, ErrServiceNameRegistered) {
+		if err := self.Register("echo", id); !errors.Is(err, ErrServiceNameRegistered) {
 			return errors.New("duplicate name accepted")
 		}
 		if err := self.Cluster().Open("missing"); !errors.Is(err, cluster.ErrNodeNotFound) {
@@ -230,7 +230,7 @@ func TestRunNodesCommunicateWithoutSingleton(t *testing.T) {
 	defer stopCaller()
 	caller := &probeService{start: func(ctx context.Context, self ServiceContext) error {
 		// 同名发布只影响本节点，不能覆盖服务端的 echo。
-		if err := self.Cluster().Register("echo", self.Self()); err != nil {
+		if err := self.Register("echo", self.Self()); err != nil {
 			return err
 		}
 		value, err := self.Cluster().Call(ctx, "server", "echo", 1)
@@ -244,6 +244,69 @@ func TestRunNodesCommunicateWithoutSingleton(t *testing.T) {
 		return nil
 	}}
 	if err := Run(callerContext, Config{Logging: logging.Config{Writer: io.Discard}, Cluster: cluster.ClusterConfig{Nodes: map[cluster.NodeID]string{"server": net.JoinHostPort("127.0.0.1", port)}}}, caller); err != nil {
+		t.Fatal(err)
+	}
+}
+
+// 验证本地按名调用复用 Service 来源与 Mailbox 顺序，并明确拒绝无效或未知名称。
+func TestServiceContextCallsLocalServiceByName(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	entry := &probeService{start: func(ctx context.Context, self ServiceContext) error {
+		var handled int
+		id, err := self.CreateService(ctx, &probeService{handle: func(current CommandContext) (any, error) {
+			if current.Source() != self.Self() {
+				return nil, errors.New("local name call lost source")
+			}
+			handled++
+			return handled, nil
+		}})
+		if err != nil {
+			return err
+		}
+		if err := self.Register("echo", id); err != nil {
+			return err
+		}
+		if err := self.Register("entry", self.Self()); err != nil {
+			return err
+		}
+		if err := self.Register("", id); !errors.Is(err, runtime.ErrServiceNotFound) {
+			return errors.New("empty name accepted")
+		}
+		if err := self.Register("zero", 0); !errors.Is(err, runtime.ErrServiceNotFound) {
+			return errors.New("zero service ID accepted")
+		}
+		if err := self.SendName("missing", 1); !errors.Is(err, runtime.ErrServiceNotFound) {
+			return errors.New("unknown send name accepted")
+		}
+		if _, err := self.CallName(ctx, "missing", 1); !errors.Is(err, runtime.ErrServiceNotFound) {
+			return errors.New("unknown call name accepted")
+		}
+		if _, err := self.CallName(nil, "echo", 1); !errors.Is(err, runtime.ErrInvalidCallContext) {
+			return errors.New("nil call context accepted")
+		}
+		cancelled, cancelCall := context.WithCancel(ctx)
+		cancelCall()
+		if _, err := self.CallName(cancelled, "missing", 1); !errors.Is(err, context.Canceled) {
+			return errors.New("cancelled call did not preserve context error")
+		}
+		if _, err := self.CallName(ctx, "entry", 1); !errors.Is(err, runtime.ErrCallCycle) {
+			return errors.New("named self call accepted")
+		}
+		if err := self.SendName("echo", 1); err != nil {
+			return err
+		}
+		value, err := self.CallName(ctx, "echo", 1)
+		if err != nil {
+			return err
+		}
+		if value != 2 {
+			return errors.New("name delivery bypassed mailbox order")
+		}
+		cancel()
+		return nil
+	}}
+	if err := Run(ctx, Config{Logging: logging.Config{Writer: io.Discard}}, entry); err != nil {
 		t.Fatal(err)
 	}
 }

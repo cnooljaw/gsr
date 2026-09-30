@@ -10,7 +10,7 @@ MainService 创建业务 Service 后，使用当前上下文开放入站：
 
 ```go
 cluster := self.Cluster()
-if err := cluster.Register("echo", id); err != nil {
+if err := self.Register("echo", id); err != nil {
     return err
 }
 if err := cluster.Open("battle"); err != nil {

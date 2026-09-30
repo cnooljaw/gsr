@@ -2,35 +2,17 @@ package gsr
 
 import (
 	"context"
-	"errors"
 	"net"
 
 	"github.com/cnooljaw/gsr/cluster"
 	"github.com/cnooljaw/gsr/runtime"
 )
 
-// ErrServiceNameRegistered 表示当前节点已有同名发布；不会静默替换。
-var ErrServiceNameRegistered = errors.New("gsr: service name already registered")
-
 // Cluster 是来源绑定的使用入口，共享节点的唯一 Cluster，不拥有独立连接或关闭责任。
 // 只能通过当前 ServiceContext.Cluster 取得并在当前回调内使用。
 type Cluster struct {
 	node   *application
 	client *cluster.ClusterClient
-}
-
-// Register 发布本节点 Service 名称；名称不自动注销或重绑，也不是跨节点发现。
-func (bound *Cluster) Register(name cluster.ServiceName, id runtime.ServiceID) error {
-	if name == "" || id == 0 {
-		return runtime.ErrServiceNotFound
-	}
-	bound.node.mu.Lock()
-	defer bound.node.mu.Unlock()
-	if _, exists := bound.node.names[name]; exists {
-		return ErrServiceNameRegistered
-	}
-	bound.node.names[name] = id
-	return nil
 }
 
 // Open 从共同节点表取端口并绑定 0.0.0.0；仅开放入站，不改变调用者身份。
@@ -71,14 +53,4 @@ func (bound *Cluster) Send(node cluster.NodeID, name cluster.ServiceName, comman
 // Call 使用当前 Service 来源等待远端结果，等待期间当前 Service 不处理下一条消息。
 func (bound *Cluster) Call(ctx context.Context, node cluster.NodeID, name cluster.ServiceName, command runtime.CommandID, args ...any) (any, error) {
 	return bound.client.Call(ctx, node, cluster.ServiceTarget{ServiceName: name}, command, args...)
-}
-
-func (node *application) resolve(name cluster.ServiceName) (runtime.ServiceID, error) {
-	node.mu.RLock()
-	defer node.mu.RUnlock()
-	id, exists := node.names[name]
-	if !exists {
-		return 0, runtime.ErrServiceNotFound
-	}
-	return id, nil
 }

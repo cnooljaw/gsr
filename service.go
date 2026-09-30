@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/cnooljaw/gsr/cluster"
 	"github.com/cnooljaw/gsr/logging"
 	"github.com/cnooljaw/gsr/runtime"
 )
@@ -22,8 +23,11 @@ type ServiceContext interface {
 	Self() runtime.ServiceID
 	CreateService(context.Context, Service) (runtime.ServiceID, error)
 	Exit()
+	Register(cluster.ServiceName, runtime.ServiceID) error
 	Send(runtime.ServiceID, runtime.CommandID, ...any) error
 	Call(context.Context, runtime.ServiceID, runtime.CommandID, ...any) (any, error)
+	SendName(cluster.ServiceName, runtime.CommandID, ...any) error
+	CallName(context.Context, cluster.ServiceName, runtime.CommandID, ...any) (any, error)
 	After(time.Duration, runtime.CommandID, ...any) (runtime.TimerID, error)
 	CancelTimer(runtime.TimerID) bool
 	Cluster() *Cluster
@@ -88,6 +92,35 @@ func (self *serviceContext) CreateService(ctx context.Context, service Service) 
 		return 0, err
 	}
 	return self.ServiceContext.CreateService(ctx, wrapped)
+}
+
+// Register 发布本节点 Service 名称，供本地和跨节点调用共同解析。
+func (self *serviceContext) Register(name cluster.ServiceName, id runtime.ServiceID) error {
+	return self.adapter.node.register(name, id)
+}
+
+// SendName 按本节点名称解析目标，随后沿用当前 Service 的本地 Send 路径。
+func (self *serviceContext) SendName(name cluster.ServiceName, command runtime.CommandID, args ...any) error {
+	id, err := self.adapter.node.resolve(name)
+	if err != nil {
+		return err
+	}
+	return self.ServiceContext.Send(id, command, args...)
+}
+
+// CallName 按本节点名称解析目标，随后沿用当前 Service 的本地 Call 路径。
+func (self *serviceContext) CallName(ctx context.Context, name cluster.ServiceName, command runtime.CommandID, args ...any) (any, error) {
+	if ctx == nil {
+		return nil, runtime.ErrInvalidCallContext
+	}
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	id, err := self.adapter.node.resolve(name)
+	if err != nil {
+		return nil, err
+	}
+	return self.ServiceContext.Call(ctx, id, command, args...)
 }
 
 func (self *serviceContext) Cluster() *Cluster {

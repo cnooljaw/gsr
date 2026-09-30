@@ -39,7 +39,7 @@ err := gsr.Run(ctx, config, &MainService{})
 // MainService.OnStart：每一步照常检查 error。
 cluster := self.Cluster()
 id, err := self.CreateService(ctx, &EchoService{})
-err = cluster.Register("echo", id)
+err = self.Register("echo", id)
 err = cluster.Open("battle")
 self.Exit()
 return nil
@@ -56,4 +56,4 @@ value, err = cluster.Call(ctx, "battle", "echo", echoCommand, "hello")
 3. 收口运行入口、名称注册和按节点表 Open，将双节点示例改成目标写法；不为旧 Host 或 registry 添加迁移别名。
 4. 验证多 Service 并发来源隔离、仅出站节点、初始化回滚、有序关闭，以及双进程恢复。
 
-实施进度：已移除 app.Host、app.Config.Commands、CommandCodecRegistry，统一默认编码并由目标解释 Command。gsr.Run、self.Cluster()、self.Logger()、名称发布和按节点名 Open 已落地；双节点示例不再持有 Host 或手工绑定 Client。底层 Runtime/Cluster 仍保留基础设施 API，应用层通过最小 Service 适配器复用 Core 生命周期，不增加 ServiceManager。
+实施进度：已移除 app.Host、app.Config.Commands、CommandCodecRegistry，统一默认编码并由目标解释 Command。gsr.Run、self.Cluster()、self.Logger()、self.Register()、本地 SendName/CallName 和按节点名 Open 已落地；双节点示例不再持有 Host 或手工绑定 Client。底层 Runtime/Cluster 仍保留基础设施 API，应用层通过最小 Service 适配器复用 Core 生命周期，不增加 ServiceManager。

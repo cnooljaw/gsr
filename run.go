@@ -81,6 +81,32 @@ type application struct {
 	listenAddress string
 }
 
+// ErrServiceNameRegistered 表示本节点已有同名发布，不会静默替换。
+var ErrServiceNameRegistered = errors.New("gsr: service name already registered")
+
+func (node *application) register(name cluster.ServiceName, id runtime.ServiceID) error {
+	if name == "" || id == 0 {
+		return runtime.ErrServiceNotFound
+	}
+	node.mu.Lock()
+	defer node.mu.Unlock()
+	if _, exists := node.names[name]; exists {
+		return ErrServiceNameRegistered
+	}
+	node.names[name] = id
+	return nil
+}
+
+func (node *application) resolve(name cluster.ServiceName) (runtime.ServiceID, error) {
+	node.mu.RLock()
+	defer node.mu.RUnlock()
+	id, exists := node.names[name]
+	if !exists {
+		return 0, runtime.ErrServiceNotFound
+	}
+	return id, nil
+}
+
 func (node *application) close() error {
 	var result error
 	if node.cluster != nil {

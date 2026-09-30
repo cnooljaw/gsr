@@ -2,7 +2,7 @@
 
 使用标准库 JSON 配置和公开 GSR API，不依赖发现服务。两个进程各有自己的 Runtime、Cluster 和 Logger；配置中的目标地址是回环地址，Open 按节点表取端口并绑定 0.0.0.0。只用于可信网络，需按部署要求配置防火墙，不应直接暴露公网。
 
-main 只调用 `gsr.Run(ctx, config, mainService)`。MainService 创建 Echo 或 Caller；接收端通过 `cluster := self.Cluster()`、`cluster.Register("echo", id)`、`cluster.Open("battle")` 完成发布和监听，再 Exit。普通 Handler 通过 `ctx.Cluster().Send/Call` 通信、`ctx.Logger()` 写入来源绑定的日志，不持有 Host、ClusterClient 或全局单例。框架负责初始化回滚和最终关闭；入口退出不停止其它 Service。
+main 只调用 `gsr.Run(ctx, config, mainService)`。MainService 创建 Echo 或 Caller；接收端通过 `self.Register("echo", id)` 发布名称，再用 `self.Cluster().Open("battle")` 开放监听，最后 Exit。普通 Handler 通过 `ctx.Cluster().Send/Call` 通信、`ctx.Logger()` 写入来源绑定的日志，不持有 Host、ClusterClient 或全局单例。框架负责初始化回滚和最终关闭；入口退出不停止其它 Service。
 
 Cluster 内建统一 ValueCodec，无需 Command 清单。Echo 创建后即可工作，Caller 用 Timer 驱动业务，不强制 Start Command。
 

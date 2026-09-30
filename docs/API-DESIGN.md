@@ -710,6 +710,8 @@ type ServiceContext interface {
 - `Call` 的 context 只能取消或收紧本次等待；实际等待永远不超过 Runtime `MaxCallWait`。
 - Cluster、Discovery 和业务 Repository 通过单独的窄 client 注入，不加入 ServiceContext。
 - Cluster client 在 Service 初始化阶段以 `Self()` 绑定 Source；其公开 Send/Call 不再要求业务重复传 source。
+- 应用层 `gsr.ServiceContext` 在 Core 接口之上提供 `Register(name, id)`、`SendName(name, command, args...)` 和 `CallName(ctx, name, command, args...)`；一张节点内名称表同时服务本地按名调用与 Cluster 入站解析。Core 的 `runtime.ServiceContext` 仍只接收 ServiceID，不引入名称或 Cluster 依赖。
+- 本地按名调用每次解析为当前节点的 ServiceID，然后复用现有 ServiceContext.Send/Call；未知名称返回 `ErrServiceNotFound`，CallName 的 nil context 返回 `ErrInvalidCallContext`，按名 self Call 继续返回 `ErrCallCycle`。不缓存旧映射，也不改变 Source、Mailbox、Reply 和超时语义。
 - `context.Context` 只负责 deadline、cancellation 和请求范围信息，不替代 ServiceContext。
 - 第一版 Timer 只有一次性 `After`；不提供 ticker。Timer 使用单调时间计算期限，同一时刻到期不承诺彼此顺序，也不高于普通消息 admission。
 - `After` 从调用时开始计时；若 Service 仍处于 `Starting`，到期事件先保留，进入 `Running` 后按普通 Mailbox admission 立即尝试一次。
@@ -845,7 +847,7 @@ Service 不提供额外 `Close` 钩子；本地资源释放属于 `OnStop`。`Ru
 
 Run 内部固定按 Cluster.Quiesce → Runtime.Close → Cluster.Close → 最终日志 → Logger.Close 收尾，聚合错误且不跳过后续步骤。Cluster/Logger 每阶段预算五秒，Runtime 沿用自身预算，不强杀 Handler/Writer。Logging 创建的 Logger 由运行环境独占关闭，组件配置中的外部 Logger 被拒绝。Commands 清单已移除，Cluster 统一使用默认编码，合法命令是否支持由目标判断。
 
-`self.Cluster().Register(name, id)` 发布节点内名称，空名/零 ID 拒绝，重复名返回 ErrServiceNameRegistered，不静默替换、不自动注销，不负责业务资源所有权或发现。`Open(nodeName)` 从 Config.Cluster.Nodes 取端口绑定 0.0.0.0，由共享 Cluster 管理唯一监听；未知名称报错，不 Open 仍可主动 Send/Call。`ListenAddress()` 供日志观测实际绑定地址，不等于外部可达地址。应用配置允许端口零用于测试动态监听，这类节点不进入出站路由；正常部署使用非零固定端口。底层 cluster.Open(Runtime, ListenConfig) 仍是基础设施接口，Cluster 本身不管理 Runtime 生命周期。
+`self.Register(name, id)` 发布节点内名称，供本地 `self.SendName/CallName` 和远端 `self.Cluster().Send/Call(node, name, ...)` 共用目标节点的同一张表。空名/零 ID 拒绝，重复名返回 ErrServiceNameRegistered，不静默替换、不自动注销或重绑，不负责业务资源所有权或发现。`Open(nodeName)` 从 Config.Cluster.Nodes 取端口绑定 0.0.0.0，由共享 Cluster 管理唯一监听；未知名称报错，不 Open 仍可主动 Send/Call。`ListenAddress()` 供日志观测实际绑定地址，不等于外部可达地址。应用配置允许端口零用于测试动态监听，这类节点不进入出站路由；正常部署使用非零固定端口。底层 cluster.Open(Runtime, ListenConfig) 仍是基础设施接口，Cluster 本身不管理 Runtime 生命周期。
 
 Service 创建成功后即可工作；`OnStart` 是 Runtime 生命周期钩子，`Start` Command 则是 Service 自行定义的可选业务协议，二者不同。Counter 等简单 Service 不增加 Start Command；需要分阶段启动参数或业务准备的 Service 才定义它。
 

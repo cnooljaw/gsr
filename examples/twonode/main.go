@@ -103,7 +103,7 @@ func (service *mainService) OnStart(ctx context.Context, self gsr.ServiceContext
 		if err != nil {
 			return err
 		}
-		if err := cluster.Register("echo", id); err != nil {
+		if err := self.Register("echo", id); err != nil {
 			return err
 		}
 		if err := cluster.Open(service.cfg.Listen); err != nil {
