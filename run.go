@@ -36,8 +36,9 @@ func Run(ctx context.Context, config Config, entry Service) (result error) {
 		return errors.New("gsr: configure shared logger through Logging")
 	}
 	node := &application{
-		names:  make(map[cluster.ServiceName]runtime.ServiceID),
-		active: make(map[runtime.ServiceID]struct{}),
+		names:     make(map[cluster.ServiceName]runtime.ServiceID),
+		namesByID: make(map[runtime.ServiceID][]cluster.ServiceName),
+		active:    make(map[runtime.ServiceID]struct{}),
 	}
 	defer func() { result = errors.Join(result, node.close()) }()
 	var err error
@@ -81,6 +82,7 @@ type application struct {
 	nodes         map[cluster.NodeID]string
 	mu            sync.RWMutex
 	names         map[cluster.ServiceName]runtime.ServiceID
+	namesByID     map[runtime.ServiceID][]cluster.ServiceName
 	active        map[runtime.ServiceID]struct{}
 	listenAddress string
 }
@@ -101,6 +103,7 @@ func (node *application) register(name cluster.ServiceName, id runtime.ServiceID
 		return ErrServiceNameRegistered
 	}
 	node.names[name] = id
+	node.namesByID[id] = append(node.namesByID[id], name)
 	return nil
 }
 
@@ -124,11 +127,10 @@ func (node *application) unregisterID(id runtime.ServiceID) {
 	node.mu.Lock()
 	defer node.mu.Unlock()
 	delete(node.active, id)
-	for name, target := range node.names {
-		if target == id {
-			delete(node.names, name)
-		}
+	for _, name := range node.namesByID[id] {
+		delete(node.names, name)
 	}
+	delete(node.namesByID, id)
 }
 
 func (node *application) close() error {

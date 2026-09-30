@@ -417,6 +417,15 @@ func TestServiceNameClearedAfterExit(t *testing.T) {
 	defer cancel()
 	stopped := make(chan struct{})
 	entry := &probeService{start: func(ctx context.Context, self ServiceContext) error {
+		survivorID, err := self.CreateService(ctx, &probeService{handle: func(CommandContext) (any, error) {
+			return "survivor", nil
+		}})
+		if err != nil {
+			return err
+		}
+		if err := self.Register("survivor", survivorID); err != nil {
+			return err
+		}
 		stoppedID, err := self.CreateService(ctx, &probeService{
 			start: func(_ context.Context, child ServiceContext) error {
 				if err := child.Register("echo", child.Self()); err != nil {
@@ -444,6 +453,10 @@ func TestServiceNameClearedAfterExit(t *testing.T) {
 		case <-stopped:
 		case <-ctx.Done():
 			return ctx.Err()
+		}
+		value, err = self.CallName(ctx, "survivor", 1)
+		if err != nil || value != "survivor" {
+			return errors.New("stopping one service removed another service name")
 		}
 		id, err := self.CreateService(ctx, &probeService{handle: func(CommandContext) (any, error) {
 			return "replacement", nil
