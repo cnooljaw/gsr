@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"net"
 	"strconv"
@@ -136,6 +137,54 @@ func TestRunConstructionRollback(t *testing.T) {
 				t.Fatal("logger not drained")
 			}
 		})
+	}
+}
+
+// 验证应用按节点名 Open 绑定失败后不发布监听地址，并可在同一节点重试。
+func TestRunOpenRetryAfterBindFailure(t *testing.T) {
+	bindAddress, err := net.ResolveTCPAddr("tcp", "0.0.0.0:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	busy, err := net.ListenTCP("tcp", bindAddress)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer busy.Close()
+	busyAddress := busy.Addr().String()
+	_, wantPort, err := net.SplitHostPort(busyAddress)
+	if err != nil {
+		t.Fatal(err)
+	}
+	nodeAddress := net.JoinHostPort("127.0.0.1", wantPort)
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	entry := &probeService{start: func(_ context.Context, self ServiceContext) error {
+		if err := self.Cluster().Open("server"); err == nil {
+			return fmt.Errorf("occupied port accepted: busy=%s, opened=%s", busyAddress, self.Cluster().ListenAddress())
+		}
+		if self.Cluster().ListenAddress() != "" {
+			return errors.New("failed bind published a listener")
+		}
+		if err := busy.Close(); err != nil {
+			return err
+		}
+		if err := self.Cluster().Open("server"); err != nil {
+			return err
+		}
+		address := self.Cluster().ListenAddress()
+		_, port, err := net.SplitHostPort(address)
+		if err != nil || port != wantPort {
+			return errors.New("retry opened the wrong port")
+		}
+		cancel()
+		return nil
+	}}
+	if err := Run(ctx, Config{
+		Logging: logging.Config{Writer: io.Discard},
+		Cluster: cluster.ClusterConfig{Nodes: map[cluster.NodeID]string{"server": nodeAddress}},
+	}, entry); err != nil {
+		t.Fatal(err)
 	}
 }
 

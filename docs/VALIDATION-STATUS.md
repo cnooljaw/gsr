@@ -54,6 +54,8 @@ Counter 入口统一切片：最小本地示例也改用 gsr.Run 和应用层 Se
 
 同日应用入口故障收尾补强：`TestRunConstructionRollback` 分别覆盖 Runtime 配置无效、Cluster 配置无效和 typed-nil 入口 Service，确认构造错误可识别、组装失败不运行业务生命周期、共享 Logger 最终排空；`TestRunCleanupAfterOpen` 在已创建子 Service 且 Open 后覆盖 OnStart 返回错误或 panic、正常停机时子 Service 返回错误、入口 OnStop panic，确认原错误与收尾错误均保留、子 Service/入口各停止一次、日志顺序及监听端口释放。两项定向 race 测试通过；只加测试，不修改生产实现。
 
+同日应用 Open 组装边界：已有 Cluster 测试覆盖占端口后重试，已有 Run 测试覆盖未知节点、重复 Open 和退出释放监听；新增 `TestRunOpenRetryAfterBindFailure` 只验证按节点名 Open 在真实绑定失败后不发布 `ListenAddress`，释放占用后同一应用可重试成功。夹具使用与生产 Open 相同的 TCP 地址解析，避免 IPv4 与 IPv6 通配地址不相冲突造成假阴性。定向 race 测试通过；不重复扩大底层测试矩阵。
+
 同日补充同名重绑定：旧目标退出且远端确认名称失效后，仍在运行的 Service 创建并注册新目标；远端在原连接上再次按名称 Call，得到新实例回复。定向 race 测试通过；只验证后续请求重新解析，不迁移已经发出的请求。
 
 同日补充名称注册与退出竞争：`TestServiceNameRegistrationRacesCleanup` 同时发起 128 次注册和目标清理，允许注册在清理前成功或在清理后被拒绝；全部结束后确认名称及反向索引无残留，已退出 ID 不能再次注册。定向 race 测试重复 10 次通过；这是名称表同步边界测试，不代表完整 Service 生命周期压力。
