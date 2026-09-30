@@ -10,7 +10,7 @@ import (
 	"github.com/cnooljaw/gsr/runtime"
 )
 
-// 验证示例通过 Send 加值、Call 查询，再清零并查询，不依赖等待或直接读取 Service 状态。
+// 验证示例通过本地名称发送和调用 Counter，顺序加值、查询、清零，不直接读取 Service 状态。
 func TestCounterExample(t *testing.T) {
 	var output bytes.Buffer
 	if err := run(&output); err != nil {

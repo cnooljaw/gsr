@@ -17,27 +17,31 @@ type MainService struct {
 
 // OnStart 完成本例的一次性业务流程；Counter 创建后即可使用，不需要 Start Command。
 func (service *MainService) OnStart(ctx context.Context, self gsr.ServiceContext) error {
+	const counterName = "counter"
 	id, err := self.CreateService(ctx, newCounterService())
 	if err != nil {
 		return err
 	}
+	if err := self.Register(counterName, id); err != nil {
+		return err
+	}
 	for _, amount := range []int{2, 3} {
-		if err := self.Send(id, addCommand, amount); err != nil {
+		if err := self.SendName(counterName, addCommand, amount); err != nil {
 			return err
 		}
 	}
 	// Get 排在两次 Add 后；不用 sleep，也不直接读取 Counter 的状态。
-	value, err := self.Call(ctx, id, getCommand)
+	value, err := self.CallName(ctx, counterName, getCommand)
 	if err != nil {
 		return err
 	}
 	if _, err := fmt.Fprintln(service.output, "count =", value); err != nil {
 		return err
 	}
-	if err := self.Send(id, resetCommand); err != nil {
+	if err := self.SendName(counterName, resetCommand); err != nil {
 		return err
 	}
-	value, err = self.Call(ctx, id, getCommand)
+	value, err = self.CallName(ctx, counterName, getCommand)
 	if err != nil {
 		return err
 	}
