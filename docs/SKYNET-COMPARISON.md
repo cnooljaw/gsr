@@ -29,10 +29,10 @@
 | `Service`、`CreateService(ctx, service)` | 已实现 | `skynet_context`、Lua service、`skynet.newservice()`、`.launcher` | 借鉴后重构 | 宿主创建普通 MainService；任何 Service 都可通过 ServiceContext.CreateService 创建实例，复用 Runtime，不新增 Launcher、工厂或自动 Bootstrap。创建经过 OnStart，失败只回滚当前实例；已成功创建的子 Service 仍归 Runtime 管理。 |
 | `ServiceID uint64` | Core 0 已定 | `skynet_context` 的 32 位 handle；远端 handle 还可能带 harbor 位 | 借鉴后重构 | GSR ServiceID 只在当前 Runtime 有效，不编码 Node、Epoch、Generation，也不作为远端地址。 |
 | `ServiceName`、外层 Registry/Discovery | Core 1/Cluster 计划 | `skynet.register()`、`skynet.localname()`、`.service`、`SERVICE`、`service_mgr.lua` | 直接对应 | GSR 稳定逻辑名称不属于 Core ServiceID；解析名称与持有运行期 ID 分层。 |
-| `Service.OnStart` / `OnStop` | Core 1 计划 | `skynet.start(func)`、`skynet.init_service()`、`skynet.exit()` | 借鉴后重构 | Skynet 的 `start` 是单个 Lua service 的初始化入口；GSR 把 Runtime 基础设施启动和 Service 生命周期分开，OnStart 接收协作 context 并显式返回 error。 |
+| `Service.OnStart` / `OnStop` | Core 1 已实现 | `skynet.start(func)`、`skynet.init_service()`、`skynet.exit()` | 借鉴后重构 | Skynet 的 `start` 是单个 Lua service 的初始化入口；GSR 把 Runtime 基础设施启动和 Service 生命周期分开，OnStart 接收协作 context 并显式返回 error。 |
 | `ServiceContext.Exit()` | 已实现 | `skynet.exit()` | 借鉴后重构 | Skynet 通过协程 QUIT 离开执行；Go 只标记退出，必须正常 return。当前 Call 按返回值完成，再停止自身；不停止新建的 Service 或 Runtime。 |
 | Runtime `Stop(ctx)` / `Close()` | Core 0.5 | `skynet_handle_retireall()` 与进程退出清理 | 职责相近而非直接对应 | 面向整个 Runtime；有序停止与最终释放分为两个幂等阶段，有 deadline 但不能强杀，Stop 后不允许重启。不等同于单 Service 的 exit/kill。 |
-| Service 状态唯一 owner | Core 1 计划 | `skynet_context`、handle 表和 Lua service 状态 | GSR 新增约束 | GSR 业务状态只能由所属 Service Handler 修改，Service 之间不能持有彼此实现指针。 |
+| Service 状态唯一 owner | 已确立约束 | `skynet_context`、handle 表和 Lua service 状态 | GSR 新增约束 | GSR 业务状态只能由所属 Service Handler 修改，Service 之间不能持有彼此实现指针。 |
 
 Skynet 的关闭顺序可概括为：timer 线程停止时间/socket 事件并唤醒 worker，主线程等待 worker 结束，再释放 Harbor 和 socket。GSR 沿用“先 quiesce、再等待、最后释放”的思想，但由 Core 管理本地组件、Cluster 管理网络资源，gsr.Run 内部协调跨组件关闭。
 
@@ -41,25 +41,25 @@ Skynet 的关闭顺序可概括为：timer 线程停止时间/socket 事件并�
 | GSR 概念/API | GSR 阶段 | Skynet 对应概念 | 关系 | 关键区别 |
 | --- | --- | --- | --- | --- |
 | `Runtime.Call(ctx, target, command, args...)` | 已实现 | `clusteragent.lua` 通过 `skynet.rawcall` 发起本地调用 | 借鉴后重构 | Skynet agent 是 Service，依赖 Lua coroutine 等待；GSR 宿主/基础设施使用 Source 为零的显式入口，经普通 Mailbox 和本地 PendingCall 完成，等待受 MaxCallWait 限制。普通业务仍使用 ServiceContext.Call。 |
-| `Message`：`Source`、`Target`、`Session`、`Command`、`Args` | Core 1/3 计划 | `skynet_message`：`source`、`session`、`data`、`sz` | 直接对应 | GSR 本地 Message 不做 wire 编码；Skynet 常规路径把 Lua 参数 pack 成 buffer，并把类型编码进 `sz` 高位。 |
-| `Command` / `CommandID uint32` | Core 1 计划 | `PTYPE_*`、`skynet.register_protocol()`、protocol id 和 Lua command string | 借鉴后重构 | GSR Core 不暴露 `PTYPE`；CommandID 使用 32 位静态命令字段，与协议保持同宽，跨节点统一编码，由目标 Service 解释命令，不按 Command 注册 codec。 |
-| `LocalDispatcher` | Core 1 计划 | `skynet_context_message_dispatch()`、`skynet.dispatch()` | 直接对应 | GSR 本地 dispatcher 只处理本地 Message；Skynet callback 还要处理 protocol type、解包和 session。 |
+| `Message`：`Source`、`Target`、`Session`、`Command`、`Args` | Core 1/3 已实现 | `skynet_message`：`source`、`session`、`data`、`sz` | 直接对应 | GSR 本地 Message 不做 wire 编码；Skynet 常规路径把 Lua 参数 pack 成 buffer，并把类型编码进 `sz` 高位。 |
+| `Command` / `CommandID uint32` | Core 1 已实现 | `PTYPE_*`、`skynet.register_protocol()`、protocol id 和 Lua command string | 借鉴后重构 | GSR Core 不暴露 `PTYPE`；CommandID 使用 32 位静态命令字段，与协议保持同宽，跨节点统一编码，由目标 Service 解释命令，不按 Command 注册 codec。 |
+| `LocalDispatcher` | Core 1 已实现 | `skynet_context_message_dispatch()`、`skynet.dispatch()` | 直接对应 | GSR 本地 dispatcher 只处理本地 Message；Skynet callback 还要处理 protocol type、解包和 session。 |
 | `Handler.Handle(CommandContext, CommandID, ...any)` | 已实现 | `skynet.dispatch(typename, func)`，回调参数通常为 `session, source, ...` | 借鉴后重构 | GSR 用 Go Handler 和只读 `CommandContext.Source()`；Source 由 Runtime 写入，Timer 可为零值，业务不能伪造。普通应用 Service 可用具名字段持有不可变 `gsr.Dispatcher`，显式实现 Handle 入口。 |
 | `gsr.Dispatcher`（每 Service、不可变、可选） | 已实现 | Service 内 `CMD[cmd]` 表配合 `skynet.dispatch()` | 借鉴后重构 | GSR 在构造期校验并复制 `CommandID -> typed Handler` 表，运行期不注册、不预检查；Dispatcher 返回结果/error，不调用手工 Reply。直接实现 `Handle` 仍是扩展口。 |
-| `CommandContext.Source()` | Core 1 计划 | dispatch callback 的 `source` 参数、`skynet.context()` | 借鉴后重构 | 普通 Send/Call 的 Source 由 Runtime 写入当前 Service；Timer Command 使用 `ServiceID(0)`；受控 Redirect 才能按固定策略保留已有 Source，业务 API 不允许覆盖或传入任意值。 |
+| `CommandContext.Source()` | Core 1 已实现 | dispatch callback 的 `source` 参数、`skynet.context()` | 借鉴后重构 | 普通 Send/Call 的 Source 由 Runtime 写入当前 Service；Timer Command 使用 `ServiceID(0)`；受控 Redirect 才能按固定策略保留已有 Source，业务 API 不允许覆盖或传入任意值。 |
 | 受控 `Redirect` / `Relay` | Core/Adapter 后续 | `skynet.redirect(dest, source, typename, ...)` | 借鉴后重构 | Skynet 的 redirect 同时承担 buffer ownership、fan-out、Harbor 控制 relay 和事件 provenance。GSR 不提供任意 source 的业务 API；首版只考虑受信任 Runtime/Adapter 的单向 Runtime-owned Message 转发，不转移 Call session/PendingCall。 |
-| `Args []any` 的消息快照 | Core 1 计划 | `skynet.pack()`、C 层 `_filter_args()`；`PTYPE_TAG_DONTCOPY` 是不复制逃生口 | 借鉴后重构 | GSR 只隔离 `Args` 外层；map/slice/pointer 的复制深度由 typed client 负责，Core 不做通用深拷贝。 |
-| `Mailbox` | Core 1 计划 | 每个 context 的 `message_queue`，以及全局 MQ | 直接对应但策略不同 | Skynet 队列满时动态扩容；GSR Mailbox 有界，admission 失败返回稳定 Runtime Error，不无限阻塞或扩容。 |
-| `Scheduler` | Core 1 计划 | worker threads、global MQ、`skynet_context_message_dispatch()` 的 weight 和 monitor | 借鉴后重构 | GSR 第一版每个 Running Service 一个 Runtime-owned runner，Scheduler 负责创建、停止、等待和 recovery，不暴露全局队列。 |
-| per-Service runner | Core 1 计划 | Skynet worker 从全局队列取 context，再创建/恢复 Lua coroutine | 有意不照搬 | GSR 用一个 runner 串行消费一个 Service 的 Mailbox；业务不得接触 runner 或自行启动 goroutine。 |
-| 同一 Service 的 run-to-completion | Core 1/3 计划 | 一个 context 的 message queue 通常由一个 worker dispatch；但 `skynet.call()` 会 yield，服务仍可运行其它 coroutine/message | 有意不照搬 | GSR 当前 Handler 内 Call 等待时保留该 Service 执行权，不处理下一条消息；其它 Service 仍可运行。 |
-| `Self()` | Core 1 计划 | `skynet.self()` / `c.addresscommand("REG")` | 直接对应 | GSR 返回当前 Runtime 的 ServiceID；不返回可编码的全局或远端地址。 |
-| `Send(target, command, args...)` | Core 1 计划 | `skynet.send()`、`skynet.rawsend()` | 直接对应但边界更窄 | GSR 使用 `SessionID == 0`，返回值只代表本地 admission；Core Send 不直接理解 Node、Transport 或 `PTYPE`。 |
+| `Args []any` 的消息快照 | Core 1 已实现 | `skynet.pack()`、C 层 `_filter_args()`；`PTYPE_TAG_DONTCOPY` 是不复制逃生口 | 借鉴后重构 | GSR 只隔离 `Args` 外层；map/slice/pointer 的复制深度由 typed client 负责，Core 不做通用深拷贝。 |
+| `Mailbox` | Core 1 已实现 | 每个 context 的 `message_queue`，以及全局 MQ | 直接对应但策略不同 | Skynet 队列满时动态扩容；GSR Mailbox 有界，admission 失败返回稳定 Runtime Error，不无限阻塞或扩容。 |
+| `Scheduler` | Core 1 已实现 | worker threads、global MQ、`skynet_context_message_dispatch()` 的 weight 和 monitor | 借鉴后重构 | GSR 第一版每个 Running Service 一个 Runtime-owned runner，Scheduler 负责创建、停止、等待和 recovery，不暴露全局队列。 |
+| per-Service runner | Core 1 已实现 | Skynet worker 从全局队列取 context，再创建/恢复 Lua coroutine | 有意不照搬 | GSR 用一个 runner 串行消费一个 Service 的 Mailbox；业务不得接触 runner 或自行启动 goroutine。 |
+| 同一 Service 的 run-to-completion | Core 1/3 已实现 | 一个 context 的 message queue 通常由一个 worker dispatch；但 `skynet.call()` 会 yield，服务仍可运行其它 coroutine/message | 有意不照搬 | GSR 当前 Handler 内 Call 等待时保留该 Service 执行权，不处理下一条消息；其它 Service 仍可运行。 |
+| `Self()` | Core 1 已实现 | `skynet.self()` / `c.addresscommand("REG")` | 直接对应 | GSR 返回当前 Runtime 的 ServiceID；不返回可编码的全局或远端地址。 |
+| `Send(target, command, args...)` | Core 1 已实现 | `skynet.send()`、`skynet.rawsend()` | 直接对应但边界更窄 | GSR 使用 `SessionID == 0`，返回值只代表本地 admission；Core Send 不直接理解 Node、Transport 或 `PTYPE`。 |
 | `Call(ctx, target, command, args...)` | Core 3 已完成 | `skynet.call()`、`skynet.rawcall()` | 直接对应但语义更严格 | GSR 必须受 `MaxCallWait` 和调用方 context 的更早 deadline 约束，拒绝 self Call；Skynet 普通 `call` 本身没有统一最大等待时间。 |
 | `PendingCall` | Core 3 已完成 | `session_id_coroutine`、`watching_session`、等待中的 Lua coroutine | 直接对应 | GSR 用独立 PendingCall completion 路径恢复原 Handler；Reply 不作为业务 Command 投递回 Mailbox。 |
-| `SessionID uint64` | Core 0/3 计划 | context 内 session、`c.genid()`、`session_id_coroutine` 表 | 借鉴后重构 | GSR 零值表示 Send，非零表示 Call，并在 owner 生命周期内单调递增、耗尽即失败；Skynet 的 session 需要处理较小整数空间的回绕冲突。 |
+| `SessionID uint64` | Core 0/3 已实现 | context 内 session、`c.genid()`、`session_id_coroutine` 表 | 借鉴后重构 | GSR 零值表示 Send，非零表示 Call，并在 owner 生命周期内单调递增、耗尽即失败；Skynet 的 session 需要处理较小整数空间的回绕冲突。 |
 | Handler 返回 `(any, error)` 自动完成 Reply | Core 3 已完成 | `skynet.ret()`、`skynet.retpack()`、`skynet.response()`、`PTYPE_RESPONSE` | 有意不照搬 | GSR 不提供手工或异步 Reply API；Runtime 根据 SessionID 恰好完成一次成功结果或结构化错误。 |
-| `ErrorClass`、`ErrorCode`、`StatusError` | Core 0/3 计划 | `PTYPE_ERROR`，通常是空 payload 或 Lua error 文本 | GSR 新增约束 | GSR 程序分支只看 Class/Code，Message 只用于安全诊断；未知 Handler error/panic 不透传内部 stack。 |
+| `ErrorClass`、`ErrorCode`、`StatusError` | Core 0/3 已实现 | `PTYPE_ERROR`，通常是空 payload 或 Lua error 文本 | GSR 新增约束 | GSR 程序分支只看 Class/Code，Message 只用于安全诊断；未知 Handler error/panic 不透传内部 stack。 |
 
 ### Skynet `redirect` 的实际用途
 
