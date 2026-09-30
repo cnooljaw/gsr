@@ -17,14 +17,10 @@ import (
 	"github.com/cnooljaw/gsr/runtime"
 )
 
-// 验证监听建立后的启动失败或停止失败仍释放端口、停止子 Service 并排空日志，保留各阶段错误。
+// 验证监听建立后的启动错误或 panic、停止错误或 panic 均保留原错误并释放资源。
 func TestRunCleanupAfterOpen(t *testing.T) {
-	for _, startupFailure := range []bool{true, false} {
-		name := "shutdown_failure"
-		if startupFailure {
-			name = "startup_rollback"
-		}
-		t.Run(name, func(t *testing.T) {
+	for _, mode := range []string{"startup_error", "startup_panic", "shutdown_failure", "stop_panic"} {
+		t.Run(mode, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 			defer cancel()
 			startFailure := errors.New("entry startup failed")
@@ -52,14 +48,20 @@ func TestRunCleanupAfterOpen(t *testing.T) {
 						return err
 					}
 					address = self.Cluster().ListenAddress()
-					if startupFailure {
+					if mode == "startup_error" {
 						return startFailure
+					}
+					if mode == "startup_panic" {
+						panic("entry startup panicked")
 					}
 					cancel()
 					return nil
 				},
 				stop: func(_ context.Context) error {
 					entryStops.Add(1)
+					if mode == "stop_panic" {
+						panic("entry stop panicked")
+					}
 					return nil
 				},
 			}
@@ -67,7 +69,7 @@ func TestRunCleanupAfterOpen(t *testing.T) {
 				Logging: logging.Config{Writer: &output},
 				Cluster: cluster.ClusterConfig{Nodes: map[cluster.NodeID]string{"server": "127.0.0.1:0"}},
 			}, entry)
-			if !errors.Is(err, stopFailure) || errors.Is(err, startFailure) != startupFailure {
+			if !errors.Is(err, stopFailure) || errors.Is(err, startFailure) != (mode == "startup_error") || errors.Is(err, runtime.ErrServicePanicked) != (mode == "startup_panic" || mode == "stop_panic") {
 				t.Fatalf("lost lifecycle error: %v", err)
 			}
 			if entryStops.Load() != 1 || childStops.Load() != 1 {
@@ -93,15 +95,47 @@ func TestRunCleanupAfterOpen(t *testing.T) {
 	}
 }
 
-// 验证后续组件构造失败仍排空日志；错误不被回滚覆盖，也不需要调用者持有 Host。
+// 验证 Runtime、Cluster 或入口构造失败仍排空日志并保留原始错误。
 func TestRunConstructionRollback(t *testing.T) {
-	var output bytes.Buffer
-	err := Run(context.Background(), Config{Logging: logging.Config{Writer: &output}, Cluster: cluster.ClusterConfig{MaxCallWait: -1}}, &probeService{})
-	if !errors.Is(err, cluster.ErrInvalidClusterConfig) {
-		t.Fatal(err)
-	}
-	if !bytes.Contains(output.Bytes(), []byte("process stopped")) {
-		t.Fatal("logger not drained")
+	var invalidEntry *probeService
+	for _, test := range []struct {
+		name   string
+		config Config
+		entry  Service
+		want   error
+	}{
+		{name: "runtime", config: Config{Runtime: runtime.Config{MaxCallWait: -1}}, want: runtime.ErrInvalidConfig},
+		{name: "cluster", config: Config{Cluster: cluster.ClusterConfig{MaxCallWait: -1}}, want: cluster.ErrInvalidClusterConfig},
+		{name: "entry", entry: invalidEntry, want: runtime.ErrInvalidService},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			var output bytes.Buffer
+			var starts, stops atomic.Int32
+			entry := test.entry
+			if test.name != "entry" {
+				entry = &probeService{
+					start: func(context.Context, ServiceContext) error {
+						starts.Add(1)
+						return nil
+					},
+					stop: func(context.Context) error {
+						stops.Add(1)
+						return nil
+					},
+				}
+			}
+			test.config.Logging = logging.Config{Writer: &output}
+			err := Run(context.Background(), test.config, entry)
+			if !errors.Is(err, test.want) {
+				t.Fatalf("construction error = %v, want %v", err, test.want)
+			}
+			if starts.Load() != 0 || stops.Load() != 0 {
+				t.Fatalf("business lifecycle ran before assembly completed: starts=%d stops=%d", starts.Load(), stops.Load())
+			}
+			if !bytes.Contains(output.Bytes(), []byte("process stopped")) {
+				t.Fatal("logger not drained")
+			}
+		})
 	}
 }
 
