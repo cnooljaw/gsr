@@ -17,7 +17,7 @@ Runtime 需要保持一个清晰的业务入口：它只把本地 Message 投递
 ## Decision
 
 - `Service.Handle(CommandContext, CommandID, ...any) (any, error)` 是 Runtime 唯一调用的业务入口。每个 Service 在自身类型上显式实现它；这是项目编码规则，Go 接口机制不能禁止匿名嵌入的方法提升。
-- `gsr` 应用层提供唯一可选的 `Dispatcher`；Core `runtime` 不维护对应分发表。Dispatcher 属于单个应用 Service，不是全局 Registry。普通业务 Service 默认用具名字段持有它，并显式实现 `Handle` 转发入口，避免匿名嵌入的方法提升隐藏接口实现。不使用 Dispatcher 的特殊 Service 不必持有它。
+- `gsr` 应用层提供唯一可选的 `Dispatcher`；Core `runtime` 不维护对应分发表。Dispatcher 属于单个应用 Service，不是全局 Registry。普通应用层 `gsr.Service` 默认用具名字段持有它，并显式实现 `Handle` 转发入口，避免匿名嵌入的方法提升隐藏接口实现。直接实现 `runtime.Service` 的基础设施或底层集成示例使用不同的 `CommandContext`，仍显式声明 `Handle`，但不套用应用层 Dispatcher，也不为此向 Core 增加第二套分发器。
 - `NewDispatcher(map[runtime.CommandID]any)` 在构造阶段复制命令表、校验 Handler 签名并准备参数绑定；`MustDispatcher` 仅为静态定义的命令表提供 fail-fast。运行期不提供 `Register`、`Unregister` 或其它可变注册入口，也不引入额外的 `CommandHandlers` 类型。
 - `CommandID` 固定为 `uint32`，与协议命令字段同宽以保留现有命令值兼容性；它由业务/协议包维护静态常量或生成代码，Runtime 不分配。
 - 标准 typed Handler 只允许：

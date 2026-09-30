@@ -253,7 +253,7 @@ Source、Call 上限和自动 Reply 的完整取舍见 [ADR 0007](adr/0007-comma
 
 ### 4.4 业务 Service 默认使用 Dispatcher
 
-`Service.Handle` 仍是 Runtime 唯一调用的业务入口。普通业务 Service 默认使用 `gsr.Dispatcher`，不重复编写 `switch`、`[]any` 参数数量检查和类型断言。它是可选的每 Service 不可变能力，匹配应用层的 `gsr.CommandContext`；Core `runtime` 不另设一套同名分发器：
+`Service.Handle` 仍是 Runtime 唯一调用的业务入口。普通应用层 `gsr.Service` 默认使用 `gsr.Dispatcher`，不重复编写 `switch`、`[]any` 参数数量检查和类型断言。它是可选的每 Service 不可变能力，匹配应用层的 `gsr.CommandContext`；Core `runtime` 不另设一套同名分发器。直接实现 Core `runtime.Service` 的基础设施和底层集成示例（如 HTTP 入站、出站示例）仍须显式声明 `Handle`，但因使用 `runtime.CommandContext`，不套用应用层 Dispatcher；普通业务新代码优先使用 `gsr.Service`：
 
 ```go
 func NewDispatcher(map[runtime.CommandID]any) (*Dispatcher, error)
