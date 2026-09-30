@@ -310,3 +310,58 @@ func TestServiceContextCallsLocalServiceByName(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+// 验证业务 Handler 按名 Send/Call 时以自身为 Source，目标按 Mailbox 顺序处理。
+func TestCommandContextCallsLocalServiceByName(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	result := make(chan error, 1)
+	entry := &probeService{start: func(ctx context.Context, self ServiceContext) error {
+		var callerID runtime.ServiceID
+		var handled int
+		targetID, err := self.CreateService(ctx, &probeService{handle: func(current CommandContext) (any, error) {
+			if current.Source() != callerID {
+				return nil, errors.New("named handler call lost caller source")
+			}
+			handled++
+			return handled, nil
+		}})
+		if err != nil {
+			return err
+		}
+		if err := self.Register("target", targetID); err != nil {
+			return err
+		}
+		callerID, err = self.CreateService(ctx, &probeService{handle: func(current CommandContext) (any, error) {
+			if err := current.SendName("target", 1); err != nil {
+				result <- err
+				cancel()
+				return nil, nil
+			}
+			callContext, stopCall := context.WithTimeout(context.Background(), time.Second)
+			defer stopCall()
+			value, err := current.CallName(callContext, "target", 1)
+			if err == nil && value != 2 {
+				err = errors.New("named handler calls bypassed mailbox order")
+			}
+			result <- err
+			cancel()
+			return nil, nil
+		}})
+		if err != nil {
+			return err
+		}
+		return self.Send(callerID, 1)
+	}}
+	if err := Run(ctx, Config{Logging: logging.Config{Writer: io.Discard}}, entry); err != nil {
+		t.Fatal(err)
+	}
+	select {
+	case err := <-result:
+		if err != nil {
+			t.Fatal(err)
+		}
+	default:
+		t.Fatal("handler did not complete named calls")
+	}
+}
