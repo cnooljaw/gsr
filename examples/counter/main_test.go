@@ -6,6 +6,7 @@ import (
 	"io"
 	"testing"
 
+	"github.com/cnooljaw/gsr"
 	"github.com/cnooljaw/gsr/runtime"
 )
 
@@ -24,6 +25,7 @@ func TestCounterExample(t *testing.T) {
 func TestCounterRejectsInvalidCommands(t *testing.T) {
 	// 本测试独占未启动实例，只验证命令处理函数；真实消息路径由 TestCounterExample 覆盖。
 	counter := newCounterService()
+	current := counterTestContext{}
 	for _, command := range []struct {
 		id   runtime.CommandID
 		args []any
@@ -34,15 +36,17 @@ func TestCounterRejectsInvalidCommands(t *testing.T) {
 		{resetCommand, []any{1}, runtime.ErrInvalidCommandArguments},
 		{99, nil, runtime.ErrUnknownCommand},
 	} {
-		if _, err := counter.Handle(nil, command.id, command.args...); !errors.Is(err, command.want) {
+		if _, err := counter.Handle(current, command.id, command.args...); !errors.Is(err, command.want) {
 			t.Fatalf("command=%d error=%v", command.id, err)
 		}
 	}
-	value, err := counter.Handle(nil, getCommand)
+	value, err := counter.Handle(current, getCommand)
 	if err != nil || value != 0 {
 		t.Fatalf("value=%v error=%v", value, err)
 	}
 }
+
+type counterTestContext struct{ gsr.CommandContext }
 
 // 验证输出失败不会因为演示完成通知而丢失，Run 仍返回原始错误。
 func TestCounterOutputFailure(t *testing.T) {

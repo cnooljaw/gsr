@@ -307,3 +307,7 @@ go test ./runtime -run '^$' -bench '^BenchmarkRuntimeCallRoundTrip$' -benchtime=
 这只是本页早期同一基准的复核，不是新增行为覆盖，也不据 1,515 与 1,496 ns/op 的小样本差异宣称性能提升。计时包括宿主 Send、caller Handler 中的本地 Call、空目标 Handler 自动回复与测试 channel 通知；无日志、无网络、无业务计算。循环等待本次通知才发下一条，属于串行闭环，不是外部定速输入。MailboxCapacity=b.N+1，本次为 10,001，不能代替默认有界队列的背压验收。
 
 下一阶段不继续用同类空 Handler 样本推导生产容量。先由应用确定暂定 10,000 条/秒是哪些操作的总量，以及本地 Send、本地 Call、跨节点 Send/Call 的构成；未裁决前不假设比例或将四种操作视为等价。随后再确定 Handler 业务成本、日志频率、持续时长及延迟/拒绝率门槛，建立代表性场景。当前数据只用于基础机制与量级参考。
+
+## 应用层 Dispatcher 小基准：2026-09-30
+
+本次应用层 `gsr.Dispatcher` 切片，Go 1.24.13、darwin/arm64、Apple M2：已构造命令表，一个 `int` 参数、一个 `int` 返回值、无业务计算和 Runtime/网络路径。运行 `go test . -run '^$' -bench '^BenchmarkDispatcher$' -benchmem -benchtime=2s`，单次结果为 699.6 ns/op、152 B/op、6 allocs/op。构造阶段反射校验不计入；运行阶段包含命令查找、参数绑定和 `reflect.Call`。这是小样本量级，不与本页 Go 1.23.3 的完整 Send/Call 基准直接比较，也不证明生产 Handler 延迟或容量。真实压测若证实热点 Service 受反射影响，该 Service 可以直接实现无反射 `Handle`。

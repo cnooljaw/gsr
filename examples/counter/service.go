@@ -15,11 +15,18 @@ const (
 
 // CounterService 独占计数状态；只能通过 Command 读写，不需要业务锁或 goroutine。
 type CounterService struct {
+	*gsr.Dispatcher
 	count int
 }
 
 func newCounterService() *CounterService {
-	return &CounterService{}
+	service := &CounterService{}
+	service.Dispatcher = gsr.MustDispatcher(map[runtime.CommandID]any{
+		addCommand:   service.add,
+		getCommand:   service.get,
+		resetCommand: service.reset,
+	})
+	return service
 }
 
 // OnStart 无外部资源需要初始化。
@@ -27,33 +34,18 @@ func (service *CounterService) OnStart(_ context.Context, _ gsr.ServiceContext) 
 	return nil
 }
 
-// Handle 在目标 Service 判断命令及参数；非法请求不修改状态。
-func (service *CounterService) Handle(_ gsr.CommandContext, command runtime.CommandID, args ...any) (any, error) {
-	switch command {
-	case addCommand:
-		if len(args) != 1 {
-			return nil, runtime.ErrInvalidCommandArguments
-		}
-		amount, ok := args[0].(int)
-		if !ok {
-			return nil, runtime.ErrInvalidCommandArguments
-		}
-		service.count += amount
-		return nil, nil
-	case getCommand:
-		if len(args) != 0 {
-			return nil, runtime.ErrInvalidCommandArguments
-		}
-		return service.count, nil
-	case resetCommand:
-		if len(args) != 0 {
-			return nil, runtime.ErrInvalidCommandArguments
-		}
-		service.count = 0
-		return nil, nil
-	default:
-		return nil, runtime.ErrUnknownCommand
-	}
+func (service *CounterService) add(_ gsr.CommandContext, amount int) error {
+	service.count += amount
+	return nil
+}
+
+func (service *CounterService) get(_ gsr.CommandContext) (int, error) {
+	return service.count, nil
+}
+
+func (service *CounterService) reset(_ gsr.CommandContext) error {
+	service.count = 0
+	return nil
 }
 
 // OnStop 无外部资源需要释放。
