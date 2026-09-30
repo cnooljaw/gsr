@@ -88,9 +88,9 @@ GSR 只用 `SessionID == 0` 或 `SessionID > 0` 区分 Send/Call；Skynet 还把
 
 | GSR 概念/API | GSR 阶段 | Skynet 对应概念 | 关系 | 关键区别 |
 | --- | --- | --- | --- | --- |
-| `After(duration, command, args...)` | Core 2 计划 | `skynet.timeout(ti, func)` 和 C `skynet_timer.c` | 借鉴后重构 | Skynet 到期后恢复一个 Lua callback coroutine；GSR Timer 只向目标 Mailbox 投递普通 Command，Source 固定为 `ServiceID(0)`，创建者由 Timer owner 表达。 |
-| `CancelTimer(TimerID)` | Core 2 计划 | 没有同等的 TimerID 取消 API；通常通过 coroutine/session 状态、`skynet.killthread()` 等方式停止等待 | GSR 新增约束 | GSR Timer 是拥有者可识别的资源，取消与触发竞争最多产生一次结果；不暴露通用协程杀线程语义。 |
-| `TimerID uint64` | Core 0/2 计划 | timeout 使用的 session 和 `sleep_session`/`session_id_coroutine` 映射 | 借鉴后重构 | GSR TimerID 与 SessionID 分离，零值无效、单调分配；Timer 不拥有高于普通 Message 的 admission 优先级。 |
+| `After(duration, command, args...)` | Core 2 已实现 | `skynet.timeout(ti, func)` 和 C `skynet_timer.c` | 借鉴后重构 | Skynet 到期后恢复一个 Lua callback coroutine；GSR Timer 只向目标 Mailbox 投递普通 Command，Source 固定为 `ServiceID(0)`，创建者由 Timer owner 表达。 |
+| `CancelTimer(TimerID)` | Core 2 已实现 | 没有同等的 TimerID 取消 API；通常通过 coroutine/session 状态、`skynet.killthread()` 等方式停止等待 | GSR 新增约束 | GSR Timer 是拥有者可识别的资源，取消与触发竞争最多产生一次结果；不暴露通用协程杀线程语义。 |
+| `TimerID uint64` | Core 0/2 已实现 | timeout 使用的 session 和 `sleep_session`/`session_id_coroutine` 映射 | 借鉴后重构 | GSR TimerID 与 SessionID 分离，零值无效、单调分配；Timer 不拥有高于普通 Message 的 admission 优先级。 |
 | Service 内 Call 等待 | Core 3 已完成 | `skynet.call()` → `coroutine.yield("SUSPEND")` → response/error 恢复 | 直接对应但执行模型不同 | GSR 挂起当前 Service runner；Skynet 挂起当前 Lua coroutine，允许同一 service 的其它 coroutine 继续推进。 |
 | 业务异步任务 | Core 4 计划 | `skynet.fork()`、`skynet.sleep()`、`skynet.wait()`、`skynet.wakeup()` | 有意不照搬 | GSR 业务不能直接启动 goroutine，也没有公共 `Runtime.Go/Fork`；并发必须由明确 owner 管理取消、上限、panic 和等待。 |
 | Result Command + `Revision`/`OperationID` fencing | Core 4/业务层 | Lua coroutine 继续执行或由 session 关联结果 | GSR 新增约束 | GSR 外部异步结果必须回到 Mailbox，由 Service 自己校验领域版本；Core 不用共享可变引用绕过 owner。 |
