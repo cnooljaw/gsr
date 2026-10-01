@@ -8,20 +8,22 @@ import (
 	"strconv"
 	"time"
 
+	gsr "github.com/cnooljaw/gsr"
+	"github.com/cnooljaw/gsr/cluster"
 	"github.com/cnooljaw/gsr/runtime"
 )
 
 // newAdminMux 将 REST 路由映射到拥有业务状态的 Service，而不保存其实现指针。
-func newAdminMux(local *runtime.Runtime, users, dashboard runtime.ServiceID) *http.ServeMux {
+func newAdminMux(in *gsr.HTTPIngress) *http.ServeMux {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /users/{id}", func(writer http.ResponseWriter, request *http.Request) {
-		callAdminService(writer, request, local, users, userGetCommand)
+		callAdminService(writer, request, in, "users", userGetCommand)
 	})
 	mux.HandleFunc("POST /users/{id}/ban", func(writer http.ResponseWriter, request *http.Request) {
-		callAdminService(writer, request, local, users, userBanCommand)
+		callAdminService(writer, request, in, "users", userBanCommand)
 	})
 	mux.HandleFunc("GET /dashboard/{id}", func(writer http.ResponseWriter, request *http.Request) {
-		callAdminService(writer, request, local, dashboard, dashboardCommand)
+		callAdminService(writer, request, in, "dashboard", dashboardCommand)
 	})
 	return mux
 }
@@ -29,8 +31,8 @@ func newAdminMux(local *runtime.Runtime, users, dashboard runtime.ServiceID) *ht
 func callAdminService(
 	writer http.ResponseWriter,
 	request *http.Request,
-	local *runtime.Runtime,
-	target runtime.ServiceID,
+	in *gsr.HTTPIngress,
+	target cluster.ServiceName,
 	command runtime.CommandID,
 ) {
 	id, err := strconv.ParseUint(request.PathValue("id"), 10, 64)
@@ -40,7 +42,7 @@ func callAdminService(
 	}
 	ctx, cancel := context.WithTimeout(request.Context(), 2*time.Second)
 	defer cancel()
-	value, err := local.Call(ctx, target, command, id)
+	value, err := in.CallName(ctx, target, command, id)
 	if err != nil {
 		status := http.StatusServiceUnavailable
 		if errors.Is(err, context.DeadlineExceeded) {

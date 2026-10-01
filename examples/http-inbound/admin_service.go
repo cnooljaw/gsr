@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	gsr "github.com/cnooljaw/gsr"
 	"github.com/cnooljaw/gsr/cluster"
 	"github.com/cnooljaw/gsr/runtime"
 )
@@ -21,27 +22,37 @@ type userRecord struct {
 
 // userService 独占用户封禁状态，HTTP Handler 不直接读写它的 map。
 type userService struct {
-	banned map[uint64]bool
+	dispatcher *gsr.Dispatcher
+	banned     map[uint64]bool
 }
 
-func (service *userService) OnStart(_ context.Context, _ runtime.ServiceContext) error {
-	service.banned = make(map[uint64]bool)
+func newUserService() *userService {
+	service := &userService{banned: make(map[uint64]bool)}
+	service.dispatcher = gsr.MustDispatcher(map[runtime.CommandID]any{
+		userGetCommand: service.get,
+		userBanCommand: service.ban,
+	})
+	return service
+}
+
+func (service *userService) OnStart(_ context.Context, _ gsr.ServiceContext) error {
 	return nil
 }
 
-func (service *userService) Handle(_ runtime.CommandContext, command runtime.CommandID, args ...any) (any, error) {
-	if command != userGetCommand && command != userBanCommand {
-		return nil, runtime.ErrUnknownCommand
+func (service *userService) Handle(ctx gsr.CommandContext, command runtime.CommandID, args ...any) (any, error) {
+	return service.dispatcher.Handle(ctx, command, args...)
+}
+
+func (service *userService) get(_ gsr.CommandContext, id uint64) (userRecord, error) {
+	if id == 0 {
+		return userRecord{}, runtime.ErrInvalidCommandArguments
 	}
-	if len(args) != 1 {
-		return nil, runtime.ErrInvalidCommandArguments
-	}
-	id, ok := args[0].(uint64)
-	if !ok || id == 0 {
-		return nil, runtime.ErrInvalidCommandArguments
-	}
-	if command == userGetCommand {
-		return userRecord{ID: id, Banned: service.banned[id]}, nil
+	return userRecord{ID: id, Banned: service.banned[id]}, nil
+}
+
+func (service *userService) ban(_ gsr.CommandContext, id uint64) (userRecord, error) {
+	if id == 0 {
+		return userRecord{}, runtime.ErrInvalidCommandArguments
 	}
 	service.banned[id] = true
 	return userRecord{ID: id, Banned: true}, nil
@@ -58,50 +69,47 @@ type dashboardRecord struct {
 
 // dashboardService 在自身 Handler 中汇总本地用户与远端房间数据。
 type dashboardService struct {
-	users      runtime.ServiceID
-	network    *cluster.Cluster
+	dispatcher *gsr.Dispatcher
 	remoteNode cluster.NodeID
-	client     *cluster.ClusterClient
 }
 
-func (service *dashboardService) OnStart(_ context.Context, self runtime.ServiceContext) error {
-	client, err := service.network.Client(self.Self())
-	if err != nil {
-		return err
-	}
-	service.client = client
+func newDashboardService(remoteNode cluster.NodeID) *dashboardService {
+	service := &dashboardService{remoteNode: remoteNode}
+	service.dispatcher = gsr.MustDispatcher(map[runtime.CommandID]any{
+		dashboardCommand: service.dashboard,
+	})
+	return service
+}
+
+func (service *dashboardService) OnStart(_ context.Context, _ gsr.ServiceContext) error {
 	return nil
 }
 
-func (service *dashboardService) Handle(self runtime.CommandContext, command runtime.CommandID, args ...any) (any, error) {
-	if command != dashboardCommand {
-		return nil, runtime.ErrUnknownCommand
-	}
-	if len(args) != 1 {
-		return nil, runtime.ErrInvalidCommandArguments
-	}
-	id, ok := args[0].(uint64)
-	if !ok || id == 0 {
-		return nil, runtime.ErrInvalidCommandArguments
+func (service *dashboardService) Handle(ctx gsr.CommandContext, command runtime.CommandID, args ...any) (any, error) {
+	return service.dispatcher.Handle(ctx, command, args...)
+}
+
+func (service *dashboardService) dashboard(self gsr.CommandContext, id uint64) (dashboardRecord, error) {
+	if id == 0 {
+		return dashboardRecord{}, runtime.ErrInvalidCommandArguments
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	userValue, err := self.Call(ctx, service.users, userGetCommand, id)
+	userValue, err := self.CallName(ctx, "users", userGetCommand, id)
 	if err != nil {
-		return nil, err
+		return dashboardRecord{}, err
 	}
 	user, ok := userValue.(userRecord)
 	if !ok {
-		return nil, runtime.ErrInvalidCommandArguments
+		return dashboardRecord{}, runtime.ErrInvalidCommandArguments
 	}
-	roomValue, err := service.client.Call(ctx, service.remoteNode,
-		cluster.ServiceTarget{ServiceName: "rooms"}, roomCountCommand)
+	roomValue, err := self.Cluster().Call(ctx, service.remoteNode, "rooms", roomCountCommand)
 	if err != nil {
-		return nil, err
+		return dashboardRecord{}, err
 	}
 	players, ok := roomValue.(int64)
 	if !ok {
-		return nil, runtime.ErrInvalidCommandArguments
+		return dashboardRecord{}, runtime.ErrInvalidCommandArguments
 	}
 	return dashboardRecord{User: user, RoomPlayers: players}, nil
 }

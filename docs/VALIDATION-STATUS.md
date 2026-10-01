@@ -48,7 +48,7 @@ Counter 入口统一切片：最小本地示例也改用 gsr.Run 和应用层 Se
 | Service 内 MySQL 产品 CRUD 示例 | [业务 Service 测试](../examples/mysql-product/service_test.go)、[入口与可选真实 MySQL 测试](../examples/mysql-product/main_test.go) | 默认使用 SQL mock；显式启用的本机专用库测试已完成真实驱动的创建、查询、更新和删除，不覆盖生产部署、并发库存一致性或断线后写入结果判定 |
 | Service 内 Redis Hash 缓存示例 | [缓存测试](../examples/redis-user-cache/cache_test.go)、[业务 Service 测试](../examples/redis-user-cache/service_test.go) | 使用自动启动的本机临时 Redis 验证 Hash、TTL、故障和 Service 隔离；缓存不是权威数据源，不覆盖跨节点一致性 |
 | Service 内 HTTP 出站示例 | [资料刷新测试](../examples/http-outbound/service_test.go) | 使用本机测试 HTTP 服务验证有界等待、错误映射和状态保留；不覆盖真实第三方服务或自动重试策略 |
-| 基础设施 HTTP 入站示例 | [房间人数接口测试](../examples/http-inbound/handler_test.go)、[管理路由业务测试](../examples/http-inbound/admin_test.go) | 使用本机 HTTP 验证只读查询、有界 Call、安全错误响应，以及三条 REST 路由经本地业务 Service 汇总真实 TCP 远端结果；不提供认证、`gsr.Run` 入站接线或公网接入能力 |
+| 基础设施 HTTP 入站示例 | [房间人数接口测试](../examples/http-inbound/handler_test.go)、[管理路由业务测试](../examples/http-inbound/admin_test.go) | 使用本机 HTTP 验证只读查询、有界 Call、安全错误响应，以及 `gsr.Run` 的三条 REST 路由经本地业务 Service 汇总真实 TCP 远端结果；不提供认证或公网接入能力 |
 
 ## 当前检查结果
 

@@ -8,7 +8,7 @@
 
 独立的 `httpserver.Server` 只管理普通 HTTP 监听与有序关闭，不接管路由、鉴权或到业务 Service 的映射。使用 `gsr.Run` 时，MainService 可通过 `self.OpenHTTP` 打开一个 HTTP 监听，由 Run 持有并在 Runtime 停止前关闭；直接使用 `httpserver.Server` 时仍由调用方持有。`redisclient.New` 和 `mysqlclient.Open` 分别返回原生 `*redis.Client`、`*sql.DB`，其生命周期仍由宿主负责。这些能力不转为 RedisService/MySQLService，也不进入 Core。
 
-HTTP 路由使用应用提供的 `http.Handler` / `http.ServeMux`。多条 REST 路由可以选择不同的本地 Service。`self.OpenHTTP(address, func(*gsr.HTTPIngress) http.Handler)` 让 Handler 保存受信任的窄入口，使用 `HTTPIngress.SendName/CallName` 按当前节点的名称表解析目标，再复用 Core 基础设施 Send/Call；消息 Source 固定为零，不伪装成 MainService 或 HTTP 客户端。Handler 自行决定鉴权、参数校验、有限等待和 HTTP 错误映射。需要汇总本地与远端结果时，由拥有该业务操作的 Service 发起本地和 Cluster Call，不让 HTTP goroutine 冒充 Service 来源。路由热变更若成为实际需求，整体重建并替换路由表，不为 `httpserver` 增加逐条动态增删 API；Go `net/http` 已处理 HTTP 并发，默认不增设固定 HTTP Agent 池。`examples/http-inbound` 已验证三条路由与本地、远端 Service 的业务链路；现有示例仍展示手工组装 Runtime 的底层用法。
+HTTP 路由使用应用提供的 `http.Handler` / `http.ServeMux`。多条 REST 路由可以选择不同的本地 Service。`self.OpenHTTP(address, func(*gsr.HTTPIngress) http.Handler)` 让 Handler 保存受信任的窄入口，使用 `HTTPIngress.SendName/CallName` 按当前节点的名称表解析目标，再复用 Core 基础设施 Send/Call；消息 Source 固定为零，不伪装成 MainService 或 HTTP 客户端。Handler 自行决定鉴权、参数校验、有限等待和 HTTP 错误映射。需要汇总本地与远端结果时，由拥有该业务操作的 Service 发起本地和 Cluster Call，不让 HTTP goroutine 冒充 Service 来源。路由热变更若成为实际需求，整体重建并替换路由表，不为 `httpserver` 增加逐条动态增删 API；Go `net/http` 已处理 HTTP 并发，默认不增设固定 HTTP Agent 池。`examples/http-inbound` 的管理路由已使用 `gsr.Run`、MainService 和 `HTTPIngress` 验证本地及远端业务链路；单个房间人数用例保留手工组装 Runtime 的底层示范。
 
 Gate 与业务 Agent 的组装只需要一个构造回调，不增加 AgentFactory 抽象：
 

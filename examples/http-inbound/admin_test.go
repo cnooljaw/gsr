@@ -3,61 +3,29 @@ package httpinbound
 import (
 	"context"
 	"encoding/json"
+	"io"
+	"net"
 	"net/http"
 	"testing"
 	"time"
 
+	gsr "github.com/cnooljaw/gsr"
 	"github.com/cnooljaw/gsr/cluster"
-	"github.com/cnooljaw/gsr/httpserver"
+	"github.com/cnooljaw/gsr/logging"
 	"github.com/cnooljaw/gsr/runtime"
 )
 
-// TestAdminHTTPRoutesCallLocalAndRemoteServices 验证多条 REST 路由能修改本地状态，并由业务 Service 汇总本地与远端结果。
+// 验证 MainService 开启的多条 REST 路由调用本地 Service，业务 Service 再汇总远端结果。
 func TestAdminHTTPRoutesCallLocalAndRemoteServices(t *testing.T) {
-	var local, remote *runtime.Runtime
-	var outbound, inbound *cluster.Cluster
-	var server *httpserver.Server
-	t.Cleanup(func() {
-		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-		defer cancel()
-		if server != nil {
-			if err := server.Close(ctx); err != nil {
-				t.Errorf("HTTP Close() error = %v", err)
-			}
-		}
-		if outbound != nil {
-			outbound.Quiesce()
-		}
-		if local != nil {
-			if err := local.Close(); err != nil {
-				t.Errorf("local Runtime.Close() error = %v", err)
-			}
-		}
-		if outbound != nil {
-			if err := outbound.Close(ctx); err != nil {
-				t.Errorf("outbound Cluster.Close() error = %v", err)
-			}
-		}
-		if inbound != nil {
-			inbound.Quiesce()
-		}
-		if remote != nil {
-			if err := remote.Close(); err != nil {
-				t.Errorf("remote Runtime.Close() error = %v", err)
-			}
-		}
-		if inbound != nil {
-			if err := inbound.Close(ctx); err != nil {
-				t.Errorf("inbound Cluster.Close() error = %v", err)
-			}
-		}
-	})
-
-	var err error
-	remote, err = runtime.NewRuntime(runtime.Config{})
+	remote, err := runtime.NewRuntime(runtime.Config{})
 	if err != nil {
 		t.Fatalf("new remote Runtime: %v", err)
 	}
+	t.Cleanup(func() {
+		if err := remote.Close(); err != nil {
+			t.Errorf("remote Runtime.Close() error = %v", err)
+		}
+	})
 	if err := remote.Start(); err != nil {
 		t.Fatalf("start remote Runtime: %v", err)
 	}
@@ -65,10 +33,18 @@ func TestAdminHTTPRoutesCallLocalAndRemoteServices(t *testing.T) {
 	if err != nil {
 		t.Fatalf("create remote room Service: %v", err)
 	}
-	inbound, err = cluster.NewCluster(cluster.ClusterConfig{})
+	inbound, err := cluster.NewCluster(cluster.ClusterConfig{})
 	if err != nil {
 		t.Fatalf("new inbound Cluster: %v", err)
 	}
+	t.Cleanup(func() {
+		inbound.Quiesce()
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		defer cancel()
+		if err := inbound.Close(ctx); err != nil {
+			t.Errorf("inbound Cluster.Close() error = %v", err)
+		}
+	})
 	remoteAddress, err := inbound.Open(remote, cluster.ListenConfig{
 		Address: "127.0.0.1:0",
 		ResolveService: func(name cluster.ServiceName) (runtime.ServiceID, error) {
@@ -81,41 +57,46 @@ func TestAdminHTTPRoutesCallLocalAndRemoteServices(t *testing.T) {
 	if err != nil {
 		t.Fatalf("open remote Cluster: %v", err)
 	}
-	outbound, err = cluster.NewCluster(cluster.ClusterConfig{
-		Nodes: map[cluster.NodeID]string{"rooms-node": remoteAddress},
+
+	reservation, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	httpAddress := reservation.Addr().String()
+	if err := reservation.Close(); err != nil {
+		t.Fatal(err)
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	started := make(chan error, 1)
+	done := make(chan error, 1)
+	go func() {
+		done <- gsr.Run(ctx, gsr.Config{
+			Logging: logging.Config{Writer: io.Discard},
+			Cluster: cluster.ClusterConfig{Nodes: map[cluster.NodeID]string{"rooms-node": remoteAddress}},
+		}, &adminMainService{address: httpAddress, started: started})
+	}()
+	t.Cleanup(func() {
+		cancel()
+		select {
+		case err := <-done:
+			if err != nil {
+				t.Errorf("gsr.Run() error = %v", err)
+			}
+		case <-time.After(3 * time.Second):
+			t.Error("gsr.Run() did not stop")
+		}
 	})
-	if err != nil {
-		t.Fatalf("new outbound Cluster: %v", err)
-	}
-	local, err = runtime.NewRuntime(runtime.Config{})
-	if err != nil {
-		t.Fatalf("new local Runtime: %v", err)
-	}
-	if err := local.Start(); err != nil {
-		t.Fatalf("start local Runtime: %v", err)
-	}
-	userID, err := local.CreateService(context.Background(), &userService{})
-	if err != nil {
-		t.Fatalf("create user Service: %v", err)
-	}
-	dashboardID, err := local.CreateService(context.Background(), &dashboardService{
-		users: userID, network: outbound, remoteNode: "rooms-node",
-	})
-	if err != nil {
-		t.Fatalf("create dashboard Service: %v", err)
-	}
-	server, err = httpserver.New(httpserver.Config{
-		Address: "127.0.0.1:0", Handler: newAdminMux(local, userID, dashboardID),
-	})
-	if err != nil {
-		t.Fatalf("new HTTP Server: %v", err)
-	}
-	if err := server.Start(); err != nil {
-		t.Fatalf("start HTTP Server: %v", err)
+	select {
+	case err := <-started:
+		if err != nil {
+			t.Fatalf("start HTTP application: %v", err)
+		}
+	case <-time.After(3 * time.Second):
+		t.Fatal("HTTP application did not start")
 	}
 
 	client := &http.Client{Timeout: 3 * time.Second}
-	baseURL := "http://" + server.Addr().String()
+	baseURL := "http://" + httpAddress
 	for _, step := range []struct {
 		method, path string
 		banned       bool
@@ -152,4 +133,42 @@ func TestAdminHTTPRoutesCallLocalAndRemoteServices(t *testing.T) {
 			t.Fatalf("%s response = %+v", step.path, body)
 		}
 	}
+}
+
+type adminMainService struct {
+	address string
+	started chan<- error
+}
+
+func (service *adminMainService) OnStart(ctx context.Context, self gsr.ServiceContext) (result error) {
+	defer func() { service.started <- result }()
+	users, err := self.CreateService(ctx, newUserService())
+	if err != nil {
+		return err
+	}
+	if err := self.Register("users", users); err != nil {
+		return err
+	}
+	dashboard, err := self.CreateService(ctx, newDashboardService("rooms-node"))
+	if err != nil {
+		return err
+	}
+	if err := self.Register("dashboard", dashboard); err != nil {
+		return err
+	}
+	if err := self.OpenHTTP(service.address, func(in *gsr.HTTPIngress) http.Handler {
+		return newAdminMux(in)
+	}); err != nil {
+		return err
+	}
+	self.Exit()
+	return nil
+}
+
+func (service *adminMainService) Handle(_ gsr.CommandContext, _ runtime.CommandID, _ ...any) (any, error) {
+	return nil, runtime.ErrUnknownCommand
+}
+
+func (service *adminMainService) OnStop(_ context.Context) error {
+	return nil
 }
