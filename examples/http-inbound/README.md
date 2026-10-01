@@ -20,4 +20,8 @@ server, err := httpserver.New(httpserver.Config{Address: "127.0.0.1:0", Handler:
 
 增加接口时继续向同一个 `mux` 注册对应的业务 Handler；不需要为 `/模块/动作` 再建一套 GSR 路由表。Handler 负责解析请求、设置有限等待、调用相应 Service 并写回 HTTP 响应。
 
-`Runtime.Call` 的 Source 固定为零，表示受信任基础设施注入，不冒充某个业务 Service 或 HTTP 客户端。HTTP Handler 的等待期限不强杀已开始执行的 Service Handler；本例只有只读查询，若以后接入修改状态的 webhook，还需由业务定义幂等、超时后的结果处理和重试策略。
+`admin_test.go` 增加了一个稍完整的业务接线：`GET /users/{id}` 查询用户、`POST /users/{id}/ban` 修改用户状态、`GET /dashboard/{id}` 查询汇总。三条路由共用同一 HTTP Listener；用户状态只由本地 `userService` 修改，`dashboardService` 在自己的 Handler 内调用本地用户 Service，并以自身 ServiceID 通过 Cluster 按 `rooms` 名称调用远端房间 Service。测试只增加这一条跨 HTTP、Core 和 Cluster 的业务链路；原有房间接口测试继续保护超时与安全错误响应。
+
+当前示例仍显式组装底层 Runtime，并把本地用户和汇总 ServiceID 交给 HTTP 路由。这能验证业务链路，但不代表 `gsr.Run` 已具备给 HTTP 入口按名称调用的接线能力。路由在启动时构造；将来确有运行期路由变更需求时，整体重建并替换路由表，不为单条路由增加动态增删 API。`net/http` 已负责 HTTP 连接和 Handler 并发，不另建固定 HTTP Agent 池。
+
+`Runtime.Call` 的 Source 固定为零，表示受信任基础设施注入，不冒充某个业务 Service 或 HTTP 客户端。HTTP Handler 的等待期限不强杀已开始执行的 Service Handler；原房间人数接口是只读查询，管理路由中的封禁操作是幂等示范。若以后接入非幂等 webhook，还需由业务定义超时后的结果处理与重试策略。

@@ -8,6 +8,8 @@
 
 独立的 `httpserver.Server` 只管理普通 HTTP 监听与有序关闭，不接管路由、鉴权或到业务 Service 的映射；`redisclient.New` 和 `mysqlclient.Open` 分别返回原生 `*redis.Client`、`*sql.DB`。这些资源均由宿主创建并在 Runtime 停止后关闭，不转为 RedisService/MySQLService，也不进入 Core。
 
+HTTP 路由使用应用提供的 `http.Handler` / `http.ServeMux`。多条 REST 路由可以选择不同的本地 Service；需要汇总本地与远端结果时，由拥有该业务操作的 Service 发起本地和 Cluster Call，不让 HTTP goroutine 冒充 Service 来源。使用 `gsr.Run` 的应用 Service 可直接使用自身的 `CallName` / `Cluster().Call`；目前的底层 HTTP 示例则显式绑定 ServiceID 和 `ClusterClient`。路由热变更若成为实际需求，整体重建并替换路由表，不为 `httpserver` 增加逐条动态增删 API；Go `net/http` 已处理 HTTP 并发，默认不增设固定 HTTP Agent 池。`examples/http-inbound` 已验证三条路由与本地、远端 Service 的业务链路；其手工传入本地 ServiceID 的做法仍是示例接线，`gsr.Run` 尚未提供受信任的 HTTP 按名称调用入口。
+
 Gate 与业务 Agent 的组装只需要一个构造回调，不增加 AgentFactory 抽象：
 
 ```go
