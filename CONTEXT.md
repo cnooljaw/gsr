@@ -21,6 +21,7 @@
 > [ADR 0011](docs/adr/0011-service-first-application-api.md) 已落地应用入口：每节点一个 Runtime/Cluster，MainService 集中组装，CommandID 由目标解释。下文底层 ClusterClient 等类型属于基础设施，业务不手工构造。
 
 - **应用运行入口（gsr.Run）**：Core 之外的统一启动函数，创建独立 Runtime、Cluster、Logger，运行普通 MainService，并负责初始化回滚和固定顺序关闭。内部资源 owner 不公开，不是全局单例或组件容器；app.Host 已移除。
+- **HTTPIngress**：`gsr.Run` 给 HTTP Handler 的长期受信任本地入口，只提供按名称 Send/Call；每次查节点内名称表，通过 Runtime 基础设施入口投递，Source 固定为零。它不是可跨 goroutine 保存的 ServiceContext，不提供业务 Service 身份或 Cluster 调用能力。HTTP Listener 由 Run 持有，在 Runtime 停止前关闭。
 
 - **坏帧诊断抑制**：单连接内按固定协议错误类别只保留首条明细，重复项不进入日志或 Diagnostics；Cluster.SuppressedDiagnosticCount 独立累计，连接结束用 DiagnosticBadFramesSuppressed 汇总数量。不是业务日志去重，不改变消息投递或错误结果。
 

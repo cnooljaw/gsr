@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"net/http"
 	"strconv"
 	"sync"
 	"sync/atomic"
@@ -17,6 +18,123 @@ import (
 	"github.com/cnooljaw/gsr/logging"
 	"github.com/cnooljaw/gsr/runtime"
 )
+
+// 验证 Run 持有 HTTP 监听，HTTP 路由按名称调用不同 Service 且不伪造来源，退出时释放端口。
+func TestRunHTTPIngress(t *testing.T) {
+	listener, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	address := listener.Addr().String()
+	if err := listener.Close(); err != nil {
+		t.Fatal(err)
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	started := make(chan error, 1)
+	finished := make(chan error, 1)
+	notified := make(chan runtime.ServiceID, 1)
+	entry := &probeService{start: func(ctx context.Context, self ServiceContext) error {
+		for _, name := range []cluster.ServiceName{"users", "rooms", "notifications"} {
+			name := name
+			id, err := self.CreateService(ctx, &probeService{handle: func(current CommandContext) (any, error) {
+				if current.Source() != 0 {
+					return nil, errors.New("HTTP ingress forged a Service source")
+				}
+				if name == "notifications" {
+					notified <- current.Source()
+				}
+				return string(name), nil
+			}})
+			if err != nil {
+				return err
+			}
+			if err := self.Register(name, id); err != nil {
+				return err
+			}
+		}
+		err := self.OpenHTTP(address, func(in *HTTPIngress) http.Handler {
+			mux := http.NewServeMux()
+			for _, name := range []cluster.ServiceName{"users", "rooms"} {
+				name := name
+				mux.HandleFunc("GET /"+string(name), func(writer http.ResponseWriter, request *http.Request) {
+					value, err := in.CallName(request.Context(), name, 1)
+					if err != nil {
+						http.Error(writer, http.StatusText(http.StatusServiceUnavailable), http.StatusServiceUnavailable)
+						return
+					}
+					fmt.Fprint(writer, value)
+				})
+			}
+			mux.HandleFunc("GET /notify", func(writer http.ResponseWriter, _ *http.Request) {
+				if err := in.SendName("notifications", 1); err != nil {
+					http.Error(writer, http.StatusText(http.StatusServiceUnavailable), http.StatusServiceUnavailable)
+					return
+				}
+				writer.WriteHeader(http.StatusAccepted)
+			})
+			return mux
+		})
+		started <- err
+		return err
+	}}
+	go func() {
+		finished <- Run(ctx, Config{Logging: logging.Config{Writer: io.Discard}}, entry)
+	}()
+	t.Cleanup(func() {
+		cancel()
+		select {
+		case err := <-finished:
+			if err != nil {
+				t.Errorf("Run() error = %v", err)
+			}
+			listener, err := net.Listen("tcp", address)
+			if err != nil {
+				t.Errorf("HTTP listener not released: %v", err)
+			} else {
+				listener.Close()
+			}
+		case <-time.After(3 * time.Second):
+			t.Error("Run() did not stop")
+		}
+	})
+	select {
+	case err := <-started:
+		if err != nil {
+			t.Fatal(err)
+		}
+	case <-time.After(3 * time.Second):
+		t.Fatal("OpenHTTP did not finish")
+	}
+	client := &http.Client{Timeout: time.Second}
+	for _, name := range []string{"users", "rooms"} {
+		response, err := client.Get("http://" + address + "/" + name)
+		if err != nil {
+			t.Fatal(err)
+		}
+		body, readErr := io.ReadAll(response.Body)
+		response.Body.Close()
+		if readErr != nil || response.StatusCode != http.StatusOK || string(body) != name {
+			t.Fatalf("GET /%s = %d %q, %v", name, response.StatusCode, body, readErr)
+		}
+	}
+	response, err := client.Get("http://" + address + "/notify")
+	if err != nil {
+		t.Fatal(err)
+	}
+	response.Body.Close()
+	if response.StatusCode != http.StatusAccepted {
+		t.Fatalf("GET /notify status = %d", response.StatusCode)
+	}
+	select {
+	case source := <-notified:
+		if source != 0 {
+			t.Fatalf("HTTP Send source = %d, want 0", source)
+		}
+	case <-time.After(time.Second):
+		t.Fatal("HTTP Send was not delivered")
+	}
+}
 
 // 验证监听建立后的启动错误或 panic、停止错误或 panic 均保留原错误并释放资源。
 func TestRunCleanupAfterOpen(t *testing.T) {

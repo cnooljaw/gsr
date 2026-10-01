@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/cnooljaw/gsr/cluster"
+	"github.com/cnooljaw/gsr/httpserver"
 	"github.com/cnooljaw/gsr/logging"
 	"github.com/cnooljaw/gsr/runtime"
 )
@@ -85,6 +86,9 @@ type application struct {
 	namesByID     map[runtime.ServiceID][]cluster.ServiceName
 	active        map[runtime.ServiceID]struct{}
 	listenAddress string
+	httpMu        sync.Mutex
+	httpServer    *httpserver.Server
+	httpClosed    bool
 }
 
 // ErrServiceNameRegistered 表示本节点已有同名发布，不会静默替换。
@@ -135,6 +139,15 @@ func (node *application) unregisterID(id runtime.ServiceID) {
 
 func (node *application) close() error {
 	var result error
+	node.httpMu.Lock()
+	node.httpClosed = true
+	server := node.httpServer
+	node.httpMu.Unlock()
+	if server != nil {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		result = errors.Join(result, server.Close(ctx))
+		cancel()
+	}
 	if node.cluster != nil {
 		node.cluster.Quiesce()
 	}

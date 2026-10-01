@@ -2,6 +2,7 @@ package gsr
 
 import (
 	"context"
+	"net/http"
 	"reflect"
 	"time"
 
@@ -28,6 +29,7 @@ type ServiceContext interface {
 	Call(context.Context, runtime.ServiceID, runtime.CommandID, ...any) (any, error)
 	SendName(cluster.ServiceName, runtime.CommandID, ...any) error
 	CallName(context.Context, cluster.ServiceName, runtime.CommandID, ...any) (any, error)
+	OpenHTTP(string, func(*HTTPIngress) http.Handler) error
 	After(time.Duration, runtime.CommandID, ...any) (runtime.TimerID, error)
 	CancelTimer(runtime.TimerID) bool
 	Cluster() *Cluster

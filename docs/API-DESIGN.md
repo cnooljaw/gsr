@@ -6,9 +6,9 @@
 
 通用客户端协议、ProdGate 和 DebugGate 已分别提升到 `gate/protocol`、`gate/prodgate` 与 `gate/debuggate`；通用 `.proto`、生成目录及生成工具属于 `gate/`，Echo 协议与 Agent 仍留在示例。Gate 仍是 Core 外基础设施 Service，构造时显式接收 `*runtime.Runtime`，以便它的 WebSocket I/O goroutine 调用 `Runtime.DeliverClientMessage`。`gsr.Run` 在内部持有 Runtime，业务 `ServiceContext` 不提供此投递权限，因此当前联调示例继续手工组装 Runtime。未来若要在 `gsr.Run` 中创建 Gate，需要另行裁决一条受信任的窄接线入口；不能通过向所有业务 Service 暴露 Runtime 解决。
 
-独立的 `httpserver.Server` 只管理普通 HTTP 监听与有序关闭，不接管路由、鉴权或到业务 Service 的映射；`redisclient.New` 和 `mysqlclient.Open` 分别返回原生 `*redis.Client`、`*sql.DB`。这些资源均由宿主创建并在 Runtime 停止后关闭，不转为 RedisService/MySQLService，也不进入 Core。
+独立的 `httpserver.Server` 只管理普通 HTTP 监听与有序关闭，不接管路由、鉴权或到业务 Service 的映射。使用 `gsr.Run` 时，MainService 可通过 `self.OpenHTTP` 打开一个 HTTP 监听，由 Run 持有并在 Runtime 停止前关闭；直接使用 `httpserver.Server` 时仍由调用方持有。`redisclient.New` 和 `mysqlclient.Open` 分别返回原生 `*redis.Client`、`*sql.DB`，其生命周期仍由宿主负责。这些能力不转为 RedisService/MySQLService，也不进入 Core。
 
-HTTP 路由使用应用提供的 `http.Handler` / `http.ServeMux`。多条 REST 路由可以选择不同的本地 Service；需要汇总本地与远端结果时，由拥有该业务操作的 Service 发起本地和 Cluster Call，不让 HTTP goroutine 冒充 Service 来源。使用 `gsr.Run` 的应用 Service 可直接使用自身的 `CallName` / `Cluster().Call`；目前的底层 HTTP 示例则显式绑定 ServiceID 和 `ClusterClient`。路由热变更若成为实际需求，整体重建并替换路由表，不为 `httpserver` 增加逐条动态增删 API；Go `net/http` 已处理 HTTP 并发，默认不增设固定 HTTP Agent 池。`examples/http-inbound` 已验证三条路由与本地、远端 Service 的业务链路；其手工传入本地 ServiceID 的做法仍是示例接线，`gsr.Run` 尚未提供受信任的 HTTP 按名称调用入口。
+HTTP 路由使用应用提供的 `http.Handler` / `http.ServeMux`。多条 REST 路由可以选择不同的本地 Service。`self.OpenHTTP(address, func(*gsr.HTTPIngress) http.Handler)` 让 Handler 保存受信任的窄入口，使用 `HTTPIngress.SendName/CallName` 按当前节点的名称表解析目标，再复用 Core 基础设施 Send/Call；消息 Source 固定为零，不伪装成 MainService 或 HTTP 客户端。Handler 自行决定鉴权、参数校验、有限等待和 HTTP 错误映射。需要汇总本地与远端结果时，由拥有该业务操作的 Service 发起本地和 Cluster Call，不让 HTTP goroutine 冒充 Service 来源。路由热变更若成为实际需求，整体重建并替换路由表，不为 `httpserver` 增加逐条动态增删 API；Go `net/http` 已处理 HTTP 并发，默认不增设固定 HTTP Agent 池。`examples/http-inbound` 已验证三条路由与本地、远端 Service 的业务链路；现有示例仍展示手工组装 Runtime 的底层用法。
 
 Gate 与业务 Agent 的组装只需要一个构造回调，不增加 AgentFactory 抽象：
 
@@ -853,7 +853,20 @@ Service 不提供额外 `Close` 钩子；本地资源释放属于 `OnStop`。`Ru
 
 应用使用 `gsr.Run(ctx, Config, Service)`；Config 包含 Logging、Runtime、Cluster 的明确配置。每次 Run 创建独立的 Runtime、Cluster、Logger 并启动普通入口实例，等待 context 取消后自动关闭。运行期间取消是正常退出信号，已取消的启动 context 返回取消错误；初始化失败保留原错误并回滚。进程信号由 main 转成 context 取消，入口 Exit 不结束进程。旧 app.Host 已移除，不提供兼容别名。
 
-Run 内部固定按 Cluster.Quiesce → Runtime.Close → Cluster.Close → 最终日志 → Logger.Close 收尾，聚合错误且不跳过后续步骤。Cluster/Logger 每阶段预算五秒，Runtime 沿用自身预算，不强杀 Handler/Writer。Logging 创建的 Logger 由运行环境独占关闭，组件配置中的外部 Logger 被拒绝。Commands 清单已移除，Cluster 统一使用默认编码，合法命令是否支持由目标判断。
+Run 内部固定按 HTTP.Close（若已打开）→ Cluster.Quiesce → Runtime.Close → Cluster.Close → 最终日志 → Logger.Close 收尾，聚合错误且不跳过后续步骤。HTTP/Cluster/Logger 每阶段预算五秒，Runtime 沿用自身预算，不强杀 Handler/Writer。HTTP 有序关闭超时后会强制关闭连接并继续后续收尾，不能保证尚未返回的 Handler 已结束；Handler 应遵守请求取消与有限等待，并处理 Runtime 正在关闭的错误。Logging 创建的 Logger 由运行环境独占关闭，组件配置中的外部 Logger 被拒绝。Commands 清单已移除，Cluster 统一使用默认编码，合法命令是否支持由目标判断。
+
+HTTP 入口的常见写法如下；业务 Service 创建并注册完成后再打开监听。`OpenHTTP` 每个 Run 只成功一次，监听失败可重试；入口 Service 退出不关闭监听，最终由 Run 收尾。`HTTPIngress` 仅供 HTTP Handler 保存，不能代替回调内的 `ServiceContext`，也不提供 Cluster 来源身份。
+
+```go
+err := self.OpenHTTP(address, func(in *gsr.HTTPIngress) http.Handler {
+	mux := http.NewServeMux()
+	mux.HandleFunc("GET /users/{id}", func(w http.ResponseWriter, r *http.Request) {
+		value, err := in.CallName(r.Context(), "users", getUserCommand, r.PathValue("id"))
+		// 按业务要求将 value / err 转成 HTTP 响应。
+	})
+	return mux
+})
+```
 
 `self.Register(name, id)` 发布节点内名称，供本地 `self.SendName/CallName` 和远端 `self.Cluster().Send/Call(node, name, ...)` 共用目标节点的同一张表。空名、零 ID 或不属于当前应用尚未收尾 Service 的 ID 返回 ErrServiceNotFound；重复名返回 ErrServiceNameRegistered，不静默替换。
 
