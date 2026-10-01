@@ -8,6 +8,6 @@
 go test ./examples/http-inbound
 ```
 
-测试用真实回环 HTTP Server 验证成功、Service 失败的安全错误响应和有界等待。示例只提供 `http.Handler`；监听地址、认证、TLS、限流以及 HTTP Server 的启动和关闭由宿主负责，不因此扩展 Runtime 或 WebSocket Gate。宿主停机时先停止 HTTP 接纳并等待在途 Handler，再关闭 Runtime。生产接入必须先确定第三方调用方身份和网络边界，不能直接把这个无认证的示例公开到公网。
+测试通过框架的 `httpserver.Server` 启动真实回环 HTTP 监听，验证成功、Service 失败的安全错误响应和有界等待。示例提供业务 `http.Handler`；`httpserver` 只管理监听、默认有限请求头等待和有序关闭，不接管路由、认证、TLS 或限流，也不扩展 Runtime 或 WebSocket Gate。宿主停机时先关闭 HTTP Server 并等待在途 Handler，再关闭 Runtime。生产接入必须先确定第三方调用方身份和网络边界，不能直接把这个无认证的示例公开到公网。
 
 `Runtime.Call` 的 Source 固定为零，表示受信任基础设施注入，不冒充某个业务 Service 或 HTTP 客户端。HTTP Handler 的等待期限不强杀已开始执行的 Service Handler；本例只有只读查询，若以后接入修改状态的 webhook，还需由业务定义幂等、超时后的结果处理和重试策略。

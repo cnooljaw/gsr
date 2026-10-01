@@ -20,7 +20,7 @@ interface ClientAuthVector {
   mac: string;
 }
 
-const vectorPath = fileURLToPath(new URL("../../testdata/client-auth-vector.json", import.meta.url));
+const vectorPath = fileURLToPath(new URL("../../../../gate/testdata/client-auth-vector.json", import.meta.url));
 const privateKeyPrefix = Buffer.from("302e020100300506032b656e04220420", "hex");
 
 function readVector(): ClientAuthVector {

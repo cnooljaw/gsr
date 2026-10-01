@@ -11,7 +11,7 @@ import (
 
 	"github.com/cnooljaw/gsr"
 	"github.com/cnooljaw/gsr/logging"
-	"github.com/redis/go-redis/v9"
+	"github.com/cnooljaw/gsr/redisclient"
 )
 
 func main() {
@@ -27,16 +27,10 @@ func run(ctx context.Context, address string, output io.Writer) (result error) {
 	if ctx == nil || address == "" || output == nil {
 		return errors.New("example requires context, Redis address and output")
 	}
-	client := redis.NewClient(&redis.Options{
-		Addr:                  address,
-		Protocol:              2,
-		DisableIdentity:       true,
-		ContextTimeoutEnabled: true,
-		MaxRetries:            -1,
-		DialTimeout:           time.Second,
-		ReadTimeout:           time.Second,
-		WriteTimeout:          time.Second,
-	})
+	client, err := redisclient.New(address)
+	if err != nil {
+		return err
+	}
 	defer func() {
 		result = errors.Join(result, client.Close())
 	}()

@@ -1,6 +1,6 @@
 # GSR Service 操作 MySQL 产品表
 
-本例只演示一张 `products` 表的创建、按 ID 查询、更新和删除。`productService` 使用 `gsr.Dispatcher` 将 Command 绑定到强类型 Handler，并在自身 Handler 内执行 SQL；MainService 只能通过 Command 访问它。`*sql.DB` 是由 Go main 创建和关闭的连接池，不是另一个 Service，也不进入 GSR Core。
+本例只演示一张 `products` 表的创建、按 ID 查询、更新和删除。`productService` 使用 `gsr.Dispatcher` 将 Command 绑定到强类型 Handler，并在自身 Handler 内执行 SQL；MainService 只能通过 Command 访问它。Go main 使用框架的 `mysqlclient.Open` 建立原生 `*sql.DB` 连接池，在 `gsr.Run` 返回后关闭；它不是另一个 Service，也不进入 GSR Core。
 
 首次使用时，在本机 MySQL 创建**专用测试库**并执行一次建表脚本（不要指向已有业务库）；如果库和账号已经存在，跳过初始化。创建账号前，把下面的 `<强密码>` 替换成符合本机 MySQL 密码策略的密码；不要使用固定的示例口令：
 

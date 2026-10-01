@@ -9,9 +9,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/cnooljaw/gsr/examples/websocket-gate/debuggate"
-	"github.com/cnooljaw/gsr/examples/websocket-gate/gate"
-	"github.com/cnooljaw/gsr/examples/websocket-gate/prodgate"
+	"github.com/cnooljaw/gsr/gate/debuggate"
+	"github.com/cnooljaw/gsr/gate"
+	"github.com/cnooljaw/gsr/gate/prodgate"
 	"github.com/cnooljaw/gsr/runtime"
 )
 

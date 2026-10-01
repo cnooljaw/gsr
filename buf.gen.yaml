@@ -1,0 +1,20 @@
+version: v2
+inputs:
+  - directory: .
+plugins:
+  - local: protoc-gen-go
+    out: .
+    opt:
+      - module=github.com/cnooljaw/gsr
+  - local:
+      - go
+      - run
+      - github.com/cnooljaw/gsr/gate/cmd/protoc-gen-gsr-registry
+    out: .
+    opt:
+      - module_path=github.com/cnooljaw/gsr
+  - local: protoc-gen-es
+    out: examples/websocket-gate/client/src/gen
+    opt:
+      - target=ts
+      - import_extension=js

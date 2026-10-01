@@ -6,11 +6,11 @@ import (
 	"errors"
 	"io"
 	"net/http"
-	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/cnooljaw/gsr/httpserver"
 	"github.com/cnooljaw/gsr/runtime"
 )
 
@@ -21,12 +21,10 @@ func TestRoomCountHTTPHandlerQueriesService(t *testing.T) {
 	if err != nil {
 		t.Fatalf("CreateService(room) error = %v", err)
 	}
-	server := newRoomCountServer(local, roomID)
-	t.Cleanup(server.Close)
+	server := newRoomCountServer(t, local, roomID)
 
-	client := server.Client()
-	client.Timeout = time.Second
-	response, err := client.Get(server.URL + "/rooms/count")
+	client := &http.Client{Timeout: time.Second}
+	response, err := client.Get("http://" + server.Addr().String() + "/rooms/count")
 	if err != nil {
 		t.Fatalf("GET /rooms/count error = %v", err)
 	}
@@ -55,12 +53,10 @@ func TestRoomCountHTTPHandlerHidesServiceError(t *testing.T) {
 	if err != nil {
 		t.Fatalf("CreateService(failing room) error = %v", err)
 	}
-	server := newRoomCountServer(local, roomID)
-	t.Cleanup(server.Close)
+	server := newRoomCountServer(t, local, roomID)
 
-	client := server.Client()
-	client.Timeout = time.Second
-	response, err := client.Get(server.URL + "/rooms/count")
+	client := &http.Client{Timeout: time.Second}
+	response, err := client.Get("http://" + server.Addr().String() + "/rooms/count")
 	if err != nil {
 		t.Fatalf("GET /rooms/count error = %v", err)
 	}
@@ -85,13 +81,11 @@ func TestRoomCountHTTPHandlerBoundsCall(t *testing.T) {
 	if err != nil {
 		t.Fatalf("CreateService(waiting room) error = %v", err)
 	}
-	server := newRoomCountServer(local, roomID)
-	t.Cleanup(server.Close)
+	server := newRoomCountServer(t, local, roomID)
 	t.Cleanup(func() { close(release) })
 
-	client := server.Client()
-	client.Timeout = time.Second
-	response, err := client.Get(server.URL + "/rooms/count")
+	client := &http.Client{Timeout: time.Second}
+	response, err := client.Get("http://" + server.Addr().String() + "/rooms/count")
 	if err != nil {
 		t.Fatalf("GET /rooms/count error = %v", err)
 	}
@@ -101,10 +95,25 @@ func TestRoomCountHTTPHandlerBoundsCall(t *testing.T) {
 	}
 }
 
-func newRoomCountServer(local *runtime.Runtime, roomID runtime.ServiceID) *httptest.Server {
+func newRoomCountServer(t *testing.T, local *runtime.Runtime, roomID runtime.ServiceID) *httpserver.Server {
+	t.Helper()
 	mux := http.NewServeMux()
 	mux.Handle("GET /rooms/count", roomCountHandler(local, roomID))
-	return httptest.NewServer(mux)
+	server, err := httpserver.New(httpserver.Config{Address: "127.0.0.1:0", Handler: mux})
+	if err != nil {
+		t.Fatalf("httpserver.New() error = %v", err)
+	}
+	if err := server.Start(); err != nil {
+		t.Fatalf("httpserver.Start() error = %v", err)
+	}
+	t.Cleanup(func() {
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+		defer cancel()
+		if err := server.Close(ctx); err != nil {
+			t.Errorf("httpserver.Close() error = %v", err)
+		}
+	})
+	return server
 }
 
 func startInboundRuntime(t *testing.T, maxCallWait time.Duration) *runtime.Runtime {

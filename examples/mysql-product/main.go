@@ -8,11 +8,10 @@ import (
 	"io"
 	"os"
 	"strings"
-	"time"
 
 	"github.com/cnooljaw/gsr"
 	"github.com/cnooljaw/gsr/logging"
-	"github.com/go-sql-driver/mysql"
+	"github.com/cnooljaw/gsr/mysqlclient"
 )
 
 func main() {
@@ -26,29 +25,13 @@ func run(ctx context.Context, dsn string, output io.Writer) (result error) {
 	if ctx == nil || strings.TrimSpace(dsn) == "" || output == nil {
 		return errors.New("example requires context, GSR_MYSQL_DSN and output")
 	}
-	config, err := mysql.ParseDSN(dsn)
-	if err != nil || config.DBName == "" {
-		return errors.New("example requires a valid MySQL DSN with a database name")
-	}
-	config.Timeout = 2 * time.Second
-	config.ReadTimeout = 2 * time.Second
-	config.WriteTimeout = 2 * time.Second
-	connector, err := mysql.NewConnector(config)
+	db, err := mysqlclient.Open(ctx, dsn)
 	if err != nil {
-		return fmt.Errorf("configure MySQL connector: %w", err)
+		return err
 	}
-	db := sql.OpenDB(connector)
-	db.SetMaxOpenConns(4)
-	db.SetMaxIdleConns(4)
-	db.SetConnMaxLifetime(3 * time.Minute)
 	defer func() {
 		result = errors.Join(result, db.Close())
 	}()
-	pingCtx, cancel := context.WithTimeout(ctx, 2*time.Second)
-	defer cancel()
-	if err := db.PingContext(pingCtx); err != nil {
-		return fmt.Errorf("connect to MySQL: %w", err)
-	}
 	return runProductDemo(ctx, db, output)
 }
 

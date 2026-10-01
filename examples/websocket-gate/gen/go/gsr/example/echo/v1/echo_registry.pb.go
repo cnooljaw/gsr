@@ -3,7 +3,7 @@
 package echopb
 
 import (
-	catalog "github.com/cnooljaw/gsr/examples/websocket-gate/protocol/catalog"
+	catalog "github.com/cnooljaw/gsr/gate/protocol/catalog"
 	proto "google.golang.org/protobuf/proto"
 )
 

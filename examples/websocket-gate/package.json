@@ -6,7 +6,7 @@
     "node": ">=22.15.0"
   },
   "scripts": {
-    "generate": "buf generate",
+    "generate": "cd ../.. && buf generate && node examples/websocket-gate/scripts/normalize-generated.mjs",
     "build": "tsc --project tsconfig.json",
     "test:crypto": "npm run build && node --test client/dist/auth_vectors.test.js client/dist/secure_auth.test.js",
     "client": "npm run build && node client/dist/index.js"

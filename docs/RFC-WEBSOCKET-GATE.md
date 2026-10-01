@@ -122,17 +122,17 @@ enum MsgId {
 - 两者使用不同监听器、端口和显式配置；生产 Gate 不自动降级到 DebugGate，DebugGate 也不根据首包猜测生产格式。DebugGate 默认关闭，启用时应绑定回环地址或明确的内网地址，并由部署防火墙限制访问。
 - DebugGate 没有应用层认证和防重放保证，不能暴露到公网，也不能被当作生产安全模式。业务鉴权仍由 Agent/业务 Service 负责。
 - 两个 Gate 共享 Agent 业务处理逻辑；帧接收和安全校验属于各自适配器。Gate 不解码或分发业务 payload。
-- 两个接入入口保留各自的监听、握手、帧验证、容量计数和日志行为；相同的 Agent 构造保护、断线重试、停机补发，以及单连接有界出站队列、写循环和关闭机制放在示例内部的 `gatecommon`，不以模式开关合并成一个 Gate。
+- 两个接入入口保留各自的监听、握手、帧验证、容量计数和日志行为；相同的 Agent 构造保护、断线重试、停机补发，以及单连接有界出站队列、写循环和关闭机制放在 `gate/internal/gatecommon`，不以模式开关合并成一个 Gate。
 
-`examples/websocket-gate/debuggate` 已实现本地示例闭环：`NewGateService` 显式接收底层 `*runtime.Runtime`，应用通过 `Runtime.CreateService` 启动它；这只是示例组装方式，不扩展 `gsr.Run`、Core 或业务 `ServiceContext`。Gate 只监听字面回环/私有 IP 的 `/ws`，每个连接由 Gate runner 调用 `NewAgent` 创建一个 Agent。创建返回的 AgentID 绑定到该连接，读循环直接调用 `Runtime.DeliverClientMessage` 投递不透明 Envelope 字节，不逐帧经过 Gate Mailbox；Gate runner 中的连接到 Agent 映射只用于断开通知。`ClientSession.Send(Envelope)` 将响应放入有界队列，再由唯一写循环发回。此处 `ClientSession` 表示客户端连接的写回能力，不是 Core `SessionID` 或 Envelope 的 `request_id`。DebugGate 显式限制连接数、帧大小和每连接出站队列，默认帧上限为 4 MiB。出站队列按序列化 Envelope 字节数加每项固定 64 字节队列开销计费，避免空帧或很多小帧绕过内存上限；正在写出的单帧另受 `MaxFrameBytes` 限制。集成测试覆盖请求/响应 request_id、连接上限、正常断开通知、Agent 创建期间既有连接继续收帧和 Runtime 关闭时连接回收。`examples/websocket-gate` 另提供独立 Echo Agent、Go DebugGate 服务端和 TypeScript CLI；通用 Envelope 与 Echo 业务消息分别定义在 `.proto` 文件中，Go 与 TypeScript 使用同一组协议源生成类型并完成真实请求/响应往返。Go Agent 从生成目录解码 Envelope，再通过手动注册的强类型 Echo Handler 响应；未实现的协议消息无需占位 Handler。示例仍不是稳定生产 API；DebugGate 没有 TLS、生产握手或 MAC。它借用 Runtime 的共享 Logger，以 Gate ServiceID 记录监听、连接接纳、Agent 创建、帧读写和投递故障；不记录原始载荷或业务 Envelope 字段，也不负责关闭 Logger。调试入口不复制生产 Gate 的握手/MAC 诊断和按连接限频机制。
+`gate/debuggate` 已实现本地示例闭环：`NewGateService` 显式接收底层 `*runtime.Runtime`，应用通过 `Runtime.CreateService` 启动它；这只是示例组装方式，不扩展 `gsr.Run`、Core 或业务 `ServiceContext`。Gate 只监听字面回环/私有 IP 的 `/ws`，每个连接由 Gate runner 调用 `NewAgent` 创建一个 Agent。创建返回的 AgentID 绑定到该连接，读循环直接调用 `Runtime.DeliverClientMessage` 投递不透明 Envelope 字节，不逐帧经过 Gate Mailbox；Gate runner 中的连接到 Agent 映射只用于断开通知。`ClientSession.Send(Envelope)` 将响应放入有界队列，再由唯一写循环发回。此处 `ClientSession` 表示客户端连接的写回能力，不是 Core `SessionID` 或 Envelope 的 `request_id`。DebugGate 显式限制连接数、帧大小和每连接出站队列，默认帧上限为 4 MiB。出站队列按序列化 Envelope 字节数加每项固定 64 字节队列开销计费，避免空帧或很多小帧绕过内存上限；正在写出的单帧另受 `MaxFrameBytes` 限制。集成测试覆盖请求/响应 request_id、连接上限、正常断开通知、Agent 创建期间既有连接继续收帧和 Runtime 关闭时连接回收。`examples/websocket-gate` 另提供独立 Echo Agent、Go DebugGate 服务端和 TypeScript CLI；通用 Envelope 与 Echo 业务消息分别定义在 `.proto` 文件中，Go 与 TypeScript 使用同一组协议源生成类型并完成真实请求/响应往返。Go Agent 从生成目录解码 Envelope，再通过手动注册的强类型 Echo Handler 响应；未实现的协议消息无需占位 Handler。Echo 示例不包含业务生产鉴权；DebugGate 没有 TLS、生产握手或 MAC，不能用于公网。它借用 Runtime 的共享 Logger，以 Gate ServiceID 记录监听、连接接纳、Agent 创建、帧读写和投递故障；不记录原始载荷或业务 Envelope 字段，也不负责关闭 Logger。调试入口不复制生产 Gate 的握手/MAC 诊断和按连接限频机制。
 
 DebugGate 的 `MaxConnections` 统计已进入 `/ws` GET Handler 的连接，不限制原始 TCP 接纳数或其它 HTTP 路径；它仅用于受信任环境调试。普通 HTTP 请求头与未升级连接的 keep-alive 空闲等待各限 5 秒，避免无期限保留这类 socket。
 
 TypeScript CLI 默认连接 DebugGate；增加 `--secure` 后，它会发送固定 33 字节的 X25519 握手，并按 `seq | Envelope | MAC` 发送第一条上行消息，可用于验证生产 Gate 的客户端认证路径。示例 `cmd/debugserver --prod` 可在本机启动不带 TLS 的生产 Gate，模拟 Ingress 终止 TLS；真实部署的监听地址、TLS 和部署配置仍由业务服务组装。
 
-### 后续归属：按需收编为基础设施
+### 当前归属：Gate 与协议进入框架
 
-`examples/websocket-gate/` 当前用于验证协议、Agent 分发与 Gate 接入流程，仍是示例，不代表最终包布局或稳定公开 API。等用户明确要求收编时，再把已经验证、具有通用性的部分提升为 GSR 基础设施，定位类似 Cluster；具体包边界和 API 在收编时根据实际使用情况裁定。收到该指示之前，示例继续独立放在 `examples/`，不预先迁移或增加包装层。
+通用 Envelope、协议目录与分发位于 `gate/protocol`，ProdGate 和 DebugGate 位于 `gate/prodgate`、`gate/debuggate`，共同的连接细节属于 `gate/internal/gatecommon`。通用 `.proto`、生成工具与跨语言认证夹具也由 `gate/` 持有。`examples/websocket-gate/` 保留 Echo 业务协议、Agent、Go 启动入口和 TypeScript 客户端，并从框架包导入通用能力。提升包归属不代表完成安全审计；`gsr.Run` 与 Gate 的受信任投递接线仍需单独裁决，当前示例继续显式组装底层 Runtime，不扩大业务 `ServiceContext` 的权限。
 
 ## 已确认：业务回复、通用错误与推送
 
@@ -193,7 +193,7 @@ message ErrorResponse {
 - 握手失败直接关闭连接，不进入 Agent，也不发送业务 ErrorResponse；握手成功后双方才启用派生的 macKey。
 - 必须设置消息大小、握手等待和接纳容量上限；具体初始值与零值语义见“已确认：Gate 容量与关闭顺序”，Protobuf 不意味着无限消息大小。
 
-当前实现位于 `examples/websocket-gate/prodgate/`：Gate 在 HTTP/WebSocket Handler 前限制已接纳 TCP 连接数；HTTP 请求头和普通 keep-alive 空闲连接有 5 秒超时，避免未升级连接长期占用名额。`TLSConfig` 非空时启动直连 WSS Listener，为 nil 时启动普通 HTTP WebSocket Listener。首个二进制 WebSocket 消息必须是固定 33 字节握手，完成 X25519 握手后，逐帧校验 MAC 和递增 seq，再将原始 Envelope 字节直接交给目标 Agent 的 `Runtime.DeliverClientMessage`。Agent 的响应通过每连接有界队列进入唯一 WebSocket 写循环。生产 Gate 从 Runtime 借用同一 Logger 并绑定自身 ServiceID；同一连接同一错误类别只记录首条，关闭时补充抑制数量，不记录密钥、MAC 或原始载荷。生产 Gate 与 DebugGate 仍使用不同监听器和显式配置，不会根据首包自动降级。端到端测试覆盖直连 TLS、Ingress 终止 TLS 后的普通 WebSocket、握手与业务帧往返、错误 MAC 拒绝、首帧超时、握手前连接上限与断开后名额回收、Mailbox/出站队列满载、基础慢客户端背压、短时多连接并发及 Runtime 关闭回收；这不替代密码协议审查或慢客户端长时压力验收。
+当前实现位于 `gate/prodgate/`：Gate 在 HTTP/WebSocket Handler 前限制已接纳 TCP 连接数；HTTP 请求头和普通 keep-alive 空闲连接有 5 秒超时，避免未升级连接长期占用名额。`TLSConfig` 非空时启动直连 WSS Listener，为 nil 时启动普通 HTTP WebSocket Listener。首个二进制 WebSocket 消息必须是固定 33 字节握手，完成 X25519 握手后，逐帧校验 MAC 和递增 seq，再将原始 Envelope 字节直接交给目标 Agent 的 `Runtime.DeliverClientMessage`。Agent 的响应通过每连接有界队列进入唯一 WebSocket 写循环。生产 Gate 从 Runtime 借用同一 Logger 并绑定自身 ServiceID；同一连接同一错误类别只记录首条，关闭时补充抑制数量，不记录密钥、MAC 或原始载荷。生产 Gate 与 DebugGate 仍使用不同监听器和显式配置，不会根据首包自动降级。端到端测试覆盖直连 TLS、Ingress 终止 TLS 后的普通 WebSocket、握手与业务帧往返、错误 MAC 拒绝、首帧超时、握手前连接上限与断开后名额回收、Mailbox/出站队列满载、基础慢客户端背压、短时多连接并发及 Runtime 关闭回收；这不替代密码协议审查或慢客户端长时压力验收。
 
 已确认的 TLS 部署边界：TLS 是部署能力，不是 ProdGate 对所有部署的强制要求。K8s Ingress/LB 已终止 TLS 时，以及可信内网部署时，`TLSConfig` 可以为 nil，Gate 监听 HTTP/WS；公网直连时部署方必须提供 `TLSConfig`，由 Gate 监听 HTTPS/WSS。Gate 无法仅凭监听地址判断是否暴露公网，部署配置必须保证这一要求，不能把 `0.0.0.0` 等同于公网直连。Cluster/业务协议不因此改变。
 
@@ -226,7 +226,7 @@ macKey = HKDF-Expand-SHA256(prk, info, 32)
 
 Go 与 TypeScript 必须使用同一组独立生成的测试向量验证客户端上行认证，不以“两个实现互相算出相同结果”代替参考结果。固定向量只用于测试，里面的私钥是公开的测试常量，不得被生产连接复用。
 
-共享夹具位于 `examples/websocket-gate/testdata/client-auth-vector.json`。其中 X25519 私钥、公钥和 shared secret 取自 [RFC 7748 §6.1](https://www.rfc-editor.org/rfc/rfc7748.html#section-6.1) 的 Alice/Bob 测试向量；单独的 `testdata/generate_client_auth_vector.mjs` 校验这些公开 X25519 结果，并生成 salt、HKDF 和 MAC 的逐阶段参考字节。Go 与 TypeScript 测试各自从同一 JSON 读取输入及期望值，不在测试运行时调用生成器。
+共享夹具位于 `gate/testdata/client-auth-vector.json`。其中 X25519 私钥、公钥和 shared secret 取自 [RFC 7748 §6.1](https://www.rfc-editor.org/rfc/rfc7748.html#section-6.1) 的 Alice/Bob 测试向量；单独的 `gate/testdata/generate_client_auth_vector.mjs` 校验这些公开 X25519 结果，并生成 salt、HKDF 和 MAC 的逐阶段参考字节。Go 与 TypeScript 测试各自从同一 JSON 读取输入及期望值，不在测试运行时调用生成器。
 
 共享向量使用 JSON 或等价的文本字段承载十六进制字节，至少包含：
 
@@ -253,14 +253,14 @@ mac
 - `envelope_bytes` 是参与 MAC 的原始 Protobuf 字节；验证器先对这些原始字节验 MAC，再交给 Protobuf 解码，不允许先解码再重新序列化替代输入。
 - MAC 只取 HMAC-SHA256 前 16 字节；测试覆盖正确 MAC、修改 seq、修改 Envelope、修改 `info`、交换公钥顺序和错误截断长度。
 - Go 和 TypeScript 的测试都直接读取同一份向量，生产实现不依赖测试向量文件；向量生成脚本与运行时实现分开，避免同一错误同时生成“期望值”和实际值。
-- 生产侧 Go 认证代码位于 `examples/websocket-gate/prodgate/`：`security.go` 实现逐连接密钥派生和上行帧认证，`handshake.go` 校验固定 33 字节握手、生成服务端临时密钥、返回固定格式公钥并建立连接认证器；`gate.go` 已将握手接入 5 秒超时、TLS Listener、容量边界和 Gate Service 读写循环。使用 `go test ./examples/websocket-gate/prodgate` 和示例目录下的 `npm run test:crypto` 分别验证 Go 与 TypeScript；重新生成夹具使用 `node testdata/generate_client_auth_vector.mjs`。
+- 生产侧 Go 认证代码位于 `gate/prodgate/`：`security.go` 实现逐连接密钥派生和上行帧认证，`handshake.go` 校验固定 33 字节握手、生成服务端临时密钥、返回固定格式公钥并建立连接认证器；`gate.go` 已将握手接入 5 秒超时、TLS Listener、容量边界和 Gate Service 读写循环。使用 `go test ./gate/prodgate` 和示例目录下的 `npm run test:crypto` 分别验证 Go 与 TypeScript；重新生成夹具使用 `node gate/testdata/generate_client_auth_vector.mjs`。
 
 ## TypeScript Protobuf 生成方案
 
 命令行客户端使用 Protobuf-ES：`.proto` 是 Go 服务端与 TypeScript 客户端共同的唯一协议源，由 Buf CLI 的单个 `buf generate` 配置分别调用本地 `protoc-gen-go` 和 `protoc-gen-es`。TypeScript 使用 `@bufbuild/protobuf` 运行时和 `protoc-gen-es` 生成的类型化消息，不在客户端手写二进制编码或运行时反射解析 `.proto`。
 
-- `buf.yaml` 与 `buf.gen.yaml` 放在联调示例根目录；输入只来自该示例的 `proto/`。
-- 生成 Go 消息到示例服务端的 `gen/go/`，生成 TypeScript 消息到客户端的 `client/src/gen/`，两侧均从同一 schema 生成。
+- `buf.yaml` 与 `buf.gen.yaml` 放在仓库根目录；输入包括框架 `gate/proto/` 的通用协议和示例 `examples/websocket-gate/proto/` 的 Echo 协议。
+- 通用 Go 消息生成到 `gate/gen/go/`，Echo Go 消息生成到示例的 `gen/go/`，TypeScript 消息仍生成到示例的 `client/src/gen/`，两侧均从同一 schema 生成。
 - Buf CLI、`protoc-gen-es` 和 `@bufbuild/protobuf` 版本由示例 `package-lock.json` 固定；`protoc-gen-go` 与 Go Protobuf 运行时版本由 Go module/安装说明固定。使用本地插件，生成不依赖远程插件服务。
 - 生成源文件纳入版本控制，便于克隆后直接运行；改动 `.proto` 后通过单条生成命令更新两侧产物，并验证工作树没有遗漏的生成差异。
 - 固定向量验证仍使用已记录的原始字节，不依赖 Protobuf-ES 和 Go 生成器重新编码成相同字节；这样 MAC 契约仍以原始输入字节为准。

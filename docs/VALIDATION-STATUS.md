@@ -2,6 +2,8 @@
 
 本清单整理 Core、Cluster、日志及已落地外围示例的验证证据，不替代 API 契约，也不表示生产发布或兼容性冻结。实施路线图保留各轮历史切片；判断当前覆盖范围时先看这里，再进入对应测试。
 
+下文历史记录中的 `examples/websocket-gate/prodgate`、`examples/websocket-gate/debuggate` 是当时运行测试的路径。通用 Gate 现位于 `gate/prodgate`、`gate/debuggate`，重跑历史命令时使用新路径；历史结果和耗时不因搬迁而改写。
+
 ## 已覆盖的运行链
 
 应用 Timer 身份切片：TestServiceTimerPreservesOwnIdentity 经 gsr.Run 在 OnStart 登记零延时 Timer，确认回调 Source 为零、Self 为拥有者；回调发起的本地 Call 使用拥有者来源，绑定 ClusterClient 仍使用 Self，实际排空的 JSON 日志也记录拥有者 ServiceID。相关测试、全仓测试、vet 和 race 通过；未修改生产代码，此测试不包含远端 Timer 调用或计时精度测量。

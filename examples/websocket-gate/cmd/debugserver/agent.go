@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 
-	"github.com/cnooljaw/gsr/examples/websocket-gate/gate"
-	commonv1 "github.com/cnooljaw/gsr/examples/websocket-gate/gen/go/gsr/common/v1"
+	"github.com/cnooljaw/gsr/gate"
+	commonv1 "github.com/cnooljaw/gsr/gate/gen/go/gsr/common/v1"
 	echopb "github.com/cnooljaw/gsr/examples/websocket-gate/gen/go/gsr/example/echo/v1"
-	"github.com/cnooljaw/gsr/examples/websocket-gate/protocol"
+	"github.com/cnooljaw/gsr/gate/protocol"
 	"github.com/cnooljaw/gsr/runtime"
 )
 

@@ -32,7 +32,7 @@ interface ClientAuthVector {
 }
 
 const clientAuthVectorPath = fileURLToPath(
-  new URL("../../testdata/client-auth-vector.json", import.meta.url),
+  new URL("../../../../gate/testdata/client-auth-vector.json", import.meta.url),
 );
 const privateKeyPrefix = Buffer.from("302e020100300506032b656e04220420", "hex");
 const publicKeyPrefix = Buffer.from("302a300506032b656e032100", "hex");
