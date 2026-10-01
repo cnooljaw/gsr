@@ -36,7 +36,7 @@
 - **Source**：由 Runtime 写入本地 Message 的来源字段。普通 Service Send/Call 使用当前发起 ServiceID；宿主/基础设施通过 Runtime.Send/Runtime.Call 注入的消息、Gate 投递的客户端消息使用 `ServiceID(0)`；Timer 触发的 Command 也使用零值，创建者由 Timer owner 表达。受控 Redirect 可以按固定 relay 策略保留已有 Message 的原始 Source，但业务不能传入或伪造任意值。跨节点原始来源由 ClusterSessionID 和传输上下文关联，不把节点身份编码进 ServiceID。
 - **Message**：Core 内存中的 Runtime-owned 本地消息对象。普通消息承载 Source、Target、Session、Command 和 Args；客户端消息由私有消息类型标记并承载不透明的 Protobuf Envelope 字节。Send/Call 共享普通消息路径，客户端消息不会伪装成 Core Command。
 - **Dispatcher**：普通业务 Service 的默认命令分发方式，也是 `gsr` 应用层的可选能力。它在构造时复制并校验 `CommandID -> typed Handler` 表，运行时绑定参数并调用；它不是 Runtime Registry，也不接受运行期注册。只有经真实压测确认的个别热点 Command 才在 Service.Handle 中手写快速分支，其余命令继续交给 Dispatcher。
-- **ClientMessageHandler**：Service 可选实现的客户端消息处理能力。实现它即表示该 Service 接纳 Runtime 投递的客户端 Envelope；未实现时 `Runtime.DeliverClientMessage` 在 Mailbox admission 前返回 `ErrClientMessageUnsupported`。
+- **ClientMessageHandler**：Service 可选实现的客户端消息处理能力。Core 的 `runtime.ClientMessageHandler` 使用 Core CommandContext；应用 Agent 实现同名的 `gsr.ClientMessageHandler`，使用应用 CommandContext。应用组装仅为实现该接口的 Service 使用客户端消息适配器，普通 Service 不因经过 `gsr.Run` 就获得此能力；未实现时 `Runtime.DeliverClientMessage` 在 Mailbox admission 前返回 `ErrClientMessageUnsupported`。
 - **Message Ownership**：消息成功被 Runtime 接受后，Message 独占自己的 `Args` 外层切片。`any` 内部的 map、slice、pointer 等引用数据必须由 typed client 按具体消息类型复制成消息专用快照；发送方不得在 admission 后继续修改，也不得把 Service 拥有的可变状态引用作为参数发送。
 - **CommandContext**：Runtime 为每次 Handler 调用创建的只读消息上下文，提供当前 Service 的 Core 能力以及由 Runtime 填入的 `Source()`；Source 可能为 `ServiceID(0)`（Timer 或宿主/基础设施注入）；业务不能覆盖 Source，也不能通过它手工或异步 Reply。
 - **Runtime.Call**：宿主或受信任基础设施的本地 Call 入口，Source 固定为零；使用独立本地 Session、普通 Mailbox 和有限等待，不创建 goroutine。普通 Service 仍通过 ServiceContext.Call 发起调用。

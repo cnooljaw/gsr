@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"sync/atomic"
 	"testing"
@@ -13,6 +14,89 @@ import (
 	"github.com/cnooljaw/gsr/logging"
 	"github.com/cnooljaw/gsr/runtime"
 )
+
+// 验证只有实现客户端处理接口的应用 Service 接纳客户端消息，并保留自身绑定的调用能力。
+func TestApplicationClientMessageCapability(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	observations := make(chan clientMessageObservation, 1)
+	entry := &probeService{start: func(ctx context.Context, self ServiceContext) error {
+		local := self.(*serviceContext).adapter.node.local
+		plainID, err := self.CreateService(ctx, &probeService{})
+		if err != nil {
+			return err
+		}
+		if err := local.DeliverClientMessage(plainID, []byte("not supported")); !errors.Is(err, runtime.ErrClientMessageUnsupported) {
+			return fmt.Errorf("plain Service accepted client message: %v", err)
+		}
+		echoID, err := self.CreateService(ctx, &probeService{handle: func(current CommandContext) (any, error) {
+			return current.Source(), nil
+		}})
+		if err != nil {
+			return err
+		}
+		if err := self.Register("echo", echoID); err != nil {
+			return err
+		}
+		agentID, err := self.CreateService(ctx, &clientMessageProbeService{observations: observations})
+		if err != nil {
+			return err
+		}
+		if err := local.DeliverClientMessage(agentID, []byte("client envelope")); err != nil {
+			return err
+		}
+		select {
+		case observed := <-observations:
+			if observed.envelope != "client envelope" || observed.source != 0 ||
+				observed.self != agentID || observed.callSource != agentID || observed.err != nil {
+				return fmt.Errorf("client observation = %+v", observed)
+			}
+		case <-ctx.Done():
+			return ctx.Err()
+		}
+		cancel()
+		return nil
+	}}
+	if err := Run(ctx, Config{Logging: logging.Config{Writer: io.Discard}}, entry); err != nil {
+		t.Fatal(err)
+	}
+}
+
+type clientMessageObservation struct {
+	envelope   string
+	source     runtime.ServiceID
+	self       runtime.ServiceID
+	callSource runtime.ServiceID
+	err        error
+}
+
+type clientMessageProbeService struct {
+	observations chan<- clientMessageObservation
+}
+
+func (service *clientMessageProbeService) OnStart(context.Context, ServiceContext) error {
+	return nil
+}
+
+func (service *clientMessageProbeService) Handle(CommandContext, runtime.CommandID, ...any) (any, error) {
+	return nil, runtime.ErrUnknownCommand
+}
+
+func (service *clientMessageProbeService) HandleClientMessage(self CommandContext, envelope []byte) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	value, err := self.CallName(ctx, "echo", 1)
+	observation := clientMessageObservation{envelope: string(envelope), source: self.Source(), self: self.Self(), err: err}
+	if err == nil {
+		observation.callSource, _ = value.(runtime.ServiceID)
+	}
+	service.observations <- observation
+	return err
+}
+
+func (service *clientMessageProbeService) OnStop(context.Context) error {
+	return nil
+}
 
 // 验证 Timer 消息来源为零，但回调发起的新调用与日志仍使用当前 Service 身份。
 func TestServiceTimerPreservesOwnIdentity(t *testing.T) {

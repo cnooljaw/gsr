@@ -299,6 +299,7 @@ Gate 只使用标准 WebSocket 关闭码，不新增当前客户端必须理解�
 - Gate 管连接、收发、上行认证和容量，剥离安全封装后交给 Agent；I/O 任务不得直接修改业务状态。
 - `AgentService` 是普通 Service，原则上一个连接对应一个 AgentService，负责解释客户端命令与数据并中转到对应业务 Service。客户端不能指定任意内部 ServiceID 或伪造 Source。
 - Runtime 内部消息类型区分客户端消息与普通 Core Command，Service 通过实现可选的 `runtime.ClientMessageHandler` 明确启用客户端处理能力。Agent 有两类逻辑入站分发，不能合并成靠 `Source` 猜测的单一路由：Gate 基础设施经 `Runtime.DeliverClientMessage` 投递的原始 Protobuf Envelope 字节按 `msg_id` 交给 `Requests`；普通本地 Service/Cluster Command 按 Core `CommandID` 分发到 `Commands`。两类 handler 属于同一个 AgentService、共用同一 Mailbox 和串行 runner，因此能安全访问同一连接私有状态；`Source` 仍只表达 Service 来源，基础设施投递的客户端消息仍为零。客户端 `msg_id`、客户端 `request_id` 和 Core `CommandID`/Session 不互相复用。Core Command 的 Send 与 Call 仍走同一种消息类型，由 Session 是否为零区分。
+- 应用层 Agent 可额外实现 `gsr.ClientMessageHandler`；只有它被适配为 Core 的可选 `runtime.ClientMessageHandler`，普通 `gsr.Service` 不因此接纳客户端消息。两者共用原有 Mailbox 和 runner。Gate 创建应用 Agent 的受信任组装入口尚未接线，当前 Gate 的 `NewAgent` 仍返回底层 `runtime.Service`。
 - Gate 的业务组装只提供一个 `NewAgent func(ClientSession) runtime.Service` 构造回调，不增加独立的 `AgentFactory` 类型、Agent 管理器或通用依赖注入容器。Gate 为每条连接调用回调构造独立 Agent 实例；回调只负责组装连接私有 Service，不执行 socket I/O，不持有 Runtime 或 Gate 连接表。
 - Agent 使用现有 Send/Call；内部 Handler 通过 return 完成 Reply，客户端响应由 Agent 组织并交 Gate 发出。不增加 Core 手工 Reply。
 - Agent 内 Call 仍是 run-to-completion，等待时该 Agent 不处理下一条消息，其它 Service 仍可运行。

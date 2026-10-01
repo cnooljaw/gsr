@@ -18,6 +18,13 @@ type Service interface {
 	OnStop(context.Context) error
 }
 
+// ClientMessageHandler 是 Agent 等应用 Service 可选的客户端消息处理能力。
+// 只有实现它的 Service 才能接收 Gate 经 Runtime 投递的完整 Envelope 字节。
+// 客户端消息与普通 Command 共用该 Service 的 Mailbox，由 GSR runner 逐条执行。
+type ClientMessageHandler interface {
+	HandleClientMessage(CommandContext, []byte) error
+}
+
 // ServiceContext 组合本地能力与当前 Service 绑定的 Cluster、日志入口。
 // 仅在当前生命周期回调或 Handler 内使用，不借给其它 Service 或异步任务。
 type ServiceContext interface {
@@ -50,7 +57,12 @@ type serviceAdapter struct {
 	logger  *logging.Logger
 }
 
-func (node *application) wrap(service Service) (*serviceAdapter, error) {
+type clientMessageAdapter struct {
+	*serviceAdapter
+	handler ClientMessageHandler
+}
+
+func (node *application) wrap(service Service) (runtime.Service, error) {
 	if service == nil {
 		return nil, runtime.ErrInvalidService
 	}
@@ -61,7 +73,11 @@ func (node *application) wrap(service Service) (*serviceAdapter, error) {
 			return nil, runtime.ErrInvalidService
 		}
 	}
-	return &serviceAdapter{service: service, node: node}, nil
+	adapter := &serviceAdapter{service: service, node: node}
+	if handler, ok := service.(ClientMessageHandler); ok {
+		return &clientMessageAdapter{serviceAdapter: adapter, handler: handler}, nil
+	}
+	return adapter, nil
 }
 
 func (adapter *serviceAdapter) OnStart(ctx context.Context, self runtime.ServiceContext) error {
@@ -78,8 +94,16 @@ func (adapter *serviceAdapter) OnStart(ctx context.Context, self runtime.Service
 
 func (adapter *serviceAdapter) Handle(ctx runtime.CommandContext, command runtime.CommandID, args ...any) (any, error) {
 	return adapter.service.Handle(&commandContext{
-		serviceContext: &serviceContext{ServiceContext: ctx, adapter: adapter}, source: ctx.Source(),
+		serviceContext: &serviceContext{ServiceContext: ctx, adapter: adapter},
+		source:         ctx.Source(),
 	}, command, args...)
+}
+
+func (adapter *clientMessageAdapter) HandleClientMessage(ctx runtime.CommandContext, envelope []byte) error {
+	return adapter.handler.HandleClientMessage(&commandContext{
+		serviceContext: &serviceContext{ServiceContext: ctx, adapter: adapter.serviceAdapter},
+		source:         ctx.Source(),
+	}, envelope)
 }
 
 func (adapter *serviceAdapter) OnStop(ctx context.Context) error {

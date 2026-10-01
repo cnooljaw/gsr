@@ -202,6 +202,8 @@ func (runtime *Runtime) DeliverClientMessage(target ServiceID, envelope []byte) 
 
 `envelope` 是完整的 Protobuf Envelope 编码字节；Runtime 不解析客户端协议，并在投递时复制字节快照。该入口是 Gate 等受信任基础设施的单向 API，消息的 Source、Session 和 CommandID 固定为零。Runtime 不维护额外的客户端处理器 Registry；目标 Service 实现 `ClientMessageHandler` 即声明这项能力。未实现时在 Mailbox admission 前返回稳定错误 `ErrClientMessageUnsupported`，不会入队后再静默丢弃。客户端处理函数与普通 `Handle` 在同一个 Service runner 中串行执行，不产生 Core Reply；Agent 根据 Envelope 自身的 `request_id` 组织客户端响应。
 
+应用层 `gsr.Service` 保持普通 `Handle` 为必需入口；只有 Agent 等需要接收客户端消息的 Service 额外实现 `gsr.ClientMessageHandler`（相同方法名，参数为 `gsr.CommandContext`）。`gsr.Run` 在创建 Service 时仅对这类实例使用客户端消息适配器，使它在 Core 中实现 `runtime.ClientMessageHandler`；普通应用 Service 的适配器不实现该接口，继续在入队前被拒绝。适配器只转换上下文，不另建 Mailbox、runner、Registry 或消息类型。Gate 仍需单独的受信任组装接线，不能因此向普通 Service 暴露 `Runtime.DeliverClientMessage`。
+
 ### 4.1 Args 的所有权
 
 未编码不代表可以共享可变状态。Runtime 接受消息时浅拷贝最外层 `Args` 切片；这只隔离参数列表本身，不递归复制 `any` 内部的数据。对每个参数遵守以下契约：
