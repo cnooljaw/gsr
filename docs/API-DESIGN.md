@@ -32,6 +32,8 @@ Gate 的网络 goroutine 把新连接转成 GateService 的内部事件；GateSe
 
 两种 Gate 共用有界连接接纳逻辑：监听先于 Gate Service 发布时，或 Gate Mailbox 暂时满载时，在连接创建期限内重试尚未接纳的内部 Call；期限结束即关闭当前连接。已进入 Gate Handler 的 Agent 创建/OnStart 失败记录原始原因，并返回终止性的 HandlerFailed；不把业务返回的 ServiceNotFound/MailboxFull 当作 admission 失败重试。Call 超时或取消不重试，迟到结果仍按既有断线清理处理，避免重复创建 Agent。
 
+两种 Gate 的 `AcceptedConnections` 均只计连接创建 Call 成功返回有效 AgentID 的连接；ProdGate 还须先完成握手。Call 已超时或取消后迟到创建的 Agent 仍按既有路径清理，但当前连接只计入 `RejectedConnections`，不再同时计为成功。
+
 应用层调试入口由 MainService 调用 `self.OpenDebugGate`：
 
 ```go

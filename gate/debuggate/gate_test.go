@@ -737,6 +737,72 @@ func TestDebugGateCountsAgentCreationRejectionOnce(t *testing.T) {
 	}
 }
 
+// 验证创建 Call 超时后迟到的 Agent 仍收到断线通知，连接只计为拒绝而不计为成功。
+func TestDebugGateDisconnectsAgentCreatedAfterCallTimeout(t *testing.T) {
+	local, err := runtime.NewRuntime(runtime.Config{
+		MaxCallWait:     40 * time.Millisecond,
+		MailboxCapacity: 8,
+		ShutdownTimeout: 2 * time.Second,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := local.Start(); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := local.Close(); err != nil {
+			t.Errorf("Runtime.Close() error = %v", err)
+		}
+	})
+	started := make(chan struct{})
+	release := make(chan struct{})
+	var releaseOnce sync.Once
+	finishCreation := func() { releaseOnce.Do(func() { close(release) }) }
+	defer finishCreation()
+	agent := &testAgent{disconnected: make(chan struct{})}
+	gate, err := NewGateService(local, Config{
+		Address:               "127.0.0.1:0",
+		MaxConnections:        1,
+		MaxOutboundQueueBytes: 1024,
+		NewAgent: func(client ClientSession) runtime.Service {
+			agent.client = client
+			close(started)
+			<-release
+			return agent
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := local.CreateService(context.Background(), gate); err != nil {
+		t.Fatal(err)
+	}
+	connection := dialTestGate(t, gate)
+	defer connection.Close()
+	select {
+	case <-started:
+	case <-time.After(time.Second):
+		t.Fatal("Gate 未开始创建 Agent")
+	}
+	if err := connection.SetReadDeadline(time.Now().Add(time.Second)); err != nil {
+		t.Fatal(err)
+	}
+	_, _, err = connection.ReadMessage()
+	if !websocket.IsCloseError(err, websocket.CloseInternalServerErr) {
+		t.Fatalf("ReadMessage() error = %v, want close 1011", err)
+	}
+	finishCreation()
+	select {
+	case <-agent.disconnected:
+	case <-time.After(time.Second):
+		t.Fatal("迟到创建的 Agent 未收到断线通知")
+	}
+	if metrics := gate.Metrics(); metrics.AcceptedConnections != 0 || metrics.RejectedConnections != 1 {
+		t.Fatalf("connection metrics = %+v, want accepted 0, rejected 1", metrics)
+	}
+}
+
 // TestDebugGateLogsAgentCreationFailure 验证 Agent 创建失败只产生一条绑定 Gate 来源的结构化故障日志。
 func TestDebugGateLogsAgentCreationFailure(t *testing.T) {
 	var output bytes.Buffer

@@ -82,7 +82,7 @@ type Config struct {
 
 // Metrics 是生产 Gate 的有限容量计数快照。
 type Metrics struct {
-	// AcceptedConnections 是已完成握手并创建 Agent 的连接数。
+	// AcceptedConnections 是完成握手且连接创建 Call 成功返回有效 AgentID 的连接数，不包含超时后的迟到创建。
 	AcceptedConnections uint64
 	// RejectedConnections 是容量、握手、升级或 Agent 创建失败的连接数。
 	RejectedConnections uint64

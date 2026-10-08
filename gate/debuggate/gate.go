@@ -77,7 +77,7 @@ type Config struct {
 
 // Metrics 是 DebugGate 的有限容量计数快照。
 type Metrics struct {
-	// AcceptedConnections 是已创建 Agent 的连接数。
+	// AcceptedConnections 是连接创建 Call 成功返回有效 AgentID 的连接数，不包含超时后的迟到创建。
 	AcceptedConnections uint64
 	// RejectedConnections 是超容量、WebSocket 握手失败或无法创建 Agent 的连接数。
 	RejectedConnections uint64
@@ -221,7 +221,6 @@ func (gate *GateService) Handle(self runtime.CommandContext, command runtime.Com
 			return nil, runtime.ErrHandlerFailed
 		}
 		gate.agentsByConnection[clientConn] = agentID
-		gate.counters.acceptedConnections.Add(1)
 		return agentID, nil
 
 	case gateDisconnectCommand:
@@ -356,6 +355,7 @@ func (gate *GateService) ServeHTTP(writer http.ResponseWriter, request *http.Req
 		return
 	}
 	agentID = createdAgentID
+	gate.counters.acceptedConnections.Add(1)
 
 	gate.ioWorkers.Add(1)
 	go func() {
