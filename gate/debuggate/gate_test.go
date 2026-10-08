@@ -23,6 +23,112 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+// 验证监听已启动但 Gate 尚未发布时，新连接有界等待并在发布后正常收发。
+func TestDebugGateWaitsForServicePublication(t *testing.T) {
+	local, err := runtime.NewRuntime(runtime.Config{ShutdownTimeout: time.Second})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := local.Start(); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { local.Close() })
+	gate, err := NewGateService(local, Config{
+		Address: "127.0.0.1:0", MaxConnections: 1, MaxOutboundQueueBytes: 1024,
+		NewAgent: func(client ClientSession) runtime.Service {
+			return &testAgent{client: client, disconnected: make(chan struct{})}
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	ready := make(chan struct{})
+	release := make(chan struct{})
+	var releaseOnce sync.Once
+	publish := func() { releaseOnce.Do(func() { close(release) }) }
+	defer publish()
+	created := make(chan error, 1)
+	go func() {
+		_, err := local.CreateService(context.Background(), &delayedGateStart{gate: gate, ready: ready, release: release})
+		created <- err
+	}()
+	select {
+	case <-ready:
+	case <-time.After(time.Second):
+		t.Fatal("Gate listener did not start")
+	}
+	connection := dialTestGate(t, gate)
+	defer connection.Close()
+	frame, err := proto.Marshal(&commonv1.Envelope{MsgId: 1001, RequestId: 41})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := connection.WriteMessage(websocket.BinaryMessage, frame); err != nil {
+		t.Fatal(err)
+	}
+	if err := connection.SetReadDeadline(time.Now().Add(time.Second)); err != nil {
+		t.Fatal(err)
+	}
+	reply := make(chan error, 1)
+	go func() {
+		_, _, err := connection.ReadMessage()
+		reply <- err
+	}()
+	select {
+	case err := <-reply:
+		t.Fatalf("connection completed before Gate publication: %v", err)
+	case <-time.After(50 * time.Millisecond):
+	}
+	publish()
+	select {
+	case err := <-created:
+		if err != nil {
+			t.Fatal(err)
+		}
+	case <-time.After(time.Second):
+		t.Fatal("Gate publication did not complete")
+	}
+	select {
+	case err := <-reply:
+		if err != nil {
+			t.Fatalf("connection failed after Gate publication: %v", err)
+		}
+	case <-time.After(time.Second):
+		t.Fatal("client frame was not handled after Gate publication")
+	}
+	if metrics := gate.Metrics(); metrics.RejectedConnections != 0 || metrics.AcceptedConnections != 1 {
+		t.Fatalf("connection metrics = %+v", metrics)
+	}
+}
+
+// delayedGateStart 只在测试中延长 Runtime 的发布窗口，不改变生产生命周期。
+type delayedGateStart struct {
+	gate    *GateService
+	ready   chan struct{}
+	release chan struct{}
+}
+
+func (service *delayedGateStart) OnStart(ctx context.Context, self runtime.ServiceContext) error {
+	if err := service.gate.OnStart(ctx, self); err != nil {
+		return err
+	}
+	close(service.ready)
+	select {
+	case <-service.release:
+		return nil
+	case <-ctx.Done():
+		return ctx.Err()
+	}
+}
+
+func (service *delayedGateStart) Handle(self runtime.CommandContext, command runtime.CommandID, args ...any) (any, error) {
+	return service.gate.Handle(self, command, args...)
+}
+
+func (service *delayedGateStart) OnStop(ctx context.Context) error {
+	return service.gate.OnStop(ctx)
+}
+
 // TestDebugGateRoutesClientRequestAndResponse 验证 WebSocket Envelope 经 Runtime 到 Agent 后可按原 request_id 回传。
 func TestDebugGateRoutesClientRequestAndResponse(t *testing.T) {
 	local, gate, agents := startTestGate(t, 8, 4)
@@ -599,10 +705,20 @@ func TestDebugGateCountsAgentCreationRejectionOnce(t *testing.T) {
 		{name: "Agent start fails", newAgent: func(ClientSession) runtime.Service {
 			return &testAgent{startErr: errors.New("start failed")}
 		}},
+		{name: "Agent reports mailbox full", newAgent: func(ClientSession) runtime.Service {
+			return &testAgent{startErr: runtime.ErrMailboxFull}
+		}},
+		{name: "Agent reports service not found", newAgent: func(ClientSession) runtime.Service {
+			return &testAgent{startErr: runtime.ErrServiceNotFound}
+		}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			_, gate, _ := startTestGate(t, 8, 1)
-			gate.config.NewAgent = test.newAgent
+			var creations atomic.Int32
+			gate.config.NewAgent = func(client ClientSession) runtime.Service {
+				creations.Add(1)
+				return test.newAgent(client)
+			}
 			connection := dialTestGate(t, gate)
 			defer connection.Close()
 			if err := connection.SetReadDeadline(time.Now().Add(time.Second)); err != nil {
@@ -613,6 +729,9 @@ func TestDebugGateCountsAgentCreationRejectionOnce(t *testing.T) {
 			}
 			if got := gate.Metrics().RejectedConnections; got != 1 {
 				t.Fatalf("RejectedConnections = %d, want 1", got)
+			}
+			if got := creations.Load(); got != 1 {
+				t.Fatalf("Agent constructor calls = %d, want 1", got)
 			}
 		})
 	}

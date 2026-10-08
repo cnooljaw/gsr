@@ -2,7 +2,7 @@
 
 `gate/prodgate` 和 `gate/debuggate` 是 Core 之外的 WebSocket 接入能力。两者复用 `gate.ClientSession` 与 `gate/protocol`，但分别保留生产握手与调试监听的显式配置；不按首帧猜测或自动降级。业务项目自行定义 `.proto`、Agent 和客户端鉴权。
 
-底层组装时，业务 Agent 实现 `runtime.Service`，并按需实现 `runtime.ClientMessageHandler`。使用 `gsr.Run` 的应用入口时，业务 Agent 实现 `gsr.Service`，按需增加 `gsr.ClientMessageHandler`，由应用组装转换成底层接口。Gate 的网络读循环在校验帧后调用 `Runtime.DeliverClientMessage`，使客户端消息进入目标 Agent 的 Mailbox；Agent 使用 `protocol.Dispatcher` 解码并手工注册已实现的强类型 Handler，再通过 `ClientSession.Send` 写回。
+普通应用使用 `gsr.Run`：业务 Agent 实现 `gsr.Service`，按需增加 `gsr.ClientMessageHandler`，由应用组装转换成底层接口。只有基础设施集成才直接使用 `runtime.Service` 和 `runtime.ClientMessageHandler`。Gate 的网络读循环在校验帧后调用 `Runtime.DeliverClientMessage`，使客户端消息进入目标 Agent 的 Mailbox；Agent 使用 `protocol.Dispatcher` 解码并手工注册已实现的强类型 Handler，再通过 `ClientSession.Send` 写回。
 
 底层 Gate 构造函数需要 `*runtime.Runtime`，因为网络 goroutine 不能保存或借用 Service 回调的 `ServiceContext`。应用可在 `gsr.Run` 的 MainService 中调用 `self.OpenDebugGate(ctx, gsr.DebugGateConfig{...})` 或 `self.OpenProdGate(ctx, gsr.ProdGateConfig{...})`：内部创建对应底层 Gate，`NewAgent` 返回应用层 Service，不把 Runtime 投递权限交给业务。`examples/websocket-gate` 已使用 `gsr.Run` 和 MainService，Echo Agent 实现应用层接口。
 
@@ -14,10 +14,10 @@
 
 ## Agent 中的协议分发
 
-应用 Agent 用具名字段持有 `*protocol.Dispatcher[gsr.CommandContext]`。在 `OnStart` 中创建 Registry、Session 和 Dispatcher，并注册已实现的业务 Handler：
+应用 Agent 用具名字段持有 `*protocol.Dispatcher[gsr.CommandContext]`。共享 Registry 在应用组装时合并生成目录；Agent 在 `OnStart` 中将目录和自己的 ClientSession 交给 Dispatcher，并注册已实现的业务 Handler：
 
 ```go
-dispatcher, err := protocol.NewDispatcher[gsr.CommandContext](registry, session)
+dispatcher, err := protocol.NewDispatcher[gsr.CommandContext](registry, agent.client)
 if err != nil {
     return err
 }
@@ -26,6 +26,10 @@ if err := protocol.Register(dispatcher, agent.OnEcho); err != nil {
 }
 agent.dispatcher = dispatcher
 ```
+
+构造器内部保证解码与写回使用同一目录，业务不创建或拼接协议 Session。客户端 Handler 使用 `ctx.Response/Push`；普通 Command 等其它业务流程需要主动推送时，使用 `agent.dispatcher.Push(msgID, message)`，仍在 Agent runner 内调用。
+
+两种 Gate 在有限期限内等待自身发布或 Mailbox 恢复；仅重试尚未接纳的连接事件。Agent 构造、OnStart 失败以及已接纳 Call 的超时不会触发重复创建，失败只关闭该连接，原始原因留在 Gate 日志。
 
 `HandleClientMessage` 只把当前消息的上下文和 Envelope 字节交给 Dispatcher，不重复解码：
 

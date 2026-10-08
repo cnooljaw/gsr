@@ -4,7 +4,7 @@ import "google.golang.org/protobuf/proto"
 
 // Context 提供单次客户端消息处理期间的响应和主动推送能力。
 type Context struct {
-	session   *Session
+	writer    *clientWriter
 	requestID uint32
 	responded *bool
 }
@@ -16,7 +16,7 @@ func (context Context) RequestID() uint32 {
 
 // Response 使用当前 request_id 发送一个强类型响应，不要求业务重复处理 Envelope。
 func (context Context) Response(msgID uint32, response proto.Message) error {
-	if context.session == nil {
+	if context.writer == nil {
 		return ErrUninitializedContext
 	}
 	if context.requestID == 0 {
@@ -25,7 +25,7 @@ func (context Context) Response(msgID uint32, response proto.Message) error {
 	if context.responded != nil && *context.responded {
 		return ErrDuplicateResponse
 	}
-	if err := context.session.sendResponse(context.requestID, msgID, response); err != nil {
+	if err := context.writer.sendResponse(context.requestID, msgID, response); err != nil {
 		return err
 	}
 	if context.responded != nil {
@@ -36,8 +36,8 @@ func (context Context) Response(msgID uint32, response proto.Message) error {
 
 // Push 发送 request_id 为零的强类型服务端主动消息。
 func (context Context) Push(msgID uint32, message proto.Message) error {
-	if context.session == nil {
+	if context.writer == nil {
 		return ErrUninitializedContext
 	}
-	return context.session.Push(msgID, message)
+	return context.writer.push(msgID, message)
 }

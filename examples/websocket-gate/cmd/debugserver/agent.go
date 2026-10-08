@@ -29,11 +29,7 @@ func (agent *echoAgent) OnStart(_ context.Context, _ gsr.ServiceContext) error {
 	if agent.registry == nil {
 		return errors.New("debugserver: protocol registry is required")
 	}
-	session, err := protocol.NewSession(agent.registry, agent.client)
-	if err != nil {
-		return err
-	}
-	dispatcher, err := protocol.NewDispatcher[gsr.CommandContext](agent.registry, session)
+	dispatcher, err := protocol.NewDispatcher[gsr.CommandContext](agent.registry, agent.client)
 	if err != nil {
 		return err
 	}

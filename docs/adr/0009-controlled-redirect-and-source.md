@@ -26,7 +26,7 @@ Skynet 的 `skynet.redirect(dest, source, typename, ...)` 同时承担了几种�
 - 受控 relay 可以按固定策略保留同一 Runtime 内已有 Message 的原始 Source，以支持透明代理和基础设施转发；若需要表达当前 relay、事件主体、认证主体或远端原始来源，使用显式 typed 参数或 Cluster/Transport metadata，不复用 Source 伪装。
 - 首版 Redirect 只覆盖单向消息/事件/控制面转发。普通请求/响应代理必须向下游发起新的 Call（Call-through），再沿代理自己的 PendingCall 返回结果；不转移原 PendingCall、Session、Reply 所有权，不承诺自动重试或 exactly-once。
 - 多播/广播属于外层能力：为每个目标分别执行有界 admission，并独立处理失败，不把 fan-out 变成 Core 的无限转发。
-- Transport 的零拷贝和 buffer ownership transfer 只能由 Transport/ConnectionAgent 私有实现完成；Core Message 中的引用型 Args 仍必须满足消息独占快照契约。
+- Transport 的零拷贝和 buffer ownership transfer 只能由 Transport/入站连接 owner 私有实现完成；Core Message 中的引用型 Args 仍必须满足消息独占快照契约。
 
 ## Consequences
 

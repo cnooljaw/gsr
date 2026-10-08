@@ -27,4 +27,4 @@ Lua coroutine 负责挂起与恢复本地调用，但“主动调用无需监听
 - `Transport` 只要求 `Send(to, envelope)`；内存替身的 Register/Unregister 与具体 Transport 的 Close 不属于主动发送接口，生命周期由外层管理。
 - 内存 Transport 按已注册目标投递请求；测试连接的 writer 直接绑定调用方 completion，不注册调用方、不通过反向 Send 模拟回复。
 - 真实 TCP 门禁使用匿名出站客户端：只有 B 监听，A 不注册节点、不交换 NodeID，验证 Send/Call、领域错误、慢 Call 隔离和断线完成等待。
-- 生产 listener、节点地址解析、连接总数限制、连接诊断元数据和重连管理仍是后续切片；本轮不宣称已有公开 open API 或完整生产 TCP Transport。
+- 静态节点表、公开 Open、连接数限制、连接诊断和按需重连均已实现；动态发现和生产认证尚未实现。历史身份方案不作为当前组装步骤。

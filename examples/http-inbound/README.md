@@ -8,20 +8,27 @@
 go test ./examples/http-inbound
 ```
 
-示例分两层：`handler_test.go` 使用底层 `httpserver.Server` 和 `Runtime.Call`，验证成功、Service 失败的安全错误响应与有界等待；`admin_test.go` 使用推荐的 `gsr.Run` + MainService + `HTTPIngress`，验证多条路由和跨节点汇总。`httpserver` 只管理监听、默认有限请求头等待和有序关闭，不接管路由、认证、TLS 或限流。生产接入必须先确定第三方调用方身份和网络边界，不能直接把这个无认证的示例公开到公网。
+## 推荐业务接线
 
-路由由应用使用 Go 标准库组织，实际接线见 `handler_test.go` 的 `newRoomCountServer`：
+先读 `main_service.go` 的 `adminMainService.OnStart`：`gsr.Run` 启动入口 Service，入口创建并注册 `users` 和 `dashboard`，打开 HTTP 后自身退出。HTTP 由 Run 持有，MainService 退出不会关闭它。
 
-```go
-mux := http.NewServeMux()
-mux.Handle("GET /rooms/count", roomCountHandler(local, roomID))
-server, err := httpserver.New(httpserver.Config{Address: "127.0.0.1:0", Handler: mux})
+```text
+gsr.Run → MainService → CreateService / Register → OpenHTTP → Exit
+
+HTTP Handler → HTTPIngress.CallName → 本地 Service
+                                        └→ self.Cluster().Call → 远端 Service
 ```
 
-增加接口时继续向同一个 `mux` 注册对应的业务 Handler；不需要为 `/模块/动作` 再建一套 GSR 路由表。Handler 负责解析请求、设置有限等待、调用相应 Service 并写回 HTTP 响应。
+`admin.go` 用标准库 `http.ServeMux` 组织 `GET /users/{id}`、`POST /users/{id}/ban` 和 `GET /dashboard/{id}`。HTTP Handler 保存 `HTTPIngress`，通过名称调用，不持有 Runtime 或 ServiceID。增加接口只需向 mux 注册对应 Handler，不新建 GSR 路由框架。
 
-`admin_test.go` 的业务接线包括 `GET /users/{id}` 查询用户、`POST /users/{id}/ban` 修改用户状态、`GET /dashboard/{id}` 查询汇总。MainService 创建并注册 `users` 和 `dashboard` 后，用 `self.OpenHTTP` 开启同一监听；HTTP Handler 通过 `HTTPIngress.CallName` 按名称调用，不持有本地 Runtime 或 ServiceID。`dashboardService` 在自己的 Handler 内使用 `self.CallName` 查询用户，再通过来源绑定的 `self.Cluster().Call` 调用远端 `rooms`。远端节点仍是底层测试夹具；原有房间接口测试继续保护超时与安全错误响应。
+`admin_service.go` 的 `dashboardService` 在自己的 Handler 内用 `self.CallName` 查询用户，再用 `self.Cluster().Call` 调用远端 `rooms`。HTTP 请求的 Source 为零；业务 Service 发起后续调用时，Source 是它自己的 ServiceID。HTTP goroutine 不冒充业务 Service，也不直接读取 Service 状态。
 
-普通应用的接线见 `admin_test.go` 中的 `adminMainService.OnStart`：`CreateService` → `Register` → `OpenHTTP` → `Exit`。MainService 退出不关闭 HTTP；`gsr.Run` 持有监听并在 Runtime 停止前关闭。路由在启动时构造；将来确有运行期路由变更需求时，整体重建并替换路由表，不为单条路由增加动态增删 API。`net/http` 已负责 HTTP 连接和 Handler 并发，不另建固定 HTTP Agent 池。
+`admin_test.go` 验证上述真实业务接线；其中远端节点是底层夹具。路由在启动时构造，将来确有变更需求时整体重建并替换，不添加逐条动态增删接口或 HTTP Agent 池。
+
+## 底层边界验证
+
+`handler.go`、`service.go` 和 `handler_test.go` 保留显式 `Runtime.Call` 与 `httpserver.Server` 夹具，保护房间人数接口的安全错误响应、超时和取消。它们不是普通业务的推荐启动方式。
+
+`httpserver` 只管理监听、有限请求头等待和有序关闭，不接管路由、认证、TLS 或限流。生产接入必须先确定第三方调用方身份和网络边界，不能直接把这个无认证的示例公开到公网。
 
 `Runtime.Call` 的 Source 固定为零，表示受信任基础设施注入，不冒充某个业务 Service 或 HTTP 客户端。HTTP Handler 的等待期限不强杀已开始执行的 Service Handler；原房间人数接口是只读查询，管理路由中的封禁操作是幂等示范。若以后接入非幂等 webhook，还需由业务定义超时后的结果处理与重试策略。

@@ -2,6 +2,8 @@
 
 状态：已获用户确认。采用 Runtime.Call 基础设施入口；正式契约已同步到 API-DESIGN、CONTEXT 和 ADR 0009。下文保留裁决时的背景与取舍。
 
+当前接线为私有 `inboundConnection → localRequestAdapter → Runtime.Send/Call`，公开 ConnectionAgent 已移除。下文的 RequestHandler/ConnectionAgent 仅描述裁决时的测试替身，不是当前推荐 API。
+
 ## 裁决时的缺口
 
 - `cluster.ConnectionAgent` 已能将 Request 交给 RequestHandler，并沿原连接写回结果；当前集成测试仍使用逻辑处理函数。

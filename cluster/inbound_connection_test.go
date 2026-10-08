@@ -44,7 +44,7 @@ func TestInboundConnectionIsolatesSlowCall(t *testing.T) {
 		t.Fatal(err)
 	}
 	for failure := range owner.diagnostics.failures {
-		if !errors.Is(failure.err, ErrConnectionAgentWrite) && !errors.Is(failure.err, context.Canceled) {
+		if !errors.Is(failure.err, errInboundResponseWrite) && !errors.Is(failure.err, context.Canceled) {
 			t.Errorf("unexpected diagnostic: %v", failure.err)
 		}
 	}

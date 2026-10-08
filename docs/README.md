@@ -4,11 +4,11 @@
 
 ## 阅读顺序
 
-下一阶段见 [WebSocket Gate、客户端协议与 Agent](RFC-WEBSOCKET-GATE.md)：WSS、固定 33 字节二进制握手、Protobuf Envelope（msg_id、uint32 request_id、payload）、X25519/HKDF 上行 MAC，以及请求/响应/通知/推送独立编号；首版不实现旧头兼容或 DES。生产 Gate 的完整验收仍按 RFC 的失败矩阵和压力计划推进。
+客户端接入见 [WebSocket Gate、客户端协议与 Agent](RFC-WEBSOCKET-GATE.md)：WSS、固定 33 字节二进制握手、Protobuf Envelope（msg_id、uint32 request_id、payload）、X25519/HKDF 上行 MAC，以及请求/响应/通知/推送独立编号；首版不实现旧头兼容或 DES。生产 Gate 的完整验收仍按 RFC 的失败矩阵和压力计划推进。
 
-应用入口见 [ADR 0011：以 Service 为中心的应用入口与统一 Command](adr/0011-service-first-application-api.md) 和 [双节点示例](../examples/twonode/README.md)：gsr.Run 启动 MainService，业务通过 self.Cluster() 通信，不需要 Host。
+默认业务入口是 `gsr.Run + MainService`：宿主管运行与停机，MainService 用 `self` 创建、命名和调用其它 Service。具体裁决见 [ADR 0011：以 Service 为中心的应用入口与统一 Command](adr/0011-service-first-application-api.md) 和 [双节点示例](../examples/twonode/README.md)：gsr.Run 启动 MainService，业务通过 self.Cluster() 通信，不需要 Host。
 
-初次运行可先看 [最小 CounterService 示例](../examples/counter/README.md)，只涉及本地 Service、Send、Call 和关闭。
+初次运行先看 [最小 CounterService 示例](../examples/counter/README.md)，只涉及本地 Service、Send、Call 和关闭。
 
 1. [项目术语](../CONTEXT.md)：ServiceID、NodeID、Message、ClusterEnvelope、Session、Source 和 Revision 的准确含义。
 2. [API 设计规范](API-DESIGN.md)：Runtime 边界、消息管道、Cluster API 和 Skynet 风格。
@@ -16,7 +16,7 @@
 4. [ADR 0002](adr/0002-message-ownership-and-call-semantics.md)：未编码参数所有权、同步 Call 与 Reply completion 的裁决。
 5. [ADR 0003](adr/0003-bounded-admission-and-send-contract.md)：有界 Mailbox/队列与 Send 接受语义的裁决。
 6. [ADR 0004](adr/0004-service-runner-lifecycle-and-timer.md)：per-Service runner、动态创建、停止策略与 Timer 的裁决。
-7. [ADR 0005](adr/0005-cluster-wire-and-connections.md)：Cluster wire、codec、NodeSender、ConnectionAgent 和重连策略的裁决。
+7. [ADR 0005](adr/0005-cluster-wire-and-connections.md)：Cluster wire、codec、NodeSender、入站连接 owner 和重连策略的裁决。
 8. [ADR 0006](adr/0006-runtime-ids-and-reply-errors.md)：uint64 运行期 ID 与结构化 Reply error 的裁决。
 9. [ADR 0007](adr/0007-command-context-call-and-timeout-stop.md)：CommandContext、Call 最大等待时间、启动期自身消息和无法强杀任务的裁决。
 10. [ADR 0008](adr/0008-runtime-component-lifecycle.md)：Runtime 组件生命周期、启动回滚与 Core/Cluster 关闭顺序的裁决。
@@ -31,3 +31,9 @@
 19. [本地规模基线](PERFORMANCE-BASELINE.md)：10,000 Service/Timer 与 Send/Call 测量结果、复现命令及口径限制。
 
 后续出现需要长期保留的重大架构取舍时，新增 ADR 或 RFC，并从这里建立索引。
+
+## 示例选择
+
+- 普通业务：先看 Counter，再看双节点、WebSocket Echo、Redis/MySQL Service 示例。统一使用 `gsr.Run + MainService` 和当前 Service 的 `self` 能力。
+- HTTP 管理入口：先看 [HTTP 示例](../examples/http-inbound/README.md) 中的 MainService 和 `HTTPIngress` 接线，再看底层测试夹具。
+- 基础设施验证：显式 Runtime、ClusterClient、Transport 等组装只用于理解或测试框架边界，不是业务启动必经步骤。

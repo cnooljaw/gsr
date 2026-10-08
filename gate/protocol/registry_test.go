@@ -34,15 +34,54 @@ func testRegistry(t *testing.T) *Registry {
 
 func testDispatcher(t *testing.T, registry *Registry, sender *recordedSender) *Dispatcher[string] {
 	t.Helper()
-	session, err := NewSession(registry, sender)
-	if err != nil {
-		t.Fatalf("NewSession() error = %v", err)
-	}
-	dispatcher, err := NewDispatcher[string](registry, session)
+	dispatcher, err := NewDispatcher[string](registry, sender)
 	if err != nil {
 		t.Fatalf("NewDispatcher() error = %v", err)
 	}
 	return dispatcher
+}
+
+// 验证 Dispatcher 构造器拒绝缺失目录和空连接能力，不接受业务手工拼装内部组件。
+func TestNewDispatcherRejectsMissingDependencies(t *testing.T) {
+	registry := testRegistry(t)
+	var typedNil *recordedSender
+	for _, testCase := range []struct {
+		name     string
+		registry *Registry
+		sender   ClientSender
+	}{
+		{name: "nil registry", sender: &recordedSender{}},
+		{name: "nil sender", registry: registry},
+		{name: "typed nil sender", registry: registry, sender: typedNil},
+	} {
+		t.Run(testCase.name, func(t *testing.T) {
+			if _, err := NewDispatcher[string](testCase.registry, testCase.sender); err == nil {
+				t.Fatal("missing dependency accepted")
+			}
+		})
+	}
+}
+
+// 验证普通 Command 等协议 Handler 之外的业务流程也能通过 Dispatcher 发送强类型 Push。
+func TestDispatcherPushUsesConstructorRegistry(t *testing.T) {
+	sender := &recordedSender{}
+	dispatcher := testDispatcher(t, testRegistry(t), sender)
+	if err := dispatcher.Push(uint32(echopb.MsgId_S2C_ECHO_PUSH), &echopb.EchoPush{Text: "outside handler"}); err != nil {
+		t.Fatal(err)
+	}
+	if len(sender.envelopes) != 1 || sender.envelopes[0].GetRequestId() != 0 {
+		t.Fatalf("Push envelopes = %v", sender.envelopes)
+	}
+	var message echopb.EchoPush
+	if err := proto.Unmarshal(sender.envelopes[0].GetPayload(), &message); err != nil || message.GetText() != "outside handler" {
+		t.Fatalf("Push payload = %v, %v", &message, err)
+	}
+	if err := dispatcher.Push(uint32(echopb.MsgId_S2C_ECHO_PUSH), &echopb.EchoResponse{}); !errors.Is(err, ErrPayloadTypeMismatch) {
+		t.Fatalf("wrong Push payload error = %v", err)
+	}
+	if len(sender.envelopes) != 1 {
+		t.Fatal("invalid Push reached client")
+	}
 }
 
 func testNotificationRegistry(t *testing.T) *Registry {

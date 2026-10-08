@@ -120,7 +120,7 @@ func (owner *inboundConnection) handle(ctx context.Context, request ClusterEnvel
 	}()
 	if err := owner.adapter.handle(ctx, request, owner.connection.write); err != nil {
 		owner.report(request, err)
-		if errors.Is(err, ErrConnectionAgentWrite) {
+		if errors.Is(err, errInboundResponseWrite) {
 			owner.connection.close()
 		}
 	}

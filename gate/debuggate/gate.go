@@ -217,7 +217,8 @@ func (gate *GateService) Handle(self runtime.CommandContext, command runtime.Com
 		agentID, err := self.CreateService(startContext, agent)
 		if err != nil {
 			gate.logConnectionFailure("agent_create", websocket.CloseInternalServerErr, err)
-			return nil, fmt.Errorf("debuggate: create Agent: %w", err)
+			// 已进入 Gate Handler；创建失败不能被接线重试误判为 Mailbox admission 失败。
+			return nil, runtime.ErrHandlerFailed
 		}
 		gate.agentsByConnection[clientConn] = agentID
 		gate.counters.acceptedConnections.Add(1)
@@ -337,7 +338,7 @@ func (gate *GateService) ServeHTTP(writer http.ResponseWriter, request *http.Req
 	}()
 
 	connectContext, cancel := context.WithTimeout(request.Context(), defaultAgentStartWait)
-	result, err := gate.runtime.Call(connectContext, serviceID, gateConnectCommand, clientConn)
+	result, err := gatecommon.CallGateConnect(connectContext, gate.runtime, serviceID, gateConnectCommand, clientConn)
 	cancel()
 	if err != nil {
 		gate.counters.rejectedConnections.Add(1)

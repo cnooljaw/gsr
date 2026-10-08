@@ -681,6 +681,7 @@ func TestProdGateRecoversFromAgentStartFailure(t *testing.T) {
 			return &startFailingProductionTestAgent{
 				productionTestAgent: &productionTestAgent{},
 				stopCalled:          failedAgentStopped,
+				startErr:            runtime.ErrMailboxFull,
 			}
 		}
 		agent := &productionTestAgent{
@@ -3917,9 +3918,13 @@ type productionTestAgent struct {
 type startFailingProductionTestAgent struct {
 	*productionTestAgent
 	stopCalled chan struct{}
+	startErr   error
 }
 
-func (*startFailingProductionTestAgent) OnStart(context.Context, runtime.ServiceContext) error {
+func (agent *startFailingProductionTestAgent) OnStart(context.Context, runtime.ServiceContext) error {
+	if agent.startErr != nil {
+		return agent.startErr
+	}
 	return errors.New("agent startup failed")
 }
 

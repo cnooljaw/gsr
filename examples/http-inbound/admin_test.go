@@ -73,7 +73,7 @@ func TestAdminHTTPRoutesCallLocalAndRemoteServices(t *testing.T) {
 		done <- gsr.Run(ctx, gsr.Config{
 			Logging: logging.Config{Writer: io.Discard},
 			Cluster: cluster.ClusterConfig{Nodes: map[cluster.NodeID]string{"rooms-node": remoteAddress}},
-		}, &adminMainService{address: httpAddress, started: started})
+		}, &observedAdminService{entry: adminMainService{address: httpAddress}, started: started})
 	}()
 	t.Cleanup(func() {
 		cancel()
@@ -135,40 +135,22 @@ func TestAdminHTTPRoutesCallLocalAndRemoteServices(t *testing.T) {
 	}
 }
 
-type adminMainService struct {
-	address string
+// observedAdminService 只为测试报告入口初始化结果，不把测试通道放进业务示例。
+type observedAdminService struct {
+	entry   adminMainService
 	started chan<- error
 }
 
-func (service *adminMainService) OnStart(ctx context.Context, self gsr.ServiceContext) (result error) {
-	defer func() { service.started <- result }()
-	users, err := self.CreateService(ctx, newUserService())
-	if err != nil {
-		return err
-	}
-	if err := self.Register("users", users); err != nil {
-		return err
-	}
-	dashboard, err := self.CreateService(ctx, newDashboardService("rooms-node"))
-	if err != nil {
-		return err
-	}
-	if err := self.Register("dashboard", dashboard); err != nil {
-		return err
-	}
-	if err := self.OpenHTTP(service.address, func(in *gsr.HTTPIngress) http.Handler {
-		return newAdminMux(in)
-	}); err != nil {
-		return err
-	}
-	self.Exit()
-	return nil
+func (service *observedAdminService) OnStart(ctx context.Context, self gsr.ServiceContext) error {
+	err := service.entry.OnStart(ctx, self)
+	service.started <- err
+	return err
 }
 
-func (service *adminMainService) Handle(_ gsr.CommandContext, _ runtime.CommandID, _ ...any) (any, error) {
-	return nil, runtime.ErrUnknownCommand
+func (service *observedAdminService) Handle(self gsr.CommandContext, command runtime.CommandID, args ...any) (any, error) {
+	return service.entry.Handle(self, command, args...)
 }
 
-func (service *adminMainService) OnStop(_ context.Context) error {
-	return nil
+func (service *observedAdminService) OnStop(ctx context.Context) error {
+	return service.entry.OnStop(ctx)
 }

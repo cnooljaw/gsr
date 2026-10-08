@@ -30,6 +30,7 @@
 - 应用由普通 MainService 发起业务：Service 内通过 ServiceContext.CreateService/Register/Send/Call/SendName/CallName/Exit 创建、命名、通信和自身退出；宿主管 Runtime。本地与远端共用节点内名称表，名称不进入 Core；Runtime.Send/Call 仅作基础设施或测试注入，不作为业务通信捷径；不新增 Launcher/ServiceManager，不强制业务 Start Command。
 - 应用启动使用 gsr.Run；业务通过 self.Cluster() / self.Logger() 取得自身来源绑定能力，不手工注入 Host 或创建 ClusterClient。Core 的 runtime.ServiceContext 不反向依赖 Cluster；禁止用全局单例的“当前 Service”或 goroutine-local 推断来源。
 - 修改范围必须能够追溯到当前任务；不顺手重构无关代码。
+- 框架内部组件之间必须成立的不变量由构造器建立并保证，不要求业务调用方手工组装关联后再由运行时检查；业务仍负责输入、资源所有权和生命周期契约。
 - 公开 API 或架构边界发生变化时，同步更新 `docs/API-DESIGN.md`。
 - 新增或修改 Go 代码必须遵守 `docs/GO-CODE-STYLE.md`。
 - 形成稳定的新设计结论时写入相关文档；较大的取舍可新增 ADR 或 RFC，不把 `AGENTS.md` 扩写成架构百科。
@@ -66,7 +67,7 @@
 - Cluster Send 在 admission 前失败时立即返回错误；返回 nil 只表示本地 Cluster 边界接受或入队。admission 后的传输失败只进入 A 侧基础设施诊断，B 侧 Handler error 归 B，不通过 Send 返回 A；需要远端结果时使用 Call。
 - ClusterEnvelope、NodeID、连接和编码不得进入 Core 本地 Message 或 ServiceID。
 - Cluster 主动 Send/Call 不要求本地 NodeID 或 open；open 只负责接受新调用。出站只持有目标，入站只持有连接，不传递 LocalNode 或来源 NodeID；回复沿原连接返回，反向主动调用使用独立出站连接。
-- Cluster 每个远端 Node 只有一个 outbound NodeSender，并为每条 inbound socket 建立独立 ConnectionAgent；断线自动重连，但不自动重放业务请求。
+- Cluster 每个远端 Node 只有一个 outbound NodeSender；每条 inbound socket 由私有 inboundConnection 管理读循环与有界 Call 任务，经 localRequestAdapter 投递本地 Runtime，回复沿原连接返回。断线自动重连，但不自动重放业务请求。
 - Cluster 统一编码，不维护节点级 Command 准入清单；CommandID 由目标 Service 解释，不同 Service 可复用编号。未知 Send 由目标丢弃，未知 Call 返回 ErrUnknownCommand。wire 输入必须设置帧长、集合深度和 payload 上限。
 - 能安全确认帧边界的格式错误和解码失败帧丢弃并限频诊断；非法长度、越界、认证失败或无法恢复帧边界时关闭连接。合法载荷中的未知 Command 不是坏帧。
 - Timer 只投递 Command，不通过回调直接修改业务状态。

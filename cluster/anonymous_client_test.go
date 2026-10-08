@@ -57,29 +57,24 @@ func TestNodeSenderOutboundWithoutListener(t *testing.T) {
 }
 
 // 验证匿名入站 Call 无需回查来源地址，按原 Session 经连接 writer 回复。
-func TestConnectionAgentReplyWithoutSource(t *testing.T) {
-	request := ClusterEnvelope{Kind: FrameRequest, Session: 7, Target: ServiceTarget{ServiceID: 1}, Command: clusterTestCommand}
-	var handled, replied bool
-	agent, err := NewConnectionAgent(ConnectionAgentConfig{
-		Handler: func(_ context.Context, _ ClusterEnvelope) ([]byte, error) {
-			handled = true
-			return []byte("result"), nil
-		},
-		Write: func(response ClusterEnvelope) error {
-			replied = true
-			if response.Kind != FrameResponse || response.Session != request.Session || response.Target != request.Target || response.Command != request.Command || string(response.Payload) != "result" {
-				t.Errorf("response = %+v", response)
-			}
-			return nil
-		},
-	})
+func TestLocalAdapterReplyWithoutSource(t *testing.T) {
+	adapter, id, codec := newLocalAdapterTest(t)
+	payload, err := codec.Encode([]any{"result"})
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := agent.Handle(context.Background(), request); err != nil {
+	request := ClusterEnvelope{Kind: FrameRequest, Session: 7, Target: ServiceTarget{ServiceID: id}, Command: clusterTestCommand, Payload: payload}
+	replied := false
+	if err := adapter.handle(context.Background(), request, func(response ClusterEnvelope) error {
+		replied = true
+		if response.Kind != FrameResponse || response.Session != request.Session || response.Target != request.Target || response.Command != request.Command {
+			t.Errorf("response = %+v", response)
+		}
+		return nil
+	}); err != nil {
 		t.Fatal(err)
 	}
-	if !handled || !replied {
-		t.Fatalf("handled = %v, replied = %v", handled, replied)
+	if !replied {
+		t.Fatal("missing reply on original connection")
 	}
 }

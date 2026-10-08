@@ -6,6 +6,8 @@
 
 本文保留历次切片记录，部分“本轮未实现”描述仅代表当时范围。当前能力与证据汇总见 [当前阶段验证清单](VALIDATION-STATUS.md)，不要将历史切片的非目标误读为当前缺失。
 
+当前入站统一走私有 `inboundConnection → localRequestAdapter → Runtime.Send/Call`，公开 ConnectionAgent 已移除；协议 Dispatcher 构造器内部绑定 Registry 和客户端写回能力。下文历史切片中的独立 ConnectionAgent 和手工 Session 接线不作为当前实施要求。
+
 空闲规模、本地消息、背压、集中 Timer 和日志开销的实测记录见 [性能基线](PERFORMANCE-BASELINE.md)；一万个 Service 的三分钟混合 Send 样本见 [混合负载验证](MIXED-LOAD-VALIDATION.md)。这些样本不作为生产容量门槛。
 
 第一轮已确认并验证的场景是 10,000 个 Service、9,800 Send/s、80% 本地与 20% 跨节点、5 秒预热加 3 分钟正式运行；全部是轻量 Handler，不包含 Call、业务 I/O 或逐条日志。真实业务的 Send/Call 构成、Handler 成本、日志频率及延迟/拒绝率验收线仍未确定。更早的 TestRuntimePaced10000Load 是单热点 Service、默认容量 1024、无业务计算和日志的 10 秒定速样本，通过 GSR_LOAD_TEST=1 显式启用；必须报告实际输入速率，不能把它当作已验收的混合负载或生产容量。

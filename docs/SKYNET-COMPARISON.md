@@ -67,7 +67,7 @@ Skynet 的关闭顺序可概括为：timer 线程停止时间/socket 事件并�
 
 | 本地示例 | 实际行为 | 对 GSR 的启示 |
 | --- | --- | --- |
-| `service/gate.lua` | 把仍由 gate 持有的 socket buffer 直接交给 agent；source 取 `c.client`，为零时由底层回退为 gate context，重点是 buffer ownership 而不是伪造来源。 | 零拷贝和缓冲区转移留在 Transport/ConnectionAgent 私有层，不能把共享可变指针带入 Core。 |
+| `service/gate.lua` | 把仍由 gate 持有的 socket buffer 直接交给 agent；source 取 `c.client`，为零时由底层回退为 gate context，重点是 buffer ownership 而不是伪造来源。 | 零拷贝和缓冲区转移留在 Transport/入站连接 owner 私有层，不能把共享可变指针带入 Core。 |
 | `service/multicastd.lua` | 将同一发布消息扇出到订阅者，并保留发布者 source；依赖 C/Lua 引用计数和消息生命周期。 | 多播属于外层功能；GSR 对每个目标分别做有界 admission，受信任 relay 才能保留已有 Source。 |
 | `service/cdummy.lua`、`service/cslave.lua` | 将 Harbor 注册/查询控制消息送到 `harbor_service`，source 表示相关句柄或登记者。 | 基础设施 relay 可有独立 source 策略，但不向业务开放任意 source 参数。 |
 | `examples/simplemonitor.lua` | 将已退出服务的地址作为事件通知中的 source，source 更像事件主体而非即时发送者。 | 生命周期事件使用显式 typed 参数或诊断 metadata，不把事件主体伪装成业务 Source。 |
@@ -110,7 +110,7 @@ GSR 只用 `SessionID == 0` 或 `SessionID > 0` 区分 Send/Call；Skynet 还把
 | `FrameCodec` | 已实现 | `lua-cluster.c` 的 `fill_header`、socket channel 帧 | 借鉴后重构 | GSR 用四字节大端长度前缀界定完整 frame；Envelope 不携带 version，stream I/O 与按需重连由连接 owner 负责，版本协商仍未实现。 |
 | `InMemoryTransport` | 已实现 | Skynet 的 socket channel 测试替身/节点间连接 | 借鉴后重构 | GSR 提供同步、可确定的进程内 Transport 作为测试边界；它不模拟 TCP、重连、队列或远端执行成功，真实 TCP 由独立网络实现负责，不能由该测试替身推断生产语义。 |
 | `NodeSender` | 已实现 | `clusterd.lua` 的 `node_sender[node]` + `clustersender.lua` | 直接对应但分阶段实现 | GSR 每个远端 Node 一个 sender，当前以固定有界队列和单一 worker 完成本地 admission/顺序投递；底层失败进入非阻塞诊断 stream，不在 worker 中运行外部 callback。底层 outboundPeer 已实现 TCP 连接复用与按需重连，不自动重放结果不确定的业务请求。 |
-| `ConnectionAgent` | Cluster 2 与 TCP owner 已实现 | `clusterd.lua` 为每条 inbound fd 创建的 `clusteragent` | 直接对应 | GSR `Handle` 只接收已解码 Request、调用窄的本地适配器并沿所属 writer 回写 Call Response/Error；每条入站 socket 仍由外层独立 agent 管理，不与同一 Node 的 outbound sender 混成一个所有者。 |
+| Cluster 入站连接 | 已实现 | `clusterd.lua` 为每条 inbound fd 创建的 `clusteragent` | 借鉴职责，不复制 Service 形态 | GSR 私有 `inboundConnection` 管理单 socket 和有界任务，`localRequestAdapter` 投递 Runtime，结果沿原连接回写；没有独立公开 ConnectionAgent，不与 outbound sender 混成一个 owner。 |
 | 远端 Service 地址 | 静态名称路由已实现；动态发现未实现 | 远端 handle、`@name`、`cluster.proxy(node, name)` | 有意不照搬 | GSR 的 ServiceID 永远是本地临时地址；业务使用 NodeID + ServiceName，目标进程的应用注册表解析当前 ServiceID。动态 Discovery 属于外层能力；Runtime 不判断业务资源所有权、一致性或过期。 |
 | 断线、重连和重放 | 按需重连已实现；不重放 | `socketchannel` 的 reconnect/changehost、`clusterd` sender 重建 | 借鉴后重构 | GSR 重连只恢复未来通信，不宣称 exactly-once，也不自动重放业务 Call/Send；幂等、RequestID 和补偿属于业务。 |
 | Cluster 关闭顺序 | 已实现 | socket close/free、cluster sender/agent service 退出、Harbor release | 借鉴后重构 | gsr.Run 内部先 Quiesce，再 Runtime.Close、Cluster.Close，最后记录停止日志并关闭 Logger；业务不持有 Host。 |

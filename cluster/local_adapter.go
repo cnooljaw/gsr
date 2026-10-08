@@ -19,15 +19,12 @@ type localRequestAdapter struct {
 // handle 在调用 Service 之前完成协议校验，坏载荷只返回本地诊断错误，不回包。
 // Call 的执行错误经共享响应函数回包；Send 的本地接纳错误返回接收侧记录，
 // 已接纳 Send 的 Handler 错误仍由目标 Runtime 记录。
-func (adapter *localRequestAdapter) handle(ctx context.Context, request ClusterEnvelope, write ResponseWriter) error {
-	if adapter == nil || adapter.runtime == nil || isNilPayloadCodec(adapter.codec) || write == nil {
-		return ErrInvalidConnectionAgentConfig
-	}
+func (adapter *localRequestAdapter) handle(ctx context.Context, request ClusterEnvelope, write func(ClusterEnvelope) error) error {
 	if ctx == nil || request.Kind != FrameRequest {
-		return ErrInvalidConnectionAgentRequest
+		return errInvalidInboundRequest
 	}
 	if err := request.Validate(); err != nil {
-		return fmt.Errorf("%w: %v", ErrInvalidConnectionAgentRequest, err)
+		return fmt.Errorf("%w: %v", errInvalidInboundRequest, err)
 	}
 	if err := ctx.Err(); err != nil {
 		return err

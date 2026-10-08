@@ -80,11 +80,7 @@ func (agent *timeoutProtocolAgent) OnStart(_ context.Context, self runtime.Servi
 	if err != nil {
 		return err
 	}
-	session, err := protocol.NewSession(registry, agent.client)
-	if err != nil {
-		return err
-	}
-	dispatcher, err := protocol.NewDispatcher[runtime.CommandContext](registry, session)
+	dispatcher, err := protocol.NewDispatcher[runtime.CommandContext](registry, agent.client)
 	if err != nil {
 		return err
 	}
@@ -136,11 +132,7 @@ func (agent *protocolGateAgent) OnStart(_ context.Context, _ runtime.ServiceCont
 	if err != nil {
 		return err
 	}
-	session, err := protocol.NewSession(registry, agent.client)
-	if err != nil {
-		return err
-	}
-	dispatcher, err := protocol.NewDispatcher[runtime.CommandContext](registry, session)
+	dispatcher, err := protocol.NewDispatcher[runtime.CommandContext](registry, agent.client)
 	if err != nil {
 		return err
 	}

@@ -249,7 +249,8 @@ func (gate *GateService) Handle(self runtime.CommandContext, command runtime.Com
 		agentID, err := self.CreateService(startContext, agent)
 		if err != nil {
 			gate.logConnectionFailure(clientConn, "agent_create", websocket.CloseInternalServerErr, err)
-			return nil, fmt.Errorf("prodgate: create Agent: %w", err)
+			// 已进入 Gate Handler；创建失败不能被接线重试误判为 Mailbox admission 失败。
+			return nil, runtime.ErrHandlerFailed
 		}
 		gate.agentsByConnection[clientConn] = agentID
 		return agentID, nil
@@ -377,7 +378,7 @@ func (gate *GateService) ServeHTTP(writer http.ResponseWriter, request *http.Req
 	// Call 超时不会取消 Gate Handler；断开事件仍要排在创建事件之后处理，因此不继承 WebSocket 请求的取消信号。
 	agentCreationRequested = true
 	connectContext, cancel := context.WithTimeout(context.Background(), defaultAgentStartWait)
-	result, err := gate.createConnectionAgent(connectContext, serviceID, clientConn)
+	result, err := gatecommon.CallGateConnect(connectContext, gate.runtime, serviceID, gateConnectCommand, clientConn)
 	cancel()
 	if err != nil {
 		// Handler 内部的创建失败已经由 Gate runner 记录；这里只记录等待创建超时，避免同一失败重复落日志。
@@ -619,26 +620,6 @@ func authErrorCategory(err error) string {
 		return "sequence"
 	}
 	return "authentication"
-}
-
-func (gate *GateService) createConnectionAgent(
-	ctx context.Context,
-	serviceID runtime.ServiceID,
-	clientConn *clientConnection,
-) (any, error) {
-	ticker := time.NewTicker(5 * time.Millisecond)
-	defer ticker.Stop()
-	for {
-		result, err := gate.runtime.Call(ctx, serviceID, gateConnectCommand, clientConn)
-		if err == nil || (!errors.Is(err, runtime.ErrServiceNotFound) && !errors.Is(err, runtime.ErrMailboxFull)) {
-			return result, err
-		}
-		select {
-		case <-ctx.Done():
-			return nil, ctx.Err()
-		case <-ticker.C:
-		}
-	}
 }
 
 func (gate *GateService) beginHandler() (runtime.ServiceID, bool) {

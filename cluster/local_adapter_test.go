@@ -104,7 +104,7 @@ func TestLocalAdapterSendDoesNotReply(t *testing.T) {
 	}
 }
 
-// 验证写回失败保留原始 I/O 原因，已取消的请求不会写回响应。
+// 验证写回失败保留 I/O 原因、writer panic 被收容，已取消的请求不会写回响应。
 func TestLocalAdapterReportsWriteFailureAndCancellation(t *testing.T) {
 	adapter, id, codec := newLocalAdapterTest(t)
 	payload, err := codec.Encode([]any{})
@@ -114,8 +114,14 @@ func TestLocalAdapterReportsWriteFailureAndCancellation(t *testing.T) {
 	request := ClusterEnvelope{Kind: FrameRequest, Session: 1, Target: ServiceTarget{ServiceID: id}, Command: clusterTestCommand, Payload: payload}
 	writeErr := errors.New("connection closed")
 	err = adapter.handle(context.Background(), request, func(ClusterEnvelope) error { return writeErr })
-	if !errors.Is(err, ErrConnectionAgentWrite) || !errors.Is(err, writeErr) {
+	if !errors.Is(err, errInboundResponseWrite) || !errors.Is(err, writeErr) {
 		t.Fatalf("write error = %v", err)
+	}
+	err = adapter.handle(context.Background(), request, func(ClusterEnvelope) error {
+		panic("private writer detail")
+	})
+	if !errors.Is(err, errInboundResponseWrite) {
+		t.Fatalf("writer panic error = %v", err)
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
@@ -123,6 +129,33 @@ func TestLocalAdapterReportsWriteFailureAndCancellation(t *testing.T) {
 	err = adapter.handle(ctx, request, func(ClusterEnvelope) error { writes++; return nil })
 	if !errors.Is(err, context.Canceled) || writes != 0 {
 		t.Fatalf("cancelled request error=%v writes=%d", err, writes)
+	}
+}
+
+// 验证非法逻辑请求在投递前被拒绝，不产生业务执行或响应。
+func TestLocalAdapterRejectsInvalidRequest(t *testing.T) {
+	adapter, id, codec := newLocalAdapterTest(t)
+	payload, err := codec.Encode([]any{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	valid := ClusterEnvelope{Kind: FrameRequest, Session: 1, Target: ServiceTarget{ServiceID: id}, Command: clusterTestCommand, Payload: payload}
+	for _, testCase := range []struct {
+		name    string
+		ctx     context.Context
+		request ClusterEnvelope
+	}{
+		{name: "nil context", request: valid},
+		{name: "wrong kind", ctx: context.Background(), request: ClusterEnvelope{Kind: FrameResponse, Session: 1, Target: valid.Target, Command: valid.Command}},
+		{name: "invalid target", ctx: context.Background(), request: ClusterEnvelope{Kind: FrameRequest, Command: valid.Command}},
+	} {
+		t.Run(testCase.name, func(t *testing.T) {
+			writes := 0
+			err := adapter.handle(testCase.ctx, testCase.request, func(ClusterEnvelope) error { writes++; return nil })
+			if !errors.Is(err, errInvalidInboundRequest) || writes != 0 {
+				t.Fatalf("error = %v, writes = %d", err, writes)
+			}
+		})
 	}
 }
 
@@ -144,7 +177,7 @@ func TestLocalAdapterPreservesEncodingAndWriteFailures(t *testing.T) {
 		}
 		return writeErr
 	})
-	if writes != 1 || !errors.Is(err, encodeErr) || !errors.Is(err, writeErr) || !errors.Is(err, ErrConnectionAgentWrite) {
+	if writes != 1 || !errors.Is(err, encodeErr) || !errors.Is(err, writeErr) || !errors.Is(err, errInboundResponseWrite) {
 		t.Fatalf("writes=%d error=%v", writes, err)
 	}
 }

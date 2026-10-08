@@ -120,11 +120,7 @@ func (agent *applicationGateAgent) OnStart(context.Context, ServiceContext) erro
 	if err != nil {
 		return err
 	}
-	session, err := protocol.NewSession(registry, agent.client)
-	if err != nil {
-		return err
-	}
-	dispatcher, err := protocol.NewDispatcher[CommandContext](registry, session)
+	dispatcher, err := protocol.NewDispatcher[CommandContext](registry, agent.client)
 	if err != nil {
 		return err
 	}

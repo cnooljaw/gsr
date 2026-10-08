@@ -8,6 +8,24 @@ Cluster 内建统一 ValueCodec，无需 Command 清单。Echo 创建后即可�
 
 Echo 和 Caller 均显式实现 `Handle`，普通命令交给各自的具名 Dispatcher：Notify 接收一个 `uint64` 操作编号且不返回结果，Echo 返回该编号；多余或错误类型的参数由 Dispatcher 拒绝。
 
+## 跨节点参数约定
+
+本示例输入和输出均用 `uint64`，是默认 ValueCodec 解码后的规范类型。本地调用不编码，跨节点调用会将有符号整数规范化为 int64、无符号整数规范化为 uint64、浮点数规范化为 float64，列表和字典分别为 []any、map[string]any。Dispatcher 不自动转换类型；跨节点 Handler 不声明 int、int32 或领域具名数值类型。
+
+业务结构体不直接发上网络，在消息边界显式展开即可，例如：
+
+```go
+type EchoRequest struct {
+    Operation uint64
+}
+
+request := EchoRequest{Operation: 7}
+value, err := self.Cluster().Call(ctx, "battle", "echo", echoCommand, request.Operation)
+// 成功后校验 value.(uint64)，再按业务需要组装领域结果。
+```
+
+复杂消息可明确转换成规范值集合或自行编码的 []byte；不会恢复原结构体或具名类型。只用于本地的 Counter、Redis/MySQL Handler 不受 wire 类型限制，不必为形式统一全部改成字典。
+
 从仓库根目录构建一次：
 
 ```sh

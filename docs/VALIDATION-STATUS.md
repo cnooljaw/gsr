@@ -52,6 +52,14 @@ Counter 入口统一切片：最小本地示例也改用 gsr.Run 和应用层 Se
 
 ## 当前检查结果
 
+2026-10-08 简化公开概念与默认接线：
+
+- 推荐入口统一为 `gsr.Run + MainService`，HTTP 接线移到 `examples/http-inbound/main_service.go`；原三条管理路由及跨节点汇总测试继续使用这份源码。
+- 删除独立公开 ConnectionAgent、RequestHandler/ResponseWriter 及其配置和错误；内存往返、匿名回复和字节流测试改用生产 localRequestAdapter 与真实 Runtime。保留 Call 返回值、Domain Error、未知错误、panic 安全转换、Send 错误归属、Session 分离和原连接回复覆盖；writer panic 与非法请求检查迁到现有适配器测试，不为已删除对象保留构造测试。
+- 协议 Dispatcher 构造改为 Registry + ClientSender，内部建立同目录解码/写回不变量；新增缺失依赖及独立强类型 Push 用例，原 Response/Notify/错误语义测试继续复用。Echo 与两种 Gate 的协议接线均已更新，业务 wire 格式不变。
+- 延长 OnStart 发布窗口的测试先复现 DebugGate 正常连接被 1011 关闭，修复后正常收发；两种 Gate 共用有界接纳重试。扩展原创建失败用例，复现 OnStart 返回 MailboxFull/ServiceNotFound 被误重试的问题；失败改为终止性内部错误并保留原始日志，两种 Gate 的创建失败及迟到创建清理验证通过。
+- 定向回归、一次 `go test ./... -timeout=5m`、最终协议包全测、相关 Cluster/Gate/协议/HTTP 接线定向 race 和 diff 检查通过。本轮未执行全仓 vet/race、跨进程故障演练、TypeScript 或生产压力测试；客户端 wire 和 TypeScript 代码未修改。
+
 2026-10-01 应用名称表跨节点收尾：`TestRunNodesCommunicateWithoutSingleton` 增加真实 TCP 调用后的目标 Service 退出检查；远端首次按名 Call 正常返回，目标 `OnStop` 完成后再次按同名 Call 得到 `ErrServiceNotFound`，不再解析到旧 ServiceID。该定向测试的 race 检查通过；本轮只扩展验收，不修改生产实现，也不代表动态发现或在途请求迁移。
 
 同日应用入口故障收尾补强：`TestRunConstructionRollback` 分别覆盖 Runtime 配置无效、Cluster 配置无效和 typed-nil 入口 Service，确认构造错误可识别、组装失败不运行业务生命周期、共享 Logger 最终排空；`TestRunCleanupAfterOpen` 在已创建子 Service 且 Open 后覆盖 OnStart 返回错误或 panic、正常停机时子 Service 返回错误、入口 OnStop panic，确认原错误与收尾错误均保留、子 Service/入口各停止一次、日志顺序及监听端口释放。两项定向 race 测试通过；只加测试，不修改生产实现。

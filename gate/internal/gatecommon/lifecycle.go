@@ -1,4 +1,4 @@
-// Package gatecommon 保存两种示例 Gate 共享的连接生命周期流程。
+// Package gatecommon 保存两种 Gate 共享的连接生命周期流程。
 package gatecommon
 
 import (
@@ -30,6 +30,24 @@ func CreateAgent(factory func(gatecontract.ClientSession) runtime.Service, sessi
 		return nil, fmt.Errorf("%s: Agent constructor returned nil", component)
 	}
 	return service, nil
+}
+
+// CallGateConnect 在调用方有限期限内等待 Gate 发布或 Mailbox 恢复。
+// 只重试尚未接纳的失败；Handler error、Call 超时或取消均直接返回，避免重复创建 Agent。
+func CallGateConnect(ctx context.Context, local *runtime.Runtime, serviceID runtime.ServiceID, command runtime.CommandID, connection any) (any, error) {
+	ticker := time.NewTicker(disconnectRetryInterval)
+	defer ticker.Stop()
+	for {
+		result, err := local.Call(ctx, serviceID, command, connection)
+		if err == nil || (!errors.Is(err, runtime.ErrServiceNotFound) && !errors.Is(err, runtime.ErrMailboxFull)) {
+			return result, err
+		}
+		select {
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		case <-ticker.C:
+		}
+	}
 }
 
 // RetryDisconnect 在正常运行时重试 Gate runner 的断线投递；停机后交给 OnStop 补发。

@@ -30,7 +30,7 @@ type clusterCallResult struct {
 // 供同一 Cluster 中所有绑定来源身份的 ClusterClient 实例共享。
 //
 // Session 分配和待完成调用由此统一管理，不归各 Service 客户端所有。
-// Transport 或 ConnectionAgent 通过 Complete 完成响应，业务代码不直接访问等待记录。
+// 逻辑 Transport 通过 Complete 完成响应，业务代码不直接访问等待记录。
 // 必须通过 NewClusterCallRegistry 构造；零值不是可用的注册表。
 type ClusterCallRegistry struct {
 	pending *clusterPendingCalls

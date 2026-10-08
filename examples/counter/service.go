@@ -39,6 +39,7 @@ func (service *CounterService) OnStart(_ context.Context, _ gsr.ServiceContext) 
 	return nil
 }
 
+// add 只用于本地；若扩展为 Cluster 命令，应显式将边界参数和结果改为 int64。
 func (service *CounterService) add(_ gsr.CommandContext, amount int) error {
 	service.count += amount
 	return nil

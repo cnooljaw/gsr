@@ -1,8 +1,16 @@
 # GSR API 设计规范
 
-客户端协议 Handler 使用当前 Agent 的逐消息上下文：应用构造 `protocol.NewDispatcher[gsr.CommandContext](registry, session)`，手动注册 `func(self gsr.CommandContext, ctx protocol.Context, request *Request) error`，并在 `HandleClientMessage` 内调用 `dispatcher.HandleFrame(self, frame)`。self 提供 Service 的 Send/Call、名称调用和 Cluster 等能力，ctx 提供客户端 RequestID/Response/Push；Dispatcher 不保存 self，也不创建额外执行单元。底层集成可使用 `runtime.CommandContext` 作为类型参数，协议包不反向依赖 `gsr`。Handler 仍在 Agent 原有 runner 中同步执行，不得将上下文保存到字段或用于异步任务。
+## 默认业务入口与阅读边界
 
-客户端接入另见 [WebSocket Gate 草案](RFC-WEBSOCKET-GATE.md)：生产 Gate 使用固定 33 字节二进制握手，WSS 上行使用 seq + Protobuf Envelope + MAC，下行只使用 Envelope；独立 DebugGate 仅传输 Envelope。Envelope 使用 msg_id、request_id(uint32) 和 payload，由业务定义的 `AgentService` 中转。C/S request_id、两种 Gate、连接认证、关闭码和错误归属均在 Core/Cluster 之外；Gate 只负责传输与安全边界。Runtime 内部消息类型区分客户端消息与普通 Core Command，Service 通过可选的 `ClientMessageHandler` 明确启用客户端处理能力；Agent 在同一 Service runner 中将客户端 Envelope 按 `msg_id` 路由到协议分发器，业务按实现进度注册强类型 Handler；本地或 Cluster 投递的普通 Core Command 按 `CommandID` 路由到 `Commands`。协议 `.proto` 显式声明每个 msg_id 对应的 payload、方向和 Request/Notify/Response/Push 种类，并生成目录；未实现 Handler 的消息仍可先存在于协议定义中。Core Command 的 Send/Call 仍是同一种消息类型，由 Session 是否为零区分；`Source` 只表示 Service 来源，不作为入口类别。AgentService 负责客户端会话并组合业务项目提供的 `ProtocolHandler`；Gate 到 Agent 使用 Runtime-owned 的 `Runtime.DeliverClientMessage` 单向基础设施投递，Agent 到 Gate 使用不暴露 socket 的 `ClientSession` 写回能力。这里的 `ClientSession` 指绑定一条客户端连接的写回能力，不是 Core `SessionID` 或 Envelope 的 `request_id`。业务协议组件只做协议适配、简单收发和业务 Service 路由，可以持有连接私有的轻量状态，但不持有跨连接共享或需恢复的权威业务状态；业务 Service 负责业务拒绝和状态变化。GSR 不内置大厅、游戏或其它具体协议实现，只提供通用接入边界。Runtime 客户端消息投递能力已实现；`examples/websocket-gate` 的 Go 与 TypeScript 类型由通用和业务 `.proto` 生成，Go Agent 用独立协议目录解码并手动注册已实现的 Echo Handler，完成请求/响应及 `request_id` 回传。当前 Echo 联调示例由 MainService 在 `gsr.Run` 中通过 `self.OpenDebugGate` / `self.OpenProdGate` 创建对应 Gate 与应用 Agent；DebugGate 没有握手、TLS 或 MAC，不能暴露到公网。框架 ProdGate、跨语言认证固定向量和结构化诊断已有实现，完整压力验收仍按 RFC 推进。标准关闭码、结构化日志和 Agent 组装边界见 RFC。首版不实现 DES 或旧 12 字节头兼容。
+普通应用只需沿一条路径阅读：`gsr.Run → MainService → self.CreateService/Register → self.Send/Call 或 SendName/CallName`；跨节点使用 `self.Cluster()`，日志使用 `self.Logger()`，HTTP 和 Gate 由 MainService 打开。Service 在自身类型上显式实现 Handle，普通命令默认委托具名字段持有的 `gsr.Dispatcher`。
+
+`gsr.Service`、`gsr.ServiceContext` 是推荐的应用接口；`runtime.Service`、`runtime.ServiceContext` 是 Core 接口，服务于基础设施和底层集成。下文 Core 签名中的未限定类型属于 `runtime`，不能当成应用层接口的另一种写法。`Runtime.Send/Call` 是 Source 为零的受信任注入入口，不是业务调用捷径。
+
+本文描述当前契约；历史实现阶段见 IMPLEMENTATION-PLAN 和 ADR。框架内部组件关联由构造器保证，不要求业务重复组装并校验内部不变量。
+
+客户端协议 Handler 使用当前 Agent 的逐消息上下文：应用构造 `protocol.NewDispatcher[gsr.CommandContext](registry, client)`，手动注册 `func(self gsr.CommandContext, ctx protocol.Context, request *Request) error`，并在 `HandleClientMessage` 内调用 `dispatcher.HandleFrame(self, frame)`。self 提供 Service 的 Send/Call、名称调用和 Cluster 等能力，ctx 提供客户端 RequestID/Response/Push；Dispatcher 不保存 self，也不创建额外执行单元。底层集成可使用 `runtime.CommandContext` 作为类型参数，协议包不反向依赖 `gsr`。Handler 仍在 Agent 原有 runner 中同步执行，不得将上下文保存到字段或用于异步任务。
+
+客户端接入另见 [WebSocket Gate 协议与边界](RFC-WEBSOCKET-GATE.md)：生产 Gate 使用固定 33 字节二进制握手，WSS 上行使用 seq + Protobuf Envelope + MAC，下行只使用 Envelope；独立 DebugGate 仅传输 Envelope。Envelope 使用 msg_id、request_id(uint32) 和 payload，由业务定义的 `AgentService` 中转。C/S request_id、两种 Gate、连接认证、关闭码和错误归属均在 Core/Cluster 之外；Gate 只负责传输与安全边界。Runtime 内部消息类型区分客户端消息与普通 Core Command，Service 通过可选的 `ClientMessageHandler` 明确启用客户端处理能力；Agent 在同一 Service runner 中将客户端 Envelope 按 `msg_id` 路由到协议分发器，业务按实现进度注册强类型 Handler；本地或 Cluster 投递的普通 Core Command 由显式 `Service.Handle` 按 `CommandID` 分发。协议 `.proto` 显式声明每个 msg_id 对应的 payload、方向和 Request/Notify/Response/Push 种类，并生成目录；未实现 Handler 的消息仍可先存在于协议定义中。Core Command 的 Send/Call 仍是同一种消息类型，由 Session 是否为零区分；`Source` 只表示 Service 来源，不作为入口类别。AgentService 持有客户端写回能力，组合通用 `protocol.Dispatcher` 并注册业务项目实现的 Handler；Gate 到 Agent 使用 Runtime-owned 的 `Runtime.DeliverClientMessage` 单向基础设施投递，Agent 到 Gate 使用不暴露 socket 的 `ClientSession` 写回能力。这里的 `ClientSession` 指绑定一条客户端连接的写回能力，不是 Core `SessionID` 或 Envelope 的 `request_id`。业务协议组件只做协议适配、简单收发和业务 Service 路由，可以持有连接私有的轻量状态，但不持有跨连接共享或需恢复的权威业务状态；业务 Service 负责业务拒绝和状态变化。GSR 不内置大厅、游戏或其它具体协议实现，只提供通用接入边界。Runtime 客户端消息投递能力已实现；`examples/websocket-gate` 的 Go 与 TypeScript 类型由通用和业务 `.proto` 生成，Go Agent 用独立协议目录解码并手动注册已实现的 Echo Handler，完成请求/响应及 `request_id` 回传。当前 Echo 联调示例由 MainService 在 `gsr.Run` 中通过 `self.OpenDebugGate` / `self.OpenProdGate` 创建对应 Gate 与应用 Agent；DebugGate 没有握手、TLS 或 MAC，不能暴露到公网。框架 ProdGate、跨语言认证固定向量和结构化诊断已有实现，完整压力验收仍按 RFC 推进。标准关闭码、结构化日志和 Agent 组装边界见 RFC。首版不实现 DES 或旧 12 字节头兼容。
 
 框架能力边界如下。
 
@@ -21,6 +29,8 @@ type GateConfig struct {
 ```
 
 Gate 的网络 goroutine 把新连接转成 GateService 的内部事件；GateService 在自己的 Service runner 中调用 `NewAgent` 和 `self.CreateService`。回调只构造连接私有的 Service，不执行 socket I/O、不持有 Runtime 或 Gate 内部连接表；构造或 OnStart 失败只关闭当前连接，不影响其它 Agent。
+
+两种 Gate 共用有界连接接纳逻辑：监听先于 Gate Service 发布时，或 Gate Mailbox 暂时满载时，在连接创建期限内重试尚未接纳的内部 Call；期限结束即关闭当前连接。已进入 Gate Handler 的 Agent 创建/OnStart 失败记录原始原因，并返回终止性的 HandlerFailed；不把业务返回的 ServiceNotFound/MailboxFull 当作 admission 失败重试。Call 超时或取消不重试，迟到结果仍按既有断线清理处理，避免重复创建 Agent。
 
 应用层调试入口由 MainService 调用 `self.OpenDebugGate`：
 
@@ -340,6 +350,10 @@ func(CommandContext, A, B, ...) (R, error)
 
 `NewDispatcher` 在构造阶段校验 Handler 签名、复制命令表并准备参数绑定；`MustDispatcher` 仅用于静态命令表，定义错误时 panic。运行阶段仍使用 `reflect.Call`，但不在每条消息上重新解析签名。参数数量和类型错误返回 `runtime.ErrInvalidCommandArguments`，非法签名返回 `runtime.ErrInvalidCommandHandler`，未知命令返回 `runtime.ErrUnknownCommand`。这些错误的程序身份只依赖 ErrorClass/ErrorCode，Message 只用于安全诊断。
 
+**本地参数与跨节点参数不是同一种类型保证。** 本地 Send/Call 不编码，Dispatcher 按 Go 可赋值规则匹配参数，不隐式转换数值或领域类型。默认 Cluster ValueCodec 将参数和结果规范化：有符号整数为 `int64`，无符号整数为 `uint64`，浮点数为 `float64`，列表为 `[]any`，字典为 `map[string]any`；`[]byte`、string、bool、nil 保持对应类型。准备接受跨节点调用的强类型 Handler 应直接声明这些类型，调用端也使用规范类型，便于本地与远端共同使用。只用于本地的 Handler 可以使用 int、结构体和指针，但仍须遵守消息快照所有权。
+
+例如 `handleAdd(self, amount int)` 能接收本地 int，却不能接收远端解码后的 int64；跨节点协议应声明 `amount int64`，调用方显式传 `int64(amount)`。`type PlayerID uint64` 等具名类型也不会在 wire 上保留身份，边界 Handler 接收 uint64 后再转换成领域类型。业务结构体在边界显式展开为规范参数、字典或自行编码的 `[]byte`；响应同样使用可编码值，在调用端校验并重建领域结果。框架不增加反射自动转换、逐命令 codec 或默认代码生成来掩盖这个边界。
+
 命令表只是构造输入，不是 Runtime Registry。业务只绑定已实现的命令，协议定义不要求同步实现全部 Handler。运行期不提供 `Register`、`Unregister` 或 per-Service 命令预检查；未知 Command 仍作为普通 Message 进入目标 Mailbox，由 Dispatcher 或 Service.Handle 自己返回 `ErrUnknownCommand`。Timer 也不预检查命令。
 
 Dispatcher 只返回 `(any, error)`，不调用 `CommandContext.Reply()`。Runtime 根据 Message 的 SessionID 自动完成 Reply：Send 丢弃返回值，Call 获取返回值或结构化错误。基础设施的特殊消息入口可以直接实现 `Handle`；普通业务 Service 不因代码形式偏好改回手写分发。
@@ -391,7 +405,7 @@ Redirect 不是普通业务 Service API，也不是 `Call` 的另一种写法。
 | 多播/广播 | 外层功能为每个目标分别进行有界 admission；不把 fan-out 隐藏成 Core 的无限转发。 |
 | 生命周期事件 | 事件主体作为显式 typed 参数或外层诊断 metadata 传递，不把“被观察对象”伪装成业务 Source。 |
 
-Redirect 首版不承诺 Call 的 session 转移、自动 Reply、重试或 exactly-once。Transport 的零拷贝/缓冲区所有权转移也只能由 Transport/ConnectionAgent 私有实现处理，不能把共享可变指针暴露给 Core Message。
+Redirect 首版不承诺 Call 的 session 转移、自动 Reply、重试或 exactly-once。Transport 的零拷贝/缓冲区所有权转移也只能由 Transport/入站连接 owner 私有实现处理，不能把共享可变指针暴露给 Core Message。
 
 ## 6. Local 与 Cluster
 
@@ -514,17 +528,6 @@ func (registry *ClusterCallRegistry) Complete(remoteNode NodeID, envelope Cluste
 func (registry *ClusterCallRegistry) Close() error
 func (registry *ClusterCallRegistry) PendingCount() int
 
-type RequestHandler func(context.Context, ClusterEnvelope) ([]byte, error)
-type ResponseWriter func(ClusterEnvelope) error
-
-type ConnectionAgentConfig struct {
-	Handler RequestHandler
-	Write   ResponseWriter
-}
-
-func NewConnectionAgent(config ConnectionAgentConfig) (*ConnectionAgent, error)
-func (agent *ConnectionAgent) Handle(ctx context.Context, request ClusterEnvelope) error
-
 type DeliveryFailure struct {
 	RemoteNode NodeID
 	Kind       FrameKind
@@ -577,7 +580,7 @@ func (codec *FrameCodec) Decode(frame []byte) (ClusterEnvelope, error)
 - `Send` 先校验并 Clone Envelope，再以 FIFO 顺序交给唯一 worker；返回 nil 只表示本地队列 admission 成功，不表示远端执行成功。
 - `Transport.Send` 的错误或 panic 发生在 admission 后时，NodeSender 向有界的 `Failures()` stream 非阻塞发布一条基础设施事件；慢消费者不会阻塞发送 worker，stream 满时丢弃事件并由 `DroppedFailureCount()` 累计。
 - `Close(ctx)` 先停止 admission；队列中尚未开始发送的 Envelope 以 `ErrNodeSenderClosed` 报告并丢弃，已经进入 `Transport.Send` 的调用允许自然返回。`ctx` 只控制调用方等待，不强杀 transport goroutine；超时后可以再次调用 `Close` 等待同一 worker。
-- sender 直接调用注入的 `Transport`，自身不管理 TCP；内部单目标 outboundPeer 已提供按需建连、连接复用与恢复，公开静态出站组装已实现，Open 已实现，动态路由仍待后续切片。这些连接行为不能由 `Send` 的 nil 返回暗示。
+- sender 直接调用注入的 `Transport`，自身不管理 TCP；内部单目标 outboundPeer 已提供按需建连、连接复用与恢复，公开静态出站组装已实现，Open 已实现，动态路由尚未实现。这些连接行为不能由 `Send` 的 nil 返回暗示。
 
 公开组装的易用性方向已确认：显式 Cluster 对象统一管理静态目标路由、共享等待表和每目标发送组件，应用通过 self.Cluster() 使用自动来源绑定入口，底层适配器使用 source-bound ClusterClient；主动调用不要求本地 NodeID、Runtime 或 open。已确认签名 `NewCluster(config ClusterConfig) (*Cluster, error)` 与 `(*Cluster).Client(source runtime.ServiceID) (*ClusterClient, error)`；两者只构造本地状态，不拨号、不监听，Client 不单独拥有发送器或等待表。绑定来源是受信任组装能力，只校验非零 ID，不验证 Service 存活。该出站组装层已实现，首轮配置与两阶段关闭已确认，统一诊断入口也已确认，见 [组装入口方案](RFC-CLUSTER-ASSEMBLY.md)。
 
@@ -656,32 +659,35 @@ Cluster 2 的远程 Call 使用 Cluster-owned `ClusterCallRegistry` 和内部 `C
 - wire request 只携带 `Session + Target + Command + Payload`；B 返回同一 `Session` 的 Response 或 Error，A 再按 Session 找回原 PendingCall 并恢复调用方 runner。
 - completion 必须来自登记的 RemoteNode，且 Target/Command 与原请求一致；未知、迟到、重复或错路由的 frame 不得完成其它 Session，只进入受控诊断。
 - cancellation、timeout、相关节点关闭和 Cluster 关闭都只完成并清理一次 PendingCall；不存在自动重放或 Session 转移。
-- 已实现 `ClusterClient.Call` 的请求编码、共享 Session 注册、本地有限等待、caller cancellation、Response/Error 解码及公开出站组装。逻辑 `Complete` 只处理未绑定连接的等待；真实 TCP 响应校验连接归属，断线只清理该连接等待，不按整个 NodeID 批量清理。公开 Open 已实现，动态路由仍在后续切片。
+- 已实现 `ClusterClient.Call` 的请求编码、共享 Session 注册、本地有限等待、caller cancellation、Response/Error 解码及公开出站组装。逻辑 `Complete` 只处理未绑定连接的等待；真实 TCP 响应校验连接归属，断线只清理该连接等待，不按整个 NodeID 批量清理。公开 Open 已实现，动态路由尚未实现。
 
 可选入站组装的资源归属及签名已确认：`func (cluster *Cluster) Open(target *runtime.Runtime, config ListenConfig) (string, error)` 显式接收目标 Runtime，成功返回实际监听地址（`host:port`），监听失败返回 error。由现有 Cluster 管理监听、入站连接及网络任务，不返回独立 Listener owner，也不启动、停止或关闭 Runtime。第一版每个 Cluster 最多一个监听，可接纳多个连接并投递到多个 Service；不支持多监听、监听热切换或运行中换绑 Runtime。不 Open 仍可主动 Send/Call，回复沿原连接返回。ListenConfig 已确认四个字段：必填 `Address string`、监听连接上限 `MaxConnections int`、每连接 Call 上限 `MaxConcurrentCalls int`、可选 `ResolveService func(ServiceName) (runtime.ServiceID, error)`。统一编解码器、帧长及写超时复用 ClusterConfig，本地 Call 等待上限由目标 Runtime 控制。默认连接上限为 128、每连接 Call 上限为 32（零值使用默认，负数无效），Address 为空报错，ResolveService 可为 nil。Open 成功后再次调用返回错误（不比较配置），失败清理本次资源后允许应用重试；并发只允许一个打开流程，其余报错；Quiesce/Close 后拒绝 Open。停止接线约定已确认：Quiesce 统一停止接纳并关闭监听，监听关闭错误由 Close 合并返回；不主动关闭已建立连接或等待任务退出。入站诊断方案已确认：增加 DiagnosticInboundFailure 和 RemoteAddress，入站 RemoteNode 留空；可信请求关联字段按需记录，Handler 错误仍归 Runtime。入站与出站共用容量 256 的 Diagnostics，最终 Close 等所有生产者退出才关闭，最小接线已实现，见 [可选入站组装](RFC-CLUSTER-OPEN.md)。
 
 ListenConfig 类型及内部校验已实现，公开 Open 已实现。地址必须包含显式主机和数字端口，监听允许端口 0；非法格式或负容量返回 ErrInvalidListenConfig。此校验不执行 DNS、绑定或 ResolveService，实际网络错误留到 Open 处理。
 
-注册与发现属于 Core 和 Cluster 之外的能力：外层维护 `NodeID → 可访问地址`，Open 不自动注册、续约或发布地址。保留显式 `ListenConfig.Address`，不增加按 NodeID 打开的公共重载；共同节点表的查找及“只取端口绑定 0.0.0.0”等部署转换由应用组装。Open 返回实际绑定地址，不保证是外部可访问地址。当前 ClusterConfig.Nodes 仅提供静态路由，不表示成员存活、业务就绪或资源所有权；动态发现结果的路由更新接线另行设计，本轮不增加通用 Discovery 框架。
+注册与发现属于 Core 和 Cluster 之外的能力：外层维护 `NodeID → 可访问地址`，Open 不自动注册、续约或发布地址。保留显式 `ListenConfig.Address`，不为底层 cluster 包增加按 NodeID 打开的重载；普通应用的 `self.Cluster().Open(name)` 由 gsr 组装层查节点表并取端口绑定 0.0.0.0。Open 返回实际绑定地址，不保证是外部可访问地址。当前 ClusterConfig.Nodes 仅提供静态路由，不表示成员存活、业务就绪或资源所有权；动态发现结果的路由更新接线另行设计，当前不提供通用 Discovery 框架。
 
-`ConnectionAgent` 是每条入站连接的逻辑接收适配器：
+Cluster 入站只沿一条生产路径执行：
 
-公开逻辑入口保留用于低层组装。真实 TCP 路径由 `inboundConnection → localRequestAdapter → Runtime.Send/Call` 直接处理，不逐请求构造 ConnectionAgent；两者共用响应构造、错误转换与安全写入函数，不改变下面的 Send/Call 契约。
+```text
+tcpListener → inboundConnection → localRequestAdapter → Runtime.Send/Call
+```
 
-- `Handle` 只接受已解码的 `FrameRequest`，把 Request 快照交给注入的 `RequestHandler`；它不构造 Core Message，也不解析 Service 实现。
-- `Session == 0` 的 Send 不写回 Response；接收节点的 Runtime/Adapter 负责记录自己的 Handler error。
-- `Session > 0` 的 Call 沿注入的 `ResponseWriter` 写回同一 Session、Target、Command 的 Response 或结构化 Error。Handler 的未知 error/panic 转成安全的 Runtime StatusError。
-- Agent 不拥有 socket、FrameCodec、连接 goroutine 或重连状态；这些由外层 Connection owner 管理。Writer 错误/ panic 返回基础设施错误，不伪装成远端业务结果。
+- 私有 `inboundConnection` 管理单条 socket 的读取、有界 Call 任务、取消与等待；不是一个业务 Service，也不建立公开 ConnectionAgent。
+- `localRequestAdapter` 解码参数、解析名称并投递本地 Runtime，不直接调用业务 Handler。
+- `Session == 0` 的 Send 不回包；接收节点独立记录接纳或 Handler 错误。
+- `Session > 0` 的 Call 沿原连接写回同一 Session、Target、Command 的 Response/Error；Handler error/panic 复用 Runtime 的安全错误边界。
+- 响应构造与 writer 故障收容为私有函数；写入错误保留 I/O 原因，由连接 owner 记录并关闭失效连接。
 
-失败归属依赖稳定 error identity，不解析错误字符串：`Send` 直接返回的错误表示 A 侧未完成本地 admission；`DeliveryFailure` 表示 admission 后的 Transport 投递失败。当前 `InMemoryTransport` 用 `ErrNodeNotFound` 表示目标节点当前没有 receiver，用 `ErrTransportClosed` 表示本地 Transport 已关闭。未来 TCP Transport 也必须提供可通过 `errors.Is`/`errors.As` 判断的稳定错误；网络分区、拒绝连接或握手失败只能记录为“远端当前不可达”及其安全原因，不能据此断言 B 的进程一定没有启动。
+失败归属依赖稳定 error identity，不解析错误字符串：`Send` 直接返回的错误表示 A 侧未完成本地 admission；`DeliveryFailure` 表示 admission 后的 Transport 投递失败。当前 `InMemoryTransport` 用 `ErrNodeNotFound` 表示目标节点当前没有 receiver，用 `ErrTransportClosed` 表示本地 Transport 已关闭。TCP 传输故障同样提供可通过 `errors.Is`/`errors.As` 判断的稳定错误；网络分区、拒绝连接或握手失败只能记录为“远端当前不可达”及其安全原因，不能据此断言 B 的进程一定没有启动。
 
-远程 Send 坚持“A 管 A、B 管 B”：A 在本地 Cluster admission 成功后继续运行；B 收到后独立执行并在 B 侧记录自己的 Handler error。A 不通过 Send 获得 B 的 Handler 结果。需要返回值或远端处理错误时使用 Call；Call 的 response/error 由共享 `ClusterCallRegistry` 完成，真实网络 stream 和连接 owner 仍属于后续切片。
+远程 Send 坚持“A 管 A、B 管 B”：A 在本地 Cluster admission 成功后继续运行；B 收到后独立执行并在 B 侧记录自己的 Handler error。A 不通过 Send 获得 B 的 Handler 结果。需要返回值或远端处理错误时使用 Call；Call 的 response/error 由共享 `ClusterCallRegistry` 完成，真实 TCP stream 由私有连接 owner 管理。
 
 默认 `ValueCodec` 的解码结果使用稳定的规范类型：有符号整数为 `int64`，无符号整数为 `uint64`，浮点数为 `float64`；复合值为 `[]any` 和 `map[string]any`。它拒绝 pointer、func、chan、struct、复杂数、`uintptr`、非有限浮点和非 string map key。自定义结构须在业务边界转换为支持的值，不由默认 Codec 猜测，也不按 Command 注册编码器。
 
 Cluster 不维护 Command 清单。`ClusterConfig.Codec` 为节点所有命令共享的 PayloadCodec，未设置时使用默认 ValueCodec；不能按 CommandID 切换协议或把编码配置用作命令准入表。需要自定义编码时两端须一致，普通业务无需配置。未知 Command 与其它合法 Message 一样进入目标 Mailbox，Send 不回包，Call 由目标返回 ErrUnknownCommand。
 
-`FrameCodec` 为每个逻辑 Envelope 添加四字节大端 body length，长度上限 `MaxFrame` 包含这四个字节。`Decode` 只接受一个边界完整、没有尾随数据的 frame；读取部分帧、拼接多个 frame 和连接关闭由未来 Transport/ConnectionAgent 负责。Envelope 仍不携带 version，版本协商留在 framing 或连接握手。
+`FrameCodec` 为每个逻辑 Envelope 添加四字节大端 body length，长度上限 `MaxFrame` 包含这四个字节。`Decode` 只接受一个边界完整、没有尾随数据的 frame；读取部分帧、拼接多个 frame 和连接关闭由私有连接 owner 负责。Envelope 仍不携带 version，版本协商留在 framing 或连接握手。
 
 ### 6.3 Cluster wire 与连接模型
 
@@ -693,7 +699,7 @@ Cluster 不维护 Command 清单。`ClusterConfig.Codec` 为节点所有命令�
 
 入站停止接纳已确认：关闭监听并阻止旧连接接纳新请求，但保留已接纳 Call 的原连接回复机会；最终关闭才取消剩余等待并断连。完整帧交给处理任务前的门禁检查是入站请求 admission 边界，不等于本地 Mailbox admission。停止后暂停读取，不新增拒绝回包；未接纳 Call 仍由原有限超时或断线结束。公开 Open 接线已确认复用 Cluster.Quiesce 关闭监听及入站门禁，替代原无网络 I/O 表述；不增加公共停止入口，已实现公开入站接线，详见两阶段关闭文档。
 
-listener 的 context 取消或非停止接纳导致的 Accept 失败时，组件关闭监听及所有已接纳 socket，取消连接内基础设施等待，并等待全部连接处理任务退出；不自动重新监听，不强杀 Handler。内部 quiesce 关闭监听后，serve 保留已有连接并等待最终 context 取消，不提前关闭诊断出口。当前连接上限属于单个 listener owner，公开 open API、多 listener 的节点总配额与生产诊断消费仍待外层组装；此组件不拥有出站连接或 Runtime 生命周期。
+listener 的 context 取消或非停止接纳导致的 Accept 失败时，组件关闭监听及所有已接纳 socket，取消连接内基础设施等待，并等待全部连接处理任务退出；不自动重新监听，不强杀 Handler。内部 quiesce 关闭监听后，serve 保留已有连接并等待最终 context 取消，不提前关闭诊断出口。当前连接上限属于单个 listener owner，公开 Open 和共享 Logger 诊断接线已实现；当前仅支持一个 listener，不提供多监听或动态发现；此组件不拥有出站连接或 Runtime 生命周期。
 
 入站连接采用一个读循环和数量有上限的 Call 等待任务。Send 在读循环中只完成本地接纳；Call 交给连接组件管理的任务，经 Runtime.Call 等待。每连接 Call 名额满载时暂停读取（包括后续 Send），不建立无界队列。响应通过同一连接串行写入，允许不同 Call 按完成顺序回包。
 
@@ -720,7 +726,7 @@ Error frame 实际携带 `ErrorClass + ErrorCode + Message`；Message 只用于�
 连接组织参考 Skynet：
 
 - 每个远端 Node 只有一个 outbound NodeSender；并发建连请求合并到该 sender，不创建多个竞争 sender。
-- 每条 inbound socket 由独立 ConnectionAgent 读取和响应，不要求把两个方向合并成一条全双工连接。
+- 每条 inbound socket 由独立的私有 inboundConnection 管理读取和响应，不要求把两个方向合并成一条全双工连接。
 - outbound 通道断开后按需恢复：没有请求时不后台拨号，下一条尚未发送的请求至多触发一次有限 Dial。失败只结束当前请求，后续请求可再次尝试；已经失败或结果不确定的业务请求不自动重放。Call 总 deadline 不重置，写入前再次检查是否已取消。内部 `outboundPeer` 已实现连接复用、替换和关闭等待，公开出站组装已实现，入站 Open 已实现。详见 [按需建连方案](RFC-CLUSTER-ON-DEMAND-CONNECT.md)。
 - 出站 Send/Call 不要求本地 NodeID 或 open 监听；open 只负责接受新入站连接，节点配置只负责目标地址解析。不强制交换 NodeID；Call 回复沿原连接返回，不是反向业务调用。
 - 删除 `LocalNode` 与入站 `from NodeID`：出站只按目标路由，入站只按连接管理。`Complete(remoteNode, response)` 中的节点来自出站连接绑定的目标，用于共享 PendingCall 匹配，不是入站来源身份。双方相互主动调用使用各自的出站连接，回复各沿原连接返回。
@@ -730,7 +736,7 @@ Error frame 实际携带 `ErrorClass + ErrorCode + Message`；Message 只用于�
 
 ## 7. ServiceContext
 
-`ServiceContext` 只能暴露当前 Service 使用 Core 所需的最小能力，例如：
+本节的 `runtime.ServiceContext` 只暴露当前 Service 使用 Core 所需的最小能力；应用层 `gsr.ServiceContext` 在其上组合名称、Cluster、日志和入口组装能力，不是另一种 Core 接口：
 
 ```go
 type ServiceContext interface {
@@ -750,7 +756,7 @@ type ServiceContext interface {
 - Exit 复用停止机制取消 Timer、清理 PendingCall、执行一次 OnStop 并结束 runner，不关闭 Runtime 或其它 Service。忽略返回或阻塞的代码不能被 Exit 强杀；OnStop 使用有界关闭 context，重复 Exit 不产生额外清理。
 - 普通 `Send` 和 `Call` 由 Runtime 自动使用 `Self()` 作为 Source；`After` 触发的 Command 使用 `ServiceID(0)`，创建者由 Timer owner 表达。
 - `Call` 的 context 只能取消或收紧本次等待；实际等待永远不超过 Runtime `MaxCallWait`。
-- Cluster、Discovery 和业务 Repository 通过单独的窄 client 注入，不加入 ServiceContext。
+- Core 的 `runtime.ServiceContext` 不包含 Cluster、Discovery 或 Repository。应用层 `gsr.ServiceContext` 提供已绑定来源的 `Cluster()` 和 `Logger()`；业务 Repository 等依赖通过具体 Service 字段注入。
 - Cluster client 在 Service 初始化阶段以 `Self()` 绑定 Source；其公开 Send/Call 不再要求业务重复传 source。
 - 应用层 `gsr.ServiceContext` 在 Core 接口之上提供 `Register(name, id)`、`SendName(name, command, args...)` 和 `CallName(ctx, name, command, args...)`；一张节点内名称表同时服务本地按名调用与 Cluster 入站解析。Core 的 `runtime.ServiceContext` 仍只接收 ServiceID，不引入名称或 Cluster 依赖。
 - 本地按名调用每次解析为当前节点的 ServiceID，然后复用现有 ServiceContext.Send/Call；未知名称返回 `ErrServiceNotFound`，CallName 的 nil context 返回 `ErrInvalidCallContext`，按名 self Call 继续返回 `ErrCallCycle`。不缓存旧映射，也不改变 Source、Mailbox、Reply 和超时语义。
@@ -928,7 +934,7 @@ Service 创建成功后即可工作；`OnStart` 是 Runtime 生命周期钩子�
 
 Runtime 不使用一个不断增长的 `closeFn` 承载所有清理逻辑。Runtime 内部维护固定、可审计的 Core 生命周期计划；组件拥有自己的资源和 goroutine，协调器只负责按明确顺序调用组件。
 
-- Core 组件计划只覆盖本地 Admission、Service 管理、Timer、PendingCall、Scheduler、Registry 等能力；Cluster、Transport、NodeSender 和 ConnectionAgent 由 Core 之外的 Cluster 管理，跨组件关闭顺序由 gsr.Run 内部运行环境协调。
+- Core 组件计划只覆盖本地 Admission、Service 管理、Timer、PendingCall、Scheduler、Registry 等能力；Cluster、Transport、NodeSender 和入站连接 owner 由 Core 之外的 Cluster 管理，跨组件关闭顺序由 gsr.Run 内部运行环境协调。
 - 启动按显式 `startOrder` 执行；某个组件启动失败时，只逆序回滚已经成功启动的组件，Runtime 不允许从部分启动状态重试。
 - 关闭的线性化点是 Runtime 进入 `Stopping` 并关闭全局 admission。随后依次停止 Timer、结束 PendingCall、停止 Service、等待 Scheduler/runner，最后释放 Core 资源。
 - 同一组件只由自己的 owner 释放；组件关闭错误继续收集并合并，不能因为一个组件失败就跳过后续组件。
@@ -983,7 +989,7 @@ func (r *Runtime) Inspect() RuntimeInspection
 
 `RuntimeMetricsSnapshot` 至少包含 admission rejected、Handler error、panic、Call timeout、Timer 创建/取消/触发/投递失败和 Stop timeout 计数。计数是 Runtime 生命周期内单调累计值，Inspect 不会重置它们。
 
-已实现 `Runtime.Diagnostics() <-chan Diagnostic` 和 `Runtime.DroppedDiagnosticCount() uint64`，由宿主负责日志消费。每 Runtime 固定 256 条非阻塞队列，满载丢弃新事件并计数，只有资源释放、进入 Closed 时关闭；Stop/Close 超时不提前关闭。事件仅含 ServiceID、Source、Command、Session、Class、Code、Message 和 Stack 值快照；Message 最多 4 KiB、真实 Handler panic 的 Stack 最多 16 KiB，不保留业务引用，也不进入 Reply。Inspect 继续只提供状态与计数。本轮只覆盖 Handler，详见 [Runtime 诊断契约](RFC-RUNTIME-DIAGNOSTICS.md)。
+已实现 `Runtime.Diagnostics() <-chan Diagnostic` 和 `Runtime.DroppedDiagnosticCount() uint64`，供宿主观察故障；Runtime 直接写共享 Logger，不要求宿主转发诊断为日志。每 Runtime 固定 256 条非阻塞队列，满载丢弃新事件并计数，只有资源释放、进入 Closed 时关闭；Stop/Close 超时不提前关闭。事件仅含 ServiceID、Source、Command、Session、Class、Code、Message 和 Stack 值快照；Message 最多 4 KiB、真实 Handler panic 的 Stack 最多 16 KiB，不保留业务引用，也不进入 Reply。Inspect 继续只提供状态与计数。此诊断流只覆盖 Handler，详见 [Runtime 诊断契约](RFC-RUNTIME-DIAGNOSTICS.md)。
 
 ## 11. Core 不变量测试
 

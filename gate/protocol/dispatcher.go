@@ -14,18 +14,18 @@ import (
 // Scope 是调用方的逐消息上下文类型；Dispatcher 只透传，不保存或解释它。
 type Dispatcher[Scope any] struct {
 	registry       *Registry
-	session        *Session
+	writer         *clientWriter
 	errorMessageID uint32
 	handlers       map[uint32]func(Scope, Context, proto.Message) error
 }
 
-// NewDispatcher 创建一个绑定协议目录和客户端会话的消息分发器。
-func NewDispatcher[Scope any](registry *Registry, session *Session) (*Dispatcher[Scope], error) {
+// NewDispatcher 绑定协议目录和连接写回能力，内部建立解码与响应共用目录的不变量。
+func NewDispatcher[Scope any](registry *Registry, sender ClientSender) (*Dispatcher[Scope], error) {
 	if registry == nil {
 		return nil, errors.New("protocol: registry is required")
 	}
-	if session == nil || session.registry != registry {
-		return nil, errors.New("protocol: session must use the same registry")
+	if isNil(sender) {
+		return nil, errors.New("protocol: client sender is required")
 	}
 	errorEntry, exists := registry.entryForType(reflect.TypeOf((*commonv1.ErrorResponse)(nil)))
 	if !exists || errorEntry.Direction != catalog.ServerToClient || errorEntry.Kind != catalog.Response {
@@ -33,7 +33,7 @@ func NewDispatcher[Scope any](registry *Registry, session *Session) (*Dispatcher
 	}
 	return &Dispatcher[Scope]{
 		registry:       registry,
-		session:        session,
+		writer:         &clientWriter{registry: registry, sender: sender},
 		errorMessageID: errorEntry.ID,
 		handlers:       make(map[uint32]func(Scope, Context, proto.Message) error),
 	}, nil
@@ -41,7 +41,7 @@ func NewDispatcher[Scope any](registry *Registry, session *Session) (*Dispatcher
 
 // Register 将一个已定义的客户端 payload 类型绑定到业务 Handler；协议目录和 Handler 可分开演进。
 func Register[Scope any, Message proto.Message](dispatcher *Dispatcher[Scope], handler func(Scope, Context, Message) error) error {
-	if dispatcher == nil || dispatcher.registry == nil || dispatcher.session == nil || dispatcher.handlers == nil {
+	if dispatcher == nil || dispatcher.registry == nil || dispatcher.writer == nil || dispatcher.handlers == nil {
 		return errors.New("protocol: dispatcher is not initialized")
 	}
 	if handler == nil {
@@ -75,7 +75,7 @@ func Register[Scope any, Message proto.Message](dispatcher *Dispatcher[Scope], h
 // HandleFrame 解码完整 Envelope，并将本次 self 原样传给对应的客户端 Handler。
 // Handler 必须在本次调用内使用 self，不得保存它或交给异步任务。
 func (dispatcher *Dispatcher[Scope]) HandleFrame(self Scope, frame []byte) error {
-	if dispatcher == nil || dispatcher.registry == nil || dispatcher.session == nil || dispatcher.handlers == nil {
+	if dispatcher == nil || dispatcher.registry == nil || dispatcher.writer == nil || dispatcher.handlers == nil {
 		return errors.New("protocol: dispatcher is not initialized")
 	}
 	var envelope commonv1.Envelope
@@ -101,7 +101,7 @@ func (dispatcher *Dispatcher[Scope]) handleEnvelope(self Scope, envelope *common
 
 	responded := false
 	handlerContext := Context{
-		session:   dispatcher.session,
+		writer:    dispatcher.writer,
 		requestID: envelope.GetRequestId(),
 		responded: &responded,
 	}
@@ -123,7 +123,7 @@ func (dispatcher *Dispatcher[Scope]) fail(requestID uint32, cause error) error {
 	}
 	errorCode, message := errorResponseFor(cause)
 	response := &commonv1.ErrorResponse{Code: errorCode, Message: message}
-	if err := dispatcher.session.sendResponse(requestID, dispatcher.errorMessageID, response); err != nil {
+	if err := dispatcher.writer.sendResponse(requestID, dispatcher.errorMessageID, response); err != nil {
 		return errors.Join(cause, fmt.Errorf("protocol: send ErrorResponse: %w", err))
 	}
 	return cause
@@ -140,4 +140,13 @@ func errorResponseFor(err error) (commonv1.ErrorCode, string) {
 	default:
 		return commonv1.ErrorCode_ERROR_CODE_INTERNAL, "request could not be processed"
 	}
+}
+
+// Push 在普通 Command 等业务流程中发送主动消息，不需要构造逐请求 Context。
+// 调用方须仍遵守自身 Service 的串行执行和连接生命周期约束。
+func (dispatcher *Dispatcher[Scope]) Push(msgID uint32, message proto.Message) error {
+	if dispatcher == nil || dispatcher.writer == nil {
+		return ErrUninitializedContext
+	}
+	return dispatcher.writer.push(msgID, message)
 }

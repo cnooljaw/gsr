@@ -1,4 +1,4 @@
-package cluster_test
+package cluster
 
 import (
 	"context"
@@ -6,7 +6,6 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/cnooljaw/gsr/cluster"
 	"github.com/cnooljaw/gsr/runtime"
 )
 
@@ -18,50 +17,13 @@ func TestClusterCallBridgesToRuntime(t *testing.T) {
 		err  error
 	}{{name: "success"}, {name: "domain error", err: domainErr}} {
 		t.Run(testCase.name, func(t *testing.T) {
-			local, err := runtime.NewRuntime(runtime.Config{})
-			if err != nil {
-				t.Fatal(err)
-			}
-			t.Cleanup(func() {
-				if err := local.Close(); err != nil {
-					t.Error(err)
-				}
-			})
-			if err := local.Start(); err != nil {
-				t.Fatal(err)
-			}
 			service := &runtimeBridgeService{handlerErr: testCase.err, sources: make(chan runtime.ServiceID, 2)}
-			id, err := local.CreateService(context.Background(), service)
-			if err != nil {
+			link := newRoundTripLink(t, service.Handle)
+			// 先消耗本地 Session，避免偶然依赖本地与 Cluster Session 相等。
+			if _, err := link.local.Call(context.Background(), link.serviceID, roundTripCommand); !errors.Is(err, testCase.err) {
 				t.Fatal(err)
 			}
-			// 先消耗一个本地 Session，避免测试偶然依赖本地与 Cluster Session 相等。
-			if _, err := local.Call(context.Background(), id, roundTripCommand); !errors.Is(err, testCase.err) {
-				t.Fatal(err)
-			}
-			codec, err := cluster.NewValueCodec(cluster.ValueCodecConfig{})
-			if err != nil {
-				t.Fatal(err)
-			}
-			link := newRoundTripLink(t, func(ctx context.Context, request cluster.ClusterEnvelope) ([]byte, error) {
-				if request.Target.ServiceName != "room" || request.Command != roundTripCommand {
-					return nil, runtime.ErrUnknownCommand
-				}
-				decoded, err := codec.Decode(request.Payload)
-				if err != nil {
-					return nil, err
-				}
-				args, ok := decoded.([]any)
-				if !ok {
-					return nil, runtime.ErrInvalidCommandArguments
-				}
-				value, err := local.Call(ctx, id, request.Command, args...)
-				if err != nil {
-					return nil, err
-				}
-				return codec.Encode(value)
-			})
-			value, err := link.client.Call(context.Background(), "node-b", cluster.ServiceTarget{ServiceName: "room"}, roundTripCommand, "hello", int32(3))
+			value, err := link.client.Call(context.Background(), "node-b", ServiceTarget{ServiceName: "room"}, roundTripCommand, "hello", int32(3))
 			if !errors.Is(err, testCase.err) {
 				t.Fatalf("Cluster Call error = %v", err)
 			}

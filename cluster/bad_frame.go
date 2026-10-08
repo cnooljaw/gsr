@@ -30,7 +30,7 @@ func (records *badFrameDiagnostics) accept(err error) bool {
 		category = 0
 	case errors.As(err, &payload):
 		category = 1
-	case errors.Is(err, ErrInvalidConnectionAgentRequest):
+	case errors.Is(err, errInvalidInboundRequest):
 		category = 2
 	default:
 		return true

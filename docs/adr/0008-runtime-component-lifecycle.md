@@ -4,7 +4,7 @@
 
 Accepted
 
-后续说明：本文的外层 Node/Host 表示 Core 之外的生命周期协调职责，不要求公开 Host 对象；该职责现由 gsr.Run 内部承担，见 [ADR 0011](0011-service-first-application-api.md)。Core 固定组件计划与本裁决保持不变。
+后续说明：本文的gsr.Run 内部运行环境 表示 Core 之外的生命周期协调职责，不要求公开 Host 对象；该职责现由 gsr.Run 内部承担，见 [ADR 0011](0011-service-first-application-api.md)。Core 固定组件计划与本裁决保持不变。
 
 ## Context
 
@@ -23,7 +23,7 @@ Skynet 的退出流程也依赖明确的组件顺序：服务句柄全部回收�
 - 如果 `Stop` 或 `Close` 在 `Starting` 期间到达，Runtime 记录待停止意图；调用者 context 只影响该调用者是否继续等待，不会取消启动完成后的停止流程。
 - `Stop` 可从 `Created`、`Starting` 或 `Running` 发起；`Starting` 只记录停止意图，基础设施启动返回后立即进入 `Stopping`。`Stopped` 表示停止流程完成，`Closed` 表示最终资源释放完成；两者都不可重新 `Start`。
 - Service 的 `OnStop`、Timer 的取消、PendingCall 的完成和 Scheduler 的 runner 等待由各自 owner 实现；它们不被压缩为一个通用 `Close` 语义。
-- Cluster、Transport、NodeSender 和 ConnectionAgent 不进入 Core Runtime 的生命周期计划。外层 Node/Host 先停止入站和新的出站 admission，再关闭 Core；Core 完成后，外层关闭连接和 I/O goroutine。
+- Cluster、Transport、NodeSender 和入站连接 owner 不进入 Core Runtime 的生命周期计划。gsr.Run 内部运行环境 先停止入站和新的出站 admission，再关闭 Core；Core 完成后，外层关闭连接和 I/O goroutine。
 - Runtime 使用 `ShutdownTimeout` 作为所有 Core 组件共享的内部关闭预算。组件收到取消后仍必须保持真实完成状态可观测，Go 不能强杀不响应取消的 OnStart、Handler 或 OnStop；未完成任务不能被伪报为已停止。
 - 同一 Runtime 的并发或重复 `Start`/`Stop`/`Close` 只执行一套生命周期流程。Stop 的调用方 context 只控制当前等待；Close 的错误继续执行后续安全清理并通过稳定错误链返回。
 

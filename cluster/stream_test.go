@@ -140,8 +140,8 @@ func (writer *streamFailWriter) Write(_ []byte) (int, error) {
 	return 1, writer.err
 }
 
-// 验证 ConnectionAgent 通过双向字节流在原连接返回同一 Session 的回复。
-func TestStreamConnectionAgentRoundTrip(t *testing.T) {
+// 验证真实入站适配器通过双向字节流在原连接返回同一 Session 的回复。
+func TestStreamLocalAdapterRoundTrip(t *testing.T) {
 	codec, err := NewFrameCodec(FrameCodecConfig{})
 	if err != nil {
 		t.Fatal(err)
@@ -154,14 +154,8 @@ func TestStreamConnectionAgentRoundTrip(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
-	agent, err := NewConnectionAgent(ConnectionAgentConfig{
-		Handler: func(_ context.Context, request ClusterEnvelope) ([]byte, error) {
-			return request.Payload, nil
-		},
-		Write: func(response ClusterEnvelope) error {
-			return codec.writeFrame(server, response)
-		},
-	})
+	adapter, id, values := newLocalAdapterTest(t)
+	payload, err := values.Encode([]any{"hello"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -169,7 +163,9 @@ func TestStreamConnectionAgentRoundTrip(t *testing.T) {
 	go func() {
 		request, err := codec.readFrame(server)
 		if err == nil {
-			err = agent.Handle(context.Background(), request)
+			err = adapter.handle(context.Background(), request, func(response ClusterEnvelope) error {
+				return codec.writeFrame(server, response)
+			})
 		}
 		done <- err
 	}()
@@ -180,7 +176,7 @@ func TestStreamConnectionAgentRoundTrip(t *testing.T) {
 			t.Errorf("server exchange: %v", err)
 		}
 	}()
-	request := ClusterEnvelope{Kind: FrameRequest, Session: 42, Target: ServiceTarget{ServiceID: 7}, Command: 1, Payload: []byte("hello")}
+	request := ClusterEnvelope{Kind: FrameRequest, Session: 42, Target: ServiceTarget{ServiceID: id}, Command: clusterTestCommand, Payload: payload}
 	if err := codec.writeFrame(client, request); err != nil {
 		t.Fatal(err)
 	}
