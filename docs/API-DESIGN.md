@@ -1,10 +1,10 @@
 # GSR API 设计规范
 
-客户端接入另见 [WebSocket Gate 草案](RFC-WEBSOCKET-GATE.md)：生产 Gate 使用固定 33 字节二进制握手，WSS 上行使用 seq + Protobuf Envelope + MAC，下行只使用 Envelope；独立 DebugGate 仅传输 Envelope。Envelope 使用 msg_id、request_id(uint32) 和 payload，由业务定义的 `AgentService` 中转。C/S request_id、两种 Gate、连接认证、关闭码和错误归属均在 Core/Cluster 之外；Gate 只负责传输与安全边界。Runtime 内部消息类型区分客户端消息与普通 Core Command，Service 通过可选的 `ClientMessageHandler` 明确启用客户端处理能力；Agent 在同一 Service runner 中将客户端 Envelope 按 `msg_id` 路由到协议分发器，业务按实现进度注册强类型 Handler；本地或 Cluster 投递的普通 Core Command 按 `CommandID` 路由到 `Commands`。协议 `.proto` 显式声明每个 msg_id 对应的 payload、方向和 Request/Notify/Response/Push 种类，并生成目录；未实现 Handler 的消息仍可先存在于协议定义中。Core Command 的 Send/Call 仍是同一种消息类型，由 Session 是否为零区分；`Source` 只表示 Service 来源，不作为入口类别。AgentService 负责客户端会话并组合业务项目提供的 `ProtocolHandler`；Gate 到 Agent 使用 Runtime-owned 的 `Runtime.DeliverClientMessage` 单向基础设施投递，Agent 到 Gate 使用不暴露 socket 的 `ClientSession` 写回能力。这里的 `ClientSession` 指绑定一条客户端连接的写回能力，不是 Core `SessionID` 或 Envelope 的 `request_id`。业务协议组件只做协议适配、简单收发和业务 Service 路由，可以持有连接私有的轻量状态，但不持有跨连接共享或需恢复的权威业务状态；业务 Service 负责业务拒绝和状态变化。GSR 不内置大厅、游戏或其它具体协议实现，只提供通用接入边界。Runtime 客户端消息投递能力已实现；`examples/websocket-gate` 的 Go 与 TypeScript 类型由通用和业务 `.proto` 生成，Go Agent 用独立协议目录解码并手动注册已实现的 Echo Handler，完成请求/响应及 `request_id` 回传。当前 Echo 联调示例仍演示底层 Runtime 组装；应用可在 `gsr.Run` 中通过 `self.OpenDebugGate` 创建 DebugGate 与应用 Agent，ProdGate 的应用层接线仍未实现；DebugGate 没有握手、TLS 或 MAC，不能暴露到公网。框架 ProdGate、跨语言认证固定向量和结构化诊断已有实现，完整压力验收仍按 RFC 推进。标准关闭码、结构化日志和 Agent 组装边界见 RFC。首版不实现 DES 或旧 12 字节头兼容。
+客户端接入另见 [WebSocket Gate 草案](RFC-WEBSOCKET-GATE.md)：生产 Gate 使用固定 33 字节二进制握手，WSS 上行使用 seq + Protobuf Envelope + MAC，下行只使用 Envelope；独立 DebugGate 仅传输 Envelope。Envelope 使用 msg_id、request_id(uint32) 和 payload，由业务定义的 `AgentService` 中转。C/S request_id、两种 Gate、连接认证、关闭码和错误归属均在 Core/Cluster 之外；Gate 只负责传输与安全边界。Runtime 内部消息类型区分客户端消息与普通 Core Command，Service 通过可选的 `ClientMessageHandler` 明确启用客户端处理能力；Agent 在同一 Service runner 中将客户端 Envelope 按 `msg_id` 路由到协议分发器，业务按实现进度注册强类型 Handler；本地或 Cluster 投递的普通 Core Command 按 `CommandID` 路由到 `Commands`。协议 `.proto` 显式声明每个 msg_id 对应的 payload、方向和 Request/Notify/Response/Push 种类，并生成目录；未实现 Handler 的消息仍可先存在于协议定义中。Core Command 的 Send/Call 仍是同一种消息类型，由 Session 是否为零区分；`Source` 只表示 Service 来源，不作为入口类别。AgentService 负责客户端会话并组合业务项目提供的 `ProtocolHandler`；Gate 到 Agent 使用 Runtime-owned 的 `Runtime.DeliverClientMessage` 单向基础设施投递，Agent 到 Gate 使用不暴露 socket 的 `ClientSession` 写回能力。这里的 `ClientSession` 指绑定一条客户端连接的写回能力，不是 Core `SessionID` 或 Envelope 的 `request_id`。业务协议组件只做协议适配、简单收发和业务 Service 路由，可以持有连接私有的轻量状态，但不持有跨连接共享或需恢复的权威业务状态；业务 Service 负责业务拒绝和状态变化。GSR 不内置大厅、游戏或其它具体协议实现，只提供通用接入边界。Runtime 客户端消息投递能力已实现；`examples/websocket-gate` 的 Go 与 TypeScript 类型由通用和业务 `.proto` 生成，Go Agent 用独立协议目录解码并手动注册已实现的 Echo Handler，完成请求/响应及 `request_id` 回传。当前 Echo 联调示例仍演示底层 Runtime 组装；应用可在 `gsr.Run` 中通过 `self.OpenDebugGate` / `self.OpenProdGate` 创建对应 Gate 与应用 Agent；DebugGate 没有握手、TLS 或 MAC，不能暴露到公网。框架 ProdGate、跨语言认证固定向量和结构化诊断已有实现，完整压力验收仍按 RFC 推进。标准关闭码、结构化日志和 Agent 组装边界见 RFC。首版不实现 DES 或旧 12 字节头兼容。
 
 框架能力边界如下。
 
-通用客户端协议、ProdGate 和 DebugGate 已分别提升到 `gate/protocol`、`gate/prodgate` 与 `gate/debuggate`；通用 `.proto`、生成目录及生成工具属于 `gate/`，Echo 协议与 Agent 仍留在示例。Gate 仍是 Core 外基础设施 Service，构造时显式接收 `*runtime.Runtime`，以便它的 WebSocket I/O goroutine 调用 `Runtime.DeliverClientMessage`。`gsr.Run` 在内部持有 Runtime，业务 `ServiceContext` 不提供客户端消息投递权限。应用可通过 `self.OpenDebugGate` 打开调试 Gate：内部创建底层 GateService，并让每条连接的 `gsr.Service` Agent 经已有适配器进入 Runtime；返回实际监听地址。ProdGate 的应用层接线尚未实现；不能通过向所有业务 Service 暴露 Runtime 解决。
+通用客户端协议、ProdGate 和 DebugGate 已分别提升到 `gate/protocol`、`gate/prodgate` 与 `gate/debuggate`；通用 `.proto`、生成目录及生成工具属于 `gate/`，Echo 协议与 Agent 仍留在示例。Gate 仍是 Core 外基础设施 Service，构造时显式接收 `*runtime.Runtime`，以便它的 WebSocket I/O goroutine 调用 `Runtime.DeliverClientMessage`。`gsr.Run` 在内部持有 Runtime，业务 `ServiceContext` 不提供客户端消息投递权限。应用可通过 `self.OpenDebugGate` / `self.OpenProdGate` 打开对应 Gate：内部创建底层 GateService，并让每条连接的 `gsr.Service` Agent 经已有适配器进入 Runtime；返回实际监听地址。两种入口均不向业务 Service 暴露 Runtime。
 
 独立的 `httpserver.Server` 只管理普通 HTTP 监听与有序关闭，不接管路由、鉴权或到业务 Service 的映射。使用 `gsr.Run` 时，MainService 可通过 `self.OpenHTTP` 打开一个 HTTP 监听，由 Run 持有并在 Runtime 停止前关闭；直接使用 `httpserver.Server` 时仍由调用方持有。`redisclient.New` 和 `mysqlclient.Open` 分别返回原生 `*redis.Client`、`*sql.DB`，其生命周期仍由宿主负责。这些能力不转为 RedisService/MySQLService，也不进入 Core。
 
@@ -34,6 +34,21 @@ address, err := self.OpenDebugGate(ctx, gsr.DebugGateConfig{
 ```
 
 应用配置单独定义 `NewAgent func(gate.ClientSession) gsr.Service`，因为底层 Gate 的回调要求的是不同接口 `runtime.Service`；容量字段沿用底层 DebugGate 的含义。应用组装在交给底层 Gate 前调用现有 `wrap`，仅对实现 `gsr.ClientMessageHandler` 的 Agent 保留客户端消息能力。DebugGate 的连接、Mailbox、runner 和关闭语义均不增加新 owner；方法返回实际监听地址，Gate 与 Agent 随 Runtime 停止。此入口仅供调试，不提供公网安全保障。
+
+生产入口使用同样的 Agent 构造方式：
+
+```go
+address, err := self.OpenProdGate(ctx, gsr.ProdGateConfig{
+	Address:               "0.0.0.0:7889",
+	MaxConnections:        1000,
+	MaxOutboundQueueBytes: 1 << 20,
+	NewAgent: func(client gate.ClientSession) gsr.Service {
+		return &myAgent{client: client}
+	},
+})
+```
+
+`ProdGateConfig` 的 TLS、握手超时和容量字段原样交给现有 ProdGate 校验，Agent 仅在完成握手后创建。`TLSConfig == nil` 适用于可信内网或由 Ingress/LB 终止 TLS 的部署；公网直连必须提供 TLS 配置。方法返回实际监听地址，Runtime 负责停止 Gate 与 Agent。业务鉴权仍由 Agent 实现。
 
 Gate 升级允许任意 `Origin`，不维护域名白名单，也不将 `Origin` 用于客户端身份判断。业务 Agent 负责显式 token 鉴权；当前 Echo 示例只验证接入和协议链路，并未实现玩家登录。生产 Gate 的 X25519、HMAC 和 seq 不代替 token 鉴权。
 
@@ -217,7 +232,7 @@ func (runtime *Runtime) DeliverClientMessage(target ServiceID, envelope []byte) 
 
 `envelope` 是完整的 Protobuf Envelope 编码字节；Runtime 不解析客户端协议，并在投递时复制字节快照。该入口是 Gate 等受信任基础设施的单向 API，消息的 Source、Session 和 CommandID 固定为零。Runtime 不维护额外的客户端处理器 Registry；目标 Service 实现 `ClientMessageHandler` 即声明这项能力。未实现时在 Mailbox admission 前返回稳定错误 `ErrClientMessageUnsupported`，不会入队后再静默丢弃。客户端处理函数与普通 `Handle` 在同一个 Service runner 中串行执行，不产生 Core Reply；Agent 根据 Envelope 自身的 `request_id` 组织客户端响应。
 
-应用层 `gsr.Service` 保持普通 `Handle` 为必需入口；只有 Agent 等需要接收客户端消息的 Service 额外实现 `gsr.ClientMessageHandler`（相同方法名，参数为 `gsr.CommandContext`）。`gsr.Run` 在创建 Service 时仅对这类实例使用客户端消息适配器，使它在 Core 中实现 `runtime.ClientMessageHandler`；普通应用 Service 的适配器不实现该接口，继续在入队前被拒绝。适配器只转换上下文，不另建 Mailbox、runner、Registry 或消息类型。Gate 仍需单独的受信任组装接线，不能因此向普通 Service 暴露 `Runtime.DeliverClientMessage`。
+应用层 `gsr.Service` 保持普通 `Handle` 为必需入口；只有 Agent 等需要接收客户端消息的 Service 额外实现 `gsr.ClientMessageHandler`（相同方法名，参数为 `gsr.CommandContext`）。`gsr.Run` 在创建 Service 时仅对这类实例使用客户端消息适配器，使它在 Core 中实现 `runtime.ClientMessageHandler`；普通应用 Service 的适配器不实现该接口，继续在入队前被拒绝。适配器只转换上下文，不另建 Mailbox、runner、Registry 或消息类型。Gate 通过 `OpenDebugGate` / `OpenProdGate` 的受信任组装入口接线，普通 Service 不获得 `Runtime.DeliverClientMessage`。
 
 ### 4.1 Args 的所有权
 
