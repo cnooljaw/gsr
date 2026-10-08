@@ -53,29 +53,35 @@ func (service *userProfileService) OnStart(_ context.Context, _ gsr.ServiceConte
 }
 
 // handleCache 校验用户业务字段后写入缓存；命令参数类型由 Dispatcher 校验。
-func (service *userProfileService) handleCache(_ gsr.CommandContext, user userInfo) error {
+func (service *userProfileService) handleCache(ctx gsr.CommandContext, user userInfo) error {
 	if user.ID == 0 || user.Name == "" || user.Level < 0 {
 		return runtime.ErrInvalidCommandArguments
 	}
 	if err := service.cache.Put(context.Background(), user); err != nil {
-		return errUserCacheUnavailable
+		return service.cacheFailure(ctx, "put", user.ID, err)
 	}
 	return nil
 }
 
 // handleLoad 将缓存未命中与损坏、不可用分开返回。
-func (service *userProfileService) handleLoad(_ gsr.CommandContext, id uint64) (userLookup, error) {
+func (service *userProfileService) handleLoad(ctx gsr.CommandContext, id uint64) (userLookup, error) {
 	if id == 0 {
 		return userLookup{}, runtime.ErrInvalidCommandArguments
 	}
 	user, found, err := service.cache.Get(context.Background(), id)
-	if errors.Is(err, errInvalidUserHash) {
-		return userLookup{}, errUserCacheCorrupt
-	}
 	if err != nil {
-		return userLookup{}, errUserCacheUnavailable
+		return userLookup{}, service.cacheFailure(ctx, "get", id, err)
 	}
 	return userLookup{User: user, Found: found}, nil
+}
+
+// cacheFailure 在业务边界记录底层原因，再向调用方返回不含内部细节的稳定错误。
+func (service *userProfileService) cacheFailure(ctx gsr.CommandContext, operation string, id uint64, err error) error {
+	_ = ctx.Logger().Error("user cache operation failed", "operation", operation, "user_id", id, "error", err.Error())
+	if errors.Is(err, errInvalidUserHash) {
+		return errUserCacheCorrupt
+	}
+	return errUserCacheUnavailable
 }
 
 // OnStop 不关闭借用的 Redis Client；应用在 Runtime 收尾后关闭它。

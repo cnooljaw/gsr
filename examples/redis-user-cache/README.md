@@ -31,6 +31,8 @@ redis-cli -h 127.0.0.1 -p 6380 TTL gsr:example:user:42
 
 `cacheUserCommand` 保存可重建的快照；`loadUserCommand` 用 `userLookup{Found: false}` 表示未命中。Redis 故障与损坏的 Hash 分别返回稳定错误，不伪装成未命中，也不向调用者暴露底层错误文本。示例没有数据库加载、自动回填或跨节点一致性规则。
 
+错误转换发生在业务 Service：通过自身 Logger 记录操作、用户 ID 和底层原因，不记录用户资料内容；调用方仍只收到安全的稳定错误。运行示例的结构化日志写到 stderr，业务结果写到 stdout，不把诊断丢弃或混进业务输出。
+
 Client 启用 `ContextTimeoutEnabled`，缓存每次操作另设 300ms 最长等待。调用方 `Call` 的截止时间不能强杀已运行的 Handler；Redis 等待期间只阻塞当前 Service 的 runner，不阻塞其它 Service。示例只使用 Redis 6.0 起已有的 `DEL`、单字段 `HSET`、`EXPIRE` 和 `HGETALL`，不依赖 Redis 8 专属命令。
 
 测试会自行启动、关闭隔离的临时 Redis，不依赖上面的 6380 端口：

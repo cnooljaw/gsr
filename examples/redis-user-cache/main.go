@@ -41,5 +41,5 @@ func run(ctx context.Context, address string, output io.Writer) (result error) {
 	runCtx, finished := context.WithCancel(ctx)
 	defer finished()
 	entry := &mainService{cache: cache, output: output, finished: finished}
-	return gsr.Run(runCtx, gsr.Config{Logging: logging.Config{Writer: io.Discard}}, entry)
+	return gsr.Run(runCtx, gsr.Config{Logging: logging.Config{Writer: os.Stderr}}, entry)
 }

@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -23,7 +25,7 @@ func TestUserProfileServiceCallsRedis(t *testing.T) {
 		t.Fatalf("newUserHashCache() error = %v", err)
 	}
 	user := userInfo{ID: 42, Name: "小明", Level: 7}
-	err = runUserProfileScenario(cache, func(ctx context.Context, self gsr.ServiceContext, id runtime.ServiceID) error {
+	err = runUserProfileScenario(cache, io.Discard, func(ctx context.Context, self gsr.ServiceContext, id runtime.ServiceID) error {
 		value, err := self.Call(ctx, id, loadUserCommand, user.ID)
 		if err != nil || value != (userLookup{}) {
 			return fmt.Errorf("Call(load missing) = %+v, %v; want cache miss", value, err)
@@ -42,7 +44,7 @@ func TestUserProfileServiceCallsRedis(t *testing.T) {
 	}
 }
 
-// TestUserProfileServiceSeparatesRedisFailure 验证 Redis 故障不被当成未命中，且不会泄露底层错误文本。
+// TestUserProfileServiceSeparatesRedisFailure 验证读写故障保留来源与原始原因，但调用方只收到安全的稳定错误。
 func TestUserProfileServiceSeparatesRedisFailure(t *testing.T) {
 	client := redis.NewClient(&redis.Options{Addr: "127.0.0.1:0", ContextTimeoutEnabled: true})
 	cache, err := newUserHashCache(client, time.Minute, 200*time.Millisecond)
@@ -52,18 +54,55 @@ func TestUserProfileServiceSeparatesRedisFailure(t *testing.T) {
 	if err := client.Close(); err != nil {
 		t.Fatalf("Client.Close() error = %v", err)
 	}
-	err = runUserProfileScenario(cache, func(ctx context.Context, self gsr.ServiceContext, id runtime.ServiceID) error {
-		value, callErr := self.Call(ctx, id, loadUserCommand, uint64(42))
-		if value != nil || !errors.Is(callErr, errUserCacheUnavailable) {
-			return fmt.Errorf("Call(load with failed Redis) = %v, %v; want cache unavailable", value, callErr)
-		}
-		if strings.Contains(callErr.Error(), "closed") {
-			return fmt.Errorf("Call(load with failed Redis) exposed client state: %v", callErr)
+	var output bytes.Buffer
+	var profileID runtime.ServiceID
+	err = runUserProfileScenario(cache, &output, func(ctx context.Context, self gsr.ServiceContext, id runtime.ServiceID) error {
+		profileID = id
+		for _, check := range []struct {
+			command  runtime.CommandID
+			argument any
+		}{
+			{loadUserCommand, uint64(42)},
+			{cacheUserCommand, userInfo{ID: 42, Name: "小明", Level: 7}},
+		} {
+			value, callErr := self.Call(ctx, id, check.command, check.argument)
+			if value != nil || !errors.Is(callErr, errUserCacheUnavailable) {
+				return fmt.Errorf("Call(%d with failed Redis) = %v, %v; want cache unavailable", check.command, value, callErr)
+			}
+			if strings.Contains(callErr.Error(), "closed") {
+				return fmt.Errorf("Call(%d) exposed client state: %v", check.command, callErr)
+			}
 		}
 		return nil
 	})
 	if err != nil {
 		t.Fatal(err)
+	}
+	operations := make(map[string]int)
+	decoder := json.NewDecoder(&output)
+	for decoder.More() {
+		var record struct {
+			Service runtime.ServiceID `json:"service"`
+			Message string            `json:"message"`
+			Fields  struct {
+				Operation string `json:"operation"`
+				UserID    uint64 `json:"user_id"`
+				Error     string `json:"error"`
+			} `json:"fields"`
+		}
+		if err := decoder.Decode(&record); err != nil {
+			t.Fatal(err)
+		}
+		if record.Message != "user cache operation failed" {
+			continue
+		}
+		if record.Service != profileID || record.Fields.UserID != 42 || !strings.Contains(record.Fields.Error, "closed") {
+			t.Fatalf("cache failure log lost source or cause: %+v", record)
+		}
+		operations[record.Fields.Operation]++
+	}
+	if len(operations) != 2 || operations["get"] != 1 || operations["put"] != 1 {
+		t.Fatalf("cache failure logs = %v, want one per get/put", operations)
 	}
 }
 
@@ -77,7 +116,7 @@ func TestUserProfileServiceRejectsCorruptHash(t *testing.T) {
 	if err := client.HSet(context.Background(), userHashKey(42), "name", "小明").Err(); err != nil {
 		t.Fatalf("HSet(corrupt hash) error = %v", err)
 	}
-	err = runUserProfileScenario(cache, func(ctx context.Context, self gsr.ServiceContext, id runtime.ServiceID) error {
+	err = runUserProfileScenario(cache, io.Discard, func(ctx context.Context, self gsr.ServiceContext, id runtime.ServiceID) error {
 		value, callErr := self.Call(ctx, id, loadUserCommand, uint64(42))
 		if value != nil || !errors.Is(callErr, errUserCacheCorrupt) {
 			return fmt.Errorf("Call(load corrupt hash) = %v, %v; want cache corrupt", value, callErr)
@@ -128,7 +167,7 @@ func TestSlowRedisDoesNotBlockOtherService(t *testing.T) {
 	if err := admin.Do(context.Background(), "CLIENT", "PAUSE", "2000").Err(); err != nil {
 		t.Fatalf("CLIENT PAUSE error = %v", err)
 	}
-	err = runUserProfileScenario(cache, func(ctx context.Context, self gsr.ServiceContext, userID runtime.ServiceID) error {
+	err = runUserProfileScenario(cache, io.Discard, func(ctx context.Context, self gsr.ServiceContext, userID runtime.ServiceID) error {
 		otherID, err := self.CreateService(ctx, &redisIndependentService{})
 		if err != nil {
 			return fmt.Errorf("CreateService(independent): %w", err)
@@ -173,7 +212,7 @@ func TestUserProfileServiceRecoversAfterRedisTimeout(t *testing.T) {
 	if err := client.Do(context.Background(), "CLIENT", "PAUSE", "1500").Err(); err != nil {
 		t.Fatalf("CLIENT PAUSE error = %v", err)
 	}
-	err = runUserProfileScenario(cache, func(ctx context.Context, self gsr.ServiceContext, id runtime.ServiceID) error {
+	err = runUserProfileScenario(cache, io.Discard, func(ctx context.Context, self gsr.ServiceContext, id runtime.ServiceID) error {
 		value, callErr := self.Call(ctx, id, loadUserCommand, user.ID)
 		if value != nil || !errors.Is(callErr, errUserCacheUnavailable) {
 			return fmt.Errorf("Call(load during pause) = %v, %v; want cache unavailable", value, callErr)
@@ -243,11 +282,11 @@ func (service *redisIndependentService) OnStop(_ context.Context) error {
 	return nil
 }
 
-func runUserProfileScenario(cache *userHashCache, check func(context.Context, gsr.ServiceContext, runtime.ServiceID) error) error {
+func runUserProfileScenario(cache *userHashCache, output io.Writer, check func(context.Context, gsr.ServiceContext, runtime.ServiceID) error) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	entry := &redisTestMainService{cache: cache, check: check, finished: cancel}
-	return gsr.Run(ctx, gsr.Config{Logging: logging.Config{Writer: io.Discard}}, entry)
+	return gsr.Run(ctx, gsr.Config{Logging: logging.Config{Writer: output}}, entry)
 }
 
 type redisTestMainService struct {
