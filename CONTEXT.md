@@ -2,7 +2,7 @@
 
 ## Glossary
 
-客户端接入的通用 Gate 与协议分发已位于 `gate/` 公共包；`examples/websocket-gate` 只保留 Echo 业务协议、Agent 和联调入口。应用可在 `gsr.Run` 中通过 `self.OpenDebugGate` / `self.OpenProdGate` 创建对应 Gate 和 `gsr.Service` Agent。当前 Echo 示例仍显式组装底层 Runtime。
+客户端接入的通用 Gate 与协议分发已位于 `gate/` 公共包；`examples/websocket-gate` 只保留 Echo 业务协议、Agent 和联调入口。应用可在 `gsr.Run` 中通过 `self.OpenDebugGate` / `self.OpenProdGate` 创建对应 Gate 和 `gsr.Service` Agent。Echo 示例已使用 `gsr.Run` 与 MainService，完成打开 Gate 后 MainService 自身退出，Gate 与连接 Agent 继续运行。
 
 - **C/S Envelope（设计中）**：Protobuf 应用消息，字段为 msg_id、request_id、payload，编号依次为 1–3；请求、响应、通知和推送使用独立的消息编号。通用协议文件定义 Envelope 和通用错误回复，业务协议文件定义各自的消息编号与 payload。每个非零 MsgId 在 `.proto` 中显式声明 payload 类型、方向和消息种类，并生成协议目录；业务 Agent 按实现进度手动注册强类型 Handler，不要求协议定义和业务 Handler 同步完成。Request 必须带非零 request_id 并得到一次响应，Notify 的 request_id 为零且不回复。Gate 不解析业务协议。首版不使用旧 12 字节头；业务拒绝使用业务 Response，无法取得正常结果时使用带原 request_id 的 ErrorResponse，业务错误码由业务协议定义。
 - **C/S request_id（设计中）**：Envelope 中的 uint32 客户端请求关联号，0 为通知/推送、非零为 Request，响应原样回传；单连接从 1 单调分配，不回绕、不复用，耗尽后重连。与 Core/Cluster Session 分离，不作为防重放或幂等凭据。见 [客户端接入草案](docs/RFC-WEBSOCKET-GATE.md)。

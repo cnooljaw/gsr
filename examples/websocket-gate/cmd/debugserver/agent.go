@@ -4,9 +4,10 @@ import (
 	"context"
 	"errors"
 
+	"github.com/cnooljaw/gsr"
+	echopb "github.com/cnooljaw/gsr/examples/websocket-gate/gen/go/gsr/example/echo/v1"
 	"github.com/cnooljaw/gsr/gate"
 	commonv1 "github.com/cnooljaw/gsr/gate/gen/go/gsr/common/v1"
-	echopb "github.com/cnooljaw/gsr/examples/websocket-gate/gen/go/gsr/example/echo/v1"
 	"github.com/cnooljaw/gsr/gate/protocol"
 	"github.com/cnooljaw/gsr/runtime"
 )
@@ -24,7 +25,7 @@ func newEchoRegistry() (*protocol.Registry, error) {
 	)
 }
 
-func (agent *echoAgent) OnStart(_ context.Context, _ runtime.ServiceContext) error {
+func (agent *echoAgent) OnStart(_ context.Context, _ gsr.ServiceContext) error {
 	if agent.registry == nil {
 		return errors.New("debugserver: protocol registry is required")
 	}
@@ -47,18 +48,18 @@ func (agent *echoAgent) OnStart(_ context.Context, _ runtime.ServiceContext) err
 }
 
 func (*echoAgent) Handle(
-	commandContext runtime.CommandContext,
+	self gsr.CommandContext,
 	command runtime.CommandID,
 	_ ...any,
 ) (any, error) {
 	if command != gate.ClientDisconnectedCommand {
 		return nil, runtime.ErrUnknownCommand
 	}
-	commandContext.Exit()
+	self.Exit()
 	return nil, nil
 }
 
-func (agent *echoAgent) HandleClientMessage(_ runtime.CommandContext, frame []byte) error {
+func (agent *echoAgent) HandleClientMessage(_ gsr.CommandContext, frame []byte) error {
 	if agent.dispatcher == nil {
 		return errors.New("debugserver: protocol dispatcher is not initialized")
 	}
