@@ -11,3 +11,42 @@
 独立业务项目可以使用 `gate/cmd/protoc-gen-gsr-registry` 生成自己的消息目录；`module_path=<业务 Go module>` 只控制输出到该 module 内的相对路径，生成的目录条目仍引用 GSR 的 `gate/protocol/catalog`。不传 `module_path` 时沿用 `.proto` 源路径输出。
 
 提升为公共包不等于已经完成密码协议审计或生产容量验收。公网直连必须启用 WSS/TLS；由 Ingress 终止 TLS 时可以在受信任的 Pod 内网使用普通 WS。DebugGate 不提供握手、MAC 或 TLS，不得暴露到公网。
+
+## Agent 中的协议分发
+
+应用 Agent 用具名字段持有 `*protocol.Dispatcher[gsr.CommandContext]`。在 `OnStart` 中创建 Registry、Session 和 Dispatcher，并注册已实现的业务 Handler：
+
+```go
+dispatcher, err := protocol.NewDispatcher[gsr.CommandContext](registry, session)
+if err != nil {
+    return err
+}
+if err := protocol.Register(dispatcher, agent.OnEcho); err != nil {
+    return err
+}
+agent.dispatcher = dispatcher
+```
+
+`HandleClientMessage` 只把当前消息的上下文和 Envelope 字节交给 Dispatcher，不重复解码：
+
+```go
+func (agent *echoAgent) HandleClientMessage(self gsr.CommandContext, frame []byte) error {
+    return agent.dispatcher.HandleFrame(self, frame)
+}
+
+func (agent *echoAgent) OnEcho(
+    self gsr.CommandContext,
+    ctx protocol.Context,
+    request *echopb.EchoRequest,
+) error {
+    // 需要访问其它 Service 时，在这里使用 self.CallName / self.Cluster().Call 等能力。
+    return ctx.Response(
+        uint32(echopb.MsgId_S2C_ECHO_RESPONSE),
+        &echopb.EchoResponse{Text: request.GetText()},
+    )
+}
+```
+
+这里 `self` 是当前 Agent 的身份与 Service 能力；`ctx` 负责当前客户端 RequestID、Response 和 Push。不使用 self 的 Handler 可将该参数写为 `_`。Dispatcher 原样传递每次收到的 self，不保存上下文，也不建立额外 Mailbox、runner 或 goroutine；两种上下文都不得存入 Agent 字段或用于异步任务。注册发生在初始化阶段，不从其它 goroutine 修改 Handler 表。
+
+普通 Core Command 仍由 Agent 显式声明的 `Handle` 处理，不进入客户端协议 Dispatcher。完整代码见 [Echo Agent](../examples/websocket-gate/cmd/debugserver/agent.go)；现有 [应用接入测试](../debug_gate_test.go) 还验证了强类型协议 Handler 通过 `CallName` 调用业务 Service、业务收到 AgentID 来源，以及客户端 request_id 回传。
