@@ -14,6 +14,13 @@
 
 ## Agent 中的协议分发
 
+两个 Dispatcher 处理不同的消息入口，不串联使用：
+
+- `gsr.Dispatcher`：在 `Service.Handle` 内按 Core `CommandID` 分发本地或跨节点 Send/Call，调用强类型业务 Handler。
+- `protocol.Dispatcher`：在 `HandleClientMessage` 内按 Envelope 的 `msg_id` 解码客户端 Protobuf 并调用强类型协议 Handler，封装客户端响应和推送。
+
+两种入口都由同一个 Agent Mailbox 和 runner 串行执行，不因使用两个分发组件增加执行单元。Echo Agent 的普通 Command 只处理断线通知，因此直接在显式 `Handle` 中处理，不需要额外创建 `gsr.Dispatcher`；有多个普通业务命令时再按默认规范使用它。
+
 应用 Agent 用具名字段持有 `*protocol.Dispatcher[gsr.CommandContext]`。共享 Registry 在应用组装时合并生成目录；Agent 在 `OnStart` 中将目录和自己的 ClientSession 交给 Dispatcher，并注册已实现的业务 Handler：
 
 ```go

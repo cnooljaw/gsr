@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"errors"
 
 	"github.com/cnooljaw/gsr"
 	echopb "github.com/cnooljaw/gsr/examples/websocket-gate/gen/go/gsr/example/echo/v1"
@@ -26,9 +25,6 @@ func newEchoRegistry() (*protocol.Registry, error) {
 }
 
 func (agent *echoAgent) OnStart(_ context.Context, _ gsr.ServiceContext) error {
-	if agent.registry == nil {
-		return errors.New("debugserver: protocol registry is required")
-	}
 	dispatcher, err := protocol.NewDispatcher[gsr.CommandContext](agent.registry, agent.client)
 	if err != nil {
 		return err
@@ -56,9 +52,6 @@ func (*echoAgent) Handle(
 }
 
 func (agent *echoAgent) HandleClientMessage(self gsr.CommandContext, frame []byte) error {
-	if agent.dispatcher == nil {
-		return errors.New("debugserver: protocol dispatcher is not initialized")
-	}
 	return agent.dispatcher.HandleFrame(self, frame)
 }
 
