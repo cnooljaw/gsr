@@ -111,7 +111,8 @@ func (registry *Registry) encodeServerMessage(msgID uint32, kind catalog.Kind, m
 	if entry.Kind != kind {
 		return nil, fmt.Errorf("protocol: msg_id %d is %v, not %v", msgID, entry.Kind, kind)
 	}
-	if isNil(message) || reflect.TypeOf(message) != reflect.TypeOf(entry.NewMessage()) {
+	messageEntry, registered := registry.byType[reflect.TypeOf(message)]
+	if isNil(message) || !registered || messageEntry.ID != msgID {
 		return nil, fmt.Errorf("%w: msg_id %d expects %s", ErrPayloadTypeMismatch, msgID, reflect.TypeOf(entry.NewMessage()))
 	}
 	payload, err := proto.Marshal(message)
