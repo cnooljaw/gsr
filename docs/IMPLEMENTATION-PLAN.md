@@ -387,6 +387,26 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 
 ## Core 之外：WebSocket Gate 联调示例
 
+### 示例基础能力抽取收口
+
+公共能力的包归属及应用接线已完成；此状态不代表已完成生产容量验收或密码协议审计。
+
+| 能力 | 框架入口 | 保留在业务/示例中的内容 |
+| --- | --- | --- |
+| WebSocket Gate | `gate/debuggate`、`gate/prodgate`；应用使用 `self.OpenDebugGate` / `self.OpenProdGate` | Agent 构造、身份认证和具体业务协议 |
+| Agent 协议公共能力 | `gate/protocol` 的 Registry、Session、`Dispatcher[gsr.CommandContext]` | 具体 Agent、Handler、连接私有状态和业务 Service 路由；不新增 BaseAgent |
+| HTTP Server | `httpserver.Server`；应用使用 `self.OpenHTTP` 和 `HTTPIngress.SendName/CallName` | `http.ServeMux` 路由、请求校验、鉴权和状态码映射 |
+| Redis | `redisclient.New` 返回原生客户端 | 用户 Hash 缓存的键、TTL、读写及错误策略 |
+| MySQL | `mysqlclient.Open` 返回原生连接池 | 产品表、SQL、事务及 CRUD Handler |
+
+Gate 和 Agent 随 Runtime 停止；通过 `gsr.Run` 打开的 HTTP Listener 由应用运行入口收尾；Redis/MySQL 客户端由宿主持有并在 Runtime 停止后关闭。没有新增 RedisService、MySQLService、HTTP Agent 池或统一外部依赖容器。
+
+示例继续保留并从公共包接入：WebSocket Echo 验证协议与连接，HTTP 管理路由验证多个本地 Service 及业务 Service 发起的远端调用，Redis 用户缓存与 MySQL 产品表验证 Service 内的外部 I/O。应用 Agent 的现有 DebugGate 用例已串起强类型协议 Handler、名称调用、Agent 来源与客户端 request_id 回传。
+
+本轮抽取到此收口。完整“客户端 → Gate → Agent → 用户 Service → MySQL”的线上化业务链路按用户决定留给独立业务项目，不在 GSR 中提前实现。后续框架扩展由具体业务需求或可复现缺陷驱动，不因示例存在某段代码就继续抽象。
+
+### 联调与验收状态
+
 状态：DebugGate 的 Go/TypeScript Echo 往返、跨语言认证固定向量、生产 WebSocket Gate（支持 Ingress 终止 TLS 与可选直连 TLS）首个纵向切片和 Runtime 共享 Logger 接线已完成；单/多慢客户端、混合连接和部分失败阶段已有可重复验收，目标部署容量与完整失败矩阵仍待验证，不提前加入 Core 或通用测试框架。
 
 - 在 `examples/websocket-gate/` 提供一个 GSR Go 服务端和一个命令行 TypeScript 客户端，用于验证真实 WebSocket 接入、Envelope 编解码、request_id 关联、业务 Response、业务拒绝、ErrorResponse、服务端 Push 和连接关闭。
