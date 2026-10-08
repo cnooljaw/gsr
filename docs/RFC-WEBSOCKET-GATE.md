@@ -124,7 +124,7 @@ enum MsgId {
 - 两个 Gate 共享 Agent 业务处理逻辑；帧接收和安全校验属于各自适配器。Gate 不解码或分发业务 payload。
 - 两个接入入口保留各自的监听、握手、帧验证、容量计数和日志行为；相同的 Agent 构造保护、断线重试、停机补发，以及单连接有界出站队列、写循环和关闭机制放在 `gate/internal/gatecommon`，不以模式开关合并成一个 Gate。
 
-`gate/debuggate` 已实现本地示例闭环：`NewGateService` 显式接收底层 `*runtime.Runtime`，应用通过 `Runtime.CreateService` 启动它；这只是示例组装方式，不扩展 `gsr.Run`、Core 或业务 `ServiceContext`。Gate 只监听字面回环/私有 IP 的 `/ws`，每个连接由 Gate runner 调用 `NewAgent` 创建一个 Agent。创建返回的 AgentID 绑定到该连接，读循环直接调用 `Runtime.DeliverClientMessage` 投递不透明 Envelope 字节，不逐帧经过 Gate Mailbox；Gate runner 中的连接到 Agent 映射只用于断开通知。`ClientSession.Send(Envelope)` 将响应放入有界队列，再由唯一写循环发回。此处 `ClientSession` 表示客户端连接的写回能力，不是 Core `SessionID` 或 Envelope 的 `request_id`。DebugGate 显式限制连接数、帧大小和每连接出站队列，默认帧上限为 4 MiB。出站队列按序列化 Envelope 字节数加每项固定 64 字节队列开销计费，避免空帧或很多小帧绕过内存上限；正在写出的单帧另受 `MaxFrameBytes` 限制。集成测试覆盖请求/响应 request_id、连接上限、正常断开通知、Agent 创建期间既有连接继续收帧和 Runtime 关闭时连接回收。`examples/websocket-gate` 另提供独立 Echo Agent、Go DebugGate 服务端和 TypeScript CLI；通用 Envelope 与 Echo 业务消息分别定义在 `.proto` 文件中，Go 与 TypeScript 使用同一组协议源生成类型并完成真实请求/响应往返。Go Agent 从生成目录解码 Envelope，再通过手动注册的强类型 Echo Handler 响应；未实现的协议消息无需占位 Handler。Echo 示例不包含业务生产鉴权；DebugGate 没有 TLS、生产握手或 MAC，不能用于公网。它借用 Runtime 的共享 Logger，以 Gate ServiceID 记录监听、连接接纳、Agent 创建、帧读写和投递故障；不记录原始载荷或业务 Envelope 字段，也不负责关闭 Logger。调试入口不复制生产 Gate 的握手/MAC 诊断和按连接限频机制。
+`gate/debuggate` 已实现本地示例闭环：`NewGateService` 显式接收底层 `*runtime.Runtime`，应用通过 `Runtime.CreateService` 启动它；这是底层示例组装方式；应用层现已通过 `self.OpenDebugGate` 接入 `gsr.Run`，不扩展 Core 或向业务暴露 Runtime。Gate 只监听字面回环/私有 IP 的 `/ws`，每个连接由 Gate runner 调用 `NewAgent` 创建一个 Agent。创建返回的 AgentID 绑定到该连接，读循环直接调用 `Runtime.DeliverClientMessage` 投递不透明 Envelope 字节，不逐帧经过 Gate Mailbox；Gate runner 中的连接到 Agent 映射只用于断开通知。`ClientSession.Send(Envelope)` 将响应放入有界队列，再由唯一写循环发回。此处 `ClientSession` 表示客户端连接的写回能力，不是 Core `SessionID` 或 Envelope 的 `request_id`。DebugGate 显式限制连接数、帧大小和每连接出站队列，默认帧上限为 4 MiB。出站队列按序列化 Envelope 字节数加每项固定 64 字节队列开销计费，避免空帧或很多小帧绕过内存上限；正在写出的单帧另受 `MaxFrameBytes` 限制。集成测试覆盖请求/响应 request_id、连接上限、正常断开通知、Agent 创建期间既有连接继续收帧和 Runtime 关闭时连接回收。`examples/websocket-gate` 另提供独立 Echo Agent、Go DebugGate 服务端和 TypeScript CLI；通用 Envelope 与 Echo 业务消息分别定义在 `.proto` 文件中，Go 与 TypeScript 使用同一组协议源生成类型并完成真实请求/响应往返。Go Agent 从生成目录解码 Envelope，再通过手动注册的强类型 Echo Handler 响应；未实现的协议消息无需占位 Handler。Echo 示例不包含业务生产鉴权；DebugGate 没有 TLS、生产握手或 MAC，不能用于公网。它借用 Runtime 的共享 Logger，以 Gate ServiceID 记录监听、连接接纳、Agent 创建、帧读写和投递故障；不记录原始载荷或业务 Envelope 字段，也不负责关闭 Logger。调试入口不复制生产 Gate 的握手/MAC 诊断和按连接限频机制。
 
 DebugGate 的 `MaxConnections` 统计已进入 `/ws` GET Handler 的连接，不限制原始 TCP 接纳数或其它 HTTP 路径；它仅用于受信任环境调试。普通 HTTP 请求头与未升级连接的 keep-alive 空闲等待各限 5 秒，避免无期限保留这类 socket。
 
@@ -132,7 +132,7 @@ TypeScript CLI 默认连接 DebugGate；增加 `--secure` 后，它会发送固�
 
 ### 当前归属：Gate 与协议进入框架
 
-通用 Envelope、协议目录与分发位于 `gate/protocol`，ProdGate 和 DebugGate 位于 `gate/prodgate`、`gate/debuggate`，共同的连接细节属于 `gate/internal/gatecommon`。通用 `.proto`、生成工具与跨语言认证夹具也由 `gate/` 持有。`examples/websocket-gate/` 保留 Echo 业务协议、Agent、Go 启动入口和 TypeScript 客户端，并从框架包导入通用能力。提升包归属不代表完成安全审计；`gsr.Run` 与 Gate 的受信任投递接线仍需单独裁决，当前示例继续显式组装底层 Runtime，不扩大业务 `ServiceContext` 的权限。
+通用 Envelope、协议目录与分发位于 `gate/protocol`，ProdGate 和 DebugGate 位于 `gate/prodgate`、`gate/debuggate`，共同的连接细节属于 `gate/internal/gatecommon`。通用 `.proto`、生成工具与跨语言认证夹具也由 `gate/` 持有。`examples/websocket-gate/` 保留 Echo 业务协议、Agent、Go 启动入口和 TypeScript 客户端，并从框架包导入通用能力。提升包归属不代表完成安全审计；DebugGate 已有 `gsr.Run` 应用组装入口，当前 Echo 示例仍保留底层 Runtime 组装；ProdGate 的应用组装仍待实现，业务 `ServiceContext` 不获得客户端消息投递权限。
 
 ## 已确认：业务回复、通用错误与推送
 
@@ -299,7 +299,7 @@ Gate 只使用标准 WebSocket 关闭码，不新增当前客户端必须理解�
 - Gate 管连接、收发、上行认证和容量，剥离安全封装后交给 Agent；I/O 任务不得直接修改业务状态。
 - `AgentService` 是普通 Service，原则上一个连接对应一个 AgentService，负责解释客户端命令与数据并中转到对应业务 Service。客户端不能指定任意内部 ServiceID 或伪造 Source。
 - Runtime 内部消息类型区分客户端消息与普通 Core Command，Service 通过实现可选的 `runtime.ClientMessageHandler` 明确启用客户端处理能力。Agent 有两类逻辑入站分发，不能合并成靠 `Source` 猜测的单一路由：Gate 基础设施经 `Runtime.DeliverClientMessage` 投递的原始 Protobuf Envelope 字节按 `msg_id` 交给 `Requests`；普通本地 Service/Cluster Command 按 Core `CommandID` 分发到 `Commands`。两类 handler 属于同一个 AgentService、共用同一 Mailbox 和串行 runner，因此能安全访问同一连接私有状态；`Source` 仍只表达 Service 来源，基础设施投递的客户端消息仍为零。客户端 `msg_id`、客户端 `request_id` 和 Core `CommandID`/Session 不互相复用。Core Command 的 Send 与 Call 仍走同一种消息类型，由 Session 是否为零区分。
-- 应用层 Agent 可额外实现 `gsr.ClientMessageHandler`；只有它被适配为 Core 的可选 `runtime.ClientMessageHandler`，普通 `gsr.Service` 不因此接纳客户端消息。两者共用原有 Mailbox 和 runner。Gate 创建应用 Agent 的受信任组装入口尚未接线，当前 Gate 的 `NewAgent` 仍返回底层 `runtime.Service`。
+- 应用层 Agent 可额外实现 `gsr.ClientMessageHandler`；只有它被适配为 Core 的可选 `runtime.ClientMessageHandler`，普通 `gsr.Service` 不因此接纳客户端消息。两者共用原有 Mailbox 和 runner。`self.OpenDebugGate` 已能将业务 `gsr.Service` Agent 经现有适配器交给 DebugGate；底层 Gate 的 `NewAgent` 仍返回 `runtime.Service`，ProdGate 的应用入口未接线。
 - Gate 的业务组装只提供一个 `NewAgent func(ClientSession) runtime.Service` 构造回调，不增加独立的 `AgentFactory` 类型、Agent 管理器或通用依赖注入容器。Gate 为每条连接调用回调构造独立 Agent 实例；回调只负责组装连接私有 Service，不执行 socket I/O，不持有 Runtime 或 Gate 连接表。
 - Agent 使用现有 Send/Call；内部 Handler 通过 return 完成 Reply，客户端响应由 Agent 组织并交 Gate 发出。不增加 Core 手工 Reply。
 - Agent 内 Call 仍是 run-to-completion，等待时该 Agent 不处理下一条消息，其它 Service 仍可运行。
@@ -359,7 +359,7 @@ Gate 不等待或强杀 Agent Handler。单独停止 Gate 时，Gate 在自己�
 
 ## 下一步与验收
 
-Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/通知/推送独立编号，通用与业务专用 `.proto` 分开定义；每个 MsgId 通过 option 显式声明 payload、方向和消息种类，协议目录由代码生成，业务 Handler 按实现进度手动注册。固定 33 字节二进制握手、大端 seq 和原始字节 MAC 验证顺序、固定 HKDF 参数、独立 DebugGate、WebSocket 关闭码和 Gate/Agent/业务错误归属，以及“一连接一个业务定义的 AgentService、Runtime 内部消息类型区分客户端消息与普通 Core Command、Service 可选择实现 ClientMessageHandler、业务协议通过 ProtocolHandler 组件组合接入”的边界已确认。Runtime 的单向投递 API 与缺少客户端处理能力时的 admission 拒绝已实现；联调示例包含通用 Envelope 与 Echo 业务 `.proto`、Go/TypeScript 生成类型、强类型 Echo Handler 和 CLI 闭环。跨语言认证固定向量已由 Go 与 TypeScript 共用夹具验证。DebugGate 使用示例专用的底层 Runtime 注入，不扩展 Core 或 `gsr.Run`。生产 Gate 的直连 WSS 与 Ingress 终止 TLS 后的 HTTP WebSocket 纵向切片、共享 Logger 接线和可调时长的慢连接压力测试已落地；目标部署的容量与其它失败组合仍待验证。一次讨论一个问题，未确认前不新增公开 API 或通用安全插件框架。
+Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/通知/推送独立编号，通用与业务专用 `.proto` 分开定义；每个 MsgId 通过 option 显式声明 payload、方向和消息种类，协议目录由代码生成，业务 Handler 按实现进度手动注册。固定 33 字节二进制握手、大端 seq 和原始字节 MAC 验证顺序、固定 HKDF 参数、独立 DebugGate、WebSocket 关闭码和 Gate/Agent/业务错误归属，以及“一连接一个业务定义的 AgentService、Runtime 内部消息类型区分客户端消息与普通 Core Command、Service 可选择实现 ClientMessageHandler、业务协议通过 ProtocolHandler 组件组合接入”的边界已确认。Runtime 的单向投递 API 与缺少客户端处理能力时的 admission 拒绝已实现；联调示例包含通用 Envelope 与 Echo 业务 `.proto`、Go/TypeScript 生成类型、强类型 Echo Handler 和 CLI 闭环。跨语言认证固定向量已由 Go 与 TypeScript 共用夹具验证。Echo 示例保留底层 Runtime 组装；应用也可经 `self.OpenDebugGate` 启动调试 Gate 和业务 Agent，不扩展 Core。生产 Gate 的直连 WSS 与 Ingress 终止 TLS 后的 HTTP WebSocket 纵向切片、共享 Logger 接线和可调时长的慢连接压力测试已落地；目标部署的容量与其它失败组合仍待验证。一次讨论一个问题，未确认前不新增公开 API 或通用安全插件框架。
 
 联调示例位于 `examples/websocket-gate/`：Go DebugGate/ProdGate、连接 Echo Agent、TypeScript 命令行客户端和 request/response 往返已经落地；生成协议目录、逐步注册强类型 Handler、通用协议错误回复、业务拒绝 Response 以及 Notify→Push 往返也已接入。Echo `.proto` 只属于示例业务协议，不扩展 GSR Core。固定向量已作为独立跨语言测试夹具落地，不由示例运行路径加载或掩盖后续生产 Gate 的安全审查。
 
