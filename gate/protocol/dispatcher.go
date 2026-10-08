@@ -90,10 +90,6 @@ func (dispatcher *Dispatcher[Scope]) handleEnvelope(self Scope, envelope *common
 	if err != nil {
 		return dispatcher.fail(envelope.GetRequestId(), err)
 	}
-	entry, exists := dispatcher.registry.entryForID(envelope.GetMsgId())
-	if !exists {
-		return dispatcher.fail(envelope.GetRequestId(), fmt.Errorf("%w: msg_id %d", ErrUnknownMessageID, envelope.GetMsgId()))
-	}
 	handler, exists := dispatcher.handlers[envelope.GetMsgId()]
 	if !exists {
 		return dispatcher.fail(envelope.GetRequestId(), fmt.Errorf("%w: msg_id %d", ErrHandlerNotRegistered, envelope.GetMsgId()))
@@ -111,7 +107,8 @@ func (dispatcher *Dispatcher[Scope]) handleEnvelope(self Scope, envelope *common
 		}
 		return err
 	}
-	if entry.Kind == catalog.Request && !responded {
+	// Decode 已保证 Request 的编号非零、Notify 的编号为零，无需再次查询消息目录。
+	if envelope.GetRequestId() != 0 && !responded {
 		return dispatcher.fail(envelope.GetRequestId(), ErrResponseRequired)
 	}
 	return nil

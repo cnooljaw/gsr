@@ -127,11 +127,6 @@ func (registry *Registry) entryForType(messageType reflect.Type) (catalog.Entry,
 	return entry, exists
 }
 
-func (registry *Registry) entryForID(msgID uint32) (catalog.Entry, bool) {
-	entry, exists := registry.byID[msgID]
-	return entry, exists
-}
-
 func isNil(value any) bool {
 	if value == nil {
 		return true
