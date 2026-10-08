@@ -15,7 +15,7 @@ import (
 type echoAgent struct {
 	client     gate.ClientSession
 	registry   *protocol.Registry
-	dispatcher *protocol.Dispatcher
+	dispatcher *protocol.Dispatcher[gsr.CommandContext]
 }
 
 func newEchoRegistry() (*protocol.Registry, error) {
@@ -33,7 +33,7 @@ func (agent *echoAgent) OnStart(_ context.Context, _ gsr.ServiceContext) error {
 	if err != nil {
 		return err
 	}
-	dispatcher, err := protocol.NewDispatcher(agent.registry, session)
+	dispatcher, err := protocol.NewDispatcher[gsr.CommandContext](agent.registry, session)
 	if err != nil {
 		return err
 	}
@@ -59,14 +59,14 @@ func (*echoAgent) Handle(
 	return nil, nil
 }
 
-func (agent *echoAgent) HandleClientMessage(_ gsr.CommandContext, frame []byte) error {
+func (agent *echoAgent) HandleClientMessage(self gsr.CommandContext, frame []byte) error {
 	if agent.dispatcher == nil {
 		return errors.New("debugserver: protocol dispatcher is not initialized")
 	}
-	return agent.dispatcher.HandleFrame(frame)
+	return agent.dispatcher.HandleFrame(self, frame)
 }
 
-func (*echoAgent) OnEcho(context protocol.Context, request *echopb.EchoRequest) error {
+func (*echoAgent) OnEcho(_ gsr.CommandContext, context protocol.Context, request *echopb.EchoRequest) error {
 	if request.GetText() == "" {
 		return context.Response(
 			uint32(echopb.MsgId_S2C_ECHO_RESPONSE),
@@ -86,7 +86,7 @@ func (*echoAgent) OnEcho(context protocol.Context, request *echopb.EchoRequest) 
 }
 
 // OnEchoNotify 将不要求响应的客户端通知转换为一次服务端主动推送。
-func (*echoAgent) OnEchoNotify(context protocol.Context, request *echopb.EchoNotify) error {
+func (*echoAgent) OnEchoNotify(_ gsr.CommandContext, context protocol.Context, request *echopb.EchoNotify) error {
 	return context.Push(
 		uint32(echopb.MsgId_S2C_ECHO_PUSH),
 		&echopb.EchoPush{Text: request.GetText()},

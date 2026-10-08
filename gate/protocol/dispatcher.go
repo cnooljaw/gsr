@@ -11,15 +11,16 @@ import (
 )
 
 // Dispatcher 按生成的消息目录解码 Envelope，并调用业务手动注册的强类型 Handler。
-type Dispatcher struct {
+// Scope 是调用方的逐消息上下文类型；Dispatcher 只透传，不保存或解释它。
+type Dispatcher[Scope any] struct {
 	registry       *Registry
 	session        *Session
 	errorMessageID uint32
-	handlers       map[uint32]func(Context, proto.Message) error
+	handlers       map[uint32]func(Scope, Context, proto.Message) error
 }
 
 // NewDispatcher 创建一个绑定协议目录和客户端会话的消息分发器。
-func NewDispatcher(registry *Registry, session *Session) (*Dispatcher, error) {
+func NewDispatcher[Scope any](registry *Registry, session *Session) (*Dispatcher[Scope], error) {
 	if registry == nil {
 		return nil, errors.New("protocol: registry is required")
 	}
@@ -30,16 +31,16 @@ func NewDispatcher(registry *Registry, session *Session) (*Dispatcher, error) {
 	if !exists || errorEntry.Direction != catalog.ServerToClient || errorEntry.Kind != catalog.Response {
 		return nil, errors.New("protocol: server-to-client ErrorResponse is required")
 	}
-	return &Dispatcher{
+	return &Dispatcher[Scope]{
 		registry:       registry,
 		session:        session,
 		errorMessageID: errorEntry.ID,
-		handlers:       make(map[uint32]func(Context, proto.Message) error),
+		handlers:       make(map[uint32]func(Scope, Context, proto.Message) error),
 	}, nil
 }
 
 // Register 将一个已定义的客户端 payload 类型绑定到业务 Handler；协议目录和 Handler 可分开演进。
-func Register[Message proto.Message](dispatcher *Dispatcher, handler func(Context, Message) error) error {
+func Register[Scope any, Message proto.Message](dispatcher *Dispatcher[Scope], handler func(Scope, Context, Message) error) error {
 	if dispatcher == nil || dispatcher.registry == nil || dispatcher.session == nil || dispatcher.handlers == nil {
 		return errors.New("protocol: dispatcher is not initialized")
 	}
@@ -61,18 +62,19 @@ func Register[Message proto.Message](dispatcher *Dispatcher, handler func(Contex
 	if _, exists := dispatcher.handlers[entry.ID]; exists {
 		return fmt.Errorf("protocol: handler already registered for msg_id %d", entry.ID)
 	}
-	dispatcher.handlers[entry.ID] = func(context Context, message proto.Message) error {
+	dispatcher.handlers[entry.ID] = func(self Scope, context Context, message proto.Message) error {
 		typedMessage, ok := message.(Message)
 		if !ok {
 			return fmt.Errorf("%w: dispatcher decoded %T for handler %s", ErrPayloadTypeMismatch, message, messageType)
 		}
-		return handler(context, typedMessage)
+		return handler(self, context, typedMessage)
 	}
 	return nil
 }
 
-// HandleFrame 解码完整 Envelope，并按其中的 msg_id 分发一个客户端消息。
-func (dispatcher *Dispatcher) HandleFrame(frame []byte) error {
+// HandleFrame 解码完整 Envelope，并将本次 self 原样传给对应的客户端 Handler。
+// Handler 必须在本次调用内使用 self，不得保存它或交给异步任务。
+func (dispatcher *Dispatcher[Scope]) HandleFrame(self Scope, frame []byte) error {
 	if dispatcher == nil || dispatcher.registry == nil || dispatcher.session == nil || dispatcher.handlers == nil {
 		return errors.New("protocol: dispatcher is not initialized")
 	}
@@ -80,10 +82,10 @@ func (dispatcher *Dispatcher) HandleFrame(frame []byte) error {
 	if err := proto.Unmarshal(frame, &envelope); err != nil {
 		return fmt.Errorf("protocol: decode Envelope: %w", err)
 	}
-	return dispatcher.handleEnvelope(&envelope)
+	return dispatcher.handleEnvelope(self, &envelope)
 }
 
-func (dispatcher *Dispatcher) handleEnvelope(envelope *commonv1.Envelope) error {
+func (dispatcher *Dispatcher[Scope]) handleEnvelope(self Scope, envelope *commonv1.Envelope) error {
 	message, err := dispatcher.registry.Decode(envelope.GetMsgId(), envelope.GetRequestId(), envelope.GetPayload())
 	if err != nil {
 		return dispatcher.fail(envelope.GetRequestId(), err)
@@ -103,7 +105,7 @@ func (dispatcher *Dispatcher) handleEnvelope(envelope *commonv1.Envelope) error 
 		requestID: envelope.GetRequestId(),
 		responded: &responded,
 	}
-	if err := handler(handlerContext, message); err != nil {
+	if err := handler(self, handlerContext, message); err != nil {
 		if !responded {
 			return dispatcher.fail(envelope.GetRequestId(), err)
 		}
@@ -115,7 +117,7 @@ func (dispatcher *Dispatcher) handleEnvelope(envelope *commonv1.Envelope) error 
 	return nil
 }
 
-func (dispatcher *Dispatcher) fail(requestID uint32, cause error) error {
+func (dispatcher *Dispatcher[Scope]) fail(requestID uint32, cause error) error {
 	if requestID == 0 {
 		return cause
 	}

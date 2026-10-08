@@ -2,6 +2,8 @@
 
 ## Glossary
 
+- **协议 Handler 上下文**：`protocol.Dispatcher[gsr.CommandContext]` 将当前 `HandleClientMessage` 的 self 原样传到强类型 Handler；self 提供 Agent 的 Service 能力，独立的 `protocol.Context` 提供客户端请求关联和 Response/Push。两者仅在当前同步 Handler 内使用，不存入 Agent 字段或异步任务。协议包只透传类型参数，不依赖应用层 `gsr`。
+
 客户端接入的通用 Gate 与协议分发已位于 `gate/` 公共包；`examples/websocket-gate` 只保留 Echo 业务协议、Agent 和联调入口。应用可在 `gsr.Run` 中通过 `self.OpenDebugGate` / `self.OpenProdGate` 创建对应 Gate 和 `gsr.Service` Agent。Echo 示例已使用 `gsr.Run` 与 MainService，完成打开 Gate 后 MainService 自身退出，Gate 与连接 Agent 继续运行。
 
 - **C/S Envelope（设计中）**：Protobuf 应用消息，字段为 msg_id、request_id、payload，编号依次为 1–3；请求、响应、通知和推送使用独立的消息编号。通用协议文件定义 Envelope 和通用错误回复，业务协议文件定义各自的消息编号与 payload。每个非零 MsgId 在 `.proto` 中显式声明 payload 类型、方向和消息种类，并生成协议目录；业务 Agent 按实现进度手动注册强类型 Handler，不要求协议定义和业务 Handler 同步完成。Request 必须带非零 request_id 并得到一次响应，Notify 的 request_id 为零且不回复。Gate 不解析业务协议。首版不使用旧 12 字节头；业务拒绝使用业务 Response，无法取得正常结果时使用带原 request_id 的 ErrorResponse，业务错误码由业务协议定义。

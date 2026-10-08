@@ -4,8 +4,8 @@ import (
 	"errors"
 	"testing"
 
-	commonv1 "github.com/cnooljaw/gsr/gate/gen/go/gsr/common/v1"
 	echopb "github.com/cnooljaw/gsr/examples/websocket-gate/gen/go/gsr/example/echo/v1"
+	commonv1 "github.com/cnooljaw/gsr/gate/gen/go/gsr/common/v1"
 	"github.com/cnooljaw/gsr/gate/protocol/catalog"
 	"google.golang.org/protobuf/proto"
 )
@@ -32,13 +32,13 @@ func testRegistry(t *testing.T) *Registry {
 	return registry
 }
 
-func testDispatcher(t *testing.T, registry *Registry, sender *recordedSender) *Dispatcher {
+func testDispatcher(t *testing.T, registry *Registry, sender *recordedSender) *Dispatcher[string] {
 	t.Helper()
 	session, err := NewSession(registry, sender)
 	if err != nil {
 		t.Fatalf("NewSession() error = %v", err)
 	}
-	dispatcher, err := NewDispatcher(registry, session)
+	dispatcher, err := NewDispatcher[string](registry, session)
 	if err != nil {
 		t.Fatalf("NewDispatcher() error = %v", err)
 	}
@@ -151,12 +151,14 @@ func TestNewRegistryRejectsAmbiguousEntries(t *testing.T) {
 	}
 }
 
-// TestTypedHandlerReturnsResponse 验证业务只注册已实现的强类型 Handler 即可完成解码和响应。
+// TestTypedHandlerReturnsResponse 验证强类型 Handler 收到每次传入的上下文，并完成解码和响应。
 func TestTypedHandlerReturnsResponse(t *testing.T) {
 	registry := testRegistry(t)
 	sender := &recordedSender{}
 	dispatcher := testDispatcher(t, registry, sender)
-	if err := Register(dispatcher, func(context Context, request *echopb.EchoRequest) error {
+	var receivedScopes []string
+	if err := Register(dispatcher, func(self string, context Context, request *echopb.EchoRequest) error {
+		receivedScopes = append(receivedScopes, self)
 		return context.Response(
 			uint32(echopb.MsgId_S2C_ECHO_RESPONSE),
 			&echopb.EchoResponse{Text: request.GetText()},
@@ -173,7 +175,7 @@ func TestTypedHandlerReturnsResponse(t *testing.T) {
 		RequestId: 45,
 		Payload:   payload,
 	})
-	if err := dispatcher.HandleFrame(frame); err != nil {
+	if err := dispatcher.HandleFrame("first-agent-context", frame); err != nil {
 		t.Fatalf("HandleFrame() error = %v", err)
 	}
 	if len(sender.envelopes) != 1 {
@@ -190,6 +192,12 @@ func TestTypedHandlerReturnsResponse(t *testing.T) {
 	if responsePayload.GetText() != "typed" {
 		t.Fatalf("response text = %q, want typed", responsePayload.GetText())
 	}
+	if err := dispatcher.HandleFrame("next-agent-context", frame); err != nil {
+		t.Fatalf("second HandleFrame() error = %v", err)
+	}
+	if len(receivedScopes) != 2 || receivedScopes[0] != "first-agent-context" || receivedScopes[1] != "next-agent-context" {
+		t.Fatalf("handler contexts = %v, want each invocation's context", receivedScopes)
+	}
 }
 
 // TestResponseRejectsPayloadTypeMismatch 验证 Response 的 msg_id 与 Protobuf 类型不匹配时不会发送错误载荷。
@@ -197,7 +205,7 @@ func TestResponseRejectsPayloadTypeMismatch(t *testing.T) {
 	registry := testRegistry(t)
 	sender := &recordedSender{}
 	dispatcher := testDispatcher(t, registry, sender)
-	if err := Register(dispatcher, func(context Context, _ *echopb.EchoRequest) error {
+	if err := Register(dispatcher, func(_ string, context Context, _ *echopb.EchoRequest) error {
 		return context.Response(
 			uint32(echopb.MsgId_S2C_ECHO_RESPONSE),
 			&echopb.EchoNotify{Text: "wrong payload type"},
@@ -209,7 +217,7 @@ func TestResponseRejectsPayloadTypeMismatch(t *testing.T) {
 		MsgId:     uint32(echopb.MsgId_C2S_ECHO_REQUEST),
 		RequestId: 57,
 	})
-	if err := dispatcher.HandleFrame(frame); !errors.Is(err, ErrPayloadTypeMismatch) {
+	if err := dispatcher.HandleFrame("", frame); !errors.Is(err, ErrPayloadTypeMismatch) {
 		t.Fatalf("HandleFrame() error = %v, want ErrPayloadTypeMismatch", err)
 	}
 	if len(sender.envelopes) != 1 {
@@ -236,7 +244,7 @@ func TestMaximumRequestIDReturnsUnchanged(t *testing.T) {
 	registry := testRegistry(t)
 	sender := &recordedSender{}
 	dispatcher := testDispatcher(t, registry, sender)
-	if err := Register(dispatcher, func(context Context, _ *echopb.EchoRequest) error {
+	if err := Register(dispatcher, func(_ string, context Context, _ *echopb.EchoRequest) error {
 		if got := context.RequestID(); got != maximumRequestID {
 			return errors.New("Handler received a changed request_id")
 		}
@@ -251,7 +259,7 @@ func TestMaximumRequestIDReturnsUnchanged(t *testing.T) {
 		MsgId:     uint32(echopb.MsgId_C2S_ECHO_REQUEST),
 		RequestId: maximumRequestID,
 	})
-	if err := dispatcher.HandleFrame(frame); err != nil {
+	if err := dispatcher.HandleFrame("", frame); err != nil {
 		t.Fatalf("HandleFrame() error = %v", err)
 	}
 	if len(sender.envelopes) != 1 {
@@ -267,7 +275,7 @@ func TestTypedNotificationCanPush(t *testing.T) {
 	registry := testRegistry(t)
 	sender := &recordedSender{}
 	dispatcher := testDispatcher(t, registry, sender)
-	if err := Register(dispatcher, func(context Context, notification *echopb.EchoNotify) error {
+	if err := Register(dispatcher, func(_ string, context Context, notification *echopb.EchoNotify) error {
 		return context.Push(
 			uint32(echopb.MsgId_S2C_ECHO_PUSH),
 			&echopb.EchoPush{Text: notification.GetText()},
@@ -283,7 +291,7 @@ func TestTypedNotificationCanPush(t *testing.T) {
 		MsgId:   uint32(echopb.MsgId_C2S_ECHO_NOTIFY),
 		Payload: payload,
 	})
-	if err := dispatcher.HandleFrame(frame); err != nil {
+	if err := dispatcher.HandleFrame("", frame); err != nil {
 		t.Fatalf("HandleFrame() error = %v", err)
 	}
 	if len(sender.envelopes) != 1 {
@@ -308,7 +316,7 @@ func TestNotificationCannotPushResponseMessage(t *testing.T) {
 	registry := testRegistry(t)
 	sender := &recordedSender{}
 	dispatcher := testDispatcher(t, registry, sender)
-	if err := Register(dispatcher, func(context Context, _ *echopb.EchoNotify) error {
+	if err := Register(dispatcher, func(_ string, context Context, _ *echopb.EchoNotify) error {
 		return context.Push(
 			uint32(echopb.MsgId_S2C_ECHO_RESPONSE),
 			&echopb.EchoResponse{},
@@ -319,7 +327,7 @@ func TestNotificationCannotPushResponseMessage(t *testing.T) {
 	frame := marshalEnvelope(t, &commonv1.Envelope{
 		MsgId: uint32(echopb.MsgId_C2S_ECHO_NOTIFY),
 	})
-	if err := dispatcher.HandleFrame(frame); err == nil {
+	if err := dispatcher.HandleFrame("", frame); err == nil {
 		t.Fatal("HandleFrame() error = nil, want Push kind validation error")
 	}
 	if len(sender.envelopes) != 0 {
@@ -333,7 +341,7 @@ func TestUnknownMessageReturnsGenericError(t *testing.T) {
 	sender := &recordedSender{}
 	dispatcher := testDispatcher(t, registry, sender)
 	frame := marshalEnvelope(t, &commonv1.Envelope{MsgId: 7777, RequestId: 46})
-	if err := dispatcher.HandleFrame(frame); !errors.Is(err, ErrUnknownMessageID) {
+	if err := dispatcher.HandleFrame("", frame); !errors.Is(err, ErrUnknownMessageID) {
 		t.Fatalf("HandleFrame() error = %v, want ErrUnknownMessageID", err)
 	}
 	if len(sender.envelopes) != 1 {
@@ -358,7 +366,7 @@ func TestUnknownNotificationDoesNotGenerateResponse(t *testing.T) {
 	sender := &recordedSender{}
 	dispatcher := testDispatcher(t, registry, sender)
 	frame := marshalEnvelope(t, &commonv1.Envelope{MsgId: 7777})
-	if err := dispatcher.HandleFrame(frame); !errors.Is(err, ErrUnknownMessageID) {
+	if err := dispatcher.HandleFrame("", frame); !errors.Is(err, ErrUnknownMessageID) {
 		t.Fatalf("HandleFrame() error = %v, want ErrUnknownMessageID", err)
 	}
 	if len(sender.envelopes) != 0 {
@@ -375,7 +383,7 @@ func TestDefinedMessageWithoutHandlerReturnsUnsupported(t *testing.T) {
 		MsgId:     uint32(echopb.MsgId_C2S_ECHO_REQUEST),
 		RequestId: 50,
 	})
-	if err := dispatcher.HandleFrame(frame); !errors.Is(err, ErrHandlerNotRegistered) {
+	if err := dispatcher.HandleFrame("", frame); !errors.Is(err, ErrHandlerNotRegistered) {
 		t.Fatalf("HandleFrame() error = %v, want ErrHandlerNotRegistered", err)
 	}
 	if len(sender.envelopes) != 1 || sender.envelopes[0].GetRequestId() != 50 {
@@ -391,7 +399,7 @@ func TestDefinedNotificationWithoutHandlerDoesNotRespond(t *testing.T) {
 	frame := marshalEnvelope(t, &commonv1.Envelope{
 		MsgId: uint32(echopb.MsgId_C2S_ECHO_NOTIFY),
 	})
-	if err := dispatcher.HandleFrame(frame); !errors.Is(err, ErrHandlerNotRegistered) {
+	if err := dispatcher.HandleFrame("", frame); !errors.Is(err, ErrHandlerNotRegistered) {
 		t.Fatalf("HandleFrame() error = %v, want ErrHandlerNotRegistered", err)
 	}
 	if len(sender.envelopes) != 0 {
@@ -404,14 +412,14 @@ func TestRequestWithoutHandlerResponseGetsError(t *testing.T) {
 	registry := testRegistry(t)
 	sender := &recordedSender{}
 	dispatcher := testDispatcher(t, registry, sender)
-	if err := Register(dispatcher, func(Context, *echopb.EchoRequest) error { return nil }); err != nil {
+	if err := Register(dispatcher, func(string, Context, *echopb.EchoRequest) error { return nil }); err != nil {
 		t.Fatalf("Register() error = %v", err)
 	}
 	frame := marshalEnvelope(t, &commonv1.Envelope{
 		MsgId:     uint32(echopb.MsgId_C2S_ECHO_REQUEST),
 		RequestId: 47,
 	})
-	if err := dispatcher.HandleFrame(frame); !errors.Is(err, ErrResponseRequired) {
+	if err := dispatcher.HandleFrame("", frame); !errors.Is(err, ErrResponseRequired) {
 		t.Fatalf("HandleFrame() error = %v, want ErrResponseRequired", err)
 	}
 	if len(sender.envelopes) != 1 || sender.envelopes[0].GetRequestId() != 47 {
@@ -424,11 +432,11 @@ func TestNotificationNeedsNoResponse(t *testing.T) {
 	registry := testNotificationRegistry(t)
 	sender := &recordedSender{}
 	dispatcher := testDispatcher(t, registry, sender)
-	if err := Register(dispatcher, func(Context, *echopb.EchoRequest) error { return nil }); err != nil {
+	if err := Register(dispatcher, func(string, Context, *echopb.EchoRequest) error { return nil }); err != nil {
 		t.Fatalf("Register() error = %v", err)
 	}
 	frame := marshalEnvelope(t, &commonv1.Envelope{MsgId: 7001})
-	if err := dispatcher.HandleFrame(frame); err != nil {
+	if err := dispatcher.HandleFrame("", frame); err != nil {
 		t.Fatalf("HandleFrame() error = %v", err)
 	}
 	if len(sender.envelopes) != 0 {
@@ -441,13 +449,13 @@ func TestNotificationCannotSendResponse(t *testing.T) {
 	registry := testNotificationRegistry(t)
 	sender := &recordedSender{}
 	dispatcher := testDispatcher(t, registry, sender)
-	if err := Register(dispatcher, func(context Context, _ *echopb.EchoRequest) error {
+	if err := Register(dispatcher, func(_ string, context Context, _ *echopb.EchoRequest) error {
 		return context.Response(uint32(commonv1.MsgId_S2C_ERROR_RESPONSE), &commonv1.ErrorResponse{})
 	}); err != nil {
 		t.Fatalf("Register() error = %v", err)
 	}
 	frame := marshalEnvelope(t, &commonv1.Envelope{MsgId: 7001})
-	if err := dispatcher.HandleFrame(frame); !errors.Is(err, ErrMissingRequestID) {
+	if err := dispatcher.HandleFrame("", frame); !errors.Is(err, ErrMissingRequestID) {
 		t.Fatalf("HandleFrame() error = %v, want ErrMissingRequestID", err)
 	}
 	if len(sender.envelopes) != 0 {
@@ -460,7 +468,7 @@ func TestHandlerErrorDoesNotLeakDetails(t *testing.T) {
 	registry := testRegistry(t)
 	sender := &recordedSender{}
 	dispatcher := testDispatcher(t, registry, sender)
-	if err := Register(dispatcher, func(Context, *echopb.EchoRequest) error {
+	if err := Register(dispatcher, func(string, Context, *echopb.EchoRequest) error {
 		return errors.New("private database address")
 	}); err != nil {
 		t.Fatalf("Register() error = %v", err)
@@ -469,7 +477,7 @@ func TestHandlerErrorDoesNotLeakDetails(t *testing.T) {
 		MsgId:     uint32(echopb.MsgId_C2S_ECHO_REQUEST),
 		RequestId: 49,
 	})
-	if err := dispatcher.HandleFrame(frame); err == nil {
+	if err := dispatcher.HandleFrame("", frame); err == nil {
 		t.Fatal("HandleFrame() error = nil, want Handler error")
 	}
 	if len(sender.envelopes) != 1 {
@@ -491,7 +499,7 @@ func TestErrorResponseSendFailurePreservesHandlerError(t *testing.T) {
 	registry := testRegistry(t)
 	sender := &recordedSender{sendErr: sendErr}
 	dispatcher := testDispatcher(t, registry, sender)
-	if err := Register(dispatcher, func(Context, *echopb.EchoRequest) error {
+	if err := Register(dispatcher, func(string, Context, *echopb.EchoRequest) error {
 		return handlerErr
 	}); err != nil {
 		t.Fatalf("Register() error = %v", err)
@@ -500,7 +508,7 @@ func TestErrorResponseSendFailurePreservesHandlerError(t *testing.T) {
 		MsgId:     uint32(echopb.MsgId_C2S_ECHO_REQUEST),
 		RequestId: 58,
 	})
-	err := dispatcher.HandleFrame(frame)
+	err := dispatcher.HandleFrame("", frame)
 	if !errors.Is(err, handlerErr) || !errors.Is(err, sendErr) {
 		t.Fatalf("HandleFrame() error = %v, want both Handler and response send errors", err)
 	}
@@ -528,7 +536,7 @@ func TestRequestRequiresIDAndOnlyOneResponse(t *testing.T) {
 	sender := &recordedSender{}
 	dispatcher := testDispatcher(t, registry, sender)
 	handlerCalls := 0
-	if err := Register(dispatcher, func(context Context, _ *echopb.EchoRequest) error {
+	if err := Register(dispatcher, func(_ string, context Context, _ *echopb.EchoRequest) error {
 		handlerCalls++
 		if err := context.Response(uint32(echopb.MsgId_S2C_ECHO_RESPONSE), &echopb.EchoResponse{}); err != nil {
 			return err
@@ -540,7 +548,7 @@ func TestRequestRequiresIDAndOnlyOneResponse(t *testing.T) {
 	requestWithoutID := marshalEnvelope(t, &commonv1.Envelope{
 		MsgId: uint32(echopb.MsgId_C2S_ECHO_REQUEST),
 	})
-	if err := dispatcher.HandleFrame(requestWithoutID); !errors.Is(err, ErrRequestIDMismatch) {
+	if err := dispatcher.HandleFrame("", requestWithoutID); !errors.Is(err, ErrRequestIDMismatch) {
 		t.Fatalf("request without ID HandleFrame() error = %v, want ErrRequestIDMismatch", err)
 	}
 	if handlerCalls != 0 {
@@ -550,7 +558,7 @@ func TestRequestRequiresIDAndOnlyOneResponse(t *testing.T) {
 		MsgId:     uint32(echopb.MsgId_C2S_ECHO_REQUEST),
 		RequestId: 48,
 	})
-	if err := dispatcher.HandleFrame(request); !errors.Is(err, ErrDuplicateResponse) {
+	if err := dispatcher.HandleFrame("", request); !errors.Is(err, ErrDuplicateResponse) {
 		t.Fatalf("request HandleFrame() error = %v, want ErrDuplicateResponse", err)
 	}
 	if handlerCalls != 1 {

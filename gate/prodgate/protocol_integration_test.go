@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	commonv1 "github.com/cnooljaw/gsr/gate/gen/go/gsr/common/v1"
 	echopb "github.com/cnooljaw/gsr/examples/websocket-gate/gen/go/gsr/example/echo/v1"
+	commonv1 "github.com/cnooljaw/gsr/gate/gen/go/gsr/common/v1"
 	"github.com/cnooljaw/gsr/gate/protocol"
 	"github.com/cnooljaw/gsr/runtime"
 	"github.com/gorilla/websocket"
@@ -18,7 +18,7 @@ import (
 // protocolGateAgent 将真实协议分发器接入生产 Gate 测试，验证未知消息不会破坏连接。
 type protocolGateAgent struct {
 	client                 ClientSession
-	dispatcher             *protocol.Dispatcher
+	dispatcher             *protocol.Dispatcher[runtime.CommandContext]
 	disconnected           chan struct{}
 	omitEchoRequestHandler bool
 	stopOnce               sync.Once
@@ -33,14 +33,15 @@ const protocolTimeoutCommand runtime.CommandID = 0x7100
 type timeoutProtocolAgent struct {
 	client       ClientSession
 	target       runtime.ServiceID
-	self         runtime.ServiceContext
-	dispatcher   *protocol.Dispatcher
+	id           runtime.ServiceID
+	dispatcher   *protocol.Dispatcher[runtime.CommandContext]
 	disconnected chan struct{}
 	stopOnce     sync.Once
 }
 
 // blockingProtocolTarget 为测试中的慢目标，释放前不会完成 Core Command。
 type blockingProtocolTarget struct {
+	source      runtime.ServiceID
 	started     chan struct{}
 	done        chan struct{}
 	release     chan struct{}
@@ -53,11 +54,14 @@ func (target *blockingProtocolTarget) OnStart(context.Context, runtime.ServiceCo
 	return nil
 }
 
-func (target *blockingProtocolTarget) Handle(_ runtime.CommandContext, command runtime.CommandID, _ ...any) (any, error) {
+func (target *blockingProtocolTarget) Handle(self runtime.CommandContext, command runtime.CommandID, _ ...any) (any, error) {
 	if command != protocolTimeoutCommand {
 		return nil, errors.New("unexpected timeout target command")
 	}
-	target.startOnce.Do(func() { close(target.started) })
+	target.startOnce.Do(func() {
+		target.source = self.Source()
+		close(target.started)
+	})
 	<-target.release
 	target.doneOnce.Do(func() { close(target.done) })
 	return nil, nil
@@ -80,14 +84,14 @@ func (agent *timeoutProtocolAgent) OnStart(_ context.Context, self runtime.Servi
 	if err != nil {
 		return err
 	}
-	dispatcher, err := protocol.NewDispatcher(registry, session)
+	dispatcher, err := protocol.NewDispatcher[runtime.CommandContext](registry, session)
 	if err != nil {
 		return err
 	}
 	if err := protocol.Register(dispatcher, agent.onEcho); err != nil {
 		return err
 	}
-	agent.self = self
+	agent.id = self.Self()
 	agent.dispatcher = dispatcher
 	return nil
 }
@@ -101,17 +105,17 @@ func (agent *timeoutProtocolAgent) Handle(commandContext runtime.CommandContext,
 	return nil, nil
 }
 
-func (agent *timeoutProtocolAgent) HandleClientMessage(_ runtime.CommandContext, frame []byte) error {
+func (agent *timeoutProtocolAgent) HandleClientMessage(self runtime.CommandContext, frame []byte) error {
 	if agent.dispatcher == nil {
 		return errors.New("timeout protocol Agent dispatcher is not initialized")
 	}
-	return agent.dispatcher.HandleFrame(frame)
+	return agent.dispatcher.HandleFrame(self, frame)
 }
 
-func (agent *timeoutProtocolAgent) onEcho(handlerContext protocol.Context, _ *echopb.EchoRequest) error {
+func (agent *timeoutProtocolAgent) onEcho(self runtime.CommandContext, handlerContext protocol.Context, _ *echopb.EchoRequest) error {
 	callContext, cancel := context.WithTimeout(context.Background(), 20*time.Millisecond)
 	defer cancel()
-	if _, err := agent.self.Call(callContext, agent.target, protocolTimeoutCommand); err != nil {
+	if _, err := self.Call(callContext, agent.target, protocolTimeoutCommand); err != nil {
 		return err
 	}
 	return handlerContext.Response(
@@ -136,7 +140,7 @@ func (agent *protocolGateAgent) OnStart(_ context.Context, _ runtime.ServiceCont
 	if err != nil {
 		return err
 	}
-	dispatcher, err := protocol.NewDispatcher(registry, session)
+	dispatcher, err := protocol.NewDispatcher[runtime.CommandContext](registry, session)
 	if err != nil {
 		return err
 	}
@@ -161,14 +165,14 @@ func (agent *protocolGateAgent) Handle(commandContext runtime.CommandContext, co
 	return nil, nil
 }
 
-func (agent *protocolGateAgent) HandleClientMessage(_ runtime.CommandContext, frame []byte) error {
+func (agent *protocolGateAgent) HandleClientMessage(self runtime.CommandContext, frame []byte) error {
 	if agent.dispatcher == nil {
 		return errors.New("protocol Gate Agent dispatcher is not initialized")
 	}
-	return agent.dispatcher.HandleFrame(frame)
+	return agent.dispatcher.HandleFrame(self, frame)
 }
 
-func (agent *protocolGateAgent) onEcho(context protocol.Context, request *echopb.EchoRequest) error {
+func (agent *protocolGateAgent) onEcho(_ runtime.CommandContext, context protocol.Context, request *echopb.EchoRequest) error {
 	if agent.echoStarted != nil {
 		agent.echoBlockOnce.Do(func() {
 			close(agent.echoStarted)
@@ -184,7 +188,7 @@ func (agent *protocolGateAgent) onEcho(context protocol.Context, request *echopb
 	)
 }
 
-func (agent *protocolGateAgent) onEchoNotify(context protocol.Context, request *echopb.EchoNotify) error {
+func (agent *protocolGateAgent) onEchoNotify(_ runtime.CommandContext, context protocol.Context, request *echopb.EchoNotify) error {
 	return context.Push(
 		uint32(echopb.MsgId_S2C_ECHO_PUSH),
 		&echopb.EchoPush{Text: request.GetText()},
@@ -295,7 +299,7 @@ func TestProdGateKeepsConnectionAfterClientRequestTimeout(t *testing.T) {
 	}
 }
 
-// TestProdGateReturnsErrorAfterAgentCallTimeout 验证 Agent 内部 Core Call 超时后回传通用错误，迟到内部完成不再生成第二条客户端响应。
+// TestProdGateReturnsErrorAfterAgentCallTimeout 验证协议 Handler 以当前 Agent 为来源调用 Service，超时只回一次客户端错误。
 func TestProdGateReturnsErrorAfterAgentCallTimeout(t *testing.T) {
 	target := &blockingProtocolTarget{
 		started: make(chan struct{}),
@@ -345,6 +349,9 @@ func TestProdGateReturnsErrorAfterAgentCallTimeout(t *testing.T) {
 	case <-target.started:
 	case <-time.After(time.Second):
 		t.Fatal("timeout target did not start")
+	}
+	if target.source == 0 || target.source != agent.id {
+		t.Fatalf("Call source = %d, want current Agent %d", target.source, agent.id)
 	}
 	_, responseBytes, err := readTestBinaryMessage(t, connection)
 	if err != nil {
