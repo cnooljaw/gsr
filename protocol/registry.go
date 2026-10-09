@@ -7,6 +7,7 @@ import (
 	"reflect"
 
 	"github.com/cnooljaw/gsr/protocol/catalog"
+	commonv1 "github.com/cnooljaw/gsr/protocol/gen/go/gsr/common/v1"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -33,11 +34,17 @@ type Registry struct {
 	byType map[reflect.Type]catalog.Entry
 }
 
-// NewRegistry 合并通用协议和业务协议生成的消息目录。
+// NewRegistry 自动纳入框架通用目录，再合并业务生成目录；调用方只传业务目录。
+// 通用消息编号和类型不可覆盖或重映射，重复传入通用目录也会返回冲突错误。
 func NewRegistry(catalogs ...[]catalog.Entry) (*Registry, error) {
 	registry := &Registry{
 		byID:   make(map[uint32]catalog.Entry),
 		byType: make(map[reflect.Type]catalog.Entry),
+	}
+	for _, entry := range commonv1.MessageCatalogGsrCommonV1Common {
+		if err := registry.add(entry); err != nil {
+			return nil, err
+		}
 	}
 	for _, entries := range catalogs {
 		for _, entry := range entries {

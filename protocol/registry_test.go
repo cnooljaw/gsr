@@ -27,7 +27,6 @@ func (sender *recordedSender) Send(frame []byte) error {
 func testRegistry(t *testing.T) *Registry {
 	t.Helper()
 	registry, err := NewRegistry(
-		commonv1.MessageCatalogGsrCommonV1Common,
 		echopb.MessageCatalogGsrExampleEchoV1Echo,
 	)
 	if err != nil {
@@ -93,14 +92,6 @@ func testNotificationRegistry(t *testing.T) *Registry {
 	registry, err := NewRegistry(
 		[]catalog.Entry{
 			{
-				ID:        9001,
-				Direction: catalog.ServerToClient,
-				Kind:      catalog.Response,
-				NewMessage: func() proto.Message {
-					return &commonv1.ErrorResponse{}
-				},
-			},
-			{
 				ID:        7001,
 				Direction: catalog.ClientToServer,
 				Kind:      catalog.Notify,
@@ -144,12 +135,34 @@ func TestGeneratedRegistryDecodesMessageAndChecksRequestID(t *testing.T) {
 	}
 }
 
-// TestNewRegistryRejectsAmbiguousEntries 验证合并协议目录时拒绝重复消息编号和重复 Protobuf 类型。
+// TestNewRegistryRejectsAmbiguousEntries 验证重复业务映射与覆盖、重映射框架通用协议均在构造时拒绝。
 func TestNewRegistryRejectsAmbiguousEntries(t *testing.T) {
 	testCases := []struct {
 		name    string
 		entries []catalog.Entry
 	}{
+		{
+			name: "reserved common msg_id",
+			entries: []catalog.Entry{{
+				ID:         uint32(commonv1.MsgId_S2C_ERROR_RESPONSE),
+				Direction:  catalog.ClientToServer,
+				Kind:       catalog.Request,
+				NewMessage: func() proto.Message { return &echopb.EchoRequest{} },
+			}},
+		},
+		{
+			name: "remapped common payload",
+			entries: []catalog.Entry{{
+				ID:         1004,
+				Direction:  catalog.ServerToClient,
+				Kind:       catalog.Response,
+				NewMessage: func() proto.Message { return &commonv1.ErrorResponse{} },
+			}},
+		},
+		{
+			name:    "explicit common catalog",
+			entries: commonv1.MessageCatalogGsrCommonV1Common,
+		},
 		{
 			name: "duplicate msg_id",
 			entries: []catalog.Entry{

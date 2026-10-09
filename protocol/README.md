@@ -27,7 +27,15 @@
 
 两种入口都由同一个 Agent Mailbox 和 runner 串行执行，不因使用两个分发组件增加执行单元。Echo Agent 的普通 Command 只处理断线通知，因此直接在显式 `Handle` 中处理，不需要额外创建 `gsr.Dispatcher`；有多个普通业务命令时再按默认规范使用它。
 
-应用 Agent 用具名字段持有 `*protocol.Dispatcher[gsr.CommandContext]`。共享 Registry 在应用组装时合并生成目录；Agent 在 `OnStart` 中将目录和自己的 ClientSession 交给 Dispatcher，并注册已实现的业务 Handler：
+应用 Agent 用具名字段持有 `*protocol.Dispatcher[gsr.CommandContext]`。共享 Registry 在应用组装时只传业务生成目录，构造器自动纳入框架通用目录：
+
+```go
+registry, err := protocol.NewRegistry(echopb.MessageCatalogGsrExampleEchoV1Echo)
+```
+
+调用方处理构造错误后再使用 Registry。通用 ErrorResponse 使用固定编号 9001，业务不得覆盖或重映射；重复传入通用目录与其它编号、类型冲突一样，在构造时拒绝，不提供兼容去重。
+
+Agent 在 `OnStart` 中将 Registry 和自己的 ClientSession 交给 Dispatcher，并注册已实现的业务 Handler：
 
 ```go
 dispatcher, err := protocol.NewDispatcher[gsr.CommandContext](registry, agent.client)

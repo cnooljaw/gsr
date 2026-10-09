@@ -74,7 +74,6 @@ func (target *blockingProtocolTarget) OnStop(context.Context) error {
 
 func (agent *timeoutProtocolAgent) OnStart(_ context.Context, self runtime.ServiceContext) error {
 	registry, err := protocol.NewRegistry(
-		commonv1.MessageCatalogGsrCommonV1Common,
 		echopb.MessageCatalogGsrExampleEchoV1Echo,
 	)
 	if err != nil {
@@ -126,7 +125,6 @@ func (agent *timeoutProtocolAgent) OnStop(context.Context) error {
 
 func (agent *protocolGateAgent) OnStart(_ context.Context, _ runtime.ServiceContext) error {
 	registry, err := protocol.NewRegistry(
-		commonv1.MessageCatalogGsrCommonV1Common,
 		echopb.MessageCatalogGsrExampleEchoV1Echo,
 	)
 	if err != nil {

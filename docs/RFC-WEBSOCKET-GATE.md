@@ -258,6 +258,8 @@ mac
 
 ## TypeScript Protobuf 生成方案
 
+Go 端通过 `protocol.NewRegistry(businessCatalogs...)` 合并业务生成目录，框架通用目录由构造器自动纳入。通用 ErrorResponse 的 msg_id 固定为 9001，业务不可覆盖或重映射；重复传入通用目录及其它编号、类型冲突均在构造时拒绝。此接线简化不改变线上 Envelope 或通用错误字节格式。
+
 命令行客户端使用 Protobuf-ES：`.proto` 是 Go 服务端与 TypeScript 客户端共同的唯一协议源，由 Buf CLI 的单个 `buf generate` 配置分别调用本地 `protoc-gen-go` 和 `protoc-gen-es`。TypeScript 使用 `@bufbuild/protobuf` 运行时和 `protoc-gen-es` 生成的类型化消息，不在客户端手写二进制编码或运行时反射解析 `.proto`。
 
 - `buf.yaml` 与 `buf.gen.yaml` 放在仓库根目录；输入包括框架 `protocol/proto/` 的通用协议和示例 `examples/websocket-gate/proto/` 的 Echo 协议。

@@ -7,6 +7,7 @@ Gate 负责有界、顺序、失败可观察地收发不透明消息；Protocol 
 - Gate 管理连接、握手、seq/MAC、容量、出站队列和关闭；不导入 Protobuf，不解释 msg_id、request_id 或 payload。握手是传输认证格式，不属于业务 Protocol。Plain 不具备 MAC 模式的认证保证。
 - `gate.ClientSession` 留在 Gate，只提供 `Send([]byte) error` 和 `Close() error`。Send 在成功接纳时复制快照，之后发送方可以复用缓冲区；nil 与空切片均表示零字节消息，仍收取队列条目开销。成功仅代表本地队列接纳，不保证客户端收到、业务执行或执行一次，不自动重放。
 - Protocol 持有通用 `.proto`、生成类型、目录、生成工具、Envelope 编解码、强类型分发和 Response/Push；写回只依赖现有 `ClientSender` 的 `Send([]byte) error`，不拥有连接，不要求 Close，也不依赖 Gate。
+- `protocol.NewRegistry(businessCatalogs...)` 自动纳入框架通用目录，业务只传自己的生成目录，不重复传入通用目录。通用 ErrorResponse 编号固定为 9001，业务不得覆盖该编号或将通用类型映射到其它编号；所有编号和类型冲突在 Registry 构造时拒绝，不静默覆盖或去重。Dispatcher 不要求业务补接框架的错误回复依赖。
 - Agent 将 Gate 投递的字节交给 `protocol.Dispatcher`，将自身连接写回能力交给 Dispatcher；Protocol 编码完整 Envelope 后发送字节。具体业务 `.proto` 与 Handler 仍属于业务项目，Runtime/Core/Cluster 语义不变。
 - Runtime 的客户端入口只负责能力接纳、字节快照和 Mailbox 投递，不要求 Protobuf 格式；Envelope 是 Protocol 的消息格式，不是 Core 的消息类型或准入条件。
 

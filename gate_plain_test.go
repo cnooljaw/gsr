@@ -116,7 +116,7 @@ type applicationGateAgent struct {
 }
 
 func (agent *applicationGateAgent) OnStart(context.Context, ServiceContext) error {
-	registry, err := protocol.NewRegistry(commonv1.MessageCatalogGsrCommonV1Common, echopb.MessageCatalogGsrExampleEchoV1Echo)
+	registry, err := protocol.NewRegistry(echopb.MessageCatalogGsrExampleEchoV1Echo)
 	if err != nil {
 		return err
 	}

@@ -7,7 +7,6 @@ import (
 	echopb "github.com/cnooljaw/gsr/examples/websocket-gate/gen/go/gsr/example/echo/v1"
 	"github.com/cnooljaw/gsr/gate"
 	"github.com/cnooljaw/gsr/protocol"
-	commonv1 "github.com/cnooljaw/gsr/protocol/gen/go/gsr/common/v1"
 	"github.com/cnooljaw/gsr/runtime"
 )
 
@@ -19,7 +18,6 @@ type echoAgent struct {
 
 func newEchoRegistry() (*protocol.Registry, error) {
 	return protocol.NewRegistry(
-		commonv1.MessageCatalogGsrCommonV1Common,
 		echopb.MessageCatalogGsrExampleEchoV1Echo,
 	)
 }

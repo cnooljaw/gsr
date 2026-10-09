@@ -8,6 +8,8 @@ Go 启动入口只解析参数、处理退出信号并调用 `gsr.Run`。MainSer
 
 ## 运行
 
+组装协议目录时只需 `protocol.NewRegistry(echopb.MessageCatalogGsrExampleEchoV1Echo)`；框架自动纳入通用错误目录，业务不重复传入。通用错误编号 9001 不得被业务占用，冲突在构造时拒绝。
+
 Agent 的强类型 Handler 现在接收 `self gsr.CommandContext` 和 `ctx protocol.Context`：前者用于调用其它 Service，后者用于客户端响应与 Push。Echo 不需要访问其它 Service，因此把 self 写为 `_`。公共接入写法见 [Agent 中的协议分发](../../protocol/README.md#agent-中的协议分发)。
 
 需要 Go 1.24 或更高版本、Node.js 22.15 或更高版本，以及 `protoc-gen-go` v1.36.1 在 `PATH` 中。可用下面的命令安装 Go 插件；Buf CLI 和 TypeScript 生成插件由本目录锁定的 npm 依赖提供。
