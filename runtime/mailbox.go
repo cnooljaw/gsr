@@ -18,8 +18,8 @@ type Message struct {
 	Command CommandID
 	Args    []any
 
-	kind           messageKind // 当前内部消息类型。
-	clientEnvelope []byte      // 客户端 Protobuf Envelope 的独占字节快照。
+	kind        messageKind // 当前内部消息类型。
+	clientFrame []byte      // 客户端不透明消息的独占字节快照。
 }
 
 // mailbox 是带有独立唤醒信号的有界 FIFO 队列。

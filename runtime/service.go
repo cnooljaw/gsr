@@ -19,8 +19,8 @@ type Service interface {
 
 // ClientMessageHandler 是 Service 可选的客户端消息处理能力。
 //
-// 实现该接口后，Runtime 才会接纳 DeliverClientMessage 投递到此 Service 的 Envelope。
-// 客户端消息与 Core Command 共用目标 Service 的 Mailbox 和串行 runner；Runtime 不解析 Envelope。
+// 实现该接口后，Runtime 才会接纳 DeliverClientMessage 投递到此 Service 的不透明字节消息。
+// 客户端消息与 Core Command 共用目标 Service 的 Mailbox 和串行 runner；Runtime 不解析消息格式。
 type ClientMessageHandler interface {
 	HandleClientMessage(CommandContext, []byte) error
 }
@@ -343,7 +343,7 @@ func (runtime *Runtime) executeMessage(instance *serviceInstance, message Messag
 		if !ok {
 			return nil, ErrClientMessageUnsupported
 		}
-		return nil, handler.HandleClientMessage(messageContext, message.clientEnvelope)
+		return nil, handler.HandleClientMessage(messageContext, message.clientFrame)
 	default:
 		return nil, ErrClientMessageUnsupported
 	}

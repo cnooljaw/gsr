@@ -8,6 +8,7 @@ Gate 负责有界、顺序、失败可观察地收发不透明消息；Protocol 
 - `gate.ClientSession` 留在 Gate，只提供 `Send([]byte) error` 和 `Close() error`。Send 在成功接纳时复制快照，之后发送方可以复用缓冲区；nil 与空切片均表示零字节消息，仍收取队列条目开销。成功仅代表本地队列接纳，不保证客户端收到、业务执行或执行一次，不自动重放。
 - Protocol 持有通用 `.proto`、生成类型、目录、生成工具、Envelope 编解码、强类型分发和 Response/Push；写回只依赖现有 `ClientSender` 的 `Send([]byte) error`，不拥有连接，不要求 Close，也不依赖 Gate。
 - Agent 将 Gate 投递的字节交给 `protocol.Dispatcher`，将自身连接写回能力交给 Dispatcher；Protocol 编码完整 Envelope 后发送字节。具体业务 `.proto` 与 Handler 仍属于业务项目，Runtime/Core/Cluster 语义不变。
+- Runtime 的客户端入口只负责能力接纳、字节快照和 Mailbox 投递，不要求 Protobuf 格式；Envelope 是 Protocol 的消息格式，不是 Core 的消息类型或准入条件。
 
 入站为 `Gate → 字节快照 → Agent → Protocol → Handler`；出站为 `Handler → Protocol 编码 → 字节消息 → Gate`。包级依赖仅由 Agent 同时指向 Gate 和 Protocol；上面的箭头表示数据流，不表示 Gate 与 Protocol 互相导入。
 

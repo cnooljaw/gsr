@@ -19,7 +19,7 @@ type Service interface {
 }
 
 // ClientMessageHandler 是 Agent 等应用 Service 可选的客户端消息处理能力。
-// 只有实现它的 Service 才能接收 Gate 经 Runtime 投递的完整 Envelope 字节。
+// 只有实现它的 Service 才能接收 Gate 经 Runtime 投递的不透明客户端字节消息。
 // 客户端消息与普通 Command 共用该 Service 的 Mailbox，由 GSR runner 逐条执行。
 type ClientMessageHandler interface {
 	HandleClientMessage(CommandContext, []byte) error
@@ -100,11 +100,11 @@ func (adapter *serviceAdapter) Handle(ctx runtime.CommandContext, command runtim
 	}, command, args...)
 }
 
-func (adapter *clientMessageAdapter) HandleClientMessage(ctx runtime.CommandContext, envelope []byte) error {
+func (adapter *clientMessageAdapter) HandleClientMessage(ctx runtime.CommandContext, frame []byte) error {
 	return adapter.handler.HandleClientMessage(&commandContext{
 		serviceContext: &serviceContext{ServiceContext: ctx, adapter: adapter.serviceAdapter},
 		source:         ctx.Source(),
-	}, envelope)
+	}, frame)
 }
 
 func (adapter *serviceAdapter) OnStop(ctx context.Context) error {

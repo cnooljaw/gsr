@@ -220,14 +220,14 @@ func (runtime *Runtime) Send(target ServiceID, command CommandID, args ...any) e
 	return runtime.dispatcher.dispatchRuntimeOwned(target, command, args...)
 }
 
-// DeliverClientMessage 将完整的 Protobuf Envelope 作为不透明字节投递给目标 Service。
+// DeliverClientMessage 将不透明客户端字节消息投递给目标 Service，不要求 Protobuf 格式。
 // 这是供 Gate 等受信任基础设施使用的单向入口；Runtime 会复制字节快照，
 // 且只接纳实现 ClientMessageHandler 的目标 Service。
-func (runtime *Runtime) DeliverClientMessage(target ServiceID, envelope []byte) error {
+func (runtime *Runtime) DeliverClientMessage(target ServiceID, frame []byte) error {
 	if runtime.dispatcher == nil {
 		return ErrRuntimeClosed
 	}
-	return runtime.dispatcher.dispatchRuntimeOwnedClient(target, envelope)
+	return runtime.dispatcher.dispatchRuntimeOwnedClient(target, frame)
 }
 
 func (runtime *Runtime) sendFrom(source *serviceInstance, target ServiceID, command CommandID, args ...any) error {
@@ -281,12 +281,12 @@ func (dispatcher *localDispatcher) dispatchRuntimeOwnedWithSession(target Servic
 	})
 }
 
-func (dispatcher *localDispatcher) dispatchRuntimeOwnedClient(target ServiceID, envelope []byte) error {
+func (dispatcher *localDispatcher) dispatchRuntimeOwnedClient(target ServiceID, frame []byte) error {
 	return dispatcher.enqueue(Message{
-		Source:         ServiceID(0),
-		Target:         target,
-		kind:           messageKindClient,
-		clientEnvelope: envelope,
+		Source:      ServiceID(0),
+		Target:      target,
+		kind:        messageKindClient,
+		clientFrame: frame,
 	})
 }
 
@@ -331,7 +331,7 @@ func (dispatcher *localDispatcher) enqueue(message Message) (err error) {
 		if _, supportsClientMessages := targetInstance.service.(ClientMessageHandler); !supportsClientMessages {
 			return ErrClientMessageUnsupported
 		}
-		message.clientEnvelope = append([]byte(nil), message.clientEnvelope...)
+		message.clientFrame = append([]byte(nil), message.clientFrame...)
 	}
 
 	return targetInstance.mailbox.enqueue(message)
