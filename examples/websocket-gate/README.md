@@ -4,7 +4,7 @@
 
 Go 启动入口只解析参数、处理退出信号并调用 `gsr.Run`。MainService 统一调用 `self.OpenGate` 并明确选择 Protocol，提供返回 `gsr.Service` 的 Echo Agent 构造回调，然后自身退出；Gate 与连接 Agent 继续运行，由 Runtime 在进程退出时统一停止。Echo Agent 显式实现普通 `Handle` 和可选的 `HandleClientMessage`，两种消息入口共用该 Service 的 Mailbox 和 runner。
 
-框架通用 Envelope 和连接控制消息定义在仓库根目录的 `protocol/proto/gsr/common/v1/common.proto`；Echo 示例的消息编号和 payload 仍定义在本目录的 `proto/gsr/example/echo/v1/echo.proto`。每个消息编号通过 `.proto` option 显式关联 payload、方向和 Request/Notify/Response/Push 种类，`npm run generate` 从仓库根目录的 Buf 配置同时生成 Go 与 TypeScript 类型和 Go 协议目录。业务 Handler 按实现进度手动注册；新协议消息可以先定义，之后逐个补 Handler。
+框架通用 Envelope 和 ErrorResponse 定义在仓库根目录的 `protocol/proto/gsr/common/v1/common.proto`；Echo 示例的消息编号和 payload 仍定义在本目录的 `proto/gsr/example/echo/v1/echo.proto`。握手属于 Gate 的固定二进制格式，断线通知属于内部 Core Command，二者都不是这里的 Protobuf 消息。每个消息编号通过 `.proto` option 显式关联 payload、方向和 Request/Notify/Response/Push 种类，`npm run generate` 从仓库根目录的 Buf 配置同时生成 Go 与 TypeScript 类型和 Go 协议目录。业务 Handler 按实现进度手动注册；新协议消息可以先定义，之后逐个补 Handler。
 
 ## 运行
 
@@ -58,7 +58,7 @@ GSR_GATE_STRESS=1 GSR_GATE_FAILURE_ATTEMPTS=32 go test ../../gate -run '^TestMAC
 
 测试会确认失败连接不进入 Agent 业务处理，并记录失败连接和已接纳连接数量。
 
-终端一启动 GSR 服务端，默认是 DebugGate：
+终端一启动 GSR 服务端，示例默认选择 Gate 的 Plain 模式（框架配置的零值默认仍是 MAC）：
 
 ```bash
 go run ./cmd/debugserver
@@ -78,7 +78,7 @@ npm run client -- --text "hello GSR"
 
 服务端默认只监听 `127.0.0.1:7888`。可以通过 `--addr 127.0.0.1:PORT` 指定其它本地端口，并通过客户端 `--url ws://127.0.0.1:PORT/ws` 连接。
 
-TypeScript CLI 默认连接 DebugGate，只演练 Echo Request/Response 的编解码和 `request_id` 回传。连接生产 Gate 时增加 `--secure`，客户端会先发送固定 33 字节 X25519 握手，再发送 `seq | Envelope | MAC`：
+TypeScript CLI 默认连接 Plain 模式，只演练 Echo Request/Response 的编解码和 `request_id` 回传。连接 MAC 模式时增加 `--secure`，客户端会先发送固定 33 字节 X25519 握手，再发送 `seq | Envelope | MAC`；该参数启用应用层认证，不会把 WS 自动改为 WSS：
 
 直连配置 TLS 的生产 Gate 使用 `wss://` 地址，例如：
 
@@ -106,4 +106,4 @@ go run ./cmd/debugserver --prod --addr 127.0.0.1:7889 --tls-cert /path/to/server
 npm run client -- --secure --url wss://127.0.0.1:7889/ws --text "hello WSS"
 ```
 
-客户端必须信任证书且证书的 SAN 包含连接地址；本机自签名测试证书可通过 `NODE_EXTRA_CA_CERTS=/path/to/server.crt` 交给 Node.js 信任，不要关闭 TLS 验证。证书文件参数不能用于 DebugGate。正式部署仍由业务应用决定证书来源和监听配置；示例不提供证书管理或自动续期。
+客户端必须信任证书且证书的 SAN 包含连接地址；本机自签名测试证书可通过 `NODE_EXTRA_CA_CERTS=/path/to/server.crt` 交给 Node.js 信任，不要关闭 TLS 验证。此示例只在 `--prod` 下接受证书文件参数；这是示例 CLI 的限制，框架 Gate 的 Plain 模式也支持 TLS。正式部署仍由业务应用决定证书来源和监听配置；示例不提供证书管理或自动续期。

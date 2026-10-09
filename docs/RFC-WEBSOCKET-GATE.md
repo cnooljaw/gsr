@@ -1,10 +1,10 @@
 # WebSocket Gate、客户端协议与 Agent
 
-状态：设计方向已确认；DebugGate 示例已完成 Go/TypeScript Echo 往返，跨语言认证固定向量已完成；生产 Gate 已接入可选直连 WSS 或 Ingress 终止 TLS 后的 HTTP WebSocket、固定二进制握手、上行认证、Agent 投递、连接写回和 Runtime 共享 Logger。单/多慢连接、混合连接与部分失败阶段已有可重复测试；目标部署容量、完整失败矩阵和密码协议审查尚未完成。
+状态：设计方向已确认；统一 Gate 的 Plain/MAC 模式及 Go/TypeScript Echo 往返已实现，跨语言认证固定向量已完成；MAC 模式已接入可选直连 WSS 或 Ingress 终止 TLS 后的 HTTP WebSocket、固定二进制握手、上行认证、Agent 投递、连接写回和 Runtime 共享 Logger。Gate 与 Protocol 为同级独立包。单/多慢连接、混合连接与部分失败阶段已有可重复测试；目标部署容量、完整失败矩阵和密码协议审查尚未完成。
 
 ## 范围与参考
 
-首版只支持 WebSocket，公网客户端使用 WSS/TLS；生产 Gate 默认允许由 K8s Ingress 终止 TLS 后以 HTTP/1.1 WebSocket 转发到 Pod，也支持显式配置 TLS 证书的直连 WSS。另提供显式开启的内网 DebugGate，以最小业务往返验证接入设计。HTTP 入站/出站、Redis、MySQL 是另一组 Core 外能力，后续分别推进。
+首版只支持 WebSocket，公网客户端使用 WSS/TLS；Gate 允许由 K8s Ingress 终止 TLS 后以 HTTP/1.1 WebSocket 转发到 Pod，也支持显式配置 TLS 证书的直连 WSS。只有一个 Gate 实现：MAC 为默认认证模式，Plain 为显式选择的可信内网模式，不是另一个 DebugGate 组件。HTTP 入站/出站、Redis、MySQL 是另一组 Core 外能力，不属于 Gate 或 Protocol。
 
 Skynet 的 `lualib/snax/gateserver.lua` 通过 socketdriver 消息及 Lua coroutine 管理监听、连接与数据事件；GSR 借鉴职责分离，不照搬 TCP netpack 和 C/Lua 调度。Go I/O 任务必须有明确 owner 管理容量、取消、关闭和等待。
 
@@ -15,15 +15,15 @@ Skynet 的 `lualib/snax/gateserver.lua` 通过 socketdriver 消息及 Lua corout
 一条完整 WebSocket 二进制消息对应一个应用包，不把 WebSocket 物理分片当作应用消息，不另加长度头。
 
 ```text
-连接阶段：Client ↔ Gateway，交换 X25519 公钥
+MAC 连接阶段：Client ↔ Gateway，交换 X25519 公钥
           X25519 shared → HKDF → 上行 macKey
 
-生产 Gate 上行：seq（8B） | Protobuf Envelope | MAC（16B）
-生产 Gate 下行：Protobuf Envelope
-DebugGate 上行/下行：Protobuf Envelope
+MAC 上行：seq（8B） | Protobuf Envelope | MAC（16B）
+MAC 下行：Protobuf Envelope
+Plain 上行/下行：Protobuf Envelope（无应用握手）
 ```
 
-生产 Gate 握手固定为两条 33 字节二进制消息：客户端发送 `version(1B) | client_public_key(32B)`，服务端返回 `version(1B) | server_public_key(32B)`；当前 `version` 固定为 `1`。
+MAC 模式握手固定为两条 33 字节二进制消息：客户端发送 `version(1B) | client_public_key(32B)`，服务端返回 `version(1B) | server_public_key(32B)`；当前 `version` 固定为 `1`。
 
 直连模式使用 WSS 提供传输保密和完整性；K8s 模式由 Ingress 对客户端提供 WSS，Ingress 到 Pod 使用受信任集群网络上的 HTTP/1.1 WebSocket。两种模式都保留连接级 X25519、上行 seq/MAC 和同一应用协议；应用层不再使用 DES 加密，下行不添加应用 MAC。握手阶段没有 macKey，使用固定 33 字节二进制握手，不套生产业务上行格式。Plain 模式不做 X25519、seq 或 MAC，直接传输 Envelope。
 
