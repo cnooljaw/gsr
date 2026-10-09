@@ -1,4 +1,4 @@
-package prodgate
+package gate
 
 import (
 	"bufio"
@@ -24,15 +24,14 @@ import (
 	"time"
 
 	commonv1 "github.com/cnooljaw/gsr/gate/gen/go/gsr/common/v1"
-	"github.com/cnooljaw/gsr/gate/internal/gatecommon"
 	"github.com/cnooljaw/gsr/logging"
 	"github.com/cnooljaw/gsr/runtime"
 	"github.com/gorilla/websocket"
 	"google.golang.org/protobuf/proto"
 )
 
-// TestProdGateAuthenticatesAndDeliversClientFrames 验证 WSS 握手、认证帧投递、Envelope 写回和断开通知形成完整链路。
-func TestProdGateAuthenticatesAndDeliversClientFrames(t *testing.T) {
+// TestMACGateAuthenticatesAndDeliversClientFrames 验证 WSS 握手、认证帧投递、Envelope 写回和断开通知形成完整链路。
+func TestMACGateAuthenticatesAndDeliversClientFrames(t *testing.T) {
 	local, gate, agents, clientTLS := startTestProductionGate(t, 2, time.Second)
 	connection, macKey := dialAuthenticatedTestClient(t, gate, clientTLS)
 	defer connection.Close()
@@ -100,8 +99,8 @@ func TestProdGateAuthenticatesAndDeliversClientFrames(t *testing.T) {
 	}
 }
 
-// TestProdGateRejectsLateAgentResponseAfterDisconnect 验证客户端断开后 Agent 的迟到写回返回稳定关闭错误。
-func TestProdGateRejectsLateAgentResponseAfterDisconnect(t *testing.T) {
+// TestMACGateRejectsLateAgentResponseAfterDisconnect 验证客户端断开后 Agent 的迟到写回返回稳定关闭错误。
+func TestMACGateRejectsLateAgentResponseAfterDisconnect(t *testing.T) {
 	local, gate, agents, clientTLS := startTestProductionGate(t, 1, time.Second)
 	connection, _ := dialAuthenticatedTestClient(t, gate, clientTLS)
 	defer connection.Close()
@@ -123,8 +122,8 @@ func TestProdGateRejectsLateAgentResponseAfterDisconnect(t *testing.T) {
 	}
 }
 
-// TestProdGateSupportsIngressTerminatedTLS 验证 Ingress 终止 TLS 后 Pod 仍可用普通 WebSocket 完成同一套应用握手和消息投递。
-func TestProdGateSupportsIngressTerminatedTLS(t *testing.T) {
+// TestMACGateSupportsIngressTerminatedTLS 验证 Ingress 终止 TLS 后 Pod 仍可用普通 WebSocket 完成同一套应用握手和消息投递。
+func TestMACGateSupportsIngressTerminatedTLS(t *testing.T) {
 	agents := make(chan *productionTestAgent, 1)
 	_, gate := startConfiguredHTTPProductionGate(t, runtime.Config{
 		MailboxCapacity: 8,
@@ -176,8 +175,8 @@ func TestProdGateSupportsIngressTerminatedTLS(t *testing.T) {
 	}
 }
 
-// TestProdGateAllowsAnyOrigin 验证跨主机 Origin 不阻止 WebSocket 升级和应用握手。
-func TestProdGateAllowsAnyOrigin(t *testing.T) {
+// TestMACGateAllowsAnyOrigin 验证跨主机 Origin 不阻止 WebSocket 升级和应用握手。
+func TestMACGateAllowsAnyOrigin(t *testing.T) {
 	_, gate := startConfiguredHTTPProductionGate(t, runtime.Config{
 		MailboxCapacity: 8,
 		ShutdownTimeout: 2 * time.Second,
@@ -198,8 +197,8 @@ func TestProdGateAllowsAnyOrigin(t *testing.T) {
 	authenticateTestClient(t, connection)
 }
 
-// TestProdGateClosesIdleNonWebSocketHTTPConnections 验证普通 HTTP 请求的 keep-alive 空闲连接会超时释放 Gate 容量。
-func TestProdGateClosesIdleNonWebSocketHTTPConnections(t *testing.T) {
+// TestMACGateClosesIdleNonWebSocketHTTPConnections 验证普通 HTTP 请求的 keep-alive 空闲连接会超时释放 Gate 容量。
+func TestMACGateClosesIdleNonWebSocketHTTPConnections(t *testing.T) {
 	_, gate := startConfiguredHTTPProductionGate(t, runtime.Config{
 		MailboxCapacity: 8,
 		ShutdownTimeout: 2 * time.Second,
@@ -241,8 +240,8 @@ func TestProdGateClosesIdleNonWebSocketHTTPConnections(t *testing.T) {
 	}
 }
 
-// TestProdGateReadHeaderTimeoutReleasesConnectionSlot 验证未完成 HTTP 请求头的连接超时后归还 TCP 名额。
-func TestProdGateReadHeaderTimeoutReleasesConnectionSlot(t *testing.T) {
+// TestMACGateReadHeaderTimeoutReleasesConnectionSlot 验证未完成 HTTP 请求头的连接超时后归还 TCP 名额。
+func TestMACGateReadHeaderTimeoutReleasesConnectionSlot(t *testing.T) {
 	local, gate := startConfiguredHTTPProductionGate(t, runtime.Config{
 		MailboxCapacity: 8,
 		ShutdownTimeout: 2 * time.Second,
@@ -303,8 +302,8 @@ func TestProdGateReadHeaderTimeoutReleasesConnectionSlot(t *testing.T) {
 	}
 }
 
-// TestProdGateStopClosesPartialHTTPHeader 验证停机立即关闭未完成请求头的连接，不等待请求头超时。
-func TestProdGateStopClosesPartialHTTPHeader(t *testing.T) {
+// TestMACGateStopClosesPartialHTTPHeader 验证停机立即关闭未完成请求头的连接，不等待请求头超时。
+func TestMACGateStopClosesPartialHTTPHeader(t *testing.T) {
 	local, gate := startConfiguredHTTPProductionGate(t, runtime.Config{
 		MailboxCapacity: 8,
 		ShutdownTimeout: 2 * time.Second,
@@ -341,8 +340,8 @@ func TestProdGateStopClosesPartialHTTPHeader(t *testing.T) {
 	}
 }
 
-// TestProdGateRejectsInvalidMACBeforeDelivery 验证错误 MAC 在进入 Agent Mailbox 前被拒绝并关闭连接。
-func TestProdGateRejectsInvalidMACBeforeDelivery(t *testing.T) {
+// TestMACGateRejectsInvalidMACBeforeDelivery 验证错误 MAC 在进入 Agent Mailbox 前被拒绝并关闭连接。
+func TestMACGateRejectsInvalidMACBeforeDelivery(t *testing.T) {
 	_, gate, agents, clientTLS := startTestProductionGate(t, 2, time.Second)
 	connection, macKey := dialAuthenticatedTestClient(t, gate, clientTLS)
 	defer connection.Close()
@@ -369,8 +368,8 @@ func TestProdGateRejectsInvalidMACBeforeDelivery(t *testing.T) {
 	}
 }
 
-// TestProdGateConcurrentBadMACDoesNotBlockHealthyConnection 验证多条坏 MAC 连接并发失败时健康连接仍能完成请求。
-func TestProdGateConcurrentBadMACDoesNotBlockHealthyConnection(t *testing.T) {
+// TestMACGateConcurrentBadMACDoesNotBlockHealthyConnection 验证多条坏 MAC 连接并发失败时健康连接仍能完成请求。
+func TestMACGateConcurrentBadMACDoesNotBlockHealthyConnection(t *testing.T) {
 	const (
 		badClientCount  = 8
 		healthyMessages = 16
@@ -490,8 +489,8 @@ func TestProdGateConcurrentBadMACDoesNotBlockHealthyConnection(t *testing.T) {
 	}
 }
 
-// TestProdGateConcurrentBadHandshakeDoesNotBlockHealthyConnection 验证多条无效 X25519 握手并发失败时健康连接仍能完成请求。
-func TestProdGateConcurrentBadHandshakeDoesNotBlockHealthyConnection(t *testing.T) {
+// TestMACGateConcurrentBadHandshakeDoesNotBlockHealthyConnection 验证多条无效 X25519 握手并发失败时健康连接仍能完成请求。
+func TestMACGateConcurrentBadHandshakeDoesNotBlockHealthyConnection(t *testing.T) {
 	const (
 		badClientCount  = 8
 		healthyMessages = 8
@@ -597,8 +596,8 @@ func TestProdGateConcurrentBadHandshakeDoesNotBlockHealthyConnection(t *testing.
 	}
 }
 
-// TestProdGateRecoversFromAgentConstructorPanic 验证 Agent 构造器 panic 只拒绝当前连接，Gate 仍能接受后续连接。
-func TestProdGateRecoversFromAgentConstructorPanic(t *testing.T) {
+// TestMACGateRecoversFromAgentConstructorPanic 验证 Agent 构造器 panic 只拒绝当前连接，Gate 仍能接受后续连接。
+func TestMACGateRecoversFromAgentConstructorPanic(t *testing.T) {
 	agents := make(chan *productionTestAgent, 1)
 	var constructorCalls atomic.Int32
 	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
@@ -668,8 +667,8 @@ func TestProdGateRecoversFromAgentConstructorPanic(t *testing.T) {
 	}
 }
 
-// TestProdGateRecoversFromAgentStartFailure 验证 Agent OnStart 失败会回滚该实例并拒绝当前连接，Gate 仍能服务后续连接。
-func TestProdGateRecoversFromAgentStartFailure(t *testing.T) {
+// TestMACGateRecoversFromAgentStartFailure 验证 Agent OnStart 失败会回滚该实例并拒绝当前连接，Gate 仍能服务后续连接。
+func TestMACGateRecoversFromAgentStartFailure(t *testing.T) {
 	agents := make(chan *productionTestAgent, 1)
 	failedAgentStopped := make(chan struct{})
 	var constructorCalls atomic.Int32
@@ -749,8 +748,8 @@ func TestProdGateRecoversFromAgentStartFailure(t *testing.T) {
 	}
 }
 
-// TestProdGateRejectsCrossConnectionReplayBeforeDelivery 验证连接 A 的认证帧不能在连接 B 重放，且新连接仍可正常请求。
-func TestProdGateRejectsCrossConnectionReplayBeforeDelivery(t *testing.T) {
+// TestMACGateRejectsCrossConnectionReplayBeforeDelivery 验证连接 A 的认证帧不能在连接 B 重放，且新连接仍可正常请求。
+func TestMACGateRejectsCrossConnectionReplayBeforeDelivery(t *testing.T) {
 	local, gate, agents, clientTLS := startTestProductionGate(t, 3, time.Second)
 	sourceConnection, sourceMACKey := dialAuthenticatedTestClient(t, gate, clientTLS)
 	defer sourceConnection.Close()
@@ -849,8 +848,8 @@ func TestProdGateRejectsCrossConnectionReplayBeforeDelivery(t *testing.T) {
 	}
 }
 
-// TestProdGateRejectsSameConnectionReplayBeforeDelivery 验证已处理过的认证帧不能在同一连接再次投递给 Agent。
-func TestProdGateRejectsSameConnectionReplayBeforeDelivery(t *testing.T) {
+// TestMACGateRejectsSameConnectionReplayBeforeDelivery 验证已处理过的认证帧不能在同一连接再次投递给 Agent。
+func TestMACGateRejectsSameConnectionReplayBeforeDelivery(t *testing.T) {
 	local, gate, agents, clientTLS := startTestProductionGate(t, 1, time.Second)
 	connection, macKey := dialAuthenticatedTestClient(t, gate, clientTLS)
 	defer connection.Close()
@@ -905,8 +904,8 @@ func TestProdGateRejectsSameConnectionReplayBeforeDelivery(t *testing.T) {
 	}
 }
 
-// TestProdGateWritesConnectionFailureToRuntimeLogger 验证 Gate 复用 Runtime 的共享 Logger，并记录安全失败而不记录原始载荷。
-func TestProdGateWritesConnectionFailureToRuntimeLogger(t *testing.T) {
+// TestMACGateWritesConnectionFailureToRuntimeLogger 验证 Gate 复用 Runtime 的共享 Logger，并记录安全失败而不记录原始载荷。
+func TestMACGateWritesConnectionFailureToRuntimeLogger(t *testing.T) {
 	var output bytes.Buffer
 	logger, err := logging.New(logging.Config{Writer: &output})
 	if err != nil {
@@ -973,8 +972,8 @@ func TestProdGateWritesConnectionFailureToRuntimeLogger(t *testing.T) {
 	}
 }
 
-// TestProdGateLogsPreHandshakeCapacityRejection 验证握手前的 TCP 容量拒绝进入共享日志并绑定 Gate 来源。
-func TestProdGateLogsPreHandshakeCapacityRejection(t *testing.T) {
+// TestMACGateLogsPreHandshakeCapacityRejection 验证握手前的 TCP 容量拒绝进入共享日志并绑定 Gate 来源。
+func TestMACGateLogsPreHandshakeCapacityRejection(t *testing.T) {
 	var output bytes.Buffer
 	logger, err := logging.New(logging.Config{Writer: &output})
 	if err != nil {
@@ -1028,8 +1027,8 @@ func TestProdGateLogsPreHandshakeCapacityRejection(t *testing.T) {
 	}
 }
 
-// TestProdGateCapacityRejectionSurvivesClosedLogger 验证日志入口不可用时连接上限、拒绝计数和停机仍正常。
-func TestProdGateCapacityRejectionSurvivesClosedLogger(t *testing.T) {
+// TestMACGateCapacityRejectionSurvivesClosedLogger 验证日志入口不可用时连接上限、拒绝计数和停机仍正常。
+func TestMACGateCapacityRejectionSurvivesClosedLogger(t *testing.T) {
 	logger, err := logging.New(logging.Config{Writer: io.Discard})
 	if err != nil {
 		t.Fatalf("logging.New() error = %v", err)
@@ -1061,8 +1060,8 @@ func TestProdGateCapacityRejectionSurvivesClosedLogger(t *testing.T) {
 	}
 }
 
-// TestProdGateCapacityRejectionsKeepExistingClientResponsive 验证握手前容量拒绝不会阻塞已接纳连接的业务往返。
-func TestProdGateCapacityRejectionsKeepExistingClientResponsive(t *testing.T) {
+// TestMACGateCapacityRejectionsKeepExistingClientResponsive 验证握手前容量拒绝不会阻塞已接纳连接的业务往返。
+func TestMACGateCapacityRejectionsKeepExistingClientResponsive(t *testing.T) {
 	const (
 		rounds          = 4
 		rejectsPerRound = 4
@@ -1127,8 +1126,8 @@ func TestProdGateCapacityRejectionsKeepExistingClientResponsive(t *testing.T) {
 	}
 }
 
-// TestProdGateSuppressesRepeatedConnectionFailures 验证同一连接同一类别只记录首条故障，并在结束时记录抑制数量。
-func TestProdGateSuppressesRepeatedConnectionFailures(t *testing.T) {
+// TestMACGateSuppressesRepeatedConnectionFailures 验证同一连接同一类别只记录首条故障，并在结束时记录抑制数量。
+func TestMACGateSuppressesRepeatedConnectionFailures(t *testing.T) {
 	var output bytes.Buffer
 	logger, err := logging.New(logging.Config{Writer: &output})
 	if err != nil {
@@ -1167,8 +1166,8 @@ func TestProdGateSuppressesRepeatedConnectionFailures(t *testing.T) {
 	}
 }
 
-// TestProdGateTLSHandshakeTimeoutReleasesConnectionSlot 验证未发送 ClientHello 的连接超时后归还 TCP 名额。
-func TestProdGateTLSHandshakeTimeoutReleasesConnectionSlot(t *testing.T) {
+// TestMACGateTLSHandshakeTimeoutReleasesConnectionSlot 验证未发送 ClientHello 的连接超时后归还 TCP 名额。
+func TestMACGateTLSHandshakeTimeoutReleasesConnectionSlot(t *testing.T) {
 	local, gate, _, clientTLS := startTestProductionGate(t, 1, time.Second)
 	pending, err := net.DialTimeout("tcp", gate.Addr().String(), time.Second)
 	if err != nil {
@@ -1227,8 +1226,8 @@ func TestProdGateTLSHandshakeTimeoutReleasesConnectionSlot(t *testing.T) {
 	}
 }
 
-// TestProdGateRecordsTLSHandshakeErrorInSharedLogger 验证坏 TLS 首包进入共享日志且不复制未认证原文。
-func TestProdGateRecordsTLSHandshakeErrorInSharedLogger(t *testing.T) {
+// TestMACGateRecordsTLSHandshakeErrorInSharedLogger 验证坏 TLS 首包进入共享日志且不复制未认证原文。
+func TestMACGateRecordsTLSHandshakeErrorInSharedLogger(t *testing.T) {
 	var output bytes.Buffer
 	logger, err := logging.New(logging.Config{Writer: &output})
 	if err != nil {
@@ -1290,8 +1289,8 @@ func TestProdGateRecordsTLSHandshakeErrorInSharedLogger(t *testing.T) {
 	}
 }
 
-// TestProdGateHandshakeCloseReasonIsNotLogged 验证客户端在应用握手前发送的 Close 文本不会进入服务端日志。
-func TestProdGateHandshakeCloseReasonIsNotLogged(t *testing.T) {
+// TestMACGateHandshakeCloseReasonIsNotLogged 验证客户端在应用握手前发送的 Close 文本不会进入服务端日志。
+func TestMACGateHandshakeCloseReasonIsNotLogged(t *testing.T) {
 	var output bytes.Buffer
 	logger, err := logging.New(logging.Config{Writer: &output})
 	if err != nil {
@@ -1352,8 +1351,8 @@ func TestProdGateHandshakeCloseReasonIsNotLogged(t *testing.T) {
 	}
 }
 
-// TestProdGateHTTPServerErrorLogRedactsRawText 验证 HTTP 服务器错误只保留类别，不复制可能含敏感信息的原始行。
-func TestProdGateHTTPServerErrorLogRedactsRawText(t *testing.T) {
+// TestMACGateHTTPServerErrorLogRedactsRawText 验证 HTTP 服务器错误只保留类别，不复制可能含敏感信息的原始行。
+func TestMACGateHTTPServerErrorLogRedactsRawText(t *testing.T) {
 	var output bytes.Buffer
 	logger, err := logging.New(logging.Config{Writer: &output})
 	if err != nil {
@@ -1365,7 +1364,7 @@ func TestProdGateHTTPServerErrorLogRedactsRawText(t *testing.T) {
 		}
 	})
 	const rawError = "http: panic serving 127.0.0.1:12345: private-client-data\nstack"
-	writer := gatecommon.NewHTTPServerErrorLog(logger).Writer()
+	writer := newHTTPServerErrorLog(logger).Writer()
 	if written, err := writer.Write([]byte(rawError)); err != nil || written != len(rawError) {
 		t.Fatalf("Write(server error) = %d, %v; want %d, nil", written, err, len(rawError))
 	}
@@ -1387,8 +1386,8 @@ func TestProdGateHTTPServerErrorLogRedactsRawText(t *testing.T) {
 	}
 }
 
-// TestProdGateTLSHandshakeErrorSurvivesClosedLogger 验证共享 Logger 已关闭时，坏握手不会阻断后续健康 TLS 连接。
-func TestProdGateTLSHandshakeErrorSurvivesClosedLogger(t *testing.T) {
+// TestMACGateTLSHandshakeErrorSurvivesClosedLogger 验证共享 Logger 已关闭时，坏握手不会阻断后续健康 TLS 连接。
+func TestMACGateTLSHandshakeErrorSurvivesClosedLogger(t *testing.T) {
 	logger, err := logging.New(logging.Config{Writer: io.Discard})
 	if err != nil {
 		t.Fatalf("logging.New() error = %v", err)
@@ -1441,8 +1440,8 @@ func TestProdGateTLSHandshakeErrorSurvivesClosedLogger(t *testing.T) {
 	}
 }
 
-// TestProdGateAppliesConnectionLimitBeforeTLSHandshake 验证连接上限覆盖未完成 TLS 握手的 TCP 连接，且断开后会归还名额。
-func TestProdGateAppliesConnectionLimitBeforeTLSHandshake(t *testing.T) {
+// TestMACGateAppliesConnectionLimitBeforeTLSHandshake 验证连接上限覆盖未完成 TLS 握手的 TCP 连接，且断开后会归还名额。
+func TestMACGateAppliesConnectionLimitBeforeTLSHandshake(t *testing.T) {
 	_, gate, _, clientTLS := startTestProductionGate(t, 1, time.Second)
 	first, err := net.DialTimeout("tcp", gate.Addr().String(), time.Second)
 	if err != nil {
@@ -1489,8 +1488,8 @@ func TestProdGateAppliesConnectionLimitBeforeTLSHandshake(t *testing.T) {
 	_ = recovered.Close()
 }
 
-// TestProdGateHandshakeTimeoutClosesConnection 验证未完成的应用握手占用连接名额，超时关闭后名额可供后续客户端使用。
-func TestProdGateHandshakeTimeoutClosesConnection(t *testing.T) {
+// TestMACGateHandshakeTimeoutClosesConnection 验证未完成的应用握手占用连接名额，超时关闭后名额可供后续客户端使用。
+func TestMACGateHandshakeTimeoutClosesConnection(t *testing.T) {
 	local, gate, agents, clientTLS := startTestProductionGate(t, 1, 250*time.Millisecond)
 	connection := dialProductionTestClient(t, gate, clientTLS)
 	defer connection.Close()
@@ -1585,8 +1584,8 @@ func TestProdGateHandshakeTimeoutClosesConnection(t *testing.T) {
 	}
 }
 
-// TestProdGateRejectsNonBinaryHandshake 验证应用层握手只接受二进制消息，并且不会创建 Agent。
-func TestProdGateRejectsNonBinaryHandshake(t *testing.T) {
+// TestMACGateRejectsNonBinaryHandshake 验证应用层握手只接受二进制消息，并且不会创建 Agent。
+func TestMACGateRejectsNonBinaryHandshake(t *testing.T) {
 	_, gate, agents, clientTLS := startTestProductionGate(t, 2, time.Second)
 	connection := dialProductionTestClient(t, gate, clientTLS)
 	defer connection.Close()
@@ -1611,8 +1610,8 @@ func TestProdGateRejectsNonBinaryHandshake(t *testing.T) {
 	}
 }
 
-// TestProdGateRejectsInvalidHandshake 验证无法解析或不符合固定握手格式的消息会在 Agent 创建前关闭连接。
-func TestProdGateRejectsInvalidHandshake(t *testing.T) {
+// TestMACGateRejectsInvalidHandshake 验证无法解析或不符合固定握手格式的消息会在 Agent 创建前关闭连接。
+func TestMACGateRejectsInvalidHandshake(t *testing.T) {
 	_, gate, agents, clientTLS := startTestProductionGate(t, 2, time.Second)
 	connection := dialProductionTestClient(t, gate, clientTLS)
 	defer connection.Close()
@@ -1637,8 +1636,8 @@ func TestProdGateRejectsInvalidHandshake(t *testing.T) {
 	}
 }
 
-// TestProdGateRejectsInvalidX25519KeyAndRecovers 验证非法 X25519 公钥被拒绝并归还唯一连接名额，后续有效连接仍可服务。
-func TestProdGateRejectsInvalidX25519KeyAndRecovers(t *testing.T) {
+// TestMACGateRejectsInvalidX25519KeyAndRecovers 验证非法 X25519 公钥被拒绝并归还唯一连接名额，后续有效连接仍可服务。
+func TestMACGateRejectsInvalidX25519KeyAndRecovers(t *testing.T) {
 	local, gate, agents, clientTLS := startTestProductionGate(t, 1, time.Second)
 	invalidConnection := dialProductionTestClient(t, gate, clientTLS)
 	defer invalidConnection.Close()
@@ -1705,8 +1704,8 @@ func TestProdGateRejectsInvalidX25519KeyAndRecovers(t *testing.T) {
 	}
 }
 
-// TestProdGateRejectsOversizedHandshake 验证首个握手帧超过上限时返回消息过大并累计帧超限计数。
-func TestProdGateRejectsOversizedHandshake(t *testing.T) {
+// TestMACGateRejectsOversizedHandshake 验证首个握手帧超过上限时返回消息过大并累计帧超限计数。
+func TestMACGateRejectsOversizedHandshake(t *testing.T) {
 	_, gate, agents, clientTLS := startTestProductionGate(t, 2, time.Second)
 	connection := dialProductionTestClient(t, gate, clientTLS)
 	defer connection.Close()
@@ -1735,8 +1734,8 @@ func TestProdGateRejectsOversizedHandshake(t *testing.T) {
 	}
 }
 
-// TestProdGateRejectsNonBinaryAuthenticatedFrame 验证认证完成后仍只接受二进制业务帧，并通知 Agent 连接断开。
-func TestProdGateRejectsNonBinaryAuthenticatedFrame(t *testing.T) {
+// TestMACGateRejectsNonBinaryAuthenticatedFrame 验证认证完成后仍只接受二进制业务帧，并通知 Agent 连接断开。
+func TestMACGateRejectsNonBinaryAuthenticatedFrame(t *testing.T) {
 	_, gate, agents, clientTLS := startTestProductionGate(t, 2, time.Second)
 	connection, _ := dialAuthenticatedTestClient(t, gate, clientTLS)
 	defer connection.Close()
@@ -1761,8 +1760,8 @@ func TestProdGateRejectsNonBinaryAuthenticatedFrame(t *testing.T) {
 	}
 }
 
-// TestProdGateRejectsMalformedAuthenticatedFrame 验证短于序号和 MAC 最小长度的认证帧以协议错误关闭且不会投递给 Agent。
-func TestProdGateRejectsMalformedAuthenticatedFrame(t *testing.T) {
+// TestMACGateRejectsMalformedAuthenticatedFrame 验证短于序号和 MAC 最小长度的认证帧以协议错误关闭且不会投递给 Agent。
+func TestMACGateRejectsMalformedAuthenticatedFrame(t *testing.T) {
 	_, gate, agents, clientTLS := startTestProductionGate(t, 1, time.Second)
 	connection, _ := dialAuthenticatedTestClient(t, gate, clientTLS)
 	defer connection.Close()
@@ -1789,8 +1788,8 @@ func TestProdGateRejectsMalformedAuthenticatedFrame(t *testing.T) {
 	}
 }
 
-// TestProdGateRejectsOversizedAuthenticatedFrame 验证认证后的超限消息在投递 Agent 前关闭当前连接，且后续连接可正常服务。
-func TestProdGateRejectsOversizedAuthenticatedFrame(t *testing.T) {
+// TestMACGateRejectsOversizedAuthenticatedFrame 验证认证后的超限消息在投递 Agent 前关闭当前连接，且后续连接可正常服务。
+func TestMACGateRejectsOversizedAuthenticatedFrame(t *testing.T) {
 	const maxFrameBytes = 256
 	agents := make(chan *productionTestAgent, 2)
 	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
@@ -1883,8 +1882,8 @@ func TestProdGateRejectsOversizedAuthenticatedFrame(t *testing.T) {
 	}
 }
 
-// TestProdGateClosesConnectionWhenAgentMailboxIsFull 验证 Mailbox 满载会关闭连接并在超过原重试上限后补交通知。
-func TestProdGateClosesConnectionWhenAgentMailboxIsFull(t *testing.T) {
+// TestMACGateClosesConnectionWhenAgentMailboxIsFull 验证 Mailbox 满载会关闭连接并在超过原重试上限后补交通知。
+func TestMACGateClosesConnectionWhenAgentMailboxIsFull(t *testing.T) {
 	release := make(chan struct{})
 	var releaseOnce sync.Once
 	releaseAgent := func() { releaseOnce.Do(func() { close(release) }) }
@@ -1947,8 +1946,8 @@ func TestProdGateClosesConnectionWhenAgentMailboxIsFull(t *testing.T) {
 	}
 }
 
-// TestProdGateStopNotifiesMappedAgent 验证单独停止 Gate 时仍会通知所有保留映射的 Agent。
-func TestProdGateStopNotifiesMappedAgent(t *testing.T) {
+// TestMACGateStopNotifiesMappedAgent 验证单独停止 Gate 时仍会通知所有保留映射的 Agent。
+func TestMACGateStopNotifiesMappedAgent(t *testing.T) {
 	local, err := runtime.NewRuntime(runtime.Config{ShutdownTimeout: time.Second})
 	if err != nil {
 		t.Fatalf("NewRuntime() error = %v", err)
@@ -1987,8 +1986,8 @@ func TestProdGateStopNotifiesMappedAgent(t *testing.T) {
 	}
 }
 
-// TestProdGateStopsClientMessageAdmissionBeforeClosingConnections 验证 Gate 标记停机后不会再把客户端帧送入 Agent Mailbox。
-func TestProdGateStopsClientMessageAdmissionBeforeClosingConnections(t *testing.T) {
+// TestMACGateStopsClientMessageAdmissionBeforeClosingConnections 验证 Gate 标记停机后不会再把客户端帧送入 Agent Mailbox。
+func TestMACGateStopsClientMessageAdmissionBeforeClosingConnections(t *testing.T) {
 	local, err := runtime.NewRuntime(runtime.Config{MailboxCapacity: 1, ShutdownTimeout: time.Second})
 	if err != nil {
 		t.Fatalf("NewRuntime() error = %v", err)
@@ -2027,8 +2026,8 @@ func TestProdGateStopsClientMessageAdmissionBeforeClosingConnections(t *testing.
 	}
 }
 
-// TestProdGateStopNotifiesHealthyAgentWhileAnotherMailboxIsFull 验证一个满载 Agent 不会挡住其他 Agent 的停机通知。
-func TestProdGateStopNotifiesHealthyAgentWhileAnotherMailboxIsFull(t *testing.T) {
+// TestMACGateStopNotifiesHealthyAgentWhileAnotherMailboxIsFull 验证一个满载 Agent 不会挡住其他 Agent 的停机通知。
+func TestMACGateStopNotifiesHealthyAgentWhileAnotherMailboxIsFull(t *testing.T) {
 	release := make(chan struct{})
 	var releaseOnce sync.Once
 	releaseAgent := func() { releaseOnce.Do(func() { close(release) }) }
@@ -2103,8 +2102,8 @@ func TestProdGateStopNotifiesHealthyAgentWhileAnotherMailboxIsFull(t *testing.T)
 	}
 }
 
-// TestProdGateStopBoundsPendingDisconnectRetry 验证 Agent Mailbox 满载时 Gate 停机仍按自己的期限完成。
-func TestProdGateStopBoundsPendingDisconnectRetry(t *testing.T) {
+// TestMACGateStopBoundsPendingDisconnectRetry 验证 Agent Mailbox 满载时 Gate 停机仍按自己的期限完成。
+func TestMACGateStopBoundsPendingDisconnectRetry(t *testing.T) {
 	release := make(chan struct{})
 	var releaseOnce sync.Once
 	releaseAgent := func() { releaseOnce.Do(func() { close(release) }) }
@@ -2163,8 +2162,8 @@ func TestProdGateStopBoundsPendingDisconnectRetry(t *testing.T) {
 	}
 }
 
-// TestProdGateReportsOutboundQueueFull 验证 Agent 的 ClientSession 在出站队列不足时返回稳定错误并累计计数。
-func TestProdGateReportsOutboundQueueFull(t *testing.T) {
+// TestMACGateReportsOutboundQueueFull 验证 Agent 的 ClientSession 在出站队列不足时返回稳定错误并累计计数。
+func TestMACGateReportsOutboundQueueFull(t *testing.T) {
 	agents := make(chan *burstOutboundAgent, 1)
 	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
 		MailboxCapacity: 8,
@@ -2213,8 +2212,8 @@ func TestProdGateReportsOutboundQueueFull(t *testing.T) {
 	}
 }
 
-// TestProdGateBoundsSlowClientOutboundQueue 验证客户端不读取时写循环遇到背压仍只保留有界出站数据并返回队列满错误。
-func TestProdGateBoundsSlowClientOutboundQueue(t *testing.T) {
+// TestMACGateBoundsSlowClientOutboundQueue 验证客户端不读取时写循环遇到背压仍只保留有界出站数据并返回队列满错误。
+func TestMACGateBoundsSlowClientOutboundQueue(t *testing.T) {
 	agents := make(chan *slowOutboundAgent, 1)
 	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
 		MailboxCapacity: 8,
@@ -2270,8 +2269,8 @@ func TestProdGateBoundsSlowClientOutboundQueue(t *testing.T) {
 	}
 }
 
-// TestProdGateSlowClientDoesNotBlockHealthyConnection 验证慢连接持续发送并触发出站背压时，健康连接仍能完成请求和响应。
-func TestProdGateSlowClientDoesNotBlockHealthyConnection(t *testing.T) {
+// TestMACGateSlowClientDoesNotBlockHealthyConnection 验证慢连接持续发送并触发出站背压时，健康连接仍能完成请求和响应。
+func TestMACGateSlowClientDoesNotBlockHealthyConnection(t *testing.T) {
 	slowAgents := make(chan *longSlowOutboundAgent, 1)
 	healthyAgents := make(chan *productionTestAgent, 1)
 	var createdAgents atomic.Uint32
@@ -2396,8 +2395,8 @@ func TestProdGateSlowClientDoesNotBlockHealthyConnection(t *testing.T) {
 	}
 }
 
-// TestProdGateLongSlowClientBackpressure 在显式压力开关下验证慢客户端持续不读时出站队列有界，写超时关闭也不被误判为业务错误。
-func TestProdGateLongSlowClientBackpressure(t *testing.T) {
+// TestMACGateLongSlowClientBackpressure 在显式压力开关下验证慢客户端持续不读时出站队列有界，写超时关闭也不被误判为业务错误。
+func TestMACGateLongSlowClientBackpressure(t *testing.T) {
 	if os.Getenv("GSR_GATE_STRESS") != "1" {
 		t.Skip("显式设置 GSR_GATE_STRESS=1 运行慢客户端压力验收")
 	}
@@ -2471,8 +2470,8 @@ func TestProdGateLongSlowClientBackpressure(t *testing.T) {
 	}
 }
 
-// TestProdGateMultipleSlowClientsDoNotBlockHealthyRequests 验证多条持续背压的连接不会拖住同节点健康连接的请求与回复。
-func TestProdGateMultipleSlowClientsDoNotBlockHealthyRequests(t *testing.T) {
+// TestMACGateMultipleSlowClientsDoNotBlockHealthyRequests 验证多条持续背压的连接不会拖住同节点健康连接的请求与回复。
+func TestMACGateMultipleSlowClientsDoNotBlockHealthyRequests(t *testing.T) {
 	if os.Getenv("GSR_GATE_STRESS") != "1" {
 		t.Skip("显式设置 GSR_GATE_STRESS=1 运行多慢连接压力验收")
 	}
@@ -2620,8 +2619,8 @@ func TestProdGateMultipleSlowClientsDoNotBlockHealthyRequests(t *testing.T) {
 	}
 }
 
-// TestProdGateHandlesConcurrentConnections 验证多条连接并发发送时消息仍进入各自 Agent，并能在关闭后全部回收。
-func TestProdGateHandlesConcurrentConnections(t *testing.T) {
+// TestMACGateHandlesConcurrentConnections 验证多条连接并发发送时消息仍进入各自 Agent，并能在关闭后全部回收。
+func TestMACGateHandlesConcurrentConnections(t *testing.T) {
 	const (
 		connectionCount  = 16
 		messagesPerAgent = 32
@@ -2720,8 +2719,8 @@ func TestProdGateHandlesConcurrentConnections(t *testing.T) {
 	}
 }
 
-// TestProdGateMixedConnectionStress 验证多连接持续发送期间所有成功写入的请求均由 Agent 处理，且没有 Mailbox 满载或连接拒绝。
-func TestProdGateMixedConnectionStress(t *testing.T) {
+// TestMACGateMixedConnectionStress 验证多连接持续发送期间所有成功写入的请求均由 Agent 处理，且没有 Mailbox 满载或连接拒绝。
+func TestMACGateMixedConnectionStress(t *testing.T) {
 	if os.Getenv("GSR_GATE_STRESS") != "1" {
 		t.Skip("显式设置 GSR_GATE_STRESS=1 运行生产 Gate 压力验收")
 	}
@@ -2838,8 +2837,8 @@ func TestProdGateMixedConnectionStress(t *testing.T) {
 	}
 }
 
-// TestProdGateFailurePhaseStress 验证重复坏 TLS、应用握手和 MAC 均不进入业务处理，故障后新连接仍能正常往返。
-func TestProdGateFailurePhaseStress(t *testing.T) {
+// TestMACGateFailurePhaseStress 验证重复坏 TLS、应用握手和 MAC 均不进入业务处理，故障后新连接仍能正常往返。
+func TestMACGateFailurePhaseStress(t *testing.T) {
 	if os.Getenv("GSR_GATE_STRESS") != "1" {
 		t.Skip("显式设置 GSR_GATE_STRESS=1 运行失败阶段压力验收")
 	}
@@ -2982,8 +2981,8 @@ func TestProdGateFailurePhaseStress(t *testing.T) {
 	}
 }
 
-// TestProdGateRejectsClientMessageForAgentWithoutHandler 验证没有客户端处理能力的 Agent 会在入站投递阶段被拒绝并正常断开。
-func TestProdGateRejectsClientMessageForAgentWithoutHandler(t *testing.T) {
+// TestMACGateRejectsClientMessageForAgentWithoutHandler 验证没有客户端处理能力的 Agent 会在入站投递阶段被拒绝并正常断开。
+func TestMACGateRejectsClientMessageForAgentWithoutHandler(t *testing.T) {
 	var output bytes.Buffer
 	logger, err := logging.New(logging.Config{Writer: &output})
 	if err != nil {
@@ -3046,8 +3045,8 @@ func TestProdGateRejectsClientMessageForAgentWithoutHandler(t *testing.T) {
 	}
 }
 
-// TestProdGateRuntimeCloseReleasesActiveClient 验证 Runtime 关闭时生产 Gate 会收尾客户端与 I/O goroutine，并释放监听地址。
-func TestProdGateRuntimeCloseReleasesActiveClient(t *testing.T) {
+// TestMACGateRuntimeCloseReleasesActiveClient 验证 Runtime 关闭时生产 Gate 会收尾客户端与 I/O goroutine，并释放监听地址。
+func TestMACGateRuntimeCloseReleasesActiveClient(t *testing.T) {
 	local, gate, agents, clientTLS := startTestProductionGate(t, 2, time.Second)
 	listenerAddress := gate.Addr().String()
 	connection, _ := dialAuthenticatedTestClient(t, gate, clientTLS)
@@ -3082,8 +3081,8 @@ func TestProdGateRuntimeCloseReleasesActiveClient(t *testing.T) {
 	}
 }
 
-// TestProdGateRuntimeStopClosesAllActiveClients 验证 Runtime.Stop 会关闭所有已认证连接并使对应 ClientSession 失效。
-func TestProdGateRuntimeStopClosesAllActiveClients(t *testing.T) {
+// TestMACGateRuntimeStopClosesAllActiveClients 验证 Runtime.Stop 会关闭所有已认证连接并使对应 ClientSession 失效。
+func TestMACGateRuntimeStopClosesAllActiveClients(t *testing.T) {
 	const activeConnections = 8
 	local, gate, agents, clientTLS := startTestProductionGate(t, activeConnections, time.Second)
 	connections := make([]*websocket.Conn, activeConnections)
@@ -3138,8 +3137,8 @@ func TestProdGateRuntimeStopClosesAllActiveClients(t *testing.T) {
 	}
 }
 
-// TestProdGateAgentAndRuntimeStopCloseSessionIdempotently 验证 Agent.OnStop 与 Gate 停止重复关闭同一 ClientSession 时均正常完成。
-func TestProdGateAgentAndRuntimeStopCloseSessionIdempotently(t *testing.T) {
+// TestMACGateAgentAndRuntimeStopCloseSessionIdempotently 验证 Agent.OnStop 与 Gate 停止重复关闭同一 ClientSession 时均正常完成。
+func TestMACGateAgentAndRuntimeStopCloseSessionIdempotently(t *testing.T) {
 	agents := make(chan *stopClosingProductionTestAgent, 1)
 	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
 		MailboxCapacity: 8,
@@ -3190,8 +3189,8 @@ func TestProdGateAgentAndRuntimeStopCloseSessionIdempotently(t *testing.T) {
 	}
 }
 
-// TestProdGateAgentStopAfterClientDisconnectKeepsServing 验证客户端先断开后 Agent.OnStop 关闭会话不会报错或影响后续连接。
-func TestProdGateAgentStopAfterClientDisconnectKeepsServing(t *testing.T) {
+// TestMACGateAgentStopAfterClientDisconnectKeepsServing 验证客户端先断开后 Agent.OnStop 关闭会话不会报错或影响后续连接。
+func TestMACGateAgentStopAfterClientDisconnectKeepsServing(t *testing.T) {
 	agents := make(chan *stopClosingProductionTestAgent, 2)
 	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
 		MailboxCapacity: 8,
@@ -3279,8 +3278,8 @@ func TestProdGateAgentStopAfterClientDisconnectKeepsServing(t *testing.T) {
 	}
 }
 
-// TestProdGateClientDisconnectOverlapsRuntimeStop 验证客户端断开与 Runtime.Stop 并发时会话仍关闭且 Agent 只执行一次清理。
-func TestProdGateClientDisconnectOverlapsRuntimeStop(t *testing.T) {
+// TestMACGateClientDisconnectOverlapsRuntimeStop 验证客户端断开与 Runtime.Stop 并发时会话仍关闭且 Agent 只执行一次清理。
+func TestMACGateClientDisconnectOverlapsRuntimeStop(t *testing.T) {
 	agents := make(chan *stopClosingProductionTestAgent, 1)
 	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
 		MailboxCapacity: 8,
@@ -3350,8 +3349,8 @@ func TestProdGateClientDisconnectOverlapsRuntimeStop(t *testing.T) {
 	}
 }
 
-// TestProdGateStopReportsClientCloseFailure 验证 Gate 停机保留每条连接的 Close 帧和 socket 关闭错误。
-func TestProdGateStopReportsClientCloseFailure(t *testing.T) {
+// TestMACGateStopReportsClientCloseFailure 验证 Gate 停机保留每条连接的 Close 帧和 socket 关闭错误。
+func TestMACGateStopReportsClientCloseFailure(t *testing.T) {
 	closeFailures := []error{
 		errors.New("first test socket close failure"),
 		errors.New("second test socket close failure"),
@@ -3363,7 +3362,7 @@ func TestProdGateStopReportsClientCloseFailure(t *testing.T) {
 	var closeCount atomic.Int32
 	serverConnections := make(chan *websocket.Conn, len(closeFailures))
 	server := httptest.NewUnstartedServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		connection, err := secureUpgrader.Upgrade(writer, request, nil)
+		connection, err := gateUpgrader.Upgrade(writer, request, nil)
 		if err != nil {
 			t.Errorf("Upgrade() error = %v", err)
 			return
@@ -3424,8 +3423,8 @@ func TestProdGateStopReportsClientCloseFailure(t *testing.T) {
 	}
 }
 
-// TestProdGateRuntimeStopReleasesListener 验证 Runtime.Stop 会释放 Gate 监听地址，随后 Close 仍可完成最终释放。
-func TestProdGateRuntimeStopReleasesListener(t *testing.T) {
+// TestMACGateRuntimeStopReleasesListener 验证 Runtime.Stop 会释放 Gate 监听地址，随后 Close 仍可完成最终释放。
+func TestMACGateRuntimeStopReleasesListener(t *testing.T) {
 	local, gate, _, _ := startTestProductionGate(t, 1, time.Second)
 	listenerAddress := gate.Addr().String()
 	if err := local.Stop(context.Background()); err != nil {
@@ -3443,8 +3442,8 @@ func TestProdGateRuntimeStopReleasesListener(t *testing.T) {
 	}
 }
 
-// TestProdGateRuntimeStopClosesPendingTLSHandshake 验证停机关闭尚未发送 TLS ClientHello 的原始 TCP 连接。
-func TestProdGateRuntimeStopClosesPendingTLSHandshake(t *testing.T) {
+// TestMACGateRuntimeStopClosesPendingTLSHandshake 验证停机关闭尚未发送 TLS ClientHello 的原始 TCP 连接。
+func TestMACGateRuntimeStopClosesPendingTLSHandshake(t *testing.T) {
 	local, gate, _, _ := startTestProductionGate(t, 1, time.Second)
 	pending, err := net.DialTimeout("tcp", gate.Addr().String(), time.Second)
 	if err != nil {
@@ -3477,8 +3476,8 @@ func TestProdGateRuntimeStopClosesPendingTLSHandshake(t *testing.T) {
 	}
 }
 
-// TestProdGateRuntimeStopClosesPendingHandshake 验证 Runtime.Stop 会关闭仍在等待客户端应用握手的连接，而不等握手超时。
-func TestProdGateRuntimeStopClosesPendingHandshake(t *testing.T) {
+// TestMACGateRuntimeStopClosesPendingHandshake 验证 Runtime.Stop 会关闭仍在等待客户端应用握手的连接，而不等握手超时。
+func TestMACGateRuntimeStopClosesPendingHandshake(t *testing.T) {
 	local, gate, agents, clientTLS := startTestProductionGate(t, 1, 30*time.Second)
 	connection := dialProductionTestClient(t, gate, clientTLS)
 	defer connection.Close()
@@ -3523,8 +3522,8 @@ func TestProdGateRuntimeStopClosesPendingHandshake(t *testing.T) {
 	}
 }
 
-// TestProdGateRuntimeStopClosesAllPendingHandshakes 验证 Runtime.Stop 会关闭全部并发等待应用握手的连接并等待它们退出。
-func TestProdGateRuntimeStopClosesAllPendingHandshakes(t *testing.T) {
+// TestMACGateRuntimeStopClosesAllPendingHandshakes 验证 Runtime.Stop 会关闭全部并发等待应用握手的连接并等待它们退出。
+func TestMACGateRuntimeStopClosesAllPendingHandshakes(t *testing.T) {
 	const pendingConnections = 8
 	local, gate, agents, clientTLS := startTestProductionGate(t, pendingConnections, 30*time.Second)
 	connections := make([]*websocket.Conn, pendingConnections)
@@ -3582,8 +3581,8 @@ func TestProdGateRuntimeStopClosesAllPendingHandshakes(t *testing.T) {
 	}
 }
 
-// TestProdGateDisconnectsAgentCreatedAfterCallTimeout 验证 Gate Call 超时后迟到创建的 Agent 仍会收到断开事件并退出。
-func TestProdGateDisconnectsAgentCreatedAfterCallTimeout(t *testing.T) {
+// TestMACGateDisconnectsAgentCreatedAfterCallTimeout 验证 Gate Call 超时后迟到创建的 Agent 仍会收到断开事件并退出。
+func TestMACGateDisconnectsAgentCreatedAfterCallTimeout(t *testing.T) {
 	serverTLS, clientTLS := testTLSConfigs(t)
 	local, err := runtime.NewRuntime(runtime.Config{
 		MaxCallWait:     40 * time.Millisecond,
@@ -3704,8 +3703,8 @@ func TestNewGateServiceRejectsInvalidTLSAndCapacity(t *testing.T) {
 	}
 }
 
-// TestProdGateAllowsDynamicCertificate 验证动态选证书仍能完成握手，且 Gate 固定最低 TLS 版本和 HTTP/1.1 协商。
-func TestProdGateAllowsDynamicCertificate(t *testing.T) {
+// TestMACGateAllowsDynamicCertificate 验证动态选证书仍能完成握手，且 Gate 固定最低 TLS 版本和 HTTP/1.1 协商。
+func TestMACGateAllowsDynamicCertificate(t *testing.T) {
 	serverTLS, clientTLS := testTLSConfigs(t)
 	certificate := serverTLS.Certificates[0]
 	serverTLS.Certificates = nil
@@ -3737,8 +3736,8 @@ func TestProdGateAllowsDynamicCertificate(t *testing.T) {
 	}
 }
 
-// TestProdGateCertificateSelectionFailureIsolated 验证动态证书选择返回错误或 panic 后，后续连接仍可建立。
-func TestProdGateCertificateSelectionFailureIsolated(t *testing.T) {
+// TestMACGateCertificateSelectionFailureIsolated 验证动态证书选择返回错误或 panic 后，后续连接仍可建立。
+func TestMACGateCertificateSelectionFailureIsolated(t *testing.T) {
 	const privateError = "private-certificate-selection-detail"
 	for _, testCase := range []struct {
 		name string
@@ -3833,10 +3832,48 @@ func TestNewGateServiceRequiresFrameLimitForHandshake(t *testing.T) {
 	if _, err := NewGateService(local, config); err != nil {
 		t.Fatalf("NewGateService(frame limit %d) error = %v, want success", config.MaxFrameBytes, err)
 	}
+	config.Protocol = ProtocolPlain
+	config.MaxFrameBytes = 1
+	if _, err := NewGateService(local, config); err != nil {
+		t.Fatalf("Plain mode with no handshake and a small frame limit: %v", err)
+	}
 }
 
-// TestProdGateListenFailureLeavesRuntimeAvailable 验证监听地址被占用时 Gate 创建失败不会停止 Runtime，释放地址后可创建新 Gate。
-func TestProdGateListenFailureLeavesRuntimeAvailable(t *testing.T) {
+// 验证 TLS 与 Plain 模式独立，WSS 连接无需应用握手即可完成 Envelope 请求和响应。
+func TestPlainGateSupportsTLSWithoutApplicationHandshake(t *testing.T) {
+	serverTLS, clientTLS := testTLSConfigs(t)
+	_, gate := startConfiguredProductionGateWithTLS(t, runtime.Config{ShutdownTimeout: 2 * time.Second},
+		1, time.Second, 1024, 4096, serverTLS, func(client ClientSession) runtime.Service {
+			return &productionTestAgent{client: client, disconnected: make(chan struct{})}
+		}, ProtocolPlain)
+	connection := dialProductionTestClient(t, gate, clientTLS)
+	defer connection.Close()
+	request, err := proto.Marshal(&Envelope{MsgId: 1001, RequestId: 9, Payload: []byte("plain over TLS")})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := connection.WriteMessage(websocket.BinaryMessage, request); err != nil {
+		t.Fatal(err)
+	}
+	_, frame, err := readTestBinaryMessage(t, connection)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var response Envelope
+	if err := proto.Unmarshal(frame, &response); err != nil {
+		t.Fatal(err)
+	}
+	if response.GetMsgId() != 1002 || response.GetRequestId() != 9 || string(response.GetPayload()) != "plain over TLS" {
+		t.Fatalf("response = %v", &response)
+	}
+	metrics := gate.Metrics()
+	if metrics.AcceptedConnections != 1 || metrics.HandshakeTimeouts != 0 {
+		t.Fatalf("Plain mode metrics = %+v", metrics)
+	}
+}
+
+// TestMACGateListenFailureLeavesRuntimeAvailable 验证监听地址被占用时 Gate 创建失败不会停止 Runtime，释放地址后可创建新 Gate。
+func TestMACGateListenFailureLeavesRuntimeAvailable(t *testing.T) {
 	blockedListener, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
 		t.Fatalf("net.Listen(blocked address) error = %v", err)
@@ -4245,6 +4282,7 @@ func startConfiguredProductionGateWithTLS(
 	maxOutboundQueueBytes int,
 	serverTLS *tls.Config,
 	newAgent func(ClientSession) runtime.Service,
+	protocols ...Protocol,
 ) (*runtime.Runtime, *GateService) {
 	t.Helper()
 	local, err := runtime.NewRuntime(runtimeConfig)
@@ -4259,7 +4297,12 @@ func startConfiguredProductionGateWithTLS(
 			t.Errorf("Runtime.Close() error = %v", err)
 		}
 	})
+	mode := ProtocolMAC
+	if len(protocols) > 0 {
+		mode = protocols[0]
+	}
 	gate, err := NewGateService(local, Config{
+		Protocol:              mode,
 		Address:               "127.0.0.1:0",
 		TLSConfig:             serverTLS,
 		MaxConnections:        maxConnections,

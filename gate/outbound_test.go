@@ -1,4 +1,4 @@
-package gatecommon
+package gate
 
 import (
 	"testing"

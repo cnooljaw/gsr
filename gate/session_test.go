@@ -1,4 +1,4 @@
-package prodgate
+package gate
 
 import (
 	"bytes"
@@ -36,8 +36,8 @@ func TestProdClientSessionCloseAggregatesCloseFailures(t *testing.T) {
 	}
 }
 
-// TestProdGateLogsClientWriterFailures 验证底层 deadline 和消息写入失败都会由 Gate 记录连接故障。
-func TestProdGateLogsClientWriterFailures(t *testing.T) {
+// TestMACGateLogsClientWriterFailures 验证底层 deadline 和消息写入失败都会由 Gate 记录连接故障。
+func TestMACGateLogsClientWriterFailures(t *testing.T) {
 	for _, testCase := range []struct {
 		name              string
 		failWriteDeadline bool
@@ -115,7 +115,7 @@ func newProdWriteFailureWebSocketPair(t *testing.T) (*websocket.Conn, *websocket
 
 	serverConnections := make(chan *websocket.Conn, 1)
 	server := httptest.NewUnstartedServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		connection, err := secureUpgrader.Upgrade(writer, request, nil)
+		connection, err := gateUpgrader.Upgrade(writer, request, nil)
 		if err != nil {
 			t.Errorf("Upgrade() error = %v", err)
 			return

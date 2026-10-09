@@ -1,4 +1,4 @@
-package gatecommon
+package gate
 
 import (
 	"bytes"
@@ -32,7 +32,7 @@ func TestHTTPServerErrorLogWithoutSharedLogger(t *testing.T) {
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			output.Reset()
-			NewHTTPServerErrorLog(nil).Print(test.input)
+			newHTTPServerErrorLog(nil).Print(test.input)
 			if !strings.Contains(output.String(), "category="+test.category) {
 				t.Fatalf("HTTP error log = %q, want category %q", output.String(), test.category)
 			}
@@ -75,7 +75,7 @@ func TestHTTPServerErrorLogDoesNotBlockOnFullQueue(t *testing.T) {
 	result := make(chan writeResult, 1)
 	const serverError = "http: Accept error: private-client-data"
 	go func() {
-		length, err := NewHTTPServerErrorLog(logger).Writer().Write([]byte(serverError))
+		length, err := newHTTPServerErrorLog(logger).Writer().Write([]byte(serverError))
 		result <- writeResult{length: length, err: err}
 	}()
 	select {

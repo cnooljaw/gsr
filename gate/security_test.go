@@ -1,4 +1,4 @@
-package prodgate
+package gate
 
 import (
 	"bytes"
@@ -239,7 +239,7 @@ func TestClientMACKeyRejectsInvalidMaterial(t *testing.T) {
 
 func readClientAuthVector(t *testing.T) clientAuthVector {
 	t.Helper()
-	data, err := os.ReadFile("../testdata/client-auth-vector.json")
+	data, err := os.ReadFile("testdata/client-auth-vector.json")
 	if err != nil {
 		t.Fatalf("read client auth vector: %v", err)
 	}

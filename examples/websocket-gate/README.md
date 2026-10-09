@@ -1,8 +1,8 @@
 # WebSocket Gate 联调示例
 
-本示例使用仅供本机调试的 DebugGate，演示 TypeScript 客户端发送 Protobuf Envelope、GSR Agent 解码业务请求并回传同一 `request_id`。DebugGate 不提供 TLS、握手、seq 或 MAC，不得暴露到公网。
+本示例默认使用统一 Gate 的 Plain 模式，演示 TypeScript 客户端发送 Protobuf Envelope、GSR Agent 解码业务请求并回传同一 `request_id`。Plain 不提供握手、seq 或 MAC，仅绑定回环/私有 IP，不得暴露到公网。
 
-Go 启动入口只解析参数、处理退出信号并调用 `gsr.Run`。MainService 根据模式调用 `self.OpenDebugGate` 或 `self.OpenProdGate`，提供返回 `gsr.Service` 的 Echo Agent 构造回调，然后自身退出；Gate 与连接 Agent 继续运行，由 Runtime 在进程退出时统一停止。Echo Agent 显式实现普通 `Handle` 和可选的 `HandleClientMessage`，两种消息入口共用该 Service 的 Mailbox 和 runner。
+Go 启动入口只解析参数、处理退出信号并调用 `gsr.Run`。MainService 统一调用 `self.OpenGate` 并明确选择 Protocol，提供返回 `gsr.Service` 的 Echo Agent 构造回调，然后自身退出；Gate 与连接 Agent 继续运行，由 Runtime 在进程退出时统一停止。Echo Agent 显式实现普通 `Handle` 和可选的 `HandleClientMessage`，两种消息入口共用该 Service 的 Mailbox 和 runner。
 
 框架通用 Envelope 和连接控制消息定义在仓库根目录的 `gate/proto/gsr/common/v1/common.proto`；Echo 示例的消息编号和 payload 仍定义在本目录的 `proto/gsr/example/echo/v1/echo.proto`。每个消息编号通过 `.proto` option 显式关联 payload、方向和 Request/Notify/Response/Push 种类，`npm run generate` 从仓库根目录的 Buf 配置同时生成 Go 与 TypeScript 类型和 Go 协议目录。业务 Handler 按实现进度手动注册；新协议消息可以先定义，之后逐个补 Handler。
 
@@ -23,23 +23,23 @@ npm run generate
 
 ```bash
 cd ../..
-go test ./gate/prodgate -run '^TestClientAuthVectorMatchesReference$'
+go test ./gate -run '^TestClientAuthVectorMatchesReference$'
 cd examples/websocket-gate
 npm run test:crypto
 ```
 
 固定向量采用 RFC 7748 的公开 X25519 测试密钥；仓库根目录的 `gate/testdata/generate_client_auth_vector.mjs` 可独立重建共享 JSON 夹具。测试私钥仅用于公开测试向量，禁止用于实际连接。
 
-框架包 `gate/prodgate` 已接入固定 33 字节首帧密钥握手、上行 seq/MAC 校验、认证后向 Agent 投递、每连接有界写队列、连接关闭管理和 Runtime 共享结构化日志。`TLSConfig` 非空时直连 WSS；留空时监听普通 HTTP WebSocket，适用于可信内网或由 K8s Ingress/LB 终止客户端 TLS 的部署。公网直连必须由部署方提供 `TLSConfig`；Gate 无法从监听地址判断是否暴露公网。两种模式共用固定二进制握手和业务协议，并有本机集成测试。提升为框架包不等于已经完成安全审计；慢客户端长时压力和完整失败矩阵尚未完成。
+框架包 `gate` 已接入固定 33 字节首帧密钥握手、上行 seq/MAC 校验、认证后向 Agent 投递、每连接有界写队列、连接关闭管理和 Runtime 共享结构化日志。`TLSConfig` 非空时直连 WSS；留空时监听普通 HTTP WebSocket，适用于可信内网或由 K8s Ingress/LB 终止客户端 TLS 的部署。公网直连必须由部署方提供 `TLSConfig`；Gate 无法从监听地址判断是否暴露公网。MAC 的 WS/WSS 部署共用固定二进制握手和业务协议；Plain 不握手，TLS 与模式独立，并有本机集成测试。提升为框架包不等于已经完成安全审计；慢客户端长时压力和完整失败矩阵尚未完成。
 
 K8s 默认部署可以让 Pod 监听 `0.0.0.0:8080`，Gate 不配置 `TLSConfig`；Ingress 持有 TLS Secret，并把 `/ws` 以 HTTP/1.1 WebSocket Upgrade 转发到 Service。Ingress 到 Pod 的网络应属于可信集群边界；如果该链路不可信，需要另外配置 mTLS，不能把应用层 MAC 当作 TLS 身份认证。
 
-ProdGate 自己终止 TLS 时要求 TLS 1.2 或更新版本，只协商 HTTP/1.1。`GetCertificate` 可以动态选择证书；`GetConfigForClient` 会被拒绝，因为它能替换连接级 TLS 配置并绕过 Gate 的约束。TLS 在 Ingress/LB 终止时，证书和 TLS 版本由该上游组件负责。
+Gate 自己终止 TLS 时要求 TLS 1.2 或更新版本，只协商 HTTP/1.1。`GetCertificate` 可以动态选择证书；`GetConfigForClient` 会被拒绝，因为它能替换连接级 TLS 配置并绕过 Gate 的约束。TLS 在 Ingress/LB 终止时，证书和 TLS 版本由该上游组件负责。
 
 生产 Gate 的短时混合连接压力样本默认不运行，避免影响普通测试；需要显式开启并可按秒调整时长：
 
 ```bash
-GSR_GATE_STRESS=1 GSR_GATE_STRESS_SECONDS=10 go test ../../gate/prodgate -run '^TestProdGateMixedConnectionStress$' -v
+GSR_GATE_STRESS=1 GSR_GATE_STRESS_SECONDS=10 go test ../../gate -run '^TestMACGateMixedConnectionStress$' -v
 ```
 
 测试会输出发送量、Agent 处理量、Mailbox 满载和连接拒绝计数，用于建立机器相关基线，不直接代表最终容量上限。
@@ -47,13 +47,13 @@ GSR_GATE_STRESS=1 GSR_GATE_STRESS_SECONDS=10 go test ../../gate/prodgate -run '^
 慢客户端长时出站背压可以单独运行；客户端连接建立后不读取服务端数据，`ClientSession.Send` 预计会稳定返回 `ErrClientQueueFull`，这属于验收目标：
 
 ```bash
-GSR_GATE_STRESS=1 GSR_GATE_SLOW_CLIENT_SECONDS=10 go test ../../gate/prodgate -run '^TestProdGateLongSlowClientBackpressure$' -v
+GSR_GATE_STRESS=1 GSR_GATE_SLOW_CLIENT_SECONDS=10 go test ../../gate -run '^TestMACGateLongSlowClientBackpressure$' -v
 ```
 
 坏握手和坏 MAC 的失败阶段样本可以重复运行，默认 32 轮：
 
 ```bash
-GSR_GATE_STRESS=1 GSR_GATE_FAILURE_ATTEMPTS=32 go test ../../gate/prodgate -run '^TestProdGateFailurePhaseStress$' -v
+GSR_GATE_STRESS=1 GSR_GATE_FAILURE_ATTEMPTS=32 go test ../../gate -run '^TestMACGateFailurePhaseStress$' -v
 ```
 
 测试会确认失败连接不进入 Agent 业务处理，并记录失败连接和已接纳连接数量。

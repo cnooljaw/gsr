@@ -37,8 +37,7 @@ type ServiceContext interface {
 	SendName(cluster.ServiceName, runtime.CommandID, ...any) error
 	CallName(context.Context, cluster.ServiceName, runtime.CommandID, ...any) (any, error)
 	OpenHTTP(string, func(*HTTPIngress) http.Handler) error
-	OpenDebugGate(context.Context, DebugGateConfig) (string, error)
-	OpenProdGate(context.Context, ProdGateConfig) (string, error)
+	OpenGate(context.Context, GateConfig) (string, error)
 	After(time.Duration, runtime.CommandID, ...any) (runtime.TimerID, error)
 	CancelTimer(runtime.TimerID) bool
 	Cluster() *Cluster

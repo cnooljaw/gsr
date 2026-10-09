@@ -1,4 +1,4 @@
-package gatecommon
+package gate
 
 import (
 	"bytes"
@@ -7,8 +7,8 @@ import (
 	"github.com/cnooljaw/gsr/logging"
 )
 
-// NewHTTPServerErrorLog 把 net/http 的内部错误收口为安全类别，不转录未认证输入。
-func NewHTTPServerErrorLog(logger *logging.Logger) *log.Logger {
+// newHTTPServerErrorLog 把 net/http 的内部错误收口为安全类别，不转录未认证输入。
+func newHTTPServerErrorLog(logger *logging.Logger) *log.Logger {
 	return log.New(httpServerErrorWriter{logger: logger}, "", 0)
 }
 

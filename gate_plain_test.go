@@ -18,7 +18,7 @@ import (
 )
 
 // 验证应用 Agent 的强类型协议 Handler 能按名称调用业务 Service，保持 Agent 来源并回传客户端请求编号。
-func TestOpenDebugGateConnectsApplicationAgent(t *testing.T) {
+func TestOpenGateConnectsApplicationAgent(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	addresses := make(chan string, 1)
@@ -32,7 +32,7 @@ func TestOpenDebugGateConnectsApplicationAgent(t *testing.T) {
 		if err := self.Register("gate-test-backend", backendID); err != nil {
 			return err
 		}
-		address, err := self.OpenDebugGate(ctx, DebugGateConfig{
+		address, err := self.OpenGate(ctx, GateConfig{Protocol: gate.ProtocolPlain,
 			Address:               "127.0.0.1:0",
 			MaxConnections:        1,
 			MaxOutboundQueueBytes: 64 << 10,

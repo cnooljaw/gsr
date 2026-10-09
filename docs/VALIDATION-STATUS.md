@@ -2,9 +2,11 @@
 
 本清单整理 Core、Cluster、日志及已落地外围示例的验证证据，不替代 API 契约，也不表示生产发布或兼容性冻结。实施路线图保留各轮历史切片；判断当前覆盖范围时先看这里，再进入对应测试。
 
-下文历史记录中的 `examples/websocket-gate/prodgate`、`examples/websocket-gate/debuggate` 是当时运行测试的路径。通用 Gate 现位于 `gate/prodgate`、`gate/debuggate`，重跑历史命令时使用新路径；历史结果和耗时不因搬迁而改写。
+下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
 ## 已覆盖的运行链
+
+2026-10-09 Gate 统一切片：连接实现、私有公共流程和原有两套测试迁移到 `gate`，应用入口收敛为 `OpenGate`；MAC 为默认模式，Plain 必须显式选择并绑定回环/私有 IP。保留既有认证、接纳、背压和停止覆盖，调整 Plain 的 TCP 容量及 HTTP 请求头超时契约；扩展配置测试覆盖未知模式和 Plain 小帧上限，新增 Plain+TLS 用例复用现有夹具。`go test -race ./gate ./examples/websocket-gate/cmd/debugserver -timeout=3m` 通过（约 35 秒/2 秒）；随后配置、Plain+TLS、应用 OpenGate 接线和简化后生命周期的定向 race 测试通过。`go test ./... -run '^$' -timeout=2m` 全仓编译检查通过，未重复运行全仓行为测试、全仓 race、TypeScript 或长时压力验收。
 
 应用 Timer 身份切片：TestServiceTimerPreservesOwnIdentity 经 gsr.Run 在 OnStart 登记零延时 Timer，确认回调 Source 为零、Self 为拥有者；回调发起的本地 Call 使用拥有者来源，绑定 ClusterClient 仍使用 Self，实际排空的 JSON 日志也记录拥有者 ServiceID。相关测试、全仓测试、vet 和 race 通过；未修改生产代码，此测试不包含远端 Timer 调用或计时精度测量。
 
@@ -89,37 +91,37 @@ GSR_CALL_STABILITY=1 go test ./cluster -run '^TestTCPCallServicePanicAndReplacem
 
 2026-09-15 规模切片：已实际运行现有空闲 Service/Timer 规模测试及固定次数 benchmark，结果见 [本地规模基线](PERFORMANCE-BASELINE.md)。这是单机小样本，不替代持续负载或生产验收；该切片未修改 Go 代码。
 
-2026-09-28 Gate 多慢连接背压样本：`TestProdGateMultipleSlowClientsDoNotBlockHealthyRequests` 在本机以四条不读取数据的客户端和一条健康连接运行 5 秒。四条慢连接均成功写入 12 条后持续遇到有界队列拒绝，健康连接完成 50 次请求/响应；合计 `OutboundQueueFull=19857`，`RejectedConnections=0`、`InboundMailboxFull=0`，五个 Agent 均收到断开通知。定向测试与对应 `-race` 检查通过；这是短时行为验收，不是目标部署容量或长时稳定性结论。
+2026-09-28 Gate 多慢连接背压样本：`TestMACGateMultipleSlowClientsDoNotBlockHealthyRequests` 在本机以四条不读取数据的客户端和一条健康连接运行 5 秒。四条慢连接均成功写入 12 条后持续遇到有界队列拒绝，健康连接完成 50 次请求/响应；合计 `OutboundQueueFull=19857`，`RejectedConnections=0`、`InboundMailboxFull=0`，五个 Agent 均收到断开通知。定向测试与对应 `-race` 检查通过；这是短时行为验收，不是目标部署容量或长时稳定性结论。
 
-2026-09-22 WebSocket Gate 短时压力切片：在 `GSR_GATE_STRESS=1` 下运行 3 秒慢客户端、16 连接持续发送和 8 轮坏握手/坏 MAC。慢客户端发送 12 条、出站队列满载拒绝 2,976 次；16 连接发送与 Agent 处理均为 4,622 条，`InboundMailboxFull=0`、连接拒绝为 0；失败阶段 8 次全部拒绝且 8 条已认证连接均正常回收。命令为 `GSR_GATE_STRESS_SECONDS=3 GSR_GATE_SLOW_CLIENT_SECONDS=3 GSR_GATE_FAILURE_ATTEMPTS=8 go test ./examples/websocket-gate/prodgate -run '^TestProdGate(LongSlowClientBackpressure|MixedConnectionStress|FailurePhaseStress)$' -count=1 -v`。这是本机短样本，只验证有限队列、连接回收和失败阶段的当前行为，不构成多连接长时容量结论。
+2026-09-22 WebSocket Gate 短时压力切片：在 `GSR_GATE_STRESS=1` 下运行 3 秒慢客户端、16 连接持续发送和 8 轮坏握手/坏 MAC。慢客户端发送 12 条、出站队列满载拒绝 2,976 次；16 连接发送与 Agent 处理均为 4,622 条，`InboundMailboxFull=0`、连接拒绝为 0；失败阶段 8 次全部拒绝且 8 条已认证连接均正常回收。命令为 `GSR_GATE_STRESS_SECONDS=3 GSR_GATE_SLOW_CLIENT_SECONDS=3 GSR_GATE_FAILURE_ATTEMPTS=8 go test ./examples/websocket-gate -run '^TestMACGate(LongSlowClientBackpressure|MixedConnectionStress|FailurePhaseStress)$' -count=1 -v`。这是本机短样本，只验证有限队列、连接回收和失败阶段的当前行为，不构成多连接长时容量结论。
 
 同日 30 秒长样本：16 条连接发送与 Agent 处理均为 47,586 条，`InboundMailboxFull=0`、连接拒绝为 0；慢客户端样本先观察到队列满载，随后因写超时关闭连接，`ClientSession.Send` 返回 `ErrClientSessionClosed`，按连接隔离契约计为正常终止，不计为业务错误。
 
-同日 2 分钟多连接样本：`GSR_GATE_STRESS=1 GSR_GATE_STRESS_SECONDS=120 go test ./examples/websocket-gate/prodgate -run '^TestProdGateMixedConnectionStress$' -count=1 -v -timeout=150s` 使用 16 条连接，发送与 Agent 处理均为 189,983 条，`InboundMailboxFull=0`、连接拒绝为 0，测试耗时约 120 秒。该样本证明当前机器和测试负载下连接/Agent 链路可持续运行，不是部署容量、长期稳定性或生产限流结论。
+同日 2 分钟多连接样本：`GSR_GATE_STRESS=1 GSR_GATE_STRESS_SECONDS=120 go test ./examples/websocket-gate -run '^TestMACGateMixedConnectionStress$' -count=1 -v -timeout=150s` 使用 16 条连接，发送与 Agent 处理均为 189,983 条，`InboundMailboxFull=0`、连接拒绝为 0，测试耗时约 120 秒。该样本证明当前机器和测试负载下连接/Agent 链路可持续运行，不是部署容量、长期稳定性或生产限流结论。
 
 2026-09-23 Gate 压力验收断言收紧：多连接测试现在等候最多 5 秒排空，并要求客户端成功写入数与 Agent 处理数相等、Mailbox 满载和连接拒绝均为零；失败阶段测试在坏握手与坏 MAC 后额外执行一次健康请求/响应。3 秒短样本中非 race 处理 4,784 条、race 处理 4,783 条，均与各自成功写入数相等；两轮 Mailbox 满载与连接拒绝均为零。失败阶段各重复 3 次坏握手与坏 MAC，计数为 `rejected=3`、`accepted=4`，随后健康往返成功。目标测试、对应 race、prodgate 全包和 vet 通过；这次仅加固验收，不改生产 Gate。
 
-同日慢连接隔离切片：`TestProdGateSlowClientDoesNotBlockHealthyConnection` 持续向不读取数据的客户端发送，确认出站队列已发生满载后，在压力窗口内通过另一条真实 WebSocket 连接完成认证请求、Agent 投递及 Protobuf 响应往返；慢连接持续发送至测试结束，校验其成功发送和队列拒绝计数均大于零、连接未提前关闭。专项重复 10 次、prodgate 全包和全仓 race 通过；只验证短时双连接隔离，不作为慢网络长时或容量测试，未修改生产 Gate。
+同日慢连接隔离切片：`TestMACGateSlowClientDoesNotBlockHealthyConnection` 持续向不读取数据的客户端发送，确认出站队列已发生满载后，在压力窗口内通过另一条真实 WebSocket 连接完成认证请求、Agent 投递及 Protobuf 响应往返；慢连接持续发送至测试结束，校验其成功发送和队列拒绝计数均大于零、连接未提前关闭。专项重复 10 次、prodgate 全包和全仓 race 通过；只验证短时双连接隔离，不作为慢网络长时或容量测试，未修改生产 Gate。
 
-同日跨连接重放切片：`TestProdGateRejectsCrossConnectionReplayBeforeDelivery` 先在源连接发送并成功处理一条认证请求，再将完全相同的 `seq | Envelope | MAC` 帧送到另一条独立握手连接。目标连接以 `1008 policy_violation` 关闭，目标 Agent 未收到该帧；第三条新连接使用自己的密钥和序号 1 成功完成请求/响应。专项重复 10 次、prodgate 全包、全仓测试、全仓 race 和 vet 通过；只验证当前 Gate 实现的连接间帧隔离，不扩展为客户端身份认证或业务防重。
+同日跨连接重放切片：`TestMACGateRejectsCrossConnectionReplayBeforeDelivery` 先在源连接发送并成功处理一条认证请求，再将完全相同的 `seq | Envelope | MAC` 帧送到另一条独立握手连接。目标连接以 `1008 policy_violation` 关闭，目标 Agent 未收到该帧；第三条新连接使用自己的密钥和序号 1 成功完成请求/响应。专项重复 10 次、prodgate 全包、全仓测试、全仓 race 和 vet 通过；只验证当前 Gate 实现的连接间帧隔离，不扩展为客户端身份认证或业务防重。
 
-同日非法 X25519 握手集成切片：`TestProdGateRejectsInvalidX25519KeyAndRecovers` 通过真实生产 Listener 发送全零低阶公钥，连接上限设为 1，确认握手以协议错误关闭、Agent 未创建、连接计入拒绝；随后有效客户端仍能占用归还的名额并完成认证请求/响应。专项重复 10 次、prodgate 全包、对应 race 通过；只验证握手拒绝与容量恢复，不构成密码协议审计。
+同日非法 X25519 握手集成切片：`TestMACGateRejectsInvalidX25519KeyAndRecovers` 通过真实生产 Listener 发送全零低阶公钥，连接上限设为 1，确认握手以协议错误关闭、Agent 未创建、连接计入拒绝；随后有效客户端仍能占用归还的名额并完成认证请求/响应。专项重复 10 次、prodgate 全包、对应 race 通过；只验证握手拒绝与容量恢复，不构成密码协议审计。
 
-同日同连接重放切片：`TestProdGateRejectsSameConnectionReplayBeforeDelivery` 先在生产 Gate 上成功处理 seq=1 请求并读取响应，再重发完全相同的认证帧。Gate 以 `1008 policy_violation` 关闭连接，Agent 未重复收到消息并收到断开通知。专项重复 10 次、prodgate 全包、全仓测试、全仓 race 和 vet 通过；和跨连接重放测试一起覆盖生产 Gate 的两种旧帧拒绝路径，不代表完整安全审计。
+同日同连接重放切片：`TestMACGateRejectsSameConnectionReplayBeforeDelivery` 先在生产 Gate 上成功处理 seq=1 请求并读取响应，再重发完全相同的认证帧。Gate 以 `1008 policy_violation` 关闭连接，Agent 未重复收到消息并收到断开通知。专项重复 10 次、prodgate 全包、全仓测试、全仓 race 和 vet 通过；和跨连接重放测试一起覆盖生产 Gate 的两种旧帧拒绝路径，不代表完整安全审计。
 
-同日认证后超限帧切片：`TestProdGateRejectsOversizedAuthenticatedFrame` 在完成握手后发送完整长度超限的认证业务帧，确认 Gate 返回 `1009 message_too_big`、累计 `FrameTooLarge`、不投递 Agent 并通知断开；随后新连接可正常完成请求/响应。专项重复 10 次、prodgate 全包、全仓测试、全仓 race 和 vet 通过；只验证单连接帧上限与故障恢复，不是吞吐或内存压力测试。
+同日认证后超限帧切片：`TestMACGateRejectsOversizedAuthenticatedFrame` 在完成握手后发送完整长度超限的认证业务帧，确认 Gate 返回 `1009 message_too_big`、累计 `FrameTooLarge`、不投递 Agent 并通知断开；随后新连接可正常完成请求/响应。专项重复 10 次、prodgate 全包、全仓测试、全仓 race 和 vet 通过；只验证单连接帧上限与故障恢复，不是吞吐或内存压力测试。
 
-同日认证后短帧切片：`TestProdGateRejectsMalformedAuthenticatedFrame` 在完成握手后发送短于序号与 MAC 最小长度的二进制帧，确认 Gate 返回 `1002 protocol_error`、不投递 Agent 并通知连接断开。定向测试 `go test ./examples/websocket-gate/prodgate -run '^TestProdGateRejectsMalformedAuthenticatedFrame$'` 通过；本轮只新增独立集成测试，未重复运行全包或全仓验证。
+同日认证后短帧切片：`TestMACGateRejectsMalformedAuthenticatedFrame` 在完成握手后发送短于序号与 MAC 最小长度的二进制帧，确认 Gate 返回 `1002 protocol_error`、不投递 Agent 并通知连接断开。定向测试 `go test ./examples/websocket-gate -run '^TestMACGateRejectsMalformedAuthenticatedFrame$'` 通过；本轮只新增独立集成测试，未重复运行全包或全仓验证。
 
-同日慢客户端回压长窗口试验：设置 `GSR_GATE_SLOW_CLIENT_SECONDS=120` 后，慢客户端成功写入 12 条，队列累计拒绝 9,994 次；Gate 在约 15 秒时因写超时关闭连接，Agent 收到稳定关闭结果。定向压力测试 `GSR_GATE_STRESS=1 GSR_GATE_SLOW_CLIENT_SECONDS=120 go test ./examples/websocket-gate/prodgate -run '^TestProdGateLongSlowClientBackpressure$' -timeout=130s -v` 通过。这里的 120 秒是 Agent 压力循环的最长窗口，并非实际 soak 时长；本次验证写超时与有界回压，不代表两分钟慢客户端稳定性验收。
+同日慢客户端回压长窗口试验：设置 `GSR_GATE_SLOW_CLIENT_SECONDS=120` 后，慢客户端成功写入 12 条，队列累计拒绝 9,994 次；Gate 在约 15 秒时因写超时关闭连接，Agent 收到稳定关闭结果。定向压力测试 `GSR_GATE_STRESS=1 GSR_GATE_SLOW_CLIENT_SECONDS=120 go test ./examples/websocket-gate -run '^TestMACGateLongSlowClientBackpressure$' -timeout=130s -v` 通过。这里的 120 秒是 Agent 压力循环的最长窗口，并非实际 soak 时长；本次验证写超时与有界回压，不代表两分钟慢客户端稳定性验收。
 
-同日失败阶段压力扩展：设置 `GSR_GATE_FAILURE_ATTEMPTS=100`，连续执行 100 次坏握手和 100 次坏 MAC；故障连接未投递坏帧，随后健康连接仍完成请求/响应。测试耗时约 1.52 秒，指标为 `rejected=100`、`accepted=101`、`inbound_mailbox_full=0`。定向测试 `GSR_GATE_STRESS=1 GSR_GATE_FAILURE_ATTEMPTS=100 go test ./examples/websocket-gate/prodgate -run '^TestProdGateFailurePhaseStress$' -timeout=90s -v` 通过；这是短时恢复压力样本，不代表长时故障洪泛容量验收。
+同日失败阶段压力扩展：设置 `GSR_GATE_FAILURE_ATTEMPTS=100`，连续执行 100 次坏握手和 100 次坏 MAC；故障连接未投递坏帧，随后健康连接仍完成请求/响应。测试耗时约 1.52 秒，指标为 `rejected=100`、`accepted=101`、`inbound_mailbox_full=0`。定向测试 `GSR_GATE_STRESS=1 GSR_GATE_FAILURE_ATTEMPTS=100 go test ./examples/websocket-gate -run '^TestMACGateFailurePhaseStress$' -timeout=90s -v` 通过；这是短时恢复压力样本，不代表长时故障洪泛容量验收。
 
-同日失败阶段 1,000 轮扩展：连续执行 1,000 次坏握手和 1,000 次坏 MAC 后，健康连接仍完成请求/响应，指标为 `rejected=1000`、`accepted=1001`、`inbound_mailbox_full=0`；测试耗时约 15.38 秒。定向测试 `GSR_GATE_STRESS=1 GSR_GATE_FAILURE_ATTEMPTS=1000 go test ./examples/websocket-gate/prodgate -run '^TestProdGateFailurePhaseStress$' -timeout=90s -v` 通过。连接按序执行，本结果不代表并发故障洪泛容量或长时稳定性。
+同日失败阶段 1,000 轮扩展：连续执行 1,000 次坏握手和 1,000 次坏 MAC 后，健康连接仍完成请求/响应，指标为 `rejected=1000`、`accepted=1001`、`inbound_mailbox_full=0`；测试耗时约 15.38 秒。定向测试 `GSR_GATE_STRESS=1 GSR_GATE_FAILURE_ATTEMPTS=1000 go test ./examples/websocket-gate -run '^TestMACGateFailurePhaseStress$' -timeout=90s -v` 通过。连接按序执行，本结果不代表并发故障洪泛容量或长时稳定性。
 
-2026-09-23 失败阶段 3,000 轮扩展：连续执行 3,000 次坏握手和 3,000 次坏 MAC 后，健康连接仍完成请求/响应，指标为 `rejected=3000`、`accepted=3001`、`inbound_mailbox_full=0`；测试耗时约 46.39 秒。定向测试 `GSR_GATE_STRESS=1 GSR_GATE_FAILURE_ATTEMPTS=3000 go test ./examples/websocket-gate/prodgate -run '^TestProdGateFailurePhaseStress$' -v` 通过。连接按序执行，本结果不代表并发故障洪泛容量或长时稳定性。
+2026-09-23 失败阶段 3,000 轮扩展：连续执行 3,000 次坏握手和 3,000 次坏 MAC 后，健康连接仍完成请求/响应，指标为 `rejected=3000`、`accepted=3001`、`inbound_mailbox_full=0`；测试耗时约 46.39 秒。定向测试 `GSR_GATE_STRESS=1 GSR_GATE_FAILURE_ATTEMPTS=3000 go test ./examples/websocket-gate -run '^TestMACGateFailurePhaseStress$' -v` 通过。连接按序执行，本结果不代表并发故障洪泛容量或长时稳定性。
 
-2026-09-23 失败阶段 5,000 轮扩展：连续执行 5,000 次坏握手和 5,000 次坏 MAC 后，健康连接仍完成请求/响应，指标为 `rejected=5000`、`accepted=5001`、`inbound_mailbox_full=0`；测试耗时约 76.22 秒。定向测试 `GSR_GATE_STRESS=1 GSR_GATE_FAILURE_ATTEMPTS=5000 go test ./examples/websocket-gate/prodgate -run '^TestProdGateFailurePhaseStress$' -timeout=110s -v` 通过。连接按序执行，本结果不代表并发故障洪泛容量或长时稳定性。
+2026-09-23 失败阶段 5,000 轮扩展：连续执行 5,000 次坏握手和 5,000 次坏 MAC 后，健康连接仍完成请求/响应，指标为 `rejected=5000`、`accepted=5001`、`inbound_mailbox_full=0`；测试耗时约 76.22 秒。定向测试 `GSR_GATE_STRESS=1 GSR_GATE_FAILURE_ATTEMPTS=5000 go test ./examples/websocket-gate -run '^TestMACGateFailurePhaseStress$' -timeout=110s -v` 通过。连接按序执行，本结果不代表并发故障洪泛容量或长时稳定性。
 
 2026-09-23 并发故障隔离：8 条已认证坏 MAC 连接同时发送故障帧期间，健康连接完成 16 次请求/响应，坏帧均未进入 Agent，`inbound_mailbox_full=0`。定向测试与对应 `-race` 测试均通过；此样本验证有限并发下的连接隔离，不代表高并发容量。
 
@@ -151,7 +153,7 @@ GSR_CALL_STABILITY=1 go test ./cluster -run '^TestTCPCallServicePanicAndReplacem
 
 2026-09-23 C/S 请求编号上限：协议分发测试将最大 `uint32 request_id` 编码进 Envelope，确认 Handler 收到原值且 Response 原样回传。该测试、protocol 全包测试和 vet 通过；客户端 request_id 分配器仍由业务客户端实现，示例 CLI 固定使用 1。
 
-同日 Agent 内部超时切片：`TestProdGateReturnsErrorAfterAgentCallTimeout` 通过真实生产 Gate 验证 Agent 调用本地目标 Service 超时后，客户端收到原 `request_id` 的 `INTERNAL`；目标 Service 释放后产生的迟到 Core 回复不会再次写回客户端。重复运行 5 次、prodgate 全包、vet 和 race 均通过。该切片只确认 Agent/Runtime 的内部 Call 超时归属，不把它扩展为客户端业务请求的统一超时或重试策略。
+同日 Agent 内部超时切片：`TestMACGateReturnsErrorAfterAgentCallTimeout` 通过真实生产 Gate 验证 Agent 调用本地目标 Service 超时后，客户端收到原 `request_id` 的 `INTERNAL`；目标 Service 释放后产生的迟到 Core 回复不会再次写回客户端。重复运行 5 次、prodgate 全包、vet 和 race 均通过。该切片只确认 Agent/Runtime 的内部 Call 超时归属，不把它扩展为客户端业务请求的统一超时或重试策略。
 
 后续热点切片新增 TestRuntimeHotMailboxLoad（GSR_LOAD_TEST=1 显式启用）：4 个发送者、10 万次固定尝试、容量 64/1024，逐条核对接纳与处理结果并记录到达延迟分位数。它是短突发测试，不替代下文的持续负载验收；未修改生产实现。
 
@@ -197,13 +199,13 @@ TestRuntimePacedMultiServiceLoad 已补 8 个真实 Service 共享文件 Logger 
 
 这一步先证明框架能被应用清楚地组装和运行，不引入通用配置框架、发现服务、网关或新 Runtime 生命周期 API。自动化跨进程正常停机、强杀与重启恢复门禁已补充；持续负载、实际部署和其它故障场景仍需独立验收，不宣称生产验收完成。
 
-2026-09-24 Gate 断开收尾切片：新增 `TestProdGateAgentStopAfterClientDisconnectKeepsServing`，验证客户端先断开后 Gate 关闭 `ClientSession`、Agent 收到断开通知并在 `OnStop` 再次关闭时不报错；随后第二个客户端仍能完成认证、请求/响应往返。定向测试重复 5 次、定向 race 重复 3 次及 `go test ./examples/websocket-gate/prodgate` 均通过；只增加测试和文档，未修改生产实现或运行全仓验证。
+2026-09-24 Gate 断开收尾切片：新增 `TestMACGateAgentStopAfterClientDisconnectKeepsServing`，验证客户端先断开后 Gate 关闭 `ClientSession`、Agent 收到断开通知并在 `OnStop` 再次关闭时不报错；随后第二个客户端仍能完成认证、请求/响应往返。定向测试重复 5 次、定向 race 重复 3 次及 `go test ./examples/websocket-gate` 均通过；只增加测试和文档，未修改生产实现或运行全仓验证。
 
-2026-09-24 Gate 并发停机切片：新增 `TestProdGateClientDisconnectOverlapsRuntimeStop`，并发触发客户端断开和 Runtime.Stop，验证运行时停机完成、Agent.OnStop 只执行一次、重复关闭后写回返回 `ErrClientSessionClosed`。定向测试重复 10 次、定向 race 重复 5 次、`go test ./examples/websocket-gate/prodgate` 与该 package 全量 race 均通过；只增加测试和文档，未修改生产实现或运行全仓验证。
+2026-09-24 Gate 并发停机切片：新增 `TestMACGateClientDisconnectOverlapsRuntimeStop`，并发触发客户端断开和 Runtime.Stop，验证运行时停机完成、Agent.OnStop 只执行一次、重复关闭后写回返回 `ErrClientSessionClosed`。定向测试重复 10 次、定向 race 重复 5 次、`go test ./examples/websocket-gate` 与该 package 全量 race 均通过；只增加测试和文档，未修改生产实现或运行全仓验证。
 
-2026-09-24 Gate 停机错误切片：生产 Gate 与 DebugGate 原先都会忽略 `ClientSession` 底层真实关闭失败，导致 Runtime.Stop 无法报告该资源错误。两处 OnStop 现在聚合并返回各连接的关闭错误，继续处理后续清理；新增 `TestProdGateStopReportsClientCloseFailure` 和 `TestDebugGateStopReportsClientCloseFailure` 通过注入返回关闭错误的测试连接验证。定向测试重复 3 次，`go test ./examples/websocket-gate/prodgate ./examples/websocket-gate/debuggate`、对应两包全量 race 与 `go vet` 均通过；不改变正常断开错误归一化规则，未运行全仓验证。
+2026-09-24 Gate 停机错误切片：生产 Gate 与 DebugGate 原先都会忽略 `ClientSession` 底层真实关闭失败，导致 Runtime.Stop 无法报告该资源错误。两处 OnStop 现在聚合并返回各连接的关闭错误，继续处理后续清理；新增 `TestMACGateStopReportsClientCloseFailure` 和 `TestPlainGateStopReportsClientCloseFailure` 通过注入返回关闭错误的测试连接验证。定向测试重复 3 次，`go test ./examples/websocket-gate ./examples/websocket-gate`、对应两包全量 race 与 `go vet` 均通过；不改变正常断开错误归一化规则，未运行全仓验证。
 
-2026-09-24 Gate 多连接错误聚合切片：扩展两个停机测试，为两条连接分别注入不同 Close 帧写错误和 socket close 错误，确认 Gate 关闭所有连接且 `OnStop` 返回的错误保留四类原因。定向测试重复 3 次、`go test ./examples/websocket-gate/prodgate ./examples/websocket-gate/debuggate` 与对应两包全量 race 均通过。只强化测试与文档，没有生产代码改动。
+2026-09-24 Gate 多连接错误聚合切片：扩展两个停机测试，为两条连接分别注入不同 Close 帧写错误和 socket close 错误，确认 Gate 关闭所有连接且 `OnStop` 返回的错误保留四类原因。定向测试重复 3 次、`go test ./examples/websocket-gate ./examples/websocket-gate` 与对应两包全量 race 均通过。只强化测试与文档，没有生产代码改动。
 
 2026-09-24 Gate Close 帧错误切片：生产 Gate 和 DebugGate 现在同时保留 WebSocket Close 帧写入与底层 socket 关闭的真实错误；对端已断开错误仍归一化为正常收尾。两个定向测试同时注入 Close 帧写入和 socket 关闭错误，确认 `errors.Is` 可分别识别两种原因。
 
@@ -235,9 +237,9 @@ TestRuntimePacedMultiServiceLoad 已补 8 个真实 Service 共享文件 Logger 
 
 2026-09-25 生产 Gate 握手帧配置下限：配置的 `MaxFrameBytes` 小于 33 字节时无法容纳固定客户端握手帧；`NewGateService` 现在在启动前返回 `ErrInvalidConfig`，并增加边界测试覆盖 32 字节拒绝、33 字节接受。定向测试和 prodgate 全包测试通过。
 
-2026-09-28 Gate HTTP 空闲连接回收：普通 HTTP 请求返回 404/405 后，keep-alive 连接此前可能无限占住 `MaxConnections` 名额。生产 Gate 为未升级 HTTP 连接设置 5 秒 idle timeout；新增真实 TCP 测试确认 404 响应仍可 keep-alive，随后连接按时关闭。定向测试与 `go test ./examples/websocket-gate/prodgate` 通过；WebSocket 升级连接不受该 idle timeout 影响。
+2026-09-28 Gate HTTP 空闲连接回收：普通 HTTP 请求返回 404/405 后，keep-alive 连接此前可能无限占住 `MaxConnections` 名额。生产 Gate 为未升级 HTTP 连接设置 5 秒 idle timeout；新增真实 TCP 测试确认 404 响应仍可 keep-alive，随后连接按时关闭。定向测试与 `go test ./examples/websocket-gate` 通过；WebSocket 升级连接不受该 idle timeout 影响。
 
-2026-09-28 DebugGate HTTP 空闲连接回收：真实 TCP 回归测试先确认 404 后的 keep-alive 连接超过 5 秒仍不关闭，再验证设置 5 秒 idle timeout 后按时关闭。定向测试与 `go test ./examples/websocket-gate/debuggate` 通过。DebugGate 的 `MaxConnections` 只统计进入 `/ws` GET Handler 的连接，仍不限制原始 TCP 接纳数；它只供受信任环境调试。
+2026-09-28 DebugGate HTTP 空闲连接回收：真实 TCP 回归测试先确认 404 后的 keep-alive 连接超过 5 秒仍不关闭，再验证设置 5 秒 idle timeout 后按时关闭。定向测试与 `go test ./examples/websocket-gate` 通过。DebugGate 的 `MaxConnections` 只统计进入 `/ws` GET Handler 的连接，仍不限制原始 TCP 接纳数；它只供受信任环境调试。
 
 2026-09-28 Gate 停机断线通知交接：两种 Gate 的连接处理协程原先在 Agent Mailbox 满载时无限重试断线通知，`OnStop` 等待协程退出便可能越过自身 context 期限。两条受控测试先复现该阻塞；现在停机标记生效后连接协程结束重试，由 `OnStop` 对剩余映射按有界上下文补发。定向测试、两 Gate 包全测及对应包的 race 测试均通过；满载 Agent 在期限内仍不接纳时，`OnStop` 按预期返回 deadline 错误。
 
@@ -275,11 +277,11 @@ TestRuntimePacedMultiServiceLoad 已补 8 个真实 Service 共享文件 Logger 
 
 2026-09-28 Gate HTTP 内部日志满载：阻塞底层日志写入并填满容量为 1 的共享队列后，HTTP 错误日志适配器立即返回，丢弃计数增加 1；日志输出恢复后能正常关闭 Logger。定向测试及其 race 测试通过；本轮只验证满载 admission，不修改 Gate 或 Logger 的生产实现。
 
-2026-09-28 生产 Gate 失败阶段压力样本扩展：`TestProdGateFailurePhaseStress` 在原应用握手/MAC 失败前加入坏 TLS 首包，确认 TLS 阶段没有创建 Agent，三类故障之后健康连接仍可请求/响应。显式开关下默认每阶段 32 次样本通过；每阶段 8 次样本及其定向 race 通过。坏 TLS 首包本身不计入应用层拒绝数，独立的 TCP 容量拒绝仍会计数；这是本机短时样本，不代表目标部署容量或完整故障矩阵。本轮不修改生产实现。
+2026-09-28 生产 Gate 失败阶段压力样本扩展：`TestMACGateFailurePhaseStress` 在原应用握手/MAC 失败前加入坏 TLS 首包，确认 TLS 阶段没有创建 Agent，三类故障之后健康连接仍可请求/响应。显式开关下默认每阶段 32 次样本通过；每阶段 8 次样本及其定向 race 通过。坏 TLS 首包本身不计入应用层拒绝数，独立的 TCP 容量拒绝仍会计数；这是本机短时样本，不代表目标部署容量或完整故障矩阵。本轮不修改生产实现。
 
 2026-09-28 客户端 WebSocket Close 原因脱敏：真实生产 Gate 握手前 Close 帧测试先复现客户端自填文本进入结构化日志；修复后连接故障诊断保留 `peer_close_code`，不记录对端文本。DebugGate 的相同日志边界用定向测试覆盖。两种 Gate 共用安全字段选择，受影响包测试和定向 race 测试通过；不改变关闭或 Agent 投递语义。
 
-2026-09-28 ProdGate TLS 配置收口：构造测试先复现 `GetConfigForClient` 可替换根配置，现在启动前以 `ErrInvalidConfig` 拒绝；`GetCertificate` 动态选证书的真实 TLS 握手仍成功，Gate 最低版本为 TLS 1.2，实际协商 HTTP/1.1。定向测试和 `go test ./examples/websocket-gate/prodgate -timeout=2m` 通过，未运行全仓验证。首次包测试中既有的客户端 Close/停机竞态使一次运行返回 `websocket: close sent`，该用例单独运行及包测试复核通过；本轮未修改该关闭路径。
+2026-09-28 ProdGate TLS 配置收口：构造测试先复现 `GetConfigForClient` 可替换根配置，现在启动前以 `ErrInvalidConfig` 拒绝；`GetCertificate` 动态选证书的真实 TLS 握手仍成功，Gate 最低版本为 TLS 1.2，实际协商 HTTP/1.1。定向测试和 `go test ./examples/websocket-gate -timeout=2m` 通过，未运行全仓验证。首次包测试中既有的客户端 Close/停机竞态使一次运行返回 `websocket: close sent`，该用例单独运行及包测试复核通过；本轮未修改该关闭路径。
 
 2026-09-28 Gate 重复关闭收尾：公共出站路径在客户端 Close 后可能再次尝试发送 Close，Gorilla 返回 `ErrCloseSent`；现在与 EOF、连接已关闭等情况一样视为关闭完成，仍保留其它真实 Close 帧和 socket 关闭错误。定向回归测试先复现错误归类，再验证生产 Gate 的客户端 Close/停机以及两 Gate 的注入关闭错误；公共包、ProdGate、DebugGate 包测试通过。未修改数据帧协议或关闭顺序，未运行全仓和 race 验证。
 

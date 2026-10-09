@@ -395,7 +395,7 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 
 | 能力 | 框架入口 | 保留在业务/示例中的内容 |
 | --- | --- | --- |
-| WebSocket Gate | `gate/debuggate`、`gate/prodgate`；应用使用 `self.OpenDebugGate` / `self.OpenProdGate` | Agent 构造、身份认证和具体业务协议 |
+| WebSocket Gate | 统一 `gate`；应用使用 `self.OpenGate`，固定选择 MAC/Plain 模式 | Agent 构造、身份认证和具体业务协议 |
 | Agent 协议公共能力 | `gate/protocol` 的 Registry、Session、`Dispatcher[gsr.CommandContext]` | 具体 Agent、Handler、连接私有状态和业务 Service 路由；不新增 BaseAgent |
 | HTTP Server | `httpserver.Server`；应用使用 `self.OpenHTTP` 和 `HTTPIngress.SendName/CallName` | `http.ServeMux` 路由、请求校验、鉴权和状态码映射 |
 | Redis | `redisclient.New` 返回原生客户端 | 用户 Hash 缓存的键、TTL、读写及错误策略 |
@@ -413,9 +413,9 @@ Gate 和 Agent 随 Runtime 停止；通过 `gsr.Run` 打开的 HTTP Listener 由
 
 - 在 `examples/websocket-gate/` 提供一个 GSR Go 服务端和一个命令行 TypeScript 客户端，用于验证真实 WebSocket 接入、Envelope 编解码、request_id 关联、业务 Response、业务拒绝、ErrorResponse、服务端 Push 和连接关闭。
 - 示例以 `proto/` 下的通用协议和业务协议 `.proto` 作为协议源，使用 Buf CLI 的单个 `buf generate` 配置调用本地 `protoc-gen-go`、`protoc-gen-es` 和 `protoc-gen-gsr-registry`，分别生成 Go/TypeScript 消息及 Go 协议目录。每个 MsgId 的 payload、方向和 Request/Notify/Response/Push 种类都显式定义；业务 Handler 按已实现消息逐步手动注册。客户端使用 `@bufbuild/protobuf` 的类型化消息和二进制 codec，不手写 wire 编码；示例锁定 generator/runtime 版本并跟踪生成源码。
-- `examples/websocket-gate` 已覆盖 DebugGate 的内网请求/响应闭环、request_id 回传、连接数量限制、断开通知和 Runtime 关闭回收；Go 服务端与 TypeScript CLI 共用通用协议和 Echo 业务 `.proto`，由 Buf 生成两侧类型及 Go 协议目录，Agent 手动注册 Echo 强类型 Handler，并完成实际 WebSocket 往返。协议目录还提供通用错误回复、Request 必须回复与 Notify 不回复的约束。服务端使用 `gsr.Run` 启动普通 MainService，由其通过 `self.OpenDebugGate` / `self.OpenProdGate` 开放入口并提供应用层 Agent；MainService 完成启动后退出，不手工组装底层 Runtime。跨语言认证固定向量、首帧握手解析、服务端临时密钥派生和生产 WebSocket Listener 接线现已完成，覆盖可选直连 TLS 与 Ingress 终止 TLS 的普通 HTTP WebSocket。
+- `examples/websocket-gate` 已覆盖 DebugGate 的内网请求/响应闭环、request_id 回传、连接数量限制、断开通知和 Runtime 关闭回收；Go 服务端与 TypeScript CLI 共用通用协议和 Echo 业务 `.proto`，由 Buf 生成两侧类型及 Go 协议目录，Agent 手动注册 Echo 强类型 Handler，并完成实际 WebSocket 往返。协议目录还提供通用错误回复、Request 必须回复与 Notify 不回复的约束。服务端使用 `gsr.Run` 启动普通 MainService，由其通过 `self.OpenGate` 开放入口并提供应用层 Agent；MainService 完成启动后退出，不手工组装底层 Runtime。跨语言认证固定向量、首帧握手解析、服务端临时密钥派生和生产 WebSocket Listener 接线现已完成，覆盖可选直连 TLS 与 Ingress 终止 TLS 的普通 HTTP WebSocket。
 - 固定向量位于 `gate/testdata/client-auth-vector.json`，Go 与 TypeScript 测试直接读取同一夹具，覆盖双向 X25519 结果、HKDF 中间值、含高位的 seq 大端编码、原始 Envelope 字节 MAC，以及修改 seq/Envelope/MAC、错误 info、公钥顺序与错误截断长度。
-- `gate/prodgate/` 已实现并测试逐连接握手、HKDF 密钥派生、常量时间 MAC 校验、严格递增 seq、坏 MAC 不推进序号和帧长度上限；生产 `GateService` 已接入可选直连 WSS/TLS 或 Ingress 后 HTTP WebSocket Listener、5 秒默认首帧握手期限、TCP accept 边界连接上限、有界出站队列、唯一 WebSocket writer，以及认证后直接投递 Agent 的路径。直连 TLS、Ingress 终止 TLS、握手与业务帧往返、错误 MAC、握手超时、握手前连接容量和关闭回收已有本机集成测试。
+- `gate/` 已实现并测试逐连接握手、HKDF 密钥派生、常量时间 MAC 校验、严格递增 seq、坏 MAC 不推进序号和帧长度上限；生产 `GateService` 已接入可选直连 WSS/TLS 或 Ingress 后 HTTP WebSocket Listener、5 秒默认首帧握手期限、TCP accept 边界连接上限、有界出站队列、唯一 WebSocket writer，以及认证后直接投递 Agent 的路径。直连 TLS、Ingress 终止 TLS、握手与业务帧往返、错误 MAC、握手超时、握手前连接容量和关闭回收已有本机集成测试。
 - 底层 Gate 使用 `NewAgent func(ClientSession) runtime.Service` 回调；应用层 Gate 配置使用返回 `gsr.Service` 的回调，并通过现有 Service 适配器接入底层 Gate。新连接和断开事件由 GateService runner 管理，创建返回的 AgentID 绑定到该客户端连接。读循环对每帧直接调用 `Runtime.DeliverClientMessage`，不经 Gate Mailbox/Core Command 转发；不新增 AgentFactory、Service 管理器或通用依赖注入层。
 - DebugGate 与生产 Gate 均限制最大连接数、单帧大小和每连接出站队列；生产 Gate 的连接限制在 TCP accept 边界生效，覆盖尚未完成 TLS/HTTP/WebSocket 握手的连接。出站按序列化帧字节和每项 64 字节队列开销计费，入站复用 Agent Mailbox，不建立无界中间队列。生产 Gate 六类容量计数和 Runtime 共享 Logger 接线已实现；同一连接同一错误类别只记录首条，关闭时补充抑制汇总。连接关闭、正常断开、Agent Mailbox 满载后的有限重试、单/多慢客户端背压及健康连接隔离、短时多连接并发、带“发送数等于处理数”断言的显式 `GSR_GATE_STRESS=1` 混合连接压力、一次 2 分钟多连接样本、可调时长的慢客户端压力以及坏 TLS/应用握手/MAC 后成功恢复连接的失败阶段样本已有集成覆盖；更长部署时长、客户端业务超时与其它失败阶段的组合压力仍待验证。不等待或强杀 Agent。
 - 业务拒绝由业务 Response 表达，只有没有正常业务结果时才发送 ErrorResponse；客户端只按稳定错误码分支，不依赖 message 文本。

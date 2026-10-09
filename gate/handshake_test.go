@@ -1,4 +1,4 @@
-package prodgate
+package gate
 
 import (
 	"bytes"
@@ -143,8 +143,8 @@ func TestAcceptClientHandshakeGeneratesRandomServerKey(t *testing.T) {
 	}
 }
 
-// TestProdGateHandshakeStopsWhenSocketWriteDeadlineFails 验证握手响应无法设置底层写 deadline 时会返回错误并关闭连接。
-func TestProdGateHandshakeStopsWhenSocketWriteDeadlineFails(t *testing.T) {
+// TestMACGateHandshakeStopsWhenSocketWriteDeadlineFails 验证握手响应无法设置底层写 deadline 时会返回错误并关闭连接。
+func TestMACGateHandshakeStopsWhenSocketWriteDeadlineFails(t *testing.T) {
 	serverConnection, clientConnection, serverSocket := newProdWriteFailureWebSocketPair(t)
 	deadlineFailure := errors.New("test handshake write deadline failure")
 	serverSocket.failWriteDeadline(deadlineFailure)
@@ -168,8 +168,8 @@ func TestProdGateHandshakeStopsWhenSocketWriteDeadlineFails(t *testing.T) {
 	}
 }
 
-// TestProdGateHandshakeStopsWhenResponseWriteFails 验证握手响应写入失败时不会继续认证并会关闭连接。
-func TestProdGateHandshakeStopsWhenResponseWriteFails(t *testing.T) {
+// TestMACGateHandshakeStopsWhenResponseWriteFails 验证握手响应写入失败时不会继续认证并会关闭连接。
+func TestMACGateHandshakeStopsWhenResponseWriteFails(t *testing.T) {
 	serverConnection, clientConnection, serverSocket := newProdWriteFailureWebSocketPair(t)
 	writeFailure := errors.New("test handshake response write failure")
 	serverSocket.failWrites(writeFailure)
@@ -192,8 +192,8 @@ func TestProdGateHandshakeStopsWhenResponseWriteFails(t *testing.T) {
 	}
 }
 
-// TestProdGateHandshakeStopsWhenSocketReadDeadlineFails 验证底层读 deadline 设置失败时握手立即返回并关闭连接。
-func TestProdGateHandshakeStopsWhenSocketReadDeadlineFails(t *testing.T) {
+// TestMACGateHandshakeStopsWhenSocketReadDeadlineFails 验证底层读 deadline 设置失败时握手立即返回并关闭连接。
+func TestMACGateHandshakeStopsWhenSocketReadDeadlineFails(t *testing.T) {
 	serverConnection, clientConnection, serverSocket := newProdWriteFailureWebSocketPair(t)
 	deadlineFailure := errors.New("test handshake read deadline failure")
 	serverSocket.failReadDeadline(deadlineFailure)
@@ -211,8 +211,8 @@ func TestProdGateHandshakeStopsWhenSocketReadDeadlineFails(t *testing.T) {
 	}
 }
 
-// TestProdGateHandshakeClosesWhenReadDeadlineCannotBeCleared 验证握手响应后无法清除临时读 deadline 时连接会按错误结束。
-func TestProdGateHandshakeClosesWhenReadDeadlineCannotBeCleared(t *testing.T) {
+// TestMACGateHandshakeClosesWhenReadDeadlineCannotBeCleared 验证握手响应后无法清除临时读 deadline 时连接会按错误结束。
+func TestMACGateHandshakeClosesWhenReadDeadlineCannotBeCleared(t *testing.T) {
 	serverConnection, clientConnection, serverSocket := newProdWriteFailureWebSocketPair(t)
 	deadlineFailure := errors.New("test handshake read deadline reset failure")
 	serverSocket.failReadDeadlineOnCall(2, deadlineFailure)

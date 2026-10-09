@@ -1,4 +1,4 @@
-package prodgate
+package gate
 
 import (
 	"context"
@@ -12,8 +12,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	gatecontract "github.com/cnooljaw/gsr/gate"
-	"github.com/cnooljaw/gsr/gate/internal/gatecommon"
 	"github.com/cnooljaw/gsr/logging"
 	"github.com/cnooljaw/gsr/runtime"
 	"github.com/gorilla/websocket"
@@ -27,66 +25,68 @@ const (
 	defaultAgentStartWait                         = 5 * time.Second
 	defaultWriteWait                              = 10 * time.Second
 	closeFrameWait                                = 100 * time.Millisecond
-	queueEntryOverhead                            = gatecommon.QueueEntryOverhead
 	gateConnectCommand          runtime.CommandID = 0xffff_ff00
 	gateDisconnectCommand       runtime.CommandID = 0xffff_ff01
 	websocketHandshakeCloseCode                   = websocket.ClosePolicyViolation
 )
 
 var (
-	// ErrInvalidConfig 表示生产 Gate 配置或有限容量边界无效。
-	ErrInvalidConfig = errors.New("prodgate: invalid config")
+	// ErrInvalidConfig 表示 Gate 协议模式、监听或有限容量配置无效。
+	ErrInvalidConfig = errors.New("gate: invalid config")
 	// ErrClientQueueFull 表示客户端出站队列达到配置的字节上限。
-	ErrClientQueueFull = errors.New("prodgate: client outbound queue full")
+	ErrClientQueueFull = errors.New("gate: client outbound queue full")
 	// ErrClientSessionClosed 表示连接已关闭，不能再发送消息。
-	ErrClientSessionClosed = errors.New("prodgate: client session closed")
+	ErrClientSessionClosed = errors.New("gate: client session closed")
 	// ErrFrameTooLarge 表示完整 WebSocket 消息超过单帧大小上限。
-	ErrFrameTooLarge = errors.New("prodgate: frame too large")
-	errGateStopping  = errors.New("prodgate: Gate is stopping")
+	ErrFrameTooLarge = errors.New("gate: frame too large")
+	errGateStopping  = errors.New("gate: Gate is stopping")
 )
 
-var secureUpgrader = websocket.Upgrader{
+var gateUpgrader = websocket.Upgrader{
 	EnableCompression: false,
 	// Origin 不是客户端身份；业务 Agent 仍须显式完成 token 鉴权。
 	CheckOrigin: func(*http.Request) bool { return true },
 }
 
-// ClientSession 是生产 Gate 和 DebugGate 共用的单连接出站能力。
-type ClientSession = gatecontract.ClientSession
+// Protocol 是单个 Gate 监听固定使用的上行协议，不按连接猜测或自动降级。
+type Protocol uint8
 
-// Envelope 是客户端与服务端共用的 Protobuf 消息外层。
-type Envelope = gatecontract.Envelope
+const (
+	// ProtocolMAC 是默认模式：X25519 握手后校验每帧的 seq 和 MAC。
+	ProtocolMAC Protocol = iota
+	// ProtocolPlain 直接接收 Envelope，仅允许显式绑定回环或私有 IP。
+	ProtocolPlain
+)
 
-// ClientDisconnectedCommand 是 Gate 通知连接 Agent 已断开的 Core Command。
-const ClientDisconnectedCommand = gatecontract.ClientDisconnectedCommand
-
-// Config 定义生产 WebSocket Gate 的监听、容量和连接 Agent。
+// Config 定义 WebSocket Gate 的固定协议模式、监听、容量和连接 Agent。
 type Config struct {
-	// Address 是 Gate 绑定的 TCP host:port。
+	// Protocol 的零值为 MAC；Plain 必须显式选择，TLS 与协议模式独立。
+	Protocol Protocol
+	// Address 是 Gate 绑定的 TCP host:port；Plain 仅允许字面回环或私有 IP。
 	Address string
 	// TLSConfig 为 nil 时监听普通 HTTP WebSocket，适用于可信内网或由 Ingress 终止 TLS 的部署；
 	// 公网直连由部署方提供 TLS 配置。Gate 克隆非 nil 配置，只协商 HTTP/1.1，
 	// 并拒绝可能替换整份 TLS 配置的 GetConfigForClient；GetCertificate 可用于动态选证书。
 	TLSConfig *tls.Config
-	// MaxConnections 必须显式设置为正数，并包含尚未完成握手的连接。
+	// MaxConnections 必须为正，限制原始 TCP 连接，包括未完成 HTTP 请求头或握手的连接。
 	MaxConnections int
-	// HandshakeTimeout 限制连接升级后等待首个握手消息的时长；零值使用 5 秒。
+	// HandshakeTimeout 仅在 MAC 模式限制首个握手帧等待，零值使用 5 秒；Plain 不执行握手。
 	HandshakeTimeout time.Duration
 	// MaxFrameBytes 限制单条 WebSocket 二进制消息；零值使用 4 MiB。
 	MaxFrameBytes int
 	// MaxOutboundQueueBytes 限制每个连接的出站队列总字节数，必须至少容纳一个队列条目开销。
 	MaxOutboundQueueBytes int
-	// NewAgent 为每条完成密钥握手的连接创建独立 Agent Service。
+	// NewAgent 在连接接纳（MAC 模式还须完成握手）后创建独立 Agent Service。
 	NewAgent func(ClientSession) runtime.Service
 }
 
-// Metrics 是生产 Gate 的有限容量计数快照。
+// Metrics 是 Gate 两种模式共用的有限容量计数快照。
 type Metrics struct {
-	// AcceptedConnections 是完成握手且连接创建 Call 成功返回有效 AgentID 的连接数，不包含超时后的迟到创建。
+	// AcceptedConnections 只计连接创建 Call 返回有效 AgentID 的连接；MAC 还须握手成功，不包含迟到创建。
 	AcceptedConnections uint64
 	// RejectedConnections 是容量、握手、升级或 Agent 创建失败的连接数。
 	RejectedConnections uint64
-	// HandshakeTimeouts 是等待首个握手消息超时的连接数。
+	// HandshakeTimeouts 是 MAC 首帧握手超时数；Plain 模式始终为零。
 	HandshakeTimeouts uint64
 	// FrameTooLarge 是超出单帧限制的收发消息数。
 	FrameTooLarge uint64
@@ -105,7 +105,7 @@ type gateCounters struct {
 	outboundQueueFull   atomic.Uint64
 }
 
-// GateService 持有生产 WebSocket Listener、客户端连接和每连接 Agent 映射。
+// GateService 是两种协议共用的连接 owner，持有监听、客户端连接和 Agent 映射。
 type GateService struct {
 	runtime *runtime.Runtime
 	config  Config
@@ -127,10 +127,13 @@ type GateService struct {
 	agentsByConnection map[*clientConnection]runtime.ServiceID
 }
 
-// NewGateService 校验可选 TLS 与容量配置并创建生产 WebSocket Gate Service。
+// NewGateService 校验固定协议模式、可选 TLS 与容量配置，不按首帧猜测模式。
 func NewGateService(local *runtime.Runtime, config Config) (*GateService, error) {
 	if local == nil {
 		return nil, fmt.Errorf("%w: Runtime is required", ErrInvalidConfig)
+	}
+	if config.Protocol != ProtocolMAC && config.Protocol != ProtocolPlain {
+		return nil, fmt.Errorf("%w: unknown protocol mode", ErrInvalidConfig)
 	}
 	if config.HandshakeTimeout == 0 {
 		config.HandshakeTimeout = defaultHandshakeTimeout
@@ -138,15 +141,23 @@ func NewGateService(local *runtime.Runtime, config Config) (*GateService, error)
 	if config.MaxFrameBytes == 0 {
 		config.MaxFrameBytes = defaultMaxFrameBytes
 	}
-	if config.MaxConnections <= 0 || config.HandshakeTimeout < 0 || config.MaxFrameBytes < handshakeFrameSize ||
+	if config.MaxConnections <= 0 || config.HandshakeTimeout < 0 || config.MaxFrameBytes <= 0 ||
 		config.MaxOutboundQueueBytes < queueEntryOverhead {
 		return nil, fmt.Errorf("%w: connection, handshake, frame, or outbound queue limit is invalid", ErrInvalidConfig)
+	}
+	if config.Protocol == ProtocolMAC && config.MaxFrameBytes < handshakeFrameSize {
+		return nil, fmt.Errorf("%w: frame limit must accommodate the handshake", ErrInvalidConfig)
 	}
 	if config.NewAgent == nil {
 		return nil, fmt.Errorf("%w: NewAgent is required", ErrInvalidConfig)
 	}
 	if err := validateListenAddress(config.Address); err != nil {
 		return nil, err
+	}
+	if config.Protocol == ProtocolPlain {
+		if err := validatePrivateAddress(config.Address); err != nil {
+			return nil, err
+		}
 	}
 	tlsConfig, err := productionTLSConfig(config.TLSConfig)
 	if err != nil {
@@ -170,7 +181,7 @@ func (gate *GateService) Addr() net.Addr {
 	return gate.address
 }
 
-// Metrics 返回生产 Gate 的容量与接纳计数快照。
+// Metrics 返回 Gate 的容量与接纳计数快照。
 func (gate *GateService) Metrics() Metrics {
 	return Metrics{
 		AcceptedConnections: gate.counters.acceptedConnections.Load(),
@@ -186,7 +197,7 @@ func (gate *GateService) Metrics() Metrics {
 func (gate *GateService) OnStart(_ context.Context, self runtime.ServiceContext) error {
 	listener, err := net.Listen("tcp", gate.config.Address)
 	if err != nil {
-		return fmt.Errorf("prodgate: listen: %w", err)
+		return fmt.Errorf("gate: listen: %w", err)
 	}
 	limitedListener := newConnectionLimitListener(listener, gate.config.MaxConnections, func() {
 		gate.counters.rejectedConnections.Add(1)
@@ -205,7 +216,7 @@ func (gate *GateService) OnStart(_ context.Context, self runtime.ServiceContext)
 	gate.server = server
 	gate.serviceID = self.Self()
 	gate.logger = gate.logger.WithService(uint64(self.Self()))
-	server.ErrorLog = gatecommon.NewHTTPServerErrorLog(gate.logger)
+	server.ErrorLog = newHTTPServerErrorLog(gate.logger)
 	gate.address = listener.Addr()
 	gate.ioWorkers.Add(1)
 	gate.mu.Unlock()
@@ -237,9 +248,9 @@ func (gate *GateService) Handle(self runtime.CommandContext, command runtime.Com
 			return nil, err
 		}
 		if _, exists := gate.agentsByConnection[clientConn]; exists {
-			return nil, errors.New("prodgate: duplicate client connection")
+			return nil, errors.New("gate: duplicate client connection")
 		}
-		agent, err := gatecommon.CreateAgent(gate.config.NewAgent, clientConn, "prodgate")
+		agent, err := createAgent(gate.config.NewAgent, clientConn)
 		if err != nil {
 			gate.logConnectionFailure(clientConn, "agent_create", websocket.CloseInternalServerErr, err)
 			return nil, err
@@ -264,20 +275,20 @@ func (gate *GateService) Handle(self runtime.CommandContext, command runtime.Com
 		if !exists {
 			return nil, nil
 		}
-		if err := self.Send(agentID, ClientDisconnectedCommand); err != nil && !gatecommon.IsRuntimeStoppingError(err) {
+		if err := self.Send(agentID, ClientDisconnectedCommand); err != nil && !isRuntimeStoppingError(err) {
 			gate.logConnectionFailure(clientConn, "disconnect_notify", websocket.CloseInternalServerErr, err)
 			if errors.Is(err, runtime.ErrMailboxFull) {
 				// 保留映射，让连接处理协程重试，避免断开通知被 Agent 背压吞掉。
 				return nil, err
 			}
 			delete(gate.agentsByConnection, clientConn)
-			return nil, fmt.Errorf("prodgate: notify Agent disconnect: %w", err)
+			return nil, fmt.Errorf("gate: notify Agent disconnect: %w", err)
 		}
 		delete(gate.agentsByConnection, clientConn)
 		return nil, nil
 
 	default:
-		return nil, fmt.Errorf("prodgate: unknown internal command %d", command)
+		return nil, fmt.Errorf("gate: unknown internal command %d", command)
 	}
 }
 
@@ -309,7 +320,7 @@ func (gate *GateService) OnStop(ctx context.Context) error {
 	}
 	for _, clientConn := range clientConnections {
 		if err := clientConn.closeWith(websocket.CloseGoingAway, "going_away", closeDeadline); err != nil {
-			result = errors.Join(result, fmt.Errorf("prodgate: close client connection %d: %w", clientConn.connectionID, err))
+			result = errors.Join(result, fmt.Errorf("gate: close client connection %d: %w", clientConn.connectionID, err))
 		}
 	}
 	gate.ioWorkers.Wait()
@@ -323,7 +334,7 @@ func (gate *GateService) OnStop(ctx context.Context) error {
 	return errors.Join(result, serveErr)
 }
 
-// ServeHTTP 接收 HTTP 或 HTTPS WebSocket 二进制消息；握手完成后逐帧验证 MAC 和序号再投递给 Agent。
+// ServeHTTP 按构造时固定的协议接纳连接，读循环直接向 Agent 投递 Envelope。
 func (gate *GateService) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	if request.URL.Path != "/ws" {
 		http.NotFound(writer, request)
@@ -356,7 +367,7 @@ func (gate *GateService) ServeHTTP(writer http.ResponseWriter, request *http.Req
 		gate.ioWorkers.Done()
 	}()
 
-	connection, err := secureUpgrader.Upgrade(writer, request, nil)
+	connection, err := gateUpgrader.Upgrade(writer, request, nil)
 	if err != nil {
 		gate.logError("Gate connection rejected", "reason", "upgrade", "error", err)
 		gate.counters.rejectedConnections.Add(1)
@@ -369,16 +380,19 @@ func (gate *GateService) ServeHTTP(writer http.ResponseWriter, request *http.Req
 	}
 
 	connection.SetReadLimit(int64(gate.config.MaxFrameBytes))
-	authenticator, err := gate.performHandshake(clientConn)
-	if err != nil {
-		gate.counters.rejectedConnections.Add(1)
-		return
+	var authenticator *clientAuthenticator
+	if gate.config.Protocol == ProtocolMAC {
+		authenticator, err = gate.performHandshake(clientConn)
+		if err != nil {
+			gate.counters.rejectedConnections.Add(1)
+			return
+		}
 	}
 
 	// Call 超时不会取消 Gate Handler；断开事件仍要排在创建事件之后处理，因此不继承 WebSocket 请求的取消信号。
 	agentCreationRequested = true
 	connectContext, cancel := context.WithTimeout(context.Background(), defaultAgentStartWait)
-	result, err := gatecommon.CallGateConnect(connectContext, gate.runtime, serviceID, gateConnectCommand, clientConn)
+	result, err := callGateConnect(connectContext, gate.runtime, serviceID, gateConnectCommand, clientConn)
 	cancel()
 	if err != nil {
 		// Handler 内部的创建失败已经由 Gate runner 记录；这里只记录等待创建超时，避免同一失败重复落日志。
@@ -416,7 +430,12 @@ func (gate *GateService) ServeHTTP(writer http.ResponseWriter, request *http.Req
 			clientConn.closeWith(websocket.CloseUnsupportedData, "unsupported_data", time.Now().Add(closeFrameWait))
 			return
 		}
-		if err := gate.deliverAuthenticatedFrame(agentID, clientConn, authenticator, frame); err != nil {
+		if gate.config.Protocol == ProtocolMAC {
+			err = gate.deliverAuthenticatedFrame(agentID, clientConn, authenticator, frame)
+		} else {
+			err = gate.deliverEnvelope(agentID, clientConn, frame)
+		}
+		if err != nil {
 			if errors.Is(err, errGateStopping) {
 				<-clientConn.outbound.Done()
 			}
@@ -461,7 +480,7 @@ func (gate *GateService) performHandshake(clientConn *clientConnection) (*client
 	if messageType != websocket.BinaryMessage {
 		gate.logConnectionFailure(clientConn, "unsupported_data", websocket.CloseUnsupportedData, errors.New("handshake must be binary"))
 		clientConn.closeWith(websocket.CloseUnsupportedData, "unsupported_data", time.Now().Add(closeFrameWait))
-		return nil, errors.New("prodgate: handshake must be a binary message")
+		return nil, errors.New("gate: handshake must be a binary message")
 	}
 
 	response, authenticator, err := acceptClientHandshake(frame, gate.config.MaxFrameBytes)
@@ -478,7 +497,7 @@ func (gate *GateService) performHandshake(clientConn *clientConnection) (*client
 		}
 		return nil, err
 	}
-	if err := gatecommon.SetWebSocketWriteDeadline(connection, time.Now().Add(defaultWriteWait)); err != nil {
+	if err := setWebSocketWriteDeadline(connection, time.Now().Add(defaultWriteWait)); err != nil {
 		gate.logConnectionFailure(clientConn, "handshake_write", websocket.CloseInternalServerErr, err)
 		clientConn.closeWith(websocket.CloseInternalServerErr, "server_error", time.Now().Add(closeFrameWait))
 		return nil, err
@@ -521,6 +540,10 @@ func (gate *GateService) deliverAuthenticatedFrame(
 		}
 		return err
 	}
+	return gate.deliverEnvelope(agentID, clientConn, envelope)
+}
+
+func (gate *GateService) deliverEnvelope(agentID runtime.ServiceID, clientConn *clientConnection, envelope []byte) error {
 	if err := gate.deliverClientMessage(agentID, envelope); err != nil {
 		if errors.Is(err, errGateStopping) {
 			return err
@@ -545,7 +568,7 @@ func (gate *GateService) deliverClientMessage(agentID runtime.ServiceID, frame [
 }
 
 func (gate *GateService) notifyDisconnected(serviceID runtime.ServiceID, clientConn *clientConnection) {
-	gatecommon.RetryDisconnect(gate.runtime, serviceID, gateDisconnectCommand, clientConn, func() bool {
+	retryDisconnect(gate.runtime, serviceID, gateDisconnectCommand, clientConn, func() bool {
 		gate.mu.RLock()
 		defer gate.mu.RUnlock()
 		return gate.stopping
@@ -557,7 +580,7 @@ func (gate *GateService) notifyMappedAgentsOnStop(ctx context.Context) error {
 	for _, agentID := range gate.agentsByConnection {
 		pending = append(pending, agentID)
 	}
-	return gatecommon.NotifyMappedAgentsOnStop(ctx, gate.runtime, pending, "prodgate")
+	return notifyAgentsOnStop(ctx, gate.runtime, pending)
 }
 
 func (gate *GateService) logError(message string, fields ...any) {
@@ -575,7 +598,7 @@ func (gate *GateService) logConnectionFailure(clientConn *clientConnection, cate
 		if clientConn != nil {
 			fields = append(fields, "connection_id", clientConn.connectionID)
 		}
-		fields = append(fields, gatecommon.SafeWebSocketErrorFields(err)...)
+		fields = append(fields, safeWebSocketErrorFields(err)...)
 		gate.logError("Gate connection failure", fields...)
 	}
 }
@@ -674,6 +697,18 @@ func validateListenAddress(address string) error {
 	return nil
 }
 
+func validatePrivateAddress(address string) error {
+	host, _, err := net.SplitHostPort(address)
+	if err != nil {
+		return fmt.Errorf("%w: Address must contain a literal private IP and port", ErrInvalidConfig)
+	}
+	ip := net.ParseIP(host)
+	if ip == nil || (!ip.IsLoopback() && !ip.IsPrivate()) {
+		return fmt.Errorf("%w: Plain mode requires a literal loopback or private IP", ErrInvalidConfig)
+	}
+	return nil
+}
+
 func productionTLSConfig(config *tls.Config) (*tls.Config, error) {
 	if config == nil {
 		return nil, nil
@@ -698,11 +733,11 @@ func productionTLSConfig(config *tls.Config) (*tls.Config, error) {
 
 func clientConnArgument(args []any) (*clientConnection, error) {
 	if len(args) != 1 {
-		return nil, errors.New("prodgate: invalid connection event")
+		return nil, errors.New("gate: invalid connection event")
 	}
 	clientConn, ok := args[0].(*clientConnection)
 	if !ok || clientConn == nil {
-		return nil, errors.New("prodgate: invalid client connection")
+		return nil, errors.New("gate: invalid client connection")
 	}
 	return clientConn, nil
 }

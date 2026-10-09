@@ -1,5 +1,4 @@
-// Package gatecommon 保存两种 Gate 共享的连接生命周期流程。
-package gatecommon
+package gate
 
 import (
 	"context"
@@ -8,7 +7,6 @@ import (
 	"sort"
 	"time"
 
-	gatecontract "github.com/cnooljaw/gsr/gate"
 	"github.com/cnooljaw/gsr/runtime"
 )
 
@@ -17,24 +15,24 @@ const (
 	disconnectAttemptWait   = 100 * time.Millisecond
 )
 
-// CreateAgent 捕获业务构造回调的 panic，并拒绝空 Agent。
-func CreateAgent(factory func(gatecontract.ClientSession) runtime.Service, session gatecontract.ClientSession, component string) (service runtime.Service, err error) {
+// createAgent 捕获业务构造回调的 panic，并拒绝空 Agent。
+func createAgent(factory func(ClientSession) runtime.Service, session ClientSession) (service runtime.Service, err error) {
 	defer func() {
 		if recovered := recover(); recovered != nil {
 			service = nil
-			err = fmt.Errorf("%s: Agent constructor panicked: %v", component, recovered)
+			err = fmt.Errorf("gate: Agent constructor panicked: %v", recovered)
 		}
 	}()
 	service = factory(session)
 	if service == nil {
-		return nil, fmt.Errorf("%s: Agent constructor returned nil", component)
+		return nil, errors.New("gate: Agent constructor returned nil")
 	}
 	return service, nil
 }
 
-// CallGateConnect 在调用方有限期限内等待 Gate 发布或 Mailbox 恢复。
+// callGateConnect 在调用方有限期限内等待 Gate 发布或 Mailbox 恢复。
 // 只重试尚未接纳的失败；Handler error、Call 超时或取消均直接返回，避免重复创建 Agent。
-func CallGateConnect(ctx context.Context, local *runtime.Runtime, serviceID runtime.ServiceID, command runtime.CommandID, connection any) (any, error) {
+func callGateConnect(ctx context.Context, local *runtime.Runtime, serviceID runtime.ServiceID, command runtime.CommandID, connection any) (any, error) {
 	ticker := time.NewTicker(disconnectRetryInterval)
 	defer ticker.Stop()
 	for {
@@ -50,8 +48,8 @@ func CallGateConnect(ctx context.Context, local *runtime.Runtime, serviceID runt
 	}
 }
 
-// RetryDisconnect 在正常运行时重试 Gate runner 的断线投递；停机后交给 OnStop 补发。
-func RetryDisconnect(local *runtime.Runtime, serviceID runtime.ServiceID, command runtime.CommandID, connection any, stopping func() bool) {
+// retryDisconnect 在正常运行时重试 Gate runner 的断线投递；停机后交给 OnStop 补发。
+func retryDisconnect(local *runtime.Runtime, serviceID runtime.ServiceID, command runtime.CommandID, connection any, stopping func() bool) {
 	ticker := time.NewTicker(disconnectRetryInterval)
 	defer ticker.Stop()
 	for {
@@ -61,16 +59,16 @@ func RetryDisconnect(local *runtime.Runtime, serviceID runtime.ServiceID, comman
 		attemptContext, cancel := context.WithTimeout(context.Background(), disconnectAttemptWait)
 		_, err := local.Call(attemptContext, serviceID, command, connection)
 		cancel()
-		if err == nil || IsRuntimeStoppingError(err) || !isDisconnectRetryableError(err) {
+		if err == nil || isRuntimeStoppingError(err) || !isDisconnectRetryableError(err) {
 			return
 		}
 		<-ticker.C
 	}
 }
 
-// NotifyMappedAgentsOnStop 在停止期限内公平重试所有仍有连接映射的 Agent。
+// notifyAgentsOnStop 在停止期限内公平重试所有仍有连接映射的 Agent。
 // pending 由调用方创建，排序和重试期间不再供调用方使用。
-func NotifyMappedAgentsOnStop(ctx context.Context, local *runtime.Runtime, pending []runtime.ServiceID, component string) error {
+func notifyAgentsOnStop(ctx context.Context, local *runtime.Runtime, pending []runtime.ServiceID) error {
 	sort.Slice(pending, func(left, right int) bool { return pending[left] < pending[right] })
 	retry := make([]runtime.ServiceID, 0, len(pending))
 	ticker := time.NewTicker(disconnectRetryInterval)
@@ -82,15 +80,15 @@ func NotifyMappedAgentsOnStop(ctx context.Context, local *runtime.Runtime, pendi
 			if err := ctx.Err(); err != nil {
 				return errors.Join(result, err)
 			}
-			err := local.Send(agentID, gatecontract.ClientDisconnectedCommand)
-			if err == nil || IsRuntimeStoppingError(err) {
+			err := local.Send(agentID, ClientDisconnectedCommand)
+			if err == nil || isRuntimeStoppingError(err) {
 				continue
 			}
 			if errors.Is(err, runtime.ErrMailboxFull) {
 				retry = append(retry, agentID)
 				continue
 			}
-			result = errors.Join(result, fmt.Errorf("%s: notify Agent %d on Gate stop: %w", component, agentID, err))
+			result = errors.Join(result, fmt.Errorf("gate: notify Agent %d on Gate stop: %w", agentID, err))
 		}
 		pending, retry = retry, pending
 		if len(pending) == 0 {
@@ -105,8 +103,8 @@ func NotifyMappedAgentsOnStop(ctx context.Context, local *runtime.Runtime, pendi
 	return result
 }
 
-// IsRuntimeStoppingError 判断 Runtime 或目标 Service 已不能继续接纳断线通知。
-func IsRuntimeStoppingError(err error) bool {
+// isRuntimeStoppingError 判断 Runtime 或目标 Service 已不能继续接纳断线通知。
+func isRuntimeStoppingError(err error) bool {
 	return errors.Is(err, runtime.ErrServiceNotFound) ||
 		errors.Is(err, runtime.ErrServiceClosed) ||
 		errors.Is(err, runtime.ErrServiceStopping) ||

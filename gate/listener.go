@@ -1,4 +1,4 @@
-package prodgate
+package gate
 
 import (
 	"net"

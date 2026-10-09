@@ -4,17 +4,17 @@ import (
 	"context"
 	"testing"
 
-	"github.com/cnooljaw/gsr/gate/debuggate"
-	commonv1 "github.com/cnooljaw/gsr/gate/gen/go/gsr/common/v1"
 	echopb "github.com/cnooljaw/gsr/examples/websocket-gate/gen/go/gsr/example/echo/v1"
+	"github.com/cnooljaw/gsr/gate"
+	commonv1 "github.com/cnooljaw/gsr/gate/gen/go/gsr/common/v1"
 	"google.golang.org/protobuf/proto"
 )
 
 type recordedClientSession struct {
-	envelopes []*debuggate.Envelope
+	envelopes []*gate.Envelope
 }
 
-func (session *recordedClientSession) Send(envelope *debuggate.Envelope) error {
+func (session *recordedClientSession) Send(envelope *gate.Envelope) error {
 	session.envelopes = append(session.envelopes, envelope)
 	return nil
 }

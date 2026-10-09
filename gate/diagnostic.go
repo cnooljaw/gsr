@@ -1,4 +1,4 @@
-package gatecommon
+package gate
 
 import (
 	"errors"
@@ -6,8 +6,8 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-// SafeWebSocketErrorFields 不把对端提供的 Close 原因文本写入 Gate 诊断。
-func SafeWebSocketErrorFields(err error) []any {
+// safeWebSocketErrorFields 不把对端提供的 Close 原因文本写入 Gate 诊断。
+func safeWebSocketErrorFields(err error) []any {
 	if err == nil {
 		return nil
 	}

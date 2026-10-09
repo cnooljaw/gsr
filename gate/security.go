@@ -1,5 +1,4 @@
-// Package prodgate 提供生产 WebSocket Gate 的连接认证实现。
-package prodgate
+package gate
 
 import (
 	"crypto/hmac"
@@ -20,12 +19,12 @@ const (
 )
 
 var (
-	errInvalidKeyMaterial    = errors.New("prodgate: invalid client key material")
-	errInvalidAuthenticator  = errors.New("prodgate: invalid client authenticator")
-	errMalformedAuthFrame    = errors.New("prodgate: malformed authenticated frame")
-	errAuthFrameTooLarge     = errors.New("prodgate: authenticated frame too large")
-	errClientMACInvalid      = errors.New("prodgate: client frame authentication failed")
-	errClientSequenceInvalid = errors.New("prodgate: client sequence is not increasing")
+	errInvalidKeyMaterial    = errors.New("gate: invalid client key material")
+	errInvalidAuthenticator  = errors.New("gate: invalid client authenticator")
+	errMalformedAuthFrame    = errors.New("gate: malformed authenticated frame")
+	errAuthFrameTooLarge     = errors.New("gate: authenticated frame too large")
+	errClientMACInvalid      = errors.New("gate: client frame authentication failed")
+	errClientSequenceInvalid = errors.New("gate: client sequence is not increasing")
 )
 
 // deriveClientMACKey 按固定公钥顺序与 HKDF 标签派生客户端上行 MAC 密钥。

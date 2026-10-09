@@ -1,4 +1,4 @@
-package gatecommon
+package gate
 
 import (
 	"errors"
@@ -9,23 +9,22 @@ import (
 	"syscall"
 	"time"
 
-	gatecontract "github.com/cnooljaw/gsr/gate"
 	"github.com/gorilla/websocket"
 	"google.golang.org/protobuf/proto"
 )
 
-// QueueEntryOverhead 为每条出站消息计入固定队列开销。
-const QueueEntryOverhead = 64
+// queueEntryOverhead 为每条出站消息计入固定队列开销。
+const queueEntryOverhead = 64
 
 var (
-	// ErrNilEnvelope 表示发送方没有提供完整消息。
-	ErrNilEnvelope = errors.New("nil Envelope")
-	// ErrFrameTooLarge 表示消息超过单帧上限。
-	ErrFrameTooLarge = errors.New("frame too large")
-	// ErrQueueFull 表示出站队列无法接纳消息。
-	ErrQueueFull = errors.New("client outbound queue full")
-	// ErrClosed 表示连接已经关闭。
-	ErrClosed = errors.New("client session closed")
+	// errNilEnvelope 表示发送方没有提供完整消息。
+	errNilEnvelope = errors.New("nil Envelope")
+	// errOutboundFrameTooLarge 表示消息超过单帧上限。
+	errOutboundFrameTooLarge = errors.New("frame too large")
+	// errOutboundQueueFull 表示出站队列无法接纳消息。
+	errOutboundQueueFull = errors.New("client outbound queue full")
+	// errOutboundClosed 表示连接已经关闭。
+	errOutboundClosed = errors.New("client session closed")
 )
 
 type queuedFrame struct {
@@ -33,8 +32,8 @@ type queuedFrame struct {
 	charge int
 }
 
-// Outbound 独占 WebSocket 的数据写入、有限队列和关闭过程。
-type Outbound struct {
+// outboundQueue 独占 WebSocket 的数据写入、有限队列和关闭过程。
+type outboundQueue struct {
 	connection  *websocket.Conn
 	maxFrame    int
 	maxQueue    int
@@ -48,9 +47,9 @@ type Outbound struct {
 	closeErr    error
 }
 
-// NewOutbound 为一条 WebSocket 创建出站状态，调用方负责启动唯一写循环。
-func NewOutbound(connection *websocket.Conn, maxFrame, maxQueue int) *Outbound {
-	return &Outbound{
+// newOutbound 为一条 WebSocket 创建出站状态，调用方负责启动唯一写循环。
+func newOutbound(connection *websocket.Conn, maxFrame, maxQueue int) *outboundQueue {
+	return &outboundQueue{
 		connection: connection,
 		maxFrame:   maxFrame,
 		maxQueue:   maxQueue,
@@ -60,33 +59,33 @@ func NewOutbound(connection *websocket.Conn, maxFrame, maxQueue int) *Outbound {
 }
 
 // Send 编码完整 Envelope，并按帧字节与固定条目开销限制队列。
-func (outbound *Outbound) Send(envelope *gatecontract.Envelope) error {
+func (outbound *outboundQueue) Send(envelope *Envelope) error {
 	if envelope == nil {
-		return ErrNilEnvelope
+		return errNilEnvelope
 	}
 	if len(envelope.GetPayload()) > outbound.maxFrame {
-		return ErrFrameTooLarge
+		return errOutboundFrameTooLarge
 	}
 	frame, err := proto.Marshal(envelope)
 	if err != nil {
 		return fmt.Errorf("marshal Envelope: %w", err)
 	}
 	if len(frame) > outbound.maxFrame {
-		return ErrFrameTooLarge
+		return errOutboundFrameTooLarge
 	}
-	if len(frame) > outbound.maxQueue-QueueEntryOverhead {
-		return ErrQueueFull
+	if len(frame) > outbound.maxQueue-queueEntryOverhead {
+		return errOutboundQueueFull
 	}
-	charge := len(frame) + QueueEntryOverhead
+	charge := len(frame) + queueEntryOverhead
 
 	outbound.mu.Lock()
 	if outbound.closed {
 		outbound.mu.Unlock()
-		return ErrClosed
+		return errOutboundClosed
 	}
 	if charge > outbound.maxQueue-outbound.queuedBytes {
 		outbound.mu.Unlock()
-		return ErrQueueFull
+		return errOutboundQueueFull
 	}
 	outbound.queue = append(outbound.queue, queuedFrame{data: frame, charge: charge})
 	outbound.queuedBytes += charge
@@ -100,18 +99,18 @@ func (outbound *Outbound) Send(envelope *gatecontract.Envelope) error {
 }
 
 // Done 在连接关闭时解除等待中的读循环。
-func (outbound *Outbound) Done() <-chan struct{} {
+func (outbound *outboundQueue) Done() <-chan struct{} {
 	return outbound.closedCh
 }
 
 // WriteLoop 是连接唯一的数据写入者；出错时关闭连接并返回写入与关闭错误。
-func (outbound *Outbound) WriteLoop(writeWait, closeWait time.Duration) error {
+func (outbound *outboundQueue) WriteLoop(writeWait, closeWait time.Duration) error {
 	for {
 		frame, ok := outbound.nextFrame()
 		if !ok {
 			return nil
 		}
-		if err := SetWebSocketWriteDeadline(outbound.connection, time.Now().Add(writeWait)); err != nil {
+		if err := setWebSocketWriteDeadline(outbound.connection, time.Now().Add(writeWait)); err != nil {
 			writeErr := normalizeCloseError(err)
 			if writeErr != nil {
 				writeErr = fmt.Errorf("set WebSocket write deadline: %w", writeErr)
@@ -130,7 +129,7 @@ func (outbound *Outbound) WriteLoop(writeWait, closeWait time.Duration) error {
 	}
 }
 
-func (outbound *Outbound) nextFrame() ([]byte, bool) {
+func (outbound *outboundQueue) nextFrame() ([]byte, bool) {
 	for {
 		outbound.mu.Lock()
 		if outbound.closed {
@@ -160,7 +159,7 @@ func (outbound *Outbound) nextFrame() ([]byte, bool) {
 }
 
 // CloseWith 关闭队列和 WebSocket；重复调用返回首次关闭的结果。
-func (outbound *Outbound) CloseWith(code int, reason string, deadline time.Time) error {
+func (outbound *outboundQueue) CloseWith(code int, reason string, deadline time.Time) error {
 	outbound.closeOnce.Do(func() {
 		outbound.mu.Lock()
 		outbound.closed = true
@@ -195,8 +194,8 @@ func (outbound *Outbound) CloseWith(code int, reason string, deadline time.Time)
 	return outbound.closeErr
 }
 
-// SetWebSocketWriteDeadline 同时检查 Gorilla 写路径可能忽略的底层 deadline 错误。
-func SetWebSocketWriteDeadline(connection *websocket.Conn, deadline time.Time) error {
+// setWebSocketWriteDeadline 同时检查 Gorilla 写路径可能忽略的底层 deadline 错误。
+func setWebSocketWriteDeadline(connection *websocket.Conn, deadline time.Time) error {
 	connection.SetWriteDeadline(deadline)
 	return connection.UnderlyingConn().SetWriteDeadline(deadline)
 }

@@ -1,4 +1,4 @@
-package prodgate
+package gate
 
 import (
 	"crypto/ecdh"
@@ -12,13 +12,13 @@ const (
 )
 
 var (
-	errInvalidClientHandshake = errors.New("prodgate: invalid client handshake")
-	errHandshakeFrameTooLarge = errors.New("prodgate: handshake frame too large")
-	errHandshakeKeyGeneration = errors.New("prodgate: server key generation failed")
-	errInvalidHandshakeConfig = errors.New("prodgate: invalid handshake configuration")
+	errInvalidClientHandshake = errors.New("gate: invalid client handshake")
+	errHandshakeFrameTooLarge = errors.New("gate: handshake frame too large")
+	errHandshakeKeyGeneration = errors.New("gate: server key generation failed")
+	errInvalidHandshakeConfig = errors.New("gate: invalid handshake configuration")
 )
 
-// acceptClientHandshake 校验未认证的首个 Envelope，返回服务端握手回复和该连接的认证器。
+// acceptClientHandshake 校验固定 33 字节握手帧，返回服务端握手回复和该连接的认证器。
 func acceptClientHandshake(frame []byte, maxFrameBytes int) ([]byte, *clientAuthenticator, error) {
 	return acceptClientHandshakeWithKeyGenerator(frame, maxFrameBytes, func() (*ecdh.PrivateKey, error) {
 		return ecdh.X25519().GenerateKey(rand.Reader)

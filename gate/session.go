@@ -1,4 +1,4 @@
-package prodgate
+package gate
 
 import (
 	"errors"
@@ -6,14 +6,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/cnooljaw/gsr/gate/internal/gatecommon"
 	"github.com/gorilla/websocket"
 )
 
-// clientConnection 只向 Agent 暴露编码后入队能力，并保留生产连接的诊断状态。
+// clientConnection 只向 Agent 暴露编码后入队能力，两种模式共用连接级诊断。
 type clientConnection struct {
 	connection           *websocket.Conn
-	outbound             *gatecommon.Outbound
+	outbound             *outboundQueue
 	connectionID         uint64
 	counters             *gateCounters
 	diagnosticMu         sync.Mutex
@@ -25,7 +24,7 @@ type clientConnection struct {
 func newClientConnection(connection *websocket.Conn, maxFrame, maxQueue int, counters *gateCounters, connectionID uint64) *clientConnection {
 	return &clientConnection{
 		connection:           connection,
-		outbound:             gatecommon.NewOutbound(connection, maxFrame, maxQueue),
+		outbound:             newOutbound(connection, maxFrame, maxQueue),
 		connectionID:         connectionID,
 		counters:             counters,
 		diagnosticSeen:       make(map[string]struct{}),
@@ -69,18 +68,18 @@ func (client *clientConnection) takeSuppressedDiagnostics() map[string]uint64 {
 func (client *clientConnection) Send(envelope *Envelope) error {
 	err := client.outbound.Send(envelope)
 	switch {
-	case errors.Is(err, gatecommon.ErrNilEnvelope):
-		return errors.New("prodgate: nil Envelope")
-	case errors.Is(err, gatecommon.ErrFrameTooLarge):
+	case errors.Is(err, errNilEnvelope):
+		return errors.New("gate: nil Envelope")
+	case errors.Is(err, errOutboundFrameTooLarge):
 		client.counters.frameTooLarge.Add(1)
 		return ErrFrameTooLarge
-	case errors.Is(err, gatecommon.ErrQueueFull):
+	case errors.Is(err, errOutboundQueueFull):
 		client.counters.outboundQueueFull.Add(1)
 		return ErrClientQueueFull
-	case errors.Is(err, gatecommon.ErrClosed):
+	case errors.Is(err, errOutboundClosed):
 		return ErrClientSessionClosed
 	case err != nil:
-		return fmt.Errorf("prodgate: %w", err)
+		return fmt.Errorf("gate: %w", err)
 	default:
 		return nil
 	}

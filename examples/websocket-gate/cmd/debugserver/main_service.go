@@ -23,34 +23,27 @@ func (service *mainService) OnStart(ctx context.Context, self gsr.ServiceContext
 	newAgent := func(client gate.ClientSession) gsr.Service {
 		return &echoAgent{client: client, registry: registry}
 	}
-	var address string
-	label, scheme := "DebugGate", "ws"
+	config := gsr.GateConfig{
+		Protocol:              gate.ProtocolPlain,
+		Address:               service.options.address,
+		MaxConnections:        128,
+		MaxOutboundQueueBytes: 1 << 20,
+		NewAgent:              newAgent,
+	}
+	label, scheme := "Plain Gate", "ws"
 	if service.options.production {
-		var tlsConfig *tls.Config
+		config.Protocol = gate.ProtocolMAC
 		if service.options.certificateFile != "" {
 			certificate, err := tls.LoadX509KeyPair(service.options.certificateFile, service.options.privateKeyFile)
 			if err != nil {
 				return fmt.Errorf("load server TLS certificate: %w", err)
 			}
-			tlsConfig = &tls.Config{Certificates: []tls.Certificate{certificate}}
+			config.TLSConfig = &tls.Config{Certificates: []tls.Certificate{certificate}}
 			scheme = "wss"
 		}
-		address, err = self.OpenProdGate(ctx, gsr.ProdGateConfig{
-			Address:               service.options.address,
-			TLSConfig:             tlsConfig,
-			MaxConnections:        128,
-			MaxOutboundQueueBytes: 1 << 20,
-			NewAgent:              newAgent,
-		})
-		label = "ProdGate"
-	} else {
-		address, err = self.OpenDebugGate(ctx, gsr.DebugGateConfig{
-			Address:               service.options.address,
-			MaxConnections:        128,
-			MaxOutboundQueueBytes: 1 << 20,
-			NewAgent:              newAgent,
-		})
+		label = "MAC Gate"
 	}
+	address, err := self.OpenGate(ctx, config)
 	if err != nil {
 		return err
 	}

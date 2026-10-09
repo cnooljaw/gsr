@@ -1,4 +1,4 @@
-package debuggate
+package gate
 
 import (
 	"bufio"
@@ -24,7 +24,7 @@ import (
 )
 
 // 验证监听已启动但 Gate 尚未发布时，新连接有界等待并在发布后正常收发。
-func TestDebugGateWaitsForServicePublication(t *testing.T) {
+func TestPlainGateWaitsForServicePublication(t *testing.T) {
 	local, err := runtime.NewRuntime(runtime.Config{ShutdownTimeout: time.Second})
 	if err != nil {
 		t.Fatal(err)
@@ -34,7 +34,8 @@ func TestDebugGateWaitsForServicePublication(t *testing.T) {
 	}
 	t.Cleanup(func() { local.Close() })
 	gate, err := NewGateService(local, Config{
-		Address: "127.0.0.1:0", MaxConnections: 1, MaxOutboundQueueBytes: 1024,
+		Protocol: ProtocolPlain,
+		Address:  "127.0.0.1:0", MaxConnections: 1, MaxOutboundQueueBytes: 1024,
 		NewAgent: func(client ClientSession) runtime.Service {
 			return &testAgent{client: client, disconnected: make(chan struct{})}
 		},
@@ -129,8 +130,8 @@ func (service *delayedGateStart) OnStop(ctx context.Context) error {
 	return service.gate.OnStop(ctx)
 }
 
-// TestDebugGateRoutesClientRequestAndResponse 验证 WebSocket Envelope 经 Runtime 到 Agent 后可按原 request_id 回传。
-func TestDebugGateRoutesClientRequestAndResponse(t *testing.T) {
+// TestPlainGateRoutesClientRequestAndResponse 验证 WebSocket Envelope 经 Runtime 到 Agent 后可按原 request_id 回传。
+func TestPlainGateRoutesClientRequestAndResponse(t *testing.T) {
 	local, gate, agents := startTestGate(t, 8, 4)
 	connection := dialTestGate(t, gate)
 	defer connection.Close()
@@ -190,8 +191,8 @@ func TestDebugGateRoutesClientRequestAndResponse(t *testing.T) {
 	}
 }
 
-// TestDebugGateRetriesDisconnectAfterAgentMailboxRecovers 验证 DebugGate 能观察 Agent Mailbox 满载，并在容量恢复后补交通知。
-func TestDebugGateRetriesDisconnectAfterAgentMailboxRecovers(t *testing.T) {
+// TestPlainGateRetriesDisconnectAfterAgentMailboxRecovers 验证 PlainGate 能观察 Agent Mailbox 满载，并在容量恢复后补交通知。
+func TestPlainGateRetriesDisconnectAfterAgentMailboxRecovers(t *testing.T) {
 	release := make(chan struct{})
 	var releaseOnce sync.Once
 	releaseAgent := func() { releaseOnce.Do(func() { close(release) }) }
@@ -210,6 +211,7 @@ func TestDebugGateRetriesDisconnectAfterAgentMailboxRecovers(t *testing.T) {
 		}
 	})
 	gate, err := NewGateService(local, Config{
+		Protocol:              ProtocolPlain,
 		Address:               "127.0.0.1:0",
 		MaxConnections:        1,
 		MaxOutboundQueueBytes: 64 << 10,
@@ -273,8 +275,8 @@ func TestDebugGateRetriesDisconnectAfterAgentMailboxRecovers(t *testing.T) {
 	}
 }
 
-// TestDebugGateStopNotifiesMappedAgent 验证单独停止 DebugGate 时仍会通知所有保留映射的 Agent。
-func TestDebugGateStopNotifiesMappedAgent(t *testing.T) {
+// TestPlainGateStopNotifiesMappedAgent 验证单独停止 PlainGate 时仍会通知所有保留映射的 Agent。
+func TestPlainGateStopNotifiesMappedAgent(t *testing.T) {
 	local, err := runtime.NewRuntime(runtime.Config{ShutdownTimeout: time.Second})
 	if err != nil {
 		t.Fatalf("NewRuntime() error = %v", err)
@@ -306,15 +308,15 @@ func TestDebugGateStopNotifiesMappedAgent(t *testing.T) {
 	select {
 	case <-agent.disconnected:
 	case <-time.After(time.Second):
-		t.Fatal("DebugGate 单独停止后 Agent 未收到断开通知")
+		t.Fatal("PlainGate 单独停止后 Agent 未收到断开通知")
 	}
 	if err := local.Stop(context.Background()); err != nil {
 		t.Fatalf("Runtime.Stop() error = %v", err)
 	}
 }
 
-// TestDebugGateStopsClientMessageAdmissionBeforeClosingConnections 验证 DebugGate 标记停机后不会再把客户端帧送入 Agent Mailbox。
-func TestDebugGateStopsClientMessageAdmissionBeforeClosingConnections(t *testing.T) {
+// TestPlainGateStopsClientMessageAdmissionBeforeClosingConnections 验证 PlainGate 标记停机后不会再把客户端帧送入 Agent Mailbox。
+func TestPlainGateStopsClientMessageAdmissionBeforeClosingConnections(t *testing.T) {
 	release := make(chan struct{})
 	defer close(release)
 	local, err := runtime.NewRuntime(runtime.Config{MailboxCapacity: 1, ShutdownTimeout: time.Second})
@@ -351,8 +353,8 @@ func TestDebugGateStopsClientMessageAdmissionBeforeClosingConnections(t *testing
 	}
 }
 
-// TestDebugGateStopNotifiesHealthyAgentWhileAnotherMailboxIsFull 验证一个满载 Agent 不会挡住其他 Agent 的停机通知。
-func TestDebugGateStopNotifiesHealthyAgentWhileAnotherMailboxIsFull(t *testing.T) {
+// TestPlainGateStopNotifiesHealthyAgentWhileAnotherMailboxIsFull 验证一个满载 Agent 不会挡住其他 Agent 的停机通知。
+func TestPlainGateStopNotifiesHealthyAgentWhileAnotherMailboxIsFull(t *testing.T) {
 	release := make(chan struct{})
 	var releaseOnce sync.Once
 	releaseAgent := func() { releaseOnce.Do(func() { close(release) }) }
@@ -429,8 +431,8 @@ func TestDebugGateStopNotifiesHealthyAgentWhileAnotherMailboxIsFull(t *testing.T
 	}
 }
 
-// TestDebugGateStopBoundsPendingDisconnectRetry 验证 Agent Mailbox 满载时 Gate 停机仍按自己的期限完成。
-func TestDebugGateStopBoundsPendingDisconnectRetry(t *testing.T) {
+// TestPlainGateStopBoundsPendingDisconnectRetry 验证 Agent Mailbox 满载时 Gate 停机仍按自己的期限完成。
+func TestPlainGateStopBoundsPendingDisconnectRetry(t *testing.T) {
 	release := make(chan struct{})
 	var releaseOnce sync.Once
 	releaseAgent := func() { releaseOnce.Do(func() { close(release) }) }
@@ -484,8 +486,8 @@ func TestDebugGateStopBoundsPendingDisconnectRetry(t *testing.T) {
 	}
 }
 
-// TestDebugGateStopReportsClientCloseFailure 验证 DebugGate 停机保留每条连接的 Close 帧和 socket 关闭错误。
-func TestDebugGateStopReportsClientCloseFailure(t *testing.T) {
+// TestPlainGateStopReportsClientCloseFailure 验证 PlainGate 停机保留每条连接的 Close 帧和 socket 关闭错误。
+func TestPlainGateStopReportsClientCloseFailure(t *testing.T) {
 	closeFailures := []error{
 		errors.New("first test socket close failure"),
 		errors.New("second test socket close failure"),
@@ -497,14 +499,14 @@ func TestDebugGateStopReportsClientCloseFailure(t *testing.T) {
 	var closeCount atomic.Int32
 	serverConnections := make(chan *websocket.Conn, len(closeFailures))
 	server := httptest.NewUnstartedServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		connection, err := debugUpgrader.Upgrade(writer, request, nil)
+		connection, err := gateUpgrader.Upgrade(writer, request, nil)
 		if err != nil {
 			t.Errorf("Upgrade() error = %v", err)
 			return
 		}
 		serverConnections <- connection
 	}))
-	server.Listener = &closeErrorTestListener{
+	server.Listener = &closeErrorTestListenerPlain{
 		Listener:    server.Listener,
 		closeErrors: closeFailures,
 		closeCount:  &closeCount,
@@ -532,12 +534,12 @@ func TestDebugGateStopReportsClientCloseFailure(t *testing.T) {
 		case <-time.After(time.Second):
 			t.Fatalf("测试服务器未建立第 %d 条 WebSocket 连接", index+1)
 		}
-		serverSocket, ok := serverConnection.UnderlyingConn().(*closeErrorTestConn)
+		serverSocket, ok := serverConnection.UnderlyingConn().(*closeErrorTestConnPlain)
 		if !ok {
-			t.Fatalf("UnderlyingConn() 类型 = %T, want *closeErrorTestConn", serverConnection.UnderlyingConn())
+			t.Fatalf("UnderlyingConn() 类型 = %T, want *closeErrorTestConnPlain", serverConnection.UnderlyingConn())
 		}
 		serverSocket.failWrites(closeFrameFailures[index])
-		connection := newClientConnection(serverConnection, 1<<20, 64<<10, &gateCounters{})
+		connection := newClientConnection(serverConnection, 1<<20, 64<<10, &gateCounters{}, 0)
 		connections[connection] = struct{}{}
 	}
 
@@ -559,7 +561,7 @@ func TestDebugGateStopReportsClientCloseFailure(t *testing.T) {
 }
 
 // 验证 Gate runner 创建其他 Agent 时，已有连接的客户端帧仍可直接进入对应 Agent。
-func TestDebugGateDeliversExistingClientFramesWhileCreatingAnotherAgent(t *testing.T) {
+func TestPlainGateDeliversExistingClientFramesWhileCreatingAnotherAgent(t *testing.T) {
 	local, gate, agents := startTestGate(t, 8, 4)
 	firstClient := dialTestGate(t, gate)
 	defer firstClient.Close()
@@ -580,7 +582,7 @@ func TestDebugGateDeliversExistingClientFramesWhileCreatingAnotherAgent(t *testi
 		return &testAgent{client: client, disconnected: make(chan struct{})}
 	}
 
-	secondConnection := newClientConnection(nil, gate.config.MaxFrameBytes, gate.config.MaxOutboundQueueBytes, &gate.counters)
+	secondConnection := newClientConnection(nil, gate.config.MaxFrameBytes, gate.config.MaxOutboundQueueBytes, &gate.counters, 0)
 	connectResult := make(chan error, 1)
 	go func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
@@ -636,8 +638,8 @@ func TestDebugGateDeliversExistingClientFramesWhileCreatingAnotherAgent(t *testi
 	}
 }
 
-// TestDebugGateShutdownClosesActiveClient 验证 Runtime 关闭时 Gate 会关闭活跃连接并等待自己的 I/O 退出。
-func TestDebugGateShutdownClosesActiveClient(t *testing.T) {
+// TestPlainGateShutdownClosesActiveClient 验证 Runtime 关闭时 Gate 会关闭活跃连接并等待自己的 I/O 退出。
+func TestPlainGateShutdownClosesActiveClient(t *testing.T) {
 	local, gate, _ := startTestGate(t, 8, 4)
 	connection := dialTestGate(t, gate)
 	defer connection.Close()
@@ -652,8 +654,8 @@ func TestDebugGateShutdownClosesActiveClient(t *testing.T) {
 	}
 }
 
-// TestDebugGateRejectsConnectionAboveLimit 验证达到显式连接上限后 Gate 在 WebSocket 升级前拒绝新连接。
-func TestDebugGateRejectsConnectionAboveLimit(t *testing.T) {
+// TestPlainGateRejectsConnectionAboveLimit 验证 Plain 模式同样在 TCP 接纳处拒绝超限连接。
+func TestPlainGateRejectsConnectionAboveLimit(t *testing.T) {
 	_, gate, agents := startTestGate(t, 8, 1)
 	first := dialTestGate(t, gate)
 	defer first.Close()
@@ -671,16 +673,16 @@ func TestDebugGateRejectsConnectionAboveLimit(t *testing.T) {
 	if response != nil && response.Body != nil {
 		_ = response.Body.Close()
 	}
-	if err == nil || response == nil || response.StatusCode != 503 {
-		t.Fatalf("second Dial() = response %v, error %v; want HTTP 503", response, err)
+	if err == nil || response != nil {
+		t.Fatalf("second Dial() = response %v, error %v; want TCP rejection before HTTP", response, err)
 	}
 	if got := gate.Metrics().RejectedConnections; got != 1 {
 		t.Fatalf("RejectedConnections = %d, want 1", got)
 	}
 }
 
-// TestDebugGateAllowsAnyOrigin 验证调试 Gate 也允许跨主机 Origin 升级 WebSocket。
-func TestDebugGateAllowsAnyOrigin(t *testing.T) {
+// TestPlainGateAllowsAnyOrigin 验证调试 Gate 也允许跨主机 Origin 升级 WebSocket。
+func TestPlainGateAllowsAnyOrigin(t *testing.T) {
 	_, gate, _ := startTestGate(t, 8, 2)
 	endpoint := "ws://" + gate.Addr().String() + "/ws"
 	connection, response, err := websocket.DefaultDialer.Dial(endpoint, http.Header{
@@ -695,8 +697,8 @@ func TestDebugGateAllowsAnyOrigin(t *testing.T) {
 	defer connection.Close()
 }
 
-// TestDebugGateCountsAgentCreationRejectionOnce 验证一次 Agent 创建失败只计入一条被拒绝连接。
-func TestDebugGateCountsAgentCreationRejectionOnce(t *testing.T) {
+// TestPlainGateCountsAgentCreationRejectionOnce 验证一次 Agent 创建失败只计入一条被拒绝连接。
+func TestPlainGateCountsAgentCreationRejectionOnce(t *testing.T) {
 	for _, test := range []struct {
 		name     string
 		newAgent func(ClientSession) runtime.Service
@@ -738,7 +740,7 @@ func TestDebugGateCountsAgentCreationRejectionOnce(t *testing.T) {
 }
 
 // 验证创建 Call 超时后迟到的 Agent 仍收到断线通知，连接只计为拒绝而不计为成功。
-func TestDebugGateDisconnectsAgentCreatedAfterCallTimeout(t *testing.T) {
+func TestPlainGateDisconnectsAgentCreatedAfterCallTimeout(t *testing.T) {
 	local, err := runtime.NewRuntime(runtime.Config{
 		MaxCallWait:     40 * time.Millisecond,
 		MailboxCapacity: 8,
@@ -762,6 +764,7 @@ func TestDebugGateDisconnectsAgentCreatedAfterCallTimeout(t *testing.T) {
 	defer finishCreation()
 	agent := &testAgent{disconnected: make(chan struct{})}
 	gate, err := NewGateService(local, Config{
+		Protocol:              ProtocolPlain,
 		Address:               "127.0.0.1:0",
 		MaxConnections:        1,
 		MaxOutboundQueueBytes: 1024,
@@ -803,8 +806,8 @@ func TestDebugGateDisconnectsAgentCreatedAfterCallTimeout(t *testing.T) {
 	}
 }
 
-// TestDebugGateLogsAgentCreationFailure 验证 Agent 创建失败只产生一条绑定 Gate 来源的结构化故障日志。
-func TestDebugGateLogsAgentCreationFailure(t *testing.T) {
+// TestPlainGateLogsAgentCreationFailure 验证 Agent 创建失败只产生一条绑定 Gate 来源的结构化故障日志。
+func TestPlainGateLogsAgentCreationFailure(t *testing.T) {
 	var output bytes.Buffer
 	logger, err := logging.New(logging.Config{Writer: &output})
 	if err != nil {
@@ -826,7 +829,8 @@ func TestDebugGateLogsAgentCreationFailure(t *testing.T) {
 		t.Fatalf("Runtime.Start() error = %v", err)
 	}
 	gate, err := NewGateService(local, Config{
-		Address: "127.0.0.1:0", MaxConnections: 1, MaxOutboundQueueBytes: 1024,
+		Protocol: ProtocolPlain,
+		Address:  "127.0.0.1:0", MaxConnections: 1, MaxOutboundQueueBytes: 1024,
 		NewAgent: func(ClientSession) runtime.Service { return nil },
 	})
 	if err != nil {
@@ -860,7 +864,7 @@ func TestDebugGateLogsAgentCreationFailure(t *testing.T) {
 		if err := json.Unmarshal(line, &entry); err != nil {
 			t.Fatalf("decode log entry: %v", err)
 		}
-		if entry.Message != "DebugGate connection failure" {
+		if entry.Message != "Gate connection failure" {
 			continue
 		}
 		matches++
@@ -876,8 +880,8 @@ func TestDebugGateLogsAgentCreationFailure(t *testing.T) {
 	}
 }
 
-// TestDebugGateHTTPServerErrorUsesSharedLogger 验证 HTTP 内部错误进入共享日志且不泄露原始文本。
-func TestDebugGateHTTPServerErrorUsesSharedLogger(t *testing.T) {
+// TestPlainGateHTTPServerErrorUsesSharedLogger 验证 HTTP 内部错误进入共享日志且不泄露原始文本。
+func TestPlainGateHTTPServerErrorUsesSharedLogger(t *testing.T) {
 	var output bytes.Buffer
 	logger, err := logging.New(logging.Config{Writer: &output})
 	if err != nil {
@@ -890,7 +894,7 @@ func TestDebugGateHTTPServerErrorUsesSharedLogger(t *testing.T) {
 	})
 	local, gate, _ := startTestGateWithLogger(t, 8, 1, logger)
 	if gate.server.ErrorLog == nil {
-		t.Fatal("DebugGate HTTP server has no shared error logger")
+		t.Fatal("PlainGate HTTP server has no shared error logger")
 	}
 	gate.server.ErrorLog.Print("http: panic serving 127.0.0.1:12345: private-client-data")
 	if err := local.Stop(context.Background()); err != nil {
@@ -900,7 +904,7 @@ func TestDebugGateHTTPServerErrorUsesSharedLogger(t *testing.T) {
 		t.Fatalf("Logger.Close() error = %v", err)
 	}
 	if bytes.Contains(output.Bytes(), []byte("private-client-data")) {
-		t.Fatal("DebugGate log contains raw HTTP server error")
+		t.Fatal("PlainGate log contains raw HTTP server error")
 	}
 	var matches int
 	for _, line := range bytes.Split(bytes.TrimSpace(output.Bytes()), []byte{'\n'}) {
@@ -924,8 +928,8 @@ func TestDebugGateHTTPServerErrorUsesSharedLogger(t *testing.T) {
 	}
 }
 
-// TestDebugGateCloseErrorLogRedactsReason 验证连接诊断保留对端 Close 码而不记录对端文本。
-func TestDebugGateCloseErrorLogRedactsReason(t *testing.T) {
+// TestPlainGateCloseErrorLogRedactsReason 验证连接诊断保留对端 Close 码而不记录对端文本。
+func TestPlainGateCloseErrorLogRedactsReason(t *testing.T) {
 	var output bytes.Buffer
 	logger, err := logging.New(logging.Config{Writer: &output})
 	if err != nil {
@@ -937,14 +941,14 @@ func TestDebugGateCloseErrorLogRedactsReason(t *testing.T) {
 		}
 	})
 	gate := &GateService{logger: logger}
-	gate.logConnectionFailure("write", websocket.CloseGoingAway, &websocket.CloseError{
+	gate.logConnectionFailure(nil, "write", websocket.CloseGoingAway, &websocket.CloseError{
 		Code: websocket.CloseNormalClosure, Text: "private-client-close-reason-do-not-log",
 	})
 	if err := logger.Close(context.Background()); err != nil {
 		t.Fatalf("Logger.Close() error = %v", err)
 	}
 	if bytes.Contains(output.Bytes(), []byte("private-client-close-reason-do-not-log")) {
-		t.Fatal("DebugGate log contains client-supplied Close reason")
+		t.Fatal("PlainGate log contains client-supplied Close reason")
 	}
 	var entry struct {
 		Message string         `json:"message"`
@@ -953,13 +957,13 @@ func TestDebugGateCloseErrorLogRedactsReason(t *testing.T) {
 	if err := json.Unmarshal(bytes.TrimSpace(output.Bytes()), &entry); err != nil {
 		t.Fatalf("decode log entry: %v", err)
 	}
-	if entry.Message != "DebugGate connection failure" || entry.Fields["peer_close_code"] != float64(websocket.CloseNormalClosure) {
-		t.Fatalf("DebugGate close log = %q, %v; want peer close code", entry.Message, entry.Fields)
+	if entry.Message != "Gate connection failure" || entry.Fields["peer_close_code"] != float64(websocket.CloseNormalClosure) {
+		t.Fatalf("PlainGate close log = %q, %v; want peer close code", entry.Message, entry.Fields)
 	}
 }
 
-// TestDebugGateLogsUnsupportedFrameWithoutClientText 验证非二进制帧的诊断不泄露客户端原文。
-func TestDebugGateLogsUnsupportedFrameWithoutClientText(t *testing.T) {
+// TestPlainGateLogsUnsupportedFrameWithoutClientText 验证非二进制帧的诊断不泄露客户端原文。
+func TestPlainGateLogsUnsupportedFrameWithoutClientText(t *testing.T) {
 	var output bytes.Buffer
 	logger, err := logging.New(logging.Config{Writer: &output})
 	if err != nil {
@@ -995,7 +999,7 @@ func TestDebugGateLogsUnsupportedFrameWithoutClientText(t *testing.T) {
 		t.Fatalf("Logger.Close() error = %v", err)
 	}
 	if bytes.Contains(output.Bytes(), []byte(clientText)) {
-		t.Fatal("DebugGate log contains client text")
+		t.Fatal("PlainGate log contains client text")
 	}
 	var matches int
 	for _, line := range bytes.Split(bytes.TrimSpace(output.Bytes()), []byte{'\n'}) {
@@ -1006,7 +1010,7 @@ func TestDebugGateLogsUnsupportedFrameWithoutClientText(t *testing.T) {
 		if err := json.Unmarshal(line, &entry); err != nil {
 			t.Fatalf("decode log entry: %v", err)
 		}
-		if entry.Message == "DebugGate connection failure" && entry.Fields["category"] == "unsupported_data" {
+		if entry.Message == "Gate connection failure" && entry.Fields["category"] == "unsupported_data" {
 			matches++
 			if entry.Fields["close_code"] != float64(websocket.CloseUnsupportedData) {
 				t.Fatalf("close_code = %v, want %d", entry.Fields["close_code"], websocket.CloseUnsupportedData)
@@ -1018,8 +1022,8 @@ func TestDebugGateLogsUnsupportedFrameWithoutClientText(t *testing.T) {
 	}
 }
 
-// TestDebugGateClosesIdleHTTPConnection 验证未升级的 HTTP keep-alive 连接不会无限占用 socket。
-func TestDebugGateClosesIdleHTTPConnection(t *testing.T) {
+// TestPlainGateClosesIdleHTTPConnection 验证未升级的 HTTP keep-alive 连接不会无限占用 socket。
+func TestPlainGateClosesIdleHTTPConnection(t *testing.T) {
 	_, gate, _ := startTestGate(t, 8, 1)
 	connection, err := net.Dial("tcp", gate.Addr().String())
 	if err != nil {
@@ -1046,7 +1050,7 @@ func TestDebugGateClosesIdleHTTPConnection(t *testing.T) {
 	if _, err := io.Copy(io.Discard, response.Body); err != nil {
 		t.Fatalf("drain HTTP response body: %v", err)
 	}
-	if err := connection.SetReadDeadline(time.Now().Add(defaultReadHeaderWait + time.Second)); err != nil {
+	if err := connection.SetReadDeadline(time.Now().Add(defaultReadHeaderTimeout + time.Second)); err != nil {
 		t.Fatalf("SetReadDeadline() error = %v", err)
 	}
 	if _, err := reader.ReadByte(); !errors.Is(err, io.EOF) {
@@ -1054,8 +1058,8 @@ func TestDebugGateClosesIdleHTTPConnection(t *testing.T) {
 	}
 }
 
-// TestDebugGateReadHeaderTimeoutDoesNotConsumeWebSocketCapacity 验证部分 HTTP 请求头会超时，且不占用 DebugGate 的 WebSocket 名额。
-func TestDebugGateReadHeaderTimeoutDoesNotConsumeWebSocketCapacity(t *testing.T) {
+// TestPlainGateReadHeaderTimeoutReleasesConnectionCapacity 验证 Plain 的部分 HTTP 请求占用 TCP 名额，但超时后恢复接入。
+func TestPlainGateReadHeaderTimeoutReleasesConnectionCapacity(t *testing.T) {
 	local, gate, agents := startTestGate(t, 8, 1)
 	partial, err := net.DialTimeout("tcp", gate.Addr().String(), time.Second)
 	if err != nil {
@@ -1067,30 +1071,21 @@ func TestDebugGateReadHeaderTimeoutDoesNotConsumeWebSocketCapacity(t *testing.T)
 		t.Fatalf("Write(partial HTTP header) error = %v", err)
 	}
 
-	client := dialTestGate(t, gate)
-	defer client.Close()
-	var agent *testAgent
-	select {
-	case agent = <-agents:
-	case <-time.After(time.Second):
-		t.Fatal("partial HTTP request blocked a WebSocket Agent")
-	}
-	if err := client.Close(); err != nil {
-		t.Fatalf("Close(WebSocket client) error = %v", err)
-	}
-	select {
-	case <-agent.disconnected:
-	case <-time.After(time.Second):
-		t.Fatal("Agent did not receive disconnect")
-	}
-	if err := partial.SetReadDeadline(started.Add(defaultReadHeaderWait + 2*time.Second)); err != nil {
+	if err := partial.SetReadDeadline(started.Add(defaultReadHeaderTimeout + 2*time.Second)); err != nil {
 		t.Fatalf("SetReadDeadline(partial HTTP) error = %v", err)
 	}
 	if _, err := io.Copy(io.Discard, partial); err != nil {
 		t.Fatalf("partial HTTP connection did not close after header timeout: %v", err)
 	}
-	if elapsed := time.Since(started); elapsed < defaultReadHeaderWait-time.Second {
+	if elapsed := time.Since(started); elapsed < defaultReadHeaderTimeout-time.Second {
 		t.Fatalf("partial HTTP connection closed after %v, before header timeout", elapsed)
+	}
+	client := dialTestGate(t, gate)
+	defer client.Close()
+	select {
+	case <-agents:
+	case <-time.After(time.Second):
+		t.Fatal("HTTP header timeout did not release connection capacity")
 	}
 	metrics := gate.Metrics()
 	if metrics.AcceptedConnections != 1 || metrics.RejectedConnections != 0 {
@@ -1101,8 +1096,8 @@ func TestDebugGateReadHeaderTimeoutDoesNotConsumeWebSocketCapacity(t *testing.T)
 	}
 }
 
-// TestDebugGateStopClosesPartialHTTPHeader 验证停机立即关闭未完成请求头的连接，不等待请求头超时。
-func TestDebugGateStopClosesPartialHTTPHeader(t *testing.T) {
+// TestPlainGateStopClosesPartialHTTPHeader 验证停机立即关闭未完成请求头的连接，不等待请求头超时。
+func TestPlainGateStopClosesPartialHTTPHeader(t *testing.T) {
 	local, gate, _ := startTestGate(t, 8, 1)
 	partial, err := net.DialTimeout("tcp", gate.Addr().String(), time.Second)
 	if err != nil {
@@ -1134,7 +1129,7 @@ func TestDebugGateStopClosesPartialHTTPHeader(t *testing.T) {
 	}
 }
 
-// TestNewGateServiceRejectsPublicAndUnboundedConfig 验证 DebugGate 不接受公网监听或缺少有限容量的配置。
+// TestNewGateServiceRejectsPublicAndUnboundedConfig 验证 PlainGate 不接受公网监听或缺少有限容量的配置。
 func TestNewGateServiceRejectsPublicAndUnboundedConfig(t *testing.T) {
 	local, err := runtime.NewRuntime(runtime.Config{})
 	if err != nil {
@@ -1147,6 +1142,7 @@ func TestNewGateServiceRejectsPublicAndUnboundedConfig(t *testing.T) {
 	})
 
 	base := Config{
+		Protocol:              ProtocolPlain,
 		Address:               "127.0.0.1:0",
 		MaxConnections:        2,
 		MaxOutboundQueueBytes: 1024,
@@ -1157,6 +1153,7 @@ func TestNewGateServiceRejectsPublicAndUnboundedConfig(t *testing.T) {
 		update func(*Config)
 	}{
 		{name: "wildcard address", update: func(config *Config) { config.Address = "0.0.0.0:9000" }},
+		{name: "unknown protocol", update: func(config *Config) { config.Protocol = Protocol(255) }},
 		{name: "missing connection limit", update: func(config *Config) { config.MaxConnections = 0 }},
 		{name: "missing outbound queue limit", update: func(config *Config) { config.MaxOutboundQueueBytes = 0 }},
 		{name: "missing agent constructor", update: func(config *Config) { config.NewAgent = nil }},
@@ -1171,9 +1168,9 @@ func TestNewGateServiceRejectsPublicAndUnboundedConfig(t *testing.T) {
 	}
 }
 
-// TestClientSessionBoundsOutboundQueue 验证序列化帧和队列条目开销合计不能超过出站字节上限。
-func TestClientSessionBoundsOutboundQueue(t *testing.T) {
-	client := newClientConnection(nil, 128, queueEntryOverhead+2, &gateCounters{})
+// TestClientSessionBoundsOutboundQueuePlain 验证序列化帧和队列条目开销合计不能超过出站字节上限。
+func TestClientSessionBoundsOutboundQueuePlain(t *testing.T) {
+	client := newClientConnection(nil, 128, queueEntryOverhead+2, &gateCounters{}, 0)
 	envelope := &Envelope{MsgId: 1}
 	if err := client.Send(envelope); err != nil {
 		t.Fatalf("Send(first) error = %v", err)
@@ -1233,7 +1230,7 @@ func (*blockingDebugAgent) OnStart(context.Context, runtime.ServiceContext) erro
 
 func (agent *blockingDebugAgent) Handle(commandContext runtime.CommandContext, command runtime.CommandID, _ ...any) (any, error) {
 	if command != ClientDisconnectedCommand {
-		return nil, errors.New("unexpected blocking DebugGate Agent command")
+		return nil, errors.New("unexpected blocking PlainGate Agent command")
 	}
 	agent.stopOnce.Do(func() { close(agent.disconnected) })
 	commandContext.Exit()
@@ -1248,16 +1245,16 @@ func (agent *blockingDebugAgent) HandleClientMessage(runtime.CommandContext, []b
 
 func (*blockingDebugAgent) OnStop(context.Context) error { return nil }
 
-type closeErrorTestListener struct {
+type closeErrorTestListenerPlain struct {
 	net.Listener
 	closeErrors []error
 	closeCount  *atomic.Int32
-	accepted    chan *closeErrorTestConn
+	accepted    chan *closeErrorTestConnPlain
 	mu          sync.Mutex
 	next        int
 }
 
-func (listener *closeErrorTestListener) Accept() (net.Conn, error) {
+func (listener *closeErrorTestListenerPlain) Accept() (net.Conn, error) {
 	connection, err := listener.Listener.Accept()
 	if err != nil {
 		return nil, err
@@ -1269,14 +1266,14 @@ func (listener *closeErrorTestListener) Accept() (net.Conn, error) {
 		listener.next++
 	}
 	listener.mu.Unlock()
-	wrapped := &closeErrorTestConn{Conn: connection, closeErr: closeErr, closeCount: listener.closeCount}
+	wrapped := &closeErrorTestConnPlain{Conn: connection, closeErr: closeErr, closeCount: listener.closeCount}
 	if listener.accepted != nil {
 		listener.accepted <- wrapped
 	}
 	return wrapped, nil
 }
 
-type closeErrorTestConn struct {
+type closeErrorTestConnPlain struct {
 	net.Conn
 	closeErr    error
 	closeCount  *atomic.Int32
@@ -1286,7 +1283,7 @@ type closeErrorTestConn struct {
 	deadlineErr error
 }
 
-func (connection *closeErrorTestConn) Write(data []byte) (int, error) {
+func (connection *closeErrorTestConnPlain) Write(data []byte) (int, error) {
 	connection.mu.Lock()
 	writeErr := connection.writeErr
 	connection.mu.Unlock()
@@ -1296,14 +1293,14 @@ func (connection *closeErrorTestConn) Write(data []byte) (int, error) {
 	return connection.Conn.Write(data)
 }
 
-func (connection *closeErrorTestConn) failWrites(err error) {
+func (connection *closeErrorTestConnPlain) failWrites(err error) {
 	connection.mu.Lock()
 	connection.writeErr = err
 	connection.mu.Unlock()
 }
 
 // SetWriteDeadline 允许测试模拟底层 socket 设置写截止时间失败。
-func (connection *closeErrorTestConn) SetWriteDeadline(deadline time.Time) error {
+func (connection *closeErrorTestConnPlain) SetWriteDeadline(deadline time.Time) error {
 	connection.mu.Lock()
 	deadlineErr := connection.deadlineErr
 	connection.mu.Unlock()
@@ -1313,13 +1310,13 @@ func (connection *closeErrorTestConn) SetWriteDeadline(deadline time.Time) error
 	return connection.Conn.SetWriteDeadline(deadline)
 }
 
-func (connection *closeErrorTestConn) failWriteDeadline(err error) {
+func (connection *closeErrorTestConnPlain) failWriteDeadline(err error) {
 	connection.mu.Lock()
 	connection.deadlineErr = err
 	connection.mu.Unlock()
 }
 
-func (connection *closeErrorTestConn) Close() error {
+func (connection *closeErrorTestConnPlain) Close() error {
 	connection.once.Do(func() {
 		_ = connection.Conn.Close()
 		if connection.closeCount != nil {
@@ -1350,6 +1347,7 @@ func startTestGateWithLogger(t *testing.T, mailboxCapacity, maxConnections int, 
 	})
 	agents := make(chan *testAgent, 1)
 	gate, err := NewGateService(local, Config{
+		Protocol:              ProtocolPlain,
 		Address:               "127.0.0.1:0",
 		MaxConnections:        maxConnections,
 		MaxOutboundQueueBytes: 64 << 10,

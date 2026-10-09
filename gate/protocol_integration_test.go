@@ -1,4 +1,4 @@
-package prodgate
+package gate
 
 import (
 	"context"
@@ -191,8 +191,8 @@ func (agent *protocolGateAgent) OnStop(context.Context) error {
 	return agent.client.Close()
 }
 
-// TestProdGateKeepsConnectionAfterClientRequestTimeout 验证客户端放弃首个等待后可忽略迟到响应，并在同一连接完成新请求。
-func TestProdGateKeepsConnectionAfterClientRequestTimeout(t *testing.T) {
+// TestMACGateKeepsConnectionAfterClientRequestTimeout 验证客户端放弃首个等待后可忽略迟到响应，并在同一连接完成新请求。
+func TestMACGateKeepsConnectionAfterClientRequestTimeout(t *testing.T) {
 	agents := make(chan *protocolGateAgent, 1)
 	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
 		MailboxCapacity: 8,
@@ -291,8 +291,8 @@ func TestProdGateKeepsConnectionAfterClientRequestTimeout(t *testing.T) {
 	}
 }
 
-// TestProdGateReturnsErrorAfterAgentCallTimeout 验证协议 Handler 以当前 Agent 为来源调用 Service，超时只回一次客户端错误。
-func TestProdGateReturnsErrorAfterAgentCallTimeout(t *testing.T) {
+// TestMACGateReturnsErrorAfterAgentCallTimeout 验证协议 Handler 以当前 Agent 为来源调用 Service，超时只回一次客户端错误。
+func TestMACGateReturnsErrorAfterAgentCallTimeout(t *testing.T) {
 	target := &blockingProtocolTarget{
 		started: make(chan struct{}),
 		done:    make(chan struct{}),
@@ -394,8 +394,8 @@ func TestProdGateReturnsErrorAfterAgentCallTimeout(t *testing.T) {
 	}
 }
 
-// TestProdGateKeepsConnectionAfterUnknownMessage 验证合法认证帧中的未知 msg_id 只回业务层 ErrorResponse，连接仍可继续处理后续请求。
-func TestProdGateKeepsConnectionAfterUnknownMessage(t *testing.T) {
+// TestMACGateKeepsConnectionAfterUnknownMessage 验证合法认证帧中的未知 msg_id 只回业务层 ErrorResponse，连接仍可继续处理后续请求。
+func TestMACGateKeepsConnectionAfterUnknownMessage(t *testing.T) {
 	agents := make(chan *protocolGateAgent, 1)
 	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
 		MailboxCapacity: 8,
@@ -484,8 +484,8 @@ func TestProdGateKeepsConnectionAfterUnknownMessage(t *testing.T) {
 	}
 }
 
-// TestProdGateReturnsUnsupportedForUnimplementedRequest 验证已定义但未注册 Handler 的 Request 返回关联错误且连接仍可用。
-func TestProdGateReturnsUnsupportedForUnimplementedRequest(t *testing.T) {
+// TestMACGateReturnsUnsupportedForUnimplementedRequest 验证已定义但未注册 Handler 的 Request 返回关联错误且连接仍可用。
+func TestMACGateReturnsUnsupportedForUnimplementedRequest(t *testing.T) {
 	agents := make(chan *protocolGateAgent, 1)
 	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
 		MailboxCapacity: 8,
@@ -553,8 +553,8 @@ func TestProdGateReturnsUnsupportedForUnimplementedRequest(t *testing.T) {
 	}
 }
 
-// TestProdGateKeepsConnectionAfterUnknownNotification 验证未知通知不回 ErrorResponse，且同一连接仍可处理后续请求。
-func TestProdGateKeepsConnectionAfterUnknownNotification(t *testing.T) {
+// TestMACGateKeepsConnectionAfterUnknownNotification 验证未知通知不回 ErrorResponse，且同一连接仍可处理后续请求。
+func TestMACGateKeepsConnectionAfterUnknownNotification(t *testing.T) {
 	agents := make(chan *protocolGateAgent, 1)
 	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
 		MailboxCapacity: 8,
@@ -617,8 +617,8 @@ func TestProdGateKeepsConnectionAfterUnknownNotification(t *testing.T) {
 	}
 }
 
-// TestProdGateDeliversNotificationPush 验证生产 Gate 能将零 request_id 的客户端通知转换为服务端主动 Push。
-func TestProdGateDeliversNotificationPush(t *testing.T) {
+// TestMACGateDeliversNotificationPush 验证生产 Gate 能将零 request_id 的客户端通知转换为服务端主动 Push。
+func TestMACGateDeliversNotificationPush(t *testing.T) {
 	agents := make(chan *protocolGateAgent, 1)
 	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
 		MailboxCapacity: 8,
@@ -679,8 +679,8 @@ func TestProdGateDeliversNotificationPush(t *testing.T) {
 	}
 }
 
-// TestProdGateRejectsNotificationWithRequestID 验证 Notify 带非零 request_id 时回传关联的 INVALID_REQUEST。
-func TestProdGateRejectsNotificationWithRequestID(t *testing.T) {
+// TestMACGateRejectsNotificationWithRequestID 验证 Notify 带非零 request_id 时回传关联的 INVALID_REQUEST。
+func TestMACGateRejectsNotificationWithRequestID(t *testing.T) {
 	agents := make(chan *protocolGateAgent, 1)
 	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
 		MailboxCapacity: 8,
@@ -742,8 +742,8 @@ func TestProdGateRejectsNotificationWithRequestID(t *testing.T) {
 	}
 }
 
-// TestProdGateRejectsRequestWithoutRequestID 验证无编号 Request 不产生无关联响应，且同一连接仍可继续使用。
-func TestProdGateRejectsRequestWithoutRequestID(t *testing.T) {
+// TestMACGateRejectsRequestWithoutRequestID 验证无编号 Request 不产生无关联响应，且同一连接仍可继续使用。
+func TestMACGateRejectsRequestWithoutRequestID(t *testing.T) {
 	agents := make(chan *protocolGateAgent, 1)
 	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
 		MailboxCapacity: 8,
@@ -820,8 +820,8 @@ func TestProdGateRejectsRequestWithoutRequestID(t *testing.T) {
 	}
 }
 
-// TestProdGateKeepsConnectionAfterMalformedEnvelope 验证无法解码的 Envelope 不生成无关联响应，且连接可继续处理请求。
-func TestProdGateKeepsConnectionAfterMalformedEnvelope(t *testing.T) {
+// TestMACGateKeepsConnectionAfterMalformedEnvelope 验证无法解码的 Envelope 不生成无关联响应，且连接可继续处理请求。
+func TestMACGateKeepsConnectionAfterMalformedEnvelope(t *testing.T) {
 	agents := make(chan *protocolGateAgent, 1)
 	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
 		MailboxCapacity: 8,
@@ -888,8 +888,8 @@ func TestProdGateKeepsConnectionAfterMalformedEnvelope(t *testing.T) {
 	}
 }
 
-// TestProdGateReturnsErrorForInvalidPayload 验证已知消息编号的坏 payload 由协议层返回通用错误，且不会关闭连接。
-func TestProdGateReturnsErrorForInvalidPayload(t *testing.T) {
+// TestMACGateReturnsErrorForInvalidPayload 验证已知消息编号的坏 payload 由协议层返回通用错误，且不会关闭连接。
+func TestMACGateReturnsErrorForInvalidPayload(t *testing.T) {
 	agents := make(chan *protocolGateAgent, 1)
 	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
 		MailboxCapacity: 8,
@@ -975,8 +975,8 @@ func TestProdGateReturnsErrorForInvalidPayload(t *testing.T) {
 	}
 }
 
-// TestProdGateReturnsErrorForWrongDirection 验证客户端反向发送服务端 Push 编号时返回通用错误，且连接仍可继续使用。
-func TestProdGateReturnsErrorForWrongDirection(t *testing.T) {
+// TestMACGateReturnsErrorForWrongDirection 验证客户端反向发送服务端 Push 编号时返回通用错误，且连接仍可继续使用。
+func TestMACGateReturnsErrorForWrongDirection(t *testing.T) {
 	agents := make(chan *protocolGateAgent, 1)
 	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
 		MailboxCapacity: 8,

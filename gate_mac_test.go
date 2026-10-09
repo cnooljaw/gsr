@@ -16,14 +16,14 @@ import (
 )
 
 // 验证 ProdGate 完成握手后才创建应用 Agent，并为它绑定业务上下文、随 Runtime 停止。
-func TestOpenProdGateCreatesApplicationAgentAfterHandshake(t *testing.T) {
+func TestOpenGateCreatesApplicationAgentAfterHandshake(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	addresses := make(chan string, 1)
 	started := make(chan runtime.ServiceID, 1)
 	stopped := make(chan struct{}, 1)
 	entry := &probeService{start: func(ctx context.Context, self ServiceContext) error {
-		address, err := self.OpenProdGate(ctx, ProdGateConfig{
+		address, err := self.OpenGate(ctx, GateConfig{
 			Address:               "127.0.0.1:0",
 			MaxConnections:        1,
 			MaxOutboundQueueBytes: 64 << 10,
