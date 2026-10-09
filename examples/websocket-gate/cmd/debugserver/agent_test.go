@@ -5,17 +5,20 @@ import (
 	"testing"
 
 	echopb "github.com/cnooljaw/gsr/examples/websocket-gate/gen/go/gsr/example/echo/v1"
-	"github.com/cnooljaw/gsr/gate"
-	commonv1 "github.com/cnooljaw/gsr/gate/gen/go/gsr/common/v1"
+	commonv1 "github.com/cnooljaw/gsr/protocol/gen/go/gsr/common/v1"
 	"google.golang.org/protobuf/proto"
 )
 
 type recordedClientSession struct {
-	envelopes []*gate.Envelope
+	envelopes []*commonv1.Envelope
 }
 
-func (session *recordedClientSession) Send(envelope *gate.Envelope) error {
-	session.envelopes = append(session.envelopes, envelope)
+func (session *recordedClientSession) Send(frame []byte) error {
+	var envelope commonv1.Envelope
+	if err := proto.Unmarshal(frame, &envelope); err != nil {
+		return err
+	}
+	session.envelopes = append(session.envelopes, &envelope)
 	return nil
 }
 

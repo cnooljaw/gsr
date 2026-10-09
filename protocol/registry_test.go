@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	echopb "github.com/cnooljaw/gsr/examples/websocket-gate/gen/go/gsr/example/echo/v1"
-	commonv1 "github.com/cnooljaw/gsr/gate/gen/go/gsr/common/v1"
-	"github.com/cnooljaw/gsr/gate/protocol/catalog"
+	"github.com/cnooljaw/gsr/protocol/catalog"
+	commonv1 "github.com/cnooljaw/gsr/protocol/gen/go/gsr/common/v1"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -15,8 +15,12 @@ type recordedSender struct {
 	sendErr   error
 }
 
-func (sender *recordedSender) Send(envelope *commonv1.Envelope) error {
-	sender.envelopes = append(sender.envelopes, envelope)
+func (sender *recordedSender) Send(frame []byte) error {
+	var envelope commonv1.Envelope
+	if err := proto.Unmarshal(frame, &envelope); err != nil {
+		return err
+	}
+	sender.envelopes = append(sender.envelopes, &envelope)
 	return sender.sendErr
 }
 

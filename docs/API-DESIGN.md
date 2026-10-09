@@ -1,5 +1,16 @@
 # GSR API 设计规范
 
+## Gate 与 Protocol 边界
+
+Gate 负责有界、顺序、失败可观察地收发不透明消息；Protocol 负责理解消息并分发消息；业务 Agent 是两者的组合点。`gate/` 与 `protocol/` 为同级包，生产代码互不导入。不引入额外桥接 Service、策略层或通用适配框架。
+
+- Gate 管理连接、握手、seq/MAC、容量、出站队列和关闭；不导入 Protobuf，不解释 msg_id、request_id 或 payload。握手是传输认证格式，不属于业务 Protocol。Plain 不具备 MAC 模式的认证保证。
+- `gate.ClientSession` 留在 Gate，只提供 `Send([]byte) error` 和 `Close() error`。Send 在成功接纳时复制快照，之后发送方可以复用缓冲区；nil 与空切片均表示零字节消息，仍收取队列条目开销。成功仅代表本地队列接纳，不保证客户端收到、业务执行或执行一次，不自动重放。
+- Protocol 持有通用 `.proto`、生成类型、目录、生成工具、Envelope 编解码、强类型分发和 Response/Push；写回只依赖现有 `ClientSender` 的 `Send([]byte) error`，不拥有连接，不要求 Close，也不依赖 Gate。
+- Agent 将 Gate 投递的字节交给 `protocol.Dispatcher`，将自身连接写回能力交给 Dispatcher；Protocol 编码完整 Envelope 后发送字节。具体业务 `.proto` 与 Handler 仍属于业务项目，Runtime/Core/Cluster 语义不变。
+
+入站为 `Gate → 字节快照 → Agent → Protocol → Handler`；出站为 `Handler → Protocol 编码 → 字节消息 → Gate`。包级依赖仅由 Agent 同时指向 Gate 和 Protocol；上面的箭头表示数据流，不表示 Gate 与 Protocol 互相导入。
+
 ## 默认业务入口与阅读边界
 
 普通应用只需沿一条路径阅读：`gsr.Run → MainService → self.CreateService/Register → self.Send/Call 或 SendName/CallName`；跨节点使用 `self.Cluster()`，日志使用 `self.Logger()`，HTTP 和 Gate 由 MainService 打开。Service 在自身类型上显式实现 Handle，普通命令默认委托具名字段持有的 `gsr.Dispatcher`。
@@ -14,7 +25,7 @@
 
 框架能力边界如下。
 
-通用客户端协议与统一 Gate 分别位于 `gate/protocol` 和 `gate`。应用通过 `self.OpenGate(ctx, gsr.GateConfig{...})` 组装，底层 `gate.NewGateService` 显式接收 Runtime，以便 I/O goroutine 调用受信任的 `Runtime.DeliverClientMessage`；业务不获得该权限。通用协议和生成工具属于框架，Echo 协议和 Agent 留在示例。
+通用客户端协议与统一 Gate 分别位于 `protocol` 和 `gate`。应用通过 `self.OpenGate(ctx, gsr.GateConfig{...})` 组装，底层 `gate.NewGateService` 显式接收 Runtime，以便 I/O goroutine 调用受信任的 `Runtime.DeliverClientMessage`；业务不获得该权限。通用协议和生成工具属于框架，Echo 协议和 Agent 留在示例。
 
 独立的 `httpserver.Server` 只管理普通 HTTP 监听与有序关闭，不接管路由、鉴权或到业务 Service 的映射。使用 `gsr.Run` 时，MainService 可通过 `self.OpenHTTP` 打开一个 HTTP 监听，由 Run 持有并在 Runtime 停止前关闭；直接使用 `httpserver.Server` 时仍由调用方持有。`redisclient.New` 和 `mysqlclient.Open` 分别返回原生 `*redis.Client`、`*sql.DB`，其生命周期仍由宿主负责。这些能力不转为 RedisService/MySQLService，也不进入 Core。
 

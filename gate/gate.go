@@ -54,7 +54,7 @@ type Protocol uint8
 const (
 	// ProtocolMAC 是默认模式：X25519 握手后校验每帧的 seq 和 MAC。
 	ProtocolMAC Protocol = iota
-	// ProtocolPlain 直接接收 Envelope，仅允许显式绑定回环或私有 IP。
+	// ProtocolPlain 直接收发字节消息，仅允许显式绑定回环或私有 IP。
 	ProtocolPlain
 )
 
@@ -334,7 +334,7 @@ func (gate *GateService) OnStop(ctx context.Context) error {
 	return errors.Join(result, serveErr)
 }
 
-// ServeHTTP 按构造时固定的协议接纳连接，读循环直接向 Agent 投递 Envelope。
+// ServeHTTP 按构造时固定的认证模式接纳连接，读循环直接向 Agent 投递不透明字节。
 func (gate *GateService) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	if request.URL.Path != "/ws" {
 		http.NotFound(writer, request)
@@ -433,7 +433,7 @@ func (gate *GateService) ServeHTTP(writer http.ResponseWriter, request *http.Req
 		if gate.config.Protocol == ProtocolMAC {
 			err = gate.deliverAuthenticatedFrame(agentID, clientConn, authenticator, frame)
 		} else {
-			err = gate.deliverEnvelope(agentID, clientConn, frame)
+			err = gate.deliverFrame(agentID, clientConn, frame)
 		}
 		if err != nil {
 			if errors.Is(err, errGateStopping) {
@@ -521,7 +521,7 @@ func (gate *GateService) deliverAuthenticatedFrame(
 	authenticator *clientAuthenticator,
 	frame []byte,
 ) error {
-	_, envelope, err := authenticator.verifyFrame(frame, gate.config.MaxFrameBytes)
+	_, message, err := authenticator.verifyFrame(frame, gate.config.MaxFrameBytes)
 	if err != nil {
 		switch {
 		case errors.Is(err, errAuthFrameTooLarge):
@@ -540,11 +540,11 @@ func (gate *GateService) deliverAuthenticatedFrame(
 		}
 		return err
 	}
-	return gate.deliverEnvelope(agentID, clientConn, envelope)
+	return gate.deliverFrame(agentID, clientConn, message)
 }
 
-func (gate *GateService) deliverEnvelope(agentID runtime.ServiceID, clientConn *clientConnection, envelope []byte) error {
-	if err := gate.deliverClientMessage(agentID, envelope); err != nil {
+func (gate *GateService) deliverFrame(agentID runtime.ServiceID, clientConn *clientConnection, frame []byte) error {
+	if err := gate.deliverClientMessage(agentID, frame); err != nil {
 		if errors.Is(err, errGateStopping) {
 			return err
 		}

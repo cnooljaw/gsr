@@ -8,8 +8,8 @@ import (
 	"time"
 
 	echopb "github.com/cnooljaw/gsr/examples/websocket-gate/gen/go/gsr/example/echo/v1"
-	commonv1 "github.com/cnooljaw/gsr/gate/gen/go/gsr/common/v1"
-	"github.com/cnooljaw/gsr/gate/protocol"
+	"github.com/cnooljaw/gsr/protocol"
+	commonv1 "github.com/cnooljaw/gsr/protocol/gen/go/gsr/common/v1"
 	"github.com/cnooljaw/gsr/runtime"
 	"github.com/gorilla/websocket"
 	"google.golang.org/protobuf/proto"

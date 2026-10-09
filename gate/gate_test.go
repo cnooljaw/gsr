@@ -23,14 +23,14 @@ import (
 	"testing"
 	"time"
 
-	commonv1 "github.com/cnooljaw/gsr/gate/gen/go/gsr/common/v1"
 	"github.com/cnooljaw/gsr/logging"
+	commonv1 "github.com/cnooljaw/gsr/protocol/gen/go/gsr/common/v1"
 	"github.com/cnooljaw/gsr/runtime"
 	"github.com/gorilla/websocket"
 	"google.golang.org/protobuf/proto"
 )
 
-// TestMACGateAuthenticatesAndDeliversClientFrames 验证 WSS 握手、认证帧投递、Envelope 写回和断开通知形成完整链路。
+// TestMACGateAuthenticatesAndDeliversClientFrames 验证 WSS 握手、认证帧投递、commonv1.Envelope 写回和断开通知形成完整链路。
 func TestMACGateAuthenticatesAndDeliversClientFrames(t *testing.T) {
 	local, gate, agents, clientTLS := startTestProductionGate(t, 2, time.Second)
 	connection, macKey := dialAuthenticatedTestClient(t, gate, clientTLS)
@@ -59,10 +59,10 @@ func TestMACGateAuthenticatesAndDeliversClientFrames(t *testing.T) {
 	select {
 	case delivered := <-agent.received:
 		if !bytes.Equal(delivered, requestBytes) {
-			t.Fatalf("Agent 收到 Envelope = %x，want %x", delivered, requestBytes)
+			t.Fatalf("Agent 收到 commonv1.Envelope = %x，want %x", delivered, requestBytes)
 		}
 	case <-time.After(time.Second):
-		t.Fatal("Gate 未将已认证 Envelope 投递给 Agent")
+		t.Fatal("Gate 未将已认证 commonv1.Envelope 投递给 Agent")
 	}
 
 	responseType, responseBytes, err := readTestBinaryMessage(t, connection)
@@ -114,7 +114,7 @@ func TestMACGateRejectsLateAgentResponseAfterDisconnect(t *testing.T) {
 	case <-time.After(time.Second):
 		t.Fatal("Agent 未收到客户端断开通知")
 	}
-	if err := agent.client.Send(&commonv1.Envelope{MsgId: 1002, RequestId: 91}); !errors.Is(err, ErrClientSessionClosed) {
+	if err := sendTestEnvelope(agent.client, &commonv1.Envelope{MsgId: 1002, RequestId: 91}); !errors.Is(err, ErrClientSessionClosed) {
 		t.Fatalf("late ClientSession.Send() error = %v, want %v", err, ErrClientSessionClosed)
 	}
 	if err := local.Stop(context.Background()); err != nil {
@@ -156,10 +156,10 @@ func TestMACGateSupportsIngressTerminatedTLS(t *testing.T) {
 	select {
 	case delivered := <-agent.received:
 		if !bytes.Equal(delivered, request) {
-			t.Fatalf("Agent 收到 Envelope = %x，want %x", delivered, request)
+			t.Fatalf("Agent 收到 commonv1.Envelope = %x，want %x", delivered, request)
 		}
 	case <-time.After(time.Second):
-		t.Fatal("普通 HTTP WebSocket 未将已认证 Envelope 投递给 Agent")
+		t.Fatal("普通 HTTP WebSocket 未将已认证 commonv1.Envelope 投递给 Agent")
 	}
 
 	_, responseBytes, err := readTestBinaryMessage(t, connection)
@@ -765,7 +765,7 @@ func TestMACGateRejectsCrossConnectionReplayBeforeDelivery(t *testing.T) {
 	select {
 	case delivered := <-sourceAgent.received:
 		if !bytes.Equal(delivered, requestBytes) {
-			t.Fatalf("source Agent 收到 Envelope = %x，want %x", delivered, requestBytes)
+			t.Fatalf("source Agent 收到 commonv1.Envelope = %x，want %x", delivered, requestBytes)
 		}
 	case <-time.After(time.Second):
 		t.Fatal("Gate 未投递源连接的认证请求")
@@ -812,7 +812,7 @@ func TestMACGateRejectsCrossConnectionReplayBeforeDelivery(t *testing.T) {
 	select {
 	case delivered := <-recoveryAgent.received:
 		if !bytes.Equal(delivered, requestBytes) {
-			t.Fatalf("recovery Agent 收到 Envelope = %x，want %x", delivered, requestBytes)
+			t.Fatalf("recovery Agent 收到 commonv1.Envelope = %x，want %x", delivered, requestBytes)
 		}
 	case <-time.After(time.Second):
 		t.Fatal("拒绝跨连接重放后，新连接未接收序号一请求")
@@ -865,7 +865,7 @@ func TestMACGateRejectsSameConnectionReplayBeforeDelivery(t *testing.T) {
 	select {
 	case delivered := <-agent.received:
 		if !bytes.Equal(delivered, requestBytes) {
-			t.Fatalf("Agent 收到 Envelope = %x，want %x", delivered, requestBytes)
+			t.Fatalf("Agent 收到 commonv1.Envelope = %x，want %x", delivered, requestBytes)
 		}
 	case <-time.After(time.Second):
 		t.Fatal("Gate 未投递首次认证请求")
@@ -1675,7 +1675,7 @@ func TestMACGateRejectsInvalidX25519KeyAndRecovers(t *testing.T) {
 	select {
 	case delivered := <-agent.received:
 		if !bytes.Equal(delivered, requestBytes) {
-			t.Fatalf("recovery Agent 收到 Envelope = %x，want %x", delivered, requestBytes)
+			t.Fatalf("recovery Agent 收到 commonv1.Envelope = %x，want %x", delivered, requestBytes)
 		}
 	case <-time.After(time.Second):
 		t.Fatal("非法握手被拒绝后，Gate 未投递有效请求")
@@ -1853,7 +1853,7 @@ func TestMACGateRejectsOversizedAuthenticatedFrame(t *testing.T) {
 	select {
 	case delivered := <-recoveryAgent.received:
 		if !bytes.Equal(delivered, requestBytes) {
-			t.Fatalf("recovery Agent 收到 Envelope = %x，want %x", delivered, requestBytes)
+			t.Fatalf("recovery Agent 收到 commonv1.Envelope = %x，want %x", delivered, requestBytes)
 		}
 	case <-time.After(time.Second):
 		t.Fatal("超限帧拒绝后，Gate 未投递有效请求")
@@ -2336,7 +2336,7 @@ func TestMACGateSlowClientDoesNotBlockHealthyConnection(t *testing.T) {
 	select {
 	case delivered := <-healthyAgent.received:
 		if !bytes.Equal(delivered, healthyRequestBytes) {
-			t.Fatalf("健康 Agent 收到 Envelope = %x，want %x", delivered, healthyRequestBytes)
+			t.Fatalf("健康 Agent 收到 commonv1.Envelope = %x，want %x", delivered, healthyRequestBytes)
 		}
 	case <-time.After(time.Second):
 		t.Fatal("慢连接出站背压期间，健康 Agent 未收到请求")
@@ -3069,7 +3069,7 @@ func TestMACGateRuntimeCloseReleasesActiveClient(t *testing.T) {
 	case <-time.After(2 * time.Second):
 		t.Fatal("Runtime.Close() 未等待 Gate I/O goroutine 退出")
 	}
-	if err := agent.client.Send(&commonv1.Envelope{MsgId: 1002, RequestId: 92}); !errors.Is(err, ErrClientSessionClosed) {
+	if err := sendTestEnvelope(agent.client, &commonv1.Envelope{MsgId: 1002, RequestId: 92}); !errors.Is(err, ErrClientSessionClosed) {
 		t.Fatalf("ClientSession.Send() after Runtime.Close() error = %v, want %v", err, ErrClientSessionClosed)
 	}
 	listener, err := net.Listen("tcp", listenerAddress)
@@ -3124,7 +3124,7 @@ func TestMACGateRuntimeStopClosesAllActiveClients(t *testing.T) {
 		if !websocket.IsCloseError(err, websocket.CloseGoingAway) {
 			t.Errorf("active connection %d ReadMessage() error = %v, want Gate close %d", index, err, websocket.CloseGoingAway)
 		}
-		if err := clientSessions[index].client.Send(&commonv1.Envelope{MsgId: 1002, RequestId: uint32(index + 1)}); !errors.Is(err, ErrClientSessionClosed) {
+		if err := sendTestEnvelope(clientSessions[index].client, &commonv1.Envelope{MsgId: 1002, RequestId: uint32(index + 1)}); !errors.Is(err, ErrClientSessionClosed) {
 			t.Errorf("ClientSession.Send() after Runtime.Stop() error = %v, want %v", err, ErrClientSessionClosed)
 		}
 	}
@@ -3245,7 +3245,7 @@ func TestMACGateAgentStopAfterClientDisconnectKeepsServing(t *testing.T) {
 	select {
 	case delivered := <-secondAgent.received:
 		if !bytes.Equal(delivered, requestBytes) {
-			t.Fatalf("second Agent received Envelope = %x, want %x", delivered, requestBytes)
+			t.Fatalf("second Agent received commonv1.Envelope = %x, want %x", delivered, requestBytes)
 		}
 	case <-time.After(time.Second):
 		t.Fatal("第一个客户端断开后 Gate 未向新 Agent 投递请求")
@@ -3341,7 +3341,7 @@ func TestMACGateClientDisconnectOverlapsRuntimeStop(t *testing.T) {
 		t.Fatalf("Agent.OnStop 被重复调用，额外结果 = %v", err)
 	default:
 	}
-	if err := agent.client.Send(&commonv1.Envelope{MsgId: 1002, RequestId: 94}); !errors.Is(err, ErrClientSessionClosed) {
+	if err := sendTestEnvelope(agent.client, &commonv1.Envelope{MsgId: 1002, RequestId: 94}); !errors.Is(err, ErrClientSessionClosed) {
 		t.Fatalf("ClientSession.Send() after concurrent shutdown error = %v, want %v", err, ErrClientSessionClosed)
 	}
 	if err := local.Close(); err != nil {
@@ -3839,7 +3839,7 @@ func TestNewGateServiceRequiresFrameLimitForHandshake(t *testing.T) {
 	}
 }
 
-// 验证 TLS 与 Plain 模式独立，WSS 连接无需应用握手即可完成 Envelope 请求和响应。
+// 验证 TLS 与 Plain 模式独立，WSS 连接无需应用握手即可完成 commonv1.Envelope 请求和响应。
 func TestPlainGateSupportsTLSWithoutApplicationHandshake(t *testing.T) {
 	serverTLS, clientTLS := testTLSConfigs(t)
 	_, gate := startConfiguredProductionGateWithTLS(t, runtime.Config{ShutdownTimeout: 2 * time.Second},
@@ -3848,7 +3848,7 @@ func TestPlainGateSupportsTLSWithoutApplicationHandshake(t *testing.T) {
 		}, ProtocolPlain)
 	connection := dialProductionTestClient(t, gate, clientTLS)
 	defer connection.Close()
-	request, err := proto.Marshal(&Envelope{MsgId: 1001, RequestId: 9, Payload: []byte("plain over TLS")})
+	request, err := proto.Marshal(&commonv1.Envelope{MsgId: 1001, RequestId: 9, Payload: []byte("plain over TLS")})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -3859,7 +3859,7 @@ func TestPlainGateSupportsTLSWithoutApplicationHandshake(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	var response Envelope
+	var response commonv1.Envelope
 	if err := proto.Unmarshal(frame, &response); err != nil {
 		t.Fatal(err)
 	}
@@ -3930,18 +3930,29 @@ func TestMACGateListenFailureLeavesRuntimeAvailable(t *testing.T) {
 	}
 }
 
-// TestClientSessionBoundsOutboundQueue 验证生产 ClientSession 按帧字节和固定条目开销限制出站队列。
+// TestClientSessionBoundsOutboundQueue 验证不透明字节按帧和条目开销限流，接纳后持有独占快照。
 func TestClientSessionBoundsOutboundQueue(t *testing.T) {
 	client := newClientConnection(nil, 128, queueEntryOverhead+2, &gateCounters{}, 0)
-	envelope := &Envelope{MsgId: 1}
-	if err := client.Send(envelope); err != nil {
+	frame := []byte{0xff, 0x00} // 故意使用非法 Protobuf，Gate 不应解释它。
+	if err := client.Send(frame); err != nil {
 		t.Fatalf("Send(first) error = %v", err)
 	}
-	if err := client.Send(envelope); !errors.Is(err, ErrClientQueueFull) {
+	if err := client.Send(frame); !errors.Is(err, ErrClientQueueFull) {
 		t.Fatalf("Send(second) error = %v, want ErrClientQueueFull", err)
 	}
 	if got := client.counters.outboundQueueFull.Load(); got != 1 {
 		t.Fatalf("outbound queue full count = %d, want 1", got)
+	}
+	frame[0] = 1
+	queued, ok := client.outbound.nextFrame()
+	if !ok || !bytes.Equal(queued, []byte{0xff, 0x00}) {
+		t.Fatalf("queued frame = %x, want independent opaque snapshot ff00", queued)
+	}
+	if err := client.Send(nil); err != nil {
+		t.Fatalf("Send(empty frame) error = %v", err)
+	}
+	if err := client.Send([]byte{}); !errors.Is(err, ErrClientQueueFull) {
+		t.Fatalf("Send(second empty frame) error = %v, want bounded entry overhead", err)
 	}
 }
 
@@ -3996,7 +4007,7 @@ func (agent *productionTestAgent) HandleClientMessage(_ runtime.CommandContext, 
 	if agent.client == nil {
 		return nil
 	}
-	return agent.client.Send(&commonv1.Envelope{
+	return sendTestEnvelope(agent.client, &commonv1.Envelope{
 		MsgId:     1002,
 		RequestId: envelope.GetRequestId(),
 		Payload:   envelope.GetPayload(),
@@ -4063,7 +4074,7 @@ func (agent *burstOutboundAgent) Handle(commandContext runtime.CommandContext, c
 }
 
 func (agent *burstOutboundAgent) HandleClientMessage(_ runtime.CommandContext, _ []byte) error {
-	err := agent.client.Send(&commonv1.Envelope{
+	err := sendTestEnvelope(agent.client, &commonv1.Envelope{
 		MsgId:   1002,
 		Payload: bytes.Repeat([]byte{'x'}, 128),
 	})
@@ -4095,7 +4106,7 @@ func (agent *slowOutboundAgent) Handle(commandContext runtime.CommandContext, co
 func (agent *slowOutboundAgent) HandleClientMessage(_ runtime.CommandContext, _ []byte) error {
 	payload := bytes.Repeat([]byte{'y'}, 64<<10)
 	for attempt := 0; attempt < 64; attempt++ {
-		err := agent.client.Send(&commonv1.Envelope{MsgId: 1002, Payload: payload})
+		err := sendTestEnvelope(agent.client, &commonv1.Envelope{MsgId: 1002, Payload: payload})
 		if err != nil {
 			agent.resultOnce.Do(func() { agent.result <- err })
 			return nil
@@ -4148,7 +4159,7 @@ func (agent *longSlowOutboundAgent) HandleClientMessage(_ runtime.CommandContext
 				agent.result <- result
 				return nil
 			}
-			err := agent.client.Send(&commonv1.Envelope{MsgId: 1002, Payload: payload})
+			err := sendTestEnvelope(agent.client, &commonv1.Envelope{MsgId: 1002, Payload: payload})
 			switch {
 			case err == nil:
 				result.sent++
@@ -4318,6 +4329,15 @@ func startConfiguredProductionGateWithTLS(
 		t.Fatalf("CreateService(Gate) error = %v", err)
 	}
 	return local, gate
+}
+
+// sendTestEnvelope 只供测试业务 Agent 使用，传输层只接收已编码字节。
+func sendTestEnvelope(client ClientSession, envelope *commonv1.Envelope) error {
+	frame, err := proto.Marshal(envelope)
+	if err != nil {
+		return err
+	}
+	return client.Send(frame)
 }
 
 func testTLSConfigs(t *testing.T) (*tls.Config, *tls.Config) {

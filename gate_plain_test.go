@@ -9,9 +9,9 @@ import (
 
 	echopb "github.com/cnooljaw/gsr/examples/websocket-gate/gen/go/gsr/example/echo/v1"
 	"github.com/cnooljaw/gsr/gate"
-	commonv1 "github.com/cnooljaw/gsr/gate/gen/go/gsr/common/v1"
-	"github.com/cnooljaw/gsr/gate/protocol"
 	"github.com/cnooljaw/gsr/logging"
+	"github.com/cnooljaw/gsr/protocol"
+	commonv1 "github.com/cnooljaw/gsr/protocol/gen/go/gsr/common/v1"
 	"github.com/cnooljaw/gsr/runtime"
 	"github.com/gorilla/websocket"
 	"google.golang.org/protobuf/proto"
@@ -78,7 +78,7 @@ func TestOpenGateConnectsApplicationAgent(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Marshal(payload) error = %v", err)
 	}
-	request, err := proto.Marshal(&gate.Envelope{
+	request, err := proto.Marshal(&commonv1.Envelope{
 		MsgId: uint32(echopb.MsgId_C2S_ECHO_REQUEST), RequestId: 7, Payload: payload,
 	})
 	if err != nil {
@@ -94,7 +94,7 @@ func TestOpenGateConnectsApplicationAgent(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ReadMessage() error = %v", err)
 	}
-	response := new(gate.Envelope)
+	response := new(commonv1.Envelope)
 	if err := proto.Unmarshal(responseBytes, response); err != nil {
 		t.Fatalf("Unmarshal() error = %v", err)
 	}

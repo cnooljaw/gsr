@@ -9,7 +9,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-// clientConnection 只向 Agent 暴露编码后入队能力，两种模式共用连接级诊断。
+// clientConnection 只向 Agent 暴露字节入队能力，两种模式共用连接级诊断。
 type clientConnection struct {
 	connection           *websocket.Conn
 	outbound             *outboundQueue
@@ -64,12 +64,10 @@ func (client *clientConnection) takeSuppressedDiagnostics() map[string]uint64 {
 	return suppressed
 }
 
-// Send 将完整 Envelope 编码后放入有界出站队列，不直接写入 WebSocket。
-func (client *clientConnection) Send(envelope *Envelope) error {
-	err := client.outbound.Send(envelope)
+// Send 接纳不透明字节消息，不解析 Protobuf，也不直接写入 WebSocket。
+func (client *clientConnection) Send(frame []byte) error {
+	err := client.outbound.Send(frame)
 	switch {
-	case errors.Is(err, errNilEnvelope):
-		return errors.New("gate: nil Envelope")
 	case errors.Is(err, errOutboundFrameTooLarge):
 		client.counters.frameTooLarge.Add(1)
 		return ErrFrameTooLarge

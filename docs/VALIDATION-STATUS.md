@@ -6,6 +6,8 @@
 
 ## 已覆盖的运行链
 
+2026-10-09 Gate / Protocol 边界切片：将协议分发、通用 proto、生成类型及生成器移到同级 `protocol/`；Gate 不再依赖 Protobuf，ClientSession 接纳字节并复制快照，Protocol 在发送边界编码完整 Envelope。扩展既有队列测试，先复现缓冲区复用影响待发送消息的问题，再验证不透明字节、快照和空消息条目开销；既有协议与示例测试改为检查字节写回。首次 Gate race 验证发现 HTTP 请求头超时用例先收到 Agent 构造通知、后更新接入计数的断言竞态，复用已有等待函数后 Gate 包 race 通过（约 35 秒），未修改生产接入行为。Protocol、Echo 示例及应用 OpenGate 的 race 测试、生成器和通用类型测试通过；重新生成 Go/TypeScript 类型、TypeScript 五条认证用例及全仓仅编译检查通过。生产依赖清单确认 Gate 与 Protocol 互不导入；未运行全仓行为测试、全仓 race 或长时压力测试。
+
 2026-10-09 Gate 统一切片：连接实现、私有公共流程和原有两套测试迁移到 `gate`，应用入口收敛为 `OpenGate`；MAC 为默认模式，Plain 必须显式选择并绑定回环/私有 IP。保留既有认证、接纳、背压和停止覆盖，调整 Plain 的 TCP 容量及 HTTP 请求头超时契约；扩展配置测试覆盖未知模式和 Plain 小帧上限，新增 Plain+TLS 用例复用现有夹具。`go test -race ./gate ./examples/websocket-gate/cmd/debugserver -timeout=3m` 通过（约 35 秒/2 秒）；随后配置、Plain+TLS、应用 OpenGate 接线和简化后生命周期的定向 race 测试通过。`go test ./... -run '^$' -timeout=2m` 全仓编译检查通过，未重复运行全仓行为测试、全仓 race、TypeScript 或长时压力验收。
 
 应用 Timer 身份切片：TestServiceTimerPreservesOwnIdentity 经 gsr.Run 在 OnStart 登记零延时 Timer，确认回调 Source 为零、Self 为拥有者；回调发起的本地 Call 使用拥有者来源，绑定 ClusterClient 仍使用 Self，实际排空的 JSON 日志也记录拥有者 ServiceID。相关测试、全仓测试、vet 和 race 通过；未修改生产代码，此测试不包含远端 Timer 调用或计时精度测量。

@@ -7,7 +7,7 @@
 package echopb
 
 import (
-	_ "github.com/cnooljaw/gsr/gate/gen/go/gsr/protocol/v1"
+	_ "github.com/cnooljaw/gsr/protocol/gen/go/gsr/protocol/v1"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"

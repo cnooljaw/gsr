@@ -37,7 +37,7 @@ func TestPlainClientWriterClosesAfterDeadlineFailure(t *testing.T) {
 	deadlineFailure := errors.New("test WebSocket write deadline failure")
 	serverSocket.failWriteDeadline(deadlineFailure)
 	client := newClientConnection(serverConnection, 1024, 2048, &gateCounters{}, 0)
-	if err := client.Send(&Envelope{MsgId: 1002}); err != nil {
+	if err := client.Send([]byte{1, 2}); err != nil {
 		t.Fatalf("ClientSession.Send() error = %v", err)
 	}
 

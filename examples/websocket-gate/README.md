@@ -4,11 +4,11 @@
 
 Go 启动入口只解析参数、处理退出信号并调用 `gsr.Run`。MainService 统一调用 `self.OpenGate` 并明确选择 Protocol，提供返回 `gsr.Service` 的 Echo Agent 构造回调，然后自身退出；Gate 与连接 Agent 继续运行，由 Runtime 在进程退出时统一停止。Echo Agent 显式实现普通 `Handle` 和可选的 `HandleClientMessage`，两种消息入口共用该 Service 的 Mailbox 和 runner。
 
-框架通用 Envelope 和连接控制消息定义在仓库根目录的 `gate/proto/gsr/common/v1/common.proto`；Echo 示例的消息编号和 payload 仍定义在本目录的 `proto/gsr/example/echo/v1/echo.proto`。每个消息编号通过 `.proto` option 显式关联 payload、方向和 Request/Notify/Response/Push 种类，`npm run generate` 从仓库根目录的 Buf 配置同时生成 Go 与 TypeScript 类型和 Go 协议目录。业务 Handler 按实现进度手动注册；新协议消息可以先定义，之后逐个补 Handler。
+框架通用 Envelope 和连接控制消息定义在仓库根目录的 `protocol/proto/gsr/common/v1/common.proto`；Echo 示例的消息编号和 payload 仍定义在本目录的 `proto/gsr/example/echo/v1/echo.proto`。每个消息编号通过 `.proto` option 显式关联 payload、方向和 Request/Notify/Response/Push 种类，`npm run generate` 从仓库根目录的 Buf 配置同时生成 Go 与 TypeScript 类型和 Go 协议目录。业务 Handler 按实现进度手动注册；新协议消息可以先定义，之后逐个补 Handler。
 
 ## 运行
 
-Agent 的强类型 Handler 现在接收 `self gsr.CommandContext` 和 `ctx protocol.Context`：前者用于调用其它 Service，后者用于客户端响应与 Push。Echo 不需要访问其它 Service，因此把 self 写为 `_`。公共接入写法见 [Agent 中的协议分发](../../gate/README.md#agent-中的协议分发)。
+Agent 的强类型 Handler 现在接收 `self gsr.CommandContext` 和 `ctx protocol.Context`：前者用于调用其它 Service，后者用于客户端响应与 Push。Echo 不需要访问其它 Service，因此把 self 写为 `_`。公共接入写法见 [Agent 中的协议分发](../../protocol/README.md#agent-中的协议分发)。
 
 需要 Go 1.24 或更高版本、Node.js 22.15 或更高版本，以及 `protoc-gen-go` v1.36.1 在 `PATH` 中。可用下面的命令安装 Go 插件；Buf CLI 和 TypeScript 生成插件由本目录锁定的 npm 依赖提供。
 

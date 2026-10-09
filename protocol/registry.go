@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/cnooljaw/gsr/gate/protocol/catalog"
+	"github.com/cnooljaw/gsr/protocol/catalog"
 	"google.golang.org/protobuf/proto"
 )
 

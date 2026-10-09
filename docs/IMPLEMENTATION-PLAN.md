@@ -396,7 +396,7 @@ Cluster 是 Core 的调用者和适配层，不进入 Core v0.1。
 | 能力 | 框架入口 | 保留在业务/示例中的内容 |
 | --- | --- | --- |
 | WebSocket Gate | 统一 `gate`；应用使用 `self.OpenGate`，固定选择 MAC/Plain 模式 | Agent 构造、身份认证和具体业务协议 |
-| Agent 协议公共能力 | `gate/protocol` 的 Registry、Session、`Dispatcher[gsr.CommandContext]` | 具体 Agent、Handler、连接私有状态和业务 Service 路由；不新增 BaseAgent |
+| Agent 协议公共能力 | `protocol` 的 Registry、Session、`Dispatcher[gsr.CommandContext]` | 具体 Agent、Handler、连接私有状态和业务 Service 路由；不新增 BaseAgent |
 | HTTP Server | `httpserver.Server`；应用使用 `self.OpenHTTP` 和 `HTTPIngress.SendName/CallName` | `http.ServeMux` 路由、请求校验、鉴权和状态码映射 |
 | Redis | `redisclient.New` 返回原生客户端 | 用户 Hash 缓存的键、TTL、读写及错误策略 |
 | MySQL | `mysqlclient.Open` 返回原生连接池 | 产品表、SQL、事务及 CRUD Handler |

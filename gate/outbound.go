@@ -10,15 +10,12 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
-	"google.golang.org/protobuf/proto"
 )
 
 // queueEntryOverhead 为每条出站消息计入固定队列开销。
 const queueEntryOverhead = 64
 
 var (
-	// errNilEnvelope 表示发送方没有提供完整消息。
-	errNilEnvelope = errors.New("nil Envelope")
 	// errOutboundFrameTooLarge 表示消息超过单帧上限。
 	errOutboundFrameTooLarge = errors.New("frame too large")
 	// errOutboundQueueFull 表示出站队列无法接纳消息。
@@ -58,18 +55,8 @@ func newOutbound(connection *websocket.Conn, maxFrame, maxQueue int) *outboundQu
 	}
 }
 
-// Send 编码完整 Envelope，并按帧字节与固定条目开销限制队列。
-func (outbound *outboundQueue) Send(envelope *Envelope) error {
-	if envelope == nil {
-		return errNilEnvelope
-	}
-	if len(envelope.GetPayload()) > outbound.maxFrame {
-		return errOutboundFrameTooLarge
-	}
-	frame, err := proto.Marshal(envelope)
-	if err != nil {
-		return fmt.Errorf("marshal Envelope: %w", err)
-	}
+// Send 按不透明字节与固定条目开销限制队列，接纳时复制快照，不解释消息格式。
+func (outbound *outboundQueue) Send(frame []byte) error {
 	if len(frame) > outbound.maxFrame {
 		return errOutboundFrameTooLarge
 	}
@@ -87,7 +74,7 @@ func (outbound *outboundQueue) Send(envelope *Envelope) error {
 		outbound.mu.Unlock()
 		return errOutboundQueueFull
 	}
-	outbound.queue = append(outbound.queue, queuedFrame{data: frame, charge: charge})
+	outbound.queue = append(outbound.queue, queuedFrame{data: append([]byte(nil), frame...), charge: charge})
 	outbound.queuedBytes += charge
 	outbound.mu.Unlock()
 

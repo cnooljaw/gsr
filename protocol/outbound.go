@@ -3,8 +3,8 @@ package protocol
 import (
 	"errors"
 
-	commonv1 "github.com/cnooljaw/gsr/gate/gen/go/gsr/common/v1"
-	"github.com/cnooljaw/gsr/gate/protocol/catalog"
+	"github.com/cnooljaw/gsr/protocol/catalog"
+	commonv1 "github.com/cnooljaw/gsr/protocol/gen/go/gsr/common/v1"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -17,9 +17,9 @@ var (
 	ErrUninitializedContext = errors.New("protocol: context is not initialized")
 )
 
-// ClientSender 是绑定单条连接的客户端消息写入能力。
+// ClientSender 只接纳编码后的字节消息，不拥有连接，也不依赖 Gate。
 type ClientSender interface {
-	Send(*commonv1.Envelope) error
+	Send([]byte) error
 }
 
 // clientWriter 归 Dispatcher 所有，将同一协议目录绑定到连接写回能力。
@@ -34,7 +34,7 @@ func (writer *clientWriter) push(msgID uint32, message proto.Message) error {
 	if err != nil {
 		return err
 	}
-	return writer.sender.Send(&commonv1.Envelope{
+	return writer.send(&commonv1.Envelope{
 		MsgId:   msgID,
 		Payload: payload,
 	})
@@ -48,9 +48,18 @@ func (writer *clientWriter) sendResponse(requestID, msgID uint32, message proto.
 	if err != nil {
 		return err
 	}
-	return writer.sender.Send(&commonv1.Envelope{
+	return writer.send(&commonv1.Envelope{
 		MsgId:     msgID,
 		RequestId: requestID,
 		Payload:   payload,
 	})
+}
+
+// send 在协议边界编码完整 Envelope，字节发送方不需要理解 Protobuf。
+func (writer *clientWriter) send(envelope *commonv1.Envelope) error {
+	frame, err := proto.Marshal(envelope)
+	if err != nil {
+		return err
+	}
+	return writer.sender.Send(frame)
 }

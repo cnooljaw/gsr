@@ -16,8 +16,8 @@ import (
 	"testing"
 	"time"
 
-	commonv1 "github.com/cnooljaw/gsr/gate/gen/go/gsr/common/v1"
 	"github.com/cnooljaw/gsr/logging"
+	commonv1 "github.com/cnooljaw/gsr/protocol/gen/go/gsr/common/v1"
 	"github.com/cnooljaw/gsr/runtime"
 	"github.com/gorilla/websocket"
 	"google.golang.org/protobuf/proto"
@@ -130,7 +130,7 @@ func (service *delayedGateStart) OnStop(ctx context.Context) error {
 	return service.gate.OnStop(ctx)
 }
 
-// TestPlainGateRoutesClientRequestAndResponse 验证 WebSocket Envelope 经 Runtime 到 Agent 后可按原 request_id 回传。
+// TestPlainGateRoutesClientRequestAndResponse 验证 WebSocket commonv1.Envelope 经 Runtime 到 Agent 后可按原 request_id 回传。
 func TestPlainGateRoutesClientRequestAndResponse(t *testing.T) {
 	local, gate, agents := startTestGate(t, 8, 4)
 	connection := dialTestGate(t, gate)
@@ -1087,6 +1087,10 @@ func TestPlainGateReadHeaderTimeoutReleasesConnectionCapacity(t *testing.T) {
 	case <-time.After(time.Second):
 		t.Fatal("HTTP header timeout did not release connection capacity")
 	}
+	// Agent 构造通知早于 HTTP 入口完成计数，等待接纳完成再断言。
+	waitForGateMetric(t, gate, "AcceptedConnections", func(metrics Metrics) uint64 {
+		return metrics.AcceptedConnections
+	}, 1)
 	metrics := gate.Metrics()
 	if metrics.AcceptedConnections != 1 || metrics.RejectedConnections != 0 {
 		t.Fatalf("Gate metrics = accepted %d, rejected %d; want 1, 0", metrics.AcceptedConnections, metrics.RejectedConnections)
@@ -1168,14 +1172,14 @@ func TestNewGateServiceRejectsPublicAndUnboundedConfig(t *testing.T) {
 	}
 }
 
-// TestClientSessionBoundsOutboundQueuePlain 验证序列化帧和队列条目开销合计不能超过出站字节上限。
+// TestClientSessionBoundsOutboundQueuePlain 验证不透明字节和队列条目开销合计不能超过出站上限。
 func TestClientSessionBoundsOutboundQueuePlain(t *testing.T) {
 	client := newClientConnection(nil, 128, queueEntryOverhead+2, &gateCounters{}, 0)
-	envelope := &Envelope{MsgId: 1}
-	if err := client.Send(envelope); err != nil {
+	frame := []byte{0xff, 0x00}
+	if err := client.Send(frame); err != nil {
 		t.Fatalf("Send(first) error = %v", err)
 	}
-	if err := client.Send(envelope); !errors.Is(err, ErrClientQueueFull) {
+	if err := client.Send(frame); !errors.Is(err, ErrClientQueueFull) {
 		t.Fatalf("Send(second) error = %v, want ErrClientQueueFull", err)
 	}
 	if got := client.counters.outboundQueueFull.Load(); got != 1 {
@@ -1209,7 +1213,7 @@ func (agent *testAgent) HandleClientMessage(_ runtime.CommandContext, frame []by
 	if envelope.GetMsgId() != 1001 {
 		return errors.New("unexpected test Agent message id")
 	}
-	return agent.client.Send(&commonv1.Envelope{
+	return sendTestEnvelope(agent.client, &commonv1.Envelope{
 		MsgId:     1002,
 		RequestId: envelope.GetRequestId(),
 		Payload:   envelope.GetPayload(),

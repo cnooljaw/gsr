@@ -6,13 +6,13 @@ import (
 	"strings"
 	"unicode"
 
-	protocolv1 "github.com/cnooljaw/gsr/gate/gen/go/gsr/protocol/v1"
+	protocolv1 "github.com/cnooljaw/gsr/protocol/gen/go/gsr/protocol/v1"
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
-const catalogImportPath = "github.com/cnooljaw/gsr/gate/protocol/catalog"
+const catalogImportPath = "github.com/cnooljaw/gsr/protocol/catalog"
 
 func main() {
 	var modulePath string

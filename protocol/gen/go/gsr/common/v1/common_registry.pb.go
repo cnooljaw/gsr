@@ -3,7 +3,7 @@
 package commonv1
 
 import (
-	catalog "github.com/cnooljaw/gsr/gate/protocol/catalog"
+	catalog "github.com/cnooljaw/gsr/protocol/catalog"
 	proto "google.golang.org/protobuf/proto"
 )
 

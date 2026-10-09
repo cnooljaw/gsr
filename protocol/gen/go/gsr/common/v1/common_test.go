@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"testing"
 
-	commonv1 "github.com/cnooljaw/gsr/gate/gen/go/gsr/common/v1"
+	commonv1 "github.com/cnooljaw/gsr/protocol/gen/go/gsr/common/v1"
 	"google.golang.org/protobuf/proto"
 )
 

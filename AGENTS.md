@@ -31,6 +31,7 @@
 - 应用启动使用 gsr.Run；业务通过 self.Cluster() / self.Logger() 取得自身来源绑定能力，不手工注入 Host 或创建 ClusterClient。Core 的 runtime.ServiceContext 不反向依赖 Cluster；禁止用全局单例的“当前 Service”或 goroutine-local 推断来源。
 - 修改范围必须能够追溯到当前任务；不顺手重构无关代码。
 - 框架内部组件之间必须成立的不变量由构造器建立并保证，不要求业务调用方手工组装关联后再由运行时检查；业务仍负责输入、资源所有权和生命周期契约。
+- Gate 负责有界、顺序、失败可观察地收发不透明字节消息，Protocol 负责消息编解码、校验和分发，业务 Agent 是二者的组合点。`gate/` 与 `protocol/` 同级且生产代码互不依赖；Gate 不导入 Protobuf、不解释 Envelope，连接能力只提供 `Send([]byte)` / `Close()`。Protocol 只依赖字节发送窄接口，不拥有连接。Send 成功只代表本地接纳，不保证送达、业务执行或执行一次；Gate 接纳时复制字节快照。详见 API 文档的“Gate 与 Protocol 边界”。
 - 公开 API 或架构边界发生变化时，同步更新 `docs/API-DESIGN.md`。
 - 新增或修改 Go 代码必须遵守 `docs/GO-CODE-STYLE.md`。
 - 形成稳定的新设计结论时写入相关文档；较大的取舍可新增 ADR 或 RFC，不把 `AGENTS.md` 扩写成架构百科。

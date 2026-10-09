@@ -1,16 +1,11 @@
 package gate
 
-import (
-	commonv1 "github.com/cnooljaw/gsr/gate/gen/go/gsr/common/v1"
-	"github.com/cnooljaw/gsr/runtime"
-)
+import "github.com/cnooljaw/gsr/runtime"
 
-// Envelope 是客户端与服务端共用的完整 Protobuf 消息外层。
-type Envelope = commonv1.Envelope
-
-// ClientSession 是绑定单条客户端连接的出站能力，与 Runtime 的 SessionID 无关。
+// ClientSession 是绑定单条客户端连接的字节写回能力，与 Runtime 的 SessionID 无关。
+// Send 成功仅表示本地队列接纳，接纳时复制快照；nil 与空切片都是零字节消息。
 type ClientSession interface {
-	Send(envelope *Envelope) error
+	Send(frame []byte) error
 	Close() error
 }
 

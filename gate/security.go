@@ -60,7 +60,7 @@ func newClientAuthenticator(macKey [clientMACKeySize]byte) *clientAuthenticator 
 	return &clientAuthenticator{macKey: macKey}
 }
 
-// verifyFrame 先校验整帧 MAC，再接纳严格递增的 seq，并返回原始 Envelope 字节切片。
+// verifyFrame 先校验整帧 MAC，再接纳严格递增的 seq，并返回不透明消息字节。
 func (auth *clientAuthenticator) verifyFrame(frame []byte, maxFrameBytes int) (uint64, []byte, error) {
 	if auth == nil || maxFrameBytes <= 0 {
 		return 0, nil, errInvalidAuthenticator

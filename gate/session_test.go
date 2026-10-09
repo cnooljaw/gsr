@@ -61,7 +61,7 @@ func TestMACGateLogsClientWriterFailures(t *testing.T) {
 				serverSocket.failWrites(writeFailure)
 			}
 			client := newClientConnection(serverConnection, 1024, 2048, &gateCounters{}, 7)
-			if err := client.Send(&Envelope{MsgId: 1002}); err != nil {
+			if err := client.Send([]byte{1, 2}); err != nil {
 				t.Fatalf("ClientSession.Send() error = %v", err)
 			}
 

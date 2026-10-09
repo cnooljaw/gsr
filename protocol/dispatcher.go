@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"reflect"
 
-	commonv1 "github.com/cnooljaw/gsr/gate/gen/go/gsr/common/v1"
-	"github.com/cnooljaw/gsr/gate/protocol/catalog"
+	"github.com/cnooljaw/gsr/protocol/catalog"
+	commonv1 "github.com/cnooljaw/gsr/protocol/gen/go/gsr/common/v1"
 	"google.golang.org/protobuf/proto"
 )
 
