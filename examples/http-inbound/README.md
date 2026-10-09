@@ -21,6 +21,8 @@ HTTP Handler → HTTPIngress.CallName → 本地 Service
 
 `admin.go` 用标准库 `http.ServeMux` 组织 `GET /users/{id}`、`POST /users/{id}/ban` 和 `GET /dashboard/{id}`。HTTP Handler 保存 `HTTPIngress`，通过名称调用，不持有 Runtime 或 ServiceID。增加接口只需向 mux 注册对应 Handler，不新建 GSR 路由框架。
 
+OpenHTTP 的构造回调只组装路由，不启动资源或调用业务 Service。已打开监听或节点已关闭时，会在调用构造回调前拒绝；并发首次打开可能分别构造路由，但最终只接纳一个监听。
+
 `admin_service.go` 的 `dashboardService` 在自己的 Handler 内用 `self.CallName` 查询用户，再用 `self.Cluster().Call` 调用远端 `rooms`。HTTP 请求的 Source 为零；业务 Service 发起后续调用时，Source 是它自己的 ServiceID。HTTP goroutine 不冒充业务 Service，也不直接读取 Service 状态。
 
 HTTP 示例将请求 deadline 和稳定的 `runtime.ErrCallTimeout` 都映射为 504，其余调用失败返回安全的 503，不透传内部错误文本。Service 转交错误及 Cluster wire 只保留 Class/Code 和安全 Message，不保证保留 `context.DeadlineExceeded` 错误链；错误映射不能只检查 Go context 错误。

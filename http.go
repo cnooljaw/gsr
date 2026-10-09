@@ -49,12 +49,23 @@ func (in *HTTPIngress) CallName(ctx context.Context, name cluster.ServiceName, c
 
 // OpenHTTP 在本节点开启唯一的 HTTP 监听。Handler 构造函数收到可长期保存的入站入口；
 // Run 在关闭 Runtime 前停止监听，并限时等待在途 Handler；超时不能强杀 Handler。
-// 监听失败后可再次尝试。
+// 监听失败后可再次尝试；已打开或已关闭时不调用路由构造函数。
+// 构造函数只组装路由，不启动资源或执行业务通信；并发打开可能各自完成构造，但只接纳一个监听。
 func (self *serviceContext) OpenHTTP(address string, handler func(*HTTPIngress) http.Handler) error {
 	if handler == nil {
 		return errors.New("gsr: HTTP handler is required")
 	}
 	node := self.adapter.node
+	node.httpMu.Lock()
+	closed, opened := node.httpClosed, node.httpServer != nil
+	node.httpMu.Unlock()
+	if closed {
+		return runtime.ErrRuntimeClosed
+	}
+	if opened {
+		return errors.New("gsr: HTTP listener already open")
+	}
+	// 业务构造函数在锁外执行；构造后再次检查状态，避免并发打开或停机漏过接纳检查。
 	server, err := httpserver.New(httpserver.Config{
 		Address: address,
 		Handler: handler(&HTTPIngress{node: node}),

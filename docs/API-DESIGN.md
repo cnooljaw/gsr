@@ -902,6 +902,8 @@ Run 内部固定按 HTTP.Close（若已打开）→ Cluster.Quiesce → Runtime.
 
 HTTP 入口的常见写法如下；业务 Service 创建并注册完成后再打开监听。`OpenHTTP` 每个 Run 只成功一次，监听失败可重试；入口 Service 退出不关闭监听，最终由 Run 收尾。`HTTPIngress` 仅供 HTTP Handler 保存，不能代替回调内的 `ServiceContext`，也不提供 Cluster 来源身份。
 
+OpenHTTP 在调用路由构造函数前检查监听状态：已经打开或节点已经关闭时直接拒绝，不再次构造路由。构造函数在锁外执行，只组装路由，不启动资源或执行业务通信；构造后再次检查状态，因此并发打开可能各自完成构造，但只成功一个监听，期间停机也会拒绝发布。
+
 ```go
 err := self.OpenHTTP(address, func(in *gsr.HTTPIngress) http.Handler {
 	mux := http.NewServeMux()

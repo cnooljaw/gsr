@@ -19,7 +19,7 @@ import (
 	"github.com/cnooljaw/gsr/runtime"
 )
 
-// 验证 Run 持有 HTTP 监听，HTTP 路由按名称调用不同 Service 且不伪造来源，退出时释放端口。
+// 验证 HTTP 按名称调用且不伪造来源，重复打开不再次构造路由，退出时释放端口。
 func TestRunHTTPIngress(t *testing.T) {
 	listener, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
@@ -75,6 +75,16 @@ func TestRunHTTPIngress(t *testing.T) {
 			})
 			return mux
 		})
+		if err == nil {
+			constructedAgain := false
+			duplicateErr := self.OpenHTTP(address, func(_ *HTTPIngress) http.Handler {
+				constructedAgain = true
+				return http.NewServeMux()
+			})
+			if duplicateErr == nil || constructedAgain {
+				err = errors.New("duplicate OpenHTTP must reject before constructing routes")
+			}
+		}
 		started <- err
 		return err
 	}}
