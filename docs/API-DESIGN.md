@@ -248,6 +248,16 @@ func (runtime *Runtime) DeliverClientMessage(target ServiceID, envelope []byte) 
 
 应用层 `gsr.Service` 保持普通 `Handle` 为必需入口；只有 Agent 等需要接收客户端消息的 Service 额外实现 `gsr.ClientMessageHandler`（相同方法名，参数为 `gsr.CommandContext`）。`gsr.Run` 在创建 Service 时仅对这类实例使用客户端消息适配器，使它在 Core 中实现 `runtime.ClientMessageHandler`；普通应用 Service 的适配器不实现该接口，继续在入队前被拒绝。适配器只转换上下文，不另建 Mailbox、runner、Registry 或消息类型。Gate 通过 `OpenDebugGate` / `OpenProdGate` 的受信任组装入口接线，普通 Service 不获得 `Runtime.DeliverClientMessage`。
 
+`gsr.Service` 与 `runtime.Service` 使用不同的上下文类型，不能直接互换。框架内部的 `serviceAdapter` 把 Core 上下文转换成应用上下文；`clientMessageAdapter` 在此基础上额外实现客户端消息接口。它们包装同一个业务实例，不是另外创建的 Service，也不是业务需要手工组装的对象。入口可在 [`service.go`](../service.go) 中直接追踪：
+
+```text
+同一个 Service 的 Mailbox → 同一个 Runtime runner
+  ├─ 普通 Command → serviceAdapter.Handle → 业务 Service.Handle
+  └─ 客户端消息 → clientMessageAdapter.HandleClientMessage → 业务 Agent.HandleClientMessage
+```
+
+第二条路径只对实现客户端处理接口的 Service 开放；普通 Service 无需实现客户端方法或准备占位 Handler。两条路径同步执行，任一 Handler 等待 Call 时，该 Service 都不会处理下一条消息。
+
 ### 4.1 Args 的所有权
 
 未编码不代表可以共享可变状态。Runtime 接受消息时浅拷贝最外层 `Args` 切片；这只隔离参数列表本身，不递归复制 `any` 内部的数据。对每个参数遵守以下契约：
@@ -307,7 +317,7 @@ Source、Call 上限和自动 Reply 的完整取舍见 [ADR 0007](adr/0007-comma
 
 ### 4.4 业务 Service 默认使用 Dispatcher
 
-`Service.Handle` 仍是 Runtime 唯一调用的业务入口。普通应用层 `gsr.Service` 默认使用 `gsr.Dispatcher`，不重复编写 `switch`、`[]any` 参数数量检查和类型断言。它是可选的每 Service 不可变能力，匹配应用层的 `gsr.CommandContext`；Core `runtime` 不另设一套同名分发器。直接实现 Core `runtime.Service` 的基础设施和底层集成示例（如 HTTP 入站、出站示例）仍须显式声明 `Handle`，但因使用 `runtime.CommandContext`，不套用应用层 Dispatcher；普通业务新代码优先使用 `gsr.Service`：
+`Service.Handle` 是普通 Core Command 的统一业务入口；客户端消息走可选的 `HandleClientMessage`，不交给 Command Dispatcher。普通应用层 `gsr.Service` 默认使用 `gsr.Dispatcher`，不重复编写 `switch`、`[]any` 参数数量检查和类型断言。它是可选的每 Service 不可变能力，匹配应用层的 `gsr.CommandContext`；Core `runtime` 不另设一套同名分发器。直接实现 Core `runtime.Service` 的基础设施和底层集成示例（如 HTTP 入站、出站示例）仍须显式声明 `Handle`，但因使用 `runtime.CommandContext`，不套用应用层 Dispatcher；普通业务新代码优先使用 `gsr.Service`：
 
 ```go
 func NewDispatcher(map[runtime.CommandID]any) (*Dispatcher, error)

@@ -27,7 +27,7 @@
 | Lifecycle Coordinator、固定 `startOrder`/`stopOrder` | Core 0.5 | `skynet_start.c` 中的固定初始化、`thread_timer` 退出 socket/唤醒 worker、主线程 join、最后 `harbor_exit`/`socket_free` | 借鉴后重构 | GSR 把顺序和回滚集中成可测试的内部计划；组件自己拥有资源，Cluster 不进入 Core 计划。 |
 | `ShutdownTimeout` | Core 0.5 | Skynet 主退出路径主要 join 线程，没有 GSR 同等的统一 Runtime deadline | GSR 新增约束 | GSR 的内部关闭预算用于 `Close()` 触发的停止；`Stop(ctx)` 的调用方 context 只控制当前等待。Go 不能强杀不响应取消的 Handler/`OnStop`。 |
 | `Service`、`CreateService(ctx, service)` | 已实现 | `skynet_context`、Lua service、`skynet.newservice()`、`.launcher` | 借鉴后重构 | 宿主创建普通 MainService；任何 Service 都可通过 ServiceContext.CreateService 创建实例，复用 Runtime，不新增 Launcher、工厂或自动 Bootstrap。创建经过 OnStart，失败只回滚当前实例；已成功创建的子 Service 仍归 Runtime 管理。 |
-| `ServiceID uint64` | Core 0 已定 | `skynet_context` 的 32 位 handle；远端 handle 还可能带 harbor 位 | 借鉴后重构 | GSR ServiceID 只在当前 Runtime 有效，不编码 Node、Epoch、Generation，也不作为远端地址。 |
+| `ServiceID uint64` | Core 0 已定 | `skynet_context` 的 32 位 handle；远端 handle 还可能带 harbor 位 | 借鉴后重构 | GSR ServiceID 只在当前 Runtime 有效，不编码 Node、Epoch、Generation，不是全局或持久化地址。业务跨节点使用 NodeID + ServiceName；底层也允许显式指定目标 Runtime 的临时 ServiceID。 |
 | `ServiceName`、外层 Registry/Discovery | 应用层静态注册和本地按名调用已实现；动态发现未实现 | `skynet.register()`、`skynet.localname()`、`.service`、`cluster.register()` | 借鉴后重构 | GSR 稳定逻辑名称不属于 Core ServiceID；`self.Register` 发布本节点名称，供本地 SendName/CallName 与跨节点入站共用；目标 Service 停止时清理，运行中不改绑。动态发现仍属外层能力。 |
 | `Service.OnStart` / `OnStop` | Core 1 已实现 | `skynet.start(func)`、`skynet.init_service()`、`skynet.exit()` | 借鉴后重构 | Skynet 的 `start` 是单个 Lua service 的初始化入口；GSR 把 Runtime 基础设施启动和 Service 生命周期分开，OnStart 接收协作 context 并显式返回 error。 |
 | `ServiceContext.Exit()` | 已实现 | `skynet.exit()` | 借鉴后重构 | Skynet 通过协程 QUIT 离开执行；Go 只标记退出，必须正常 return。当前 Call 按返回值完成，再停止自身；不停止新建的 Service 或 Runtime。 |
@@ -42,10 +42,12 @@ Skynet 的关闭顺序可概括为：timer 线程停止时间/socket 事件并�
 | --- | --- | --- | --- | --- |
 | `Runtime.Call(ctx, target, command, args...)` | 已实现 | `clusteragent.lua` 通过 `skynet.rawcall` 发起本地调用 | 借鉴后重构 | Skynet agent 是 Service，依赖 Lua coroutine 等待；GSR 宿主/基础设施使用 Source 为零的显式入口，经普通 Mailbox 和本地 PendingCall 完成，等待受 MaxCallWait 限制。普通业务仍使用 ServiceContext.Call。 |
 | `Message`：`Source`、`Target`、`Session`、`Command`、`Args` | Core 1/3 已实现 | `skynet_message`：`source`、`session`、`data`、`sz` | 直接对应 | GSR 本地 Message 不做 wire 编码；Skynet 常规路径把 Lua 参数 pack 成 buffer，并把类型编码进 `sz` 高位。 |
-| `Command` / `CommandID uint32` | Core 1 已实现 | `PTYPE_*`、`skynet.register_protocol()`、protocol id 和 Lua command string | 借鉴后重构 | GSR Core 不暴露 `PTYPE`；CommandID 使用 32 位静态命令字段，与协议保持同宽，跨节点统一编码，由目标 Service 解释命令，不按 Command 注册 codec。 |
+| `Command` / `CommandID uint32` | Core 1 已实现 | Lua `CMD[cmd]` 中的 command string | 借鉴后重构 | CommandID 表示目标 Service 内的操作，不是 Skynet 的 PTYPE/protocol id。它使用 32 位静态命令字段，跨节点统一编码，由目标 Service 解释，不按 Command 注册 codec。 |
 | `LocalDispatcher` | Core 1 已实现 | `skynet_context_message_dispatch()`、`skynet.dispatch()` | 直接对应 | GSR 本地 dispatcher 只处理本地 Message；Skynet callback 还要处理 protocol type、解包和 session。 |
-| `Handler.Handle(CommandContext, CommandID, ...any)` | 已实现 | `skynet.dispatch(typename, func)`，回调参数通常为 `session, source, ...` | 借鉴后重构 | GSR 用 Go Handler 和只读 `CommandContext.Source()`；Source 由 Runtime 写入，Timer 可为零值，业务不能伪造。普通应用 Service 可用具名字段持有不可变 `gsr.Dispatcher`，显式实现 Handle 入口。 |
-| `gsr.Dispatcher`（每 Service、不可变、可选） | 已实现 | Service 内 `CMD[cmd]` 表配合 `skynet.dispatch()` | 借鉴后重构 | GSR 在构造期校验并复制 `CommandID -> typed Handler` 表，运行期不注册、不预检查；Dispatcher 返回结果/error，不调用手工 Reply。直接实现 `Handle` 仍是扩展口。 |
+| `Service.Handle(CommandContext, CommandID, ...any)` | 已实现 | `skynet.dispatch("lua", func)`，回调参数通常为 `session, source, cmd, ...` | 借鉴后重构 | GSR 用显式 Handle 接收普通 Command，Source 由 Runtime 写入、业务不能伪造。普通应用 Service 用具名字段持有不可变 `gsr.Dispatcher`，不靠匿名嵌入隐式获得入口。 |
+| 可选 `ClientMessageHandler.HandleClientMessage` | 已实现 | `examples/agent.lua` 注册 `client` protocol，与 `lua` dispatch 分别处理客户端和内部消息 | 借鉴后重构 | GSR 用可选 Go 接口声明客户端处理能力，不暴露动态 protocol 注册表；缺少能力时入队前拒绝。两类消息共用一个 Mailbox 和 runner，不能用 Source 或 CommandID 猜入口。Skynet 通过 protocol id 选回调，并可在 Lua Call yield 后处理其它消息；GSR 保持 run-to-completion。 |
+| 应用 Service 的内部适配器 | 已实现 | 无需同形组件；Lua service 直接使用 skynet 模块提供的运行能力 | GSR 新增边界 | `serviceAdapter` 转换 Core 与应用上下文，`clientMessageAdapter` 仅为实现客户端接口的实例增加该能力；不新建 ServiceID、Mailbox 或 runner，业务不手工 wrap。见 API 文档的两类入口调用链。 |
+| `gsr.Dispatcher`（每 Service、不可变、可选） | 已实现 | Service 内 `CMD[cmd]` 表配合 `skynet.dispatch()` | 借鉴后重构 | GSR 在构造期校验并复制 `CommandID -> typed Handler` 表，运行期按签名校验参数并调用 Handler，不支持动态注册；Dispatcher 返回结果/error，不调用手工 Reply。只有 benchmark/profile 证明必要时，才在显式 Handle 中为个别热点直接分发。 |
 | `CommandContext.Source()` | Core 1 已实现 | dispatch callback 的 `source` 参数、`skynet.context()` | 借鉴后重构 | 普通 Send/Call 的 Source 由 Runtime 写入当前 Service；Timer Command 使用 `ServiceID(0)`；受控 Redirect 才能按固定策略保留已有 Source，业务 API 不允许覆盖或传入任意值。 |
 | 受控 `Redirect` / `Relay` | Core/Adapter 后续 | `skynet.redirect(dest, source, typename, ...)` | 借鉴后重构 | Skynet 的 redirect 同时承担 buffer ownership、fan-out、Harbor 控制 relay 和事件 provenance。GSR 不提供任意 source 的业务 API；首版只考虑受信任 Runtime/Adapter 的单向 Runtime-owned Message 转发，不转移 Call session/PendingCall。 |
 | `Args []any` 的消息快照 | Core 1 已实现 | `skynet.pack()`、C 层 `_filter_args()`；`PTYPE_TAG_DONTCOPY` 是不复制逃生口 | 借鉴后重构 | GSR 只隔离 `Args` 外层；map/slice/pointer 的复制深度由 typed client 负责，Core 不做通用深拷贝。 |
@@ -99,7 +101,7 @@ GSR 只用 `SessionID == 0` 或 `SessionID > 0` 区分 Send/Call；Skynet 还把
 
 | GSR 概念/API | GSR 阶段 | Skynet 对应概念 | 关系 | 关键区别 |
 | --- | --- | --- | --- | --- |
-| Cluster（Core 之外） | 静态出入站链路已实现；发现/认证未实现 | Harbor、`skynet.cluster`、`clusterd`、`clusterproxy`、`clustersender`、`clusteragent` | 直接对应架构方向 | GSR 已接入 Envelope、sender、agent 和 TCP，但 NodeID、Envelope、Transport 不进入 Core Message 或 ServiceID；动态发现与认证不属于现有静态链路。 |
+| Cluster（Core 之外） | 静态出入站链路已实现；发现/认证未实现 | Harbor、`skynet.cluster`、`clusterd`、`clusterproxy`、`clustersender`、`clusteragent` | 直接对应架构方向 | GSR 已接入 Envelope、NodeSender、私有入站连接 owner 和 TCP，但 NodeID、Envelope、Transport 不进入 Core Message 或 ServiceID；入站连接 owner 不是客户端业务 Agent，动态发现与认证不属于现有静态链路。 |
 | `NodeID` | 已实现 | `cluster.call(node, address, ...)` 的 node 名称、Harbor 编号 | 直接对应 | GSR NodeID 是独立路由维度，不能从 ServiceID 推断；远端目标必须由 Cluster 层解析。 |
 | `ClusterClient`（绑定 Source ServiceID） | 已实现 | `cluster.call()`、`cluster.send()`，以及按 node 缓存 sender | 借鉴后重构 | GSR 由应用适配器从 Self 自动绑定底层 client，业务使用 self.Cluster()；client 共享统一 codec、sender 与等待表。禁止全局变量、goroutine-local 或调用栈推断当前 Service；回复沿原连接返回并关联本地 Session。 |
 | `ClusterEnvelope` | 已实现 | `cluster.packrequest/packresponse`、`PTYPE_HARBOR`、socket channel 帧 | 借鉴后重构 | GSR Envelope 显式区分 request/response/error、ClusterSessionID、ServiceTarget、Command 和结构化错误；本地 Message 不变成网络包，并在 Transport admission 前校验和 Clone。版本兼容留给未来 framing/握手。 |
@@ -128,7 +130,7 @@ GSR 只用 `SessionID == 0` 或 `SessionID > 0` 区分 Send/Call；Skynet 还把
 | `skynet.timeout()` | 定时器回调 | GSR `After` 只投递 Command；状态变化仍必须在 Service Handler 中发生。 |
 | `skynet.redirect()` | 任意业务 Service 都能指定 source 的公共转发 API | GSR 只在明确受信任的 Runtime/Adapter relay 中转发 Runtime-owned Message；普通业务用 Send/Call，Call 代理发起新的下游 Call。 |
 | `skynet.send()` 返回成功 | 远端业务已执行 | GSR 和 Cluster 都只承诺本地 admission；远端执行和持久化需要 Call 或业务协议确认。 |
-| `PTYPE_*` | GSR 的 CommandID 或错误码 | PTYPE 是 Skynet 的消息类型/协议层标记；GSR Core 用 CommandID，wire 层另有 codec 和 Envelope。 |
+| `PTYPE_*` | GSR 的 CommandID 或错误码 | PTYPE 是 Skynet 的消息类型/协议层标记；GSR 内部区分普通 Command 与客户端消息，分别调用 Handle / HandleClientMessage，不暴露通用 PTYPE 注册表。CommandID 只选择普通 Command 的业务操作。 |
 | 远端 handle `@name`/Harbor 位 | 全局 ServiceID | GSR ServiceID 不携带 Node；使用 NodeID、ServiceName 和 ClusterSessionID 分层表达远端请求。 |
 | `skynet.killthread()` | 可安全强杀 Go goroutine | Go 不能强杀任意 Handler/`OnStop`；GSR 用 context、owner 取消、隔离和残留任务观测。 |
 
