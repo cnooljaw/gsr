@@ -9,3 +9,28 @@ Send 接纳时复制字节快照，调用方之后可以复用缓冲区。队列
 TLS 独立配置：公网直连必须启用 WSS/TLS；Ingress 已终止 TLS 时可在可信内网使用 WS。Plain 不提供握手或 MAC，即使配置 TLS 也仅用于可信内网。两种模式共用 TCP 限额、诊断和关闭流程；公共包不等于已经完成密码协议审计或生产容量验收。
 
 业务 Agent 是 Gate 与 [Protocol](../protocol/README.md) 的组合点。Protocol 理解 Envelope、编解码和分发；Gate 只负责连接与字节传输。认证固定向量留在 Gate；通用 `.proto`、生成类型和生成工具位于同级 `protocol/`。完整接线见 [WebSocket 示例](../examples/websocket-gate/README.md)。
+
+## 职责与代码入口
+
+| 职责 | 代码入口 |
+| --- | --- |
+| 连接生命周期、WebSocket 读循环 | [gate.go](gate.go) |
+| 固定二进制握手、密钥派生、MAC / seq | [handshake.go](handshake.go)、[security.go](security.go) |
+| 有界出站队列、唯一写循环 | [outbound.go](outbound.go) |
+| TCP 连接限额 | [listener.go](listener.go) |
+| ClientSession 字节写回与关闭能力 | [contract.go](contract.go)、[session.go](session.go) |
+| 断线通知与停机收尾 | [gate.go](gate.go)、[lifecycle.go](lifecycle.go) |
+
+Gate 没有额外入站消息队列；入站容量由目标 Agent Mailbox 控制。网络 I/O 只由 Gate 的读写 goroutine 执行，协议与业务处理在 Agent 的串行 runner 上执行。
+
+```text
+入站：WebSocket → Gate 校验 / 剥离安全封装
+      → Runtime.DeliverClientMessage → Agent Mailbox
+      → Agent.HandleClientMessage → Protocol → 业务 Handler
+
+出站：业务 Handler → Protocol 编码 Envelope
+      → ClientSession.Send(字节) → Gate 有界出站队列 → WebSocket
+
+断线：Gate 使 ClientSession 失效
+      → Core Command → Agent.Handle
+```

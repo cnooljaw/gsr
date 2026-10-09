@@ -4,6 +4,20 @@
 
 通用 `.proto`、生成的 Go 类型和目录生成工具分别位于 `proto/`、`gen/` 和 `cmd/`。根目录 Buf 配置同时生成通用类型和 Echo 示例类型。独立业务项目使用目录生成插件时，`module_path=<业务 Go module>` 控制输出相对路径，生成目录仍引用 GSR 的 `protocol/catalog`。
 
+## 职责与代码入口
+
+| 职责 | 代码入口 |
+| --- | --- |
+| Envelope 与通用消息定义 | [proto/gsr/common/v1/common.proto](proto/gsr/common/v1/common.proto) |
+| 生成类型、生成消息目录 | `gen/` |
+| Registry：协议目录与编解码校验 | [registry.go](registry.go) |
+| Dispatcher：手动注册 Handler 与入站分发 | [dispatcher.go](dispatcher.go) |
+| Context：request_id 关联、Response / Push | [context.go](context.go) |
+| ClientSender：编码后字节发送窄接口 | [outbound.go](outbound.go) |
+| 目录生成工具 | `cmd/protoc-gen-gsr-registry/` |
+
+`ClientSession` 不属于此包：它由 Gate 提供，包含字节发送和连接关闭能力。Protocol 只使用其中的 Send，不读取 socket、不关闭连接，也不判断 MAC / seq。Agent 直接传入 ClientSession 即可，Go 接口由方法集合满足，不需要额外 wrapper。
+
 ## Agent 中的协议分发
 
 两个 Dispatcher 处理不同的消息入口，不串联使用：
