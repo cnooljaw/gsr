@@ -389,10 +389,10 @@ func (service *userService) Handle(ctx gsr.CommandContext, command runtime.Comma
 - `After` 到期后由 Runtime 创建普通 Command，但其 `Message.Source` 固定为 `ServiceID(0)`；Timer 的创建者由 Timer owner 记录，不能用 Source 冒充创建者。Handler 必须允许 `CommandContext.Source()` 为零值。
 - 业务调用者不能传入、覆盖或伪造 Source。`ServiceContext` 和 typed client 均不暴露任意 source 参数。
 - Core 内部对普通 Service、Runtime-owned 注入和 Timer 使用不同的显式投递入口；`nil` 不是 `Source == 0` 的业务语义。
-- 外部连接、网关和 Cluster relay 若要进入 Core，优先由 Adapter Service 发起普通投递；跨节点原始来源、连接、trace 和认证信息属于 ClusterEnvelope/Transport metadata，不得塞入 Core Message 或 `ServiceID`。
+- HTTP 与 Cluster 入站适配器通过基础设施 `Runtime.Send/Call` 投递普通 Command，Source 固定为零；Gate 通过 `Runtime.DeliverClientMessage` 直接投递客户端消息，不增加 Adapter Service 或 Gate Mailbox 中转。连接、trace 和认证信息由外层维护，不扩展 Core Message 或 `ServiceID`。
 - Runtime 可以向受信任的 Runtime-owned adapter 提供受控的 Redirect/Relay 能力。该能力转发已有的 Runtime-owned Message 或 relay token，由 Runtime 写入目标和 admission 状态；它不能接收业务任意给出的 ServiceID 作为 Source。是否保留原 Source 只能由该受信任能力的固定策略决定。
 
-这里的 Source 不是可由业务填写的身份字段，而是 Runtime 写入的本地消息来源。普通消息表示当前本地发起者；受控 Redirect 可以在同一 Runtime 内保留已有消息的原始 Source，以支持透明代理或基础设施 relay。跨节点的原始来源仍由 Cluster session 和传输上下文关联，不能把远端 ServiceID 直接当成本地 Source。
+这里的 Source 不是可由业务填写的身份字段，而是 Runtime 写入的本地消息来源。普通消息表示当前本地发起者；受控 Redirect 可以在同一 Runtime 内保留已有消息的原始 Source，以支持透明代理或基础设施 relay。跨节点 Call 的发起方在本地 ClusterPendingCall 中保存 Source，并用 Cluster Session 关联回复；Source 不进入 wire，目标 Handler 看到的是零值，而不是远端 ServiceID。需要业务身份时由业务协议显式表达，不能从零值 Source 推断请求来自 Gate、HTTP 或 Cluster。
 
 ### 5.1 Redirect / Relay 边界
 
@@ -416,72 +416,59 @@ Redirect 首版不承诺 Call 的 session 转移、自动 Reply、重试或 exac
 ### 6.1 本地路径
 
 ```text
-Service.Send(target ServiceID, command, args...)
-  → construct local Message in memory
+self.Send(target ServiceID, command, args...)
+  → 创建内存 Message（Source = 当前 ServiceID）
   → LocalDispatcher
-  → target Mailbox
+  → 目标 Mailbox
+  → Service.Handle
 ```
 
 - 不经过 protobuf/TCP 序列化。
 - 不依赖 Cluster、NodeID 或 Discovery。
 - LocalDispatcher 只查询当前 Runtime 的 Service registry。
+- `self.SendName/CallName` 先查询节点内名称表，再进入同一本地路径。
 
 ### 6.2 Cluster 路径
 
-业务 API 采用 Skynet 风格，不显式传 Source：
+业务通过当前 Service 上下文取得绑定入口，按节点名与 Service 名调用，不显式传 Source：
 
 ```go
-clusterClient.Send(node, ServiceTarget{ServiceID: serviceID}, command, args...)
-clusterClient.Call(ctx, node, ServiceTarget{ServiceID: serviceID}, command, args...)
+cluster := self.Cluster()
+err := cluster.Send(node, "room", command, args...)
+value, err := cluster.Call(ctx, node, "room", command, args...)
 ```
 
-Go 没有可靠的“当前 Service”隐式上下文。Cluster 内部采用显式 Source 的实现入口，但只向业务暴露预先绑定当前 ServiceID 的窄 client：
+框架在 Service 初始化时从 Self ID 绑定底层 ClusterClient；业务不手工构造 Client、配置 Source、组装发送器或等待表。所有 Service 绑定入口共享节点唯一 Cluster 的资源，不需要单独关闭。入口仅在所属 Service 当前回调内使用，不借给其它 Service 或异步任务。
 
-```go
-// Cluster 内部入口，不向业务包暴露；source 由绑定 client 或受信任 relay 提供。
-sendFrom(source, node, target, command, args...)
-callFrom(source, node, target, command, args...)
-
-// Service 初始化时绑定一次 source，业务调用时无需重复传入。
-clusterClient, err := cluster.NewClusterClient(cluster.ClusterClientConfig{
-	Source:       serviceContext.Self(),
-	Senders:      senderResolver,
-	Codec:        payloadCodec,
-	PendingCalls: clusterCallRegistry,
-	MaxCallWait:  5 * time.Second,
-})
-```
-
-禁止使用包级全局变量、goroutine-local 或调用栈猜测来寻找“当前 ServiceID”。绑定后的 client 不允许业务覆盖 Source；只有明确受信任的 Cluster/Adapter relay 才能使用受控转发能力。
+Go 没有可靠的“当前 Service”隐式上下文；禁止使用包级全局变量、goroutine-local 或调用栈猜测来源。绑定使用当前 Service 的 Self ID，不继承收到消息的 Source。
 
 执行路径：
 
 ```text
-origin Service
-  → local ClusterSender/Transport
-  → encode ClusterEnvelope
-  → wire
-  → remote ClusterAgent/Transport
-  → decode ClusterEnvelope
-  → construct local Message in memory
-  → remote LocalDispatcher
-  → remote ServiceID
+发起 Service：self.Cluster().Send/Call
+  → ClusterClient 编码参数、构造 ClusterEnvelope
+  → 每目标节点唯一 NodeSender 的有界出站队列
+  → outboundPeer / streamConnection 编码帧并写入 TCP
+  → 目标 inboundConnection 读取帧
+  → localRequestAdapter 解码参数、按名称解析当前 ServiceID
+  → Runtime.Send/Call（Source = 0）
+  → 目标 Mailbox → Service.Handle
 ```
 
 - `NodeID` 由 Cluster 用来选择连接，不进入 Core ServiceID。
-- 网络包中的目标 ServiceID 是远端 Runtime 的本地地址。
+- 业务使用 ServiceName；目标节点每次解析当前 ServiceID，不缓存旧实例映射。底层 ServiceTarget 也允许直接指定远端 Runtime 的局部 ServiceID。
 - ClusterEnvelope 是 Cluster/Transport 自己的编码结构，不复用 Core Message 作为 wire schema。
 - ClusterEnvelope 必须显式携带 request、response 或 error 的 frame kind；Session 只用于关联，不能单独判断消息方向。
-- 远端 relay 把 ClusterEnvelope 解码为新的本地 Message，再通过 LocalDispatcher 投递。
-- ClusterSessionID 由 ClusterSender/ClusterAgent 管理，不要求与本地 Core SessionID 相同。
+- 入站适配器把请求转换为新的本地 Message；它是私有基础设施组件，不是另一个业务 Service。
+- 发起方的 ClusterCallRegistry 分配 ClusterSessionID 并管理远程等待；目标节点 Runtime.Call 使用自己的 Core SessionID，两者不要求相同。Call 结果沿入站原连接返回，发起方据 ClusterSessionID 完成等待，不进入发起 Service 的 Mailbox。
 - 本地消息不创建 ClusterEnvelope，也不为了统一表象执行远程序列化。
 - 数字形式的远端 ServiceID 只在当前远端 Runtime 生命周期内有效；断线、重连或 Runtime 重启后必须通过外层名称或 Discovery 重新解析。
 - GSR 不把 Epoch、Lease 或 Generation 加入 ServiceID/远端地址，也不由 Runtime 判断业务资源的唯一所有权、一致性或过期。Runtime 只负责路由、投递和连接恢复；资源 fencing、幂等、RequestID、补偿和业务过期判断由拥有该语义的业务/外层模块负责。
-- `clusterClient.Send` 返回 `error`。返回 nil 只表示请求已被本地 Cluster 边界接受或入队，不表示远端 Handler 已执行，更不表示持久化成功。
+- `cluster.Send` 返回 `error`。返回 nil 只表示请求已被本地 Cluster 边界接受或入队，不表示远端 Handler 已执行，更不表示持久化成功。
 - 本地没有可用路由/sender、编码或参数校验失败、出站队列满以及 Cluster 边界已关闭，都发生在 admission 前，必须由 `Send` 立即返回稳定错误。
 - admission 成功后的节点不可达、断线、网络或 I/O 错误不能追溯修改 `Send` 的 nil 返回；它们由 NodeSender 发布本地基础设施诊断。需要确认远端处理结果时使用 Call，并为有歧义的网络失败设计 RequestID 与幂等。
 
-Cluster 0 先提供独立于 Runtime 的值边界和可替换 Transport：
+以下是底层基础设施的值边界与 Transport 接口，不是普通业务的组装步骤：
 
 ```go
 type ServiceTarget struct {

@@ -35,7 +35,7 @@
 - **SessionID**：`uint64` 形式的 Core 本地请求关联号；零表示 Send、不需要 Reply，非零表示 Call、等待一次 Reply。它只负责关联，在当前 Runtime 内单调分配且不回绕复用。
 - **TimerID**：`uint64` 形式的 Runtime 局部 Timer 标识，只在当前 Runtime 生命周期内有效；零值无效，已发放的 ID 不回绕复用。
 - **CommandID**：`uint32` 形式的业务命令标识，与协议字段保持同宽以兼容现有命令值；由业务/协议包维护静态常量或生成代码。Runtime 不分配、不回收，也不从它推断 Service 能力。一个 CommandID 对应的 typed Handler 参数数量和类型固定。
-- **Source**：由 Runtime 写入本地 Message 的来源字段。普通 Service Send/Call 使用当前发起 ServiceID；宿主/基础设施通过 Runtime.Send/Runtime.Call 注入的消息、Gate 投递的客户端消息使用 `ServiceID(0)`；Timer 触发的 Command 也使用零值，创建者由 Timer owner 表达。受控 Redirect 可以按固定 relay 策略保留已有 Message 的原始 Source，但业务不能传入或伪造任意值。跨节点原始来源由 ClusterSessionID 和传输上下文关联，不把节点身份编码进 ServiceID。
+- **Source**：由 Runtime 写入本地 Message 的来源字段。普通 Service Send/Call 使用当前发起 ServiceID；宿主/基础设施通过 Runtime.Send/Runtime.Call 注入的消息、Gate 投递的客户端消息使用 `ServiceID(0)`；Timer 触发的 Command 也使用零值，创建者由 Timer owner 表达。受控 Redirect 可以按固定 relay 策略保留已有 Message 的原始 Source，但业务不能传入或伪造任意值。跨节点 Call 的 Source 只保存在发起方本地 ClusterPendingCall 中，回复通过 ClusterSessionID 关联；Source 不进入 wire，目标 Handler 看到的是零值，不是远端 Service 身份。
 - **Message**：Core 内存中的 Runtime-owned 本地消息对象。普通消息承载 Source、Target、Session、Command 和 Args；客户端消息由私有消息类型标记并承载不透明的 Protobuf Envelope 字节。Send/Call 共享普通消息路径，客户端消息不会伪装成 Core Command。
 - **Dispatcher**：普通业务 Service 的默认命令分发方式，也是 `gsr` 应用层的可选能力。它在构造时复制并校验 `CommandID -> typed Handler` 表，运行时绑定参数并调用；它不是 Runtime Registry，也不接受运行期注册。只有经真实压测确认的个别热点 Command 才在 Service.Handle 中手写快速分支，其余命令继续交给 Dispatcher。
 - **Command 参数类型边界**：本地调用保留 Go 类型，Dispatcher 不做隐式转换；默认 Cluster codec 解码为 int64、uint64、float64、[]any、map[string]any 等规范类型。跨节点 Handler 按规范类型声明输入与可编码输出，业务结构体和具名类型在边界显式转换；统一 Send/Call 模型不代表任意 Go 类型原样跨网传递。
