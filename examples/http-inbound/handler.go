@@ -17,7 +17,7 @@ func roomCountHandler(local *runtime.Runtime, roomID runtime.ServiceID) http.Han
 		defer cancel()
 		value, err := local.Call(ctx, roomID, roomCountCommand)
 		if err != nil {
-			if errors.Is(err, context.DeadlineExceeded) {
+			if errors.Is(err, runtime.ErrCallTimeout) || errors.Is(err, context.DeadlineExceeded) {
 				http.Error(writer, http.StatusText(http.StatusGatewayTimeout), http.StatusGatewayTimeout)
 				return
 			}

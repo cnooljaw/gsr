@@ -23,6 +23,8 @@ HTTP Handler → HTTPIngress.CallName → 本地 Service
 
 `admin_service.go` 的 `dashboardService` 在自己的 Handler 内用 `self.CallName` 查询用户，再用 `self.Cluster().Call` 调用远端 `rooms`。HTTP 请求的 Source 为零；业务 Service 发起后续调用时，Source 是它自己的 ServiceID。HTTP goroutine 不冒充业务 Service，也不直接读取 Service 状态。
 
+HTTP 示例将请求 deadline 和稳定的 `runtime.ErrCallTimeout` 都映射为 504，其余调用失败返回安全的 503，不透传内部错误文本。Service 转交错误及 Cluster wire 只保留 Class/Code 和安全 Message，不保证保留 `context.DeadlineExceeded` 错误链；错误映射不能只检查 Go context 错误。
+
 `admin_test.go` 验证上述真实业务接线；其中远端节点是底层夹具。路由在启动时构造，将来确有变更需求时整体重建并替换，不添加逐条动态增删接口或 HTTP Agent 池。
 
 ## 底层边界验证

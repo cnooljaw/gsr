@@ -73,25 +73,37 @@ func TestRoomCountHTTPHandlerHidesServiceError(t *testing.T) {
 	}
 }
 
-// TestRoomCountHTTPHandlerBoundsCall 验证本地 Service 未及时回复时 HTTP 入口有界返回 504。
+// 验证本地等待超时或 Service 转交稳定超时错误时，HTTP 入口都返回 504。
 func TestRoomCountHTTPHandlerBoundsCall(t *testing.T) {
-	local := startInboundRuntime(t, 50*time.Millisecond)
-	release := make(chan struct{})
-	roomID, err := local.CreateService(context.Background(), &waitingRoomService{release: release})
-	if err != nil {
-		t.Fatalf("CreateService(waiting room) error = %v", err)
-	}
-	server := newRoomCountServer(t, local, roomID)
-	t.Cleanup(func() { close(release) })
+	for _, forwarded := range []bool{false, true} {
+		name := "local wait"
+		if forwarded {
+			name = "forwarded timeout"
+		}
+		t.Run(name, func(t *testing.T) {
+			local := startInboundRuntime(t, 50*time.Millisecond)
+			release := make(chan struct{})
+			var service runtime.Service = &waitingRoomService{release: release}
+			if forwarded {
+				service = &failingRoomService{err: runtime.ErrCallTimeout}
+			}
+			roomID, err := local.CreateService(context.Background(), service)
+			if err != nil {
+				t.Fatalf("CreateService(room) error = %v", err)
+			}
+			server := newRoomCountServer(t, local, roomID)
+			t.Cleanup(func() { close(release) })
 
-	client := &http.Client{Timeout: time.Second}
-	response, err := client.Get("http://" + server.Addr().String() + "/rooms/count")
-	if err != nil {
-		t.Fatalf("GET /rooms/count error = %v", err)
-	}
-	defer response.Body.Close()
-	if response.StatusCode != http.StatusGatewayTimeout {
-		t.Fatalf("GET /rooms/count status = %d, want 504", response.StatusCode)
+			client := &http.Client{Timeout: time.Second}
+			response, err := client.Get("http://" + server.Addr().String() + "/rooms/count")
+			if err != nil {
+				t.Fatalf("GET /rooms/count error = %v", err)
+			}
+			defer response.Body.Close()
+			if response.StatusCode != http.StatusGatewayTimeout {
+				t.Fatalf("GET /rooms/count status = %d, want 504", response.StatusCode)
+			}
+		})
 	}
 }
 
@@ -133,13 +145,18 @@ func startInboundRuntime(t *testing.T, maxCallWait time.Duration) *runtime.Runti
 	return local
 }
 
-type failingRoomService struct{}
+type failingRoomService struct {
+	err error
+}
 
 func (service *failingRoomService) OnStart(_ context.Context, _ runtime.ServiceContext) error {
 	return nil
 }
 
 func (service *failingRoomService) Handle(_ runtime.CommandContext, _ runtime.CommandID, _ ...any) (any, error) {
+	if service.err != nil {
+		return nil, service.err
+	}
 	return nil, errors.New("private database detail")
 }
 

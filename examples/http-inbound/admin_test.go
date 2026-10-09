@@ -6,6 +6,7 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -15,7 +16,7 @@ import (
 	"github.com/cnooljaw/gsr/runtime"
 )
 
-// 验证 MainService 开启的多条 REST 路由调用本地 Service，业务 Service 再汇总远端结果。
+// 验证 REST 路由调用本地 Service 并汇总远端结果，远端稳定超时错误映射为 HTTP 504。
 func TestAdminHTTPRoutesCallLocalAndRemoteServices(t *testing.T) {
 	remote, err := runtime.NewRuntime(runtime.Config{})
 	if err != nil {
@@ -33,6 +34,9 @@ func TestAdminHTTPRoutesCallLocalAndRemoteServices(t *testing.T) {
 	if err != nil {
 		t.Fatalf("create remote room Service: %v", err)
 	}
+	// 仅用于测试阶段间切换目标，跨 goroutine 发布名称映射时不共享可变普通变量。
+	var currentRoom atomic.Uint64
+	currentRoom.Store(uint64(roomID))
 	inbound, err := cluster.NewCluster(cluster.ClusterConfig{})
 	if err != nil {
 		t.Fatalf("new inbound Cluster: %v", err)
@@ -49,7 +53,7 @@ func TestAdminHTTPRoutesCallLocalAndRemoteServices(t *testing.T) {
 		Address: "127.0.0.1:0",
 		ResolveService: func(name cluster.ServiceName) (runtime.ServiceID, error) {
 			if name == "rooms" {
-				return roomID, nil
+				return runtime.ServiceID(currentRoom.Load()), nil
 			}
 			return 0, runtime.ErrServiceNotFound
 		},
@@ -132,6 +136,22 @@ func TestAdminHTTPRoutesCallLocalAndRemoteServices(t *testing.T) {
 		} else if body.ID != 7 || body.Banned != step.banned {
 			t.Fatalf("%s response = %+v", step.path, body)
 		}
+	}
+
+	// 复用同一条 HTTP → Service → Cluster 链路，验证 wire 保留的稳定错误身份。
+	timedOutRoom, err := remote.CreateService(context.Background(), &failingRoomService{err: runtime.ErrCallTimeout})
+	if err != nil {
+		t.Fatalf("create timed out room Service: %v", err)
+	}
+	currentRoom.Store(uint64(timedOutRoom))
+	response, err := client.Get(baseURL + "/dashboard/7")
+	if err != nil {
+		t.Fatalf("request remote timeout: %v", err)
+	}
+	defer response.Body.Close()
+	body, err := io.ReadAll(response.Body)
+	if err != nil || response.StatusCode != http.StatusGatewayTimeout || string(body) != http.StatusText(http.StatusGatewayTimeout)+"\n" {
+		t.Fatalf("remote timeout: status=%d body=%q error=%v", response.StatusCode, body, err)
 	}
 }
 

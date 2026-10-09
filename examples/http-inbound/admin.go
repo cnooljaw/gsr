@@ -45,7 +45,7 @@ func callAdminService(
 	value, err := in.CallName(ctx, target, command, id)
 	if err != nil {
 		status := http.StatusServiceUnavailable
-		if errors.Is(err, context.DeadlineExceeded) {
+		if errors.Is(err, runtime.ErrCallTimeout) || errors.Is(err, context.DeadlineExceeded) {
 			status = http.StatusGatewayTimeout
 		}
 		http.Error(writer, http.StatusText(status), status)
