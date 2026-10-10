@@ -24,7 +24,7 @@ func (sender *recordedSender) Send(frame []byte) error {
 	return sender.sendErr
 }
 
-func testRegistry(t *testing.T) *Registry {
+func testRegistry(t testing.TB) *Registry {
 	t.Helper()
 	registry, err := NewRegistry(
 		echopb.MessageCatalogGsrExampleEchoV1Echo,
