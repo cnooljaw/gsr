@@ -21,6 +21,7 @@ type protocolGateAgent struct {
 	protocolDispatcher     *protocol.Dispatcher[runtime.CommandContext]
 	disconnected           chan struct{}
 	omitEchoRequestHandler bool
+	panicOnEcho            bool
 	stopOnce               sync.Once
 	echoStarted            chan struct{}
 	releaseEcho            chan struct{}
@@ -160,6 +161,9 @@ func (agent *protocolGateAgent) HandleClientMessage(self runtime.CommandContext,
 }
 
 func (agent *protocolGateAgent) onEcho(_ runtime.CommandContext, context protocol.Context, request *echopb.EchoRequest) error {
+	if agent.panicOnEcho {
+		panic("protocol Handler failed")
+	}
 	if agent.echoStarted != nil {
 		agent.echoBlockOnce.Do(func() {
 			close(agent.echoStarted)
@@ -184,6 +188,70 @@ func (agent *protocolGateAgent) onEchoNotify(_ runtime.CommandContext, context p
 
 func (agent *protocolGateAgent) OnStop(context.Context) error {
 	return agent.client.Close()
+}
+
+// 验证客户端协议反射 Handler panic 只停止当前 Agent 并关闭其连接，健康连接仍可响应。
+func TestMACGateContainsProtocolHandlerPanic(t *testing.T) {
+	created := 0 // 仅由 Gate runner 中的构造回调访问。
+	local, gate, clientTLS := startConfiguredProductionGate(t, runtime.Config{
+		MailboxCapacity: 8,
+		ShutdownTimeout: 2 * time.Second,
+	}, 2, time.Second, 1<<20, 64<<10, func(client ClientSession) runtime.Service {
+		created++
+		return &protocolGateAgent{
+			client:       client,
+			disconnected: make(chan struct{}),
+			panicOnEcho:  created == 1,
+		}
+	})
+	failedConnection, failedKey := dialAuthenticatedTestClient(t, gate, clientTLS)
+	defer failedConnection.Close()
+	healthyConnection, healthyKey := dialAuthenticatedTestClient(t, gate, clientTLS)
+	defer healthyConnection.Close()
+
+	requestBytes, err := proto.Marshal(&commonv1.Envelope{
+		MsgId:     uint32(echopb.MsgId_C2S_ECHO_REQUEST),
+		RequestId: 1,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := failedConnection.WriteMessage(websocket.BinaryMessage,
+		makeAuthenticatedTestFrame(t, failedKey[:], 1, requestBytes)); err != nil {
+		t.Fatalf("WriteMessage(failing request) error = %v", err)
+	}
+	_, _, err = readTestBinaryMessage(t, failedConnection)
+	var closeError *websocket.CloseError
+	if !errors.As(err, &closeError) {
+		t.Fatalf("panicked Agent connection error = %v, want WebSocket close", err)
+	}
+
+	if err := healthyConnection.WriteMessage(websocket.BinaryMessage,
+		makeAuthenticatedTestFrame(t, healthyKey[:], 1, requestBytes)); err != nil {
+		t.Fatalf("WriteMessage(healthy request) error = %v", err)
+	}
+	_, responseBytes, err := readTestBinaryMessage(t, healthyConnection)
+	if err != nil {
+		t.Fatalf("ReadMessage(healthy response) error = %v", err)
+	}
+	var envelope commonv1.Envelope
+	if err := proto.Unmarshal(responseBytes, &envelope); err != nil {
+		t.Fatal(err)
+	}
+	if envelope.GetMsgId() != uint32(echopb.MsgId_S2C_ECHO_RESPONSE) || envelope.GetRequestId() != 1 {
+		t.Fatalf("healthy response = %v, want EchoResponse with request_id 1", &envelope)
+	}
+	var response echopb.EchoResponse
+	if err := proto.Unmarshal(envelope.GetPayload(), &response); err != nil {
+		t.Fatal(err)
+	}
+	if response.GetCode() != echopb.EchoResultCode_ECHO_RESULT_OK {
+		t.Fatalf("healthy response code = %v, want OK", response.GetCode())
+	}
+	inspection := local.Inspect()
+	if inspection.State != runtime.RuntimeRunning || inspection.Metrics.Panics != 1 {
+		t.Fatalf("Runtime inspection = %#v, want Running with exactly one contained panic", inspection)
+	}
 }
 
 // TestMACGateKeepsConnectionAfterClientRequestTimeout 验证客户端放弃首个等待后可忽略迟到响应，并在同一连接完成新请求。
