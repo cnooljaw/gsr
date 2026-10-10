@@ -111,8 +111,8 @@ func TestOpenGateConnectsApplicationAgent(t *testing.T) {
 }
 
 type applicationGateAgent struct {
-	client     gate.ClientSession
-	dispatcher *protocol.Dispatcher[CommandContext]
+	client             gate.ClientSession
+	protocolDispatcher *protocol.Dispatcher[CommandContext]
 }
 
 func (agent *applicationGateAgent) OnStart(context.Context, ServiceContext) error {
@@ -120,14 +120,13 @@ func (agent *applicationGateAgent) OnStart(context.Context, ServiceContext) erro
 	if err != nil {
 		return err
 	}
-	dispatcher, err := protocol.NewDispatcher[CommandContext](registry, agent.client)
+	dispatcher, err := protocol.NewDispatcher[CommandContext](registry, agent.client, map[uint32]any{
+		uint32(echopb.MsgId_C2S_ECHO_REQUEST): agent.onEcho,
+	})
 	if err != nil {
 		return err
 	}
-	if err := protocol.Register(dispatcher, agent.onEcho); err != nil {
-		return err
-	}
-	agent.dispatcher = dispatcher
+	agent.protocolDispatcher = dispatcher
 	return nil
 }
 
@@ -136,7 +135,7 @@ func (agent *applicationGateAgent) Handle(CommandContext, runtime.CommandID, ...
 }
 
 func (agent *applicationGateAgent) HandleClientMessage(self CommandContext, frame []byte) error {
-	return agent.dispatcher.HandleFrame(self, frame)
+	return agent.protocolDispatcher.HandleFrame(self, frame)
 }
 
 func (agent *applicationGateAgent) onEcho(self CommandContext, ctx protocol.Context, request *echopb.EchoRequest) error {

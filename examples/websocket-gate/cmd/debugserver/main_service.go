@@ -10,7 +10,7 @@ import (
 	"github.com/cnooljaw/gsr/runtime"
 )
 
-// mainService 打开所选 Gate，连接 Agent 由 Gate 按需创建。
+// mainService 创建命名业务 Service 并打开 Gate，连接 Agent 由 Gate 按需创建。
 type mainService struct {
 	options serverOptions
 }
@@ -20,8 +20,15 @@ func (service *mainService) OnStart(ctx context.Context, self gsr.ServiceContext
 	if err != nil {
 		return err
 	}
+	echoID, err := self.CreateService(ctx, newEchoService())
+	if err != nil {
+		return err
+	}
+	if err := self.Register(echoServiceName, echoID); err != nil {
+		return err
+	}
 	newAgent := func(client gate.ClientSession) gsr.Service {
-		return &echoAgent{client: client, registry: registry}
+		return newEchoAgent(client, registry)
 	}
 	config := gsr.GateConfig{
 		Protocol:              gate.ProtocolPlain,

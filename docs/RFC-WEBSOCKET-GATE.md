@@ -51,7 +51,7 @@ C2S_ECHO_REQUEST = 1001 [
 ];
 ```
 
-该映射由 `protoc-gen-gsr-registry` 生成 Go 协议目录；业务侧只需逐步注册已实现的类型，例如 `protocol.Register(dispatcher, agent.OnEcho)`。Handler 注册按 Protobuf payload 类型定位 msg_id，不需要再复制一份 ID 到业务注册代码。
+该映射由 `protoc-gen-gsr-registry` 生成 Go 协议目录；业务侧在 Dispatcher 构造时提供显式 `msg_id → 强类型 Handler` 表，只绑定已实现的业务函数。编号与 payload 类型仍由 `.proto` 定义，构造器核对 Handler 参数类型，不在表中重复声明方向、消息种类或 payload。Dispatcher 复制并校验表后只读，不提供逐条 Register；静态表可用 `protocol.MustDispatcher` fail-fast，逐消息反射调用不改变已有响应与错误契约。
 
 示例协议表：
 

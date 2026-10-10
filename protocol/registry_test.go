@@ -35,9 +35,9 @@ func testRegistry(t *testing.T) *Registry {
 	return registry
 }
 
-func testDispatcher(t *testing.T, registry *Registry, sender *recordedSender) *Dispatcher[string] {
+func testDispatcher(t *testing.T, registry *Registry, sender *recordedSender, handlers map[uint32]any) *Dispatcher[string] {
 	t.Helper()
-	dispatcher, err := NewDispatcher[string](registry, sender)
+	dispatcher, err := NewDispatcher[string](registry, sender, handlers)
 	if err != nil {
 		t.Fatalf("NewDispatcher() error = %v", err)
 	}
@@ -58,17 +58,88 @@ func TestNewDispatcherRejectsMissingDependencies(t *testing.T) {
 		{name: "typed nil sender", registry: registry, sender: typedNil},
 	} {
 		t.Run(testCase.name, func(t *testing.T) {
-			if _, err := NewDispatcher[string](testCase.registry, testCase.sender); err == nil {
+			if _, err := NewDispatcher[string](testCase.registry, testCase.sender, nil); err == nil {
 				t.Fatal("missing dependency accepted")
 			}
 		})
 	}
 }
 
+// 验证显式 Handler 表在构造时拒绝未知编号、错误方向、非法签名和不匹配的 payload。
+func TestNewDispatcherValidatesHandlerTable(t *testing.T) {
+	valid := func(string, Context, *echopb.EchoRequest) error { return nil }
+	var typedNil func(string, Context, *echopb.EchoRequest) error
+	for _, testCase := range []struct {
+		name    string
+		id      uint32
+		handler any
+		want    error
+	}{
+		{name: "zero id", id: 0, handler: valid, want: ErrUnknownMessageID},
+		{name: "unknown id", id: 7777, handler: valid, want: ErrUnknownMessageID},
+		{name: "outbound id", id: 1002, handler: valid, want: ErrWrongDirection},
+		{name: "nil handler", id: 1001},
+		{name: "typed nil handler", id: 1001, handler: typedNil},
+		{name: "not a function", id: 1001, handler: 42},
+		{name: "wrong scope", id: 1001, handler: func(int, Context, *echopb.EchoRequest) error { return nil }},
+		{name: "wrong context", id: 1001, handler: func(string, *Context, *echopb.EchoRequest) error { return nil }},
+		{name: "wrong payload", id: 1001, handler: func(string, Context, *echopb.EchoNotify) error { return nil }, want: ErrPayloadTypeMismatch},
+		{name: "generic payload", id: 1001, handler: func(string, Context, proto.Message) error { return nil }, want: ErrPayloadTypeMismatch},
+		{name: "missing argument", id: 1001, handler: func(string, Context) error { return nil }},
+		{name: "variadic payload", id: 1001, handler: func(string, Context, ...*echopb.EchoRequest) error { return nil }},
+		{name: "missing error", id: 1001, handler: func(string, Context, *echopb.EchoRequest) {}},
+		{name: "wrong return type", id: 1001, handler: func(string, Context, *echopb.EchoRequest) string { return "" }},
+		{name: "extra result", id: 1001, handler: func(string, Context, *echopb.EchoRequest) (int, error) { return 0, nil }},
+	} {
+		t.Run(testCase.name, func(t *testing.T) {
+			dispatcher, err := NewDispatcher[string](testRegistry(t), &recordedSender{}, map[uint32]any{testCase.id: testCase.handler})
+			if err == nil || dispatcher != nil {
+				t.Fatalf("invalid Handler table accepted: %v, %v", dispatcher, err)
+			}
+			if testCase.want != nil && !errors.Is(err, testCase.want) {
+				t.Fatalf("error = %v, want %v", err, testCase.want)
+			}
+		})
+	}
+}
+
+// 验证构造器复制多 Handler 表，外部修改不影响分发，Must 构造失败只表达接线错误。
+func TestMustDispatcherCopiesHandlerTable(t *testing.T) {
+	requestCalls, notifyCalls := 0, 0
+	handlers := map[uint32]any{
+		1001: func(_ string, ctx Context, _ *echopb.EchoRequest) error {
+			requestCalls++
+			return ctx.Response(1002, &echopb.EchoResponse{})
+		},
+		1003: func(string, Context, *echopb.EchoNotify) error {
+			notifyCalls++
+			return nil
+		},
+	}
+	dispatcher := MustDispatcher[string](testRegistry(t), &recordedSender{}, handlers)
+	delete(handlers, 1001)
+	handlers[1003] = nil
+	if err := dispatcher.HandleFrame("", marshalEnvelope(t, &commonv1.Envelope{MsgId: 1001, RequestId: 1})); err != nil {
+		t.Fatal(err)
+	}
+	if err := dispatcher.HandleFrame("", marshalEnvelope(t, &commonv1.Envelope{MsgId: 1003})); err != nil {
+		t.Fatal(err)
+	}
+	if requestCalls != 1 || notifyCalls != 1 {
+		t.Fatalf("Handler calls = %d, %d, want 1, 1", requestCalls, notifyCalls)
+	}
+	defer func() {
+		if recover() == nil {
+			t.Error("invalid static Handler table did not panic")
+		}
+	}()
+	MustDispatcher[string](testRegistry(t), &recordedSender{}, map[uint32]any{1001: nil})
+}
+
 // 验证普通 Command 等协议 Handler 之外的业务流程也能通过 Dispatcher 发送强类型 Push。
 func TestDispatcherPushUsesConstructorRegistry(t *testing.T) {
 	sender := &recordedSender{}
-	dispatcher := testDispatcher(t, testRegistry(t), sender)
+	dispatcher := testDispatcher(t, testRegistry(t), sender, nil)
 	if err := dispatcher.Push(uint32(echopb.MsgId_S2C_ECHO_PUSH), &echopb.EchoPush{Text: "outside handler"}); err != nil {
 		t.Fatal(err)
 	}
@@ -211,17 +282,16 @@ func TestNewRegistryRejectsAmbiguousEntries(t *testing.T) {
 func TestTypedHandlerReturnsResponse(t *testing.T) {
 	registry := testRegistry(t)
 	sender := &recordedSender{}
-	dispatcher := testDispatcher(t, registry, sender)
 	var receivedScopes []string
-	if err := Register(dispatcher, func(self string, context Context, request *echopb.EchoRequest) error {
-		receivedScopes = append(receivedScopes, self)
-		return context.Response(
-			uint32(echopb.MsgId_S2C_ECHO_RESPONSE),
-			&echopb.EchoResponse{Text: request.GetText()},
-		)
-	}); err != nil {
-		t.Fatalf("Register() error = %v", err)
-	}
+	dispatcher := testDispatcher(t, registry, sender, map[uint32]any{
+		uint32(echopb.MsgId_C2S_ECHO_REQUEST): func(self string, context Context, request *echopb.EchoRequest) error {
+			receivedScopes = append(receivedScopes, self)
+			return context.Response(
+				uint32(echopb.MsgId_S2C_ECHO_RESPONSE),
+				&echopb.EchoResponse{Text: request.GetText()},
+			)
+		},
+	})
 	payload, err := proto.Marshal(&echopb.EchoRequest{Text: "typed"})
 	if err != nil {
 		t.Fatalf("marshal EchoRequest: %v", err)
@@ -254,21 +324,33 @@ func TestTypedHandlerReturnsResponse(t *testing.T) {
 	if len(receivedScopes) != 2 || receivedScopes[0] != "first-agent-context" || receivedScopes[1] != "next-agent-context" {
 		t.Fatalf("handler contexts = %v, want each invocation's context", receivedScopes)
 	}
+	t.Run("nil interface scope", func(t *testing.T) {
+		dispatcher := MustDispatcher[any](registry, sender, map[uint32]any{
+			uint32(echopb.MsgId_C2S_ECHO_REQUEST): func(self any, ctx Context, request *echopb.EchoRequest) error {
+				if self != nil {
+					t.Fatalf("Scope = %v, want nil", self)
+				}
+				return ctx.Response(uint32(echopb.MsgId_S2C_ECHO_RESPONSE), &echopb.EchoResponse{Text: request.Text})
+			},
+		})
+		if err := dispatcher.HandleFrame(nil, frame); err != nil {
+			t.Fatal(err)
+		}
+	})
 }
 
 // TestResponseRejectsPayloadTypeMismatch 验证 Response 的 msg_id 与 Protobuf 类型不匹配时不会发送错误载荷。
 func TestResponseRejectsPayloadTypeMismatch(t *testing.T) {
 	registry := testRegistry(t)
 	sender := &recordedSender{}
-	dispatcher := testDispatcher(t, registry, sender)
-	if err := Register(dispatcher, func(_ string, context Context, _ *echopb.EchoRequest) error {
-		return context.Response(
-			uint32(echopb.MsgId_S2C_ECHO_RESPONSE),
-			&echopb.EchoNotify{Text: "wrong payload type"},
-		)
-	}); err != nil {
-		t.Fatalf("Register() error = %v", err)
-	}
+	dispatcher := testDispatcher(t, registry, sender, map[uint32]any{
+		uint32(echopb.MsgId_C2S_ECHO_REQUEST): func(_ string, context Context, _ *echopb.EchoRequest) error {
+			return context.Response(
+				uint32(echopb.MsgId_S2C_ECHO_RESPONSE),
+				&echopb.EchoNotify{Text: "wrong payload type"},
+			)
+		},
+	})
 	frame := marshalEnvelope(t, &commonv1.Envelope{
 		MsgId:     uint32(echopb.MsgId_C2S_ECHO_REQUEST),
 		RequestId: 57,
@@ -299,18 +381,17 @@ func TestMaximumRequestIDReturnsUnchanged(t *testing.T) {
 	const maximumRequestID uint32 = ^uint32(0)
 	registry := testRegistry(t)
 	sender := &recordedSender{}
-	dispatcher := testDispatcher(t, registry, sender)
-	if err := Register(dispatcher, func(_ string, context Context, _ *echopb.EchoRequest) error {
-		if got := context.RequestID(); got != maximumRequestID {
-			return errors.New("Handler received a changed request_id")
-		}
-		return context.Response(
-			uint32(echopb.MsgId_S2C_ECHO_RESPONSE),
-			&echopb.EchoResponse{Text: "maximum request_id"},
-		)
-	}); err != nil {
-		t.Fatalf("Register() error = %v", err)
-	}
+	dispatcher := testDispatcher(t, registry, sender, map[uint32]any{
+		uint32(echopb.MsgId_C2S_ECHO_REQUEST): func(_ string, context Context, _ *echopb.EchoRequest) error {
+			if got := context.RequestID(); got != maximumRequestID {
+				return errors.New("Handler received a changed request_id")
+			}
+			return context.Response(
+				uint32(echopb.MsgId_S2C_ECHO_RESPONSE),
+				&echopb.EchoResponse{Text: "maximum request_id"},
+			)
+		},
+	})
 	frame := marshalEnvelope(t, &commonv1.Envelope{
 		MsgId:     uint32(echopb.MsgId_C2S_ECHO_REQUEST),
 		RequestId: maximumRequestID,
@@ -330,15 +411,14 @@ func TestMaximumRequestIDReturnsUnchanged(t *testing.T) {
 func TestTypedNotificationCanPush(t *testing.T) {
 	registry := testRegistry(t)
 	sender := &recordedSender{}
-	dispatcher := testDispatcher(t, registry, sender)
-	if err := Register(dispatcher, func(_ string, context Context, notification *echopb.EchoNotify) error {
-		return context.Push(
-			uint32(echopb.MsgId_S2C_ECHO_PUSH),
-			&echopb.EchoPush{Text: notification.GetText()},
-		)
-	}); err != nil {
-		t.Fatalf("Register() error = %v", err)
-	}
+	dispatcher := testDispatcher(t, registry, sender, map[uint32]any{
+		uint32(echopb.MsgId_C2S_ECHO_NOTIFY): func(_ string, context Context, notification *echopb.EchoNotify) error {
+			return context.Push(
+				uint32(echopb.MsgId_S2C_ECHO_PUSH),
+				&echopb.EchoPush{Text: notification.GetText()},
+			)
+		},
+	})
 	payload, err := proto.Marshal(&echopb.EchoNotify{Text: "notify"})
 	if err != nil {
 		t.Fatalf("marshal EchoNotify: %v", err)
@@ -371,15 +451,14 @@ func TestTypedNotificationCanPush(t *testing.T) {
 func TestNotificationCannotPushResponseMessage(t *testing.T) {
 	registry := testRegistry(t)
 	sender := &recordedSender{}
-	dispatcher := testDispatcher(t, registry, sender)
-	if err := Register(dispatcher, func(_ string, context Context, _ *echopb.EchoNotify) error {
-		return context.Push(
-			uint32(echopb.MsgId_S2C_ECHO_RESPONSE),
-			&echopb.EchoResponse{},
-		)
-	}); err != nil {
-		t.Fatalf("Register() error = %v", err)
-	}
+	dispatcher := testDispatcher(t, registry, sender, map[uint32]any{
+		uint32(echopb.MsgId_C2S_ECHO_NOTIFY): func(_ string, context Context, _ *echopb.EchoNotify) error {
+			return context.Push(
+				uint32(echopb.MsgId_S2C_ECHO_RESPONSE),
+				&echopb.EchoResponse{},
+			)
+		},
+	})
 	frame := marshalEnvelope(t, &commonv1.Envelope{
 		MsgId: uint32(echopb.MsgId_C2S_ECHO_NOTIFY),
 	})
@@ -395,7 +474,7 @@ func TestNotificationCannotPushResponseMessage(t *testing.T) {
 func TestUnknownMessageReturnsGenericError(t *testing.T) {
 	registry := testRegistry(t)
 	sender := &recordedSender{}
-	dispatcher := testDispatcher(t, registry, sender)
+	dispatcher := testDispatcher(t, registry, sender, nil)
 	frame := marshalEnvelope(t, &commonv1.Envelope{MsgId: 7777, RequestId: 46})
 	if err := dispatcher.HandleFrame("", frame); !errors.Is(err, ErrUnknownMessageID) {
 		t.Fatalf("HandleFrame() error = %v, want ErrUnknownMessageID", err)
@@ -420,7 +499,7 @@ func TestUnknownMessageReturnsGenericError(t *testing.T) {
 func TestUnknownNotificationDoesNotGenerateResponse(t *testing.T) {
 	registry := testRegistry(t)
 	sender := &recordedSender{}
-	dispatcher := testDispatcher(t, registry, sender)
+	dispatcher := testDispatcher(t, registry, sender, nil)
 	frame := marshalEnvelope(t, &commonv1.Envelope{MsgId: 7777})
 	if err := dispatcher.HandleFrame("", frame); !errors.Is(err, ErrUnknownMessageID) {
 		t.Fatalf("HandleFrame() error = %v, want ErrUnknownMessageID", err)
@@ -434,7 +513,7 @@ func TestUnknownNotificationDoesNotGenerateResponse(t *testing.T) {
 func TestDefinedMessageWithoutHandlerReturnsUnsupported(t *testing.T) {
 	registry := testRegistry(t)
 	sender := &recordedSender{}
-	dispatcher := testDispatcher(t, registry, sender)
+	dispatcher := testDispatcher(t, registry, sender, nil)
 	frame := marshalEnvelope(t, &commonv1.Envelope{
 		MsgId:     uint32(echopb.MsgId_C2S_ECHO_REQUEST),
 		RequestId: 50,
@@ -451,7 +530,7 @@ func TestDefinedMessageWithoutHandlerReturnsUnsupported(t *testing.T) {
 func TestDefinedNotificationWithoutHandlerDoesNotRespond(t *testing.T) {
 	registry := testRegistry(t)
 	sender := &recordedSender{}
-	dispatcher := testDispatcher(t, registry, sender)
+	dispatcher := testDispatcher(t, registry, sender, nil)
 	frame := marshalEnvelope(t, &commonv1.Envelope{
 		MsgId: uint32(echopb.MsgId_C2S_ECHO_NOTIFY),
 	})
@@ -467,10 +546,9 @@ func TestDefinedNotificationWithoutHandlerDoesNotRespond(t *testing.T) {
 func TestRequestWithoutHandlerResponseGetsError(t *testing.T) {
 	registry := testRegistry(t)
 	sender := &recordedSender{}
-	dispatcher := testDispatcher(t, registry, sender)
-	if err := Register(dispatcher, func(string, Context, *echopb.EchoRequest) error { return nil }); err != nil {
-		t.Fatalf("Register() error = %v", err)
-	}
+	dispatcher := testDispatcher(t, registry, sender, map[uint32]any{
+		uint32(echopb.MsgId_C2S_ECHO_REQUEST): func(string, Context, *echopb.EchoRequest) error { return nil },
+	})
 	frame := marshalEnvelope(t, &commonv1.Envelope{
 		MsgId:     uint32(echopb.MsgId_C2S_ECHO_REQUEST),
 		RequestId: 47,
@@ -487,10 +565,9 @@ func TestRequestWithoutHandlerResponseGetsError(t *testing.T) {
 func TestNotificationNeedsNoResponse(t *testing.T) {
 	registry := testNotificationRegistry(t)
 	sender := &recordedSender{}
-	dispatcher := testDispatcher(t, registry, sender)
-	if err := Register(dispatcher, func(string, Context, *echopb.EchoRequest) error { return nil }); err != nil {
-		t.Fatalf("Register() error = %v", err)
-	}
+	dispatcher := testDispatcher(t, registry, sender, map[uint32]any{
+		7001: func(string, Context, *echopb.EchoRequest) error { return nil },
+	})
 	frame := marshalEnvelope(t, &commonv1.Envelope{MsgId: 7001})
 	if err := dispatcher.HandleFrame("", frame); err != nil {
 		t.Fatalf("HandleFrame() error = %v", err)
@@ -504,12 +581,11 @@ func TestNotificationNeedsNoResponse(t *testing.T) {
 func TestNotificationCannotSendResponse(t *testing.T) {
 	registry := testNotificationRegistry(t)
 	sender := &recordedSender{}
-	dispatcher := testDispatcher(t, registry, sender)
-	if err := Register(dispatcher, func(_ string, context Context, _ *echopb.EchoRequest) error {
-		return context.Response(uint32(commonv1.MsgId_S2C_ERROR_RESPONSE), &commonv1.ErrorResponse{})
-	}); err != nil {
-		t.Fatalf("Register() error = %v", err)
-	}
+	dispatcher := testDispatcher(t, registry, sender, map[uint32]any{
+		7001: func(_ string, context Context, _ *echopb.EchoRequest) error {
+			return context.Response(uint32(commonv1.MsgId_S2C_ERROR_RESPONSE), &commonv1.ErrorResponse{})
+		},
+	})
 	frame := marshalEnvelope(t, &commonv1.Envelope{MsgId: 7001})
 	if err := dispatcher.HandleFrame("", frame); !errors.Is(err, ErrMissingRequestID) {
 		t.Fatalf("HandleFrame() error = %v, want ErrMissingRequestID", err)
@@ -523,12 +599,11 @@ func TestNotificationCannotSendResponse(t *testing.T) {
 func TestHandlerErrorDoesNotLeakDetails(t *testing.T) {
 	registry := testRegistry(t)
 	sender := &recordedSender{}
-	dispatcher := testDispatcher(t, registry, sender)
-	if err := Register(dispatcher, func(string, Context, *echopb.EchoRequest) error {
-		return errors.New("private database address")
-	}); err != nil {
-		t.Fatalf("Register() error = %v", err)
-	}
+	dispatcher := testDispatcher(t, registry, sender, map[uint32]any{
+		uint32(echopb.MsgId_C2S_ECHO_REQUEST): func(string, Context, *echopb.EchoRequest) error {
+			return errors.New("private database address")
+		},
+	})
 	frame := marshalEnvelope(t, &commonv1.Envelope{
 		MsgId:     uint32(echopb.MsgId_C2S_ECHO_REQUEST),
 		RequestId: 49,
@@ -554,12 +629,11 @@ func TestErrorResponseSendFailurePreservesHandlerError(t *testing.T) {
 	sendErr := errors.New("client session closed")
 	registry := testRegistry(t)
 	sender := &recordedSender{sendErr: sendErr}
-	dispatcher := testDispatcher(t, registry, sender)
-	if err := Register(dispatcher, func(string, Context, *echopb.EchoRequest) error {
-		return handlerErr
-	}); err != nil {
-		t.Fatalf("Register() error = %v", err)
-	}
+	dispatcher := testDispatcher(t, registry, sender, map[uint32]any{
+		uint32(echopb.MsgId_C2S_ECHO_REQUEST): func(string, Context, *echopb.EchoRequest) error {
+			return handlerErr
+		},
+	})
 	frame := marshalEnvelope(t, &commonv1.Envelope{
 		MsgId:     uint32(echopb.MsgId_C2S_ECHO_REQUEST),
 		RequestId: 58,
@@ -590,17 +664,16 @@ func TestErrorResponseSendFailurePreservesHandlerError(t *testing.T) {
 func TestRequestRequiresIDAndOnlyOneResponse(t *testing.T) {
 	registry := testRegistry(t)
 	sender := &recordedSender{}
-	dispatcher := testDispatcher(t, registry, sender)
 	handlerCalls := 0
-	if err := Register(dispatcher, func(_ string, context Context, _ *echopb.EchoRequest) error {
-		handlerCalls++
-		if err := context.Response(uint32(echopb.MsgId_S2C_ECHO_RESPONSE), &echopb.EchoResponse{}); err != nil {
-			return err
-		}
-		return context.Response(uint32(echopb.MsgId_S2C_ECHO_RESPONSE), &echopb.EchoResponse{})
-	}); err != nil {
-		t.Fatalf("Register() error = %v", err)
-	}
+	dispatcher := testDispatcher(t, registry, sender, map[uint32]any{
+		uint32(echopb.MsgId_C2S_ECHO_REQUEST): func(_ string, context Context, _ *echopb.EchoRequest) error {
+			handlerCalls++
+			if err := context.Response(uint32(echopb.MsgId_S2C_ECHO_RESPONSE), &echopb.EchoResponse{}); err != nil {
+				return err
+			}
+			return context.Response(uint32(echopb.MsgId_S2C_ECHO_RESPONSE), &echopb.EchoResponse{})
+		},
+	})
 	requestWithoutID := marshalEnvelope(t, &commonv1.Envelope{
 		MsgId: uint32(echopb.MsgId_C2S_ECHO_REQUEST),
 	})

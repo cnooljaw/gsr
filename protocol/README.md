@@ -25,9 +25,9 @@
 - `gsr.Dispatcher`：在 `Service.Handle` 内按 Core `CommandID` 分发本地或跨节点 Send/Call，调用强类型业务 Handler。
 - `protocol.Dispatcher`：在 `HandleClientMessage` 内按 Envelope 的 `msg_id` 解码客户端 Protobuf 并调用强类型协议 Handler，封装客户端响应和推送。
 
-两种入口都由同一个 Agent Mailbox 和 runner 串行执行，不因使用两个分发组件增加执行单元。Echo Agent 的普通 Command 只处理断线通知，因此直接在显式 `Handle` 中处理，不需要额外创建 `gsr.Dispatcher`；有多个普通业务命令时再按默认规范使用它。
+两种入口都由同一个 Agent Mailbox 和 runner 串行执行，不因使用两个分发组件增加执行单元。Echo Agent 用具名 `gsr.Dispatcher` 处理 EchoService 发来的推送 Command；断线通知仍在显式 `Handle` 中处理。客户端 Echo 请求则经协议 Handler 调用 EchoService，两种编号空间不混用。
 
-应用 Agent 用具名字段持有 `*protocol.Dispatcher[gsr.CommandContext]`。共享 Registry 在应用组装时只传业务生成目录，构造器自动纳入框架通用目录：
+应用 Agent 用具名 `protocolDispatcher` 字段持有 `*protocol.Dispatcher[gsr.CommandContext]`，普通 Command 的组件命名为 `commandDispatcher`。共享 Registry 在应用组装时只传业务生成目录，构造器自动纳入框架通用目录：
 
 ```go
 registry, err := protocol.NewRegistry(echopb.MessageCatalogGsrExampleEchoV1Echo)
@@ -35,20 +35,22 @@ registry, err := protocol.NewRegistry(echopb.MessageCatalogGsrExampleEchoV1Echo)
 
 调用方处理构造错误后再使用 Registry。通用 ErrorResponse 使用固定编号 9001，业务不得覆盖或重映射；重复传入通用目录与其它编号、类型冲突一样，在构造时拒绝，不提供兼容去重。
 
-Agent 在 `OnStart` 中将 Registry 和自己的 ClientSession 交给 Dispatcher，并注册已实现的业务 Handler：
+Agent 构造时将 Registry、自己的 ClientSession 和显式 Handler 表一次性交给 Dispatcher：
 
 ```go
-dispatcher, err := protocol.NewDispatcher[gsr.CommandContext](registry, agent.client)
-if err != nil {
-    return err
-}
-if err := protocol.Register(dispatcher, agent.OnEcho); err != nil {
-    return err
-}
-agent.dispatcher = dispatcher
+agent.protocolDispatcher = protocol.MustDispatcher[gsr.CommandContext](
+    registry,
+    agent.client,
+    map[uint32]any{
+        uint32(echopb.MsgId_C2S_ECHO_REQUEST): agent.OnEcho,
+        uint32(echopb.MsgId_C2S_ECHO_NOTIFY):  agent.OnEchoNotify,
+    },
+)
 ```
 
-构造器内部保证解码与写回使用同一目录，业务不创建或拼接协议 Session。客户端 Handler 使用 `ctx.Response/Push`；普通 Command 等其它业务流程需要主动推送时，使用 `agent.dispatcher.Push(msgID, message)`，仍在 Agent runner 内调用。
+`.proto` 负责编号与 payload、方向、消息种类；表只负责编号到业务函数的接线。构造器复制表，校验编号已定义且允许客户端入站，并校验 `func(Scope, Context, *具体Protobuf消息) error` 的完整签名和对应 payload 类型。构造后只读，没有逐条 Register 或运行期修改。静态接线用 MustDispatcher，错误时 panic；需要返回构造错误时使用同样接收三参数的 NewDispatcher。协议可以先定义，表只绑定已实现的 Handler；未绑定消息保持既有错误行为。运行时仍使用 reflect.Call，不逐消息重新分析签名。
+
+构造器内部保证解码与写回使用同一目录，业务不创建或拼接协议 Session。客户端 Handler 使用 `ctx.Response/Push`；普通 Command 等其它业务流程需要主动推送时，使用 `agent.protocolDispatcher.Push(msgID, message)`，仍在 Agent runner 内调用。Echo 的通知先 Send 到业务 Service，业务再 Send 回 Agent；推送不依赖原请求的 `protocol.Context`。
 
 Gate 的两种模式在有限期限内等待自身发布或 Mailbox 恢复；仅重试尚未接纳的连接事件。Agent 构造、OnStart 失败以及已接纳 Call 的超时不会触发重复创建，失败只关闭该连接，原始原因留在 Gate 日志。
 
@@ -56,22 +58,18 @@ Gate 的两种模式在有限期限内等待自身发布或 Mailbox 恢复；仅
 
 ```go
 func (agent *echoAgent) HandleClientMessage(self gsr.CommandContext, frame []byte) error {
-    return agent.dispatcher.HandleFrame(self, frame)
+    return agent.protocolDispatcher.HandleFrame(self, frame)
 }
 
-func (agent *echoAgent) OnEcho(
-    self gsr.CommandContext,
-    ctx protocol.Context,
-    request *echopb.EchoRequest,
-) error {
-    // 需要访问其它 Service 时，在这里使用 self.CallName / self.Cluster().Call 等能力。
-    return ctx.Response(
-        uint32(echopb.MsgId_S2C_ECHO_RESPONSE),
-        &echopb.EchoResponse{Text: request.GetText()},
+func (agent *echoAgent) handlePushEcho(_ gsr.CommandContext, text string) error {
+    // 普通 Command 入口没有当前客户端请求，用独立 Push 能力写回。
+    return agent.protocolDispatcher.Push(
+        uint32(echopb.MsgId_S2C_ECHO_PUSH),
+        &echopb.EchoPush{Text: text},
     )
 }
 ```
 
-这里 `self` 是当前 Agent 的身份与 Service 能力；`ctx` 负责当前客户端 RequestID、Response 和 Push。不使用 self 的 Handler 可将该参数写为 `_`。Dispatcher 原样传递每次收到的 self，不保存上下文，也不建立额外 Mailbox、runner 或 goroutine；两种上下文都不得存入 Agent 字段或用于异步任务。注册发生在初始化阶段，不从其它 goroutine 修改 Handler 表。
+这里 `self` 是当前 Agent 的身份与 Service 能力；`ctx` 负责当前客户端 RequestID、Response 和 Push。不使用 self 的 Handler 可将该参数写为 `_`。Dispatcher 原样传递每次收到的 self，不保存上下文，也不建立额外 Mailbox、runner 或 goroutine；两种上下文都不得存入 Agent 字段或用于异步任务。Handler 表在构造时完成绑定，之后不从其它 goroutine 修改。
 
-普通 Core Command 仍由 Agent 显式声明的 `Handle` 处理，不进入客户端协议 Dispatcher。完整代码见 [Echo Agent](../examples/websocket-gate/cmd/debugserver/agent.go)；现有 [应用接入测试](../gate_plain_test.go) 还验证了强类型协议 Handler 通过 `CallName` 调用业务 Service、业务收到 AgentID 来源，以及客户端 request_id 回传。
+普通 Core Command 仍由 Agent 显式声明的 `Handle` 处理，不进入客户端协议 Dispatcher。完整代码及两条运行链路见 [Echo 示例](../examples/websocket-gate/README.md#agent-的两个消息入口)；[示例测试](../examples/websocket-gate/cmd/debugserver/agent_test.go) 通过真实 Gate 验证 Call 响应、业务拒绝和 Send 回 Agent 后的 Push。[应用接入测试](../gate_plain_test.go) 另有来源身份契约覆盖，不在示例中重复搭建该底层用例。

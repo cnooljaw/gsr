@@ -2,7 +2,7 @@
 
 本示例默认使用统一 Gate 的 Plain 模式，演示 TypeScript 客户端发送 Protobuf Envelope、GSR Agent 解码业务请求并回传同一 `request_id`。Plain 不提供握手、seq 或 MAC，仅绑定回环/私有 IP，不得暴露到公网。
 
-Go 启动入口只解析参数、处理退出信号并调用 `gsr.Run`。MainService 统一调用 `self.OpenGate` 并明确选择 Protocol，提供返回 `gsr.Service` 的 Echo Agent 构造回调，然后自身退出；Gate 与连接 Agent 继续运行，由 Runtime 在进程退出时统一停止。Echo Agent 显式实现普通 `Handle` 和可选的 `HandleClientMessage`，两种消息入口共用该 Service 的 Mailbox 和 runner。
+Go 启动入口只解析参数、处理退出信号并调用 `gsr.Run`。MainService 创建并注册共享的 `echo` Service，再调用 `self.OpenGate` 并明确选择 Protocol，提供返回 `gsr.Service` 的 Echo Agent 构造回调，然后自身退出；EchoService、Gate 与连接 Agent 继续运行，由 Runtime 在进程退出时统一停止。Echo Agent 显式实现普通 `Handle` 和可选的 `HandleClientMessage`，两种消息入口共用该 Service 的 Mailbox 和 runner。
 
 框架通用 Envelope 和 ErrorResponse 定义在仓库根目录的 `protocol/proto/gsr/common/v1/common.proto`；Echo 示例的消息编号和 payload 仍定义在本目录的 `proto/gsr/example/echo/v1/echo.proto`。握手属于 Gate 的固定二进制格式，断线通知属于内部 Core Command，二者都不是这里的 Protobuf 消息。每个消息编号通过 `.proto` option 显式关联 payload、方向和 Request/Notify/Response/Push 种类，`npm run generate` 从仓库根目录的 Buf 配置同时生成 Go 与 TypeScript 类型和 Go 协议目录。业务 Handler 按实现进度手动注册；新协议消息可以先定义，之后逐个补 Handler。
 
@@ -10,7 +10,39 @@ Go 启动入口只解析参数、处理退出信号并调用 `gsr.Run`。MainSer
 
 组装协议目录时只需 `protocol.NewRegistry(echopb.MessageCatalogGsrExampleEchoV1Echo)`；框架自动纳入通用错误目录，业务不重复传入。通用错误编号 9001 不得被业务占用，冲突在构造时拒绝。
 
-Agent 的强类型 Handler 现在接收 `self gsr.CommandContext` 和 `ctx protocol.Context`：前者用于调用其它 Service，后者用于客户端响应与 Push。Echo 不需要访问其它 Service，因此把 self 写为 `_`。公共接入写法见 [Agent 中的协议分发](../../protocol/README.md#agent-中的协议分发)。
+Agent 的强类型 Handler 接收 `self gsr.CommandContext` 和 `ctx protocol.Context`：前者用于调用其它 Service，后者用于当前客户端请求的响应。公共接入写法见 [Agent 中的协议分发](../../protocol/README.md#agent-中的协议分发)。
+
+## Agent 的两个消息入口
+
+请求链路（默认 CLI）：
+
+```text
+Client EchoRequest
+  → Gate → Agent.HandleClientMessage → OnEcho
+  → CallName("echo", echoCommand, text)
+  → EchoService.Handle → handleEcho → 返回业务结果
+  → Agent ctx.Response → Client EchoResponse（保留 request_id）
+```
+
+主动推送链路（CLI `--notify`）：
+
+```text
+Client EchoNotify（request_id = 0，不要求响应）
+  → Gate → Agent.HandleClientMessage → OnEchoNotify
+  → SendName("echo", notifyEchoCommand, text)
+  → EchoService.Handle → handleNotifyEcho
+  → Send(Source(), pushEchoCommand, text)
+  → Agent.Handle → handlePushEcho
+  → agent.protocolDispatcher.Push → Client EchoPush（request_id = 0）
+```
+
+第二条链路的 Push 是新的主动消息，不是 Notify 的 Response。EchoService 只知道来源 AgentID，不持有 Agent 实例或连接；Agent 的 `Handle` 收到普通 Command 时，没有当前客户端请求的 `protocol.Context`，因此使用协议 Dispatcher 的独立 `Push` 能力，不保存旧请求上下文。
+
+阅读入口：[`main_service.go`](cmd/debugserver/main_service.go) 负责组装；[`agent.go`](cmd/debugserver/agent.go) 展示两个入口，普通 Command 使用 `commandDispatcher`，客户端 Envelope 使用 `protocolDispatcher`，均在构造时提供显式编号到强类型 Handler 的表；[`echo_service.go`](cmd/debugserver/echo_service.go) 展示显式 `Handle`、强类型业务 Handler 和基于来源的 Send。Call 最多等待一秒，期间仅当前 Agent runner 等待，不阻塞其它 Service。空文本的业务拒绝由 EchoService 决定，再由 Agent 转为协议 Response；Send 的成功仅表示接纳，后续失败由框架诊断记录，不保证客户端收到 Push。
+
+Core CommandID 和客户端 msg_id 是不同编号空间，分别由目标 Service 和协议目录解释；不需要一一对应，也不按本地／远端另建命令清单。
+
+## 环境准备与联调
 
 需要 Go 1.24 或更高版本、Node.js 22.15 或更高版本，以及 `protoc-gen-go` v1.36.1 在 `PATH` 中。可用下面的命令安装 Go 插件；Buf CLI 和 TypeScript 生成插件由本目录锁定的 npm 依赖提供。
 

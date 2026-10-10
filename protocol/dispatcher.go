@@ -10,17 +10,19 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-// Dispatcher 按生成的消息目录解码 Envelope，并调用业务手动注册的强类型 Handler。
+// Dispatcher 按生成的消息目录解码 Envelope，并调用构造时显式绑定的强类型 Handler。
 // Scope 是调用方的逐消息上下文类型；Dispatcher 只透传，不保存或解释它。
 type Dispatcher[Scope any] struct {
 	registry       *Registry
 	writer         *clientWriter
 	errorMessageID uint32
-	handlers       map[uint32]func(Scope, Context, proto.Message) error
+	handlers       map[uint32]reflect.Value
 }
 
-// NewDispatcher 绑定协议目录和连接写回能力，内部建立解码与响应共用目录的不变量。
-func NewDispatcher[Scope any](registry *Registry, sender ClientSender) (*Dispatcher[Scope], error) {
+// NewDispatcher 绑定协议目录和连接写回能力，并复制、校验 msg_id 到强类型 Handler 的表。
+// Handler 必须是 func(Scope, Context, *具体Protobuf消息) error；编号与参数类型须匹配目录。
+// 构造后 Handler 表只读；协议已定义但尚未实现的消息可以不绑定。
+func NewDispatcher[Scope any](registry *Registry, sender ClientSender, handlers map[uint32]any) (*Dispatcher[Scope], error) {
 	if registry == nil {
 		return nil, errors.New("protocol: registry is required")
 	}
@@ -31,45 +33,60 @@ func NewDispatcher[Scope any](registry *Registry, sender ClientSender) (*Dispatc
 	if !exists || errorEntry.Direction != catalog.ServerToClient || errorEntry.Kind != catalog.Response {
 		return nil, errors.New("protocol: server-to-client ErrorResponse is required")
 	}
+	compiled := make(map[uint32]reflect.Value, len(handlers))
+	for msgID, handler := range handlers {
+		entry, exists := registry.byID[msgID]
+		if !exists {
+			return nil, fmt.Errorf("%w: %d", ErrUnknownMessageID, msgID)
+		}
+		if entry.Direction != catalog.ClientToServer {
+			return nil, fmt.Errorf("%w: msg_id %d is not client-to-server", ErrWrongDirection, msgID)
+		}
+		binding, err := compileHandler[Scope](entry, handler)
+		if err != nil {
+			return nil, fmt.Errorf("msg_id %d: %w", msgID, err)
+		}
+		compiled[msgID] = binding
+	}
 	return &Dispatcher[Scope]{
 		registry:       registry,
 		writer:         &clientWriter{registry: registry, sender: sender},
 		errorMessageID: errorEntry.ID,
-		handlers:       make(map[uint32]func(Scope, Context, proto.Message) error),
+		handlers:       compiled,
 	}, nil
 }
 
-// Register 将一个已定义的客户端 payload 类型绑定到业务 Handler；协议目录和 Handler 可分开演进。
-func Register[Scope any, Message proto.Message](dispatcher *Dispatcher[Scope], handler func(Scope, Context, Message) error) error {
-	if dispatcher == nil || dispatcher.registry == nil || dispatcher.writer == nil || dispatcher.handlers == nil {
-		return errors.New("protocol: dispatcher is not initialized")
+// MustDispatcher 用于程序员定义的静态协议接线；构造错误时 panic。
+func MustDispatcher[Scope any](registry *Registry, sender ClientSender, handlers map[uint32]any) *Dispatcher[Scope] {
+	dispatcher, err := NewDispatcher[Scope](registry, sender, handlers)
+	if err != nil {
+		panic(err)
 	}
+	return dispatcher
+}
+
+func compileHandler[Scope any](entry catalog.Entry, handler any) (reflect.Value, error) {
 	if handler == nil {
-		return errors.New("protocol: handler is required")
+		return reflect.Value{}, errors.New("protocol: handler is required")
 	}
-	var sample Message
-	messageType := reflect.TypeOf(sample)
-	if messageType == nil {
-		return errors.New("protocol: handler payload must be a concrete Protobuf message type")
+	function := reflect.ValueOf(handler)
+	signature := function.Type()
+	if signature.Kind() != reflect.Func || function.IsNil() {
+		return reflect.Value{}, errors.New("protocol: handler must be a non-nil function")
 	}
-	entry, exists := dispatcher.registry.entryForType(messageType)
-	if !exists {
-		return fmt.Errorf("protocol: payload type %s is not in the generated message catalog", messageType)
+	if signature.IsVariadic() || signature.NumIn() != 3 || signature.NumOut() != 1 {
+		return reflect.Value{}, errors.New("protocol: handler must be func(Scope, Context, Message) error")
 	}
-	if entry.Direction != catalog.ClientToServer {
-		return fmt.Errorf("%w: payload type %s is not client-to-server", ErrWrongDirection, messageType)
+	if signature.In(0) != reflect.TypeOf((*Scope)(nil)).Elem() || signature.In(1) != reflect.TypeOf(Context{}) ||
+		signature.Out(0) != reflect.TypeOf((*error)(nil)).Elem() {
+		return reflect.Value{}, errors.New("protocol: handler Scope, Context or error type does not match")
 	}
-	if _, exists := dispatcher.handlers[entry.ID]; exists {
-		return fmt.Errorf("protocol: handler already registered for msg_id %d", entry.ID)
+	payloadType := reflect.TypeOf(entry.NewMessage())
+	if signature.In(2) != payloadType {
+		return reflect.Value{}, fmt.Errorf("%w: handler expects %s, catalog requires %s",
+			ErrPayloadTypeMismatch, signature.In(2), payloadType)
 	}
-	dispatcher.handlers[entry.ID] = func(self Scope, context Context, message proto.Message) error {
-		typedMessage, ok := message.(Message)
-		if !ok {
-			return fmt.Errorf("%w: dispatcher decoded %T for handler %s", ErrPayloadTypeMismatch, message, messageType)
-		}
-		return handler(self, context, typedMessage)
-	}
-	return nil
+	return function, nil
 }
 
 // HandleFrame 解码完整 Envelope，并将本次 self 原样传给对应的客户端 Handler。
@@ -101,7 +118,14 @@ func (dispatcher *Dispatcher[Scope]) handleEnvelope(self Scope, envelope *common
 		requestID: envelope.GetRequestId(),
 		responded: &responded,
 	}
-	if err := handler(self, handlerContext, message); err != nil {
+	// 从变量地址取值保留 Scope 的声明类型，接口 Scope 为 nil 时也能正确传入。
+	results := handler.Call([]reflect.Value{
+		reflect.ValueOf(&self).Elem(),
+		reflect.ValueOf(handlerContext),
+		reflect.ValueOf(message),
+	})
+	if !results[0].IsNil() {
+		err := results[0].Interface().(error)
 		if !responded {
 			return dispatcher.fail(envelope.GetRequestId(), err)
 		}

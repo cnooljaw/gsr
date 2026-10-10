@@ -18,7 +18,7 @@ import (
 // protocolGateAgent 将真实协议分发器接入生产 Gate 测试，验证未知消息不会破坏连接。
 type protocolGateAgent struct {
 	client                 ClientSession
-	dispatcher             *protocol.Dispatcher[runtime.CommandContext]
+	protocolDispatcher     *protocol.Dispatcher[runtime.CommandContext]
 	disconnected           chan struct{}
 	omitEchoRequestHandler bool
 	stopOnce               sync.Once
@@ -31,12 +31,12 @@ const protocolTimeoutCommand runtime.CommandID = 0x7100
 
 // timeoutProtocolAgent 将 Agent 内部的 Core Call 超时接到客户端协议错误回复，验证超时归属不进入 Gate。
 type timeoutProtocolAgent struct {
-	client       ClientSession
-	target       runtime.ServiceID
-	id           runtime.ServiceID
-	dispatcher   *protocol.Dispatcher[runtime.CommandContext]
-	disconnected chan struct{}
-	stopOnce     sync.Once
+	client             ClientSession
+	target             runtime.ServiceID
+	id                 runtime.ServiceID
+	protocolDispatcher *protocol.Dispatcher[runtime.CommandContext]
+	disconnected       chan struct{}
+	stopOnce           sync.Once
 }
 
 // blockingProtocolTarget 为测试中的慢目标，释放前不会完成 Core Command。
@@ -79,15 +79,14 @@ func (agent *timeoutProtocolAgent) OnStart(_ context.Context, self runtime.Servi
 	if err != nil {
 		return err
 	}
-	dispatcher, err := protocol.NewDispatcher[runtime.CommandContext](registry, agent.client)
+	dispatcher, err := protocol.NewDispatcher[runtime.CommandContext](registry, agent.client, map[uint32]any{
+		uint32(echopb.MsgId_C2S_ECHO_REQUEST): agent.onEcho,
+	})
 	if err != nil {
 		return err
 	}
-	if err := protocol.Register(dispatcher, agent.onEcho); err != nil {
-		return err
-	}
 	agent.id = self.Self()
-	agent.dispatcher = dispatcher
+	agent.protocolDispatcher = dispatcher
 	return nil
 }
 
@@ -101,10 +100,10 @@ func (agent *timeoutProtocolAgent) Handle(commandContext runtime.CommandContext,
 }
 
 func (agent *timeoutProtocolAgent) HandleClientMessage(self runtime.CommandContext, frame []byte) error {
-	if agent.dispatcher == nil {
+	if agent.protocolDispatcher == nil {
 		return errors.New("timeout protocol Agent dispatcher is not initialized")
 	}
-	return agent.dispatcher.HandleFrame(self, frame)
+	return agent.protocolDispatcher.HandleFrame(self, frame)
 }
 
 func (agent *timeoutProtocolAgent) onEcho(self runtime.CommandContext, handlerContext protocol.Context, _ *echopb.EchoRequest) error {
@@ -130,19 +129,17 @@ func (agent *protocolGateAgent) OnStart(_ context.Context, _ runtime.ServiceCont
 	if err != nil {
 		return err
 	}
-	dispatcher, err := protocol.NewDispatcher[runtime.CommandContext](registry, agent.client)
+	handlers := map[uint32]any{
+		uint32(echopb.MsgId_C2S_ECHO_NOTIFY): agent.onEchoNotify,
+	}
+	if !agent.omitEchoRequestHandler {
+		handlers[uint32(echopb.MsgId_C2S_ECHO_REQUEST)] = agent.onEcho
+	}
+	dispatcher, err := protocol.NewDispatcher[runtime.CommandContext](registry, agent.client, handlers)
 	if err != nil {
 		return err
 	}
-	if !agent.omitEchoRequestHandler {
-		if err := protocol.Register(dispatcher, agent.onEcho); err != nil {
-			return err
-		}
-	}
-	if err := protocol.Register(dispatcher, agent.onEchoNotify); err != nil {
-		return err
-	}
-	agent.dispatcher = dispatcher
+	agent.protocolDispatcher = dispatcher
 	return nil
 }
 
@@ -156,10 +153,10 @@ func (agent *protocolGateAgent) Handle(commandContext runtime.CommandContext, co
 }
 
 func (agent *protocolGateAgent) HandleClientMessage(self runtime.CommandContext, frame []byte) error {
-	if agent.dispatcher == nil {
+	if agent.protocolDispatcher == nil {
 		return errors.New("protocol Gate Agent dispatcher is not initialized")
 	}
-	return agent.dispatcher.HandleFrame(self, frame)
+	return agent.protocolDispatcher.HandleFrame(self, frame)
 }
 
 func (agent *protocolGateAgent) onEcho(_ runtime.CommandContext, context protocol.Context, request *echopb.EchoRequest) error {
