@@ -159,27 +159,58 @@ func TestLocalAdapterRejectsInvalidRequest(t *testing.T) {
 	}
 }
 
-// 验证响应编码和写入同时失败时，两种本地原因都保留，远端错误不包含编码内部文本。
+// 验证响应编码和写入失败均保留，编码错误的分类 panic 不跳过安全回包。
 func TestLocalAdapterPreservesEncodingAndWriteFailures(t *testing.T) {
-	adapter, id, codec := newLocalAdapterTest(t)
-	encodeErr := errors.New("private encoding failure")
-	writeErr := errors.New("socket write failed")
-	adapter.codec = localFailingEncodeCodec{PayloadCodec: codec, err: encodeErr}
-	payload, err := codec.Encode([]any{})
-	if err != nil {
-		t.Fatal(err)
+	for _, test := range []struct {
+		name string
+		err  error
+	}{
+		{name: "ordinary", err: errors.New("private encoding failure")},
+		{name: "As panic", err: inboundClassificationPanicError{hook: "As"}},
+		{name: "Unwrap panic", err: inboundClassificationPanicError{hook: "Unwrap"}},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			adapter, id, codec := newLocalAdapterTest(t)
+			encodeErr := test.err
+			writeErr := errors.New("socket write failed")
+			adapter.codec = localFailingEncodeCodec{PayloadCodec: codec, err: encodeErr}
+			payload, err := codec.Encode([]any{})
+			if err != nil {
+				t.Fatal(err)
+			}
+			writes := 0
+			err = adapter.handle(context.Background(), ClusterEnvelope{Kind: FrameRequest, Session: 7, Target: ServiceTarget{ServiceID: id}, Command: clusterTestCommand, Payload: payload}, func(reply ClusterEnvelope) error {
+				writes++
+				if reply.Kind != FrameError || reply.Session != 7 || !errors.Is(reply.Error, runtime.ErrHandlerFailed) || reply.Error.Message == encodeErr.Error() {
+					t.Fatalf("unsafe encoding response: %+v", reply)
+				}
+				return writeErr
+			})
+			if writes != 1 || !errors.Is(err, encodeErr) || !errors.Is(err, writeErr) || !errors.Is(err, errInboundResponseWrite) {
+				t.Fatalf("writes=%d error=%v", writes, err)
+			}
+		})
 	}
-	writes := 0
-	err = adapter.handle(context.Background(), ClusterEnvelope{Kind: FrameRequest, Session: 7, Target: ServiceTarget{ServiceID: id}, Command: clusterTestCommand, Payload: payload}, func(reply ClusterEnvelope) error {
-		writes++
-		if reply.Kind != FrameError || !errors.Is(reply.Error, runtime.ErrHandlerFailed) || reply.Error.Message == encodeErr.Error() {
-			t.Fatalf("unsafe encoding response: %+v", reply)
-		}
-		return writeErr
-	})
-	if writes != 1 || !errors.Is(err, encodeErr) || !errors.Is(err, writeErr) || !errors.Is(err, errInboundResponseWrite) {
-		t.Fatalf("writes=%d error=%v", writes, err)
+}
+
+type inboundClassificationPanicError struct{ hook string }
+
+func (failure inboundClassificationPanicError) Error() string {
+	return "private encoding error"
+}
+
+func (failure inboundClassificationPanicError) As(any) bool {
+	if failure.hook == "As" {
+		panic("private As panic")
 	}
+	return false
+}
+
+func (failure inboundClassificationPanicError) Unwrap() error {
+	if failure.hook == "Unwrap" {
+		panic("private Unwrap panic")
+	}
+	return nil
 }
 
 // 验证名称解析期间发生取消后，不继续投递或回复，无论原请求是 Send 还是 Call。

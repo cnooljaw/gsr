@@ -46,11 +46,16 @@ func writeInboundResponse(writer func(ClusterEnvelope) error, response ClusterEn
 	return nil
 }
 
-func normalizeInboundError(err error) *runtime.StatusError {
+// normalizeInboundError 的错误链分类同样属于扩展边界，panic 不能跳过 Call 回包。
+func normalizeInboundError(err error) (status *runtime.StatusError) {
+	defer func() {
+		if recover() != nil {
+			status = cloneInboundStatus(runtime.ErrHandlerFailed)
+		}
+	}()
 	if err == nil {
 		return nil
 	}
-	var status *runtime.StatusError
 	if errors.As(err, &status) && status != nil {
 		return runtime.NewStatusError(status.Class, status.Code, status.Message)
 	}

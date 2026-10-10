@@ -100,7 +100,7 @@ func TestInboundConnectionBackpressureAndSendOrder(t *testing.T) {
 	}
 }
 
-// 验证解码和名称解析 panic 只进入本地诊断，不使连接退出或泄露 panic 文本。
+// 验证扩展 panic 只进入本地诊断，回复编码或错误分类 panic 仍安全回包且连接继续工作。
 func TestInboundConnectionRecoversAdapterPanics(t *testing.T) {
 	adapter, id, values := newLocalAdapterTest(t)
 	adapter.codec = inboundFaultCodec{PayloadCodec: values}
@@ -128,6 +128,13 @@ func TestInboundConnectionRecoversAdapterPanics(t *testing.T) {
 	if reply, err := frames.readFrame(peer); err != nil || reply.Session != 9 || !errors.Is(reply.Error, runtime.ErrHandlerFailed) {
 		t.Fatalf("encode panic reply = %+v, %v", reply, err)
 	}
+	for index, hook := range []string{"As", "Unwrap"} {
+		session := ClusterSessionID(10 + index)
+		writeInboundTestRequest(t, peer, frames, values, id, session, "encode error "+hook)
+		if reply, err := frames.readFrame(peer); err != nil || reply.Session != session || !errors.Is(reply.Error, runtime.ErrHandlerFailed) {
+			t.Fatalf("encoding error %s reply = %+v, %v", hook, reply, err)
+		}
+	}
 	writeInboundTestRequest(t, peer, frames, values, id, 1, "alive")
 	if reply, err := frames.readFrame(peer); err != nil || reply.Kind != FrameResponse {
 		t.Fatalf("reply = %+v, %v", reply, err)
@@ -141,7 +148,7 @@ func TestInboundConnectionRecoversAdapterPanics(t *testing.T) {
 		}
 		count++
 	}
-	if count != 3 {
+	if count != 5 {
 		t.Fatalf("panic diagnostics = %d", count)
 	}
 }
@@ -337,8 +344,13 @@ type inboundFaultCodec struct {
 }
 
 func (codec inboundFaultCodec) Encode(value any) ([]byte, error) {
-	if reflect.DeepEqual(value, []any{"encode panic"}) {
+	switch {
+	case reflect.DeepEqual(value, []any{"encode panic"}):
 		panic("private encoding detail")
+	case reflect.DeepEqual(value, []any{"encode error As"}):
+		return nil, inboundClassificationPanicError{hook: "As"}
+	case reflect.DeepEqual(value, []any{"encode error Unwrap"}):
+		return nil, inboundClassificationPanicError{hook: "Unwrap"}
 	}
 	return codec.PayloadCodec.Encode(value)
 }

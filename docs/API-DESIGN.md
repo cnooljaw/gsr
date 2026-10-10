@@ -687,6 +687,7 @@ tcpListener → inboundConnection → localRequestAdapter → Runtime.Send/Call
 - `Session == 0` 的 Send 不回包；接收节点独立记录接纳或 Handler 错误。
 - `Session > 0` 的 Call 沿原连接写回同一 Session、Target、Command 的 Response/Error；Handler error/panic 复用 Runtime 的安全错误边界。
 - 响应构造与 writer 故障收容为私有函数；写入错误保留 I/O 原因，由连接 owner 记录并关闭失效连接。
+- 回复编码错误的自定义 `As/Unwrap` 分类发生 panic 时，仍沿原连接返回安全的 `ErrHandlerFailed`，不泄露内部文本、不跳过回包；本地诊断由连接 owner 收容，健康 Service 与连接后续请求继续工作。原错误链仅留在本地诊断边界，不进入 wire。
 
 失败归属依赖稳定 error identity，不解析错误字符串：`Send` 直接返回的错误表示 A 侧未完成本地 admission；`DeliveryFailure` 表示 admission 后的 Transport 投递失败。当前 `InMemoryTransport` 用 `ErrNodeNotFound` 表示目标节点当前没有 receiver，用 `ErrTransportClosed` 表示本地 Transport 已关闭。TCP 传输故障同样提供可通过 `errors.Is`/`errors.As` 判断的稳定错误；网络分区、拒绝连接或握手失败只能记录为“远端当前不可达”及其安全原因，不能据此断言 B 的进程一定没有启动。
 
