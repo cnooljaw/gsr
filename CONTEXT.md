@@ -26,6 +26,7 @@
 
 - **应用运行入口（gsr.Run）**：Core 之外的统一启动函数，创建独立 Runtime、Cluster、Logger，运行普通 MainService，并负责初始化回滚和固定顺序关闭。内部资源 owner 不公开，不是全局单例或组件容器；app.Host 已移除。
 - **HTTPIngress**：`gsr.Run` 给 HTTP Handler 的长期受信任本地入口，只提供按名称 Send/Call；每次查节点内名称表，通过 Runtime 基础设施入口投递，Source 固定为零。它不是可跨 goroutine 保存的 ServiceContext，不提供业务 Service 身份或 Cluster 调用能力。HTTP Listener 由 Run 持有，在 Runtime 停止前关闭。
+- **HTTP Server Close**：首次调用执行有序关闭，超时或取消后强制关闭连接而不强杀 Handler；重复调用等待同一流程并共享最终结果，后续 context 只控制自身等待。
 
 - **坏帧诊断抑制**：单连接内按固定协议错误类别只保留首条明细，重复项不进入日志或 Diagnostics；Cluster.SuppressedDiagnosticCount 独立累计，连接结束用 DiagnosticBadFramesSuppressed 汇总数量。不是业务日志去重，不改变消息投递或错误结果。
 
@@ -57,12 +58,14 @@
 - **Service 组装**：宿主启动 Runtime 并显式创建普通 MainService；Service 内使用 ServiceContext.CreateService 创建其它实例，底层仍委托所属 Runtime。传实例，不引入工厂、Launcher、ServiceManager 或 Runtime 自动 Bootstrap。创建成功的 Service 归 Runtime 管理，不随创建者退出而停止。
 - **MainService**：应用定义的普通入口 Service，负责业务组装和 Send/Call；名字不具有 Runtime 特权。退出不代表 Runtime 退出，宿主负责进程信号或完成通知及最终收尾。
 - **Exit**：ServiceContext 的自身退出请求，幂等、不阻塞、不强杀当前 Go 执行。OnStart/Handler 返回后由 Runtime 收尾；当前 Handler 的 Call 先按 return 完成，其余排队请求停止执行，已有取消、超时、panic 和 Runtime Stop 语义不变。
+- **退出后的回收**：OnStop 真实返回后释放业务实例和上下文引用，runner 完成时解除 Scheduler 跟踪。已关闭 ID 的元数据与停止结果保留到 Runtime 停止收尾，维持 ErrServiceClosed 和 Inspection；元数据不是业务对象，也不是有界历史记录。
 - **Start Command**：可选的业务协议，不是所有 Service 必须实现的生命周期；与 Runtime.Start 和 Service.OnStart 区分。
 - **OnStart 失败**：只回滚当前 Service，Runtime 保持 Running，可以继续创建其它 Service；失败实例不发布 ServiceID，且该 ID 永不复用。Runtime 至多调用一次 `OnStop` 为部分初始化资源清理。
 - **ClusterEnvelope**：Cluster/Transport 使用的可编码网络载体，显式区分 request、response 和 error frame；不携带业务或 wire version。远端 relay 解码请求后创建新的本地 Message；本地投递不创建或编码 ClusterEnvelope。
 - **FrameKind**：ClusterEnvelope 的显式方向标签，第一版只有 Request、Response 和 Error；不能只凭 Session 是否为零推断 frame 方向。
 - **ServiceTarget**：ClusterEnvelope 的远端目标值；必须且只能填写当前远端 Runtime 的临时 ServiceID 或由外层解析的 ServiceName。它不把 NodeID、Epoch、Lease 或 Generation 编进 Core 地址。
 - **ValueCodec**：Cluster 的默认值编码器，只接受 nil、bool、整数、有限浮点数、string、`[]byte`、list 和 string-key map；解码将整数规范化为 `int64`/`uint64`，浮点数规范化为 `float64`，并执行深度与 payload 上限。
+- **集合数量校验**：ValueCodec 在容量分配前按剩余载荷的最小编码大小校验集合数量，拒绝以伪造 map 数量放大内存分配的坏载荷，不改变合法 wire 编码。
 - **PayloadCodec**：节点所有命令共享的参数与回复编解码器；默认 ValueCodec，不负责命令准入、路由或 Source。
 - **ClusterConfig**：已实现的公开出站组装配置，包含静态目标地址表、统一 PayloadCodec（为空使用 ValueCodec）、有限 Call/Dial/Write 等待、每目标出站队列容量和帧上限；不包含本地 NodeID、Runtime 或监听能力。零值数值使用有限默认值，负数拒绝。
 - **FrameCodec**：Cluster 的长度前缀 frame 编解码器；使用四字节大端 body length，`MaxFrame` 包含前缀，只处理一个完整 frame，不负责 stream I/O、版本协商或连接生命周期。

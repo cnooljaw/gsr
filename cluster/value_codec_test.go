@@ -1,9 +1,11 @@
 package cluster
 
 import (
+	"encoding/binary"
 	"errors"
 	"math"
 	"reflect"
+	goruntime "runtime"
 	"testing"
 )
 
@@ -176,6 +178,27 @@ func TestValueCodecRejectsMalformedPayload(t *testing.T) {
 		if _, err := codec.Decode(payload); !errors.Is(err, ErrMalformedPayload) {
 			t.Fatalf("case %d Decode() error = %v, want ErrMalformedPayload", index, err)
 		}
+	}
+}
+
+// 验证坏 map 的数量字段不会在拒绝载荷前触发远大于输入的大容量预分配。
+func TestValueCodecRejectsInflatedMapCountBeforeAllocation(t *testing.T) {
+	codec, err := NewValueCodec(ValueCodecConfig{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	payload := make([]byte, 64<<10)
+	payload[0] = byte(valueTagMap)
+	binary.LittleEndian.PutUint32(payload[1:5], uint32(len(payload)-5))
+	var before, after goruntime.MemStats
+	goruntime.ReadMemStats(&before)
+	_, err = codec.Decode(payload)
+	goruntime.ReadMemStats(&after)
+	if !errors.Is(err, ErrMalformedPayload) {
+		t.Fatalf("Decode = %v", err)
+	}
+	if allocated := after.TotalAlloc - before.TotalAlloc; allocated > 1<<20 {
+		t.Fatalf("invalid 64 KiB map allocated %d bytes before rejection", allocated)
 	}
 }
 

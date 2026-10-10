@@ -3,10 +3,12 @@ package runtime
 import (
 	"context"
 	"errors"
+	goruntime "runtime"
 	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
+	"weak"
 )
 
 // 验证 OnStart 可以创建并调用其它 Service，入口退出不停止新实例，消息来源仍为入口 ID。
@@ -52,6 +54,59 @@ func TestServiceCreateAndExitOnStart(t *testing.T) {
 	// 即使误保留已停止上下文，也不能继续创建新的运行单元。
 	if _, err := saved.CreateService(context.Background(), &exitProbe{}); !errors.Is(err, ErrServiceClosed) {
 		t.Fatal(err)
+	}
+}
+
+// 验证正常 Exit 释放业务对象和 runner，但保留已关闭 ID 的错误、观测和 OnStop 结果。
+func TestServiceExitReleasesBusinessReferences(t *testing.T) {
+	local, err := NewRuntime(Config{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := local.Start(); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = local.Close() })
+	stopErr := errors.New("exit cleanup failed")
+	id, reference := func() (ServiceID, weak.Pointer[exitProbe]) {
+		payload := make([]byte, 256<<10)
+		service := &exitProbe{
+			start: func(_ context.Context, self ServiceContext) error {
+				self.Exit()
+				return nil
+			},
+			handle: func(CommandContext) (any, error) { return payload[0], nil },
+			stop:   func(context.Context) error { return stopErr },
+		}
+		reference := weak.Make(service)
+		id, err := local.CreateService(context.Background(), service)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return id, reference
+	}()
+	waitExitedService(t, local, id)
+	deadline := time.Now().Add(time.Second)
+	for {
+		goruntime.GC()
+		if reference.Value() == nil {
+			break
+		}
+		if time.Now().After(deadline) {
+			t.Fatal("completed Service still retains its business object")
+		}
+	}
+	if local.scheduler.runnerTracked(id) {
+		t.Fatal("completed runner is still tracked")
+	}
+	if err := local.Send(id, 1); !errors.Is(err, ErrServiceClosed) {
+		t.Fatalf("Send to completed ID = %v", err)
+	}
+	if err := local.Close(); !errors.Is(err, stopErr) {
+		t.Fatalf("Close lost OnStop error: %v", err)
+	}
+	if len(local.Inspect().Services) != 0 {
+		t.Fatal("Close did not release completed metadata")
 	}
 }
 

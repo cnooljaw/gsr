@@ -2,8 +2,11 @@ package httpserver
 
 import (
 	"context"
+	"errors"
 	"io"
+	"net"
 	"net/http"
+	"sync"
 	"testing"
 	"time"
 )
@@ -46,6 +49,84 @@ func TestServerServesAndCloses(t *testing.T) {
 	}
 	if err := server.Start(); err == nil {
 		t.Fatal("Start() succeeded after Close")
+	}
+}
+
+// 验证重复 Close 等待同一在途清理；等待取消及最终关闭错误不会被后续调用隐藏。
+func TestServerConcurrentCloseSharesCompletion(t *testing.T) {
+	for _, force := range []bool{false, true} {
+		t.Run(map[bool]string{false: "graceful", true: "forced"}[force], func(t *testing.T) {
+			entered, release := make(chan struct{}), make(chan struct{})
+			var releaseOnce sync.Once
+			unblock := func() { releaseOnce.Do(func() { close(release) }) }
+			server, err := New(Config{Address: "127.0.0.1:0", Handler: http.HandlerFunc(func(http.ResponseWriter, *http.Request) {
+				close(entered)
+				<-release
+			})})
+			if err != nil {
+				t.Fatal(err)
+			}
+			if err := server.Start(); err != nil {
+				t.Fatal(err)
+			}
+			requestDone := make(chan struct{})
+			go func() {
+				defer close(requestDone)
+				response, _ := (&http.Client{Timeout: time.Second}).Get("http://" + server.Addr().String())
+				if response != nil {
+					response.Body.Close()
+				}
+			}()
+			defer func() {
+				unblock()
+				_ = server.Close(context.Background())
+				<-requestDone
+			}()
+			select {
+			case <-entered:
+			case <-time.After(time.Second):
+				t.Fatal("Handler did not start")
+			}
+			ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+			defer cancel()
+			first := make(chan error, 1)
+			go func() { first <- server.Close(ctx) }()
+			// 监听关闭证明第一次 Close 已开始，不用 sleep 推测 goroutine 调度。
+			for {
+				connection, err := net.DialTimeout("tcp", server.Addr().String(), 10*time.Millisecond)
+				if err != nil {
+					break
+				}
+				connection.Close()
+				if ctx.Err() != nil {
+					t.Fatal("Close did not stop listener")
+				}
+			}
+			cancelled, stopWaiting := context.WithCancel(context.Background())
+			stopWaiting()
+			if err := server.Close(cancelled); !errors.Is(err, context.Canceled) {
+				t.Fatalf("repeated Close before completion = %v", err)
+			}
+			if force {
+				cancel()
+			} else {
+				unblock()
+				if err := <-first; err != nil {
+					t.Fatalf("first Close = %v", err)
+				}
+				if err := server.Close(context.Background()); err != nil {
+					t.Fatalf("completed Close = %v", err)
+				}
+			}
+			if force {
+				if err := <-first; !errors.Is(err, context.Canceled) {
+					t.Fatalf("first Close = %v", err)
+				}
+				if err := server.Close(context.Background()); !errors.Is(err, context.Canceled) {
+					t.Fatalf("repeated Close lost final error: %v", err)
+				}
+			}
+		})
 	}
 }
 

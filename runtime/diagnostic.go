@@ -1,7 +1,6 @@
 package runtime
 
 import (
-	"errors"
 	goruntime "runtime"
 	"strings"
 )
@@ -46,15 +45,14 @@ func (runtime *Runtime) DroppedDiagnosticCount() uint64 {
 	return runtime.droppedDiagnostics.Load()
 }
 
-func (runtime *Runtime) recordHandlerError(instance *serviceInstance, message Message, err error, stack string) {
-	runtime.recordHandlerMetric(err)
+func (runtime *Runtime) recordHandlerError(instance *serviceInstance, message Message, cause, normalized error, stack string) {
+	runtime.recordHandlerMetric(normalized)
 	event := Diagnostic{
 		ServiceID: instance.id, Source: message.Source, Command: message.Command, Session: message.Session,
 		Class: ErrorClassRuntime, Code: ErrorCodeHandlerFailed,
-		Message: diagnosticErrorText(err), Stack: stack,
+		Message: diagnosticErrorText(cause), Stack: stack,
 	}
-	var status *StatusError
-	if errors.As(err, &status) && status != nil {
+	if status, ok := normalized.(*StatusError); ok && status != nil {
 		event.Class = ErrorClass(strings.Clone(string(status.Class)))
 		event.Code = ErrorCode(strings.Clone(string(status.Code)))
 	}

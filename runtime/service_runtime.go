@@ -76,11 +76,14 @@ func (scheduler *scheduler) stop(ctx context.Context) error {
 	}
 	scheduler.mu.Lock()
 	scheduler.stopping = true
-	instances := make([]*serviceInstance, 0, len(scheduler.runners))
-	for _, instance := range scheduler.runners {
+	scheduler.mu.Unlock()
+	// 已完成 runner 不再被 Scheduler 持有；Runtime 的退役元数据仍保存 OnStop 结果。
+	scheduler.runtime.servicesMu.RLock()
+	instances := make([]*serviceInstance, 0, len(scheduler.runtime.services))
+	for _, instance := range scheduler.runtime.services {
 		instances = append(instances, instance)
 	}
-	scheduler.mu.Unlock()
+	scheduler.runtime.servicesMu.RUnlock()
 
 	var result error
 	for _, instance := range instances {
@@ -95,6 +98,12 @@ func (scheduler *scheduler) stop(ctx context.Context) error {
 		scheduler.watchCompletion(instance)
 	}
 	return result
+}
+
+func (scheduler *scheduler) releaseRunner(id ServiceID) {
+	scheduler.mu.Lock()
+	delete(scheduler.runners, id)
+	scheduler.mu.Unlock()
 }
 
 func (scheduler *scheduler) removeCompleted(instances []*serviceInstance) {
@@ -323,12 +332,13 @@ func (dispatcher *localDispatcher) enqueue(message Message) (err error) {
 		return ErrServiceNotFound
 	}
 	targetState := targetInstance.currentState()
+	_, supportsClientMessages := targetInstance.service.(ClientMessageHandler)
 	runtime.servicesMu.RUnlock()
 	if targetErr := serviceAdmissionError(targetState); targetErr != nil {
 		return targetErr
 	}
 	if message.kind == messageKindClient {
-		if _, supportsClientMessages := targetInstance.service.(ClientMessageHandler); !supportsClientMessages {
+		if !supportsClientMessages {
 			return ErrClientMessageUnsupported
 		}
 		message.clientFrame = append([]byte(nil), message.clientFrame...)
@@ -420,7 +430,9 @@ func (runtime *Runtime) requestStopServices(ctx context.Context) error {
 	}
 	runtime.servicesMu.RUnlock()
 	for _, instance := range instances {
-		instance.requestStop(ctx)
+		if instance.currentState() != serviceStopped {
+			instance.requestStop(ctx)
+		}
 	}
 
 	creatingDone := make(chan struct{})

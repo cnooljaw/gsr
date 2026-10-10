@@ -140,17 +140,30 @@ func callTimeoutError() error {
 }
 
 func normalizeCallError(err error) error {
+	normalized, _ := normalizeHandlerError(err)
+	return normalized
+}
+
+// normalizeHandlerError 只在受控边界执行业务 error 的 Is/As/Unwrap 扩展。
+// 输出均为 Runtime 自有状态值，后续 Reply、计数和诊断不再遍历业务错误链。
+func normalizeHandlerError(err error) (normalized error, stack string) {
+	defer func() {
+		if recover() != nil {
+			normalized = ErrServicePanicked
+			stack = handlerPanicStack()
+		}
+	}()
 	if err == nil {
-		return nil
+		return nil, ""
 	}
 	if errors.Is(err, ErrServicePanicked) {
-		return ErrServicePanicked
+		return ErrServicePanicked, ""
 	}
 	var status *StatusError
 	if errors.As(err, &status) && status != nil {
-		return NewStatusError(status.Class, status.Code, status.Message)
+		return NewStatusError(status.Class, status.Code, status.Message), ""
 	}
-	return ErrHandlerFailed
+	return ErrHandlerFailed, ""
 }
 
 func (runtime *Runtime) completeMessage(message Message, result any, err error) {
@@ -159,6 +172,6 @@ func (runtime *Runtime) completeMessage(message Message, result any, err error) 
 	}
 	runtime.pendingCalls.complete(message.Session, callResult{
 		value: result,
-		err:   normalizeCallError(err),
+		err:   err,
 	})
 }

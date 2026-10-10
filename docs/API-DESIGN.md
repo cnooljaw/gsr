@@ -33,6 +33,8 @@ Protocol 的构造器复制 Handler 表，校验编号已定义且属于客户�
 
 独立的 `httpserver.Server` 只管理普通 HTTP 监听与有序关闭，不接管路由、鉴权或到业务 Service 的映射。使用 `gsr.Run` 时，MainService 可通过 `self.OpenHTTP` 打开一个 HTTP 监听，由 Run 持有并在 Runtime 停止前关闭；直接使用 `httpserver.Server` 时仍由调用方持有。`redisclient.New` 和 `mysqlclient.Open` 分别返回原生 `*redis.Client`、`*sql.DB`，其生命周期仍由宿主负责。这些能力不转为 RedisService/MySQLService，也不进入 Core。
 
+`httpserver.Server.Close(ctx)` 的首次调用执行关闭，其 context 控制有序关闭预算，超时或取消后强制关闭连接，但不强杀 Handler。并发或重复调用等待同一关闭流程并取得同一最终结果；后续调用的 context 只控制自身等待，不取消原流程。关闭完成前不得仅因已经停止接纳就返回成功。
+
 HTTP 路由使用应用提供的 `http.Handler` / `http.ServeMux`。多条 REST 路由可以选择不同的本地 Service。`self.OpenHTTP(address, func(*gsr.HTTPIngress) http.Handler)` 让 Handler 保存受信任的窄入口，使用 `HTTPIngress.SendName/CallName` 按当前节点的名称表解析目标，再复用 Core 基础设施 Send/Call；消息 Source 固定为零，不伪装成 MainService 或 HTTP 客户端。Handler 自行决定鉴权、参数校验、有限等待和 HTTP 错误映射。需要汇总本地与远端结果时，由拥有该业务操作的 Service 发起本地和 Cluster Call，不让 HTTP goroutine 冒充 Service 来源。路由热变更若成为实际需求，整体重建并替换路由表，不为 `httpserver` 增加逐条动态增删 API；Go `net/http` 已处理 HTTP 并发，默认不增设固定 HTTP Agent 池。`examples/http-inbound` 的管理路由已使用 `gsr.Run`、MainService 和 `HTTPIngress` 验证本地及远端业务链路；单个房间人数用例保留手工组装 Runtime 的底层示范。
 
 Gate 与业务 Agent 的组装只需要一个构造回调，不增加 AgentFactory 抽象：
@@ -692,6 +694,8 @@ tcpListener → inboundConnection → localRequestAdapter → Runtime.Send/Call
 
 默认 `ValueCodec` 的解码结果使用稳定的规范类型：有符号整数为 `int64`，无符号整数为 `uint64`，浮点数为 `float64`；复合值为 `[]any` 和 `map[string]any`。它拒绝 pointer、func、chan、struct、复杂数、`uintptr`、非有限浮点和非 string map key。自定义结构须在业务边界转换为支持的值，不由默认 Codec 猜测，也不按 Command 注册编码器。
 
+集合数量必须先符合剩余载荷的最小编码大小，再用于容量分配；不能让伪造的 map 数量将很小的输入放大为大额预分配。此检查不改变合法值的 wire 格式。
+
 Cluster 不维护 Command 清单。`ClusterConfig.Codec` 为节点所有命令共享的 PayloadCodec，未设置时使用默认 ValueCodec；不能按 CommandID 切换协议或把编码配置用作命令准入表。需要自定义编码时两端须一致，普通业务无需配置。未知 Command 与其它合法 Message 一样进入目标 Mailbox，Send 不回包，Call 由目标返回 ErrUnknownCommand。
 
 `FrameCodec` 为每个逻辑 Envelope 添加四字节大端 body length，长度上限 `MaxFrame` 包含这四个字节。`Decode` 只接受一个边界完整、没有尾随数据的 frame；读取部分帧、拼接多个 frame 和连接关闭由私有连接 owner 负责。Envelope 仍不携带 version，版本协商留在 framing 或连接握手。
@@ -840,6 +844,7 @@ type StatusError struct {
 - Domain code 使用稳定、可读的 `{domain}.{reason}`，例如 `room.full`；GSR 保留 `runtime.` 前缀。
 - `StatusError` 同时承载本地 error 和可传输的稳定状态，不再额外包装一个重复的 `ErrorStatus`；它按 Class + Code 实现 `errors.Is`，本地和 Cluster 解码后的 typed client 使用同一种判断方式。
 - Runtime 的 panic 判定、Service 停止和 panic 计数同样按 Class + Code 比较，不因 Code 相同就将 Domain 错误当成 Runtime panic。Handler 返回带类型的 nil `*StatusError`（包括包装后的错误）时按未分类错误处理，Call 返回 `ErrHandlerFailed`，Send 记录 Handler error 计数；不得因此崩溃或误停 Service。
+- 业务 error 的自定义 `Is`、`As`、`Unwrap` 也属于受控执行边界。分类时发生 panic，按真实 Handler panic 收容：Call 返回安全的 `ErrServicePanicked`，停止当前 Service，并保留本地堆栈，不影响其它 Service。错误链只在此边界解析，后续回复、计数和诊断使用 Runtime 自有的安全错误值。`Error()` 格式化 panic 仍只使用诊断文本兜底；无限阻塞的方法不能被 Go 强杀。
 - Message 是经过审查的安全文本，只用于日志或展示，禁止比较字符串决定业务分支。
 - Handler 返回未实现 GSR 状态契约的普通 error 时，Runtime 在本地记录原始 error，并向调用方返回 `runtime.handler_failed`。
 - Handler panic 对调用方返回 `runtime.service_panicked`；panic value 和 stack 只进入本地诊断，不进入 Reply 或 wire。
@@ -961,6 +966,7 @@ Runtime 不使用一个不断增长的 `closeFn` 承载所有清理逻辑。Runt
 - 进入 `Stopping` 后立即拒绝新消息、取消 Timer，并结束该 Service 发起的 PendingCall。
 - 当前 Handler 可以在 shutdown deadline 内结束；排队的 Send 被丢弃并计入诊断，排队的 Call 以 `ErrServiceStopping` 完成。
 - `OnStop` 最多执行一次。Stop 和 Close 幂等并等待完成；重复 Start 返回稳定的生命周期错误。
+- Service 的 `OnStop` 真实返回后立即释放业务实例、上下文及关闭取消函数的引用，runner 完成时从 Scheduler 移除。保留已关闭 ID 的状态、Mailbox 容量和停止结果等元数据，维持 `ErrServiceClosed`、Inspection 及最终关闭错误汇总，Runtime 停止收尾时再移除记录；这些元数据仍随已发放 ID 数量增长，但不保留业务对象。
 - Stop 为当前 Handler 和 `OnStop` 建立统一的有限 shutdown deadline。Go 不能强杀忽略取消的 Handler 或 `OnStop`：deadline 到达后 Stop 返回稳定超时错误，Service 保持拒绝 admission 并从普通本地寻址中移除，但仍在运行的 runner 必须继续由 Runtime Inspection 追踪到真实返回。
 - Runtime 不得在超时 Handler 尚未返回时并发调用 `OnStop`。Handler 后续返回后，runner 仍至多调用一次 `OnStop`，并传入已经取消的 shutdown context；若 `OnStop` 也不返回，任务继续保持可观测。
 - 超时不表示业务 goroutine 已终止，也不得导致旧 ServiceID 复用。重复 Stop 返回或等待已保存的同一停止结果，不启动第二套停止流程。

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"testing"
 )
 
@@ -31,6 +32,72 @@ func TestNormalizeCallErrorIdentity(t *testing.T) {
 			}
 		})
 	}
+}
+
+// 验证错误的 Is/As/Unwrap 扩展 panic 只停止当前 Service，安全完成 Call 并留下诊断。
+func TestHandlerErrorClassificationPanicContained(t *testing.T) {
+	for _, hook := range []string{"Is", "As", "Unwrap"} {
+		for _, call := range []bool{false, true} {
+			t.Run(fmt.Sprintf("%s/Call=%t", hook, call), func(t *testing.T) {
+				local := newCallTestRuntime(t, Config{})
+				id, err := local.CreateService(context.Background(), &errorBoundaryService{err: classificationPanicError{hook: hook}})
+				if err != nil {
+					t.Fatal(err)
+				}
+				if call {
+					_, err := local.Call(context.Background(), id, 1)
+					if !errors.Is(err, ErrServicePanicked) || strings.Contains(err.Error(), "private") {
+						t.Fatalf("Call error = %v", err)
+					}
+				} else if err := local.Send(id, 1); err != nil {
+					t.Fatal(err)
+				}
+				event := awaitDiagnostic(t, local)
+				if event.Code != ErrorCodeServicePanicked || event.Stack == "" {
+					t.Fatalf("diagnostic = %+v", event)
+				}
+				waitExitedService(t, local, id)
+				healthyID, err := local.CreateService(context.Background(), &errorBoundaryService{})
+				if err != nil {
+					t.Fatal(err)
+				}
+				if value, err := local.Call(context.Background(), healthyID, 2); err != nil || value != "alive" {
+					t.Fatalf("healthy Call = %v, %v", value, err)
+				}
+				inspection := local.Inspect()
+				if inspection.Metrics.Panics != 1 || inspection.Metrics.HandlerErrors != 1 || inspection.PendingCallCount != 0 {
+					t.Fatalf("inspection = %+v", inspection)
+				}
+			})
+		}
+	}
+}
+
+type classificationPanicError struct{ hook string }
+
+func (failure classificationPanicError) Error() string {
+	return "private business error"
+}
+
+func (failure classificationPanicError) Is(error) bool {
+	if failure.hook == "Is" {
+		panic("private Is panic")
+	}
+	return false
+}
+
+func (failure classificationPanicError) As(any) bool {
+	if failure.hook == "As" {
+		panic("private As panic")
+	}
+	return false
+}
+
+func (failure classificationPanicError) Unwrap() error {
+	if failure.hook == "Unwrap" {
+		panic("private Unwrap panic")
+	}
+	return nil
 }
 
 // 验证 Send 与 Call 的特殊错误不会误停 Service，后续消息仍执行且 panic 计数不增加。

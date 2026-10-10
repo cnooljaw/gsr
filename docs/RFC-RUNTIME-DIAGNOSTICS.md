@@ -36,9 +36,9 @@ type Diagnostic struct {
 
 - ServiceID 是处理消息的 Service，Source 是原消息来源；Timer/基础设施来源仍为零。
 - Session 为零表示 Send，非零表示本地 Call；不增加业务 OperationID 或 ClusterSessionID。
-- Class/Code 使用已有错误身份规则；未知错误使用 ErrHandlerFailed 身份，真实 Handler panic 使用 ErrServicePanicked 身份。
+- Class/Code 使用已有错误身份规则；未知错误使用 ErrHandlerFailed 身份，真实 Handler panic 使用 ErrServicePanicked 身份。返回的业务 error 在 Is/As/Unwrap 分类过程中 panic 也按真实 panic 收容，停止当前 Service，不逃逸到进程；后续回复、计数与诊断不再遍历该业务错误链。
 - Message 保存本地错误文本快照，不保留原始 error 对象、Args、返回值或业务对象引用。它不是可直接发给客户端的安全 Message，也不保证自动脱敏。
-- Stack 仅在实际 recover 到 Handler panic 时采集；普通返回 ErrServicePanicked 不凭错误码伪造堆栈。
+- Stack 仅在实际 recover 到 Handler 或错误分类 panic 时采集；普通返回 ErrServicePanicked 不凭错误码伪造堆栈。Error 方法格式化 panic 只使用文本兜底，不将其升级为 Service panic。
 - Message 最多 4 KiB、Stack 最多 16 KiB，超限按字节截断；字符串快照保证宿主不能通过事件修改 Service 状态。错误格式化防御 panic，但 Go 无法强杀无限阻塞的自定义 Error 方法，不增加后台格式化 worker。
 
 选择文本快照而不是 Err error，是为了避免诊断队列长期持有业务对象或让日志消费者并发访问可变自定义 error。代价是诊断消费者不能 errors.As 原始 error；程序分类使用 Class/Code，Call 返回值的既有错误规则不改变。
@@ -54,6 +54,6 @@ type Diagnostic struct {
 
 ## 验证门禁
 
-覆盖 Send/Call 的关联字段、普通错误与 typed-nil 错误、真实 panic 的本地 stack 与安全 Reply 分离、后续消息行为、无消费者与队列满载、文本快照及截断，以及 Stop/Close 超时后的晚到事件、最终关闭、重复关闭与并发安全。
+覆盖 Send/Call 的关联字段、普通错误与 typed-nil 错误、Handler 和 Is/As/Unwrap 分类 panic 的本地 stack 与安全 Reply 分离、其它 Service 继续运行、后续消息行为、无消费者与队列满载、文本快照及截断，以及 Stop/Close 超时后的晚到事件、最终关闭、重复关闭与并发安全。
 
 不新增 DiagnosticSink 接口、callback、全局 logger、事件路由器或转发 goroutine。后续 Cluster 诊断简化与此切片分开处理。

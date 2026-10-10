@@ -345,7 +345,8 @@ func (decoder *valueDecoder) decodeMap(depth int) (any, error) {
 	if uint64(count) > uint64(decoder.codec.maxPayload) {
 		return nil, fmt.Errorf("%w: map has %d items", ErrPayloadTooLarge, count)
 	}
-	if count > len(decoder.data)-decoder.offset {
+	// 每个条目至少包含四字节 key 长度和一个 value tag，先验证数量再预分配。
+	if count > (len(decoder.data)-decoder.offset)/5 {
 		return nil, malformedPayload("map count exceeds remaining payload")
 	}
 	values := make(map[string]any, count)

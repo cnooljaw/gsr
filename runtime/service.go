@@ -184,7 +184,10 @@ func (instance *serviceInstance) requestStopWithCancel(ctx context.Context, canc
 }
 
 func (instance *serviceInstance) run() {
-	defer close(instance.done)
+	defer func() {
+		instance.runtime.scheduler.releaseRunner(instance.id)
+		close(instance.done)
+	}()
 	for {
 		message, ok := instance.mailbox.dequeue()
 		if !ok {
@@ -226,13 +229,22 @@ func (instance *serviceInstance) finishStop() {
 		stopCancel()
 	}
 
+	// 与客户端能力检查共用注册表锁，避免退役时清空 Service 与入站读取竞争。
+	instance.runtime.servicesMu.Lock()
 	instance.mu.Lock()
 	if contextDeadlineExceeded(stopContext) {
 		instance.stopDeadlineExceeded = true
 	}
 	instance.stopResult = onStopErr
 	instance.state = serviceStopped
+	// 保留 ID、状态、Mailbox 容量和收尾结果用于关闭语义及 Inspection，
+	// 不再让历史记录持有业务实例、回调上下文或取消函数。
+	instance.service = nil
+	instance.context = nil
+	instance.stopContext = nil
+	instance.stopCancel = nil
 	instance.mu.Unlock()
+	instance.runtime.servicesMu.Unlock()
 }
 
 func (instance *serviceInstance) deadlineExceeded() bool {
@@ -325,9 +337,16 @@ func (runtime *Runtime) executeMessage(instance *serviceInstance, message Messag
 			stack = handlerPanicStack()
 			err = wrapStatusError(ErrServicePanicked, "service Handler panicked: %v", recovered)
 		}
+		cause := err
+		var classificationStack string
+		err, classificationStack = normalizeHandlerError(err)
+		if classificationStack != "" {
+			stack = classificationStack
+			cause = wrapStatusError(ErrServicePanicked, "service error classification panicked")
+		}
 		runtime.completeMessage(message, result, err)
 		if err != nil {
-			runtime.recordHandlerError(instance, message, err, stack)
+			runtime.recordHandlerError(instance, message, cause, err, stack)
 		}
 	}()
 
