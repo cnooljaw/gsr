@@ -1,5 +1,7 @@
 # Context
 
+当前版本为 **GSR 1.0**（完整版本号 `1.0.0`，见 [VERSION](VERSION)），自 2026-10-12 起进入正式内部发布阶段。发布范围和验证记录见 [内部发布说明](docs/RELEASE-1.0.md)。历史 Core/Cluster 切片编号不作为当前产品版本号。
+
 ## Glossary
 
 - **Gate / Protocol 边界**：Gate 只收发不透明字节并拥有连接、安全封装、有界队列和关闭；Protocol 理解 Envelope、编解码、校验和分发，只依赖字节发送窄接口。二者为同级包，生产代码互不导入，业务 Agent 是组合点。ClientSession.Send 接纳时复制字节快照，成功只表示本地入队，不保证送达或执行一次。

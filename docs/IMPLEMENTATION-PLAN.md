@@ -2,6 +2,8 @@
 
 本文把已接受的 API 和 ADR 拆成可验证的纵向切片。每个切片只引入完成当前运行链所需的能力；Core 完成后再开始 Cluster。
 
+当前 GSR 版本定为 1.0，已进入正式内部发布阶段，见 [内部发布说明](RELEASE-1.0.md)。下文 Core v0.1 是历史路线图的里程碑名称，不代表当前产品版本或已有发布标签。
+
 当前应用入口及编码契约以 [ADR 0011](adr/0011-service-first-application-api.md) 为准：gsr.Run 统一管理运行环境，业务使用 self.Cluster()/self.Logger()；已移除 CommandCodecRegistry，合法未知命令由目标 Service 判断。下方历史切片中的 Node/Host 组装描述不作为当前实施要求。
 
 本文保留历次切片记录，部分“本轮未实现”描述仅代表当时范围。当前能力与证据汇总见 [当前阶段验证清单](VALIDATION-STATUS.md)，不要将历史切片的非目标误读为当前缺失。
@@ -22,7 +24,7 @@
 
 日志基准 BenchmarkLoggingBatch 已补禁用、io.Discard、文件三种模式，每批 10,000 次调用并包含关闭排空，报告接纳/丢弃/禁用及分配成本；TestLoggingBatchAccounting 验证计数与文件行数。单发送者文件缓存写入结果不代表慢盘、多 Service 并发或可靠落盘性能。
 
-Core v0.1 是第一条公开兼容基线。此前各切片只在能力真正实现时把对应方法加入代码接口：Core 1 提供 Self/Send，Core 2 加入 After/CancelTimer，Core 3 加入 Call；不得为了让接口提前看似完整而加入固定返回“未实现”的占位方法。每次接口增长仍须同步文档和测试。
+历史路线图以 Core v0.1 作为首条 Core 兼容基线目标。此前各切片只在能力真正实现时把对应方法加入代码接口：Core 1 提供 Self/Send，Core 2 加入 After/CancelTimer，Core 3 加入 Call；不得为了让接口提前看似完整而加入固定返回“未实现”的占位方法。每次接口增长仍须同步文档和测试。
 
 ## 总体顺序
 

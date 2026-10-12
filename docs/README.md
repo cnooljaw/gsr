@@ -2,6 +2,8 @@
 
 本目录记录 `gsr` 当前设计。项目按新实现推进，兄弟目录中的旧工程和 Skynet 源码只用于比较与学习，不构成本项目的兼容契约。
 
+当前版本定为 GSR 1.0，已进入正式内部发布阶段。版本与接入范围见 [1.0 内部发布说明](RELEASE-1.0.md)，初次接入也可从根目录 [README](../README.md) 开始。
+
 ## 阅读顺序
 
 客户端接入见 [WebSocket Gate、客户端协议与 Agent](RFC-WEBSOCKET-GATE.md)：WSS、固定 33 字节二进制握手、Protobuf Envelope（msg_id、uint32 request_id、payload）、X25519/HKDF 上行 MAC，以及请求/响应/通知/推送独立编号；首版不实现旧头兼容或 DES。生产 Gate 的完整验收仍按 RFC 的失败矩阵和压力计划推进。
@@ -29,6 +31,7 @@
 17. [当前阶段验证清单](VALIDATION-STATUS.md)：已覆盖运行链、测试证据、当前验证结果与尚未验收的范围。
 18. [最小双进程示例](../examples/twonode/README.md)：独立配置与日志目录、Send/Call、停机与恢复演练。
 19. [本地规模基线](PERFORMANCE-BASELINE.md)：10,000 Service/Timer 与 Send/Call 测量结果、复现命令及口径限制。
+20. [GSR 1.0 内部发布说明](RELEASE-1.0.md)：版本、代码基线、发布范围、接入边界和发布前验证结果。
 
 后续出现需要长期保留的重大架构取舍时，新增 ADR 或 RFC，并从这里建立索引。
 
