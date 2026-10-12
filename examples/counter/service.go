@@ -19,6 +19,8 @@ type CounterService struct {
 	count      int
 }
 
+var _ gsr.Service = (*CounterService)(nil)
+
 func newCounterService() *CounterService {
 	service := &CounterService{}
 	service.dispatcher = gsr.MustDispatcher(map[runtime.CommandID]any{

@@ -49,6 +49,8 @@ type productService struct {
 	timeout    time.Duration
 }
 
+var _ gsr.Service = (*productService)(nil)
+
 func newProductService(db *sql.DB, timeout time.Duration) (*productService, error) {
 	if db == nil || timeout <= 0 {
 		return nil, errors.New("product service requires a database and finite timeout")

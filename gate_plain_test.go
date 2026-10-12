@@ -115,6 +115,11 @@ type applicationGateAgent struct {
 	protocolDispatcher *protocol.Dispatcher[CommandContext]
 }
 
+var (
+	_ Service              = (*applicationGateAgent)(nil)
+	_ ClientMessageHandler = (*applicationGateAgent)(nil)
+)
+
 func (agent *applicationGateAgent) OnStart(context.Context, ServiceContext) error {
 	registry, err := protocol.NewRegistry(echopb.MessageCatalogGsrExampleEchoV1Echo)
 	if err != nil {

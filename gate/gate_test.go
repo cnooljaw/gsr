@@ -3963,11 +3963,21 @@ type productionTestAgent struct {
 	once         sync.Once
 }
 
+var (
+	_ runtime.Service              = (*productionTestAgent)(nil)
+	_ runtime.ClientMessageHandler = (*productionTestAgent)(nil)
+)
+
 type startFailingProductionTestAgent struct {
 	*productionTestAgent
 	stopCalled chan struct{}
 	startErr   error
 }
+
+var (
+	_ runtime.Service              = (*startFailingProductionTestAgent)(nil)
+	_ runtime.ClientMessageHandler = (*startFailingProductionTestAgent)(nil)
+)
 
 func (agent *startFailingProductionTestAgent) OnStart(context.Context, runtime.ServiceContext) error {
 	if agent.startErr != nil {
@@ -4021,6 +4031,11 @@ type stopClosingProductionTestAgent struct {
 	stopResult chan error
 }
 
+var (
+	_ runtime.Service              = (*stopClosingProductionTestAgent)(nil)
+	_ runtime.ClientMessageHandler = (*stopClosingProductionTestAgent)(nil)
+)
+
 func (agent *stopClosingProductionTestAgent) OnStop(context.Context) error {
 	err := agent.client.Close()
 	agent.stopResult <- err
@@ -4034,6 +4049,11 @@ type blockingInboundAgent struct {
 	startOnce    sync.Once
 	stopOnce     sync.Once
 }
+
+var (
+	_ runtime.Service              = (*blockingInboundAgent)(nil)
+	_ runtime.ClientMessageHandler = (*blockingInboundAgent)(nil)
+)
 
 func (*blockingInboundAgent) OnStart(context.Context, runtime.ServiceContext) error { return nil }
 
@@ -4061,6 +4081,11 @@ type burstOutboundAgent struct {
 	resultOnce   sync.Once
 	stopOnce     sync.Once
 }
+
+var (
+	_ runtime.Service              = (*burstOutboundAgent)(nil)
+	_ runtime.ClientMessageHandler = (*burstOutboundAgent)(nil)
+)
 
 func (*burstOutboundAgent) OnStart(context.Context, runtime.ServiceContext) error { return nil }
 
@@ -4091,6 +4116,11 @@ type slowOutboundAgent struct {
 	resultOnce   sync.Once
 	stopOnce     sync.Once
 }
+
+var (
+	_ runtime.Service              = (*slowOutboundAgent)(nil)
+	_ runtime.ClientMessageHandler = (*slowOutboundAgent)(nil)
+)
 
 func (*slowOutboundAgent) OnStart(context.Context, runtime.ServiceContext) error { return nil }
 
@@ -4134,6 +4164,11 @@ type longSlowOutboundAgent struct {
 	queueFullOnce     sync.Once
 	stopOnce          sync.Once
 }
+
+var (
+	_ runtime.Service              = (*longSlowOutboundAgent)(nil)
+	_ runtime.ClientMessageHandler = (*longSlowOutboundAgent)(nil)
+)
 
 func (*longSlowOutboundAgent) OnStart(context.Context, runtime.ServiceContext) error { return nil }
 
@@ -4188,6 +4223,11 @@ type loadTestAgent struct {
 	disconnected chan struct{}
 	stopOnce     sync.Once
 }
+
+var (
+	_ runtime.Service              = (*loadTestAgent)(nil)
+	_ runtime.ClientMessageHandler = (*loadTestAgent)(nil)
+)
 
 func (*loadTestAgent) OnStart(context.Context, runtime.ServiceContext) error { return nil }
 

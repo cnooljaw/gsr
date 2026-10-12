@@ -58,10 +58,17 @@ type serviceAdapter struct {
 	logger  *logging.Logger
 }
 
+var _ runtime.Service = (*serviceAdapter)(nil)
+
 type clientMessageAdapter struct {
 	*serviceAdapter
 	handler ClientMessageHandler
 }
+
+var (
+	_ runtime.Service              = (*clientMessageAdapter)(nil)
+	_ runtime.ClientMessageHandler = (*clientMessageAdapter)(nil)
+)
 
 func (node *application) wrap(service Service) (runtime.Service, error) {
 	if service == nil {
@@ -117,6 +124,8 @@ type serviceContext struct {
 	adapter *serviceAdapter
 }
 
+var _ ServiceContext = (*serviceContext)(nil)
+
 func (self *serviceContext) CreateService(ctx context.Context, service Service) (runtime.ServiceID, error) {
 	wrapped, err := self.adapter.node.wrap(service)
 	if err != nil {
@@ -166,6 +175,8 @@ type commandContext struct {
 	*serviceContext
 	source runtime.ServiceID
 }
+
+var _ CommandContext = (*commandContext)(nil)
 
 func (ctx *commandContext) Source() runtime.ServiceID {
 	return ctx.source

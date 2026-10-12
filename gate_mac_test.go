@@ -107,6 +107,11 @@ type productionApplicationAgent struct {
 	stopped chan<- struct{}
 }
 
+var (
+	_ Service              = (*productionApplicationAgent)(nil)
+	_ ClientMessageHandler = (*productionApplicationAgent)(nil)
+)
+
 func (agent *productionApplicationAgent) OnStart(_ context.Context, self ServiceContext) error {
 	if self.Cluster() == nil || self.Logger() == nil {
 		return fmt.Errorf("Agent 缺少应用上下文能力")

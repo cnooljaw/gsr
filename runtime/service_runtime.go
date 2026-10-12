@@ -12,6 +12,8 @@ type serviceLifecycle struct {
 	runtime *Runtime
 }
 
+var _ lifecycleComponent = (*serviceLifecycle)(nil)
+
 // localDispatcher 是由 Runtime 管理的本地路由边界。
 // 它查询当前 Service 注册表，不检查 Core CommandID 支持情况；
 // 客户端消息则要求目标 Service 实现 ClientMessageHandler。
@@ -41,6 +43,8 @@ type scheduler struct {
 	runners  map[ServiceID]*serviceInstance
 	watching map[ServiceID]struct{}
 }
+
+var _ lifecycleComponent = (*scheduler)(nil)
 
 func newScheduler(runtime *Runtime) *scheduler {
 	return &scheduler{

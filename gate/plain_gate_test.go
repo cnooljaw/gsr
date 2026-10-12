@@ -1194,6 +1194,11 @@ type testAgent struct {
 	startErr     error
 }
 
+var (
+	_ runtime.Service              = (*testAgent)(nil)
+	_ runtime.ClientMessageHandler = (*testAgent)(nil)
+)
+
 func (agent *testAgent) OnStart(context.Context, runtime.ServiceContext) error { return agent.startErr }
 
 func (agent *testAgent) Handle(commandContext runtime.CommandContext, command runtime.CommandID, _ ...any) (any, error) {
@@ -1229,6 +1234,11 @@ type blockingDebugAgent struct {
 	startOnce    sync.Once
 	stopOnce     sync.Once
 }
+
+var (
+	_ runtime.Service              = (*blockingDebugAgent)(nil)
+	_ runtime.ClientMessageHandler = (*blockingDebugAgent)(nil)
+)
 
 func (*blockingDebugAgent) OnStart(context.Context, runtime.ServiceContext) error { return nil }
 

@@ -281,6 +281,8 @@ type serviceContext struct {
 	instance *serviceInstance
 }
 
+var _ ServiceContext = (*serviceContext)(nil)
+
 func (context *serviceContext) Self() ServiceID {
 	return context.instance.id
 }
@@ -325,6 +327,8 @@ type commandContext struct {
 	*serviceContext
 	source ServiceID
 }
+
+var _ CommandContext = (*commandContext)(nil)
 
 func (context *commandContext) Source() ServiceID {
 	return context.source

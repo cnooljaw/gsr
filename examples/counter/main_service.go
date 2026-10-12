@@ -15,6 +15,8 @@ type MainService struct {
 	finished context.CancelFunc // 有限演示通知宿主结束等待；普通服务端通常由进程信号取消。
 }
 
+var _ gsr.Service = (*MainService)(nil)
+
 // OnStart 完成本例的一次性业务流程；Counter 创建后即可使用，不需要 Start Command。
 func (service *MainService) OnStart(ctx context.Context, self gsr.ServiceContext) error {
 	const counterName = "counter"

@@ -115,6 +115,8 @@ type timerManager struct {
 	lastFailure *timerAdmissionFailure
 }
 
+var _ lifecycleComponent = (*timerManager)(nil)
+
 func newTimerManager(runtime *Runtime, clock runtimeClock) *timerManager {
 	if clock == nil {
 		clock = realClock{}

@@ -26,6 +26,8 @@ type userService struct {
 	banned     map[uint64]bool
 }
 
+var _ gsr.Service = (*userService)(nil)
+
 func newUserService() *userService {
 	service := &userService{banned: make(map[uint64]bool)}
 	service.dispatcher = gsr.MustDispatcher(map[runtime.CommandID]any{
@@ -72,6 +74,8 @@ type dashboardService struct {
 	dispatcher *gsr.Dispatcher
 	remoteNode cluster.NodeID
 }
+
+var _ gsr.Service = (*dashboardService)(nil)
 
 func newDashboardService(remoteNode cluster.NodeID) *dashboardService {
 	service := &dashboardService{remoteNode: remoteNode}

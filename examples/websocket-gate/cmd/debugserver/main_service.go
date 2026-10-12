@@ -15,6 +15,8 @@ type mainService struct {
 	options serverOptions
 }
 
+var _ gsr.Service = (*mainService)(nil)
+
 func (service *mainService) OnStart(ctx context.Context, self gsr.ServiceContext) error {
 	registry, err := newEchoRegistry()
 	if err != nil {

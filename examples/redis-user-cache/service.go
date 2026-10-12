@@ -30,6 +30,8 @@ type userProfileService struct {
 	cache      *userHashCache
 }
 
+var _ gsr.Service = (*userProfileService)(nil)
+
 func newUserProfileService(cache *userHashCache) *userProfileService {
 	service := &userProfileService{cache: cache}
 	service.dispatcher = gsr.MustDispatcher(map[runtime.CommandID]any{

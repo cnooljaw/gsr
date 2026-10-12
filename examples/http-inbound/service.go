@@ -13,6 +13,8 @@ type roomService struct {
 	players int
 }
 
+var _ runtime.Service = (*roomService)(nil)
+
 func (service *roomService) OnStart(_ context.Context, _ runtime.ServiceContext) error {
 	return nil
 }

@@ -61,6 +61,8 @@ type NodeSender struct {
 	sharedDiagnostics *clusterDiagnostics
 }
 
+var _ OutboundSender = (*NodeSender)(nil)
+
 // NewNodeSender 构造并启动一个使用有界队列的出站发送 worker。
 func NewNodeSender(config NodeSenderConfig) (*NodeSender, error) {
 	return newNodeSender(config, nil)

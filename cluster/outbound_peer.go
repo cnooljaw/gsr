@@ -44,6 +44,8 @@ type outboundPeer struct {
 	diagnosticsClosed bool // sendMu 保护；所有生产者退出后关闭。
 }
 
+var _ Transport = (*outboundPeer)(nil)
+
 func newOutboundPeer(config outboundPeerConfig) (*outboundPeer, error) {
 	if config.node == "" || config.address == "" || !config.calls.valid() ||
 		config.codec == nil || config.codec.maxFrame <= frameHeaderSize ||

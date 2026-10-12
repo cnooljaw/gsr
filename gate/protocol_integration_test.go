@@ -28,6 +28,11 @@ type protocolGateAgent struct {
 	echoBlockOnce          sync.Once
 }
 
+var (
+	_ runtime.Service              = (*protocolGateAgent)(nil)
+	_ runtime.ClientMessageHandler = (*protocolGateAgent)(nil)
+)
+
 const protocolTimeoutCommand runtime.CommandID = 0x7100
 
 // timeoutProtocolAgent 将 Agent 内部的 Core Call 超时接到客户端协议错误回复，验证超时归属不进入 Gate。
@@ -39,6 +44,11 @@ type timeoutProtocolAgent struct {
 	disconnected       chan struct{}
 	stopOnce           sync.Once
 }
+
+var (
+	_ runtime.Service              = (*timeoutProtocolAgent)(nil)
+	_ runtime.ClientMessageHandler = (*timeoutProtocolAgent)(nil)
+)
 
 // blockingProtocolTarget 为测试中的慢目标，释放前不会完成 Core Command。
 type blockingProtocolTarget struct {

@@ -18,6 +18,11 @@ type echoAgent struct {
 	commandDispatcher  *gsr.Dispatcher
 }
 
+var (
+	_ gsr.Service              = (*echoAgent)(nil)
+	_ gsr.ClientMessageHandler = (*echoAgent)(nil)
+)
+
 func newEchoAgent(client gate.ClientSession, registry *protocol.Registry) *echoAgent {
 	agent := &echoAgent{client: client}
 	agent.commandDispatcher = gsr.MustDispatcher(map[runtime.CommandID]any{

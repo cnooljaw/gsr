@@ -25,6 +25,8 @@ type echoService struct {
 	dispatcher *gsr.Dispatcher
 }
 
+var _ gsr.Service = (*echoService)(nil)
+
 func newEchoService() *echoService {
 	service := &echoService{}
 	service.dispatcher = gsr.MustDispatcher(map[runtime.CommandID]any{

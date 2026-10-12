@@ -29,6 +29,8 @@ type profileService struct {
 	name       string
 }
 
+var _ runtime.Service = (*profileService)(nil)
+
 func newProfileService(client *http.Client, profileURL string) (*profileService, error) {
 	if client == nil || client.Timeout <= 0 {
 		return nil, errors.New("profile service requires an HTTP Client with finite timeout")

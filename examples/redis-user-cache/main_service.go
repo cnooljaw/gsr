@@ -17,6 +17,8 @@ type mainService struct {
 	finished context.CancelFunc
 }
 
+var _ gsr.Service = (*mainService)(nil)
+
 // OnStart 演示一次缓存写入和读取；Redis I/O 在目标 Service 的 Handler 内完成。
 func (service *mainService) OnStart(ctx context.Context, self gsr.ServiceContext) error {
 	id, err := self.CreateService(ctx, newUserProfileService(service.cache))

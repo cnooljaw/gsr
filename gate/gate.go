@@ -127,6 +127,8 @@ type GateService struct {
 	agentsByConnection map[*clientConnection]runtime.ServiceID
 }
 
+var _ runtime.Service = (*GateService)(nil)
+
 // NewGateService 校验固定协议模式、可选 TLS 与容量配置，不按首帧猜测模式。
 func NewGateService(local *runtime.Runtime, config Config) (*GateService, error) {
 	if local == nil {

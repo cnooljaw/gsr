@@ -101,6 +101,7 @@ if err != nil {
 - 只有多实现、测试隔离、模块边界、插件化或明确依赖倒置需求时才引入接口。
 - Struct 显式声明依赖，默认优先组合而非继承式 embedding；只有 embedding 不泄漏内部生命周期、方法集合和所有权时才作为局部实现细节使用。
 - Service 具体类型显式声明 `Handle` 消息入口；若使用 Dispatcher，应以具名字段持有并由 `Handle` 转发，不依靠匿名嵌入的方法提升满足接口。这是编码与评审规则，Go 接口本身不能强制检查。
+- 承担明确框架角色的类型，在类型定义后紧跟编译期接口断言，例如 `var _ Service = (*echoService)(nil)`。同一类型实现多个重要接口时统一放在一个 `var` 块中；Agent 同时实现 `Service` 与 `ClientMessageHandler` 时，两者都显式声明。按实际方法集选择指针或值形式，不为断言修改 receiver，不集中到文件末尾或独立的 `interfaces.go`。断言用于 Service、上下文、Gate 连接、Cluster 扩展和 Core 生命周期组件等架构角色，不机械覆盖普通工具接口或仅为局部实现、测试替换而定义的小接口。
 - 配置项较多时默认使用 Config Struct；Functional Option 只在可选项多、组合频繁且确实更清楚时使用。
 - 构造函数完成默认值填充和不变量建立；可能失败的构造返回 error。
 - 框架内部组件之间必须成立的不变量由构造器保证，不暴露给业务调用方组装后再运行时校验。例如，协议 Dispatcher 内部的解码与写回必须共用同一 Registry，由 Dispatcher 构造器建立这种关联，而不是要求调用方重复传入并匹配。

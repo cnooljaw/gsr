@@ -118,6 +118,11 @@ type clientMessageAwareService struct {
 	releaseOnce    sync.Once
 }
 
+var (
+	_ runtime.Service              = (*clientMessageAwareService)(nil)
+	_ runtime.ClientMessageHandler = (*clientMessageAwareService)(nil)
+)
+
 func newClientMessageAwareService() *clientMessageAwareService {
 	return &clientMessageAwareService{
 		clientStarted:  make(chan struct{}),

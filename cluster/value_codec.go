@@ -40,6 +40,8 @@ type ValueCodec struct {
 	maxPayload int
 }
 
+var _ PayloadCodec = (*ValueCodec)(nil)
+
 // NewValueCodec 构造输入与输出均有上限的值编解码器。
 func NewValueCodec(config ValueCodecConfig) (*ValueCodec, error) {
 	if config.MaxDepth == 0 {

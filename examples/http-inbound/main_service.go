@@ -13,6 +13,8 @@ type adminMainService struct {
 	address string
 }
 
+var _ gsr.Service = (*adminMainService)(nil)
+
 func (service *adminMainService) OnStart(ctx context.Context, self gsr.ServiceContext) error {
 	users, err := self.CreateService(ctx, newUserService())
 	if err != nil {

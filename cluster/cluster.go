@@ -45,6 +45,8 @@ type clusterTarget struct {
 	peer    *outboundPeer
 }
 
+var _ OutboundSender = (*clusterTarget)(nil)
+
 // NewCluster 校验并复制配置，不拨号、监听或启动发送任务。
 func NewCluster(config ClusterConfig) (*Cluster, error) {
 	config, err := config.normalized()
@@ -78,6 +80,8 @@ func (cluster *Cluster) Client(source runtime.ServiceID) (*ClusterClient, error)
 
 // clusterResolver 隐藏 sender 管理能力，不额外导出 Cluster 的解析接口。
 type clusterResolver struct{ cluster *Cluster }
+
+var _ NodeSenderResolver = clusterResolver{}
 
 func (resolver clusterResolver) ResolveNodeSender(node NodeID) (OutboundSender, error) {
 	cluster := resolver.cluster

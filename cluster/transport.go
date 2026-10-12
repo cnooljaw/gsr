@@ -58,6 +58,8 @@ type InMemoryTransport struct {
 	receivers  map[NodeID]Receiver
 }
 
+var _ Transport = (*InMemoryTransport)(nil)
+
 // NewInMemoryTransport 构造确定性的进程内传输。
 func NewInMemoryTransport(config InMemoryTransportConfig) (*InMemoryTransport, error) {
 	normalized, err := config.normalized()

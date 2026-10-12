@@ -21,6 +21,8 @@ type clientConnection struct {
 	diagnosticsFlushed   bool
 }
 
+var _ ClientSession = (*clientConnection)(nil)
+
 func newClientConnection(connection *websocket.Conn, maxFrame, maxQueue int, counters *gateCounters, connectionID uint64) *clientConnection {
 	return &clientConnection{
 		connection:           connection,

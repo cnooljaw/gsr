@@ -74,6 +74,11 @@ type clientMessageProbeService struct {
 	observations chan<- clientMessageObservation
 }
 
+var (
+	_ Service              = (*clientMessageProbeService)(nil)
+	_ ClientMessageHandler = (*clientMessageProbeService)(nil)
+)
+
 func (service *clientMessageProbeService) OnStart(context.Context, ServiceContext) error {
 	return nil
 }

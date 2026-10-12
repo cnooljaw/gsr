@@ -96,6 +96,8 @@ type mainService struct {
 	cfg config
 }
 
+var _ gsr.Service = (*mainService)(nil)
+
 func (service *mainService) OnStart(ctx context.Context, self gsr.ServiceContext) error {
 	cluster := self.Cluster()
 	if service.cfg.Role == "server" {
@@ -132,6 +134,8 @@ func (service *mainService) OnStop(_ context.Context) error {
 type echoService struct {
 	dispatcher *gsr.Dispatcher
 }
+
+var _ gsr.Service = (*echoService)(nil)
 
 func newEchoService() *echoService {
 	service := &echoService{}
@@ -171,6 +175,8 @@ type callerService struct {
 	target     cluster.NodeID
 	operation  uint64
 }
+
+var _ gsr.Service = (*callerService)(nil)
 
 func newCallerService(target cluster.NodeID) *callerService {
 	service := &callerService{target: target}

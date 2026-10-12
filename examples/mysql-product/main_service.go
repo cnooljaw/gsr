@@ -19,6 +19,8 @@ type productMainService struct {
 	finished context.CancelFunc
 }
 
+var _ gsr.Service = (*productMainService)(nil)
+
 func (service *productMainService) OnStart(ctx context.Context, self gsr.ServiceContext) error {
 	products, err := newProductService(service.db, 500*time.Millisecond)
 	if err != nil {

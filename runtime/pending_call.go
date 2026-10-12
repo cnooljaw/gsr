@@ -34,6 +34,8 @@ type pendingCallManager struct {
 	stopResult  error
 }
 
+var _ lifecycleComponent = (*pendingCallManager)(nil)
+
 func newPendingCallManager(runtime *Runtime) *pendingCallManager {
 	return &pendingCallManager{
 		runtime:  runtime,
