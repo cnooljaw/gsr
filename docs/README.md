@@ -32,6 +32,7 @@
 18. [最小双进程示例](../examples/twonode/README.md)：独立配置与日志目录、Send/Call、停机与恢复演练。
 19. [本地规模基线](PERFORMANCE-BASELINE.md)：10,000 Service/Timer 与 Send/Call 测量结果、复现命令及口径限制。
 20. [GSR 1.0 内部发布说明](RELEASE-1.0.md)：版本、代码基线、发布范围、接入边界和发布前验证结果。
+21. [Cluster 节点间调用教程](CLUSTER-CALL-TUTORIAL.md)：双节点启动、Send/Call、参数与返回值类型、集合规范化、错误及测试覆盖。
 
 后续出现需要长期保留的重大架构取舍时，新增 ADR 或 RFC，并从这里建立索引。
 

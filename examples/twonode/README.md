@@ -10,6 +10,8 @@ Echo 和 Caller 均显式实现 `Handle`，普通命令交给各自的具名 Dis
 
 ## 跨节点参数约定
 
+完整参数教程与测试覆盖见 [Cluster 节点间调用教程](../../docs/CLUSTER-CALL-TUTORIAL.md)。本示例保持最小 `uint64` 业务协议；字符串、数字、切片、定长数组、map 和多参数的测试集中在已有 Codec 与 TCP 往返用例中。
+
 本示例输入和输出均用 `uint64`，是默认 ValueCodec 解码后的规范类型。本地调用不编码，跨节点调用会将有符号整数规范化为 int64、无符号整数规范化为 uint64、浮点数规范化为 float64，列表和字典分别为 []any、map[string]any。Dispatcher 不自动转换类型；跨节点 Handler 不声明 int、int32 或领域具名数值类型。
 
 业务结构体不直接发上网络，在消息边界显式展开即可，例如：

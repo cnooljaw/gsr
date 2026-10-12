@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"io"
+	"math"
 	"net"
 	"reflect"
 	"sync"
@@ -14,16 +15,55 @@ import (
 	"github.com/cnooljaw/gsr/runtime"
 )
 
-// 验证没有本地 NodeID 或监听的 TCP 客户端可 Send/Call，并沿原连接收到结果和领域错误。
+// 验证无本地监听的 TCP 客户端可 Send/Call，参数与结果按规范类型往返，并沿原连接收到领域错误。
 func TestTCPClusterRoundTrip(t *testing.T) {
 	link := newTCPClusterTestLink(t)
 	target := ServiceTarget{ServiceID: link.target}
 	if err := link.client.Send("node-b", target, clusterTestCommand, "send"); err != nil {
 		t.Fatal(err)
 	}
-	value, err := link.client.Call(context.Background(), "node-b", target, clusterTestCommand, "hello", int32(3))
-	if err != nil || !reflect.DeepEqual(value, []any{"hello", int64(3)}) {
-		t.Fatalf("TCP Call = %#v, %v", value, err)
+	cases := []struct {
+		name string
+		args []any
+		want []any
+	}{
+		{name: "string and integer", args: []any{"hello", int32(3)}, want: []any{"hello", int64(3)}},
+		{name: "no arguments", want: []any{}},
+		{
+			name: "mixed scalars",
+			args: []any{"你好，GSR", "", int(-7), uint16(9), float32(1.5), true, false, nil},
+			want: []any{"你好，GSR", "", int64(-7), uint64(9), float64(1.5), true, false, nil},
+		},
+		{
+			name: "integer limits",
+			args: []any{int64(math.MinInt64), int64(math.MaxInt64), uint64(math.MaxUint64)},
+			want: []any{int64(math.MinInt64), int64(math.MaxInt64), uint64(math.MaxUint64)},
+		},
+		{
+			name: "single list argument",
+			args: []any{[]int{1, -2}},
+			want: []any{[]any{int64(1), int64(-2)}},
+		},
+		{
+			name: "collections",
+			args: []any{[]byte{1, 2}, [2]string{"a", "b"}, [2]byte{3, 4}, map[string]int{"count": 5},
+				map[string]any{"items": []any{"nested", uint32(6)}}},
+			want: []any{[]byte{1, 2}, []any{"a", "b"}, []any{uint64(3), uint64(4)}, map[string]any{"count": int64(5)},
+				map[string]any{"items": []any{"nested", uint64(6)}}},
+		},
+		{
+			name: "empty and nil collections",
+			args: []any{[]byte{}, []byte(nil), []any{}, []any(nil), map[string]any{}, map[string]any(nil)},
+			want: []any{[]byte(nil), []byte(nil), []any{}, []any{}, map[string]any{}, map[string]any{}},
+		},
+	}
+	for _, testCase := range cases {
+		t.Run(testCase.name, func(t *testing.T) {
+			value, err := link.client.Call(context.Background(), "node-b", target, clusterTestCommand, testCase.args...)
+			if err != nil || !reflect.DeepEqual(value, testCase.want) {
+				t.Fatalf("TCP Call = %#v, %v; want %#v", value, err, testCase.want)
+			}
+		})
 	}
 	domainErr := runtime.NewStatusError(runtime.ErrorClassDomain, "room.full", "room is full")
 	id, err := link.adapter.runtime.CreateService(context.Background(), &tcpErrorService{err: domainErr})

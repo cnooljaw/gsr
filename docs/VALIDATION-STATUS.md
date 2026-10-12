@@ -8,6 +8,12 @@
 
 代码基线 `b2a9f16` 已通过同日 `go test ./... -timeout=2m`。本轮补跑 `go vet ./...`、`GSR_PROCESS_TEST=1 go test -race ./... -timeout=2m` 和 WebSocket 示例的 `npm run test:crypto`，全部通过；race 包含双进程正常停机与强杀后恢复，TypeScript 包含编译及 5 条认证测试。首次 race 受沙箱 TCP 监听限制，在允许本机监听的环境中运行同一命令后完整通过。仅补充版本与发布文档，没有修改 Go/TypeScript 实现或重新生成协议代码；未启用负载、Gate 压力或真实 MySQL 门禁。环境、耗时与接入范围见 [1.0 内部发布说明](RELEASE-1.0.md)。
 
+## Cluster 参数教程与覆盖补充（2026-10-12）
+
+新增 [节点间调用教程](CLUSTER-CALL-TUTORIAL.md)，说明默认 Codec 的类型规范化、多位置参数与列表参数的区别、强类型 Handler、返回值及错误。扩展已有 `TestValueCodecRoundTripsSupportedValues` 和 `TestTCPClusterRoundTrip`，补充 Unicode/空字符串、64 位整数极值、类型化切片、定长数组、字节数组、typed map 和 nil/空集合；TCP 用例复用原有连接与 Core Echo Service，验证请求和结果往返，不新增重复夹具或修改生产实现。
+
+`go test -race ./cluster -timeout=2m` 通过（约 2 秒）。教程第 5 节的接收 Service 与调用代码已接入双节点启动结构，在临时目录编译后以两个独立进程经真实 TCP 调用，实际输出 `text=hello count=3 items=[10 20] meta=map[active:true]`，两端均有序退出。首次定向 TCP 测试受到沙箱监听限制，后续验证在允许本机监听的环境中完成。本轮未重跑全仓测试、vet、跨进程恢复门禁或压力测试；1.0 发布验收记录保持为此前基线。
+
 ## 已覆盖的运行链
 
 2026-10-09 Gate / Protocol 边界切片：将协议分发、通用 proto、生成类型及生成器移到同级 `protocol/`；Gate 不再依赖 Protobuf，ClientSession 接纳字节并复制快照，Protocol 在发送边界编码完整 Envelope。扩展既有队列测试，先复现缓冲区复用影响待发送消息的问题，再验证不透明字节、快照和空消息条目开销；既有协议与示例测试改为检查字节写回。首次 Gate race 验证发现 HTTP 请求头超时用例先收到 Agent 构造通知、后更新接入计数的断言竞态，复用已有等待函数后 Gate 包 race 通过（约 35 秒），未修改生产接入行为。Protocol、Echo 示例及应用 OpenGate 的 race 测试、生成器和通用类型测试通过；重新生成 Go/TypeScript 类型、TypeScript 五条认证用例及全仓仅编译检查通过。生产依赖清单确认 Gate 与 Protocol 互不导入；未运行全仓行为测试、全仓 race 或长时压力测试。
