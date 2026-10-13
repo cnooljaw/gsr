@@ -12,6 +12,8 @@
 
 初次运行先看 [最小 CounterService 示例](../examples/counter/README.md)，只涉及本地 Service、Send、Call 和关闭。
 
+在另一个仓库开发业务时，从 [独立业务项目开发指南](APPLICATION-DEVELOPMENT.md) 和 [业务项目 AGENTS.md 模板](templates/AGENTS.application.md) 开始，固定 GSR 依赖版本并明确业务状态、协议和资源 owner。
+
 1. [项目术语](../CONTEXT.md)：ServiceID、NodeID、Message、ClusterEnvelope、Session、Source 和 Revision 的准确含义。
 2. [API 设计规范](API-DESIGN.md)：Runtime 边界、消息管道、Cluster API 和 Skynet 风格。
 3. [ADR 0001](adr/0001-local-service-id-and-cluster-routing.md)：Runtime 局部 ServiceID、Cluster 路由及 Source 绑定的裁决。
@@ -33,6 +35,7 @@
 19. [本地规模基线](PERFORMANCE-BASELINE.md)：10,000 Service/Timer 与 Send/Call 测量结果、复现命令及口径限制。
 20. [GSR 1.0 内部发布说明](RELEASE-1.0.md)：版本、代码基线、发布范围、接入边界和发布前验证结果。
 21. [Cluster 节点间调用教程](CLUSTER-CALL-TUTORIAL.md)：双节点启动、Send/Call、参数与返回值类型、集合规范化、错误及测试覆盖。
+22. [独立业务项目开发指南](APPLICATION-DEVELOPMENT.md)：依赖版本、项目布局、可运行 Service 骨架、所有权/生命周期、接入与验证，以及 AGENTS.md 模板。
 
 后续出现需要长期保留的重大架构取舍时，新增 ADR 或 RFC，并从这里建立索引。
 

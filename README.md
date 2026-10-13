@@ -39,6 +39,7 @@ Service 显式实现 `Handle`，普通命令由具名字段持有的 `gsr.Dispat
 
 - [文档索引](docs/README.md)、[项目术语](CONTEXT.md)和 [API 契约](docs/API-DESIGN.md)。
 - [Cluster 节点间调用教程](docs/CLUSTER-CALL-TUTORIAL.md)：字符串、数字、字节串、数组、map 和多参数的跨节点调用。
+- [独立业务项目开发指南](docs/APPLICATION-DEVELOPMENT.md)和 [业务项目 AGENTS.md 模板](docs/templates/AGENTS.application.md)：新项目的依赖、编码、状态与资源边界。
 - [当前验证清单](docs/VALIDATION-STATUS.md)、[性能基线](docs/PERFORMANCE-BASELINE.md)和 [混合负载样本](docs/MIXED-LOAD-VALIDATION.md)。
 - [开发工作流](docs/DEVELOPMENT-WORKFLOW.md)和 [Go 编码规范](docs/GO-CODE-STYLE.md)。
 
