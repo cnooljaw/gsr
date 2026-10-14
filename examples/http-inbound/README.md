@@ -13,7 +13,7 @@ go test ./examples/http-inbound
 先读 `main_service.go` 的 `adminMainService.OnStart`：`gsr.Run` 启动入口 Service，入口创建并注册 `users` 和 `dashboard`，打开 HTTP 后自身退出。HTTP 由 Run 持有，MainService 退出不会关闭它。
 
 ```text
-gsr.Run → MainService → CreateService / Register → OpenHTTP → Exit
+gsr.Run → MainService → self.CreateService → self.Node().RegisterService / OpenHTTP → self.Exit
 
 HTTP Handler → HTTPIngress.CallName → 本地 Service
                                         └→ self.Cluster().Call → 远端 Service

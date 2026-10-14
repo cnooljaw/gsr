@@ -2,7 +2,7 @@
 
 本示例默认使用统一 Gate 的 Plain 模式，演示 TypeScript 客户端发送 Protobuf Envelope、GSR Agent 解码业务请求并回传同一 `request_id`。Plain 不提供握手、seq 或 MAC，仅绑定回环/私有 IP，不得暴露到公网。
 
-Go 启动入口只解析参数、处理退出信号并调用 `gsr.Run`。MainService 创建并注册共享的 `echo` Service，再调用 `self.OpenGate` 并明确选择 Protocol，提供返回 `gsr.Service` 的 Echo Agent 构造回调，然后自身退出；EchoService、Gate 与连接 Agent 继续运行，由 Runtime 在进程退出时统一停止。Echo Agent 显式实现普通 `Handle` 和可选的 `HandleClientMessage`，两种消息入口共用该 Service 的 Mailbox 和 runner。
+Go 启动入口只解析参数、处理退出信号并调用 `gsr.Run`。MainService 创建并注册共享的 `echo` Service，再调用 `self.Node().CreateGate` 并明确选择 Protocol，提供返回 `gsr.Service` 的 Echo Agent 构造回调，然后自身退出；EchoService、Gate 与连接 Agent 继续运行，由 Runtime 在进程退出时统一停止。Echo Agent 显式实现普通 `Handle` 和可选的 `HandleClientMessage`，两种消息入口共用该 Service 的 Mailbox 和 runner。
 
 框架通用 Envelope 和 ErrorResponse 定义在仓库根目录的 `protocol/proto/gsr/common/v1/common.proto`；Echo 示例的消息编号和 payload 仍定义在本目录的 `proto/gsr/example/echo/v1/echo.proto`。握手属于 Gate 的固定二进制格式，断线通知属于内部 Core Command，二者都不是这里的 Protobuf 消息。每个消息编号通过 `.proto` option 显式关联 payload、方向和 Request/Notify/Response/Push 种类，`npm run generate` 从仓库根目录的 Buf 配置同时生成 Go 与 TypeScript 类型和 Go 协议目录。业务 Handler 按实现进度手动注册；新协议消息可以先定义，之后逐个补 Handler。
 

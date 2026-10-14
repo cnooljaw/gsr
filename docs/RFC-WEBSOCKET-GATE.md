@@ -117,7 +117,7 @@ enum MsgId {
 
 ## 已确认：统一 Gate 与固定协议模式
 
-- 只有一个 `gate.GateService` 实现和应用入口 `self.OpenGate(ctx, gsr.GateConfig{...})`，不保留独立 DebugGate/ProdGate 包或兼容别名。
+- 只有一个 `gate.GateService` 实现和应用入口 `self.Node().CreateGate(ctx, gsr.GateConfig{...})`，不保留独立 DebugGate/ProdGate 包或兼容别名。
 - `gate.ProtocolMAC` 为零值默认模式：固定 33 字节 X25519 握手后，上行使用 `seq | Envelope | MAC`，下行只使用 Envelope。握手或 MAC 失败直接关闭，不降级。
 - `gate.ProtocolPlain` 必须显式选择：上下行直接传输 Envelope，不做 X25519、seq 或 MAC；仅允许绑定字面回环或私有 IP，并由部署限制访问，不能作为公网安全模式。
 - 一个监听固定一种协议，不按首帧猜测，不混用模式。需要同时接入两种模式时，分别打开两个监听，但复用同一个实现。
@@ -125,7 +125,7 @@ enum MsgId {
 - 两种模式共用 TCP 连接限额、Agent 创建、逐帧投递、出站队列、断线通知、停止、日志和指标。仅在握手与入站认证处区分模式，不增加策略接口、插件框架或额外 owner。
 - 两种模式都在 HTTP Handler 之前限制原始 TCP 连接数，未完成 HTTP 请求头的连接也占用名额；请求头和未升级连接的 keep-alive 空闲等待各限 5 秒，超时后释放名额。
 
-底层 `gate.NewGateService` 显式接收 Runtime，应用通过 `gsr.Run` 与 `OpenGate` 组装，不获得 Runtime 投递权限。Gate runner 为每连接创建独立 Agent，连接读循环直接调用 `Runtime.DeliverClientMessage` 投递 Envelope，不逐帧经过 Gate Mailbox；连接到 Agent 的映射只用于断线通知。`ClientSession.Send([]byte)` 将响应放入有界队列，由唯一写循环发送。业务 token 鉴权、请求语义和 payload 解码由 Agent 负责，MAC 不替代业务身份认证。
+底层 `gate.NewGateService` 显式接收 Runtime，应用通过 `gsr.Run` 与 `Node.CreateGate` 组装，不获得 Runtime 投递权限。Gate runner 为每连接创建独立 Agent，连接读循环直接调用 `Runtime.DeliverClientMessage` 投递 Envelope，不逐帧经过 Gate Mailbox；连接到 Agent 的映射只用于断线通知。`ClientSession.Send([]byte)` 将响应放入有界队列，由唯一写循环发送。业务 token 鉴权、请求语义和 payload 解码由 Agent 负责，MAC 不替代业务身份认证。
 
 单帧默认上限 4 MiB；出站队列按编码字节加每项 64 字节固定开销计费。两种模式借用 Runtime Logger 并绑定 Gate ServiceID；同一连接同类失败只记录首条，关闭时补充抑制数量，不记录原始载荷、密钥或 MAC。原有 Plain 与 MAC 的接入、创建失败、背压和关闭用例保留在统一 `gate` 包中。
 
@@ -302,7 +302,7 @@ Gate 只使用标准 WebSocket 关闭码，不新增当前客户端必须理解�
 - Gate 管连接、收发、上行认证和容量，剥离安全封装后交给 Agent；I/O 任务不得直接修改业务状态。
 - `AgentService` 是普通 Service，原则上一个连接对应一个 AgentService，负责解释客户端命令与数据并中转到对应业务 Service。客户端不能指定任意内部 ServiceID 或伪造 Source。
 - Runtime 内部消息类型区分客户端消息与普通 Core Command，Service 通过实现可选的 `runtime.ClientMessageHandler` 明确启用客户端处理能力。Agent 有两类逻辑入站分发，不能合并成靠 `Source` 猜测的单一路由：Gate 基础设施经 `Runtime.DeliverClientMessage` 投递的原始 Protobuf Envelope 字节按 `msg_id` 交给 `Requests`；普通本地 Service/Cluster Command 按 Core `CommandID` 分发到 `Commands`。两类 handler 属于同一个 AgentService、共用同一 Mailbox 和串行 runner，因此能安全访问同一连接私有状态；`Source` 仍只表达 Service 来源，基础设施投递的客户端消息仍为零。客户端 `msg_id`、客户端 `request_id` 和 Core `CommandID`/Session 不互相复用。Core Command 的 Send 与 Call 仍走同一种消息类型，由 Session 是否为零区分。
-- 应用层 Agent 可额外实现 `gsr.ClientMessageHandler`；只有它被适配为 Core 的可选 `runtime.ClientMessageHandler`，普通 `gsr.Service` 不因此接纳客户端消息。两者共用原有 Mailbox 和 runner。`self.OpenGate` 将业务 `gsr.Service` Agent 经现有适配器交给对应 Gate；底层 Gate 的 `NewAgent` 仍返回 `runtime.Service`。
+- 应用层 Agent 可额外实现 `gsr.ClientMessageHandler`；只有它被适配为 Core 的可选 `runtime.ClientMessageHandler`，普通 `gsr.Service` 不因此接纳客户端消息。两者共用原有 Mailbox 和 runner。`self.Node().CreateGate` 将业务 `gsr.Service` Agent 经现有适配器交给对应 Gate；底层 Gate 的 `NewAgent` 仍返回 `runtime.Service`。
 - Gate 的业务组装只提供一个 `NewAgent func(ClientSession) runtime.Service` 构造回调，不增加独立的 `AgentFactory` 类型、Agent 管理器或通用依赖注入容器。Gate 为每条连接调用回调构造独立 Agent 实例；回调只负责组装连接私有 Service，不执行 socket I/O，不持有 Runtime 或 Gate 连接表。
 - Agent 使用现有 Send/Call；内部 Handler 通过 return 完成 Reply，客户端响应由 Agent 组织并交 Gate 发出。不增加 Core 手工 Reply。
 - Agent 内 Call 仍是 run-to-completion，等待时该 Agent 不处理下一条消息，其它 Service 仍可运行。
@@ -363,7 +363,7 @@ Gate 不等待或强杀 Agent Handler。单独停止 Gate 时，Gate 在自己�
 
 ## 下一步与验收
 
-Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/通知/推送独立编号，通用与业务专用 `.proto` 分开定义；每个 MsgId 通过 option 显式声明 payload、方向和消息种类，协议目录由代码生成，业务在构造时提供按实现进度维护的显式 Handler 表。固定 33 字节二进制握手、大端 seq 和原始字节 MAC 验证顺序、固定 HKDF 参数、统一 Gate 的 MAC/Plain 模式、WebSocket 关闭码和 Gate/Agent/业务错误归属，以及“一连接一个业务定义的 AgentService、Runtime 内部消息类型区分客户端消息与普通 Core Command、Service 可选择实现 ClientMessageHandler、业务协议通过 protocol.Dispatcher 组合接入”的边界已确认。Runtime 的单向投递 API 与缺少客户端处理能力时的 admission 拒绝已实现；联调示例包含通用 Envelope 与 Echo 业务 `.proto`、Go/TypeScript 生成类型、强类型 Echo Handler 和 CLI 闭环。跨语言认证固定向量已由 Go 与 TypeScript 共用夹具验证。Echo 示例通过 `gsr.Run` 与 MainService，经 `self.OpenGate` 启动对应 Gate 和业务 Agent，不扩展 Core。生产 Gate 的直连 WSS 与 Ingress 终止 TLS 后的 HTTP WebSocket 纵向切片、共享 Logger 接线和可调时长的慢连接压力测试已落地；目标部署的容量与其它失败组合仍待验证。一次讨论一个问题，未确认前不新增公开 API 或通用安全插件框架。
+Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/通知/推送独立编号，通用与业务专用 `.proto` 分开定义；每个 MsgId 通过 option 显式声明 payload、方向和消息种类，协议目录由代码生成，业务在构造时提供按实现进度维护的显式 Handler 表。固定 33 字节二进制握手、大端 seq 和原始字节 MAC 验证顺序、固定 HKDF 参数、统一 Gate 的 MAC/Plain 模式、WebSocket 关闭码和 Gate/Agent/业务错误归属，以及“一连接一个业务定义的 AgentService、Runtime 内部消息类型区分客户端消息与普通 Core Command、Service 可选择实现 ClientMessageHandler、业务协议通过 protocol.Dispatcher 组合接入”的边界已确认。Runtime 的单向投递 API 与缺少客户端处理能力时的 admission 拒绝已实现；联调示例包含通用 Envelope 与 Echo 业务 `.proto`、Go/TypeScript 生成类型、强类型 Echo Handler 和 CLI 闭环。跨语言认证固定向量已由 Go 与 TypeScript 共用夹具验证。Echo 示例通过 `gsr.Run` 与 MainService，经 `self.Node().CreateGate` 启动对应 Gate 和业务 Agent，不扩展 Core。生产 Gate 的直连 WSS 与 Ingress 终止 TLS 后的 HTTP WebSocket 纵向切片、共享 Logger 接线和可调时长的慢连接压力测试已落地；目标部署的容量与其它失败组合仍待验证。一次讨论一个问题，未确认前不新增公开 API 或通用安全插件框架。
 
 联调示例位于 `examples/websocket-gate/`：Go Gate（Plain/MAC 模式）、连接 Echo Agent、TypeScript 命令行客户端和 request/response 往返已经落地；生成协议目录、逐步注册强类型 Handler、通用协议错误回复、业务拒绝 Response 以及 Notify→Push 往返也已接入。Echo `.proto` 只属于示例业务协议，不扩展 GSR Core。固定向量已作为独立跨语言测试夹具落地，不由示例运行路径加载或掩盖后续生产 Gate 的安全审查。
 

@@ -120,7 +120,7 @@ type GateService struct {
 	serveErr       error
 	ioWorkers      sync.WaitGroup
 	counters       gateCounters
-	logger         *logging.Logger
+	logger         *logging.ServiceLogger
 	nextConnection atomic.Uint64
 
 	// agentsByConnection 只在连接断开时定位需要通知的 Agent。
@@ -172,7 +172,7 @@ func NewGateService(local *runtime.Runtime, config Config) (*GateService, error)
 		config:             config,
 		connections:        make(map[*clientConnection]struct{}),
 		agentsByConnection: make(map[*clientConnection]runtime.ServiceID),
-		logger:             local.Config().Logger,
+		logger:             local.Config().Logger.WithService(0),
 	}, nil
 }
 
@@ -217,7 +217,7 @@ func (gate *GateService) OnStart(_ context.Context, self runtime.ServiceContext)
 	gate.mu.Lock()
 	gate.server = server
 	gate.serviceID = self.Self()
-	gate.logger = gate.logger.WithService(uint64(self.Self()))
+	gate.logger = gate.runtime.Config().Logger.WithService(uint64(self.Self()))
 	server.ErrorLog = newHTTPServerErrorLog(gate.logger)
 	gate.address = listener.Addr()
 	gate.ioWorkers.Add(1)

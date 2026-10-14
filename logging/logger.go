@@ -35,8 +35,13 @@ type Config struct {
 	Capacity  int
 }
 
-// Logger 是轻量绑定入口；WithService 共享相同队列、计数器和生命周期。
+// Logger 是共享日志的 owner 入口，负责来源绑定、观测和最终关闭。
 type Logger struct {
+	core *writerState
+}
+
+// ServiceLogger 是来源绑定的记录能力，只共享日志 core，不拥有关闭或重新绑定能力。
+type ServiceLogger struct {
 	core    *writerState
 	service uint64
 }
@@ -93,31 +98,54 @@ func New(config Config) (*Logger, error) {
 }
 
 // WithService 绑定日志来源；ID 由受信任组装代码传入，不读取当前 goroutine 身份。
-func (logger *Logger) WithService(id uint64) *Logger {
+func (logger *Logger) WithService(id uint64) *ServiceLogger {
 	if logger == nil {
 		return nil
 	}
-	return &Logger{core: logger.core, service: id}
+	return &ServiceLogger{core: logger.core, service: id}
 }
 
 // Info 在调用处记录时间、代码位置和字段快照；nil 入口禁用输出。
 func (logger *Logger) Info(message string, fields ...any) error {
-	return logger.write("INFO", message, fields)
+	return write(loggerState(logger), 0, "INFO", message, fields)
 }
 
 // Error 与 Info 使用同一入队路径，不单独排队，也不等待写盘。
 func (logger *Logger) Error(message string, fields ...any) error {
-	return logger.write("ERROR", message, fields)
+	return write(loggerState(logger), 0, "ERROR", message, fields)
 }
 
-func (logger *Logger) write(level, message string, fields []any) (err error) {
-	if logger == nil || logger.core == nil {
+// Info 在调用处记录来源、时间、位置及字段快照；nil 入口禁用输出。
+func (logger *ServiceLogger) Info(message string, fields ...any) error {
+	if logger == nil {
 		return nil
 	}
-	if err := logger.Err(); err != nil {
+	return write(logger.core, logger.service, "INFO", message, fields)
+}
+
+// Error 与 Info 共享同一接纳路径，成功不表示已写盘。
+func (logger *ServiceLogger) Error(message string, fields ...any) error {
+	if logger == nil {
+		return nil
+	}
+	return write(logger.core, logger.service, "ERROR", message, fields)
+}
+
+func loggerState(logger *Logger) *writerState {
+	if logger == nil {
+		return nil
+	}
+	return logger.core
+}
+
+func write(state *writerState, service uint64, level, message string, fields []any) (err error) {
+	if state == nil {
+		return nil
+	}
+	if err := state.err(); err != nil {
 		return err
 	}
-	entry := record{Time: time.Now(), Level: level, Service: logger.service, Message: message}
+	entry := record{Time: time.Now(), Level: level, Service: service, Message: message}
 	_, entry.File, entry.Line, _ = runtime.Caller(2)
 	// 扩展 error/JSON 格式化可能 panic，不能逃出业务记录点；不在队列锁内执行扩展。
 	defer func() {
@@ -150,7 +178,6 @@ func (logger *Logger) write(level, message string, fields []any) (err error) {
 	if len(entry.Fields)+len(message) > 64<<10 {
 		return ErrInvalidRecord
 	}
-	state := logger.core
 	state.mu.Lock()
 	defer state.mu.Unlock()
 	if state.result != nil {
@@ -201,9 +228,13 @@ func (logger *Logger) Err() error {
 	if logger == nil || logger.core == nil {
 		return nil
 	}
-	logger.core.mu.Lock()
-	defer logger.core.mu.Unlock()
-	return logger.core.result
+	return logger.core.err()
+}
+
+func (state *writerState) err() error {
+	state.mu.Lock()
+	defer state.mu.Unlock()
+	return state.result
 }
 
 // Close 停止接纳并等待排空和 Flush，关闭内部文件；ctx 只限制本次等待，不强杀阻塞 Writer。

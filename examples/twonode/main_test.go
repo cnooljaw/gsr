@@ -69,6 +69,6 @@ func TestCallerServiceRejectsTickArguments(t *testing.T) {
 
 type echoTestCommandContext struct{ gsr.CommandContext }
 
-func (echoTestCommandContext) Logger() *logging.Logger {
+func (echoTestCommandContext) Logger() *logging.ServiceLogger {
 	return nil
 }

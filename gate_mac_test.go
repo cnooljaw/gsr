@@ -23,7 +23,7 @@ func TestOpenGateCreatesApplicationAgentAfterHandshake(t *testing.T) {
 	started := make(chan runtime.ServiceID, 1)
 	stopped := make(chan struct{}, 1)
 	entry := &probeService{start: func(ctx context.Context, self ServiceContext) error {
-		address, err := self.OpenGate(ctx, GateConfig{
+		address, err := self.Node().CreateGate(ctx, GateConfig{
 			Address:               "127.0.0.1:0",
 			MaxConnections:        1,
 			MaxOutboundQueueBytes: 64 << 10,

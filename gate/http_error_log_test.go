@@ -75,7 +75,7 @@ func TestHTTPServerErrorLogDoesNotBlockOnFullQueue(t *testing.T) {
 	result := make(chan writeResult, 1)
 	const serverError = "http: Accept error: private-client-data"
 	go func() {
-		length, err := newHTTPServerErrorLog(logger).Writer().Write([]byte(serverError))
+		length, err := newHTTPServerErrorLog(logger.WithService(0)).Writer().Write([]byte(serverError))
 		result <- writeResult{length: length, err: err}
 	}()
 	select {

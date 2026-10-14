@@ -76,7 +76,7 @@ func TestAdminHTTPRoutesCallLocalAndRemoteServices(t *testing.T) {
 	go func() {
 		done <- gsr.Run(ctx, gsr.Config{
 			Logging: logging.Config{Writer: io.Discard},
-			Cluster: cluster.ClusterConfig{Nodes: map[cluster.NodeID]string{"rooms-node": remoteAddress}},
+			Cluster: gsr.ClusterConfig{Nodes: map[cluster.NodeID]string{"rooms-node": remoteAddress}},
 		}, &observedAdminService{entry: adminMainService{address: httpAddress}, started: started})
 	}()
 	t.Cleanup(func() {

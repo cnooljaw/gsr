@@ -940,7 +940,7 @@ func TestPlainGateCloseErrorLogRedactsReason(t *testing.T) {
 			t.Errorf("Logger.Close() error = %v", err)
 		}
 	})
-	gate := &GateService{logger: logger}
+	gate := &GateService{logger: logger.WithService(0)}
 	gate.logConnectionFailure(nil, "write", websocket.CloseGoingAway, &websocket.CloseError{
 		Code: websocket.CloseNormalClosure, Text: "private-client-close-reason-do-not-log",
 	})

@@ -2,7 +2,6 @@ package gsr
 
 import (
 	"context"
-	"net/http"
 	"reflect"
 	"time"
 
@@ -25,26 +24,29 @@ type ClientMessageHandler interface {
 	HandleClientMessage(CommandContext, []byte) error
 }
 
-// ServiceContext 组合本地能力与当前 Service 绑定的 Cluster、日志入口。
+// ServiceContext 组合当前 Service 的本地与来源绑定能力，以及所属节点的组装入口。
 // 仅在当前生命周期回调或 Handler 内使用，不借给其它 Service 或异步任务。
 type ServiceContext interface {
 	Self() runtime.ServiceID
+	// CreateService 将实例交给 Runtime；ctx 仅控制启动，创建者退出不停止新 Service。
 	CreateService(context.Context, Service) (runtime.ServiceID, error)
+	// Exit 请求当前回调返回后自身退出，不中断 Go 控制流，调用后应返回。
 	Exit()
-	Register(cluster.ServiceName, runtime.ServiceID) error
+	// Send 成功仅表示消息被接纳，不代表目标已经执行。
 	Send(runtime.ServiceID, runtime.CommandID, ...any) error
+	// Call 有限等待目标结果，期间当前 Service 不处理下一条消息；取消等待不保证目标未执行。
 	Call(context.Context, runtime.ServiceID, runtime.CommandID, ...any) (any, error)
 	SendName(cluster.ServiceName, runtime.CommandID, ...any) error
 	CallName(context.Context, cluster.ServiceName, runtime.CommandID, ...any) (any, error)
-	OpenHTTP(string, func(*HTTPIngress) http.Handler) error
-	OpenGate(context.Context, GateConfig) (string, error)
 	After(time.Duration, runtime.CommandID, ...any) (runtime.TimerID, error)
 	CancelTimer(runtime.TimerID) bool
+	Node() *Node
 	Cluster() *Cluster
-	Logger() *logging.Logger
+	Logger() *logging.ServiceLogger
 }
 
-// CommandContext 补充收到消息的来源；新调用的来源仍是 Self，不是上一跳 Source。
+// CommandContext 补充本地消息来源；HTTP、Timer、跨节点等入站来源为零，不是通用身份凭据。
+// 新调用的来源仍是 Self，不继承上一跳 Source。
 type CommandContext interface {
 	ServiceContext
 	Source() runtime.ServiceID
@@ -55,7 +57,7 @@ type serviceAdapter struct {
 	node    *application
 	id      runtime.ServiceID
 	cluster *Cluster
-	logger  *logging.Logger
+	logger  *logging.ServiceLogger
 }
 
 var _ runtime.Service = (*serviceAdapter)(nil)
@@ -95,7 +97,7 @@ func (adapter *serviceAdapter) OnStart(ctx context.Context, self runtime.Service
 	if err != nil {
 		return err
 	}
-	adapter.cluster = &Cluster{node: adapter.node, client: client}
+	adapter.cluster = &Cluster{client: client}
 	adapter.logger = adapter.node.logger.WithService(uint64(self.Self()))
 	return adapter.service.OnStart(ctx, &serviceContext{ServiceContext: self, adapter: adapter})
 }
@@ -134,9 +136,9 @@ func (self *serviceContext) CreateService(ctx context.Context, service Service) 
 	return self.ServiceContext.CreateService(ctx, wrapped)
 }
 
-// Register 发布本节点 Service 名称，供本地和跨节点调用共同解析。
-func (self *serviceContext) Register(name cluster.ServiceName, id runtime.ServiceID) error {
-	return self.adapter.node.register(name, id)
+// Node 返回所属节点的组装能力，不转移资源的生命周期责任。
+func (self *serviceContext) Node() *Node {
+	return &Node{node: self.adapter.node}
 }
 
 // SendName 按本节点名称解析目标，随后沿用当前 Service 的本地 Send 路径。
@@ -167,7 +169,7 @@ func (self *serviceContext) Cluster() *Cluster {
 	return self.adapter.cluster
 }
 
-func (self *serviceContext) Logger() *logging.Logger {
+func (self *serviceContext) Logger() *logging.ServiceLogger {
 	return self.adapter.logger
 }
 

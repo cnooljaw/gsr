@@ -20,17 +20,17 @@ func (service *adminMainService) OnStart(ctx context.Context, self gsr.ServiceCo
 	if err != nil {
 		return err
 	}
-	if err := self.Register("users", users); err != nil {
+	if err := self.Node().RegisterService("users", users); err != nil {
 		return err
 	}
 	dashboard, err := self.CreateService(ctx, newDashboardService("rooms-node"))
 	if err != nil {
 		return err
 	}
-	if err := self.Register("dashboard", dashboard); err != nil {
+	if err := self.Node().RegisterService("dashboard", dashboard); err != nil {
 		return err
 	}
-	if err := self.OpenHTTP(service.address, func(in *gsr.HTTPIngress) http.Handler {
+	if err := self.Node().OpenHTTP(service.address, func(in *gsr.HTTPIngress) http.Handler {
 		return newAdminMux(in)
 	}); err != nil {
 		return err

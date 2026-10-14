@@ -26,7 +26,7 @@ func (service *mainService) OnStart(ctx context.Context, self gsr.ServiceContext
 	if err != nil {
 		return err
 	}
-	if err := self.Register(echoServiceName, echoID); err != nil {
+	if err := self.Node().RegisterService(echoServiceName, echoID); err != nil {
 		return err
 	}
 	newAgent := func(client gate.ClientSession) gsr.Service {
@@ -52,7 +52,7 @@ func (service *mainService) OnStart(ctx context.Context, self gsr.ServiceContext
 		}
 		label = "MAC Gate"
 	}
-	address, err := self.OpenGate(ctx, config)
+	address, err := self.Node().CreateGate(ctx, config)
 	if err != nil {
 		return err
 	}

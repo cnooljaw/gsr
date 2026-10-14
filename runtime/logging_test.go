@@ -126,18 +126,19 @@ func (writer *runtimeLogWriter) Write(data []byte) (int, error) {
 }
 
 type runtimeLoggingService struct {
-	log     *logging.Logger
-	results chan<- error
-	err     error
+	log      *logging.Logger
+	boundLog *logging.ServiceLogger
+	results  chan<- error
+	err      error
 }
 
 func (service *runtimeLoggingService) OnStart(_ context.Context, ctx ServiceContext) error {
-	service.log = service.log.WithService(uint64(ctx.Self()))
+	service.boundLog = service.log.WithService(uint64(ctx.Self()))
 	return nil
 }
 
 func (service *runtimeLoggingService) Handle(_ CommandContext, _ CommandID, _ ...any) (any, error) {
-	service.results <- service.log.Info("business event")
+	service.results <- service.boundLog.Info("business event")
 	return "business result", service.err
 }
 

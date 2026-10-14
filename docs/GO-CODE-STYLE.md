@@ -107,6 +107,8 @@ if err != nil {
 - 框架内部组件之间必须成立的不变量由构造器保证，不暴露给业务调用方组装后再运行时校验。例如，协议 Dispatcher 内部的解码与写回必须共用同一 Registry，由 Dispatcher 构造器建立这种关联，而不是要求调用方重复传入并匹配。
 - `MustXxx` 只用于静态、由程序员定义且失败代表编程错误的构造，名称必须明确 panic 语义。
 
+- 业务上下文取得的日志使用具体 ServiceLogger，只暴露 Info/Error；日志 owner 的 Close/WithService 不进入业务方法集。节点名称与接入组装放 self.Node()，来源绑定通信留 self.Cluster()，不在同一使用视图混入资源管理。
+
 ### 2.8 配置
 
 - 配置使用明确 Struct，并在进入业务代码前完成默认值填充和完整校验。

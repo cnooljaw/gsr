@@ -65,7 +65,7 @@ func TestMACGateLogsClientWriterFailures(t *testing.T) {
 				t.Fatalf("ClientSession.Send() error = %v", err)
 			}
 
-			gate := &GateService{logger: logger}
+			gate := &GateService{logger: logger.WithService(0)}
 			gate.startClientWriter(client)
 			writerDone := make(chan struct{})
 			go func() {

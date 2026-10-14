@@ -19,7 +19,7 @@ count = 5
 count = 0
 ```
 
-应用以 `gsr.Run(ctx, config, mainService)` 启动。MainService 通过 `self.CreateService` 创建业务 Service，通过 `self.Register` 发布名称；业务使用 `self.Send/Call` 或 `self.SendName/CallName` 通信，通过 `self.Cluster()` 和 `self.Logger()` 取得自身来源绑定能力。
+应用以 `gsr.Run(ctx, config, mainService)` 启动。MainService 通过 `self.CreateService` 创建业务 Service，通过 `self.Node().RegisterService` 发布名称；业务使用 `self.Send/Call` 或 `self.SendName/CallName` 通信，通过 `self.Cluster()` 和 `self.Logger()` 取得自身来源绑定能力。
 
 Service 显式实现 `Handle`，普通命令由具名字段持有的 `gsr.Dispatcher` 分发。每个 Service 独占自身可变状态，消息按 Mailbox 顺序在同一 runner 中执行；`Send` 成功只表示本地接纳，`Call` 必须有限等待。
 
@@ -34,6 +34,8 @@ Service 显式实现 `Handle`，普通命令由具名字段持有的 `gsr.Dispat
 | Service 内有限等待的 HTTP 调用 | [HTTP 出站](examples/http-outbound/README.md) |
 | Redis 用户缓存 | [Redis](examples/redis-user-cache/README.md) |
 | MySQL 产品 CRUD | [MySQL](examples/mysql-product/README.md) |
+
+当前开发接口按 [ADR 0012](docs/adr/0012-node-capabilities-and-service-logging.md) 分离 Node 组装、来源绑定的 Cluster 和窄日志入口；尚未发布新版，与 v1.0.0 源码不兼容。已有标签不移动，旧版用户阅读标签文档。
 
 ## 文档与验证
 

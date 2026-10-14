@@ -216,14 +216,15 @@ type pacedSample struct {
 }
 
 type pacedLoadService struct {
-	id      ServiceID
-	samples chan<- pacedSample
-	logger  *logging.Logger
+	id          ServiceID
+	samples     chan<- pacedSample
+	logger      *logging.Logger
+	boundLogger *logging.ServiceLogger
 }
 
 func (service *pacedLoadService) OnStart(_ context.Context, ctx ServiceContext) error {
 	service.id = ctx.Self()
-	service.logger = service.logger.WithService(uint64(ctx.Self()))
+	service.boundLogger = service.logger.WithService(uint64(ctx.Self()))
 	return nil
 }
 
@@ -232,7 +233,7 @@ func (service *pacedLoadService) Handle(_ CommandContext, _ CommandID, args ...a
 	arrival := time.Since(message.sent)
 	var logErr error
 	if service.logger != nil {
-		logErr = service.logger.Info("message handled", "operation", message.index)
+		logErr = service.boundLogger.Info("message handled", "operation", message.index)
 	}
 	service.samples <- pacedSample{service: service.id, index: message.index, latency: arrival,
 		handledLatency: time.Since(message.sent), logErr: logErr}

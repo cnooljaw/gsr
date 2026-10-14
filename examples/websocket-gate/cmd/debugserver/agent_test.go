@@ -180,14 +180,14 @@ func (entry *echoTestEntry) OnStart(ctx context.Context, self gsr.ServiceContext
 	if err != nil {
 		return err
 	}
-	if err := self.Register(echoServiceName, id); err != nil {
+	if err := self.Node().RegisterService(echoServiceName, id); err != nil {
 		return err
 	}
 	registry, err := newEchoRegistry()
 	if err != nil {
 		return err
 	}
-	address, err := self.OpenGate(ctx, gsr.GateConfig{
+	address, err := self.Node().CreateGate(ctx, gsr.GateConfig{
 		Protocol: gate.ProtocolPlain, Address: "127.0.0.1:0", MaxConnections: 1,
 		MaxOutboundQueueBytes: 64 << 10,
 		NewAgent: func(client gate.ClientSession) gsr.Service {

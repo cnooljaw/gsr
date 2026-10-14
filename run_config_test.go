@@ -41,7 +41,7 @@ func TestRunRejectsInvalidNodesBeforeStartup(t *testing.T) {
 			}}
 			err := Run(context.Background(), Config{
 				Logging: logging.Config{Writer: io.Discard},
-				Cluster: cluster.ClusterConfig{Nodes: map[cluster.NodeID]string{test.node: test.address}},
+				Cluster: ClusterConfig{Nodes: map[cluster.NodeID]string{test.node: test.address}},
 			}, entry)
 			if !errors.Is(err, cluster.ErrInvalidClusterConfig) || started {
 				t.Fatalf("error=%v, entry started=%v", err, started)

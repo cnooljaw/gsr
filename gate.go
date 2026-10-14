@@ -31,13 +31,13 @@ type GateConfig struct {
 	NewAgent func(gate.ClientSession) Service
 }
 
-// OpenGate 创建固定协议模式的 Gate，并让连接 Agent 经现有应用适配器进入 Runtime。
+// CreateGate 创建固定协议模式的 Gate，并让连接 Agent 经现有应用适配器进入 Runtime。
 // 成功返回实际监听地址；Gate 和 Agent 均由 Runtime 管理生命周期。
-func (self *serviceContext) OpenGate(ctx context.Context, config GateConfig) (string, error) {
+func (capability *Node) CreateGate(ctx context.Context, config GateConfig) (string, error) {
 	if config.NewAgent == nil {
 		return "", fmt.Errorf("%w: NewAgent is required", gate.ErrInvalidConfig)
 	}
-	node := self.adapter.node
+	node := capability.node
 	gateService, err := gate.NewGateService(node.local, gate.Config{
 		Protocol:              config.Protocol,
 		Address:               config.Address,
@@ -57,7 +57,7 @@ func (self *serviceContext) OpenGate(ctx context.Context, config GateConfig) (st
 	if err != nil {
 		return "", err
 	}
-	if _, err := self.ServiceContext.CreateService(ctx, gateService); err != nil {
+	if _, err := node.local.CreateService(ctx, gateService); err != nil {
 		return "", err
 	}
 	return gateService.Addr().String(), nil

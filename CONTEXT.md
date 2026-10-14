@@ -1,14 +1,19 @@
 # Context
 
+当前开发 API 按 [ADR 0012](docs/adr/0012-node-capabilities-and-service-logging.md) 分离 Node 组装和 Service 来源能力，尚未发布新版本；v1.0.0 保留原接口。
+
 当前版本为 **GSR 1.0**（完整版本号 `1.0.0`，见 [VERSION](VERSION)），自 2026-10-12 起进入正式内部发布阶段。发布范围和验证记录见 [内部发布说明](docs/RELEASE-1.0.md)。历史 Core/Cluster 切片编号不作为当前产品版本号。
 
 ## Glossary
+
+- **Node 能力**：self.Node() 提供 RegisterService/OpenCluster/ClusterListenAddress/OpenHTTP/CreateGate，复用所属运行环境；不提供关闭、业务通信或内部组件访问，仅在当前回调使用。名称归目标 ServiceID，HTTP/Cluster 归运行环境，Gate 资源归独立 GateService。
+- **应用配置**：gsr.RuntimeConfig 与 gsr.ClusterConfig 不暴露 Logger，Run 转换到底层配置并统一注入；底层基础设施配置仍可借用 Logger。
 
 - **Gate / Protocol 边界**：Gate 只收发不透明字节并拥有连接、安全封装、有界队列和关闭；Protocol 理解 Envelope、编解码、校验和分发，只依赖字节发送窄接口。二者为同级包，生产代码互不导入，业务 Agent 是组合点。ClientSession.Send 接纳时复制字节快照，成功只表示本地入队，不保证送达或执行一次。
 
 - **协议 Handler 上下文**：`protocol.Dispatcher[gsr.CommandContext]` 将当前 `HandleClientMessage` 的 self 原样传到强类型 Handler；self 提供 Agent 的 Service 能力，独立的 `protocol.Context` 提供客户端请求关联和 Response/Push。两者仅在当前同步 Handler 内使用，不存入 Agent 字段或异步任务。协议包只透传类型参数，不依赖应用层 `gsr`。
 
-客户端接入的通用 Gate 与协议分发分别位于同级 `gate/` 和 `protocol/` 公共包；`examples/websocket-gate` 只保留 Echo 业务协议、Agent 和联调入口。应用可在 `gsr.Run` 中通过 `self.OpenGate` 创建对应 Gate 和 `gsr.Service` Agent。Echo 示例已使用 `gsr.Run` 与 MainService，完成打开 Gate 后 MainService 自身退出，Gate 与连接 Agent 继续运行。
+客户端接入的通用 Gate 与协议分发分别位于同级 `gate/` 和 `protocol/` 公共包；`examples/websocket-gate` 只保留 Echo 业务协议、Agent 和联调入口。应用可在 `gsr.Run` 中通过 `self.Node().CreateGate` 创建对应 Gate 和 `gsr.Service` Agent。Echo 示例已使用 `gsr.Run` 与 MainService，完成打开 Gate 后 MainService 自身退出，Gate 与连接 Agent 继续运行。
 
 - **C/S Envelope**：Protobuf 应用消息，字段为 msg_id、request_id、payload，编号依次为 1–3；请求、响应、通知和推送使用独立的消息编号。通用协议文件定义 Envelope 和通用错误回复，业务协议文件定义各自的消息编号与 payload。每个非零 MsgId 在 `.proto` 中显式声明 payload 类型、方向和消息种类，并生成协议目录；业务 Agent 按实现进度手动注册强类型 Handler，不要求协议定义和业务 Handler 同步完成。Request 必须带非零 request_id 并得到一次响应，Notify 的 request_id 为零且不回复。Gate 不解析业务协议。首版不使用旧 12 字节头；业务拒绝使用业务 Response，无法取得正常结果时使用带原 request_id 的 ErrorResponse，业务错误码由业务协议定义。
 - **C/S request_id**：Envelope 中的 uint32 客户端请求关联号，0 为通知/推送、非零为 Request，响应原样回传；单连接从 1 单调分配，不回绕、不复用，耗尽后重连。与 Core/Cluster Session 分离，不作为防重放或幂等凭据。见 [客户端接入草案](docs/RFC-WEBSOCKET-GATE.md)。
@@ -32,10 +37,10 @@
 
 - **坏帧诊断抑制**：单连接内按固定协议错误类别只保留首条明细，重复项不进入日志或 Diagnostics；Cluster.SuppressedDiagnosticCount 独立累计，连接结束用 DiagnosticBadFramesSuppressed 汇总数量。不是业务日志去重，不改变消息投递或错误结果。
 
-- **统一日志服务**：logging.Logger 提供共享 FIFO 队列和单写入者；记录处采集时间、位置和内容快照，按成功入队序号输出。业务、Runtime、Cluster 注入同一 Logger，框架直接记录，不通过 Diagnostics 转发。应用最后关闭它；支持终端、借用 Writer 和 Directory 选择的滚动文件，内部文件由 Logger 管理。输出失败后拒绝接纳，Err() 与 Close 保留首次故障；SLS 外部采集待后续。
+- **统一日志服务**：logging.Logger 是共享 FIFO 与单写入者的 owner，WithService 返回仅有 Info/Error 的 ServiceLogger；记录处采集时间、位置和内容快照，按成功入队序号输出。业务使用绑定的 ServiceLogger，Runtime/Cluster 借用同一原始 Logger，框架直接记录，不通过 Diagnostics 转发。应用最后关闭它；支持终端、借用 Writer 和 Directory 选择的滚动文件，内部文件由 Logger 管理。输出失败后拒绝接纳，Err() 与 Close 保留首次故障；SLS 外部采集待后续。
 
 - **ServiceID**：`uint64` 形式的 Runtime 局部 Service 地址，只在当前 Runtime 生命周期内有效，不包含 Node、Epoch 或 Generation，也不是可持久化业务身份。
-- **ServiceName**：由 Core 外层管理的稳定逻辑名称。应用层 `self.Register(name, id)` 只接受当前应用仍存活的目标 ServiceID；本地 `self.SendName/CallName` 与 Cluster 入站共用该表，每次解析成当前节点的 ServiceID。名称归目标 ServiceID，目标启动失败或停止时在业务 OnStop 前自动清理，之后可由新实例复用；运行中的名称不直接改绑。跨节点动态发现仍属外层能力。
+- **ServiceName**：由 Core 外层管理的稳定逻辑名称。应用层 `self.Node().RegisterService(name, id)` 只接受当前应用仍存活的目标 ServiceID；本地 `self.SendName/CallName` 与 Cluster 入站共用该表，每次解析成当前节点的 ServiceID。名称归目标 ServiceID，目标启动失败或停止时在业务 OnStop 前自动清理，之后可由新实例复用；运行中的名称不直接改绑。跨节点动态发现仍属外层能力。
 - **NodeID**：Cluster 用于选择远端节点和连接的路由名称，不属于 Core ServiceID。仅出站调用不要求本地 NodeID 或监听；入站不持有来源 NodeID，Call 回复沿原连接返回。主动 Send/Call 与 open 接受新调用是独立能力，NodeID 不是认证凭据。
 - **SessionID**：`uint64` 形式的 Core 本地请求关联号；零表示 Send、不需要 Reply，非零表示 Call、等待一次 Reply。它只负责关联，在当前 Runtime 内单调分配且不回绕复用。
 - **TimerID**：`uint64` 形式的 Runtime 局部 Timer 标识，只在当前 Runtime 生命周期内有效；零值无效，已发放的 ID 不回绕复用。

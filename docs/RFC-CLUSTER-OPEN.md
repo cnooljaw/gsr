@@ -2,27 +2,27 @@
 
 状态：资源归属、公开签名、配置字段、默认值、重复调用规则及停止接线约定已获用户确认；公开 Open、统一停止与入站诊断最小切片已实现。
 
-应用入口已按 [ADR 0011](adr/0011-service-first-application-api.md) 简化为 `self.Cluster().Open(name)`。下文显式接收 Runtime/ListenConfig 的签名属于 `cluster` 包基础设施接口，不是业务需要手工组装的另一套启动流程。
+应用入口已按 [ADR 0012](adr/0012-node-capabilities-and-service-logging.md) 调整为 `self.Node().OpenCluster(name)`。下文显式接收 Runtime/ListenConfig 的签名属于 `cluster` 包基础设施接口，不是业务需要手工组装的另一套启动流程。
 
 ## 应用层用法
 
 MainService 创建业务 Service 后，使用当前上下文开放入站：
 
 ```go
-cluster := self.Cluster()
-if err := self.Register("echo", id); err != nil {
+node := self.Node()
+if err := node.RegisterService("echo", id); err != nil {
     return err
 }
-if err := cluster.Open("battle"); err != nil {
+if err := node.OpenCluster("battle"); err != nil {
     return err
 }
 self.Exit()
 return nil
 ```
 
-共同节点表由 `gsr.Config.Cluster.Nodes` 提供。应用层 Open 取 `battle` 对应地址的端口，固定绑定 `0.0.0.0`；映射中的 host 用于其它节点拨号，不要求是本机可绑定地址。此模式面向可信 IPv4 内网，未认证监听不得暴露到不可信网络。端口零仅供本机测试动态分配，不进入出站路由。
+共同节点表由 `gsr.Config.Cluster.Nodes` 提供。应用层 Open 取 `battle` 对应地址的端口，固定绑定 `0.0.0.0`；映射中的 host 用于其它节点拨号，不要求是本机可绑定地址。访问地址可以是内网或受访问限制的公网地址；Cluster 仍要求可信访问范围，IP 限制由部署网络、ACL 或防火墙控制，不由节点表 host 约束本机绑定。端口零仅供本机测试动态分配，不进入出站路由。
 
-Runtime、名称解析与关闭接线由 gsr.Run 内部完成。入口 Exit 不关闭监听或其它 Service；不调用 Open 仍可主动 Send/Call。`ListenAddress()` 返回实际绑定地址供观测，不负责发布地址。
+Runtime、名称解析与关闭接线由 gsr.Run 内部完成。入口 Exit 不关闭监听或其它 Service；不调用 Open 仍可主动 Send/Call。`Node.ClusterListenAddress()` 返回实际绑定地址供观测，不负责发布地址。
 
 ## 当前依据
 
@@ -91,7 +91,7 @@ Skynet gate 有连接数上限，默认 maxclient 为 1024；它依赖 Lua corou
 
 静态部署共用节点说明表，业务按名字 Open 即可，不手工构造 ListenConfig。此前仅提供显式 Address 的应用使用约定已由 ADR 0011 替代；底层接口仍保持显式地址语义。两层接口并非可互换的业务写法。
 
-监听地址与发布地址用途不同：例如本机监听 `0.0.0.0:7000`，外部发布 `battle-17 → 10.0.0.37:7000`。底层 Open 的返回值与应用层 ListenAddress() 都是实际绑定地址，不保证其它节点可访问，也不自动把通配地址转换为发布地址。当前无需为此在 Cluster 增加 LocalNode 或发布地址配置。
+监听地址与发布地址用途不同：例如本机监听 `0.0.0.0:7000`，外部发布 `battle-17 → 10.0.0.37:7000`。底层 Open 的返回值与应用层 Node.ClusterListenAddress() 都是实际绑定地址，不保证其它节点可访问，也不自动把通配地址转换为发布地址。当前无需为此在 Cluster 增加 LocalNode 或发布地址配置。
 
 ## 已确认：重复调用与失败重试
 

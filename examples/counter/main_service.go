@@ -24,7 +24,7 @@ func (service *MainService) OnStart(ctx context.Context, self gsr.ServiceContext
 	if err != nil {
 		return err
 	}
-	if err := self.Register(counterName, id); err != nil {
+	if err := self.Node().RegisterService(counterName, id); err != nil {
 		return err
 	}
 	for _, amount := range []int{2, 3} {

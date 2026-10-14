@@ -6,6 +6,8 @@ Accepted，2026-09-16 用户确认；已落地最小应用运行链。Cluster �
 
 本裁决替代旧设计中节点级 CommandCodecRegistry 作为远端命令准入清单的要求，以及要求应用理解 app.Host 的使用模型。不改变 Core 与 Cluster 的职责边界。
 
+本文件保留原裁决过程。2026-10-14 [ADR 0012](0012-node-capabilities-and-service-logging.md) 更新组装入口：名称/监听归 self.Node()，Cluster 视图仅通信，日志返回 ServiceLogger；下文旧 API 形状为历史，不再是当前调用示例。
+
 ## 参考依据
 
 只读参考 `skynet/examples/cluster1.lua` 在启动回调中配置节点、创建 Service、注册名称并 cluster.open；`examples/main.lua` 在组装完成后 skynet.exit。前者本身没有退出，不能混同两个例子的实际行为。

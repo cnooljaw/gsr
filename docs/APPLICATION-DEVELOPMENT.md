@@ -1,6 +1,6 @@
 # 基于 GSR 开发独立业务项目
 
-本文面向依赖 GSR 的业务仓库，按已发布的 `v1.0.0` API 编写。业务项目负责游戏规则、协议、持久化和部署；GSR 负责 Service 调度、消息、生命周期及接入基础设施。框架仓库的 `AGENTS.md` 包含 Core 开发和 Skynet 对照流程，不应整份复制到业务项目。
+本文面向独立业务仓库，使用当前开发 API（ADR 0012，尚未发布新版）。`v1.0.0` 的入口形式不同，旧版请阅读标签中的文档。业务项目负责游戏规则、协议、持久化和部署；GSR 负责 Service 调度、消息、生命周期及接入基础设施。框架仓库的 `AGENTS.md` 包含 Core 开发和 Skynet 对照流程，不应整份复制到业务项目。
 
 ## 1. 建立独立模块并固定依赖
 
@@ -9,9 +9,10 @@
 ```sh
 go mod init example.com/mygame/server
 go get github.com/cnooljaw/gsr@v1.0.0
+# 当前新版接口演练需在下面用本地 replace 指向本仓库开发 checkout。
 ```
 
-需要 Go 1.24 或更高版本。提交 `go.mod` 与 `go.sum`，CI 使用明确的 Go 工具链版本。生产依赖固定版本，不长期追随 `@main`；升级时记录版本、API/错误代码/参数类型变化，并验证业务自己的集成链路。当前标签不等于 `main` 最新提交：`v1.0.0` 定位发布基线，后续教程和测试补充在 `main`。
+需要 Go 1.24 或更高版本。提交 `go.mod` 与 `go.sum`，CI 使用明确的 Go 工具链版本。生产依赖固定版本，不长期追随 `@main`；升级时记录版本、API/错误代码/参数类型变化，并验证业务自己的集成链路。当前标签不等于 `main` 最新提交：`v1.0.0` 定位发布基线，后续教程、测试与 ADR 0012 的不兼容 API 调整在开发 checkout。
 
 本地联调可以临时指定 GSR checkout：
 
@@ -19,7 +20,7 @@ go get github.com/cnooljaw/gsr@v1.0.0
 go mod edit -replace=github.com/cnooljaw/gsr=../gsr
 ```
 
-该相对路径只适用于业务项目与 GSR 目录同级的情况；路径按 `go.mod` 所在目录解析。联调结束执行以下命令，再确认实际依赖版本：
+该相对路径只适用于业务项目与 GSR 目录同级的情况；路径按 `go.mod` 所在目录解析。新版尚未发布时，下面的骨架必须保留本地 replace 才能编译。只有已有匹配新版 API 的正式标签或明确提交依赖后，才移除 replace 并确认实际版本；直接退回 v1.0.0 无法编译新版入口：
 
 ```sh
 go mod edit -dropreplace=github.com/cnooljaw/gsr
@@ -56,6 +57,8 @@ server/
 可复制 [业务项目 AGENTS.md 模板](templates/AGENTS.application.md) 到新仓库根目录，改名为 `AGENTS.md`。随后根据实际业务补齐文档和验证命令；模板中的 GSR 版本链接应随依赖升级同步调整。
 
 ## 3. 入口、Service 与状态归属
+
+当前应用配置使用 `gsr.RuntimeConfig` 和 `gsr.ClusterConfig`，不传底层带 Logger 的配置。MainService 通过 `self.Node().RegisterService/OpenCluster/OpenHTTP/CreateGate` 组装节点；Node 没有 Close/业务通信，Logger 返回仅有 Info/Error 的 ServiceLogger。
 
 - `main` 负责配置加载、信号、外部资源和 `gsr.Run`；普通 MainService 负责创建、命名和发起业务。
 - 普通业务实现 `gsr.Service`，使用 `gsr.ServiceContext` / `gsr.CommandContext`；`runtime.Service` 是底层集成接口。仍可导入 `runtime.CommandID` 和稳定错误，不需要直接持有 `*runtime.Runtime`。
@@ -112,7 +115,7 @@ func (service *mainService) OnStart(ctx context.Context, self gsr.ServiceContext
 	if err != nil {
 		return err
 	}
-	if err := self.Register("counter", id); err != nil {
+	if err := self.Node().RegisterService("counter", id); err != nil {
 		return err
 	}
 	if err := self.SendName("counter", setCountCommand, int64(7)); err != nil {
@@ -183,7 +186,7 @@ func (service *counterService) OnStop(_ context.Context) error {
 
 这是单文件入门骨架，后续按实际职责拆包。MainService 不提供业务命令，因此显式拒绝未知命令且无需 Dispatcher。Counter 的两个消息由同一调用方顺序投递，查询排在已接纳的写入之后；不需要 sleep，也不依赖 Send 返回时写入已经完成。`gsr.Config{}` 使用有限默认值，部署前按实际负载确定容量和超时预算。
 
-2026-10-13 已将此代码放入临时的独立 Go module，以本地 replace 指向从 `v1.0.0` 标签导出的源码；gofmt、依赖整理与编译通过，实际输出 `count=7`，入口退出后节点继续运行，SIGTERM 后退出码为零。该演练复用现有依赖缓存，未验证从远端首次下载模块，也未运行全仓 Go 测试。
+2026-10-13 已将此代码放入临时的独立 Go module，以本地 replace 指向当时从 `v1.0.0` 标签导出的源码，旧版骨架编译与停机演练通过；本节代码已按 ADR 0012 迁移，新版验证结果见当前验证清单。该演练复用现有依赖缓存，未验证从远端首次下载模块，也未运行全仓 Go 测试。
 
 ## 5. Command、参数与调用约束
 
@@ -236,7 +239,7 @@ var (
 | 玩家/房间状态 | 对应业务 Service；跨 Service 只能消息访问 |
 | Redis/MySQL 原生客户端 | 宿主或明确资源 owner 创建，作为借用依赖注入；先结束使用者再关闭，不能多个 Service 重复 Close |
 | Service 私有资源 | 明确 OnStart/OnStop 契约；部分启动失败也要能清理，借用资源不关闭 |
-| HTTP | `self.OpenHTTP` + `*gsr.HTTPIngress`；HTTP Handler 可以保存该窄入口，不能保存 ServiceContext，鉴权/参数/错误映射由业务负责 |
+| HTTP | `self.Node().OpenHTTP` + `*gsr.HTTPIngress`；HTTP Handler 可以保存该窄入口，不能保存 ServiceContext，鉴权/参数/错误映射由业务负责 |
 | Gate / Protocol / Agent | Gate 管字节连接，Protocol 管 Envelope 编解码，Agent 组合二者；权威玩家/房间状态由业务 Service 管理 |
 
 Service 内同步 I/O 会阻塞该 Service，必须使用有限 context 和客户端 I/O 超时。不要从 OnStart 保存 context 供未来 Handler 使用。真正需要外部并行工作时，建立有固定上限的基础设施 worker owner，完成后通过受控入口投递 Command；任务只携带输入快照和关联信息，不持有/调用 ServiceContext、不直接写业务状态。状态 owner 验证业务 ID、RequestID/Revision 等关联条件，丢弃迟到或失效结果。没有实际并发需求时不要先建 worker 框架。

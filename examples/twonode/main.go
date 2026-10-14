@@ -87,7 +87,7 @@ func runFile(path string) error {
 func run(ctx context.Context, cfg config) error {
 	return gsr.Run(ctx, gsr.Config{
 		Logging: logging.Config{Directory: cfg.LogDirectory},
-		Cluster: cluster.ClusterConfig{Nodes: cfg.Nodes},
+		Cluster: gsr.ClusterConfig{Nodes: cfg.Nodes},
 	}, &mainService{cfg: cfg})
 }
 
@@ -99,16 +99,16 @@ type mainService struct {
 var _ gsr.Service = (*mainService)(nil)
 
 func (service *mainService) OnStart(ctx context.Context, self gsr.ServiceContext) error {
-	cluster := self.Cluster()
+	node := self.Node()
 	if service.cfg.Role == "server" {
 		id, err := self.CreateService(ctx, newEchoService())
 		if err != nil {
 			return err
 		}
-		if err := self.Register("echo", id); err != nil {
+		if err := self.Node().RegisterService("echo", id); err != nil {
 			return err
 		}
-		if err := cluster.Open(service.cfg.Listen); err != nil {
+		if err := node.OpenCluster(service.cfg.Listen); err != nil {
 			return err
 		}
 	} else {
@@ -116,7 +116,7 @@ func (service *mainService) OnStart(ctx context.Context, self gsr.ServiceContext
 			return err
 		}
 	}
-	if err := self.Logger().Info("process ready", "role", service.cfg.Role, "listen_address", cluster.ListenAddress()); err != nil {
+	if err := self.Logger().Info("process ready", "role", service.cfg.Role, "listen_address", node.ClusterListenAddress()); err != nil {
 		return err
 	}
 	self.Exit()

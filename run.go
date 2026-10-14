@@ -16,14 +16,6 @@ import (
 	"github.com/cnooljaw/gsr/runtime"
 )
 
-// Config 声明应用运行环境；组件中的 Logger 必须为空，由 Logging 统一创建。
-type Config struct {
-	Logging logging.Config
-	Runtime runtime.Config
-	// Nodes 是共同节点表。端口 0 仅供本机测试 Open 分配端口，不作为出站路由。
-	Cluster cluster.ClusterConfig
-}
-
 // Run 启动一个独立节点和普通入口 Service，等待 ctx 取消后统一收尾。
 // 入口 Exit 不结束节点。信号处理归 main；运行中的 ctx 取消视为正常退出。
 func Run(ctx context.Context, config Config, entry Service) (result error) {
@@ -32,9 +24,6 @@ func Run(ctx context.Context, config Config, entry Service) (result error) {
 	}
 	if err := ctx.Err(); err != nil {
 		return err
-	}
-	if config.Runtime.Logger != nil || config.Cluster.Logger != nil {
-		return errors.New("gsr: configure shared logger through Logging")
 	}
 	node := &application{
 		names:     make(map[cluster.ServiceName]runtime.ServiceID),
@@ -51,13 +40,11 @@ func Run(ctx context.Context, config Config, entry Service) (result error) {
 	if err != nil {
 		return err
 	}
-	config.Runtime.Logger = node.logger
-	node.local, err = runtime.NewRuntime(config.Runtime)
+	node.local, err = runtime.NewRuntime(config.Runtime.core(node.logger))
 	if err != nil {
 		return err
 	}
-	config.Cluster.Logger = node.logger
-	node.cluster, err = cluster.NewCluster(config.Cluster)
+	node.cluster, err = cluster.NewCluster(config.Cluster.outbound(node.logger))
 	if err != nil {
 		return err
 	}

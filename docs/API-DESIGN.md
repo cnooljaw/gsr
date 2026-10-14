@@ -1,6 +1,31 @@
 # GSR API 设计规范
 
-本文作为 GSR 1.0 正式内部发布阶段的当前 API 契约。版本、能力范围与验证边界见 [1.0 内部发布说明](RELEASE-1.0.md)；后续公开 API 或架构边界变化仍需同步文档和行为测试，并遵守项目设计裁决流程。
+本文描述当前开发 API。2026-10-14 按 [ADR 0012](adr/0012-node-capabilities-and-service-logging.md) 分离节点能力和 Service 日志入口，尚未发布新版本，与 v1.0.0 源码不兼容；旧版契约以标签文档为准，标签不移动。历史验收见 [内部发布说明](RELEASE-1.0.md)。
+
+应用组装通过 self.Node()：RegisterService 发布目标名称，OpenCluster 开放共享监听，OpenHTTP 打开节点 HTTP，CreateGate 创建独立 GateService，ClusterListenAddress 观测实际 Cluster 绑定地址。Node 是运行环境的窄视图，不拥有独立资源，不提供 Close、业务通信或内部组件 getter，限当前回调使用。MainService 可完成组装后退出，原有 owner 继续管理资源。
+
+应用 `gsr.Config` 包含 `Logging logging.Config`、`Runtime gsr.RuntimeConfig`、`Cluster gsr.ClusterConfig`。RuntimeConfig 的可调项是 MaxCallWait、MailboxCapacity、ShutdownTimeout；ClusterConfig 的可调项是 Nodes、Codec、MaxCallWait、DialTimeout、WriteTimeout、OutboundQueueCapacity、MaxFrame。两者没有 Logger、不嵌入底层配置，零值和校验继续沿用原契约。
+
+self.Cluster() 仅提供来源绑定的 Send/Call；self.Logger() 返回仅有 Info/Error 的 *logging.ServiceLogger。原始 Logger.WithService(id) 返回共享 core 的 ServiceLogger。应用配置使用 gsr.RuntimeConfig/gsr.ClusterConfig，保留可调字段但无 Logger，由 Run 转换并统一注入日志。
+
+共同节点表 host 是访问地址，port 同时用于本机监听；Node.OpenCluster(name) 取对应端口绑定 0.0.0.0，访问范围由部署网络控制，不拆分节点表。
+
+## 应用能力入口
+
+```go
+// 所属节点的组装与观测，限当前 Service 回调使用。
+func (node *Node) RegisterService(cluster.ServiceName, runtime.ServiceID) error
+func (node *Node) OpenCluster(cluster.NodeID) error
+func (node *Node) ClusterListenAddress() string
+func (node *Node) OpenHTTP(string, func(*HTTPIngress) http.Handler) error
+func (node *Node) CreateGate(context.Context, GateConfig) (string, error)
+
+// Service 的来源绑定能力。
+// self.Node() 不提供 Close；self.Cluster() 只提供 Send/Call。
+// self.Logger() 返回 *logging.ServiceLogger，仅提供 Info/Error。
+```
+
+Node.CreateGate 的 context 仅用于独立 GateService 的启动；返回值是实际监听地址，不是需要调用者释放的句柄。MainService 可以在完成名称和接入组装后 Exit。普通 Service 启动失败不关闭共享节点资源，MainService 启动失败则由 Run 进入整体收尾；资源 owner 与关闭顺序保持不变。
 
 ## Gate 与 Protocol 边界
 
@@ -17,7 +42,7 @@ Gate 负责有界、顺序、失败可观察地收发不透明消息；Protocol 
 
 ## 默认业务入口与阅读边界
 
-普通应用只需沿一条路径阅读：`gsr.Run → MainService → self.CreateService/Register → self.Send/Call 或 SendName/CallName`；跨节点使用 `self.Cluster()`，日志使用 `self.Logger()`，HTTP 和 Gate 由 MainService 打开。Service 在自身类型上显式实现 Handle，普通命令默认委托具名字段持有的 `gsr.Dispatcher`。
+普通应用只需沿一条路径阅读：`gsr.Run → MainService → self.CreateService → self.Node().RegisterService → self.Send/Call 或 SendName/CallName`；跨节点使用 `self.Cluster()`，日志使用 `self.Logger()`，HTTP 和 Gate 由 MainService 打开。Service 在自身类型上显式实现 Handle，普通命令默认委托具名字段持有的 `gsr.Dispatcher`。
 
 `gsr.Service`、`gsr.ServiceContext` 是推荐的应用接口；`runtime.Service`、`runtime.ServiceContext` 是 Core 接口，服务于基础设施和底层集成。下文 Core 签名中的未限定类型属于 `runtime`，不能当成应用层接口的另一种写法。`Runtime.Send/Call` 是 Source 为零的受信任注入入口，不是业务调用捷径。
 
@@ -27,17 +52,17 @@ Gate 负责有界、顺序、失败可观察地收发不透明消息；Protocol 
 
 Protocol 的构造器复制 Handler 表，校验编号已定义且属于客户端入站、Handler 签名精确匹配 Scope/Context/error，以及请求参数类型与该编号的生成目录一致；构造后只读，不提供逐条 Register 或运行期修改。`MustDispatcher` 用于程序员定义的静态接线，构造错误时 panic；外部组装需要返回错误时使用 `NewDispatcher`。运行时沿用 Command Dispatcher 的反射调用做法，不逐消息重新解析签名，但仍使用 reflect.Call。协议可以先定义，表中只绑定已实现的 Handler；未绑定消息保持原有错误语义。Agent 使用具名 `commandDispatcher` 与 `protocolDispatcher` 字段区分两个入口，不混用编号或合并执行层。
 
-客户端接入另见 [WebSocket Gate 协议与边界](RFC-WEBSOCKET-GATE.md)：生产 Gate 使用固定 33 字节二进制握手，WSS 上行使用 seq + Protobuf Envelope + MAC，下行只使用 Envelope；Gate 的显式 Plain 模式仅传输 Envelope。Envelope 使用 msg_id、request_id(uint32) 和 payload，由业务定义的 `AgentService` 中转。C/S request_id、Gate 的两种协议模式、连接认证、关闭码和错误归属均在 Core/Cluster 之外；Gate 只负责传输与安全边界。Runtime 内部消息类型区分客户端消息与普通 Core Command，Service 通过可选的 `ClientMessageHandler` 明确启用客户端处理能力；Agent 在同一 Service runner 中将客户端 Envelope 按 `msg_id` 路由到协议分发器，业务按实现进度注册强类型 Handler；本地或 Cluster 投递的普通 Core Command 由显式 `Service.Handle` 按 `CommandID` 分发。协议 `.proto` 显式声明每个 msg_id 对应的 payload、方向和 Request/Notify/Response/Push 种类，并生成目录；未实现 Handler 的消息仍可先存在于协议定义中。Core Command 的 Send/Call 仍是同一种消息类型，由 Session 是否为零区分；`Source` 只表示 Service 来源，不作为入口类别。AgentService 持有客户端写回能力，组合通用 `protocol.Dispatcher` 并注册业务项目实现的 Handler；Gate 到 Agent 使用 Runtime-owned 的 `Runtime.DeliverClientMessage` 单向基础设施投递，Agent 到 Gate 使用不暴露 socket 的 `ClientSession` 写回能力。这里的 `ClientSession` 指绑定一条客户端连接的写回能力，不是 Core `SessionID` 或 Envelope 的 `request_id`。业务协议组件只做协议适配、简单收发和业务 Service 路由，可以持有连接私有的轻量状态，但不持有跨连接共享或需恢复的权威业务状态；业务 Service 负责业务拒绝和状态变化。GSR 不内置大厅、游戏或其它具体协议实现，只提供通用接入边界。Runtime 客户端消息投递能力已实现；`examples/websocket-gate` 的 Go 与 TypeScript 类型由通用和业务 `.proto` 生成，Go Agent 用独立协议目录解码并手动注册已实现的 Echo Handler，完成请求/响应及 `request_id` 回传。当前 Echo 联调示例由 MainService 在 `gsr.Run` 中通过 `self.OpenGate` 创建对应 Gate 与应用 Agent；Plain 没有握手或 MAC，仅允许内网绑定，TLS 独立配置。框架 Gate、跨语言认证固定向量和结构化诊断已有实现，完整压力验收仍按 RFC 推进。标准关闭码、结构化日志和 Agent 组装边界见 RFC。首版不实现 DES 或旧 12 字节头兼容。
+客户端接入另见 [WebSocket Gate 协议与边界](RFC-WEBSOCKET-GATE.md)：生产 Gate 使用固定 33 字节二进制握手，WSS 上行使用 seq + Protobuf Envelope + MAC，下行只使用 Envelope；Gate 的显式 Plain 模式仅传输 Envelope。Envelope 使用 msg_id、request_id(uint32) 和 payload，由业务定义的 `AgentService` 中转。C/S request_id、Gate 的两种协议模式、连接认证、关闭码和错误归属均在 Core/Cluster 之外；Gate 只负责传输与安全边界。Runtime 内部消息类型区分客户端消息与普通 Core Command，Service 通过可选的 `ClientMessageHandler` 明确启用客户端处理能力；Agent 在同一 Service runner 中将客户端 Envelope 按 `msg_id` 路由到协议分发器，业务按实现进度注册强类型 Handler；本地或 Cluster 投递的普通 Core Command 由显式 `Service.Handle` 按 `CommandID` 分发。协议 `.proto` 显式声明每个 msg_id 对应的 payload、方向和 Request/Notify/Response/Push 种类，并生成目录；未实现 Handler 的消息仍可先存在于协议定义中。Core Command 的 Send/Call 仍是同一种消息类型，由 Session 是否为零区分；`Source` 只表示 Service 来源，不作为入口类别。AgentService 持有客户端写回能力，组合通用 `protocol.Dispatcher` 并注册业务项目实现的 Handler；Gate 到 Agent 使用 Runtime-owned 的 `Runtime.DeliverClientMessage` 单向基础设施投递，Agent 到 Gate 使用不暴露 socket 的 `ClientSession` 写回能力。这里的 `ClientSession` 指绑定一条客户端连接的写回能力，不是 Core `SessionID` 或 Envelope 的 `request_id`。业务协议组件只做协议适配、简单收发和业务 Service 路由，可以持有连接私有的轻量状态，但不持有跨连接共享或需恢复的权威业务状态；业务 Service 负责业务拒绝和状态变化。GSR 不内置大厅、游戏或其它具体协议实现，只提供通用接入边界。Runtime 客户端消息投递能力已实现；`examples/websocket-gate` 的 Go 与 TypeScript 类型由通用和业务 `.proto` 生成，Go Agent 用独立协议目录解码并手动注册已实现的 Echo Handler，完成请求/响应及 `request_id` 回传。当前 Echo 联调示例由 MainService 在 `gsr.Run` 中通过 `self.Node().CreateGate` 创建对应 Gate 与应用 Agent；Plain 没有握手或 MAC，仅允许内网绑定，TLS 独立配置。框架 Gate、跨语言认证固定向量和结构化诊断已有实现，完整压力验收仍按 RFC 推进。标准关闭码、结构化日志和 Agent 组装边界见 RFC。首版不实现 DES 或旧 12 字节头兼容。
 
 框架能力边界如下。
 
-通用客户端协议与统一 Gate 分别位于 `protocol` 和 `gate`。应用通过 `self.OpenGate(ctx, gsr.GateConfig{...})` 组装，底层 `gate.NewGateService` 显式接收 Runtime，以便 I/O goroutine 调用受信任的 `Runtime.DeliverClientMessage`；业务不获得该权限。通用协议和生成工具属于框架，Echo 协议和 Agent 留在示例。
+通用客户端协议与统一 Gate 分别位于 `protocol` 和 `gate`。应用通过 `self.Node().CreateGate(ctx, gsr.GateConfig{...})` 组装，底层 `gate.NewGateService` 显式接收 Runtime，以便 I/O goroutine 调用受信任的 `Runtime.DeliverClientMessage`；业务不获得该权限。通用协议和生成工具属于框架，Echo 协议和 Agent 留在示例。
 
-独立的 `httpserver.Server` 只管理普通 HTTP 监听与有序关闭，不接管路由、鉴权或到业务 Service 的映射。使用 `gsr.Run` 时，MainService 可通过 `self.OpenHTTP` 打开一个 HTTP 监听，由 Run 持有并在 Runtime 停止前关闭；直接使用 `httpserver.Server` 时仍由调用方持有。`redisclient.New` 和 `mysqlclient.Open` 分别返回原生 `*redis.Client`、`*sql.DB`，其生命周期仍由宿主负责。这些能力不转为 RedisService/MySQLService，也不进入 Core。
+独立的 `httpserver.Server` 只管理普通 HTTP 监听与有序关闭，不接管路由、鉴权或到业务 Service 的映射。使用 `gsr.Run` 时，MainService 可通过 `self.Node().OpenHTTP` 打开一个 HTTP 监听，由 Run 持有并在 Runtime 停止前关闭；直接使用 `httpserver.Server` 时仍由调用方持有。`redisclient.New` 和 `mysqlclient.Open` 分别返回原生 `*redis.Client`、`*sql.DB`，其生命周期仍由宿主负责。这些能力不转为 RedisService/MySQLService，也不进入 Core。
 
 `httpserver.Server.Close(ctx)` 的首次调用执行关闭，其 context 控制有序关闭预算，超时或取消后强制关闭连接，但不强杀 Handler。并发或重复调用等待同一关闭流程并取得同一最终结果；后续调用的 context 只控制自身等待，不取消原流程。关闭完成前不得仅因已经停止接纳就返回成功。
 
-HTTP 路由使用应用提供的 `http.Handler` / `http.ServeMux`。多条 REST 路由可以选择不同的本地 Service。`self.OpenHTTP(address, func(*gsr.HTTPIngress) http.Handler)` 让 Handler 保存受信任的窄入口，使用 `HTTPIngress.SendName/CallName` 按当前节点的名称表解析目标，再复用 Core 基础设施 Send/Call；消息 Source 固定为零，不伪装成 MainService 或 HTTP 客户端。Handler 自行决定鉴权、参数校验、有限等待和 HTTP 错误映射。需要汇总本地与远端结果时，由拥有该业务操作的 Service 发起本地和 Cluster Call，不让 HTTP goroutine 冒充 Service 来源。路由热变更若成为实际需求，整体重建并替换路由表，不为 `httpserver` 增加逐条动态增删 API；Go `net/http` 已处理 HTTP 并发，默认不增设固定 HTTP Agent 池。`examples/http-inbound` 的管理路由已使用 `gsr.Run`、MainService 和 `HTTPIngress` 验证本地及远端业务链路；单个房间人数用例保留手工组装 Runtime 的底层示范。
+HTTP 路由使用应用提供的 `http.Handler` / `http.ServeMux`。多条 REST 路由可以选择不同的本地 Service。`self.Node().OpenHTTP(address, func(*gsr.HTTPIngress) http.Handler)` 让 Handler 保存受信任的窄入口，使用 `HTTPIngress.SendName/CallName` 按当前节点的名称表解析目标，再复用 Core 基础设施 Send/Call；消息 Source 固定为零，不伪装成 MainService 或 HTTP 客户端。Handler 自行决定鉴权、参数校验、有限等待和 HTTP 错误映射。需要汇总本地与远端结果时，由拥有该业务操作的 Service 发起本地和 Cluster Call，不让 HTTP goroutine 冒充 Service 来源。路由热变更若成为实际需求，整体重建并替换路由表，不为 `httpserver` 增加逐条动态增删 API；Go `net/http` 已处理 HTTP 并发，默认不增设固定 HTTP Agent 池。`examples/http-inbound` 的管理路由已使用 `gsr.Run`、MainService 和 `HTTPIngress` 验证本地及远端业务链路；单个房间人数用例保留手工组装 Runtime 的底层示范。
 
 Gate 与业务 Agent 的组装只需要一个构造回调，不增加 AgentFactory 抽象：
 
@@ -54,10 +79,10 @@ Gate 的两种模式共用有界连接接纳逻辑：监听先于 Gate Service �
 
 两种模式的 `AcceptedConnections` 均只计连接创建 Call 成功返回有效 AgentID 的连接；MAC 模式还须先完成握手。Call 已超时或取消后迟到创建的 Agent 仍按既有路径清理，但当前连接只计入 `RejectedConnections`，不再同时计为成功。
 
-MainService 统一通过 `OpenGate` 打开监听，默认使用 MAC 模式：
+MainService 统一通过 `Node.CreateGate` 打开监听，默认使用 MAC 模式：
 
 ```go
-address, err := self.OpenGate(ctx, gsr.GateConfig{
+address, err := self.Node().CreateGate(ctx, gsr.GateConfig{
     Protocol:              gate.ProtocolMAC, // 零值也是 MAC。
     Address:               ":7889",
     MaxConnections:        1000,
@@ -150,7 +175,7 @@ Skynet 的接口形状是 API 设计的重要参照，但 GSR 的具体契约由
 - 为 Runtime 自身提供启动、收尾或故障支撑的基础设施，若普通 Service 不能满足其生命周期，可以保留职责明确、数量有界的独立运行组件。例外必须说明具体原因，并负责取消、关闭、等待、并发上限、panic 与错误归属，不能成为随意自建运行框架的理由。
 - 通用能力优先通过组合和窄能力接口提供，不建立继承式的公开基类；尤其不要用不断增长的 `BaseAgent`、`BaseService` 承载不同业务的协议和生命周期。只有真实的多实现、测试隔离或边界依赖倒置需要时，才提取接口。
 
-Logger 保持现有实现：由应用在 Runtime、Cluster 收尾后最后关闭，正常关闭时排空已接纳日志；当前普通 Service 随 Runtime 停止，其 Mailbox 停止时清空待处理消息，不能直接满足上述契约。Logger 的独立单写入者是有明确生命周期理由的基础设施例外，不新增 LoggerService，也不改变现有日志 API。
+Logger 保持现有实现：由应用在 Runtime、Cluster 收尾后最后关闭，正常关闭时排空已接纳日志；当前普通 Service 随 Runtime 停止，其 Mailbox 停止时清空待处理消息，不能直接满足上述契约。Logger 的独立单写入者是有明确生命周期理由的基础设施例外，不新增 LoggerService，来源绑定视图按 ADR 0012 收窄为 ServiceLogger。
 
 **需要独立运行，优先 Service；只是被调用，直接调用；基础设施例外，必须有具体理由。**
 
@@ -258,7 +283,7 @@ func (runtime *Runtime) DeliverClientMessage(target ServiceID, frame []byte) err
 
 `frame` 是不透明客户端字节消息；Runtime 不要求 Protobuf 格式，不解析客户端协议，并在投递时复制字节快照。该入口是 Gate 等受信任基础设施的单向 API，消息的 Source、Session 和 CommandID 固定为零。Runtime 不维护额外的客户端处理器 Registry；目标 Service 实现 `ClientMessageHandler` 即声明这项能力。未实现时在 Mailbox admission 前返回稳定错误 `ErrClientMessageUnsupported`，不会入队后再静默丢弃。客户端处理函数与普通 `Handle` 在同一个 Service runner 中串行执行，不产生 Core Reply。使用当前 Protocol 时，Agent 将字节交给协议 Dispatcher 解码 Envelope，并由协议层关联 `request_id` 和客户端响应。
 
-应用层 `gsr.Service` 保持普通 `Handle` 为必需入口；只有 Agent 等需要接收客户端消息的 Service 额外实现 `gsr.ClientMessageHandler`（相同方法名，参数为 `gsr.CommandContext`）。`gsr.Run` 在创建 Service 时仅对这类实例使用客户端消息适配器，使它在 Core 中实现 `runtime.ClientMessageHandler`；普通应用 Service 的适配器不实现该接口，继续在入队前被拒绝。适配器只转换上下文，不另建 Mailbox、runner、Registry 或消息类型。Gate 通过 `OpenGate` 的受信任组装入口接线，普通 Service 不获得 `Runtime.DeliverClientMessage`。
+应用层 `gsr.Service` 保持普通 `Handle` 为必需入口；只有 Agent 等需要接收客户端消息的 Service 额外实现 `gsr.ClientMessageHandler`（相同方法名，参数为 `gsr.CommandContext`）。`gsr.Run` 在创建 Service 时仅对这类实例使用客户端消息适配器，使它在 Core 中实现 `runtime.ClientMessageHandler`；普通应用 Service 的适配器不实现该接口，继续在入队前被拒绝。适配器只转换上下文，不另建 Mailbox、runner、Registry 或消息类型。Gate 通过 `Node.CreateGate` 的受信任组装入口接线，普通 Service 不获得 `Runtime.DeliverClientMessage`。
 
 `gsr.Service` 与 `runtime.Service` 使用不同的上下文类型，不能直接互换。框架内部的 `serviceAdapter` 把 Core 上下文转换成应用上下文；`clientMessageAdapter` 在此基础上额外实现客户端消息接口。它们包装同一个业务实例，不是另外创建的 Service，也不是业务需要手工组装的对象。入口可在 [`service.go`](../service.go) 中直接追踪：
 
@@ -676,7 +701,7 @@ Cluster 2 的远程 Call 使用 Cluster-owned `ClusterCallRegistry` 和内部 `C
 
 ListenConfig 类型及内部校验已实现，公开 Open 已实现。地址必须包含显式主机和数字端口，监听允许端口 0；非法格式或负容量返回 ErrInvalidListenConfig。此校验不执行 DNS、绑定或 ResolveService，实际网络错误留到 Open 处理。
 
-注册与发现属于 Core 和 Cluster 之外的能力：外层维护 `NodeID → 可访问地址`，Open 不自动注册、续约或发布地址。保留显式 `ListenConfig.Address`，不为底层 cluster 包增加按 NodeID 打开的重载；普通应用的 `self.Cluster().Open(name)` 由 gsr 组装层查节点表并取端口绑定 0.0.0.0。Open 返回实际绑定地址，不保证是外部可访问地址。当前 ClusterConfig.Nodes 仅提供静态路由，不表示成员存活、业务就绪或资源所有权；动态发现结果的路由更新接线另行设计，当前不提供通用 Discovery 框架。
+注册与发现属于 Core 和 Cluster 之外的能力：外层维护 `NodeID → 可访问地址`，Open 不自动注册、续约或发布地址。保留显式 `ListenConfig.Address`，不为底层 cluster 包增加按 NodeID 打开的重载；普通应用的 `self.Node().OpenCluster(name)` 由 gsr 组装层查节点表并取端口绑定 0.0.0.0。Open 返回实际绑定地址，不保证是外部可访问地址。当前 ClusterConfig.Nodes 仅提供静态路由，不表示成员存活、业务就绪或资源所有权；动态发现结果的路由更新接线另行设计，当前不提供通用 Discovery 框架。
 
 Cluster 入站只沿一条生产路径执行：
 
@@ -772,7 +797,7 @@ type ServiceContext interface {
 - `Call` 的 context 只能取消或收紧本次等待；实际等待永远不超过 Runtime `MaxCallWait`。
 - Core 的 `runtime.ServiceContext` 不包含 Cluster、Discovery 或 Repository。应用层 `gsr.ServiceContext` 提供已绑定来源的 `Cluster()` 和 `Logger()`；业务 Repository 等依赖通过具体 Service 字段注入。
 - Cluster client 在 Service 初始化阶段以 `Self()` 绑定 Source；其公开 Send/Call 不再要求业务重复传 source。
-- 应用层 `gsr.ServiceContext` 在 Core 接口之上提供 `Register(name, id)`、`SendName(name, command, args...)` 和 `CallName(ctx, name, command, args...)`；一张节点内名称表同时服务本地按名调用与 Cluster 入站解析。Core 的 `runtime.ServiceContext` 仍只接收 ServiceID，不引入名称或 Cluster 依赖。
+- 应用层通过 `self.Node().RegisterService(name, id)` 发布名称，ServiceContext 提供 `SendName(name, command, args...)` 和 `CallName(ctx, name, command, args...)`；一张节点内名称表同时服务本地按名调用与 Cluster 入站解析。Core 的 `runtime.ServiceContext` 仍只接收 ServiceID，不引入名称或 Cluster 依赖。
 - 本地按名调用每次解析为当前节点的 ServiceID，然后复用现有 ServiceContext.Send/Call；未知名称返回 `ErrServiceNotFound`，CallName 的 nil context 返回 `ErrInvalidCallContext`，按名 self Call 继续返回 `ErrCallCycle`。不缓存旧映射，也不改变 Source、Mailbox、Reply 和超时语义。
 - `context.Context` 只负责 deadline、cancellation 和请求范围信息，不替代 ServiceContext。
 - 第一版 Timer 只有一次性 `After`；不提供 ticker。Timer 使用单调时间计算期限，同一时刻到期不承诺彼此顺序，也不高于普通消息 admission。
@@ -807,7 +832,7 @@ func (client *BattleClient) StartBattle(
 
 文件滚动已实现：当前文件 gsr.log，固定 100 MiB，下一条会超限时先滚动，不拆记录；保留 10 个历史文件（.1 最新，.10 最旧），超过后删除最旧的受管理文件。现有单写入者负责滚动，不增加任务、不重置 seq；第一版不按日期切分、不压缩，不暴露大小和保留数量配置。各进程由启动参数选择不同配置，显式传入独占的相对日志目录；Logger.New 将其相对当前工作目录解析并固定，应用应在启动时创建 Logger。日志组件不读取命令行、不推断节点名。文件模式创建缺失目录，初始化失败直接报错；重启追加当前文件。运行中写入或滚动失败后拒绝新日志、累计已接纳未输出记录、停止继续写入和滚动，Err() 和 Close 返回首次错误，不自动重试/转终端/退出进程。
 
-统一 FIFO 日志服务已实现：logging.New(logging.Config{Directory: "./log/battle-01"}) 选择文件输出；Directory 为空时使用 Writer，两者同时设置报错，都未设置则默认 stdout。Capacity 默认 1024。Info/Error 在调用处采集时间/位置并快照字段，WithService 仅绑定来源。Runtime.Config.Logger 与 ClusterConfig.Logger 注入同一个入口，框架同步入主日志队列，Diagnostics 仍作观测，不再转发为主日志。满载返回 ErrQueueFull 并计数，成功入队不等待写盘；文件和借用 Writer 均在首次输出故障后停止写入和接纳。Close(ctx) 正常排空、失败时统计残留，并有限等待；关闭内部文件，不关闭借用 Writer。Logger 由应用最后关闭，不进入普通 Service 生命周期。Cluster 已在源头实现同连接同类坏帧首条保留、抑制计数与关闭汇总，详见 [日志方案](RFC-LOGGING.md)。
+统一 FIFO 日志服务已实现：logging.New(logging.Config{Directory: "./log/battle-01"}) 选择文件输出；Directory 为空时使用 Writer，两者同时设置报错，都未设置则默认 stdout。Capacity 默认 1024。Info/Error 在调用处采集时间/位置并快照字段，WithService 返回仅有 Info/Error 的 ServiceLogger，来源不可由业务改绑。Runtime.Config.Logger 与 ClusterConfig.Logger 注入同一个入口，框架同步入主日志队列，Diagnostics 仍作观测，不再转发为主日志。满载返回 ErrQueueFull 并计数，成功入队不等待写盘；文件和借用 Writer 均在首次输出故障后停止写入和接纳。Close(ctx) 正常排空、失败时统计残留，并有限等待；关闭内部文件，不关闭借用 Writer。Logger 由应用最后关闭，不进入普通 Service 生命周期。Cluster 已在源头实现同连接同类坏帧首条保留、抑制计数与关闭汇总，详见 [日志方案](RFC-LOGGING.md)。
 
 错误分为三类，但继续使用标准 Go `error` 和稳定 error type/sentinel 表达：
 
@@ -908,14 +933,14 @@ Service 不提供额外 `Close` 钩子；本地资源释放属于 `OnStop`。`Ru
 
 应用使用 `gsr.Run(ctx, Config, Service)`；Config 包含 Logging、Runtime、Cluster 的明确配置。每次 Run 创建独立的 Runtime、Cluster、Logger 并启动普通入口实例，等待 context 取消后自动关闭。运行期间取消是正常退出信号，已取消的启动 context 返回取消错误；初始化失败保留原错误并回滚。进程信号由 main 转成 context 取消，入口 Exit 不结束进程。旧 app.Host 已移除，不提供兼容别名。
 
-Run 内部固定按 HTTP.Close（若已打开）→ Cluster.Quiesce → Runtime.Close → Cluster.Close → 最终日志 → Logger.Close 收尾，聚合错误且不跳过后续步骤。HTTP/Cluster/Logger 每阶段预算五秒，Runtime 沿用自身预算，不强杀 Handler/Writer。HTTP 有序关闭超时后会强制关闭连接并继续后续收尾，不能保证尚未返回的 Handler 已结束；Handler 应遵守请求取消与有限等待，并处理 Runtime 正在关闭的错误。Logging 创建的 Logger 由运行环境独占关闭，组件配置中的外部 Logger 被拒绝。Commands 清单已移除，Cluster 统一使用默认编码，合法命令是否支持由目标判断。
+Run 内部固定按 HTTP.Close（若已打开）→ Cluster.Quiesce → Runtime.Close → Cluster.Close → 最终日志 → Logger.Close 收尾，聚合错误且不跳过后续步骤。HTTP/Cluster/Logger 每阶段预算五秒，Runtime 沿用自身预算，不强杀 Handler/Writer。HTTP 有序关闭超时后会强制关闭连接并继续后续收尾，不能保证尚未返回的 Handler 已结束；Handler 应遵守请求取消与有限等待，并处理 Runtime 正在关闭的错误。Logging 创建的 Logger 由运行环境独占关闭，应用层 RuntimeConfig/ClusterConfig 不提供 Logger 字段，内部转换到基础设施配置时注入唯一 owner。Commands 清单已移除，Cluster 统一使用默认编码，合法命令是否支持由目标判断。
 
 HTTP 入口的常见写法如下；业务 Service 创建并注册完成后再打开监听。`OpenHTTP` 每个 Run 只成功一次，监听失败可重试；入口 Service 退出不关闭监听，最终由 Run 收尾。`HTTPIngress` 仅供 HTTP Handler 保存，不能代替回调内的 `ServiceContext`，也不提供 Cluster 来源身份。
 
 OpenHTTP 在调用路由构造函数前检查监听状态：已经打开或节点已经关闭时直接拒绝，不再次构造路由。构造函数在锁外执行，只组装路由，不启动资源或执行业务通信；构造后再次检查状态，因此并发打开可能各自完成构造，但只成功一个监听，期间停机也会拒绝发布。
 
 ```go
-err := self.OpenHTTP(address, func(in *gsr.HTTPIngress) http.Handler {
+err := self.Node().OpenHTTP(address, func(in *gsr.HTTPIngress) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /users/{id}", func(w http.ResponseWriter, r *http.Request) {
 		value, err := in.CallName(r.Context(), "users", getUserCommand, r.PathValue("id"))
@@ -925,13 +950,13 @@ err := self.OpenHTTP(address, func(in *gsr.HTTPIngress) http.Handler {
 })
 ```
 
-`self.Register(name, id)` 发布节点内名称，供本地 `self.SendName/CallName` 和远端 `self.Cluster().Send/Call(node, name, ...)` 共用目标节点的同一张表。空名、零 ID 或不属于当前应用尚未收尾 Service 的 ID 返回 ErrServiceNotFound；重复名返回 ErrServiceNameRegistered，不静默替换。
+`self.Node().RegisterService(name, id)` 发布节点内名称，供本地 `self.SendName/CallName` 和远端 `self.Cluster().Send/Call(node, name, ...)` 共用目标节点的同一张表。空名、零 ID 或不属于当前应用尚未收尾 Service 的 ID 返回 ErrServiceNotFound；重复名返回 ErrServiceNameRegistered，不静默替换。
 
 名称归目标 ServiceID：该 Service 启动失败、Exit、停止或 panic 后，应用层在调用其业务 OnStop 前清理全部对应名称；发布它的 MainService 先退出不影响该映射。清理后新实例可注册同名；运行中的名称不支持直接改绑，也不负责业务资源所有权或发现。
 
-推荐由创建者（通常是 MainService）在 `CreateService` 成功返回后再调用 `Register(name, id)`。目标 Service 不在自己的 `OnStart` 中提前发布名称：Runtime 要等 `OnStart` 成功返回才正式接纳该 Service，提前注册会出现名称可解析、目标却尚不可投递的短暂窗口。业务 `OnStop` 无需手工注销，应用层在调用它之前已完成清理。
+推荐由创建者（通常是 MainService）在 `CreateService` 成功返回后再调用 `self.Node().RegisterService(name, id)`。目标 Service 不在自己的 `OnStart` 中提前发布名称：Runtime 要等 `OnStart` 成功返回才正式接纳该 Service，提前注册会出现名称可解析、目标却尚不可投递的短暂窗口。业务 `OnStop` 无需手工注销，应用层在调用它之前已完成清理。
 
-`Open(nodeName)` 从 Config.Cluster.Nodes 取端口绑定 0.0.0.0，由共享 Cluster 管理唯一监听；未知名称报错，不 Open 仍可主动 Send/Call。`ListenAddress()` 供日志观测实际绑定地址，不等于外部可达地址。应用配置允许端口零用于测试动态监听，这类节点不进入出站路由；正常部署使用非零固定端口。底层 cluster.Open(Runtime, ListenConfig) 仍是基础设施接口，Cluster 本身不管理 Runtime 生命周期。
+`Node.OpenCluster(nodeName)` 从 Config.Cluster.Nodes 取端口绑定 0.0.0.0，由共享 Cluster 管理唯一监听；未知名称报错，不 Open 仍可主动 Send/Call。`Node.ClusterListenAddress()` 供日志观测实际绑定地址，不等于外部可达地址。应用配置允许端口零用于测试动态监听，这类节点不进入出站路由；正常部署使用非零固定端口。底层 cluster.Open(Runtime, ListenConfig) 仍是基础设施接口，Cluster 本身不管理 Runtime 生命周期。
 
 Service 创建成功后即可工作；`OnStart` 是 Runtime 生命周期钩子，`Start` Command 则是 Service 自行定义的可选业务协议，二者不同。Counter 等简单 Service 不增加 Start Command；需要分阶段启动参数或业务准备的 Service 才定义它。
 

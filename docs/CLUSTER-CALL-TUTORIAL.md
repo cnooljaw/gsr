@@ -1,6 +1,6 @@
 # Cluster 节点间调用教程
 
-本教程面向 GSR 1.0 的默认 ValueCodec，使用应用层 `self.Cluster().Send/Call`。先运行现成双节点示例，再看不同参数如何编码、远端 Handler 如何声明，以及返回值如何读取。
+本教程使用当前开发入口（ADR 0012，尚未发布新版）和默认 ValueCodec；参数编码仍与 GSR 1.0 相同。调用使用应用层 `self.Cluster().Send/Call`。先运行现成双节点示例，再看不同参数如何编码、远端 Handler 如何声明，以及返回值如何读取。
 
 ## 1. 先跑通两个节点
 
@@ -20,7 +20,7 @@ go build -o /tmp/gsr-twonode ./examples/twonode
 /tmp/gsr-twonode -config examples/twonode/caller.json
 ```
 
-配置中的 `battle` 是节点路由名，`echo` 是目标节点内的 Service 名称，两者用途不同。示例把 `battle` 映射到 `127.0.0.1:19091`；跨机器时调用方填写接收端可访问的地址。应用层 `Open("battle")` 取该配置的端口并绑定 `0.0.0.0`，不是只绑定配置中的回环 IP。Cluster 用于可信网络，按部署配置控制访问范围。
+配置中的 `battle` 是节点路由名，`echo` 是目标节点内的 Service 名称，两者用途不同。示例把 `battle` 映射到 `127.0.0.1:19091`；跨机器时调用方填写接收端可访问的地址。应用层 `self.Node().OpenCluster("battle")` 取该配置的端口并绑定 `0.0.0.0`，不是只绑定配置中的回环 IP。Cluster 用于可信网络，按部署配置控制访问范围。
 
 调用节点每轮向 `echo` 发一次 Send 和 Call。查看日志：
 
@@ -40,10 +40,10 @@ id, err := self.CreateService(ctx, newEchoService())
 if err != nil {
     return err
 }
-if err := self.Register("echo", id); err != nil {
+if err := self.Node().RegisterService("echo", id); err != nil {
     return err
 }
-if err := self.Cluster().Open("battle"); err != nil {
+if err := self.Node().OpenCluster("battle"); err != nil {
     return err
 }
 self.Exit()
@@ -178,7 +178,7 @@ func (service *parameterService) OnStop(_ context.Context) error {
 }
 ```
 
-接收端 MainService 用 `newParameterService()` 创建实例，将它注册为 `"params"`，再 `Open("battle")`；顺序与第 2 节相同。若在双节点示例中练习，可以添加该 Service，并在 server 分支替换 Echo 的创建和注册名称。
+接收端 MainService 用 `newParameterService()` 创建实例，将它注册为 `"params"`，再 `self.Node().OpenCluster("battle")`；顺序与第 2 节相同。若在双节点示例中练习，可以添加该 Service，并在 server 分支替换 Echo 的创建和注册名称。
 
 调用端可把原 `callerService.handleTick` 换成下面的一次调用；不再登记下一次 Timer，因此只演示一轮。它使用示例已经导入的 `context`、`fmt` 和 `time`：
 

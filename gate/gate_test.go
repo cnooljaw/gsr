@@ -1135,7 +1135,7 @@ func TestMACGateSuppressesRepeatedConnectionFailures(t *testing.T) {
 	}
 	t.Cleanup(func() { _ = logger.Close(context.Background()) })
 	client := newClientConnection(nil, 128, queueEntryOverhead, &gateCounters{}, 7)
-	gate := &GateService{logger: logger}
+	gate := &GateService{logger: logger.WithService(0)}
 	gate.logConnectionFailure(client, "mac", websocket.ClosePolicyViolation, errClientMACInvalid)
 	gate.logConnectionFailure(client, "mac", websocket.ClosePolicyViolation, errClientMACInvalid)
 	gate.flushConnectionDiagnostics(client)
@@ -1364,7 +1364,7 @@ func TestMACGateHTTPServerErrorLogRedactsRawText(t *testing.T) {
 		}
 	})
 	const rawError = "http: panic serving 127.0.0.1:12345: private-client-data\nstack"
-	writer := newHTTPServerErrorLog(logger).Writer()
+	writer := newHTTPServerErrorLog(logger.WithService(0)).Writer()
 	if written, err := writer.Write([]byte(rawError)); err != nil || written != len(rawError) {
 		t.Fatalf("Write(server error) = %d, %v; want %d, nil", written, err, len(rawError))
 	}

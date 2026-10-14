@@ -27,8 +27,9 @@
 - Service 是运行单元，不是代码分类方式；需要独立运行时优先 Service，普通调用不额外包装，基础设施例外必须说明具体理由。见 [Service 化原则](docs/API-DESIGN.md#11-service-化原则)。
 - 每个 Service 在自身类型上显式实现 `Handle`，让 Runtime → Service 的消息入口可见；这是项目编码规则，不能仅靠 Go 接口检查强制。不得靠匿名嵌入 Dispatcher 的方法提升隐式获得 `Handle`。
 - 普通应用层 `gsr.Service` 默认在构造时用具名字段持有 `gsr.Dispatcher`，把已实现的 `CommandID` 绑定到强类型 Handler，并在 `Handle` 中转发；不使用 Dispatcher 的 Service 不必持有它。直接实现 Core `runtime.Service` 的基础设施和底层集成示例仍须显式声明 `Handle`，但不套用依赖 `gsr.CommandContext` 的应用层 Dispatcher。只有真实 benchmark/profile 确认个别命令的分发成本成为瓶颈时，才在 `Handle` 中校验参数并直接调用强类型 Handler，其余命令继续委托 Dispatcher。不引入 Fast Handler 注册机制、默认代码生成或额外分发层。见 [Dispatcher 契约](docs/API-DESIGN.md#44-业务-service-默认使用-dispatcher)。
-- 应用由普通 MainService 发起业务：Service 内通过 ServiceContext.CreateService/Register/Send/Call/SendName/CallName/Exit 创建、命名、通信和自身退出；宿主管 Runtime。本地与远端共用节点内名称表，名称不进入 Core；Runtime.Send/Call 仅作基础设施或测试注入，不作为业务通信捷径；不新增 Launcher/ServiceManager，不强制业务 Start Command。
+- 应用由普通 MainService 发起业务：Service 内通过 ServiceContext.CreateService/Send/Call/SendName/CallName/Exit 和 Node.RegisterService 创建、命名、通信和自身退出；宿主管 Runtime。本地与远端共用节点内名称表，名称不进入 Core；Runtime.Send/Call 仅作基础设施或测试注入，不作为业务通信捷径；不新增 Launcher/ServiceManager，不强制业务 Start Command。
 - 应用启动使用 gsr.Run；业务通过 self.Cluster() / self.Logger() 取得自身来源绑定能力，不手工注入 Host 或创建 ClusterClient。Core 的 runtime.ServiceContext 不反向依赖 Cluster；禁止用全局单例的“当前 Service”或 goroutine-local 推断来源。
+- 节点组装使用 self.Node().RegisterService/OpenCluster/OpenHTTP/CreateGate，监听观测使用 ClusterListenAddress；self.Cluster() 仅通信，self.Logger() 只记录，不承担关闭或改绑。见 [ADR 0012](docs/adr/0012-node-capabilities-and-service-logging.md)。
 - 修改范围必须能够追溯到当前任务；不顺手重构无关代码。
 - 框架内部组件之间必须成立的不变量由构造器建立并保证，不要求业务调用方手工组装关联后再由运行时检查；业务仍负责输入、资源所有权和生命周期契约。
 - Gate 负责有界、顺序、失败可观察地收发不透明字节消息，Protocol 负责消息编解码、校验和分发，业务 Agent 是二者的组合点。`gate/` 与 `protocol/` 同级且生产代码互不依赖；Gate 不导入 Protobuf、不解释 Envelope，连接能力只提供 `Send([]byte)` / `Close()`。Protocol 只依赖字节发送窄接口，不拥有连接。Send 成功只代表本地接纳，不保证送达、业务执行或执行一次；Gate 接纳时复制字节快照。详见 API 文档的“Gate 与 Protocol 边界”。

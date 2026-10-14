@@ -35,7 +35,7 @@ func TestApplicationClientMessageCapability(t *testing.T) {
 		if err != nil {
 			return err
 		}
-		if err := self.Register("echo", echoID); err != nil {
+		if err := self.Node().RegisterService("echo", echoID); err != nil {
 			return err
 		}
 		agentID, err := self.CreateService(ctx, &clientMessageProbeService{observations: observations})

@@ -8,12 +8,12 @@ import (
 )
 
 // newHTTPServerErrorLog 把 net/http 的内部错误收口为安全类别，不转录未认证输入。
-func newHTTPServerErrorLog(logger *logging.Logger) *log.Logger {
+func newHTTPServerErrorLog(logger *logging.ServiceLogger) *log.Logger {
 	return log.New(httpServerErrorWriter{logger: logger}, "", 0)
 }
 
 type httpServerErrorWriter struct {
-	logger *logging.Logger
+	logger *logging.ServiceLogger
 }
 
 func (writer httpServerErrorWriter) Write(data []byte) (int, error) {

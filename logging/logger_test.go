@@ -5,7 +5,9 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
+	"reflect"
 	"runtime"
 	"sync"
 	"testing"
@@ -18,6 +20,12 @@ func TestLoggerConcurrentOrder(t *testing.T) {
 	logger, err := New(Config{Writer: &output, Capacity: 1024})
 	if err != nil {
 		t.Fatal(err)
+	}
+	boundType := reflect.TypeOf(logger.WithService(1))
+	for _, method := range []string{"Close", "WithService", "Err", "DroppedCount"} {
+		if _, exists := boundType.MethodByName(method); exists {
+			t.Fatalf("Service 日志入口暴露了 owner 方法 %s", method)
+		}
 	}
 	var workers sync.WaitGroup
 	for id := uint64(1); id <= 8; id++ {
@@ -50,24 +58,32 @@ func TestLoggerConcurrentOrder(t *testing.T) {
 
 // 验证时间和代码位置来自调用处，引用字段在入队前快照，不由写入者延迟读取。
 func TestLoggerSnapshotAndCaller(t *testing.T) {
-	writer := &blockingWriter{entered: make(chan struct{}), release: make(chan struct{})}
-	logger, _ := New(Config{Writer: writer, Capacity: 2})
-	defer func() { close(writer.release); logger.Close(context.Background()) }()
-	fields := map[string]int{"value": 1}
-	before := time.Now()
-	_, file, line, _ := runtime.Caller(0)
-	if err := logger.Info("snapshot", "data", fields); err != nil {
-		t.Fatal(err)
-	}
-	after := time.Now()
-	fields["value"] = 2
-	<-writer.entered
-	var entry record
-	if err := json.Unmarshal(writer.first, &entry); err != nil {
-		t.Fatal(err)
-	}
-	if entry.File != file || entry.Line != line+1 || entry.Time.Before(before) || entry.Time.After(after) || !bytes.Contains(entry.Fields, []byte(`"value":1`)) {
-		t.Fatalf("entry=%+v", entry)
+	for _, serviceID := range []uint64{0, 42} {
+		t.Run(fmt.Sprint(serviceID), func(t *testing.T) {
+			writer := &blockingWriter{entered: make(chan struct{}), release: make(chan struct{})}
+			logger, _ := New(Config{Writer: writer, Capacity: 2})
+			defer func() { close(writer.release); logger.Close(context.Background()) }()
+			info := logger.Info
+			if serviceID != 0 {
+				info = logger.WithService(serviceID).Info
+			}
+			fields := map[string]int{"value": 1}
+			before := time.Now()
+			_, file, line, _ := runtime.Caller(0)
+			if err := info("snapshot", "data", fields); err != nil {
+				t.Fatal(err)
+			}
+			after := time.Now()
+			fields["value"] = 2
+			<-writer.entered
+			var entry record
+			if err := json.Unmarshal(writer.first, &entry); err != nil {
+				t.Fatal(err)
+			}
+			if entry.Service != serviceID || entry.File != file || entry.Line != line+1 || entry.Time.Before(before) || entry.Time.After(after) || !bytes.Contains(entry.Fields, []byte(`"value":1`)) {
+				t.Fatalf("entry=%+v", entry)
+			}
+		})
 	}
 }
 

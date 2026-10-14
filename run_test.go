@@ -8,6 +8,7 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"reflect"
 	"strconv"
 	"sync"
 	"sync/atomic"
@@ -19,7 +20,7 @@ import (
 	"github.com/cnooljaw/gsr/runtime"
 )
 
-// 验证 HTTP 按名称调用且不伪造来源，重复打开不再次构造路由，退出时释放端口。
+// 验证入口退出后 HTTP 与名称继续有效、来源不伪造，重复打开不构造路由且停机释放端口。
 func TestRunHTTPIngress(t *testing.T) {
 	listener, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
@@ -34,6 +35,7 @@ func TestRunHTTPIngress(t *testing.T) {
 	started := make(chan error, 1)
 	finished := make(chan error, 1)
 	notified := make(chan runtime.ServiceID, 1)
+	entryStopped := make(chan struct{})
 	entry := &probeService{start: func(ctx context.Context, self ServiceContext) error {
 		for _, name := range []cluster.ServiceName{"users", "rooms", "notifications"} {
 			name := name
@@ -49,11 +51,11 @@ func TestRunHTTPIngress(t *testing.T) {
 			if err != nil {
 				return err
 			}
-			if err := self.Register(name, id); err != nil {
+			if err := self.Node().RegisterService(name, id); err != nil {
 				return err
 			}
 		}
-		err := self.OpenHTTP(address, func(in *HTTPIngress) http.Handler {
+		err := self.Node().OpenHTTP(address, func(in *HTTPIngress) http.Handler {
 			mux := http.NewServeMux()
 			for _, name := range []cluster.ServiceName{"users", "rooms"} {
 				name := name
@@ -77,7 +79,7 @@ func TestRunHTTPIngress(t *testing.T) {
 		})
 		if err == nil {
 			constructedAgain := false
-			duplicateErr := self.OpenHTTP(address, func(_ *HTTPIngress) http.Handler {
+			duplicateErr := self.Node().OpenHTTP(address, func(_ *HTTPIngress) http.Handler {
 				constructedAgain = true
 				return http.NewServeMux()
 			})
@@ -86,7 +88,13 @@ func TestRunHTTPIngress(t *testing.T) {
 			}
 		}
 		started <- err
+		if err == nil {
+			self.Exit()
+		}
 		return err
+	}, stop: func(context.Context) error {
+		close(entryStopped)
+		return nil
 	}}
 	go func() {
 		finished <- Run(ctx, Config{Logging: logging.Config{Writer: io.Discard}}, entry)
@@ -115,6 +123,11 @@ func TestRunHTTPIngress(t *testing.T) {
 		}
 	case <-time.After(3 * time.Second):
 		t.Fatal("OpenHTTP did not finish")
+	}
+	select {
+	case <-entryStopped:
+	case <-time.After(time.Second):
+		t.Fatal("入口 Service 未退出")
 	}
 	client := &http.Client{Timeout: time.Second}
 	for _, name := range []string{"users", "rooms"} {
@@ -157,7 +170,7 @@ func TestRunCleanupAfterOpen(t *testing.T) {
 			var output bytes.Buffer
 			var entryStops, childStops atomic.Int32
 			var address string
-			var childLogger *logging.Logger
+			var childLogger *logging.ServiceLogger
 			child := &probeService{
 				start: func(_ context.Context, self ServiceContext) error {
 					childLogger = self.Logger()
@@ -173,10 +186,10 @@ func TestRunCleanupAfterOpen(t *testing.T) {
 					if _, err := self.CreateService(ctx, child); err != nil {
 						return err
 					}
-					if err := self.Cluster().Open("server"); err != nil {
+					if err := self.Node().OpenCluster("server"); err != nil {
 						return err
 					}
-					address = self.Cluster().ListenAddress()
+					address = self.Node().ClusterListenAddress()
 					if mode == "startup_error" {
 						return startFailure
 					}
@@ -196,7 +209,7 @@ func TestRunCleanupAfterOpen(t *testing.T) {
 			}
 			err := Run(ctx, Config{
 				Logging: logging.Config{Writer: &output},
-				Cluster: cluster.ClusterConfig{Nodes: map[cluster.NodeID]string{"server": "127.0.0.1:0"}},
+				Cluster: ClusterConfig{Nodes: map[cluster.NodeID]string{"server": "127.0.0.1:0"}},
 			}, entry)
 			if !errors.Is(err, stopFailure) || errors.Is(err, startFailure) != (mode == "startup_error") || errors.Is(err, runtime.ErrServicePanicked) != (mode == "startup_panic" || mode == "stop_panic") {
 				t.Fatalf("lost lifecycle error: %v", err)
@@ -233,8 +246,8 @@ func TestRunConstructionRollback(t *testing.T) {
 		entry  Service
 		want   error
 	}{
-		{name: "runtime", config: Config{Runtime: runtime.Config{MaxCallWait: -1}}, want: runtime.ErrInvalidConfig},
-		{name: "cluster", config: Config{Cluster: cluster.ClusterConfig{MaxCallWait: -1}}, want: cluster.ErrInvalidClusterConfig},
+		{name: "runtime", config: Config{Runtime: RuntimeConfig{MaxCallWait: -1}}, want: runtime.ErrInvalidConfig},
+		{name: "cluster", config: Config{Cluster: ClusterConfig{MaxCallWait: -1}}, want: cluster.ErrInvalidClusterConfig},
 		{name: "entry", entry: invalidEntry, want: runtime.ErrInvalidService},
 	} {
 		t.Run(test.name, func(t *testing.T) {
@@ -268,7 +281,7 @@ func TestRunConstructionRollback(t *testing.T) {
 	}
 }
 
-// 验证应用按节点名 Open 绑定失败后不发布监听地址，并可在同一节点重试。
+// 验证节点按访问地址的端口通配监听，失败不发布地址且可在同一节点重试。
 func TestRunOpenRetryAfterBindFailure(t *testing.T) {
 	bindAddress, err := net.ResolveTCPAddr("tcp", "0.0.0.0:0")
 	if err != nil {
@@ -284,39 +297,39 @@ func TestRunOpenRetryAfterBindFailure(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	nodeAddress := net.JoinHostPort("127.0.0.1", wantPort)
+	nodeAddress := net.JoinHostPort("203.0.113.10", wantPort)
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	entry := &probeService{start: func(_ context.Context, self ServiceContext) error {
-		if err := self.Cluster().Open("server"); err == nil {
-			return fmt.Errorf("occupied port accepted: busy=%s, opened=%s", busyAddress, self.Cluster().ListenAddress())
+		if err := self.Node().OpenCluster("server"); err == nil {
+			return fmt.Errorf("occupied port accepted: busy=%s, opened=%s", busyAddress, self.Node().ClusterListenAddress())
 		}
-		if self.Cluster().ListenAddress() != "" {
+		if self.Node().ClusterListenAddress() != "" {
 			return errors.New("failed bind published a listener")
 		}
 		if err := busy.Close(); err != nil {
 			return err
 		}
-		if err := self.Cluster().Open("server"); err != nil {
+		if err := self.Node().OpenCluster("server"); err != nil {
 			return err
 		}
-		address := self.Cluster().ListenAddress()
-		_, port, err := net.SplitHostPort(address)
-		if err != nil || port != wantPort {
-			return errors.New("retry opened the wrong port")
+		address := self.Node().ClusterListenAddress()
+		host, port, err := net.SplitHostPort(address)
+		if err != nil || net.ParseIP(host) == nil || !net.ParseIP(host).IsUnspecified() || port != wantPort {
+			return errors.New("retry must bind all IPv4 interfaces using the configured port")
 		}
 		cancel()
 		return nil
 	}}
 	if err := Run(ctx, Config{
 		Logging: logging.Config{Writer: io.Discard},
-		Cluster: cluster.ClusterConfig{Nodes: map[cluster.NodeID]string{"server": nodeAddress}},
+		Cluster: ClusterConfig{Nodes: map[cluster.NodeID]string{"server": nodeAddress}},
 	}, entry); err != nil {
 		t.Fatal(err)
 	}
 }
 
-// 验证取消和无效入口都有明确结果，不借用外部 Logger 或遗留运行环境。
+// 验证取消和无效入口都有明确结果，应用配置不暴露外部 Logger 注入字段。
 func TestRunInvalidInputs(t *testing.T) {
 	config := Config{Logging: logging.Config{Writer: io.Discard}}
 	var entry *probeService
@@ -331,9 +344,10 @@ func TestRunInvalidInputs(t *testing.T) {
 	if err := Run(ctx, config, &probeService{}); !errors.Is(err, context.Canceled) {
 		t.Fatal(err)
 	}
-	config.Runtime.Logger = &logging.Logger{}
-	if err := Run(context.Background(), config, &probeService{}); err == nil {
-		t.Fatal("accepted borrowed logger")
+	for _, configType := range []reflect.Type{reflect.TypeOf(RuntimeConfig{}), reflect.TypeOf(ClusterConfig{})} {
+		if _, exists := configType.FieldByName("Logger"); exists {
+			t.Fatalf("应用配置 %s 暴露了 Logger 字段", configType)
+		}
 	}
 }
 
@@ -406,7 +420,7 @@ func TestRunNodesCommunicateWithoutSingleton(t *testing.T) {
 		if err != nil {
 			return err
 		}
-		if err := self.Register("echo", id); err != nil {
+		if err := self.Node().RegisterService("echo", id); err != nil {
 			return err
 		}
 		managerID, err := self.CreateService(ctx, &probeService{handle: func(current CommandContext) (any, error) {
@@ -419,32 +433,32 @@ func TestRunNodesCommunicateWithoutSingleton(t *testing.T) {
 			if err != nil {
 				return nil, err
 			}
-			return nil, current.Register("echo", replacementID)
+			return nil, current.Node().RegisterService("echo", replacementID)
 		}})
 		if err != nil {
 			return err
 		}
-		if err := self.Register("manager", managerID); err != nil {
+		if err := self.Node().RegisterService("manager", managerID); err != nil {
 			return err
 		}
-		if err := self.Register("echo", id); !errors.Is(err, ErrServiceNameRegistered) {
+		if err := self.Node().RegisterService("echo", id); !errors.Is(err, ErrServiceNameRegistered) {
 			return errors.New("duplicate name accepted")
 		}
-		if err := self.Cluster().Open("missing"); !errors.Is(err, cluster.ErrNodeNotFound) {
+		if err := self.Node().OpenCluster("missing"); !errors.Is(err, cluster.ErrNodeNotFound) {
 			return errors.New("missing route accepted")
 		}
-		if err := self.Cluster().Open("server"); err != nil {
+		if err := self.Node().OpenCluster("server"); err != nil {
 			return err
 		}
-		if err := self.Cluster().Open("server"); !errors.Is(err, cluster.ErrClusterAlreadyOpen) {
+		if err := self.Node().OpenCluster("server"); !errors.Is(err, cluster.ErrClusterAlreadyOpen) {
 			return errors.New("second listener accepted")
 		}
-		ready <- self.Cluster().ListenAddress()
+		ready <- self.Node().ClusterListenAddress()
 		self.Exit()
 		return nil
 	}}
 	go func() {
-		serverDone <- Run(ctx, Config{Logging: logging.Config{Writer: io.Discard}, Cluster: cluster.ClusterConfig{Nodes: map[cluster.NodeID]string{"server": "127.0.0.1:0"}}}, server)
+		serverDone <- Run(ctx, Config{Logging: logging.Config{Writer: io.Discard}, Cluster: ClusterConfig{Nodes: map[cluster.NodeID]string{"server": "127.0.0.1:0"}}}, server)
 	}()
 	defer func() {
 		cancel()
@@ -466,7 +480,7 @@ func TestRunNodesCommunicateWithoutSingleton(t *testing.T) {
 	defer stopCaller()
 	caller := &probeService{start: func(ctx context.Context, self ServiceContext) error {
 		// 同名发布只影响本节点，不能覆盖服务端的 echo。
-		if err := self.Register("echo", self.Self()); err != nil {
+		if err := self.Node().RegisterService("echo", self.Self()); err != nil {
 			return err
 		}
 		value, err := self.Cluster().Call(ctx, "server", "echo", 1)
@@ -505,7 +519,7 @@ func TestRunNodesCommunicateWithoutSingleton(t *testing.T) {
 		stopCaller()
 		return nil
 	}}
-	if err := Run(callerContext, Config{Logging: logging.Config{Writer: io.Discard}, Cluster: cluster.ClusterConfig{Nodes: map[cluster.NodeID]string{"server": net.JoinHostPort("127.0.0.1", port)}}}, caller); err != nil {
+	if err := Run(callerContext, Config{Logging: logging.Config{Writer: io.Discard}, Cluster: ClusterConfig{Nodes: map[cluster.NodeID]string{"server": net.JoinHostPort("127.0.0.1", port)}}}, caller); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -526,19 +540,19 @@ func TestServiceContextCallsLocalServiceByName(t *testing.T) {
 		if err != nil {
 			return err
 		}
-		if err := self.Register("echo", id); err != nil {
+		if err := self.Node().RegisterService("echo", id); err != nil {
 			return err
 		}
-		if err := self.Register("entry", self.Self()); err != nil {
+		if err := self.Node().RegisterService("entry", self.Self()); err != nil {
 			return err
 		}
-		if err := self.Register("", id); !errors.Is(err, runtime.ErrServiceNotFound) {
+		if err := self.Node().RegisterService("", id); !errors.Is(err, runtime.ErrServiceNotFound) {
 			return errors.New("empty name accepted")
 		}
-		if err := self.Register("zero", 0); !errors.Is(err, runtime.ErrServiceNotFound) {
+		if err := self.Node().RegisterService("zero", 0); !errors.Is(err, runtime.ErrServiceNotFound) {
 			return errors.New("zero service ID accepted")
 		}
-		if err := self.Register("unknown", runtime.ServiceID(999999)); !errors.Is(err, runtime.ErrServiceNotFound) {
+		if err := self.Node().RegisterService("unknown", runtime.ServiceID(999999)); !errors.Is(err, runtime.ErrServiceNotFound) {
 			return errors.New("unknown service ID accepted")
 		}
 		if err := self.SendName("missing", 1); !errors.Is(err, runtime.ErrServiceNotFound) {
@@ -594,7 +608,7 @@ func TestCommandContextCallsLocalServiceByName(t *testing.T) {
 		if err != nil {
 			return err
 		}
-		if err := self.Register("target", targetID); err != nil {
+		if err := self.Node().RegisterService("target", targetID); err != nil {
 			return err
 		}
 		callerID, err = self.CreateService(ctx, &probeService{handle: func(current CommandContext) (any, error) {
@@ -640,7 +654,7 @@ func TestServiceNameClearedAfterStartupFailure(t *testing.T) {
 		_, err := self.CreateService(ctx, &probeService{
 			start: func(_ context.Context, child ServiceContext) error {
 				// 故意在正式发布前注册，用于验证异常启动时的防御性清理。
-				if err := child.Register("echo", child.Self()); err != nil {
+				if err := child.Node().RegisterService("echo", child.Self()); err != nil {
 					return err
 				}
 				return startFailure
@@ -658,7 +672,7 @@ func TestServiceNameClearedAfterStartupFailure(t *testing.T) {
 		if err != nil {
 			return err
 		}
-		if err := self.Register("echo", id); err != nil {
+		if err := self.Node().RegisterService("echo", id); err != nil {
 			return err
 		}
 		value, err := self.CallName(ctx, "echo", 1)
@@ -685,15 +699,15 @@ func TestServiceNameClearedAfterExit(t *testing.T) {
 		if err != nil {
 			return err
 		}
-		if err := self.Register("survivor", survivorID); err != nil {
+		if err := self.Node().RegisterService("survivor", survivorID); err != nil {
 			return err
 		}
 		stoppedID, err := self.CreateService(ctx, &probeService{
 			start: func(_ context.Context, child ServiceContext) error {
-				if err := child.Register("echo", child.Self()); err != nil {
+				if err := child.Node().RegisterService("echo", child.Self()); err != nil {
 					return err
 				}
-				return child.Register("alias", child.Self())
+				return child.Node().RegisterService("alias", child.Self())
 			},
 			handle: func(current CommandContext) (any, error) {
 				current.Exit()
@@ -726,13 +740,13 @@ func TestServiceNameClearedAfterExit(t *testing.T) {
 		if err != nil {
 			return err
 		}
-		if err := self.Register("echo", id); err != nil {
+		if err := self.Node().RegisterService("echo", id); err != nil {
 			return err
 		}
-		if err := self.Register("alias", id); err != nil {
+		if err := self.Node().RegisterService("alias", id); err != nil {
 			return err
 		}
-		if err := self.Register("stale", stoppedID); !errors.Is(err, runtime.ErrServiceNotFound) {
+		if err := self.Node().RegisterService("stale", stoppedID); !errors.Is(err, runtime.ErrServiceNotFound) {
 			return errors.New("stopped service ID was registered again")
 		}
 		value, err = self.CallName(ctx, "echo", 1)

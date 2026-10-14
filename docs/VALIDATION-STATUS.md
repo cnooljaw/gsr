@@ -4,6 +4,16 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## Node 与 Service 日志入口调整（2026-10-14）
+
+按 [ADR 0012](adr/0012-node-capabilities-and-service-logging.md) 迁移节点名称/接入能力，Cluster 视图只通信，Logger 绑定视图只记录，应用配置无 Logger 注入字段。旧 v1.0.0 标签不移动，当前开发接口尚未发布新版本。
+
+扩展原有日志并发与快照用例：旧方法集首先被 Close 暴露检查拒绝，修复后验证共享 FIFO、来源、快照和 owner/ServiceLogger 调用位置。HTTP 与 Gate 既有接线测试等待 MainService OnStop 后继续真实请求；名称归目标和最终端口释放沿用现有验收。原应用占端口/重试用例改用非本机访问 host，检查仍按配置 port 通配绑定；Go 在本机可把 0.0.0.0 的实际地址显示为 IPv6 unspecified，验证按通配语义判断，生产绑定不变。未新增重复网络夹具。
+
+`GSR_PROCESS_TEST=1 go test -race ./... -timeout=2m` 和 `go vet ./...` 均通过；全仓 race 覆盖默认行为及双进程正常停机/强杀恢复（双节点约 17 秒、Gate 约 35 秒），不重复已由 race 覆盖的普通测试。此前普通全仓检查发现残留 Gate 日志夹具类型及监听显示形式断言问题，修正后由上述全仓验收覆盖。
+
+更新后的独立业务项目骨架以临时 module + 本地 replace 编译运行，输出 count=7，入口退出后节点继续运行并在 SIGTERM 后有序退出。Cluster 教程接入双节点源码后，两个独立进程真实 TCP 四参数往返及有序退出通过。文档链接和 diff 检查通过；未重跑 TypeScript（客户端/wire 未改）、外部数据库、容量或压力门禁。
+
 ## 1.0 内部发布验收（2026-10-12）
 
 代码基线 `b2a9f16` 已通过同日 `go test ./... -timeout=2m`。本轮补跑 `go vet ./...`、`GSR_PROCESS_TEST=1 go test -race ./... -timeout=2m` 和 WebSocket 示例的 `npm run test:crypto`，全部通过；race 包含双进程正常停机与强杀后恢复，TypeScript 包含编译及 5 条认证测试。首次 race 受沙箱 TCP 监听限制，在允许本机监听的环境中运行同一命令后完整通过。仅补充版本与发布文档，没有修改 Go/TypeScript 实现或重新生成协议代码；未启用负载、Gate 压力或真实 MySQL 门禁。环境、耗时与接入范围见 [1.0 内部发布说明](RELEASE-1.0.md)。

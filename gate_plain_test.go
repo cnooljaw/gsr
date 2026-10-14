@@ -17,11 +17,12 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-// 验证应用 Agent 的强类型协议 Handler 能按名称调用业务 Service，保持 Agent 来源并回传客户端请求编号。
+// 验证入口退出后 Gate 仍创建 Agent，协议按名称调用保持来源并回传请求编号。
 func TestOpenGateConnectsApplicationAgent(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	addresses := make(chan string, 1)
+	entryStopped := make(chan struct{})
 	entry := &probeService{start: func(ctx context.Context, self ServiceContext) error {
 		backendID, err := self.CreateService(ctx, &probeService{handle: func(current CommandContext) (any, error) {
 			return current.Source(), nil
@@ -29,10 +30,10 @@ func TestOpenGateConnectsApplicationAgent(t *testing.T) {
 		if err != nil {
 			return err
 		}
-		if err := self.Register("gate-test-backend", backendID); err != nil {
+		if err := self.Node().RegisterService("gate-test-backend", backendID); err != nil {
 			return err
 		}
-		address, err := self.OpenGate(ctx, GateConfig{Protocol: gate.ProtocolPlain,
+		address, err := self.Node().CreateGate(ctx, GateConfig{Protocol: gate.ProtocolPlain,
 			Address:               "127.0.0.1:0",
 			MaxConnections:        1,
 			MaxOutboundQueueBytes: 64 << 10,
@@ -42,8 +43,12 @@ func TestOpenGateConnectsApplicationAgent(t *testing.T) {
 		})
 		if err == nil {
 			addresses <- address
+			self.Exit()
 		}
 		return err
+	}, stop: func(context.Context) error {
+		close(entryStopped)
+		return nil
 	}}
 	done := make(chan error, 1)
 	go func() {
@@ -68,6 +73,11 @@ func TestOpenGateConnectsApplicationAgent(t *testing.T) {
 		t.Fatalf("Run() 在 Gate 打开前结束: %v", err)
 	case <-ctx.Done():
 		t.Fatal("等待 Gate 打开超时")
+	}
+	select {
+	case <-entryStopped:
+	case <-ctx.Done():
+		t.Fatal("入口 Service 未退出")
 	}
 	connection, _, err := websocket.DefaultDialer.Dial("ws://"+address+"/ws", nil)
 	if err != nil {
