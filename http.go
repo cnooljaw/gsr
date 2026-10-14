@@ -14,7 +14,7 @@ import (
 // SendName 只保证本地消息被接纳；CallName 等待目标回复，二者的 Source 均为零。
 // 入站鉴权、参数校验、超时和 HTTP 响应格式由应用 Handler 决定。
 type HTTPIngress struct {
-	node *application
+	node *Node
 }
 
 // SendName 按当前名称表解析目标，并以基础设施来源投递本地 Command。
@@ -51,11 +51,10 @@ func (in *HTTPIngress) CallName(ctx context.Context, name cluster.ServiceName, c
 // Run 在关闭 Runtime 前停止监听，并限时等待在途 Handler；超时不能强杀 Handler。
 // 监听失败后可再次尝试；已打开或已关闭时不调用路由构造函数。
 // 构造函数只组装路由，不启动资源或执行业务通信；并发打开可能各自完成构造，但只接纳一个监听。
-func (capability *Node) OpenHTTP(address string, handler func(*HTTPIngress) http.Handler) error {
+func (node *Node) OpenHTTP(address string, handler func(*HTTPIngress) http.Handler) error {
 	if handler == nil {
 		return errors.New("gsr: HTTP handler is required")
 	}
-	node := capability.node
 	node.httpMu.Lock()
 	closed, opened := node.httpClosed, node.httpServer != nil
 	node.httpMu.Unlock()

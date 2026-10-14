@@ -2,7 +2,7 @@
 
 本文把已接受的 API 和 ADR 拆成可验证的纵向切片。每个切片只引入完成当前运行链所需的能力；Core 完成后再开始 Cluster。
 
-当前 GSR 版本定为 1.0，已进入正式内部发布阶段，见 [内部发布说明](RELEASE-1.0.md)。下文 Core v0.1 是历史路线图的里程碑名称，不代表当前产品版本或已有发布标签。
+当前 GSR 版本为 1.0.1，处于正式内部发布阶段，见 [发布说明](RELEASE-1.0.1.md)。下文 Core v0.1 是历史路线图的里程碑名称，不代表当前产品版本或已有发布标签。
 
 当前应用入口及编码契约以 [ADR 0011](adr/0011-service-first-application-api.md) 为准：gsr.Run 统一管理运行环境，业务使用 self.Cluster()/self.Logger()；已移除 CommandCodecRegistry，合法未知命令由目标 Service 判断。下方历史切片中的 Node/Host 组装描述不作为当前实施要求。
 

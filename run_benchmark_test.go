@@ -14,7 +14,7 @@ func BenchmarkServiceNameCleanup(b *testing.B) {
 		b.Run(strconv.Itoa(count), func(b *testing.B) {
 			for range b.N {
 				b.StopTimer()
-				node := &application{
+				node := &Node{
 					names:     make(map[cluster.ServiceName]runtime.ServiceID, count),
 					namesByID: make(map[runtime.ServiceID][]cluster.ServiceName, count),
 					active:    make(map[runtime.ServiceID]struct{}, count),
@@ -22,7 +22,7 @@ func BenchmarkServiceNameCleanup(b *testing.B) {
 				for i := range count {
 					id := runtime.ServiceID(i + 1)
 					node.activateID(id)
-					if err := node.register(cluster.ServiceName(strconv.Itoa(i)), id); err != nil {
+					if err := node.RegisterService(cluster.ServiceName(strconv.Itoa(i)), id); err != nil {
 						b.Fatal(err)
 					}
 				}
@@ -39,7 +39,7 @@ func BenchmarkServiceNameCleanup(b *testing.B) {
 func BenchmarkServiceNameResolve(b *testing.B) {
 	for _, count := range []int{100, 10000} {
 		b.Run(strconv.Itoa(count), func(b *testing.B) {
-			node := &application{
+			node := &Node{
 				names:     make(map[cluster.ServiceName]runtime.ServiceID, count),
 				namesByID: make(map[runtime.ServiceID][]cluster.ServiceName, count),
 				active:    make(map[runtime.ServiceID]struct{}, count),
@@ -49,7 +49,7 @@ func BenchmarkServiceNameResolve(b *testing.B) {
 				id := runtime.ServiceID(i + 1)
 				names[i] = cluster.ServiceName(strconv.Itoa(i))
 				node.activateID(id)
-				if err := node.register(names[i], id); err != nil {
+				if err := node.RegisterService(names[i], id); err != nil {
 					b.Fatal(err)
 				}
 			}

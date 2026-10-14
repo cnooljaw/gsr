@@ -24,7 +24,7 @@ err = log.Error("结算失败", "battleID", battleID, "err", cause)
 // 根据需要处理入队错误；不等待写盘。
 ```
 
-logging.Logger 是共享日志 owner，不依赖普通 Runtime Mailbox。WithService 返回具体 ServiceLogger，仅提供 Info/Error，不提供 Close、WithService 或 owner getter。所有视图共享一个队列和串行 writer，记录处捕获调用位置。gsr.Run 持有原始 Logger，Runtime/Cluster 借用它，业务取得自身来源绑定的 ServiceLogger；运行环境最后关闭 owner。业务可保存 ServiceLogger 用于 OnStop，不保存 ServiceContext。此公开方法集按 [ADR 0012](adr/0012-node-capabilities-and-service-logging.md) 更新，尚未发布新版。
+logging.Logger 是共享日志 owner，不依赖普通 Runtime Mailbox。WithService 返回具体 ServiceLogger，仅提供 Info/Error，不提供 Close、WithService 或 owner getter。所有视图共享一个队列和串行 writer，记录处捕获调用位置。gsr.Run 持有原始 Logger，Runtime/Cluster 借用它，业务取得自身来源绑定的 ServiceLogger；运行环境最后关闭 owner。业务可保存 ServiceLogger 用于 OnStop，不保存 ServiceContext。此公开方法集按 [ADR 0012](adr/0012-node-capabilities-and-service-logging.md) 更新，随 v1.0.1 发布。
 
 底层 Runtime.Config.Logger 与 ClusterConfig.Logger 都只借用该实例，不管理其生命周期；底层直接构造时 nil 保留仅 Diagnostics 的行为，不隐式启动后台写入者。应用使用 gsr.Run 时通过 Config.Logging 配置；应用层 RuntimeConfig/ClusterConfig 不暴露 Logger 字段，由 Run 内部转换注入。logging.New 的 Directory 和 Writer 都未设置时默认终端；可传入 io.Writer，输出所有权仍归应用。
 

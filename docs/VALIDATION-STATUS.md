@@ -1,12 +1,26 @@
 # 当前阶段验证清单
 
-本清单整理 Core、Cluster、日志及已落地外围示例的验证证据，不替代 API 契约。GSR 自 2026-10-12 起进入 1.0 正式内部发布阶段，版本范围与本轮发布前验证见 [内部发布说明](RELEASE-1.0.md)。内部发布不将历史开发机样本扩大为目标部署容量结论。实施路线图保留各轮历史切片；判断当前覆盖范围时先看这里，再进入对应测试。
+本清单整理 Core、Cluster、日志及已落地外围示例的验证证据，不替代 API 契约。GSR 自 2026-10-12 起进入 1.0 正式内部发布阶段，当前版本变化与发布验证见 [1.0.1 发布说明](RELEASE-1.0.1.md)，最初的发布范围见 [1.0 内部发布说明](RELEASE-1.0.md)。内部发布不将历史开发机样本扩大为目标部署容量结论。实施路线图保留各轮历史切片；判断当前覆盖范围时先看这里，再进入对应测试。
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## v1.0.1 发布验收（2026-10-14）
+
+统一 Node 运行对象后的发布代码已通过 `GSR_PROCESS_TEST=1 go test -race ./... -timeout=2m` 和 `go vet ./...`。全仓 race 覆盖默认 Go 行为测试、双进程正常停机与强杀后恢复；根包约 2 秒、双节点约 19 秒、Gate 约 35 秒，未变化的部分 package 使用缓存，不重复普通全仓测试。
+
+版本文件、发布说明、API/术语、业务指南和模板已统一到 v1.0.1；模板参考链接固定到 v1.0.1 标签。Go 格式、diff 与发布相关 Markdown 本地链接检查通过。相对 v1.0.0 的六项变化和源码不兼容迁移见 [发布说明](RELEASE-1.0.1.md)。未重跑 TypeScript 认证测试，未启用真实 MySQL、负载或 Gate 压力门禁。
+
+## 统一 Node 运行对象（2026-10-14）
+
+按用户确认合并 application 与 Node，删除包装及名称注册转发；Run 创建唯一 Node 并管理关闭，ServiceContext.Node 返回所属对象。地址表改为 nodeAddresses，公开五个方法、通配监听及关闭顺序保持不变。内部状态与关闭方法仍未导出。
+
+扩展 TestConcurrentServiceClusterBindings，在旧实现上先复现同一回调取得不同包装对象的问题；合并后保护同 Run 的 Service 共用节点、各自通信来源仍绑定 Self。现有 TestRunNodesCommunicateWithoutSingleton 增加不同 Run 的 Node 对象隔离，保留名称重建、Send/Call、入口退出和最终收尾检查；名称竞争和 benchmark 夹具迁移到 Node，不另建网络夹具。
+
+`go test -race . ./examples/http-inbound ./examples/twonode -timeout=2m` 通过，`go test ./... -run '^$' -timeout=2m` 全仓编译通过（含测试和 benchmark 夹具）；go doc 核对公开方法集仍为五项。未重复全仓行为/race、跨进程恢复、外部依赖或压力验收；此前 API 迁移的全仓验证记录见下节。
+
 ## Node 与 Service 日志入口调整（2026-10-14）
 
-按 [ADR 0012](adr/0012-node-capabilities-and-service-logging.md) 迁移节点名称/接入能力，Cluster 视图只通信，Logger 绑定视图只记录，应用配置无 Logger 注入字段。旧 v1.0.0 标签不移动，当前开发接口尚未发布新版本。
+按 [ADR 0012](adr/0012-node-capabilities-and-service-logging.md) 迁移节点名称/接入能力，Cluster 视图只通信，Logger 绑定视图只记录，应用配置无 Logger 注入字段。旧 v1.0.0 标签不移动，调整后的接口随 v1.0.1 发布。
 
 扩展原有日志并发与快照用例：旧方法集首先被 Close 暴露检查拒绝，修复后验证共享 FIFO、来源、快照和 owner/ServiceLogger 调用位置。HTTP 与 Gate 既有接线测试等待 MainService OnStop 后继续真实请求；名称归目标和最终端口释放沿用现有验收。原应用占端口/重试用例改用非本机访问 host，检查仍按配置 port 通配绑定；Go 在本机可把 0.0.0.0 的实际地址显示为 IPv6 unspecified，验证按通配语义判断，生产绑定不变。未新增重复网络夹具。
 

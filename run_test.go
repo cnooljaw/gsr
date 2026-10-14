@@ -351,7 +351,7 @@ func TestRunInvalidInputs(t *testing.T) {
 	}
 }
 
-// 验证多个 Service 并发执行时各自绑定 Self，不使用共享的当前 Service 变量。
+// 验证同 Run 的 Service 共享唯一 Node，但并发通信仍各自绑定 Self。
 func TestConcurrentServiceClusterBindings(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
@@ -362,12 +362,18 @@ func TestConcurrentServiceClusterBindings(t *testing.T) {
 	defer unblock()
 	entry := &probeService{start: func(ctx context.Context, self ServiceContext) error {
 		defer unblock()
+		node := self.Node()
+		if self.Node() != node {
+			return errors.New("同一节点能力取得了不同运行对象")
+		}
 		for i := 0; i < 8; i++ {
 			id, err := self.CreateService(ctx, &probeService{handle: func(current CommandContext) (any, error) {
 				<-release
 				var result error
-				if current.Cluster().client.Source() != current.Self() || current.Source() == current.Self() {
-					result = errors.New("source leaked between services")
+				sameNode := current.Node() == node
+				boundToSelf := current.Cluster().client.Source() == current.Self() && current.Source() != current.Self()
+				if !sameNode || !boundToSelf {
+					result = fmt.Errorf("shared Node=%t, source bound to Self=%t", sameNode, boundToSelf)
 				}
 				results <- result
 				current.Exit()
@@ -406,7 +412,9 @@ func TestRunNodesCommunicateWithoutSingleton(t *testing.T) {
 	ready, serverDone := make(chan string, 1), make(chan error, 1)
 	stopped := make(chan struct{})
 	delivered := make(chan runtime.ServiceID, 1)
+	var serverNode *Node
 	server := &probeService{start: func(ctx context.Context, self ServiceContext) error {
+		serverNode = self.Node()
 		id, err := self.CreateService(ctx, &probeService{handle: func(current CommandContext) (any, error) {
 			if current.Source() != 0 {
 				return nil, errors.New("remote source must remain zero")
@@ -479,6 +487,9 @@ func TestRunNodesCommunicateWithoutSingleton(t *testing.T) {
 	callerContext, stopCaller := context.WithCancel(ctx)
 	defer stopCaller()
 	caller := &probeService{start: func(ctx context.Context, self ServiceContext) error {
+		if self.Node() == serverNode {
+			return errors.New("不同 Run 共用了 Node")
+		}
 		// 同名发布只影响本节点，不能覆盖服务端的 echo。
 		if err := self.Node().RegisterService("echo", self.Self()); err != nil {
 			return err
@@ -764,14 +775,14 @@ func TestServiceNameClearedAfterExit(t *testing.T) {
 // 验证并发注册与目标退出竞争后不会留下名称或重新发布已退出的 ServiceID。
 func TestServiceNameRegistrationRacesCleanup(t *testing.T) {
 	const registrations = 128
-	node := &application{
+	node := &Node{
 		names:     make(map[cluster.ServiceName]runtime.ServiceID),
 		namesByID: make(map[runtime.ServiceID][]cluster.ServiceName),
 		active:    make(map[runtime.ServiceID]struct{}),
 	}
 	id := runtime.ServiceID(1)
 	node.activateID(id)
-	if err := node.register("initial", id); err != nil {
+	if err := node.RegisterService("initial", id); err != nil {
 		t.Fatal(err)
 	}
 	start := make(chan struct{})
@@ -782,7 +793,7 @@ func TestServiceNameRegistrationRacesCleanup(t *testing.T) {
 		go func() {
 			defer workers.Done()
 			<-start
-			errorsSeen <- node.register(cluster.ServiceName(strconv.Itoa(i)), id)
+			errorsSeen <- node.RegisterService(cluster.ServiceName(strconv.Itoa(i)), id)
 		}()
 	}
 	workers.Add(1)
@@ -810,7 +821,7 @@ func TestServiceNameRegistrationRacesCleanup(t *testing.T) {
 	if len(node.namesByID) != 0 {
 		t.Fatalf("reverse index retained stopped ServiceID: %d entries", len(node.namesByID))
 	}
-	if err := node.register("late", id); !errors.Is(err, runtime.ErrServiceNotFound) {
+	if err := node.RegisterService("late", id); !errors.Is(err, runtime.ErrServiceNotFound) {
 		t.Fatalf("stopped ServiceID registered again: %v", err)
 	}
 }

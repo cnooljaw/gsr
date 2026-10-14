@@ -7,11 +7,9 @@ import (
 	"net"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/cnooljaw/gsr/cluster"
-	"github.com/cnooljaw/gsr/httpserver"
 	"github.com/cnooljaw/gsr/logging"
 	"github.com/cnooljaw/gsr/runtime"
 )
@@ -25,14 +23,14 @@ func Run(ctx context.Context, config Config, entry Service) (result error) {
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	node := &application{
+	node := &Node{
 		names:     make(map[cluster.ServiceName]runtime.ServiceID),
 		namesByID: make(map[runtime.ServiceID][]cluster.ServiceName),
 		active:    make(map[runtime.ServiceID]struct{}),
 	}
 	defer func() { result = errors.Join(result, node.close()) }()
 	var err error
-	node.nodes, config.Cluster.Nodes, err = splitNodeAddresses(config.Cluster.Nodes)
+	node.nodeAddresses, config.Cluster.Nodes, err = splitNodeAddresses(config.Cluster.Nodes)
 	if err != nil {
 		return err
 	}
@@ -62,69 +60,7 @@ func Run(ctx context.Context, config Config, entry Service) (result error) {
 	return nil
 }
 
-// application 是固定组件 owner，仅存在于 Run 内部，不是公开的组装对象。
-type application struct {
-	local         *runtime.Runtime
-	cluster       *cluster.Cluster
-	logger        *logging.Logger
-	nodes         map[cluster.NodeID]string
-	mu            sync.RWMutex
-	names         map[cluster.ServiceName]runtime.ServiceID
-	namesByID     map[runtime.ServiceID][]cluster.ServiceName
-	active        map[runtime.ServiceID]struct{}
-	listenAddress string
-	httpMu        sync.Mutex
-	httpServer    *httpserver.Server
-	httpClosed    bool
-}
-
-// ErrServiceNameRegistered 表示本节点已有同名发布，不会静默替换。
-var ErrServiceNameRegistered = errors.New("gsr: service name already registered")
-
-func (node *application) register(name cluster.ServiceName, id runtime.ServiceID) error {
-	if name == "" || id == 0 {
-		return runtime.ErrServiceNotFound
-	}
-	node.mu.Lock()
-	defer node.mu.Unlock()
-	if _, exists := node.active[id]; !exists {
-		return runtime.ErrServiceNotFound
-	}
-	if _, exists := node.names[name]; exists {
-		return ErrServiceNameRegistered
-	}
-	node.names[name] = id
-	node.namesByID[id] = append(node.namesByID[id], name)
-	return nil
-}
-
-func (node *application) activateID(id runtime.ServiceID) {
-	node.mu.Lock()
-	node.active[id] = struct{}{}
-	node.mu.Unlock()
-}
-
-func (node *application) resolve(name cluster.ServiceName) (runtime.ServiceID, error) {
-	node.mu.RLock()
-	defer node.mu.RUnlock()
-	id, exists := node.names[name]
-	if !exists {
-		return 0, runtime.ErrServiceNotFound
-	}
-	return id, nil
-}
-
-func (node *application) unregisterID(id runtime.ServiceID) {
-	node.mu.Lock()
-	defer node.mu.Unlock()
-	delete(node.active, id)
-	for _, name := range node.namesByID[id] {
-		delete(node.names, name)
-	}
-	delete(node.namesByID, id)
-}
-
-func (node *application) close() error {
+func (node *Node) close() error {
 	var result error
 	node.httpMu.Lock()
 	node.httpClosed = true
@@ -157,7 +93,7 @@ func (node *application) close() error {
 
 // 端口零只供本节点 Open 动态监听，不能成为出站路由；正常部署使用固定非零端口。
 func splitNodeAddresses(input map[cluster.NodeID]string) (map[cluster.NodeID]string, map[cluster.NodeID]string, error) {
-	nodes, routes := make(map[cluster.NodeID]string), make(map[cluster.NodeID]string)
+	addresses, routes := make(map[cluster.NodeID]string), make(map[cluster.NodeID]string)
 	for name, address := range input {
 		host, port, err := net.SplitHostPort(address)
 		number, parseErr := strconv.Atoi(port)
@@ -169,10 +105,10 @@ func splitNodeAddresses(input map[cluster.NodeID]string) (map[cluster.NodeID]str
 				return nil, nil, fmt.Errorf("%w: node %q port", cluster.ErrInvalidClusterConfig, name)
 			}
 		}
-		nodes[name] = address
+		addresses[name] = address
 		if number != 0 {
 			routes[name] = address
 		}
 	}
-	return nodes, routes, nil
+	return addresses, routes, nil
 }

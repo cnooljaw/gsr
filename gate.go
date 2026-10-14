@@ -33,11 +33,10 @@ type GateConfig struct {
 
 // CreateGate 创建固定协议模式的 Gate，并让连接 Agent 经现有应用适配器进入 Runtime。
 // 成功返回实际监听地址；Gate 和 Agent 均由 Runtime 管理生命周期。
-func (capability *Node) CreateGate(ctx context.Context, config GateConfig) (string, error) {
+func (node *Node) CreateGate(ctx context.Context, config GateConfig) (string, error) {
 	if config.NewAgent == nil {
 		return "", fmt.Errorf("%w: NewAgent is required", gate.ErrInvalidConfig)
 	}
-	node := capability.node
 	gateService, err := gate.NewGateService(node.local, gate.Config{
 		Protocol:              config.Protocol,
 		Address:               config.Address,

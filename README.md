@@ -1,8 +1,8 @@
-# GSR 1.0
+# GSR 1.0.1
 
 GSR 是使用 Go 实现的游戏服务器 Service Runtime，借鉴 Skynet 的 Service、消息和生命周期思想，以显式依赖、类型化 Handler 和有界消息接纳组织业务。
 
-当前版本定为 **1.0**（完整版本号见 [VERSION](VERSION)：`1.0.0`），自 2026-10-12 起进入正式内部发布阶段。发布范围、验证结果和接入边界见 [1.0 内部发布说明](docs/RELEASE-1.0.md)。
+当前版本为 **1.0.1**（见 [VERSION](VERSION)），处于正式内部发布阶段。相对 v1.0.0 的变化、迁移说明和验证结果见 [1.0.1 发布说明](docs/RELEASE-1.0.1.md)；最初的接入范围见 [1.0 内部发布说明](docs/RELEASE-1.0.md)。
 
 ## 快速开始
 
@@ -35,7 +35,7 @@ Service 显式实现 `Handle`，普通命令由具名字段持有的 `gsr.Dispat
 | Redis 用户缓存 | [Redis](examples/redis-user-cache/README.md) |
 | MySQL 产品 CRUD | [MySQL](examples/mysql-product/README.md) |
 
-当前开发接口按 [ADR 0012](docs/adr/0012-node-capabilities-and-service-logging.md) 分离 Node 组装、来源绑定的 Cluster 和窄日志入口；尚未发布新版，与 v1.0.0 源码不兼容。已有标签不移动，旧版用户阅读标签文档。
+v1.0.1 按 [ADR 0012](docs/adr/0012-node-capabilities-and-service-logging.md) 分离 Node 组装、来源绑定的 Cluster 和窄日志入口，与 v1.0.0 源码不兼容。升级前按发布说明迁移调用；旧版代码和文档保留在 v1.0.0 标签。
 
 ## 文档与验证
 

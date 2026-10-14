@@ -2,9 +2,9 @@
 
 本目录记录 `gsr` 当前设计。项目按新实现推进，兄弟目录中的旧工程和 Skynet 源码只用于比较与学习，不构成本项目的兼容契约。
 
-当前版本定为 GSR 1.0，已进入正式内部发布阶段。版本与接入范围见 [1.0 内部发布说明](RELEASE-1.0.md)，初次接入也可从根目录 [README](../README.md) 开始。
+当前版本为 GSR 1.0.1，处于正式内部发布阶段。版本变化与迁移见 [1.0.1 发布说明](RELEASE-1.0.1.md)，最初的接入范围见 [1.0 内部发布说明](RELEASE-1.0.md)。初次接入也可从根目录 [README](../README.md) 开始。
 
-当前开发入口已按 [ADR 0012](adr/0012-node-capabilities-and-service-logging.md) 调整，尚未发布新版；v1.0.0 的代码和文档保留在原标签。
+v1.0.1 入口已按 [ADR 0012](adr/0012-node-capabilities-and-service-logging.md) 调整，与 v1.0.0 源码不兼容；旧版代码和文档保留在原标签。
 
 ## 阅读顺序
 
@@ -38,8 +38,8 @@
 20. [GSR 1.0 内部发布说明](RELEASE-1.0.md)：版本、代码基线、发布范围、接入边界和发布前验证结果。
 21. [Cluster 节点间调用教程](CLUSTER-CALL-TUTORIAL.md)：双节点启动、Send/Call、参数与返回值类型、集合规范化、错误及测试覆盖。
 22. [独立业务项目开发指南](APPLICATION-DEVELOPMENT.md)：依赖版本、项目布局、可运行 Service 骨架、所有权/生命周期、接入与验证，以及 AGENTS.md 模板。
-
 23. [ADR 0012：节点组装与 Service 日志入口](adr/0012-node-capabilities-and-service-logging.md)：作用范围、资源归属、窄日志能力及配置边界。
+24. [GSR 1.0.1 发布说明](RELEASE-1.0.1.md)：相对 v1.0.0 的六项变化、API 迁移与发布验证。
 
 后续出现需要长期保留的重大架构取舍时，新增 ADR 或 RFC，并从这里建立索引。
 

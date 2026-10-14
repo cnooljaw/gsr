@@ -1,6 +1,6 @@
 # 基于 GSR 开发独立业务项目
 
-本文面向独立业务仓库，使用当前开发 API（ADR 0012，尚未发布新版）。`v1.0.0` 的入口形式不同，旧版请阅读标签中的文档。业务项目负责游戏规则、协议、持久化和部署；GSR 负责 Service 调度、消息、生命周期及接入基础设施。框架仓库的 `AGENTS.md` 包含 Core 开发和 Skynet 对照流程，不应整份复制到业务项目。
+本文面向独立业务仓库，使用 v1.0.1 API（ADR 0012）。`v1.0.0` 的入口形式不同，旧版请阅读标签中的文档。业务项目负责游戏规则、协议、持久化和部署；GSR 负责 Service 调度、消息、生命周期及接入基础设施。框架仓库的 `AGENTS.md` 包含 Core 开发和 Skynet 对照流程，不应整份复制到业务项目。
 
 ## 1. 建立独立模块并固定依赖
 
@@ -8,11 +8,10 @@
 
 ```sh
 go mod init example.com/mygame/server
-go get github.com/cnooljaw/gsr@v1.0.0
-# 当前新版接口演练需在下面用本地 replace 指向本仓库开发 checkout。
+go get github.com/cnooljaw/gsr@v1.0.1
 ```
 
-需要 Go 1.24 或更高版本。提交 `go.mod` 与 `go.sum`，CI 使用明确的 Go 工具链版本。生产依赖固定版本，不长期追随 `@main`；升级时记录版本、API/错误代码/参数类型变化，并验证业务自己的集成链路。当前标签不等于 `main` 最新提交：`v1.0.0` 定位发布基线，后续教程、测试与 ADR 0012 的不兼容 API 调整在开发 checkout。
+需要 Go 1.24 或更高版本。提交 `go.mod` 与 `go.sum`，CI 使用明确的 Go 工具链版本。生产依赖固定版本，不长期追随 `@main`；升级时记录版本、API/错误代码/参数类型变化，并验证业务自己的集成链路。本文骨架与模板对应 `v1.0.1`；从 v1.0.0 升级时先按 [迁移对照](RELEASE-1.0.1.md#升级注意) 更新入口。
 
 本地联调可以临时指定 GSR checkout：
 
@@ -20,7 +19,7 @@ go get github.com/cnooljaw/gsr@v1.0.0
 go mod edit -replace=github.com/cnooljaw/gsr=../gsr
 ```
 
-该相对路径只适用于业务项目与 GSR 目录同级的情况；路径按 `go.mod` 所在目录解析。新版尚未发布时，下面的骨架必须保留本地 replace 才能编译。只有已有匹配新版 API 的正式标签或明确提交依赖后，才移除 replace 并确认实际版本；直接退回 v1.0.0 无法编译新版入口：
+该相对路径只适用于业务项目与 GSR 目录同级的情况；路径按 `go.mod` 所在目录解析。联调结束后移除 replace，并确认实际依赖为 v1.0.1；直接退回 v1.0.0 无法编译新版入口：
 
 ```sh
 go mod edit -dropreplace=github.com/cnooljaw/gsr

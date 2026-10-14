@@ -1,8 +1,8 @@
 # GSR API 设计规范
 
-本文描述当前开发 API。2026-10-14 按 [ADR 0012](adr/0012-node-capabilities-and-service-logging.md) 分离节点能力和 Service 日志入口，尚未发布新版本，与 v1.0.0 源码不兼容；旧版契约以标签文档为准，标签不移动。历史验收见 [内部发布说明](RELEASE-1.0.md)。
+本文描述 v1.0.1 API。2026-10-14 按 [ADR 0012](adr/0012-node-capabilities-and-service-logging.md) 分离节点能力和 Service 日志入口，与 v1.0.0 源码不兼容；迁移与验证见 [1.0.1 发布说明](RELEASE-1.0.1.md)。旧版契约以 v1.0.0 标签文档为准，标签不移动。
 
-应用组装通过 self.Node()：RegisterService 发布目标名称，OpenCluster 开放共享监听，OpenHTTP 打开节点 HTTP，CreateGate 创建独立 GateService，ClusterListenAddress 观测实际 Cluster 绑定地址。Node 是运行环境的窄视图，不拥有独立资源，不提供 Close、业务通信或内部组件 getter，限当前回调使用。MainService 可完成组装后退出，原有 owner 继续管理资源。
+应用组装通过 self.Node()：RegisterService 发布目标名称，OpenCluster 开放共享监听，OpenHTTP 打开节点 HTTP，CreateGate 创建独立 GateService，ClusterListenAddress 观测实际 Cluster 绑定地址。Node 保存节点运行状态，由 Run 管理生命周期，业务借用同一对象的公开能力，不提供 Close、业务通信或内部组件 getter，限当前回调使用。同一 Run 共享唯一 Node，不同 Run 隔离；内部字段和 close 不公开。MainService 可完成组装后退出，原有 owner 继续管理资源。
 
 应用 `gsr.Config` 包含 `Logging logging.Config`、`Runtime gsr.RuntimeConfig`、`Cluster gsr.ClusterConfig`。RuntimeConfig 的可调项是 MaxCallWait、MailboxCapacity、ShutdownTimeout；ClusterConfig 的可调项是 Nodes、Codec、MaxCallWait、DialTimeout、WriteTimeout、OutboundQueueCapacity、MaxFrame。两者没有 Logger、不嵌入底层配置，零值和校验继续沿用原契约。
 

@@ -1,12 +1,12 @@
 # Context
 
-当前开发 API 按 [ADR 0012](docs/adr/0012-node-capabilities-and-service-logging.md) 分离 Node 组装和 Service 来源能力，尚未发布新版本；v1.0.0 保留原接口。
+v1.0.1 API 按 [ADR 0012](docs/adr/0012-node-capabilities-and-service-logging.md) 分离 Node 组装和 Service 来源能力，与 v1.0.0 源码不兼容；旧标签保留原接口。
 
-当前版本为 **GSR 1.0**（完整版本号 `1.0.0`，见 [VERSION](VERSION)），自 2026-10-12 起进入正式内部发布阶段。发布范围和验证记录见 [内部发布说明](docs/RELEASE-1.0.md)。历史 Core/Cluster 切片编号不作为当前产品版本号。
+当前版本为 **GSR 1.0.1**（见 [VERSION](VERSION)），于 2026-10-14 发布，继续处于正式内部发布阶段。版本变化和迁移见 [1.0.1 发布说明](docs/RELEASE-1.0.1.md)，最初的内部接入范围见 [1.0 发布说明](docs/RELEASE-1.0.md)。历史 Core/Cluster 切片编号不作为当前产品版本号。
 
 ## Glossary
 
-- **Node 能力**：self.Node() 提供 RegisterService/OpenCluster/ClusterListenAddress/OpenHTTP/CreateGate，复用所属运行环境；不提供关闭、业务通信或内部组件访问，仅在当前回调使用。名称归目标 ServiceID，HTTP/Cluster 归运行环境，Gate 资源归独立 GateService。
+- **Node 能力**：self.Node() 提供 RegisterService/OpenCluster/ClusterListenAddress/OpenHTTP/CreateGate，保存节点运行状态，Run 管理生命周期，业务借用同一对象；同 Run 共享、不同 Run 隔离，不提供关闭、业务通信或内部组件访问，仅在当前回调使用。名称归目标 ServiceID，HTTP/Cluster 归运行环境，Gate 资源归独立 GateService。
 - **应用配置**：gsr.RuntimeConfig 与 gsr.ClusterConfig 不暴露 Logger，Run 转换到底层配置并统一注入；底层基础设施配置仍可借用 Logger。
 
 - **Gate / Protocol 边界**：Gate 只收发不透明字节并拥有连接、安全封装、有界队列和关闭；Protocol 理解 Envelope、编解码、校验和分发，只依赖字节发送窄接口。二者为同级包，生产代码互不导入，业务 Agent 是组合点。ClientSession.Send 接纳时复制字节快照，成功只表示本地入队，不保证送达或执行一次。
@@ -31,7 +31,7 @@
 
 > [ADR 0011](docs/adr/0011-service-first-application-api.md) 已落地应用入口：每节点一个 Runtime/Cluster，MainService 集中组装，CommandID 由目标解释。下文底层 ClusterClient 等类型属于基础设施，业务不手工构造。
 
-- **应用运行入口（gsr.Run）**：Core 之外的统一启动函数，创建独立 Runtime、Cluster、Logger，运行普通 MainService，并负责初始化回滚和固定顺序关闭。内部资源 owner 不公开，不是全局单例或组件容器；app.Host 已移除。
+- **应用运行入口（gsr.Run）**：Core 之外的统一启动函数，创建独立 Runtime、Cluster、Logger，运行普通 MainService，并负责初始化回滚和固定顺序关闭。Node 保存运行状态，Run 管理生命周期，内部资源与关闭入口不公开；不是全局单例或组件容器；app.Host 已移除。
 - **HTTPIngress**：`gsr.Run` 给 HTTP Handler 的长期受信任本地入口，只提供按名称 Send/Call；每次查节点内名称表，通过 Runtime 基础设施入口投递，Source 固定为零。它不是可跨 goroutine 保存的 ServiceContext，不提供业务 Service 身份或 Cluster 调用能力。HTTP Listener 由 Run 持有，在 Runtime 停止前关闭。
 - **HTTP Server Close**：首次调用执行有序关闭，超时或取消后强制关闭连接而不强杀 Handler；重复调用等待同一流程并共享最终结果，后续 context 只控制自身等待。
 

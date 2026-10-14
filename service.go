@@ -54,7 +54,7 @@ type CommandContext interface {
 
 type serviceAdapter struct {
 	service Service
-	node    *application
+	node    *Node
 	id      runtime.ServiceID
 	cluster *Cluster
 	logger  *logging.ServiceLogger
@@ -72,7 +72,7 @@ var (
 	_ runtime.ClientMessageHandler = (*clientMessageAdapter)(nil)
 )
 
-func (node *application) wrap(service Service) (runtime.Service, error) {
+func (node *Node) wrap(service Service) (runtime.Service, error) {
 	if service == nil {
 		return nil, runtime.ErrInvalidService
 	}
@@ -136,9 +136,9 @@ func (self *serviceContext) CreateService(ctx context.Context, service Service) 
 	return self.ServiceContext.CreateService(ctx, wrapped)
 }
 
-// Node 返回所属节点的组装能力，不转移资源的生命周期责任。
+// Node 返回所属 Run 的唯一节点对象，业务只借用其组装能力，不接管生命周期。
 func (self *serviceContext) Node() *Node {
-	return &Node{node: self.adapter.node}
+	return self.adapter.node
 }
 
 // SendName 按本节点名称解析目标，随后沿用当前 Service 的本地 Send 路径。
