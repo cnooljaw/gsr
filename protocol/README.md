@@ -2,6 +2,8 @@
 
 `protocol` 负责 Protobuf Envelope 的编解码、校验和强类型分发，不依赖 Gate，不拥有连接、Mailbox 或 goroutine。它只依赖 `ClientSender.Send([]byte) error`；业务 Agent 可以直接传入 `gate.ClientSession`，不增加适配层。
 
+本包是 Protobuf 实现。Envelope/Registry/MessageRoute/Direction/Kind 与 request_id 不提升为公共协议模型。已确认的 Sproto 扩展放在独立 protocol/sproto，各自持有协议定义和上下文，不依赖本包；当前接入尚未完成，见 [接入计划](../docs/SPROTO-INTEGRATION.md)。Gate 的 SecurityMode 只选择握手与传输认证，不选择业务编码。
+
 通用 `.proto`、生成的 Go 类型和目录生成工具分别位于 `proto/`、`gen/` 和 `cmd/`。根目录 Buf 配置同时生成通用类型和 Echo 示例类型。独立业务项目使用目录生成插件时，`module_path=<业务 Go module>` 控制输出相对路径，生成目录仍引用 GSR 的 `protocol/catalog`。
 
 ## 职责与代码入口

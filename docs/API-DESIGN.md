@@ -1,6 +1,6 @@
 # GSR API 设计规范
 
-本文描述 v1.0.1 API。2026-10-14 按 [ADR 0012](adr/0012-node-capabilities-and-service-logging.md) 分离节点能力和 Service 日志入口，与 v1.0.0 源码不兼容；迁移与验证见 [1.0.1 发布说明](RELEASE-1.0.1.md)。旧版契约以 v1.0.0 标签文档为准，标签不移动。
+本文描述当前开发 API，以 v1.0.1 为发布基线。按 [ADR 0013](adr/0013-client-protocol-boundaries.md)，Gate 的 Protocol/ProtocolMAC/ProtocolPlain 和配置字段 Protocol 已改名为 SecurityMode/SecurityModeMAC/SecurityModePlain 与 SecurityMode，此改名尚未发布。v1.0.1 的节点入口迁移与验证见 [发布说明](RELEASE-1.0.1.md)。旧版契约以相应标签文档为准，标签不移动。
 
 应用组装通过 self.Node()：RegisterService 发布目标名称，OpenCluster 开放共享监听，OpenHTTP 打开节点 HTTP，CreateGate 创建独立 GateService，ClusterListenAddress 观测实际 Cluster 绑定地址。Node 保存节点运行状态，由 Run 管理生命周期，业务借用同一对象的公开能力，不提供 Close、业务通信或内部组件 getter，限当前回调使用。同一 Run 共享唯一 Node，不同 Run 隔离；内部字段和 close 不公开。MainService 可完成组装后退出，原有 owner 继续管理资源。
 
@@ -29,16 +29,20 @@ Node.CreateGate 的 context 仅用于独立 GateService 的启动；返回值是
 
 ## Gate 与 Protocol 边界
 
-Gate 负责有界、顺序、失败可观察地收发不透明消息；Protocol 负责理解消息并分发消息；业务 Agent 是两者的组合点。`gate/` 与 `protocol/` 为同级包，生产代码互不导入。不引入额外桥接 Service、策略层或通用适配框架。
+Gate 负责有界、顺序、失败可观察地收发不透明消息；具体客户端协议负责理解消息并分发消息；业务 Agent 是两者的组合点。`gate/` 与 `protocol/` 为同级包，生产代码互不导入。不引入额外桥接 Service、策略层或通用适配框架。
+
+业务协议由 Agent 构造时选定，Gate 不提供 Protobuf/Sproto/JSON 枚举或格式探测。SecurityModeMAC/Plain 只控制握手和传输认证，TLS 独立配置；MAC 不仅握手，还校验后续消息的 seq/MAC。一个具体 Agent 固定使用一个业务协议实现，协议选择与安全模式相互独立。
+
+现有 `protocol` 是 Protobuf 实现，Envelope、Registry、MessageRoute、Direction、Kind 和 request_id 均属于它。已确认增加独立 `protocol/sproto`，使用 Sproto 自身的协议、Request/Response、package(type/session) 和 pack/unpack；不依赖父包的 Protobuf 模型，不再套 Envelope 或重复的 MessageRoute。Sproto 实现及 Go/TS Echo 尚待后续切片完成，进度与验收见 [双协议接入计划](SPROTO-INTEGRATION.md)。JSON 只保留同样的字节接入能力，本轮不增加实现。
 
 - Gate 管理连接、握手、seq/MAC、容量、出站队列和关闭；不导入 Protobuf，不解释 msg_id、request_id 或 payload。握手是传输认证格式，不属于业务 Protocol。Plain 不具备 MAC 模式的认证保证。
 - `gate.ClientSession` 留在 Gate，只提供 `Send([]byte) error` 和 `Close() error`。Send 在成功接纳时复制快照，之后发送方可以复用缓冲区；nil 与空切片均表示零字节消息，仍收取队列条目开销。成功仅代表本地队列接纳，不保证客户端收到、业务执行或执行一次，不自动重放。
-- Protocol 持有通用 `.proto`、生成类型、目录、生成工具、Envelope 编解码、强类型分发和 Response/Push；写回只依赖现有 `ClientSender` 的 `Send([]byte) error`，不拥有连接，不要求 Close，也不依赖 Gate。
+- Protobuf 的 `protocol` 持有通用 `.proto`、生成类型、目录、生成工具、Envelope 编解码、强类型分发和 Response/Push；写回只依赖现有 `ClientSender` 的 `Send([]byte) error`，不拥有连接，不要求 Close，也不依赖 Gate。Sproto 实现同样只借用字节发送能力，各自定义自己的协议上下文，不统一 Context 或 Schema。
 - `protocol.NewRegistry(businessCatalogs...)` 自动纳入框架通用目录，业务只传自己的生成目录，不重复传入通用目录。通用 ErrorResponse 编号固定为 9001，业务不得覆盖该编号或将通用类型映射到其它编号；所有编号和类型冲突在 Registry 构造时拒绝，不静默覆盖或去重。Dispatcher 不要求业务补接框架的错误回复依赖。
 - Agent 将 Gate 投递的字节交给 `protocol.Dispatcher`，将自身连接写回能力交给 Dispatcher；Protocol 编码完整 Envelope 后发送字节。具体业务 `.proto` 与 Handler 仍属于业务项目，Runtime/Core/Cluster 语义不变。
 - Runtime 的客户端入口只负责能力接纳、字节快照和 Mailbox 投递，不要求 Protobuf 格式；Envelope 是 Protocol 的消息格式，不是 Core 的消息类型或准入条件。
 
-入站为 `Gate → 字节快照 → Agent → Protocol → Handler`；出站为 `Handler → Protocol 编码 → 字节消息 → Gate`。包级依赖仅由 Agent 同时指向 Gate 和 Protocol；上面的箭头表示数据流，不表示 Gate 与 Protocol 互相导入。
+入站为 `Gate → 字节快照 → Agent → 具体协议 Dispatcher → Handler`；出站为 `Handler → 具体协议编码 → 字节消息 → Gate`。包级依赖仅由 Agent 同时指向 Gate 和协议实现；上面的箭头表示数据流，不表示 Gate 与协议实现互相导入。Sproto 会话状态归每连接 Agent，不与 Core/Cluster Session 混用；不可变协议定义可共享。框架不增加 ProtocolCodec、公共 Message/Route/SchemaProvider 或统一 Envelope。
 
 ## 默认业务入口与阅读边界
 
@@ -83,7 +87,7 @@ MainService 统一通过 `Node.CreateGate` 打开监听，默认使用 MAC 模�
 
 ```go
 address, err := self.Node().CreateGate(ctx, gsr.GateConfig{
-    Protocol:              gate.ProtocolMAC, // 零值也是 MAC。
+    SecurityMode:          gate.SecurityModeMAC, // 零值也是 MAC。
     Address:               ":7889",
     MaxConnections:        1000,
     MaxOutboundQueueBytes: 1 << 20,
@@ -93,7 +97,7 @@ address, err := self.Node().CreateGate(ctx, gsr.GateConfig{
 })
 ```
 
-内网调试改为 `Protocol: gate.ProtocolPlain` 并显式绑定 `127.0.0.1:7888` 或私有 IP，Agent 与业务协议不变。每个监听固定一种协议，不猜首帧、不降级；没有独立 DebugGate/ProdGate 入口或兼容别名。
+内网调试改为 `SecurityMode: gate.SecurityModePlain` 并显式绑定 `127.0.0.1:7888` 或私有 IP，Agent 与业务协议不变。每个监听固定一种安全模式，不猜首帧、不降级；没有独立 DebugGate/ProdGate 入口或兼容别名。
 
 应用回调返回 `gsr.Service`，底层回调返回 `runtime.Service`，现有适配器转换上下文并按需保留客户端处理能力，不增加 Mailbox 或 runner。MAC 模式在握手成功后创建 Agent；Plain 不握手。Gate 和 Agent 生命周期由 Runtime 管理。
 

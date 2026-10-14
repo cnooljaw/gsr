@@ -34,8 +34,8 @@ func TestPlainGateWaitsForServicePublication(t *testing.T) {
 	}
 	t.Cleanup(func() { local.Close() })
 	gate, err := NewGateService(local, Config{
-		Protocol: ProtocolPlain,
-		Address:  "127.0.0.1:0", MaxConnections: 1, MaxOutboundQueueBytes: 1024,
+		SecurityMode: SecurityModePlain,
+		Address:      "127.0.0.1:0", MaxConnections: 1, MaxOutboundQueueBytes: 1024,
 		NewAgent: func(client ClientSession) runtime.Service {
 			return &testAgent{client: client, disconnected: make(chan struct{})}
 		},
@@ -211,7 +211,7 @@ func TestPlainGateRetriesDisconnectAfterAgentMailboxRecovers(t *testing.T) {
 		}
 	})
 	gate, err := NewGateService(local, Config{
-		Protocol:              ProtocolPlain,
+		SecurityMode:          SecurityModePlain,
 		Address:               "127.0.0.1:0",
 		MaxConnections:        1,
 		MaxOutboundQueueBytes: 64 << 10,
@@ -764,7 +764,7 @@ func TestPlainGateDisconnectsAgentCreatedAfterCallTimeout(t *testing.T) {
 	defer finishCreation()
 	agent := &testAgent{disconnected: make(chan struct{})}
 	gate, err := NewGateService(local, Config{
-		Protocol:              ProtocolPlain,
+		SecurityMode:          SecurityModePlain,
 		Address:               "127.0.0.1:0",
 		MaxConnections:        1,
 		MaxOutboundQueueBytes: 1024,
@@ -829,8 +829,8 @@ func TestPlainGateLogsAgentCreationFailure(t *testing.T) {
 		t.Fatalf("Runtime.Start() error = %v", err)
 	}
 	gate, err := NewGateService(local, Config{
-		Protocol: ProtocolPlain,
-		Address:  "127.0.0.1:0", MaxConnections: 1, MaxOutboundQueueBytes: 1024,
+		SecurityMode: SecurityModePlain,
+		Address:      "127.0.0.1:0", MaxConnections: 1, MaxOutboundQueueBytes: 1024,
 		NewAgent: func(ClientSession) runtime.Service { return nil },
 	})
 	if err != nil {
@@ -1146,7 +1146,7 @@ func TestNewGateServiceRejectsPublicAndUnboundedConfig(t *testing.T) {
 	})
 
 	base := Config{
-		Protocol:              ProtocolPlain,
+		SecurityMode:          SecurityModePlain,
 		Address:               "127.0.0.1:0",
 		MaxConnections:        2,
 		MaxOutboundQueueBytes: 1024,
@@ -1157,7 +1157,7 @@ func TestNewGateServiceRejectsPublicAndUnboundedConfig(t *testing.T) {
 		update func(*Config)
 	}{
 		{name: "wildcard address", update: func(config *Config) { config.Address = "0.0.0.0:9000" }},
-		{name: "unknown protocol", update: func(config *Config) { config.Protocol = Protocol(255) }},
+		{name: "unknown security mode", update: func(config *Config) { config.SecurityMode = SecurityMode(255) }},
 		{name: "missing connection limit", update: func(config *Config) { config.MaxConnections = 0 }},
 		{name: "missing outbound queue limit", update: func(config *Config) { config.MaxOutboundQueueBytes = 0 }},
 		{name: "missing agent constructor", update: func(config *Config) { config.NewAgent = nil }},
@@ -1361,7 +1361,7 @@ func startTestGateWithLogger(t *testing.T, mailboxCapacity, maxConnections int, 
 	})
 	agents := make(chan *testAgent, 1)
 	gate, err := NewGateService(local, Config{
-		Protocol:              ProtocolPlain,
+		SecurityMode:          SecurityModePlain,
 		Address:               "127.0.0.1:0",
 		MaxConnections:        maxConnections,
 		MaxOutboundQueueBytes: 64 << 10,

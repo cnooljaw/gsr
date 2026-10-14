@@ -188,7 +188,7 @@ func (entry *echoTestEntry) OnStart(ctx context.Context, self gsr.ServiceContext
 		return err
 	}
 	address, err := self.Node().CreateGate(ctx, gsr.GateConfig{
-		Protocol: gate.ProtocolPlain, Address: "127.0.0.1:0", MaxConnections: 1,
+		SecurityMode: gate.SecurityModePlain, Address: "127.0.0.1:0", MaxConnections: 1,
 		MaxOutboundQueueBytes: 64 << 10,
 		NewAgent: func(client gate.ClientSession) gsr.Service {
 			return newEchoAgent(client, registry)

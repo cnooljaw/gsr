@@ -3832,7 +3832,7 @@ func TestNewGateServiceRequiresFrameLimitForHandshake(t *testing.T) {
 	if _, err := NewGateService(local, config); err != nil {
 		t.Fatalf("NewGateService(frame limit %d) error = %v, want success", config.MaxFrameBytes, err)
 	}
-	config.Protocol = ProtocolPlain
+	config.SecurityMode = SecurityModePlain
 	config.MaxFrameBytes = 1
 	if _, err := NewGateService(local, config); err != nil {
 		t.Fatalf("Plain mode with no handshake and a small frame limit: %v", err)
@@ -3845,7 +3845,7 @@ func TestPlainGateSupportsTLSWithoutApplicationHandshake(t *testing.T) {
 	_, gate := startConfiguredProductionGateWithTLS(t, runtime.Config{ShutdownTimeout: 2 * time.Second},
 		1, time.Second, 1024, 4096, serverTLS, func(client ClientSession) runtime.Service {
 			return &productionTestAgent{client: client, disconnected: make(chan struct{})}
-		}, ProtocolPlain)
+		}, SecurityModePlain)
 	connection := dialProductionTestClient(t, gate, clientTLS)
 	defer connection.Close()
 	request, err := proto.Marshal(&commonv1.Envelope{MsgId: 1001, RequestId: 9, Payload: []byte("plain over TLS")})
@@ -4333,7 +4333,7 @@ func startConfiguredProductionGateWithTLS(
 	maxOutboundQueueBytes int,
 	serverTLS *tls.Config,
 	newAgent func(ClientSession) runtime.Service,
-	protocols ...Protocol,
+	securityModes ...SecurityMode,
 ) (*runtime.Runtime, *GateService) {
 	t.Helper()
 	local, err := runtime.NewRuntime(runtimeConfig)
@@ -4348,12 +4348,12 @@ func startConfiguredProductionGateWithTLS(
 			t.Errorf("Runtime.Close() error = %v", err)
 		}
 	})
-	mode := ProtocolMAC
-	if len(protocols) > 0 {
-		mode = protocols[0]
+	mode := SecurityModeMAC
+	if len(securityModes) > 0 {
+		mode = securityModes[0]
 	}
 	gate, err := NewGateService(local, Config{
-		Protocol:              mode,
+		SecurityMode:          mode,
 		Address:               "127.0.0.1:0",
 		TLSConfig:             serverTLS,
 		MaxConnections:        maxConnections,

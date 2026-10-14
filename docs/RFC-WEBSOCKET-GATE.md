@@ -118,8 +118,8 @@ enum MsgId {
 ## 已确认：统一 Gate 与固定协议模式
 
 - 只有一个 `gate.GateService` 实现和应用入口 `self.Node().CreateGate(ctx, gsr.GateConfig{...})`，不保留独立 DebugGate/ProdGate 包或兼容别名。
-- `gate.ProtocolMAC` 为零值默认模式：固定 33 字节 X25519 握手后，上行使用 `seq | Envelope | MAC`，下行只使用 Envelope。握手或 MAC 失败直接关闭，不降级。
-- `gate.ProtocolPlain` 必须显式选择：上下行直接传输 Envelope，不做 X25519、seq 或 MAC；仅允许绑定字面回环或私有 IP，并由部署限制访问，不能作为公网安全模式。
+- `gate.SecurityModeMAC` 为零值默认模式：固定 33 字节 X25519 握手后，上行使用 `seq | 业务消息字节 | MAC`，下行只使用业务消息字节。握手或 MAC 失败直接关闭，不降级。现有 Protobuf 示例的业务消息为 Envelope。
+- `gate.SecurityModePlain` 必须显式选择：上下行直接传输业务消息字节，不做 X25519、seq 或 MAC；仅允许绑定字面回环或私有 IP，并由部署限制访问，不能作为公网安全模式。
 - 一个监听固定一种协议，不按首帧猜测，不混用模式。需要同时接入两种模式时，分别打开两个监听，但复用同一个实现。
 - TLS 与模式独立：非空 `TLSConfig` 启动 WSS；MAC 模式可在可信内网或由 Ingress/LB 终止 TLS 后使用 WS。公网直连必须启用 TLS。Plain 即使启用 TLS 也保留内网绑定限制。
 - 两种模式共用 TCP 连接限额、Agent 创建、逐帧投递、出站队列、断线通知、停止、日志和指标。仅在握手与入站认证处区分模式，不增加策略接口、插件框架或额外 owner。

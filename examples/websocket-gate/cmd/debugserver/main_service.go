@@ -33,7 +33,7 @@ func (service *mainService) OnStart(ctx context.Context, self gsr.ServiceContext
 		return newEchoAgent(client, registry)
 	}
 	config := gsr.GateConfig{
-		Protocol:              gate.ProtocolPlain,
+		SecurityMode:          gate.SecurityModePlain,
 		Address:               service.options.address,
 		MaxConnections:        128,
 		MaxOutboundQueueBytes: 1 << 20,
@@ -41,7 +41,7 @@ func (service *mainService) OnStart(ctx context.Context, self gsr.ServiceContext
 	}
 	label, scheme := "Plain Gate", "ws"
 	if service.options.production {
-		config.Protocol = gate.ProtocolMAC
+		config.SecurityMode = gate.SecurityModeMAC
 		if service.options.certificateFile != "" {
 			certificate, err := tls.LoadX509KeyPair(service.options.certificateFile, service.options.privateKeyFile)
 			if err != nil {

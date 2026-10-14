@@ -4,6 +4,14 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## Gate 安全模式命名与 Sproto 前置验证（2026-10-14）
+
+按 [ADR 0013](adr/0013-client-protocol-boundaries.md) 将 Gate Protocol 类型、常量和配置字段改为 SecurityMode，保持枚举值、默认 MAC、握手、seq/MAC、Plain 绑定限制与生命周期。调用方与既有测试同步迁移，不新增兼容别名或重复测试夹具。
+
+`go test ./gate . ./examples/websocket-gate/cmd/debugserver -timeout=2m` 通过（Gate 约 33 秒），覆盖现有 MAC/Plain、应用接线和 Protobuf Echo。测试夹具的变量/用例文字随后同步命名，由 `go test ./... -run '^$' -timeout=2m` 验证全仓编译；不因纯命名重复运行全仓行为、race、TypeScript 或进程恢复门禁。Go 格式、diff 和相关 Markdown 本地链接检查通过。
+
+Sproto 仍未进入生产依赖或公开 API。隔离 module 的 `gosproto v0.1.0` 最小用例复现负整数数组改变数值、double 不支持及坏数组除零 panic；这些是候选库未通过的接入门禁，不是 GSR 的失败测试。候选范围、首次 clone 无进展及后续步骤见 [接入计划](SPROTO-INTEGRATION.md)。尚未验证 Go/TS Sproto Echo。
+
 ## v1.0.1 发布验收（2026-10-14）
 
 统一 Node 运行对象后的发布代码已通过 `GSR_PROCESS_TEST=1 go test -race ./... -timeout=2m` 和 `go vet ./...`。全仓 race 覆盖默认 Go 行为测试、双进程正常停机与强杀后恢复；根包约 2 秒、双节点约 19 秒、Gate 约 35 秒，未变化的部分 package 使用缓存，不重复普通全仓测试。

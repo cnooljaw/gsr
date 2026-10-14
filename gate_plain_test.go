@@ -33,7 +33,7 @@ func TestOpenGateConnectsApplicationAgent(t *testing.T) {
 		if err := self.Node().RegisterService("gate-test-backend", backendID); err != nil {
 			return err
 		}
-		address, err := self.Node().CreateGate(ctx, GateConfig{Protocol: gate.ProtocolPlain,
+		address, err := self.Node().CreateGate(ctx, GateConfig{SecurityMode: gate.SecurityModePlain,
 			Address:               "127.0.0.1:0",
 			MaxConnections:        1,
 			MaxOutboundQueueBytes: 64 << 10,

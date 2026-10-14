@@ -31,7 +31,7 @@ const (
 )
 
 var (
-	// ErrInvalidConfig 表示 Gate 协议模式、监听或有限容量配置无效。
+	// ErrInvalidConfig 表示 Gate 安全模式、监听或有限容量配置无效。
 	ErrInvalidConfig = errors.New("gate: invalid config")
 	// ErrClientQueueFull 表示客户端出站队列达到配置的字节上限。
 	ErrClientQueueFull = errors.New("gate: client outbound queue full")
@@ -48,20 +48,20 @@ var gateUpgrader = websocket.Upgrader{
 	CheckOrigin: func(*http.Request) bool { return true },
 }
 
-// Protocol 是单个 Gate 监听固定使用的上行协议，不按连接猜测或自动降级。
-type Protocol uint8
+// SecurityMode 是单个 Gate 监听固定使用的接入安全模式，不按连接猜测或自动降级。
+type SecurityMode uint8
 
 const (
-	// ProtocolMAC 是默认模式：X25519 握手后校验每帧的 seq 和 MAC。
-	ProtocolMAC Protocol = iota
-	// ProtocolPlain 直接收发字节消息，仅允许显式绑定回环或私有 IP。
-	ProtocolPlain
+	// SecurityModeMAC 是默认模式：X25519 握手后校验每帧的 seq 和 MAC。
+	SecurityModeMAC SecurityMode = iota
+	// SecurityModePlain 直接收发字节消息，仅允许显式绑定回环或私有 IP。
+	SecurityModePlain
 )
 
-// Config 定义 WebSocket Gate 的固定协议模式、监听、容量和连接 Agent。
+// Config 定义 WebSocket Gate 的固定安全模式、监听、容量和连接 Agent。
 type Config struct {
-	// Protocol 的零值为 MAC；Plain 必须显式选择，TLS 与协议模式独立。
-	Protocol Protocol
+	// SecurityMode 的零值为 MAC；Plain 必须显式选择，TLS 与安全模式独立。
+	SecurityMode SecurityMode
 	// Address 是 Gate 绑定的 TCP host:port；Plain 仅允许字面回环或私有 IP。
 	Address string
 	// TLSConfig 为 nil 时监听普通 HTTP WebSocket，适用于可信内网或由 Ingress 终止 TLS 的部署；
@@ -129,13 +129,13 @@ type GateService struct {
 
 var _ runtime.Service = (*GateService)(nil)
 
-// NewGateService 校验固定协议模式、可选 TLS 与容量配置，不按首帧猜测模式。
+// NewGateService 校验固定安全模式、可选 TLS 与容量配置，不按首帧猜测模式。
 func NewGateService(local *runtime.Runtime, config Config) (*GateService, error) {
 	if local == nil {
 		return nil, fmt.Errorf("%w: Runtime is required", ErrInvalidConfig)
 	}
-	if config.Protocol != ProtocolMAC && config.Protocol != ProtocolPlain {
-		return nil, fmt.Errorf("%w: unknown protocol mode", ErrInvalidConfig)
+	if config.SecurityMode != SecurityModeMAC && config.SecurityMode != SecurityModePlain {
+		return nil, fmt.Errorf("%w: unknown security mode", ErrInvalidConfig)
 	}
 	if config.HandshakeTimeout == 0 {
 		config.HandshakeTimeout = defaultHandshakeTimeout
@@ -147,7 +147,7 @@ func NewGateService(local *runtime.Runtime, config Config) (*GateService, error)
 		config.MaxOutboundQueueBytes < queueEntryOverhead {
 		return nil, fmt.Errorf("%w: connection, handshake, frame, or outbound queue limit is invalid", ErrInvalidConfig)
 	}
-	if config.Protocol == ProtocolMAC && config.MaxFrameBytes < handshakeFrameSize {
+	if config.SecurityMode == SecurityModeMAC && config.MaxFrameBytes < handshakeFrameSize {
 		return nil, fmt.Errorf("%w: frame limit must accommodate the handshake", ErrInvalidConfig)
 	}
 	if config.NewAgent == nil {
@@ -156,7 +156,7 @@ func NewGateService(local *runtime.Runtime, config Config) (*GateService, error)
 	if err := validateListenAddress(config.Address); err != nil {
 		return nil, err
 	}
-	if config.Protocol == ProtocolPlain {
+	if config.SecurityMode == SecurityModePlain {
 		if err := validatePrivateAddress(config.Address); err != nil {
 			return nil, err
 		}
@@ -383,7 +383,7 @@ func (gate *GateService) ServeHTTP(writer http.ResponseWriter, request *http.Req
 
 	connection.SetReadLimit(int64(gate.config.MaxFrameBytes))
 	var authenticator *clientAuthenticator
-	if gate.config.Protocol == ProtocolMAC {
+	if gate.config.SecurityMode == SecurityModeMAC {
 		authenticator, err = gate.performHandshake(clientConn)
 		if err != nil {
 			gate.counters.rejectedConnections.Add(1)
@@ -432,7 +432,7 @@ func (gate *GateService) ServeHTTP(writer http.ResponseWriter, request *http.Req
 			clientConn.closeWith(websocket.CloseUnsupportedData, "unsupported_data", time.Now().Add(closeFrameWait))
 			return
 		}
-		if gate.config.Protocol == ProtocolMAC {
+		if gate.config.SecurityMode == SecurityModeMAC {
 			err = gate.deliverAuthenticatedFrame(agentID, clientConn, authenticator, frame)
 		} else {
 			err = gate.deliverFrame(agentID, clientConn, frame)

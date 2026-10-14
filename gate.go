@@ -10,10 +10,10 @@ import (
 	"github.com/cnooljaw/gsr/runtime"
 )
 
-// GateConfig 定义应用层 Gate 的固定协议模式、监听和连接 Agent 构造入口。
+// GateConfig 定义应用层 Gate 的固定安全模式、监听和连接 Agent 构造入口。
 type GateConfig struct {
-	// Protocol 默认使用 gate.ProtocolMAC；内网调试须显式选择 gate.ProtocolPlain。
-	Protocol gate.Protocol
+	// SecurityMode 默认使用 gate.SecurityModeMAC；内网调试须显式选择 gate.SecurityModePlain。
+	SecurityMode gate.SecurityMode
 	// Address 是 TCP host:port；Plain 仅允许字面回环或私有 IP，端口零可供本机测试。
 	Address string
 	// TLSConfig 为 nil 时使用 HTTP/WS，适用于可信内网或由 Ingress/LB 终止 TLS 的部署。
@@ -31,14 +31,14 @@ type GateConfig struct {
 	NewAgent func(gate.ClientSession) Service
 }
 
-// CreateGate 创建固定协议模式的 Gate，并让连接 Agent 经现有应用适配器进入 Runtime。
+// CreateGate 创建固定安全模式的 Gate，并让连接 Agent 经现有应用适配器进入 Runtime。
 // 成功返回实际监听地址；Gate 和 Agent 均由 Runtime 管理生命周期。
 func (node *Node) CreateGate(ctx context.Context, config GateConfig) (string, error) {
 	if config.NewAgent == nil {
 		return "", fmt.Errorf("%w: NewAgent is required", gate.ErrInvalidConfig)
 	}
 	gateService, err := gate.NewGateService(node.local, gate.Config{
-		Protocol:              config.Protocol,
+		SecurityMode:          config.SecurityMode,
 		Address:               config.Address,
 		TLSConfig:             config.TLSConfig,
 		MaxConnections:        config.MaxConnections,
