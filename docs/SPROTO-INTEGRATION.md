@@ -18,6 +18,7 @@ Go/TS 先验证已有工具；只有现有生成产物确实无法满足接线�
 
 - [cloudwu/sproto](https://github.com/cloudwu/sproto)：官方 C/Lua 实现与 wire 规范，作为兼容性参考。
 - [xjdrew/gosproto](https://github.com/xjdrew/gosproto)：Go 编解码与 Protocol/RPC；标准库没有对应实现，候选库用于避免重写编码器。
+- [davyxu/gosproto](https://github.com/davyxu/gosproto)：基于 xjdrew 代码的编解码器与 sprotogen，提供扩展 `.sp` 描述及生成工具；候选实现仍以官方 `.sproto` 与 wire 为准，不采用改变官方解释的扩展来解决兼容问题。
 - [lvzixun/sprotodump](https://github.com/lvzixun/sprotodump)：现有 Go 类型、协议定义及 schema 生成工具，需实际核对产物。
 - [sealindx/sproto-ts](https://github.com/sealindx/sproto-ts)：候选 TypeScript 客户端，需核对整数精度、浏览器字节缓冲与坏包行为。
 
@@ -41,8 +42,32 @@ Go/TS 先验证已有工具；只有现有生成产物确实无法满足接线�
 
 - 有符号整数数组 `[-1, -2147483648, 42]` 编解码后得到 `[4294967295, 2147483648, 42]`，负值被改变。
 - `double` 字段无法建立编码类型，返回 unknown wire type。
-- 整数数组元素宽度为零的畸形字节触发 integer divide by zero panic。
+- 整数数组元素宽度为零的输入触发 integer divide by zero panic。后续官方对照更正：无元素的零宽度输入被官方接受为空数组，不能直接称为坏包；非空零宽度输入则由官方拒绝，两种输入都不应触发 Go panic。
 
 同时，Unpack 没有配置解包后上限，递归结构解码没有深度预算。这些结论只针对已下载的 v0.1.0，不扩展为对其它提交或其它 Go Sproto 库的结论。正式引入前需比对后续提交/修复实现，并以这些可复现用例验证；不能用 recover 掩盖数值错误或当作完整资源限制。本轮未修改依赖缓存、未把候选库写入生产 go.mod。
 
 TypeScript 实现与生成工具的首次 GitHub clone 长时间无进展，已停止该操作，尚未形成其生成产物或跨语言互通证据。
+
+## 官方对照与 davyxu 候选验证（2026-10-14）
+
+用户要求以官方仓库为准，并补充 davyxu 作为候选。本轮通过 GitHub API 下载并固定源码，所有编译、隔离 module 与输入用例均在临时目录，不修改生产依赖或 Envelope：
+
+- 官方 `cloudwu/sproto`：`e93fd5a0653b2bcab38d3b830958bf2e3a901b5f`。
+- `davyxu/gosproto`：`001cf85c891ced746b27a36a75a735025d7fcc79`。
+- 对照 `xjdrew/gosproto`：继续使用 `v0.1.0`。
+
+官方 C/Lua 实现已编译并实际执行；本机 Lua 5.3 的 x86_64 模块构建额外定义 `luai_unlikely(x)=(x)`，只补齐分支提示宏，不改变官方编解码代码。官方成功往返负整数数组、负整数标量和 double；空整数数组的规范编码为 `0100000000000000`；零宽度但无元素的非规范编码被接受，非空零宽度输入返回解码错误。
+
+| 行为 / 官方结果 | xjdrew v0.1.0 | davyxu 固定提交 |
+| --- | --- | --- |
+| 数组 `[-1, -2147483648, 42]` 保留符号 | 变为 `[4294967295, 2147483648, 42]` | 相同失真 |
+| 官方四字节 `-1` 标量解码为 `-1` | 通过 | 得到 `4294967295` |
+| 官方空整数数组规范编码可解码 | 返回 Decode error | 返回 Decode error |
+| 原生 `double` 可以建立类型 | 不支持 | 不支持 |
+| 非空零宽度整数数组由解码器拒绝 | 除零 panic | 除零 panic |
+
+davyxu 的五条最小 Go 用例均未通过；xjdrew 的标量用例通过，其余四条未通过。官方基准验证成功；这些失败属于候选库兼容性检查，不是 GSR 现有测试失败。规范输入的十六进制向量来自上述官方实现，后续实现须使用它们做回归。
+
+davyxu 的 `float32/float64` 是生成器扩展：生成整数字段，用精度因子缩放，默认因子为 1000；它不是官方 double 的 IEEE-754 wire，不能当作 double 支持。源码的顶层解析分支与生成模板主要处理结构体/enum，未覆盖原生 `echo 1 { request ... response ... }` 的完整 RPC 定义生成，不能直接替代原生协议工具链；本轮没有运行其生成器。
+
+结论：这两个候选版本均不能直接作为满足接入门禁的依赖。优先验证修复实现，并以官方 schema、编码向量和错误行为验收；若采用某库的修复分支，明确锁定提交和修复范围。不改官方协议来迁就第三方扩展，不把临时 recover 当作兼容性或资源上限的解决方案。

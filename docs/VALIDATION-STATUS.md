@@ -4,6 +4,12 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## Sproto 官方与第二候选库对照（2026-10-14）
+
+固定官方 cloudwu/sproto 提交编译 C/Lua 实现，实际验证负整数数组、标量、double、规范空数组、非规范空数组和非法非空零宽度数组。用官方向量检查 davyxu/gosproto 固定提交及 xjdrew/gosproto v0.1.0：davyxu 五条门禁均未通过，xjdrew 通过负整数标量，其余四条未通过。另更正此前将零宽度无元素输入笼统称为坏包的表述：官方接受该输入，Go 候选库触发 panic，仍属于兼容性缺陷。
+
+候选源码、用例、编译及模块替换仅存在于临时目录，不修改 GSR 生产依赖、协议、生成代码或 sibling 参考仓库。第三方生成器只做源码检查，未运行；未重复运行无变化的 GSR 测试。固定版本、限制及实际结果见 [接入计划](SPROTO-INTEGRATION.md#官方对照与-davyxu-候选验证2026-10-14)。
+
 ## Gate 安全模式命名与 Sproto 前置验证（2026-10-14）
 
 按 [ADR 0013](adr/0013-client-protocol-boundaries.md) 将 Gate Protocol 类型、常量和配置字段改为 SecurityMode，保持枚举值、默认 MAC、握手、seq/MAC、Plain 绑定限制与生命周期。调用方与既有测试同步迁移，不新增兼容别名或重复测试夹具。
