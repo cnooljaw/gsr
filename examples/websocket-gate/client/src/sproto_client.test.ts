@@ -169,11 +169,25 @@ test("Sproto pending and packet limits", () => {
     assert.equal(codec.lunpack(packed, prefix), expected.length);
     assert.deepEqual(prefix, expected.subarray(0, capacity));
   }
+  // 批量零头扫描不能跨过后续 mask，且非零 byteOffset 与有限输出前缀保持一致。
+  for (const words of [3, 4, 5, 7, 8, 9, 63, 64, 65, 2047, 2048, 2049, 4096]) {
+    const packed = Buffer.alloc(words + 5).subarray(3);
+    packed[words] = 1;
+    packed[words + 1] = 9;
+    const expected = Buffer.alloc(words * 8 + 8);
+    expected[words * 8] = 9;
+    assert.deepEqual(codec.unpack(packed), expected);
+    for (const capacity of [0, 1, 7, 8, 13, Math.min(2049, expected.length), expected.length]) {
+      const prefix = Buffer.alloc(capacity, 0xcc);
+      assert.equal(codec.lunpack(packed, prefix), expected.length);
+      assert.deepEqual(prefix, expected.subarray(0, capacity));
+    }
+  }
   for (const malformed of [[255], [255, 0, 1], [3, 1], [0, 0, 255]]) {
     assert.equal(codec.unpack(Buffer.from(malformed)), null);
   }
   // 大输入的计数路径同样拒绝末尾截断，恰好达到解包额度仍可接受。
-  for (const prefix of [Buffer.alloc(2048), codec.pack(Buffer.alloc(2048, 1))]) {
+  for (const prefix of [Buffer.alloc(2048), Buffer.alloc(4096), codec.pack(Buffer.alloc(2048, 1))]) {
     assert.equal(codec.unpack(Buffer.concat([prefix, Buffer.from([255])])), null);
   }
   const limit = codec.unpack(Buffer.alloc((8 << 20) / 8))!;

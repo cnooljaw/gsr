@@ -933,6 +933,16 @@ class Sproto {
 			if (mask === 0 && sourceOffset < source.length && source[sourceOffset] === 0) {
 				const start = destination;
 				destination += 8;
+				// 凑齐四个零头再展开计数，仍逐字节处理剩余尾部。
+				if (sourceOffset + 3 <= source.length && source[sourceOffset + 1] === 0 && source[sourceOffset + 2] === 0) {
+					sourceOffset += 3;
+					destination += 24;
+					while (destination <= 8 * 1024 * 1024 && sourceOffset + 4 <= source.length
+						&& (source[sourceOffset] | source[sourceOffset + 1] | source[sourceOffset + 2] | source[sourceOffset + 3]) === 0) {
+						sourceOffset += 4;
+						destination += 32;
+					}
+				}
 				while (destination <= 8 * 1024 * 1024 && sourceOffset < source.length && source[sourceOffset] === 0) {
 					sourceOffset++;
 					destination += 8;

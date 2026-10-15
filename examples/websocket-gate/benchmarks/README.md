@@ -92,9 +92,11 @@ node examples/websocket-gate/scripts/benchmark-sproto-api.mjs /absolute/output/a
 
 每操作独立热身至少约 50 ms，五轮各约 100 ms，并反转执行顺序；结果保存模块、脚本、夹具指纹及运行环境。代表性消息同时测 Encode/Decode、Pack/Unpack、原生 PEncode/PDecode 与分阶段组合；PB Encode/Decode 作为同进程控制项。可选基线参数只用于 Sproto 前后对照，不更换 PB 依赖。
 
+Echo 文本在计时外构造一次，PB 与两个 SP 版本共享同一份输入。值相同但独立 repeat 生成的字符串可能具有不同 V8 内部表示，不能据此计算编解码器变化；历史记录保持原样，后续以共享输入的采样为主。
+
 RPC 使用已有 attach/dispatch、真实 C2S schema 和固定 session=1，覆盖同一个等待项，不包含外层客户端安全预检、会话分配、网络或 MAC。原生收发与手工组帧/固定 schema 解码分别计时，不能混用两种入口计算优化比例。内部解包缓冲在热身时已建立，原生解码数据代表热缓冲；冷启动、超保留容量和失败复用由回归与缓冲观测单独验证。
 
-另测 29 种公开 unpack 数据形态：32 B–64 KiB 的 ASCII、零块、稀疏 word，以及 512 B–4 KiB FF 前缀后接稀疏数据。它们专门检查容量策略在混合消息中的回退，不与 PB 编解码排名混合。有基线时共 188 项、五轮 940 个样本。
+另测 46 种公开 unpack 数据形态：32 B–64 KiB 的 ASCII、零块、稀疏 word，512 B–4 KiB FF 前缀后接稀疏数据，重复短零串，以及零前缀后接 ASCII；重复形态最大约 129 KiB。它们专门检查解包策略在混合消息中的回退，不与 PB 编解码排名混合。有基线时共 222 项、五轮 1110 个样本。
 
 ### 结果文件入库规则
 

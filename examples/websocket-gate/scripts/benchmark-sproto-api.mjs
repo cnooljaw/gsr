@@ -21,6 +21,8 @@ const variants = process.argv[3]
 const read = name => readFileSync(resolve(example, name), "utf8");
 const representative = JSON.parse(read("benchmarks/representative.json"));
 const echoes = JSON.parse(read("benchmarks/cases.json"));
+// 同值的独立 repeat 结果可能有不同的 V8 字符串表示；三方必须共享同一份输入。
+const echoMessages = new Map(echoes.map(sample => [sample.name, { text: sample.pattern.repeat(sample.repeat) }]));
 const schema = read("benchmarks/schema/representative.sproto");
 const rpcSchema = read("sproto/c2s.sproto");
 const echoSchema = read("benchmarks/echo.sproto");
@@ -45,6 +47,14 @@ for (const prefix of [512, 1024, 2048, 4096]) {
     unpackShapes.push({ name: `FF${prefix}-sparse${length}`, raw: Buffer.concat([Buffer.alloc(prefix, 127), sparse]) });
   }
 }
+// 重复短零串保护批量比较失败的成本；长零前缀后仍需正确恢复非零段。
+for (const words of [2, 8, 9, 16, 17, 32, 33, 64, 65, 128, 129, 256, 257]) {
+  const block = Buffer.concat([Buffer.alloc(words * 8), Buffer.alloc(8, 127)]);
+  unpackShapes.push({ name: `zeroRun${words}x64`, raw: Buffer.concat(Array(64).fill(block)) });
+}
+for (const prefix of [64, 512, 4096, 16384]) {
+  unpackShapes.push({ name: `zero${prefix}-ascii4096`, raw: Buffer.concat([Buffer.alloc(prefix), Buffer.alloc(4096, 127)]) });
+}
 const referenceShapes = new Map();
 const hash = bytes => createHash("sha256").update(bytes).digest("hex");
 const startedAt = new Date().toISOString(), startLoad = loadavg();
@@ -60,7 +70,7 @@ for (const sample of representative) {
   }
 }
 for (const sample of echoes) {
-  const message = create(EchoRequestSchema, { text: sample.pattern.repeat(sample.repeat) });
+  const message = create(EchoRequestSchema, echoMessages.get(sample.name));
   const encode = () => toBinary(EnvelopeSchema, create(EnvelopeSchema, {
     msgId: MsgId.C2S_ECHO_REQUEST, requestId: 1, payload: toBinary(EchoRequestSchema, message),
   }));
@@ -98,7 +108,7 @@ for (const [version, modulePath] of variants) {
   for (const sample of echoes) {
     const codec = new Sproto(rpcSchema), request = codec.attach();
     const manual = new Sproto(echoSchema), server = new Sproto(rpcSchema);
-    const message = { text: sample.pattern.repeat(sample.repeat) };
+    const message = echoMessages.get(sample.name);
     // 固定 session 只覆盖一个等待项，避免基准自己积累会话；不含客户端安全预检。
     const run = () => request("echo", message, 1);
     const wire = run();
@@ -162,6 +172,7 @@ writeFileSync(resolve(output, "typescript.json"), JSON.stringify({
   unpackShapes: unpackShapes.map(({ name, raw }) => ({ name, rawBytes: raw.length,
     packedBytes: referenceShapes.get(name).length, rawSha256: hash(raw), packedSha256: hash(referenceShapes.get(name)) })),
   rounds: 5, targetMilliseconds: 100, sources,
+  echoInputsShared: true,
   results: operations.map(({ name, version, iterations, samples }) => ({
     name, version, iterations, samples, nsPerOp: [...samples].sort((a, b) => a - b)[2],
   })),
