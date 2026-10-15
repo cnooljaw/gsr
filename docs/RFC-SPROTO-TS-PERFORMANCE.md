@@ -1,0 +1,123 @@
+# TypeScript Sproto 剩余性能差距排查与改进草案
+
+状态：待实施方案。2026-10-15 排查；未修改生产实现，不替换已有正式基线，不表示以下原型已完成正确性验收。
+
+范围为第二轮之后相对正式 TypeScript Protobuf 基线仍慢 10% 以上的六项。Go 后续工作仍见 [Gosproto 性能方案](RFC-GOSPROTO-PERFORMANCE.md)。
+
+## 1. 对照范围与测量口径
+
+- 历史基线：[v0.4.0 完整复测](benchmarks/2026-10-15-v0.4.0/report.md)。
+- 当前实现：[第二轮结果](benchmarks/2026-10-15-sproto-round2/RESULTS.md)。
+- 实际使用的 TS Protobuf 是 `@bufbuild/protobuf 2.15.0`，不是 protobuf.js。检查其 `to-binary`、`from-binary` 和 `wire/binary-encoding` 源码。
+- Sproto 对照官方固定快照 `e93fd5a0653b2bcab38d3b830958bf2e3a901b5f` 的 `sproto.c`、`lsproto.c`，并核对只读 `../skynet/lualib-src/sproto` 中对应实现；不更换 wire 规范。
+- 本次诊断的生产 TS 源码 SHA-256：`18be66be36805c274551ee47ad0c43e4af8c5ab064fde7990c6911d5611d439d`。
+
+原有代表性基准的组合编码为 `pack(encode(...))`；Echo frame 编码为两次 `encode`、`Buffer.concat`、`pack`。它们继续计入中间输出复制，不能冒充上一轮已优化的 `pencode` / `attach` 路径。
+
+本次额外做了同进程交错五轮专项采样、输入长度与执行次数探针，以及分开进行的五项 CPU profile。采样范围是 codec，不包含外层客户端安全预检、网络或 MAC。专项结果不与历史样本合并，也不作为新正式基线。
+
+诊断脚本、全部原始样本、原型模块和 profile 保存在忽略的 `tmp/sproto-diagnosis/`，不把候选源码替换到 vendor 实现。后续实施时，应扩展已有可复用基准并保存正式验收来源。
+
+## 2. 六项差距的实际来源
+
+| 原测试项 | 已确认的现象 | 结论 |
+| --- | --- | --- |
+| AddressBook Encode+Pack，历史对照 +54.9% | 同进程 PB 为 1.221 µs，SP 手工组合 1.260 µs，原生 pencode 1.243 µs；纯 SP encode 0.826 µs、pack 0.441 µs。 | 本次仅约 +3.2% / +1.8%，原先 +54.9% 不是稳定差距。优先解决共同热路径，不为该数据单独增加机制。 |
+| 896 项整数数组 Encode+Pack，+27.8% | 3593 B 原始数据拆成 450 个 word，无 FF word；编码 profile 中 `encode_integer_array` self 约 51.1%，Node `checkInt` self 约 35.8%。独立 Pack 的热点仍在其 word 循环。 | 编码重复值域检查和混合 word Pack 都值得处理；不是 FF 阈值问题。 |
+| 4 KiB ASCII body Unpack+Decode，+129.3% | packed 4103 B，初始分配 8206 B，实际输出 4104 B；一次扫描即可完成。专项 unpack 约 0.989 µs，纯 decode 约 0.468 µs。 | 原先“可能二次扫描”的猜测在此不成立，主要排查过量分配和 Buffer 创建。单测中位数不能直接相加作为组合耗时。 |
+| 1000 B UTF-8 frame Encode，+47.8% | package + body 为 1014 B，低于 FF 批量扫描的 1024 B 门槛；调用 `pack_seg` 127 次，其中 125 次属于 FF word。原生 attach 可消除部分手工组包复制，但 Pack 开销仍存在。 | 首要问题是批量扫描门槛造成的性能断点，字符串编码是次级候选。 |
+| 4 KiB ASCII frame Decode，+55.0% | packed 4109 B，分配 8218 B，实际输出 4112 B，只扫描一次；专项 unpack profile 中 FastBuffer self 约 57.4%。 | 优先处理分配与私有缓冲复用，不再重点优化已很快的字符串解码。 |
+| 4 KiB 零字节 frame Decode，+173.0% | packed 519 B，先分配 1038 B，扫描得到 4112 B 后再分配 4112 B，并重新扫描和填零；unpack profile 中 lunpack self 约 56.6%、FastBuffer 约 26.1%、fill 约 11.0%。 | 二次扫描、重复分配及填零共同造成成本。不能只改为统一的精确长度预扫。 |
+
+这些 self 百分比来自各自独立 profile，不能跨场景相加，也不能直接换算成预计收益。数字数组专项中的 PB 控制值和历史值也有较大差异，不能据此重写正式排名。
+
+## 3. 官方与 Protobuf 的可借鉴做法
+
+### 官方 Sproto / Skynet
+
+`sproto_pack` 对 FF 连续块通过 `write_ff` / memcpy 批量复制；普通混合 word 仍逐字节生成 mask。`sproto_unpack` 写入调用方提供的缓冲。
+
+Lua 绑定的 `pushfunction_withbuffer` 把可扩容缓冲保存在 C closure upvalue 中。`lunpack` 只有在已有容量不够时才扩容和重扫，后续调用能复用已有容量；最终 `lua_pushlstring` 创建独立 Lua 字符串。它不是每包都按 packed 长度乘二重新分配。
+
+GSR 可以借鉴“内部复用、输出独占”，但 TS 不能把可变 Buffer 当成不可变 Lua 字符串直接交出去。不能照搬 Lua C 指针、全局共享缓冲或无上限容量保留。
+
+### Protobuf-ES 2.15.0
+
+`BinaryWriter` 使用位置游标，容量不足才增长，固定宽度数值通过缓存 DataView 写入；最终 `finish()` 复制为独立输出。`BinaryReader.bytes()` 返回输入的 subarray，在同步解析中避免不必要的中间复制。字段 reader / writer 在 schema 首次使用时确定并缓存。
+
+可直接借鉴 DataView 写数值、同步阶段借用字节和稳定 schema 信息复用。Sproto 的固定宽度数组、头/body 分区与 0 packing 仍遵循自己的规则；PB 不承担 0 packing，不能要求对应额外开销凭空消失。
+
+参考源码：
+
+- [官方 sproto.c](https://github.com/cloudwu/sproto/blob/e93fd5a0653b2bcab38d3b830958bf2e3a901b5f/sproto.c)
+- [官方 lsproto.c](https://github.com/cloudwu/sproto/blob/e93fd5a0653b2bcab38d3b830958bf2e3a901b5f/lsproto.c)
+- [Protobuf-ES BinaryReader / BinaryWriter](https://github.com/bufbuild/protobuf-es/blob/v2.15.0/packages/protobuf/src/wire/binary-encoding.ts)
+- [Protobuf-ES 编码器](https://github.com/bufbuild/protobuf-es/blob/v2.15.0/packages/protobuf/src/to-binary.ts)
+- [Protobuf-ES 解码器](https://github.com/bufbuild/protobuf-es/blob/v2.15.0/packages/protobuf/src/from-binary.ts)
+
+## 4. 推荐实施顺序
+
+### P1：先修 FF 批量扫描门槛
+
+定位：`client/src/vendor/sproto.ts` 的 Pack FF 起始分支，当前条件 `srcsz - i >= 1024`。
+
+在已确认进入 FF 后，允许更短的连续非零块使用现有有界 `nonzeroWords` 扫描。以 64 B 为已验证候选，再用 32/64/128/256 B 和 1 KiB 邻域测门槛；不新增公开配置，不按消息名称特判。
+
+保持每段最多 256 word、尾部补零、FF 中 6/7 个非零字节的合并规则，以及官方固定 wire。只跳过已确认全非零的完整 word，遇到零字节后继续原规则。
+
+仅把该门槛改成 64 B 的隔离原型，UTF-8 attach 编码从 3.384 降至 1.933 µs（-42.9%）；4 KiB ASCII 约 1.705 → 1.678 µs。这里只证明方向有效，尚未完成全边界回归，64 B 不视为最终参数。
+
+### P2：数值数组保留预检，写出使用固定宽度循环
+
+定位：`encode_integer_array`。当前首遍已校验类型、整数精度、位宽和总长度，随后逐项 `Buffer.writeUInt32LE/writeInt32LE` 又进入 Node 通用值域检查。
+
+推荐在预检后按 4 / 8 字节拆开写出循环，候选为 `DataView.setUint32/setInt32(..., true)`。DataView 必须绑定真实 buffer、byteOffset 和 byteLength，扩容后重建；是否缓存视图，结合每数组构造成本测试。不使用要求对齐的 Uint32Array 直接解释 wire，不取消首遍值域和长度检查。
+
+8 字节路径继续按 low/high 写出，保留负数符号扩展及 Number 安全整数边界。普通整数类型、混合正负 int64、首/中/尾宽值、空数组、非零 byteOffset 都要验证。
+
+隔离原型在已有三类数值消息中均有收益，但原实现样本出现明显抖动（整数数组单纯编码约 20–119 µs），本次不据此发布收益百分比；实施后必须稳定复测。
+
+混合 word Pack 另做局部尝试：完整 word 与尾部分开循环，尾部用带界读取替代每次分配 8 B 临时 Buffer；保留当前八字节展开和 FF/零块快路径。450 个 word 中没有 FF，不能指望 P1 解决它。上一轮已回退的算术 mask 方案不原样重做。
+
+### P3：内部同步解码借用有界解包缓冲
+
+借鉴官方 Lua 绑定的持久缓冲，但限定在 Sproto 实例内部。私有 unpack 路径供 `pdecode` / `dispatch` 同步消费；公开 `unpack` 仍返回独占结果，不能返回下次调用会覆盖的 scratch。
+
+内部借用结果不能进入业务对象、闭包或异步任务。先检查所有解码字段与返回路径不保留 Buffer 视图；未来增加 binary 字段时同样必须保持输出所有权。
+
+容量按实际需求增长，并设置内部保留上限；超出保留上限的大消息使用调用内临时缓冲。不能让一条偶发 8 MiB 消息令每连接实例永久保留 8 MiB。上限以并发连接数 × 保留容量和冷热混合测试选择，不新增业务配置项。
+
+同步帧解码隔离原型（同一方法下的当前实现 → 借用原型）：
+
+| 输入 | 当前 µs | 原型 µs | 耗时变化 |
+| --- | ---: | ---: | ---: |
+| 4 KiB ASCII | 1.348 | 0.675 | -49.9% |
+| 4 KiB 零字节 | 2.559 | 1.279 | -50.0% |
+
+原型只检查固定夹具等价性，测的是热缓冲下 codec 同步解码，不是完整客户端；它不是可直接合入的实现。验收必须增加冷启动、大小交替、超保留上限和失败后复用。
+
+### P4：单独优化公开 unpack 的容量选择
+
+不能把 P3 的内部借用收益套到 `unpack` 的公开字节返回值。
+
+当前近乎未压缩的 ASCII 也分配 packed × 2，容量约是有效输出的两倍；优先试验轻量尺寸扫描、按确切长度分配，并保留高压缩率输入原路径作为比较。
+
+本次“统一先计数，再分配和解包”的原型，ASCII unpack 为 1.018 → 0.691 µs，但零字节为 2.048 → 2.581 µs（+26.0%），因此不推荐统一采用。内部 scratch 后复制独占输出在 32 B 小包也可能回退。
+
+优先目标是减少明显过量分配；最终选择必须由低/高压缩率和小包共同决定。保留有界重扫作为回退是可接受结果，不为了消灭第二遍扫描建立复杂的新解包框架。
+
+### P5：前四步后再判断字符串与 schema 专门化
+
+Sproto 当前字符串为 `Buffer.byteLength` 后 `Buffer.write`；PB 使用预留容量、encodeInto，再回填长度。Sproto 固定四字节长度，理论上可先预留、编码后回填，但按 UTF-16 长度 × 3 预留会放大内存，也可能错误拒绝实际编码后仍在额度内的消息。
+
+仅在 P1 后 UTF-8 编码仍明显落后、profile 仍指向字符串时尝试。保留精确长度回退与现有 Unicode 行为，不统一替换已占优势的 ASCII 编码。类似地，字段专用 reader/writer 只在新 profile 证明收益后局部引入，不因 PB 有缓存编译器就再造一套框架。
+
+## 5. 验收条件
+
+1. 扩展已有 API 基准，同时列出 PB、SP 分阶段组合、SP 原生 pencode/attach/pdecode；同输入交错五轮，保存全部样本和源码指纹，历史正式数据不覆盖。
+2. 复用现有官方向量、所有八位 mask、高位非零字节、FF 256-word、尾部和错误输入差分；门槛邻域、非零 byteOffset、输出快照和 scratch 复用仅在未覆盖处扩展。
+3. 保留现有整数精度、8 MiB 解包/编码预算、package/body 额度、未知字段、optional presence、失败与输出所有权契约，不删除外层安全预检换速度。
+4. 内部借用同时测冷/热缓冲、32 B 小包、UTF-8、4 KiB ASCII/零字节、稀疏和高压缩率数据；报告每实例保留容量与并发连接下内存成本。
+5. 每个局部切片先跑对应回归；连贯切片完成后运行现有 TS 官方差分和 Go/TS Plain/MAC 集成。CPU/分配 profile 与计时分开；持续回退或不稳定结果不算通过。
+
+本轮只产出排查与候选方案。未升级依赖，未改变 Gate / Runtime / 协议边界，未提交。

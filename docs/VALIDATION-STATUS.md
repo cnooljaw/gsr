@@ -4,6 +4,32 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## 数值 packing、字段查询与类型化构造（2026-10-15）
+
+继续按数值 Pack、TS 字段索引、Go 标量写出、Go 类型化构造、完整帧与解包的顺序优化。Go 使用精确 word mask 并保留 FF 快路径；TS 展开八字节 Pack/Unpack，按 schema 建立有界 tag 索引；Go 合并标量读取与写出，对原生 *int64/*string 使用类型化构造，命名类型保留兼容路径。TS pencode/attach/Response 减少中间复制，公开 encode 保留直接路径和独占输出。未新增公开 API、unsafe、代码生成或依赖。
+
+扩展 Go/TS 全部 mask 与高位字节、原生/命名 optional 标量测试。TS 未知 body 字段错位以及合并缓冲挤占 8 MiB body 编码额度的问题均由新增用例先复现再修复；package/body 原有独立额度、超限拒绝及输出快照保持。独立 Go 库官方 C/Lua 对照、完整 race、vet 和三个各约 10 秒的有限 fuzz 通过；最终 TS 3416 组新旧 Pack/Unpack 差分通过。GSR 受影响三包 race 和最终 Plain/MAC 集成六项全部通过、零跳过。
+
+原有两套完整五轮基准共 720 个样本，另采 TS 同进程前后对照 340 个样本及 Go Echo 波动复核 30 个样本；profile 在计时完成后单独采集。Go 大型消息 Pack 约 5.500 → 3.483 µs，解码约 23.310 → 18.152 µs，分配与首轮逐项一致。TS 完整采样出现明显波动，PB 控制项也变慢，全部原始值保留；同进程交错中大型消息解码约 -14%、Pack/Unpack 约 -23%/-17%，4 KiB ASCII RPC 编码约 -49%。Go ASCII 帧专项未支持持续回退，零字节帧编码约 -38%。Go 查表解包和 TS 预清零输出的回退尝试已撤回。
+
+实现、完整数据、同进程复核、profile 和覆盖限制见 [第二轮验收](benchmarks/2026-10-15-sproto-round2/RESULTS.md)。Go 源码仍在独立库未发布工作树，GSR 正式依赖仍为 v0.4.0，验收使用临时 modfile；本轮未提交或发布。
+
+## TS 长块与 gosproto 反射路径优化（2026-10-15）
+
+先优化 TS 长 FF/零块 Pack/Unpack，再按性能方案改进独立 Go 库的字段元信息、原生 []int64 批量循环、当前调用布局记录与有界稠密 tag 索引。公开 API、官方 wire、资源预算、失败原子性和输出独占不变。Go 改动尚未提交/发布，GSR 正式依赖仍为 v0.4.0，验收使用临时 modfile。
+
+扩展现有测试覆盖有限输出前缀、混合零块、截断、命名/unsigned 数组与未知高 tag；新增同一对象改变 presence、数组宽度、空/nil 数组和嵌套数量后重编码的回归。独立库完整回归、固定 C/Lua 对照、race 与 vet 通过，三个 fuzz 入口各约 10 秒通过。临时覆盖下，Sproto Dispatcher、Echo 服务端和 Benchmark 包 race 通过，Plain/MAC Go↔TS 集成六项全部通过、零跳过；TS 开发期新旧实现 3200 组差分通过。
+
+两套完整 Go/TS × PB/SP 五轮采样（720 个计时样本）与 game_large 六步骤 Go/TS CPU/分配 profile 已完成，采样互不并行。大型游戏消息 Go 纯编码约 26.973 → 14.781 µs，整数数组约 13.125 → 2.224 µs；TS 4 KiB ASCII 帧编码约 7.660 → 3.263 µs，零字节帧解码约 11.854 → 2.640 µs。大型 Go 编码多 1024 B / 1 次布局分配，每次新建 Echo 帧头另多 16 B / 1 次；数值 packing 未获得同等收益，Go Pack 零 word 尝试已撤回。
+
+完整 Echo 采样出现 Go 零字节帧编码约 38% 的疑似回退，保持源码不变交错复核为 7.247 → 7.257 µs，未支持持续回退；全量慢样本仍保留。实现范围、前后数据、复核、profile 与来源见 [本轮验收](benchmarks/2026-10-15-sproto-next/RESULTS.md)，历史正式基线不改写。
+
+## v0.4.0 正式依赖完整性能复测（2026-10-15）
+
+依赖升级提交 `f82551c` 后，完成 Go/TS × Protobuf/Sproto 的两套现有 Benchmark：每种语言 40 项代表性 body 操作和 32 项 Echo payload/frame 操作，各五轮，共 720 个计时样本。全部语义、固定 wire、padding 检查通过，两个 TS 能力探针通过；全程顺序采集，未修改编解码器或重复采集 profile。代表性采样在依赖提交前启动，使用已升级工作树；Echo 在提交后启动，源码指纹一致。
+
+完整四种实现对比、包大小、Go 分配、图表与两项 max/min 超过 2 的采样波动见 [完整复测报告](benchmarks/2026-10-15-v0.4.0/report.md)。原始五轮和环境作为正式基线保留；中间生成脚本与临时数据继续忽略。本机结果不扩展为所有协议类型、语言性能或部署吞吐结论。
+
 ## gosproto v0.4.0 发布与 GSR 正式依赖升级（2026-10-15）
 
 [gosproto v0.4.0](https://github.com/cnooljaw/gosproto/releases/tag/v0.4.0) 已正式发布，标签指向 `3f2491f7b2701c710fdfc9dfa7952c8e7002dd1d`。本机官方 C/Lua 对照、完整 race 与 vet 通过；GitHub 分支和标签两次 CI 均通过，包含固定官方对照、race、vet 和三个各 30 秒的有限 fuzz 入口。发布版五份 Go 编解码源文件与优化 Benchmark 保存的哈希一致，未改写历史采样环境或重新宣称性能结果。

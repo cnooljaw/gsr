@@ -31,6 +31,7 @@ test("official Sproto boolean and mixed signed int64 arrays", () => {
     assert.deepEqual(codec.encode(vector.type, vector.data), raw, `${vector.name} encode`);
     assert.deepEqual(codec.decode(vector.type, raw), vector.data, `${vector.name} decode`);
     assert.deepEqual(codec.pack(raw), packed, `${vector.name} pack`);
+    assert.deepEqual(codec.pencode(vector.type, vector.data), packed, `${vector.name} pencode`);
     assert.deepEqual(codec.decode(vector.type, codec.unpack(packed)!), vector.data, `${vector.name} unpack/decode`);
   }
   const integer = new Sproto(".Probe { value 0 : integer } .Array { value 0 : *integer }");
@@ -42,6 +43,22 @@ test("official Sproto boolean and mixed signed int64 arrays", () => {
   const snapshot = Buffer.from(encoded);
   integer.encode("Array", { value: [7, 8, 9] });
   assert.deepEqual(encoded, snapshot, "encoded buffers remain owned by the caller");
+  const packedSnapshot = integer.pencode("Array", { value: [1, 4294967296, -1] })!;
+  const packedCopy = Buffer.from(packedSnapshot);
+  integer.pencode("Array", { value: [7] });
+  assert.deepEqual(packedSnapshot, packedCopy, "packed buffers remain owned by the caller");
+  const future = new Sproto(".Future { unknown 0 : string middle 30000 : integer later 60000 : string }");
+  const current = new Sproto(".Current { later 60000 : string }");
+  const evolved = future.encode("Future", { unknown: "skip", middle: 7, later: "keep" })!;
+  assert.deepEqual(current.decode("Current", evolved), { later: "keep" });
+  // 合并 scratch 后，package 不挤占原本属于单条 body 的 8 MiB 编码预算。
+  const large = new Sproto(c2sSchema + "\n.Text { text 0 : string }");
+  const request = large.attach();
+  const text = "x".repeat((8 << 20) - 8);
+  const frame = request("echo", { text }, 1)!;
+  assert.ok(frame.length > 8 << 20);
+  assert.throws(() => request("echo", { text: text + "x" }, 1), /size limit/);
+  assert.throws(() => large.encode("Text", { text: text + "x" }), /size limit/);
 });
 
 // 每连接 host 保留独立会话；一个客户端关闭不清理另一个的等待。
@@ -75,12 +92,34 @@ test("Sproto pending and packet limits", () => {
 
   // 原生解包器必须完整统计输出长度，包括首次缓冲区放不下的 FF 连续块。
   const codec = new Sproto(c2sSchema);
+  for (let mask = 0; mask < 256; mask++) {
+    for (const value of [1, 0x7f, 0x80, 0xff]) {
+      const raw = Buffer.alloc(8);
+      const expected = mask === 255 ? [255, 0] : [mask];
+      for (let index = 0; index < 8; index++) {
+        if ((mask & (1 << index)) !== 0) { raw[index] = value; expected.push(value); }
+      }
+      assert.deepEqual(codec.pack(raw), Buffer.from(expected));
+    }
+  }
   for (const raw of [
     Buffer.alloc(4096),
     Buffer.concat([Buffer.alloc(4096), Buffer.alloc(2048, 1)]),
     Buffer.concat([Buffer.alloc(2048, 1), Buffer.alloc(4096)]),
+    Buffer.concat([Buffer.alloc(4096), Buffer.from([1, 0, 0, 0, 0, 0, 0, 0]), Buffer.alloc(4096)]),
   ]) {
     assert.deepEqual(codec.unpack(codec.pack(raw)), raw);
+  }
+  // 缓冲不足仍计算完整长度，并写入可容纳的普通/零块前缀。
+  const packed = Buffer.from([1, 7, 0, 0, 1, 9]);
+  const expected = Buffer.alloc(32); expected[0] = 7; expected[24] = 9;
+  for (const capacity of [0, 1, 7, 8, 9, 13, 25, 32]) {
+    const prefix = Buffer.alloc(capacity, 0xcc);
+    assert.equal(codec.lunpack(packed, prefix), expected.length);
+    assert.deepEqual(prefix, expected.subarray(0, capacity));
+  }
+  for (const malformed of [[255], [255, 0, 1], [3, 1], [0, 0, 255]]) {
+    assert.equal(codec.unpack(Buffer.from(malformed)), null);
   }
   assert.throws(() => codec.unpack(Buffer.alloc((8 << 20) / 8 + 1)), /size limit/);
 });

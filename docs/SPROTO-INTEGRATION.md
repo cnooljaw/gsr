@@ -72,6 +72,12 @@ go get github.com/cnooljaw/gosproto@v0.4.0
 
 五步优化已完成，结果、原始采样、profile 与撤回的回退方案见 [优化实施与验收](benchmarks/2026-10-15-optimized/RESULTS.md)。TS 改动直接位于示例参考实现；Go 优化已随 [gosproto v0.4.0](https://github.com/cnooljaw/gosproto/releases/tag/v0.4.0) 发布，GSR 正式依赖已升级，GSR 不保存源码补丁副本。报告中的性能测量使用发布前同一源码与临时 modfile；正式接入不使用 replace。资源预算、官方 wire 和解码失败原子性保持不变。
 
+随后使用正式 v0.4.0 重跑两套完整基准，Go/TS 各 72 项、每项五轮；纯 body、含 packing、应用帧、大小与分配的四种实现对照见 [正式依赖完整复测](benchmarks/2026-10-15-v0.4.0/report.md)。
+
+随后先优化 TS 长 FF/零块的 Pack/Unpack，再参考 Protobuf v1.36.1 完成安全 Go 路线，减少重复反射与遍历。实现范围见 [gosproto 性能方案](RFC-GOSPROTO-PERFORMANCE.md)，完整前后对照见 [本轮验收](benchmarks/2026-10-15-sproto-next/RESULTS.md)。TS 修改位于示例参考实现；Go 修改位于独立库未发布工作树，验收通过临时 modfile 接入，GSR 正式依赖仍为 v0.4.0。没有引入 unsafe、代码生成或新的公开 API。
+
+第二轮继续优化数值 packing、TS 字段查询、Go 标量写出与原生 optional 值构造，以及 TS 实际 RPC 的中间复制。修复 TS 未知 body 字段导致后续字段错位的问题，并保护合并缓冲后的独立 body 编码预算。原有分阶段基准保持口径，pencode/attach 的融合收益另行测量，结果见 [第二轮验收](benchmarks/2026-10-15-sproto-round2/RESULTS.md)。正式 Go 依赖尚未改变。
+
 ## 独立修复库与官方对照（2026-10-15）
 
 [cnooljaw/gosproto v0.2.0](https://github.com/cnooljaw/gosproto/releases/tag/v0.2.0) 基于 xjdrew v0.1.0，保留上游历史与 MIT 许可证，自己的 module 路径和标签避免给业务项目传播 replace。标准库没有 Sproto 实现，使用这个依赖专门解决原生编解码与 pack/unpack，不引入通用协议框架或运行时 C/Lua。

@@ -1,0 +1,34 @@
+{
+  "date": "2026-10-15T07:29:12.471Z",
+  "commit": "f82551ccc8a8c8615d945642e27aefd2c9dae142",
+  "workingTree": " M docs/SPROTO-INTEGRATION.md\n M docs/VALIDATION-STATUS.md\n M examples/websocket-gate/benchmarks/README.md\n M examples/websocket-gate/client/src/sproto_client.test.ts\n M examples/websocket-gate/client/src/vendor/sproto.ts\n?? docs/RFC-GOSPROTO-PERFORMANCE.md\n?? docs/benchmarks/2026-10-15-sproto-next/\n?? docs/benchmarks/2026-10-15-v0.4.0/\n?? examples/websocket-gate/scripts/benchmark-sproto-api.mjs\n",
+  "go": "go version go1.24.13 darwin/arm64",
+  "node": "v23.11.0",
+  "cpu": "Apple M2",
+  "os": "darwin 23.4.0 arm64",
+  "codecs": {
+    "module": {
+      "Path": "github.com/cnooljaw/gosproto",
+      "Version": "v0.4.0",
+      "Replace": {
+        "Path": "/private/tmp/gsr-gosproto-fork",
+        "Dir": "/private/tmp/gsr-gosproto-fork",
+        "GoMod": "/private/tmp/gsr-gosproto-fork/go.mod",
+        "GoVersion": "1.24.0"
+      },
+      "Dir": "/private/tmp/gsr-gosproto-fork",
+      "GoMod": "/private/tmp/gsr-gosproto-fork/go.mod",
+      "GoVersion": "1.24.0"
+    },
+    "goFlags": "-modfile=/private/tmp/gsr-next-codec.mod",
+    "goSource": {
+      "encode.go": "85b0fae146f97a53ffebe8f8a14ea4d44f5e864f26276c8e8ccd701406948a6a",
+      "decode.go": "b5bb24108008236b222a81c45a29cd78e73f114ffc0d843ce358dd237824bb74",
+      "meta.go": "8ed8bdabbf12daba964f782c44242aad202fbe50128c60de34d1acaf3d8e0200",
+      "limits.go": "5ab000ed4b9f956fb5b5d7951fc64c007a1257d18c47266ec63f908b3858ed31",
+      "pack.go": "49824119062ee8e3c7393534d9abef26d7620d0c722e4cff0307ee81139642b1"
+    },
+    "tsSource": "18be66be36805c274551ee47ad0c43e4af8c5ab064fde7990c6911d5611d439d"
+  },
+  "goCommand": "GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks -run ^$ -bench ^BenchmarkProtocolCodec$ -benchmem -benchtime=200ms -count=5 -timeout=2m"
+}

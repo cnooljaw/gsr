@@ -1,0 +1,243 @@
+{
+  "date": "2026-10-15T06:33:28.219Z",
+  "cpu": "Apple M2",
+  "node": "v23.11.0",
+  "go": "go version go1.24.13 darwin/arm64",
+  "loadBefore": [
+    4.4697265625,
+    5.4052734375,
+    5.47705078125
+  ],
+  "commit": "f82551ccc8a8c8615d945642e27aefd2c9dae142",
+  "codecs": {
+    "module": {
+      "Path": "github.com/cnooljaw/gosproto",
+      "Version": "v0.4.0",
+      "Replace": {
+        "Path": "/private/tmp/gsr-gosproto-fork",
+        "Dir": "/private/tmp/gsr-gosproto-fork",
+        "GoMod": "/private/tmp/gsr-gosproto-fork/go.mod",
+        "GoVersion": "1.24.0"
+      },
+      "Dir": "/private/tmp/gsr-gosproto-fork",
+      "GoMod": "/private/tmp/gsr-gosproto-fork/go.mod",
+      "GoVersion": "1.24.0"
+    },
+    "goFlags": "-modfile=/private/tmp/gsr-next-codec.mod",
+    "goSource": {
+      "encode.go": "73619b3196b7541fc49d5c2acaa4a0b6808796e4c42c03ef1ab9e62b8079e0cc",
+      "decode.go": "940c313eb74f3b99b1bccadeb5fe7c7637f2bbb3fcb4a0e2fa478f7a12750cde",
+      "meta.go": "e60bc9b3882f35a32f22505ab0e7f6fe917154d1527d84ca9633eeb1ddac933f",
+      "limits.go": "5ab000ed4b9f956fb5b5d7951fc64c007a1257d18c47266ec63f908b3858ed31",
+      "pack.go": "d7cd2a0c3fa09cc78c2f4b5e1fd57b5c4f8719fcfe221cafbc5c4978d0bc3eba"
+    },
+    "tsSource": "379f88a5a98d1ae92bcf35a9f8aad31ec4305ae083080c79846c80da8eb21c16"
+  },
+  "secondsPerCPU": 2,
+  "goAllocationIterations": 1000,
+  "nodeHeapIntervalBytes": 16384,
+  "scenarios": [
+    "game_large"
+  ],
+  "steps": [
+    "protobuf_encode",
+    "protobuf_decode",
+    "sproto_encode",
+    "sproto_decode",
+    "sproto_pack",
+    "sproto_unpack"
+  ],
+  "commands": [
+    [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/sproto-next/accepted-profile/codec.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkRepresentativeCodec$/^game_large$/^protobuf_encode$",
+      "-test.count=1",
+      "-test.timeout=30s",
+      "-test.benchtime=2s",
+      "-test.cpuprofile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/sproto-next/accepted-profile/go/game_large/protobuf_encode/cpu.pprof"
+    ],
+    [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/sproto-next/accepted-profile/codec.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkRepresentativeCodec$/^game_large$/^protobuf_encode$",
+      "-test.count=1",
+      "-test.timeout=30s",
+      "-test.benchtime=1000x",
+      "-test.memprofilerate=1",
+      "-test.memprofile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/sproto-next/accepted-profile/go/game_large/protobuf_encode/alloc.pprof"
+    ],
+    [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/sproto-next/accepted-profile/codec.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkRepresentativeCodec$/^game_large$/^protobuf_decode$",
+      "-test.count=1",
+      "-test.timeout=30s",
+      "-test.benchtime=2s",
+      "-test.cpuprofile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/sproto-next/accepted-profile/go/game_large/protobuf_decode/cpu.pprof"
+    ],
+    [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/sproto-next/accepted-profile/codec.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkRepresentativeCodec$/^game_large$/^protobuf_decode$",
+      "-test.count=1",
+      "-test.timeout=30s",
+      "-test.benchtime=1000x",
+      "-test.memprofilerate=1",
+      "-test.memprofile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/sproto-next/accepted-profile/go/game_large/protobuf_decode/alloc.pprof"
+    ],
+    [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/sproto-next/accepted-profile/codec.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkRepresentativeCodec$/^game_large$/^sproto_encode$",
+      "-test.count=1",
+      "-test.timeout=30s",
+      "-test.benchtime=2s",
+      "-test.cpuprofile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/sproto-next/accepted-profile/go/game_large/sproto_encode/cpu.pprof"
+    ],
+    [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/sproto-next/accepted-profile/codec.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkRepresentativeCodec$/^game_large$/^sproto_encode$",
+      "-test.count=1",
+      "-test.timeout=30s",
+      "-test.benchtime=1000x",
+      "-test.memprofilerate=1",
+      "-test.memprofile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/sproto-next/accepted-profile/go/game_large/sproto_encode/alloc.pprof"
+    ],
+    [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/sproto-next/accepted-profile/codec.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkRepresentativeCodec$/^game_large$/^sproto_decode$",
+      "-test.count=1",
+      "-test.timeout=30s",
+      "-test.benchtime=2s",
+      "-test.cpuprofile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/sproto-next/accepted-profile/go/game_large/sproto_decode/cpu.pprof"
+    ],
+    [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/sproto-next/accepted-profile/codec.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkRepresentativeCodec$/^game_large$/^sproto_decode$",
+      "-test.count=1",
+      "-test.timeout=30s",
+      "-test.benchtime=1000x",
+      "-test.memprofilerate=1",
+      "-test.memprofile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/sproto-next/accepted-profile/go/game_large/sproto_decode/alloc.pprof"
+    ],
+    [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/sproto-next/accepted-profile/codec.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkRepresentativeCodec$/^game_large$/^sproto_pack$",
+      "-test.count=1",
+      "-test.timeout=30s",
+      "-test.benchtime=2s",
+      "-test.cpuprofile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/sproto-next/accepted-profile/go/game_large/sproto_pack/cpu.pprof"
+    ],
+    [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/sproto-next/accepted-profile/codec.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkRepresentativeCodec$/^game_large$/^sproto_pack$",
+      "-test.count=1",
+      "-test.timeout=30s",
+      "-test.benchtime=1000x",
+      "-test.memprofilerate=1",
+      "-test.memprofile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/sproto-next/accepted-profile/go/game_large/sproto_pack/alloc.pprof"
+    ],
+    [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/sproto-next/accepted-profile/codec.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkRepresentativeCodec$/^game_large$/^sproto_unpack$",
+      "-test.count=1",
+      "-test.timeout=30s",
+      "-test.benchtime=2s",
+      "-test.cpuprofile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/sproto-next/accepted-profile/go/game_large/sproto_unpack/cpu.pprof"
+    ],
+    [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/sproto-next/accepted-profile/codec.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkRepresentativeCodec$/^game_large$/^sproto_unpack$",
+      "-test.count=1",
+      "-test.timeout=30s",
+      "-test.benchtime=1000x",
+      "-test.memprofilerate=1",
+      "-test.memprofile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/sproto-next/accepted-profile/go/game_large/sproto_unpack/alloc.pprof"
+    ],
+    [
+      "/opt/homebrew/Cellar/node/23.11.0/bin/node",
+      "client/dist/representative_benchmark.js",
+      "--mode",
+      "profile",
+      "--operation",
+      "game_large/protobuf_encode",
+      "--seconds",
+      "2",
+      "--output",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/sproto-next/accepted-profile/typescript/game_large/protobuf_encode"
+    ],
+    [
+      "/opt/homebrew/Cellar/node/23.11.0/bin/node",
+      "client/dist/representative_benchmark.js",
+      "--mode",
+      "profile",
+      "--operation",
+      "game_large/protobuf_decode",
+      "--seconds",
+      "2",
+      "--output",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/sproto-next/accepted-profile/typescript/game_large/protobuf_decode"
+    ],
+    [
+      "/opt/homebrew/Cellar/node/23.11.0/bin/node",
+      "client/dist/representative_benchmark.js",
+      "--mode",
+      "profile",
+      "--operation",
+      "game_large/sproto_encode",
+      "--seconds",
+      "2",
+      "--output",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/sproto-next/accepted-profile/typescript/game_large/sproto_encode"
+    ],
+    [
+      "/opt/homebrew/Cellar/node/23.11.0/bin/node",
+      "client/dist/representative_benchmark.js",
+      "--mode",
+      "profile",
+      "--operation",
+      "game_large/sproto_decode",
+      "--seconds",
+      "2",
+      "--output",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/sproto-next/accepted-profile/typescript/game_large/sproto_decode"
+    ],
+    [
+      "/opt/homebrew/Cellar/node/23.11.0/bin/node",
+      "client/dist/representative_benchmark.js",
+      "--mode",
+      "profile",
+      "--operation",
+      "game_large/sproto_pack",
+      "--seconds",
+      "2",
+      "--output",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/sproto-next/accepted-profile/typescript/game_large/sproto_pack"
+    ],
+    [
+      "/opt/homebrew/Cellar/node/23.11.0/bin/node",
+      "client/dist/representative_benchmark.js",
+      "--mode",
+      "profile",
+      "--operation",
+      "game_large/sproto_unpack",
+      "--seconds",
+      "2",
+      "--output",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/sproto-next/accepted-profile/typescript/game_large/sproto_unpack"
+    ]
+  ],
+  "loadAfter": [
+    5.82177734375,
+    5.57666015625,
+    5.53271484375
+  ]
+}

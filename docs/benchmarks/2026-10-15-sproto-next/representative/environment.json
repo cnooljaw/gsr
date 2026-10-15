@@ -1,0 +1,64 @@
+{
+  "date": "2026-10-15T06:29:05.080Z",
+  "commit": "f82551ccc8a8c8615d945642e27aefd2c9dae142",
+  "workingTree": " M docs/SPROTO-INTEGRATION.md\n M docs/VALIDATION-STATUS.md\n M examples/websocket-gate/benchmarks/README.md\n M examples/websocket-gate/client/src/sproto_client.test.ts\n M examples/websocket-gate/client/src/vendor/sproto.ts\n?? docs/RFC-GOSPROTO-PERFORMANCE.md\n?? docs/benchmarks/2026-10-15-v0.4.0/\n",
+  "go": "go version go1.24.13 darwin/arm64",
+  "node": "v23.11.0",
+  "cpu": "Apple M2",
+  "cpuCount": 8,
+  "os": "darwin 23.4.0 arm64",
+  "loadBefore": [
+    5.9619140625,
+    5.9072265625,
+    5.58984375
+  ],
+  "codecs": {
+    "module": {
+      "Path": "github.com/cnooljaw/gosproto",
+      "Version": "v0.4.0",
+      "Replace": {
+        "Path": "/private/tmp/gsr-gosproto-fork",
+        "Dir": "/private/tmp/gsr-gosproto-fork",
+        "GoMod": "/private/tmp/gsr-gosproto-fork/go.mod",
+        "GoVersion": "1.24.0"
+      },
+      "Dir": "/private/tmp/gsr-gosproto-fork",
+      "GoMod": "/private/tmp/gsr-gosproto-fork/go.mod",
+      "GoVersion": "1.24.0"
+    },
+    "goFlags": "-modfile=/private/tmp/gsr-next-codec.mod",
+    "goSource": {
+      "encode.go": "73619b3196b7541fc49d5c2acaa4a0b6808796e4c42c03ef1ab9e62b8079e0cc",
+      "decode.go": "940c313eb74f3b99b1bccadeb5fe7c7637f2bbb3fcb4a0e2fa478f7a12750cde",
+      "meta.go": "e60bc9b3882f35a32f22505ab0e7f6fe917154d1527d84ca9633eeb1ddac933f",
+      "limits.go": "5ab000ed4b9f956fb5b5d7951fc64c007a1257d18c47266ec63f908b3858ed31",
+      "pack.go": "d7cd2a0c3fa09cc78c2f4b5e1fd57b5c4f8719fcfe221cafbc5c4978d0bc3eba"
+    },
+    "tsSource": "379f88a5a98d1ae92bcf35a9f8aad31ec4305ae083080c79846c80da8eb21c16"
+  },
+  "commands": {
+    "go": [
+      "GOMAXPROCS=1",
+      "go",
+      "test",
+      "./examples/websocket-gate/benchmarks",
+      "-run",
+      "^TestRepresentativeFixtures$",
+      "-bench",
+      "^BenchmarkRepresentativeCodec$",
+      "-benchmem",
+      "-benchtime=200ms",
+      "-count=5",
+      "-timeout=2m"
+    ],
+    "typescript": [
+      "/opt/homebrew/Cellar/node/23.11.0/bin/node",
+      "client/dist/representative_benchmark.js"
+    ]
+  },
+  "loadAfter": [
+    6.18994140625,
+    5.96533203125,
+    5.638671875
+  ]
+}

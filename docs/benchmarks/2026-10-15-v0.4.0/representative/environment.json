@@ -1,0 +1,61 @@
+{
+  "date": "2026-10-15T05:29:42.097Z",
+  "commit": "77bbbaa1f6105ee38a94f4efbdc5e8291f7de724",
+  "workingTree": " M CONTEXT.md\n M docs/API-DESIGN.md\n M docs/SPROTO-INTEGRATION.md\n M docs/VALIDATION-STATUS.md\n M docs/adr/0013-client-protocol-boundaries.md\n M docs/benchmarks/2026-10-15-optimized/RESULTS.md\n M docs/benchmarks/2026-10-15-optimized/report.md\n M examples/websocket-gate/README.md\n M examples/websocket-gate/benchmarks/README.md\n M go.mod\n M go.sum\n M protocol/sproto/README.md\n",
+  "go": "go version go1.24.13 darwin/arm64",
+  "node": "v23.11.0",
+  "cpu": "Apple M2",
+  "cpuCount": 8,
+  "os": "darwin 23.4.0 arm64",
+  "loadBefore": [
+    4.35498046875,
+    5.2900390625,
+    5.18017578125
+  ],
+  "codecs": {
+    "module": {
+      "Path": "github.com/cnooljaw/gosproto",
+      "Version": "v0.4.0",
+      "Time": "2026-10-15T05:19:57Z",
+      "Dir": "/Users/lijiawang/go/pkg/mod/github.com/cnooljaw/gosproto@v0.4.0",
+      "GoMod": "/Users/lijiawang/go/pkg/mod/cache/download/github.com/cnooljaw/gosproto/@v/v0.4.0.mod",
+      "GoVersion": "1.24.0",
+      "Sum": "h1:HL1gBuROP6SihZp3Ks377OJJ2FfsqpuEUXr7EozUhtY=",
+      "GoModSum": "h1:vKD91QPdOMxcf7kL22hzcehTlvYGK8DpZ7y88b2Pmbs="
+    },
+    "goFlags": "",
+    "goSource": {
+      "encode.go": "914ee4b3f940a59301dbda138c47cdfacd21018fa0efb4aca1752639e8c76e0e",
+      "decode.go": "d09a63ad941179dcbdc7c9682e7ca840a1b494930e3d410422ece079883baaad",
+      "meta.go": "2617c581b8ac7906aa087c66b4d38069650794a40a593542a3d9b45da5421a50",
+      "limits.go": "2845c8b3894e356c2d53fc181feba14715c6bba3312f432773a566778b6e55f3",
+      "pack.go": "d7cd2a0c3fa09cc78c2f4b5e1fd57b5c4f8719fcfe221cafbc5c4978d0bc3eba"
+    },
+    "tsSource": "1ff1bfa74fcaadf33cd78ac75b2c23eea1f05f287399d913516b92418bfd2468"
+  },
+  "commands": {
+    "go": [
+      "GOMAXPROCS=1",
+      "go",
+      "test",
+      "./examples/websocket-gate/benchmarks",
+      "-run",
+      "^TestRepresentativeFixtures$",
+      "-bench",
+      "^BenchmarkRepresentativeCodec$",
+      "-benchmem",
+      "-benchtime=200ms",
+      "-count=5",
+      "-timeout=2m"
+    ],
+    "typescript": [
+      "/opt/homebrew/Cellar/node/23.11.0/bin/node",
+      "client/dist/representative_benchmark.js"
+    ]
+  },
+  "loadAfter": [
+    6.5361328125,
+    5.64013671875,
+    5.31396484375
+  ]
+}

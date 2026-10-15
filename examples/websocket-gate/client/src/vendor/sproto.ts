@@ -16,6 +16,7 @@ const SIZEOF_INT32 = 4;
 const ERROR_TYPE = -3;
 const NONZERO_COUNT = new Uint8Array(256);
 for (let mask = 1; mask < 256; mask++) NONZERO_COUNT[mask] = NONZERO_COUNT[mask >>> 1] + (mask & 1);
+const ZERO_BLOCK = Buffer.alloc(2048);
 
 const ENCODE_BUFFERSIZE = 2050;
 
@@ -147,15 +148,11 @@ function gen_response(self, response, spindex, session) {
 	return function(args) {
 		self.header_tmp.type = null;
 		self.header_tmp.session = session;
-
-		let header = self.encode(self.__pack, self.header_tmp);
-		if (response) {
-			let content = self.encode("", args, response, spindex);
-			let sz = header.length + content.length;
-			return self.pack(Buffer.concat([header, content], sz));
-		} else {
-			return self.pack(header);
-		}
+		let size = self.encodeBuffered(self.__pack, self.header_tmp, 0);
+		if (size === undefined) throw new TypeError("Sproto encode failed");
+		if (response) size = self.encodeBuffered("", args, size, response, spindex);
+		if (size === undefined) throw new TypeError("Sproto encode failed");
+		return self.pack(self.buffer.subarray(0, size));
 	};
 }
 
@@ -170,6 +167,24 @@ class Field {
 class Stype {
 	public f: Field[] = [];
 	public maxn: number = 0;
+	private dense: Field[] = [];
+	private byTag = new Map<number, Field>();
+
+	indexFields() {
+		let lowCount = 0, length = 0;
+		for (const field of this.f) {
+			this.byTag.set(field.tag, field);
+			if (field.tag >= 0 && field.tag < 128) { lowCount++; length = Math.max(length, field.tag + 1); }
+		}
+		if (length <= lowCount * 2) {
+			this.dense = new Array(length);
+			for (const field of this.f) if (field.tag < length) this.dense[field.tag] = field;
+		}
+	}
+
+	fieldByTag(tag: number) {
+		return tag >= 0 && tag < this.dense.length ? this.dense[tag] : this.byTag.get(tag);
+	}
 
 	constructor(public name: string) {
 
@@ -251,6 +266,7 @@ class Sproto {
 
 		maxn += stype.f[0].tag + offcounter;
 		stype.maxn = maxn;
+		stype.indexFields();
 
 		return stype;
 	}
@@ -401,30 +417,35 @@ class Sproto {
 		return length < 0 ? length : fill_size(output, offset, length);
 	}
 
-	encode(typeName: string, tbl: any, st?, spindex?) {
-		let sz = 0;
-		while(true) {
-			sz = this.lencode(typeName, tbl, 0, st, spindex);
-			if (sz < 0) {
-				if (sz === ERROR_TYPE) {
-					return;
-				}
-
-				let alloc_sz = this.buffer.length * 2;
-                if (alloc_sz > 8 * 1024 * 1024) throw new Error("Sproto encode size limit");
-				if (alloc_sz > 65535) {
-					console.log("[sproto warning]: alloc memory more 6k");
-					// return;
-				}
-				this.buffer = Buffer.allocUnsafe(alloc_sz);
-			} else {
-				break;
-			}
+	encode(typeName: string, message: any, st?, spindex?) {
+		let size;
+		while ((size = this.lencode(typeName, message, 0, st, spindex)) < 0) {
+			if (size === ERROR_TYPE) return;
+			const capacity = this.buffer.length * 2;
+			if (capacity > 8 * 1024 * 1024) throw new Error("Sproto encode size limit");
+			this.buffer = Buffer.allocUnsafe(capacity);
 		}
-
-		let result = Buffer.allocUnsafe(sz);
-		this.buffer.copy(result, 0, 0, result.length);
+		if (size > 8 * 1024 * 1024) throw new Error("Sproto encode size limit");
+		const result = Buffer.allocUnsafe(size);
+		this.buffer.copy(result, 0, 0, size);
 		return result;
+	}
+
+	// scratch 只供本次同步编码借用，只有 Encode 的副本或 Pack 的独占输出可以返回调用方。
+	private encodeBuffered(typeName: string, message: any, start: number, st?, spindex?) {
+		const maxSize = 8 * 1024 * 1024;
+		for (;;) {
+			const size = this.lencode(typeName, message, start, st, spindex);
+			if (size === ERROR_TYPE) return;
+			if (size > maxSize) throw new Error("Sproto encode size limit");
+			if (size >= 0) return start + size;
+			const capacity = Math.min(this.buffer.length * 2, maxSize + start);
+			if (capacity <= this.buffer.length) throw new Error("Sproto encode size limit");
+			const expanded = Buffer.allocUnsafe(capacity);
+			// body 扩容时只保留已完成的 package；当前未完成的 body 会重新编码。
+			if (start > 0) this.buffer.copy(expanded, 0, 0, start);
+			this.buffer = expanded;
+		}
 	}
 
 	private lencode(typename: string, message: any, startpoint: number, st?, spindex?) {
@@ -593,13 +614,13 @@ class Sproto {
 	}
 
 	private ldecode(typename: string, buffer: Buffer, startpoint:number, result: object, st?, reqdecode?) {
+		const type = st || this.vquerytype(typename, reqdecode);
 		let fn = this.toword(buffer, startpoint);
 		let size = SIZEOF_HEADER;
 
 		let field_idx = startpoint + SIZEOF_HEADER;
 		let data_idx = startpoint + SIZEOF_HEADER + fn * SIZEOF_FIELD;
 		let tag = -1;
-		let args = {name: null, type: null};
 
 		for (var i = 0; i < fn; ++i) {
 			++tag;
@@ -615,23 +636,23 @@ class Sproto {
 			}
 
 			value = (value>>1) - 1;
-			let f = this.findtag(typename, tag, st, reqdecode);
-			if (f === null) {
-				continue;
-			}
-
 			let currentdata_idx = data_idx;
-
+			// 无论 schema 是否认识字段，都先消费它的 body，保持后续字段位置正确。
 			if (value < 0) {
+				if (currentdata_idx + SIZEOF_LENGTH > buffer.length) return -1;
 				sz = this.todword(buffer, currentdata_idx);
 				currentdata_idx += SIZEOF_LENGTH;
+				if (sz < 0 || sz > buffer.length - currentdata_idx) return -1;
 				data_idx = currentdata_idx + sz;
 				size += SIZEOF_LENGTH + sz;
-
-				if (f.type.charAt(0) === '*') {
+			}
+			const f = type.fieldByTag(tag);
+			if (f === undefined) continue;
+			if (value < 0) {
+				if (f.elementType !== null) {
 					let array_res :any = [];
 					if (sz > 0) {
-						let t = f.type.substring(1, f.type.length);
+						let t = f.elementType;
 						array_res = this.decode_array(t, buffer, currentdata_idx, sz, st, reqdecode);
 						if (array_res === false) {
 							console.error("[sproto error]: decode array filed(%s) failed", f.name);
@@ -683,46 +704,43 @@ class Sproto {
 	}
 
 	pencode(typename: string, tbl: object) {
-		let buffer = this.encode(typename, tbl);
-		return this.pack(buffer);
+		const size = this.encodeBuffered(typename, tbl, 0);
+		if (size === undefined) throw new TypeError("Sproto encode failed");
+		return this.pack(this.buffer.subarray(0, size));
 	}
 
 	pdecode(typename: string, buffer) {
 		return this.decode(typename, this.unpack(buffer));
 	}
 
-	pack_seg(srcbuffer, srcidx, dstbuffer, dstidx, n) {
-		if (n > 0) {
-			const low = srcbuffer.readUInt32LE(srcidx);
-			const high = srcbuffer.readUInt32LE(srcidx + 4);
+	pack_seg(source, sourceIndex, output, outputIndex, ffCount) {
+		if (ffCount > 0) {
+			const low = source.readUInt32LE(sourceIndex);
+			const high = source.readUInt32LE(sourceIndex + 4);
 			if (((low - 0x01010101) & ~low & 0x80808080) === 0
 				&& ((high - 0x01010101) & ~high & 0x80808080) === 0) return 8;
 		}
-		let header = dstidx++;
-		let notzero = 0;
-		let bits = 0;
-
-		for (var i = 0; i < 8; ++i) {
-			if(srcbuffer[srcidx + i] !== 0) {
-				dstbuffer[dstidx++] = srcbuffer[srcidx + i];
-				bits |= (1 << i);
-				++notzero;
-			}
-		}
-
-		if ((notzero === 6 || notzero === 7) && n > 0) {
-			notzero = 8;
-		}
-
-		if (notzero === 8) {
-			if (n > 0) {
-				return 8;
-			}
-			return 10;
-		}
-
-		dstbuffer[header] = bits;
-		return notzero + 1;
+		let count = 0, mask = 0;
+		const value0 = source[sourceIndex + 0];
+		if (value0 !== 0) { output[outputIndex + ++count] = value0; mask |= 1; }
+		const value1 = source[sourceIndex + 1];
+		if (value1 !== 0) { output[outputIndex + ++count] = value1; mask |= 2; }
+		const value2 = source[sourceIndex + 2];
+		if (value2 !== 0) { output[outputIndex + ++count] = value2; mask |= 4; }
+		const value3 = source[sourceIndex + 3];
+		if (value3 !== 0) { output[outputIndex + ++count] = value3; mask |= 8; }
+		const value4 = source[sourceIndex + 4];
+		if (value4 !== 0) { output[outputIndex + ++count] = value4; mask |= 16; }
+		const value5 = source[sourceIndex + 5];
+		if (value5 !== 0) { output[outputIndex + ++count] = value5; mask |= 32; }
+		const value6 = source[sourceIndex + 6];
+		if (value6 !== 0) { output[outputIndex + ++count] = value6; mask |= 64; }
+		const value7 = source[sourceIndex + 7];
+		if (value7 !== 0) { output[outputIndex + ++count] = value7; mask |= 128; }
+		if (ffCount > 0 && count >= 6) return 8;
+		if (count === 8) return 10;
+		output[outputIndex] = mask;
+		return count + 1;
 	}
 
 	write_ff(source, sourceStart, output, destination, length) {
@@ -776,6 +794,17 @@ class Sproto {
 				ff_desstart = dstidx;
 				ff_buffer = buffer;
 				ff_n = 1;
+				if (srcsz - i >= 1024) {
+					const words = this.nonzeroWords(buffer, srcidx + 8, srcsz - i - 8);
+					ff_n += words;
+					i += words * 8;
+					n += words * 8;
+					dstsz -= words * 8;
+					if (ff_n === 256) {
+						if (dstsz >= 0) this.write_ff(ff_buffer, ff_srcstart, dstbuffer, ff_desstart, 2048);
+						ff_n = 0;
+					}
+				}
 			} else if (n === 8 && ff_n > 0) {
 				++ff_n;
 				if (ff_n === 256) {
@@ -790,6 +819,15 @@ class Sproto {
 						this.write_ff(ff_buffer, ff_srcstart, dstbuffer, ff_desstart, ff_n*8);
 					}
 					ff_n = 0;
+				}
+				if (n === 1 && srcsz - i >= 1024) {
+					const words = this.zeroWords(buffer, srcidx + 8, srcsz - i - 8);
+					if (words > 0) {
+						dstbuffer.fill(0, dstidx, dstidx + 1 + words);
+						i += words * 8;
+						n += words;
+						dstsz -= words;
+					}
 				}
 			}
 
@@ -806,6 +844,19 @@ class Sproto {
 		}
 
 		return dstbuffer.slice(0, dstidx);
+	}
+
+	// 只在长连续块确认后使用原生有界扫描，普通数值消息沿用逐 word 路径。
+	private nonzeroWords(source, start, available) {
+		const bytes = Math.min(2040, available & ~7);
+		const zero = source.subarray(start, start + bytes).indexOf(0);
+		return zero < 0 ? bytes >>> 3 : zero >>> 3;
+	}
+
+	private zeroWords(source, start, available) {
+		if (source.readUInt32LE(start) !== 0 || source.readUInt32LE(start + 4) !== 0) return 0;
+		const bytes = Math.min(2048, available & ~7);
+		return source.compare(ZERO_BLOCK, 0, bytes, start, start + bytes) === 0 ? bytes >>> 3 : 0;
 	}
 
 	unpack(buffer: Buffer) {
@@ -831,6 +882,17 @@ class Sproto {
 		let destination = 0;
 		while (sourceOffset < source.length) {
 			let mask = source[sourceOffset++];
+			if (mask === 0 && sourceOffset < source.length && source[sourceOffset] === 0) {
+				const start = destination;
+				destination += 8;
+				while (destination <= 8 * 1024 * 1024 && sourceOffset < source.length && source[sourceOffset] === 0) {
+					sourceOffset++;
+					destination += 8;
+				}
+				if (destination > 8 * 1024 * 1024) throw new Error("Sproto unpack size limit");
+				if (start < output.length) output.fill(0, start, Math.min(destination, output.length));
+				continue;
+			}
 			if (mask === 255) {
 				if (sourceOffset >= source.length) return -1;
 				const length = (source[sourceOffset++] + 1) * 8;
@@ -843,11 +905,21 @@ class Sproto {
 			}
 			if (NONZERO_COUNT[mask] > source.length - sourceOffset) return -1;
 			if (8 > 8 * 1024 * 1024 - destination) throw new Error("Sproto unpack size limit");
+			if (destination >= output.length) {
+				// 首次缓冲耗尽后只验证和计数，不再逐字节做无效写入判断。
+				sourceOffset += NONZERO_COUNT[mask];
+				destination += 8;
+				continue;
+			}
 			if (destination + 8 <= output.length) {
-				for (let index = 0; index < 8; index++) {
-					output[destination + index] = (mask & 1) !== 0 ? source[sourceOffset++] : 0;
-					mask >>>= 1;
-				}
+				output[destination + 0] = (mask & 1) !== 0 ? source[sourceOffset++] : 0;
+				output[destination + 1] = (mask & 2) !== 0 ? source[sourceOffset++] : 0;
+				output[destination + 2] = (mask & 4) !== 0 ? source[sourceOffset++] : 0;
+				output[destination + 3] = (mask & 8) !== 0 ? source[sourceOffset++] : 0;
+				output[destination + 4] = (mask & 16) !== 0 ? source[sourceOffset++] : 0;
+				output[destination + 5] = (mask & 32) !== 0 ? source[sourceOffset++] : 0;
+				output[destination + 6] = (mask & 64) !== 0 ? source[sourceOffset++] : 0;
+				output[destination + 7] = (mask & 128) !== 0 ? source[sourceOffset++] : 0;
 			} else {
 				// 保留缓冲不足时的完整计数与前缀写入语义。
 				for (let index = 0; index < 8; index++) {
@@ -891,27 +963,6 @@ class Sproto {
 		return this.p[name];
 	}
 
-	private findtag(typename: string, tag: number, st?, reqdecode?) {
-		let type = null;
-		if (!isNull(reqdecode) && isNull(st)) {
-			let sp = this.peer || this;
-			type = sp.t[typename];
-		} else {
-			if (st) {
-				type = st;
-			} else {
-				type = this.querytype(typename);
-			}
-		}
-
-		for (let f of type.f) {
-			if (tag === f.tag) {
-				return f;
-			}
-		}
-
-		return null;
-	}
 
 	host(sp: Sproto) {
 		this.peer = sp;
@@ -928,19 +979,18 @@ class Sproto {
 			this.header_tmp.type = p.tag;
 			this.header_tmp.session = session;
 
-			let header = this.encode(this.__pack, this.header_tmp);
+			let size = this.encodeBuffered(this.__pack, this.header_tmp, 0);
+			if (size === undefined) throw new TypeError("Sproto encode failed");
 
 			if (session) {
 				this.__session[session] = p.st[RESPONSE] || true;
 			}
 
 			if (p.st[REQUEST]) {
-				let content = this.encode(p.st[REQUEST].name, args, p.st[REQUEST]);
-				let sz = header.length + content.length;
-				return this.pack(Buffer.concat([header, content], sz));
-			} else {
-				return this.pack(header);
+				size = this.encodeBuffered(p.st[REQUEST].name, args, size, p.st[REQUEST]);
 			}
+			if (size === undefined) throw new TypeError("Sproto encode failed");
+			return this.pack(this.buffer.subarray(0, size));
 		}.bind(this);
 	}
 

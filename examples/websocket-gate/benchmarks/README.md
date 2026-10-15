@@ -34,6 +34,12 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 
 ## 报告
 
+[数值 packing、字段查询与类型化构造](../../../docs/benchmarks/2026-10-15-sproto-round2/RESULTS.md) 是第二轮结果；保留与首轮及正式 v0.4.0 的对照。原有两套基准不改变调用方式，实际 pencode/attach 的缓冲融合收益单独测量。
+
+[TS 长块与 Go 反射路径优化验收](../../../docs/benchmarks/2026-10-15-sproto-next/RESULTS.md) 保存相对 v0.4.0 的前后对照、两套完整五轮采样、分配代价、profile 和撤回的尝试。TS 修改在当前工作树；Go 使用独立库未发布优化源码及临时 modfile，正式依赖仍为 v0.4.0，复现时需按该报告指定源码。
+
+[v0.4.0 正式依赖完整复测](../../../docs/benchmarks/2026-10-15-v0.4.0/report.md) 汇总 Go/TS × Protobuf/Sproto 的两套基准：每种语言 72 项、每项五轮，同时列出纯 body、packing、应用帧、wire 大小、Go 分配和采样波动。
+
 [2026-10-15 本机结果](../../../docs/benchmarks/2026-10-15/report.md) 包含完整耗时、大小、分配、实现版本和原始数据。此基线仅覆盖 Echo 字符串，后续比较整数数组、嵌套结构或真实游戏消息时，应新增相同语义的夹具并分别报告。
 
 ## AddressBook、游戏数值与数组
@@ -72,6 +78,19 @@ Profile 默认对 AddressBook/game_large 的六个独立步骤逐个采集，Go 
 [新套件结果](../../../docs/benchmarks/2026-10-15-representative/report.md) 与前述 Echo 报告分开保存，避免将 body 与应用帧数据混为同一口径。
 
 [优化实施与验收](../../../docs/benchmarks/2026-10-15-optimized/RESULTS.md) 保存修复后五轮数据、小包回退检查、profile 摘要及独立 Go 库提交。Go 优化已随 gosproto v0.4.0 发布，GSR 正式依赖已升级；当前可直接用正式依赖复现，报告保留当时的临时 modfile 采样来源。采集器会记录实际模块覆盖及 Go/TS 源码哈希，避免把本地优化结果误标为正式版本。Profile 可设 `GSR_PROFILE_SCENARIO=game_large` 只采大型游戏消息，默认仍采两组。
+
+### PEncode 与实际 RPC 编码
+
+原套件有意分开调用 encode/pack，Echo frame 也分别编码头和 body 后拼接，因此不会体现 pencode/attach 内部减少复制的全部收益。补充脚本复用上述五组 body 和四组 Echo 数据，不更改 wire 签名：
+
+```sh
+npm --prefix examples/websocket-gate run build
+node examples/websocket-gate/scripts/benchmark-sproto-api.mjs /absolute/output/api
+# 可选：同进程交错对比上一版已编译的 Sproto 模块。
+node examples/websocket-gate/scripts/benchmark-sproto-api.mjs /absolute/output/api /absolute/baseline/sproto.mjs
+```
+
+每操作独立热身至少约 50 ms，五轮各约 100 ms，并反转执行顺序；结果保存模块指纹。代表性消息同时测原生 Encode/Decode、Pack/Unpack、PEncode/PDecode，可用于同进程交错复核前后变化。RPC 使用已有 attach、真实 C2S schema 和固定 session=1，覆盖同一个等待项，不包含外层客户端安全预检、会话分配、网络或 MAC。它与原手工组帧结果分开报告，不能拿两种入口的数字直接计算优化比例。
 
 ### 结果文件入库规则
 
