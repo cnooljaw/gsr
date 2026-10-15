@@ -33,7 +33,7 @@ Gate 负责有界、顺序、失败可观察地收发不透明消息；具体客
 
 业务协议由 Agent 构造时选定，Gate 不提供 Protobuf/Sproto/JSON 枚举或格式探测。SecurityModeMAC/Plain 只控制握手和传输认证，TLS 独立配置；MAC 不仅握手，还校验后续消息的 seq/MAC。一个具体 Agent 固定使用一个业务协议实现，协议选择与安全模式相互独立。
 
-现有 `protocol` 是 Protobuf 实现，Envelope、Registry、MessageRoute、Direction、Kind 和 request_id 均属于它。已确认增加独立 `protocol/sproto`，使用 Sproto 自身的协议、Request/Response、package(type/session) 和 pack/unpack；不依赖父包的 Protobuf 模型，不再套 Envelope 或重复的 MessageRoute。Sproto 实现及 Go/TS Echo 尚待后续切片完成，进度与验收见 [双协议接入计划](SPROTO-INTEGRATION.md)。JSON 只保留同样的字节接入能力，本轮不增加实现。
+现有 `protocol` 是 Protobuf 实现，Envelope、Registry、MessageRoute、Direction、Kind 和 request_id 均属于它。当前开发切片新增独立 `protocol/sproto`，使用 Sproto 自身的协议、Request/Response、package(type/session) 和 pack/unpack；不依赖父包的 Protobuf 模型，不再套 Envelope 或重复的 MessageRoute。Sproto Dispatcher 与 Go/TS Echo 已实现，新增 API 尚未发布；接入方式、支持类型及限制见 [双协议指南](SPROTO-INTEGRATION.md)。JSON 只保留同样的字节接入能力，本轮不增加实现。
 
 - Gate 管理连接、握手、seq/MAC、容量、出站队列和关闭；不导入 Protobuf，不解释 msg_id、request_id 或 payload。握手是传输认证格式，不属于业务 Protocol。Plain 不具备 MAC 模式的认证保证。
 - `gate.ClientSession` 留在 Gate，只提供 `Send([]byte) error` 和 `Close() error`。Send 在成功接纳时复制快照，之后发送方可以复用缓冲区；nil 与空切片均表示零字节消息，仍收取队列条目开销。成功仅代表本地队列接纳，不保证客户端收到、业务执行或执行一次，不自动重放。
@@ -43,6 +43,12 @@ Gate 负责有界、顺序、失败可观察地收发不透明消息；具体客
 - Runtime 的客户端入口只负责能力接纳、字节快照和 Mailbox 投递，不要求 Protobuf 格式；Envelope 是 Protocol 的消息格式，不是 Core 的消息类型或准入条件。
 
 入站为 `Gate → 字节快照 → Agent → 具体协议 Dispatcher → Handler`；出站为 `Handler → 具体协议编码 → 字节消息 → Gate`。包级依赖仅由 Agent 同时指向 Gate 和协议实现；上面的箭头表示数据流，不表示 Gate 与协议实现互相导入。Sproto 会话状态归每连接 Agent，不与 Core/Cluster Session 混用；不可变协议定义可共享。框架不增加 ProtocolCodec、公共 Message/Route/SchemaProvider 或统一 Envelope。
+
+Sproto 接线使用 `sproto.NewDispatcher[gsr.CommandContext](sproto.Config{C2S: c2s.Protocols, S2C: s2c.Protocols}, client, handlers)`；原生 `gosproto.Protocol` 定义 Request/Response，无公共 Registry 或 MessageRoute。底层正常依赖 gosproto v0.3.0，只使用协议字段，不绑定 Go MethodName 或借用其已移除的网络 Service helper。构造时复制协议并检查名称、非负 type（零有效）、payload schema 和 Handler 精确签名。含 Request 的 Handler 为 `func(gsr.CommandContext, sproto.Context, *具体Request) error`，无 Request 时省略最后参数；定义可以先存在，未实现协议不要求绑定。
+
+`Context.Session/Response/Push` 仅在当前同步 Handler 使用，Response 按当前定义匹配类型并保留原 session，最多成功接纳一次；Notify 不接受 Response。普通 Command 中使用 `Dispatcher.Push`，不保存旧 Context。需要响应的客户端请求必须使用正 int32 session，Notify/Push 不带 session；与 Core/Cluster ID 分配无关。S2C 首版只接受不带 Response 的 Push，不提供服务端请求客户端的等待机制。
+
+`Config.MaxPackedBytes` 默认 1 MiB；`Config.Limits` 使用修复库的有限默认值（解包/编码 8 MiB、深度 64、字段及集合元素合计 100000），可显式配置。协议只借用 Send，不拥有 Close；HandleFrame 对坏包、未知协议、Handler error 和遗漏 Response 返回错误，由 Agent 记录诊断并关闭连接，使客户端结束等待。业务拒绝通过协议自己的 Response 表达，Echo 使用 code/message，不增加公共错误 schema，也不透传内部错误。
 
 ## 默认业务入口与阅读边界
 
@@ -56,7 +62,7 @@ Gate 负责有界、顺序、失败可观察地收发不透明消息；具体客
 
 Protocol 的构造器复制 Handler 表，校验编号已定义且属于客户端入站、Handler 签名精确匹配 Scope/Context/error，以及请求参数类型与该编号的生成目录一致；构造后只读，不提供逐条 Register 或运行期修改。`MustDispatcher` 用于程序员定义的静态接线，构造错误时 panic；外部组装需要返回错误时使用 `NewDispatcher`。运行时沿用 Command Dispatcher 的反射调用做法，不逐消息重新解析签名，但仍使用 reflect.Call。协议可以先定义，表中只绑定已实现的 Handler；未绑定消息保持原有错误语义。Agent 使用具名 `commandDispatcher` 与 `protocolDispatcher` 字段区分两个入口，不混用编号或合并执行层。
 
-客户端接入另见 [WebSocket Gate 协议与边界](RFC-WEBSOCKET-GATE.md)：生产 Gate 使用固定 33 字节二进制握手，WSS 上行使用 seq + Protobuf Envelope + MAC，下行只使用 Envelope；Gate 的显式 Plain 模式仅传输 Envelope。Envelope 使用 msg_id、request_id(uint32) 和 payload，由业务定义的 `AgentService` 中转。C/S request_id、Gate 的两种协议模式、连接认证、关闭码和错误归属均在 Core/Cluster 之外；Gate 只负责传输与安全边界。Runtime 内部消息类型区分客户端消息与普通 Core Command，Service 通过可选的 `ClientMessageHandler` 明确启用客户端处理能力；Agent 在同一 Service runner 中将客户端 Envelope 按 `msg_id` 路由到协议分发器，业务按实现进度注册强类型 Handler；本地或 Cluster 投递的普通 Core Command 由显式 `Service.Handle` 按 `CommandID` 分发。协议 `.proto` 显式声明每个 msg_id 对应的 payload、方向和 Request/Notify/Response/Push 种类，并生成目录；未实现 Handler 的消息仍可先存在于协议定义中。Core Command 的 Send/Call 仍是同一种消息类型，由 Session 是否为零区分；`Source` 只表示 Service 来源，不作为入口类别。AgentService 持有客户端写回能力，组合通用 `protocol.Dispatcher` 并注册业务项目实现的 Handler；Gate 到 Agent 使用 Runtime-owned 的 `Runtime.DeliverClientMessage` 单向基础设施投递，Agent 到 Gate 使用不暴露 socket 的 `ClientSession` 写回能力。这里的 `ClientSession` 指绑定一条客户端连接的写回能力，不是 Core `SessionID` 或 Envelope 的 `request_id`。业务协议组件只做协议适配、简单收发和业务 Service 路由，可以持有连接私有的轻量状态，但不持有跨连接共享或需恢复的权威业务状态；业务 Service 负责业务拒绝和状态变化。GSR 不内置大厅、游戏或其它具体协议实现，只提供通用接入边界。Runtime 客户端消息投递能力已实现；`examples/websocket-gate` 的 Go 与 TypeScript 类型由通用和业务 `.proto` 生成，Go Agent 用独立协议目录解码并手动注册已实现的 Echo Handler，完成请求/响应及 `request_id` 回传。当前 Echo 联调示例由 MainService 在 `gsr.Run` 中通过 `self.Node().CreateGate` 创建对应 Gate 与应用 Agent；Plain 没有握手或 MAC，仅允许内网绑定，TLS 独立配置。框架 Gate、跨语言认证固定向量和结构化诊断已有实现，完整压力验收仍按 RFC 推进。标准关闭码、结构化日志和 Agent 组装边界见 RFC。首版不实现 DES 或旧 12 字节头兼容。
+默认 Protobuf 示例的客户端接入另见 [WebSocket Gate 协议与边界](RFC-WEBSOCKET-GATE.md)：生产 Gate 使用固定 33 字节二进制握手，MAC 上行使用 seq + 不透明业务字节 + MAC，下行传输业务字节；Gate 的显式 Plain 模式直接传输业务字节。Protobuf Agent 使用 Envelope，Sproto Agent 使用原生 packed package + body。Envelope 使用 msg_id、request_id(uint32) 和 payload，由业务定义的 `AgentService` 中转。C/S request_id、Gate 的两种安全模式、连接认证、关闭码和错误归属均在 Core/Cluster 之外；Gate 只负责传输与安全边界。Runtime 内部消息类型区分客户端消息与普通 Core Command，Service 通过可选的 `ClientMessageHandler` 明确启用客户端处理能力；Agent 在同一 Service runner 中将客户端 Envelope 按 `msg_id` 路由到协议分发器，业务按实现进度注册强类型 Handler；本地或 Cluster 投递的普通 Core Command 由显式 `Service.Handle` 按 `CommandID` 分发。协议 `.proto` 显式声明每个 msg_id 对应的 payload、方向和 Request/Notify/Response/Push 种类，并生成目录；未实现 Handler 的消息仍可先存在于协议定义中。Core Command 的 Send/Call 仍是同一种消息类型，由 Session 是否为零区分；`Source` 只表示 Service 来源，不作为入口类别。AgentService 持有客户端写回能力，组合通用 `protocol.Dispatcher` 并注册业务项目实现的 Handler；Gate 到 Agent 使用 Runtime-owned 的 `Runtime.DeliverClientMessage` 单向基础设施投递，Agent 到 Gate 使用不暴露 socket 的 `ClientSession` 写回能力。这里的 `ClientSession` 指绑定一条客户端连接的写回能力，不是 Core `SessionID` 或 Envelope 的 `request_id`。业务协议组件只做协议适配、简单收发和业务 Service 路由，可以持有连接私有的轻量状态，但不持有跨连接共享或需恢复的权威业务状态；业务 Service 负责业务拒绝和状态变化。GSR 不内置大厅、游戏或其它具体协议实现，只提供通用接入边界。Runtime 客户端消息投递能力已实现；`examples/websocket-gate` 的 Go 与 TypeScript 类型由通用和业务 `.proto` 生成，Go Agent 用独立协议目录解码并手动注册已实现的 Echo Handler，完成请求/响应及 `request_id` 回传。当前 Echo 联调示例由 MainService 在 `gsr.Run` 中通过 `self.Node().CreateGate` 创建对应 Gate 与应用 Agent；Plain 没有握手或 MAC，仅允许内网绑定，TLS 独立配置。框架 Gate、跨语言认证固定向量和结构化诊断已有实现，完整压力验收仍按 RFC 推进。标准关闭码、结构化日志和 Agent 组装边界见 RFC。首版不实现 DES 或旧 12 字节头兼容。
 
 框架能力边界如下。
 

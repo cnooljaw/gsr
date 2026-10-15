@@ -137,11 +137,17 @@ func TestEchoAgentTurnsNotificationIntoPush(t *testing.T) {
 // 复用三个已有协议用例，改为通过真实 Gate、Agent 和 EchoService 验证应用接线。
 func startEchoTestClient(t *testing.T) *echoTestClient {
 	t.Helper()
+	return startEchoTestClientWithProtocol(t, "protobuf")
+}
+
+func startEchoTestClientWithProtocol(t *testing.T, clientProtocol string) *echoTestClient {
+	t.Helper()
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	addresses := make(chan string, 1)
 	done := make(chan error, 1)
+	stopped := make(chan struct{})
 	go func() {
-		done <- gsr.Run(ctx, gsr.Config{Logging: logging.Config{Writer: io.Discard}}, &echoTestEntry{addresses: addresses})
+		done <- gsr.Run(ctx, gsr.Config{Logging: logging.Config{Writer: io.Discard}}, &echoTestEntry{addresses: addresses, clientProtocol: clientProtocol, stopped: stopped})
 	}()
 	t.Cleanup(func() {
 		cancel()
@@ -163,6 +169,11 @@ func startEchoTestClient(t *testing.T) *echoTestClient {
 	case <-ctx.Done():
 		t.Fatal("等待 Gate 启动超时")
 	}
+	select {
+	case <-stopped:
+	case <-ctx.Done():
+		t.Fatal("入口 Service 未退出")
+	}
 	connection, _, err := websocket.DefaultDialer.Dial("ws://"+address+"/ws", nil)
 	if err != nil {
 		t.Fatalf("Dial() error = %v", err)
@@ -172,7 +183,9 @@ func startEchoTestClient(t *testing.T) *echoTestClient {
 }
 
 type echoTestEntry struct {
-	addresses chan<- string
+	addresses      chan<- string
+	clientProtocol string
+	stopped        chan struct{}
 }
 
 func (entry *echoTestEntry) OnStart(ctx context.Context, self gsr.ServiceContext) error {
@@ -191,11 +204,15 @@ func (entry *echoTestEntry) OnStart(ctx context.Context, self gsr.ServiceContext
 		SecurityMode: gate.SecurityModePlain, Address: "127.0.0.1:0", MaxConnections: 1,
 		MaxOutboundQueueBytes: 64 << 10,
 		NewAgent: func(client gate.ClientSession) gsr.Service {
+			if entry.clientProtocol == "sproto" {
+				return newSprotoAgent(client)
+			}
 			return newEchoAgent(client, registry)
 		},
 	})
 	if err == nil {
 		entry.addresses <- address
+		self.Exit()
 	}
 	return err
 }
@@ -205,5 +222,6 @@ func (entry *echoTestEntry) Handle(_ gsr.CommandContext, _ runtime.CommandID, _ 
 }
 
 func (entry *echoTestEntry) OnStop(_ context.Context) error {
+	close(entry.stopped)
 	return nil
 }

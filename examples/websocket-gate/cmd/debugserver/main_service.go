@@ -18,9 +18,17 @@ type mainService struct {
 var _ gsr.Service = (*mainService)(nil)
 
 func (service *mainService) OnStart(ctx context.Context, self gsr.ServiceContext) error {
-	registry, err := newEchoRegistry()
-	if err != nil {
-		return err
+	newAgent := func(client gate.ClientSession) gsr.Service {
+		return newSprotoAgent(client)
+	}
+	if service.options.clientProtocol != "sproto" {
+		registry, err := newEchoRegistry()
+		if err != nil {
+			return err
+		}
+		newAgent = func(client gate.ClientSession) gsr.Service {
+			return newEchoAgent(client, registry)
+		}
 	}
 	echoID, err := self.CreateService(ctx, newEchoService())
 	if err != nil {
@@ -28,9 +36,6 @@ func (service *mainService) OnStart(ctx context.Context, self gsr.ServiceContext
 	}
 	if err := self.Node().RegisterService(echoServiceName, echoID); err != nil {
 		return err
-	}
-	newAgent := func(client gate.ClientSession) gsr.Service {
-		return newEchoAgent(client, registry)
 	}
 	config := gsr.GateConfig{
 		SecurityMode:          gate.SecurityModePlain,

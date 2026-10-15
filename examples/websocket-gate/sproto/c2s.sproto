@@ -1,0 +1,21 @@
+.package {
+    type 0 : integer
+    session 1 : integer
+}
+
+echo 1 {
+    request {
+        text 0 : string
+    }
+    response {
+        text 0 : string
+        code 1 : integer
+        message 2 : string
+    }
+}
+
+notify 2 {
+    request {
+        text 0 : string
+    }
+}

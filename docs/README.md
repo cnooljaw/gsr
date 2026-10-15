@@ -41,7 +41,7 @@ v1.0.1 入口已按 [ADR 0012](adr/0012-node-capabilities-and-service-logging.md
 23. [ADR 0012：节点组装与 Service 日志入口](adr/0012-node-capabilities-and-service-logging.md)：作用范围、资源归属、窄日志能力及配置边界。
 24. [GSR 1.0.1 发布说明](RELEASE-1.0.1.md)：相对 v1.0.0 的六项变化、API 迁移与发布验证。
 25. [ADR 0013：客户端协议与 Gate 安全模式](adr/0013-client-protocol-boundaries.md)：安全模式命名、Agent 选择协议与两个协议实现的独立边界。
-26. [Protobuf / Sproto 接入计划](SPROTO-INTEGRATION.md)：按切片记录候选库验证、Dispatcher、Go/TS Echo 与验收范围。
+26. [Protobuf / Sproto 接入指南](SPROTO-INTEGRATION.md)：独立修复库、Dispatcher、Go/TS Echo、支持范围与历史兼容证据。
 
 后续出现需要长期保留的重大架构取舍时，新增 ADR 或 RFC，并从这里建立索引。
 

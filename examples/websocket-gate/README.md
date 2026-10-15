@@ -1,8 +1,8 @@
 # WebSocket Gate 联调示例
 
-本示例默认使用统一 Gate 的 Plain 模式，演示 TypeScript 客户端发送 Protobuf Envelope、GSR Agent 解码业务请求并回传同一 `request_id`。Plain 不提供握手、seq 或 MAC，仅绑定回环/私有 IP，不得暴露到公网。
+本示例默认使用统一 Gate 的 Plain 模式和 Protobuf；`--protocol sproto` 切换到原生 Sproto Agent，共用 EchoService 与 Gate。Protobuf 响应保留 `request_id`，Sproto 响应保留 `session`。Plain 不提供握手、seq 或 MAC，仅绑定回环/私有 IP，不得暴露到公网。
 
-Go 启动入口只解析参数、处理退出信号并调用 `gsr.Run`。MainService 创建并注册共享的 `echo` Service，再调用 `self.Node().CreateGate` 并明确选择 Protocol，提供返回 `gsr.Service` 的 Echo Agent 构造回调，然后自身退出；EchoService、Gate 与连接 Agent 继续运行，由 Runtime 在进程退出时统一停止。Echo Agent 显式实现普通 `Handle` 和可选的 `HandleClientMessage`，两种消息入口共用该 Service 的 Mailbox 和 runner。
+Go 启动入口只解析参数、处理退出信号并调用 `gsr.Run`。MainService 创建并注册共享的 `echo` Service，再调用 `self.Node().CreateGate` 并明确选择 SecurityMode，提供返回 `gsr.Service` 的 Echo Agent 构造回调，然后自身退出；EchoService、Gate 与连接 Agent 继续运行，由 Runtime 在进程退出时统一停止。Echo Agent 显式实现普通 `Handle` 和可选的 `HandleClientMessage`，两种消息入口共用该 Service 的 Mailbox 和 runner。
 
 框架通用 Envelope 和 ErrorResponse 定义在仓库根目录的 `protocol/proto/gsr/common/v1/common.proto`；Echo 示例的消息编号和 payload 仍定义在本目录的 `proto/gsr/example/echo/v1/echo.proto`。握手属于 Gate 的固定二进制格式，断线通知属于内部 Core Command，二者都不是这里的 Protobuf 消息。每个消息编号通过 `.proto` option 显式关联 payload、方向和 Request/Notify/Response/Push 种类，`npm run generate` 从仓库根目录的 Buf 配置同时生成 Go 与 TypeScript 类型和 Go 协议目录。业务 Handler 按实现进度手动注册；新协议消息可以先定义，之后逐个补 Handler。
 
@@ -141,3 +141,40 @@ npm run client -- --secure --url wss://127.0.0.1:7889/ws --text "hello WSS"
 ```
 
 客户端必须信任证书且证书的 SAN 包含连接地址；本机自签名测试证书可通过 `NODE_EXTRA_CA_CERTS=/path/to/server.crt` 交给 Node.js 信任，不要关闭 TLS 验证。此示例只在 `--prod` 下接受证书文件参数；这是示例 CLI 的限制，框架 Gate 的 Plain 模式也支持 TLS。正式部署仍由业务应用决定证书来源和监听配置；示例不提供证书管理或自动续期。
+
+## Sproto 联调
+
+GSR 当前工作树提供此示例；v1.0.1 发布标签尚不包含新 API。Sproto 与安全模式独立，`--protocol sproto` 使用 Plain，附加 `--prod` 使用现有 MAC。服务端不猜测客户端编码。
+
+在仓库根目录启动服务端：
+
+```sh
+go run ./examples/websocket-gate/cmd/debugserver --protocol sproto --addr 127.0.0.1:18080
+```
+
+在另一个终端运行客户端（URL 按服务端输出填写）：
+
+```sh
+cd examples/websocket-gate
+npm ci
+npm run client:sproto -- --url ws://127.0.0.1:18080/ws --text '中文🙂'
+npm run client:sproto -- --url ws://127.0.0.1:18080/ws --text notice --notify
+```
+
+MAC 服务端追加 `--prod`，客户端追加 `--secure`。自动验证两种安全模式：
+
+```sh
+npm run test:sproto:integration
+```
+
+`test:sproto` 只运行本地向量/会话/边界测试，未设置 GSR_SPROTO_SERVER_BIN 时跳过真实服务器用例；`test:sproto:integration` 编译 Go 服务端并运行全部五个测试。原有 `test:crypto` 与 Protobuf Go 测试继续运行。
+
+定义来源为 `sproto/c2s.sproto` 与 `sproto/s2c.sproto`：echo 带 Request/Response，notify 和 push 不带 Response。生成 Go 类型使用现有 sprotodump，固定提交 `3a45d3e49ea2bc8e2b607e2c8060b32281d730dd`，需要 Lua 与 lpeg：
+
+```sh
+SPROTODUMP_DIR=/path/to/sprotodump npm run generate:sproto
+```
+
+生成文件已包含在示例中，普通运行不需要 Lua。脚本规范模块导入、来源路径和工具添加的协议名前缀，并剔除 gosproto v0.3.0 已移除的 MethodName 方法绑定字段，不另建 generator。TS 加载同一份 schema；参考源码来源、许可证与本地修正见 `client/src/vendor/`。当前 TS 客户端面向扁平 Echo schema，支持安全整数、字符串、session 与 Push，限制 pending/报文/字符串；它不是包含 map、double 或 BigInt 的通用客户端 SDK。
+
+阅读 [`sproto_agent.go`](cmd/debugserver/sproto_agent.go) 及 [Sproto Dispatcher](../../protocol/sproto/README.md)。Go 编码器完整支持范围和官方对照证据见 [双协议指南](../../docs/SPROTO-INTEGRATION.md)。

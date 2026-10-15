@@ -54,7 +54,7 @@ export function completeClientHandshake(handshake: ClientHandshake, response: Ui
   };
 }
 
-// authenticatedFrame 为一个完整 Protobuf Envelope 添加严格递增的大端序列号和截断 MAC。
+// authenticatedFrame 为一条不透明业务消息添加严格递增的大端序列号和截断 MAC。
 export function authenticatedFrame(authenticator: ClientAuthenticator, envelope: Uint8Array): Uint8Array {
   if (authenticator.nextSequence >= sequenceMax) {
     throw new Error("client sequence exhausted");

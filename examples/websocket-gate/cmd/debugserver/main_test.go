@@ -76,3 +76,16 @@ func TestParseServerOptionsRejectsUnknownArguments(t *testing.T) {
 		t.Fatal("parseServerOptions(--secure) error = nil, want usage error")
 	}
 }
+
+// 验证业务协议选择独立于 Gate 安全模式，并拒绝未知或缺失的协议参数。
+func TestParseClientProtocol(t *testing.T) {
+	options, err := parseServerOptions([]string{"--protocol", "sproto", "--prod"})
+	if err != nil || options.clientProtocol != "sproto" || !options.production {
+		t.Fatalf("sproto with MAC: %+v %v", options, err)
+	}
+	for _, arguments := range [][]string{{"--protocol"}, {"--protocol", "json"}} {
+		if _, err := parseServerOptions(arguments); err == nil {
+			t.Fatalf("invalid protocol accepted: %v", arguments)
+		}
+	}
+}

@@ -1,18 +1,18 @@
-# Protobuf / Sproto 接入计划
+# Protobuf / Sproto 接入指南
 
-本计划按 [ADR 0013](adr/0013-client-protocol-boundaries.md) 推进。当前已实现 Protobuf；Sproto 尚未进入生产依赖或公开 API。所有发布标签及其原有协议保持不变。
+本计划按 [ADR 0013](adr/0013-client-protocol-boundaries.md) 推进。当前工作树已实现 Protobuf 与独立 `protocol/sproto`，通过 Go/TypeScript Echo 验证。Go 编解码依赖独立维护的 `github.com/cnooljaw/gosproto v0.3.0`。新增 GSR API 尚未发布；已有 GSR 标签及原有协议保持不变。
 
 ## 边界与步骤
 
 | 切片 | 内容 | 完成条件 | 当前状态 |
 | --- | --- | --- | --- |
 | 1 | Gate 安全模式命名与双协议边界 | SecurityMode 替换 Protocol，现有 Gate/Protobuf 接线测试通过，API/术语同步 | 已完成 |
-| 2 | Go Sproto 与生成工具验证 | 固定可复现版本；类型与坏包测试；确认 `.sproto` 到 Go 类型/协议定义的产物，pack/unpack 和解码资源上限可落实 | 验证中 |
-| 3 | 独立 Sproto Dispatcher | 构造时绑定强类型 Handler，逐请求 Sproto Context，响应关联与 Notify/Push，单连接状态隔离，错误契约及测试 | 待实施 |
-| 4 | Go Server ↔ TypeScript Client Echo | 共用一份 schema，通过真实 WebSocket 验证 Request/Response、Notify/Push、session、错误、断线和已有 Protobuf 回归 | 待实施 |
-| 5 | 接入指南与收尾 | 可复现生成/运行命令，支持类型与限制明确，按改动范围验证和审查 | 待实施 |
+| 2 | Go Sproto 与生成工具验证 | 固定可复现版本；类型与坏包测试；确认 `.sproto` 到 Go 类型/协议定义的产物，pack/unpack 和解码资源上限可落实 | 已完成 |
+| 3 | 独立 Sproto Dispatcher | 构造时绑定强类型 Handler，逐请求 Sproto Context，响应关联与 Notify/Push，单连接状态隔离，错误契约及测试 | 已完成 |
+| 4 | Go Server ↔ TypeScript Client Echo | 共用一份 schema，通过真实 WebSocket 验证 Request/Response、Notify/Push、session、错误、断线和已有 Protobuf 回归 | 已完成 |
+| 5 | 接入指南与收尾 | 可复现生成/运行命令，支持类型与限制明确，按改动范围验证和审查 | 已完成 |
 
-Go/TS 先验证已有工具；只有现有生成产物确实无法满足接线时再考虑 GSR generator。Sproto 新示例复用 Gate，不复制握手、MAC 或队列实现。
+Go/TS 已复用并验证现有工具；本轮没有新增 GSR generator。Sproto 新示例复用 Gate，不复制握手、MAC 或队列实现。
 
 ## 候选实现
 
@@ -22,7 +22,7 @@ Go/TS 先验证已有工具；只有现有生成产物确实无法满足接线�
 - [lvzixun/sprotodump](https://github.com/lvzixun/sprotodump)：现有 Go 类型、协议定义及 schema 生成工具，需实际核对产物。
 - [sealindx/sproto-ts](https://github.com/sealindx/sproto-ts)：候选 TypeScript 客户端，需核对整数精度、浏览器字节缓冲与坏包行为。
 
-不能混用仓库主分支说明与已发布版本的能力。Go 候选库初步固定为 `v0.1.0` 做隔离验证，尚未写入本项目 go.mod；此版本的 RPC session 使用 int32。业务字段的 integer 为有符号 64 位，TS 端超过安全整数范围的表达方式需验证，不能静默丢精度。
+不能混用仓库主分支说明与已发布版本的能力。历史候选验证固定 `v0.1.0`；当前采用自己的修复版本 `v0.3.0`，正常 require，不使用本地 replace。RPC session 使用正 int32。业务字段的 integer 为有符号 64 位，TS 端超过安全整数范围的表达方式需验证，不能静默丢精度。
 
 ## 必须保护的行为
 
@@ -34,7 +34,55 @@ Go/TS 先验证已有工具；只有现有生成产物确实无法满足接线�
 - Response 使用自身定义表达业务失败；框架失败和未知协议明确如何让客户端结束等待，不塞入另一种协议的错误消息。
 - Agent 仍显式实现 Handle/HandleClientMessage，普通 Command 和客户端 Dispatcher 分别持有具名字段，并在同一 runner 中使用。
 
-这些是接入验收要求，不表示候选库已经全部满足。
+这些是接入验收要求；已落地范围与未覆盖能力见下一节。
+
+## 当前接入方式
+
+1. 从当前 GSR 工作树开发，业务项目在新 GSR 版本发布后固定对应版本；不要把 v1.0.1 标签当作已包含 Sproto。
+2. 业务 `.sproto` 分别定义 C2S/S2C，通过现有 sprotodump 生成 Go struct 与 `gosproto.Protocol` 表；不添加 Protobuf 元数据。
+3. Agent 具名持有 `sproto.Dispatcher[gsr.CommandContext]`，构造时绑定强类型 Handler；在 `HandleClientMessage` 调用 `HandleFrame(self, frame)`。
+4. `Context.Response` 保留原 session，`Context.Push` 和 `Dispatcher.Push` 使用 S2C 定义；普通业务仍经 Send/Call 路由到 Service。
+5. Handler、坏包、未知协议或遗漏响应错误由 Agent 关闭连接并记录诊断；业务拒绝使用自身 Response，客户端断线清理等待。
+
+修复库可以在独立项目直接使用：
+
+```sh
+go get github.com/cnooljaw/gosproto@v0.3.0
+```
+
+本轮已在独立 module 验证普通安装与 64 位整数数组、double 的 Pack/Unpack 往返，无 replace。GSR 新 API 的外部项目接入需等待对应 GSR 发布版本；当前本地开发以该工作树为准。
+
+完整接线见 [Sproto 包](../protocol/sproto/README.md)，可复制运行命令见 [Echo 示例](../examples/websocket-gate/README.md#sproto-联调)。Gate 的 SecurityMode 独立选择 MAC/Plain，客户端协议由 NewAgent 选择。现有 Protobuf Envelope 字段不改名。
+
+| 能力 | Go 修复库 | 本轮 TS Echo 客户端 |
+| --- | --- | --- |
+| string / binary / boolean | 支持，沿用原有类型回归；binary 是 []byte，不新增 binary 数组 | Echo 使用字符串；不宣称验证所有类型 |
+| signed integer / 数组 | 修复负值、空数组与宽度检查，保留 64 位位模式 | 只接受 JavaScript 安全整数，超范围报错 |
+| 原生 double / 数组 | 新增 IEEE-754 支持，官方编码向量对照 | 不作为已验收能力 |
+| 嵌套结构与数组 | 沿用原有类型回归，增加深度/元素预算 | 当前预检限于扁平 Echo schema |
+| map / 自动定点数缩放 / BigInt 客户端 | 未新增或验收 | 未实现 |
+| Request/Response、Notify/Push | 已实现 | Plain/MAC 真正跨语言验证 |
+| 服务端请求客户端并等待 Response | 首版 Dispatcher 不提供 | 未提供 |
+
+默认 packed 输入/输出上限 1 MiB，解包和编码 8 MiB，深度 64，字段/集合元素合计 100000。TS Echo 最多等待 32 个请求，字符串最多 64 KiB，关闭时清理会话；它是 Node.js 联调参考，不是通用浏览器生产 SDK。有限 fuzz、race 和固定向量不能证明所有官方类型/输入组合已穷尽。
+
+## 独立修复库与官方对照（2026-10-15）
+
+[cnooljaw/gosproto v0.2.0](https://github.com/cnooljaw/gosproto/releases/tag/v0.2.0) 基于 xjdrew v0.1.0，保留上游历史与 MIT 许可证，自己的 module 路径和标签避免给业务项目传播 replace。标准库没有 Sproto 实现，使用这个依赖专门解决原生编解码与 pack/unpack，不引入通用协议框架或运行时 C/Lua。
+
+修复覆盖负整数数组、官方空数组、畸形宽度、原生 double、整数溢出、schema 缓存失败、有限资源预算、解码失败保留原值、有界 Unpack，以及 RPC 等待上限和显式清理。生成工具固定 `lvzixun/sprotodump 3a45d3e49ea2bc8e2b607e2c8060b32281d730dd`；TS 参考固定 `sealindx/sproto-ts bbee46fd76e2c9a7401ff9efd1dcadb538908130`，保留其 BSD 许可证并修正实例间 host/会话共享、整数安全范围及包边界。
+
+官方参考仍为 `cloudwu/sproto e93fd5a0653b2bcab38d3b830958bf2e3a901b5f`，未修改其编解码源码。实际扩大边界验证时发现：`sproto.c` 的 `todword` 在 signed int 中计算后返回 size_t，本机 64 位 C/Lua 构建会对低 32 位最高位为 1 的部分 64 位值错误扩展，例如数组里的 MaxInt64 解为 -1。这是固定实现的缺陷，不应改变 Go wire 去复制错误。
+
+因此完整边界向量从独立 Lua 输入由官方编码，Go 编码与其逐字节一致并正确解码；另以官方解码核对四字节负整数数组。固定十六进制向量加入修复库默认测试，无需 Lua；开启 `SPROTO_ORACLE_DIR` 则实际运行 C/Lua 对照。该官方解码限制被显式记录，没有通过只做 Go 自身往返隐藏它。
+
+### 修复库 v0.3.0 职责收敛与 GSR 升级
+
+用户确认 gosproto 对齐官方 Sproto 的协议职责：删除上游额外的 Service 网络 helper、阻塞 Call/异步 Go、Done channel、两字节 TCP 分帧、反射方法注册及其旧网络示例；保留结构体编解码、Pack/Unpack 和原生 type/session RPC。官方 host:dispatch/attach 处理协议消息，连接、调度、Handler 和超时由外部负责。GSR 一直使用自己的 Dispatcher，没有调用被删的 helper。
+
+同时删除只为 Go 方法绑定服务的 Protocol.MethodName、MatchMethod 和 GetProtocolByMethod。此变更已随 [gosproto v0.3.0](https://github.com/cnooljaw/gosproto/releases/tag/v0.3.0) 发布，独立模块的正常安装、RPC 与打包边界验证通过。GSR 当前已正常 require v0.3.0，go.sum 固定发布版本校验和，不使用 replace。sprotodump 包装脚本在生成时剔除 MethodName，C2S/S2C 产物已重新生成；后续重生成会保持相同格式。
+
+以下历史记录保留候选版本的失败证据；“未引入/尚未验证”描述当时状态，不覆盖上述实施结果。
 
 ## 第一轮候选库证据（2026-10-14）
 

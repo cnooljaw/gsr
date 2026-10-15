@@ -33,11 +33,12 @@ func run() error {
 type serverOptions struct {
 	address         string
 	production      bool
+	clientProtocol  string
 	certificateFile string
 	privateKeyFile  string
 }
 
-const serverUsage = "usage: debugserver [--prod] [--addr 127.0.0.1:7888] [--tls-cert FILE --tls-key FILE]"
+const serverUsage = "usage: debugserver [--prod] [--protocol protobuf|sproto] [--addr 127.0.0.1:7888] [--tls-cert FILE --tls-key FILE]"
 
 // parseServerOptions 解析示例服务的监听模式和地址，不引入通用配置框架。
 func parseServerOptions(arguments []string) (serverOptions, error) {
@@ -45,6 +46,12 @@ func parseServerOptions(arguments []string) (serverOptions, error) {
 	addressSet := false
 	for index := 0; index < len(arguments); index++ {
 		switch arguments[index] {
+		case "--protocol":
+			if index+1 >= len(arguments) || (arguments[index+1] != "protobuf" && arguments[index+1] != "sproto") {
+				return serverOptions{}, errors.New(serverUsage)
+			}
+			options.clientProtocol = arguments[index+1]
+			index++
 		case "--prod":
 			options.production = true
 		case "--addr":

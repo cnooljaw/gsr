@@ -115,17 +115,17 @@ enum MsgId {
 
 `Envelope.msg_id` 保持 `uint32`，枚举只提供常量。Agent 的协议分发器根据生成目录选择 Protobuf 类型，并校验方向、消息种类和 request_id；Gate 不解析业务 payload。协议目录由 `.proto` 生成，业务 Handler 仍手动增量注册，二者不要求同时实现。客户端 msg_id 与不同 Service 可复用的内部 `CommandID` 是两套编号。
 
-## 已确认：统一 Gate 与固定协议模式
+## 已确认：统一 Gate 与固定安全模式
 
 - 只有一个 `gate.GateService` 实现和应用入口 `self.Node().CreateGate(ctx, gsr.GateConfig{...})`，不保留独立 DebugGate/ProdGate 包或兼容别名。
 - `gate.SecurityModeMAC` 为零值默认模式：固定 33 字节 X25519 握手后，上行使用 `seq | 业务消息字节 | MAC`，下行只使用业务消息字节。握手或 MAC 失败直接关闭，不降级。现有 Protobuf 示例的业务消息为 Envelope。
 - `gate.SecurityModePlain` 必须显式选择：上下行直接传输业务消息字节，不做 X25519、seq 或 MAC；仅允许绑定字面回环或私有 IP，并由部署限制访问，不能作为公网安全模式。
-- 一个监听固定一种协议，不按首帧猜测，不混用模式。需要同时接入两种模式时，分别打开两个监听，但复用同一个实现。
+- 一个监听固定一种安全模式，不按首帧猜测，不混用模式。需要同时接入两种模式时，分别打开两个监听，但复用同一个实现。
 - TLS 与模式独立：非空 `TLSConfig` 启动 WSS；MAC 模式可在可信内网或由 Ingress/LB 终止 TLS 后使用 WS。公网直连必须启用 TLS。Plain 即使启用 TLS 也保留内网绑定限制。
 - 两种模式共用 TCP 连接限额、Agent 创建、逐帧投递、出站队列、断线通知、停止、日志和指标。仅在握手与入站认证处区分模式，不增加策略接口、插件框架或额外 owner。
 - 两种模式都在 HTTP Handler 之前限制原始 TCP 连接数，未完成 HTTP 请求头的连接也占用名额；请求头和未升级连接的 keep-alive 空闲等待各限 5 秒，超时后释放名额。
 
-底层 `gate.NewGateService` 显式接收 Runtime，应用通过 `gsr.Run` 与 `Node.CreateGate` 组装，不获得 Runtime 投递权限。Gate runner 为每连接创建独立 Agent，连接读循环直接调用 `Runtime.DeliverClientMessage` 投递 Envelope，不逐帧经过 Gate Mailbox；连接到 Agent 的映射只用于断线通知。`ClientSession.Send([]byte)` 将响应放入有界队列，由唯一写循环发送。业务 token 鉴权、请求语义和 payload 解码由 Agent 负责，MAC 不替代业务身份认证。
+底层 `gate.NewGateService` 显式接收 Runtime，应用通过 `gsr.Run` 与 `Node.CreateGate` 组装，不获得 Runtime 投递权限。Gate runner 为每连接创建独立 Agent，连接读循环直接调用 `Runtime.DeliverClientMessage` 投递不透明业务字节，不逐帧经过 Gate Mailbox；连接到 Agent 的映射只用于断线通知。`ClientSession.Send([]byte)` 将响应放入有界队列，由唯一写循环发送。业务 token 鉴权、请求语义和 payload 解码由 Agent 负责，MAC 不替代业务身份认证。
 
 单帧默认上限 4 MiB；出站队列按编码字节加每项 64 字节固定开销计费。两种模式借用 Runtime Logger 并绑定 Gate ServiceID；同一连接同类失败只记录首条，关闭时补充抑制数量，不记录原始载荷、密钥或 MAC。原有 Plain 与 MAC 的接入、创建失败、背压和关闭用例保留在统一 `gate` 包中。
 
@@ -133,7 +133,7 @@ TypeScript CLI 默认使用 Plain；`--secure` 使用固定握手和认证上行
 
 ### 当前归属：Gate 与协议进入框架
 
-连接实现与私有辅助逻辑位于 `gate/`；协议目录、分发、通用 `.proto`、生成类型和生成工具位于同级 `protocol/`，生产代码互不依赖。跨语言认证夹具仍由 Gate 持有。业务 Agent 组合二者，Protocol 将完整 Envelope 编码为字节后交给 ClientSession；Gate 不解释 Envelope。示例只保留 Echo 业务协议、Agent、启动入口和 TypeScript 客户端。统一实现不代表已完成密码协议审计或部署容量验收。
+连接实现与私有辅助逻辑位于 `gate/`；协议目录、分发、通用 `.proto`、生成类型和生成工具位于同级 `protocol/`，生产代码互不依赖。跨语言认证夹具仍由 Gate 持有。业务 Agent 组合二者，具体协议实现将业务消息编码为字节后交给 ClientSession；Gate 不解释 Envelope 或 Sproto package。示例只保留 Echo 业务协议、Agent、启动入口和 TypeScript 客户端。统一实现不代表已完成密码协议审计或部署容量验收。
 
 ## 已确认：业务回复、通用错误与推送
 
@@ -428,3 +428,7 @@ Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/
 `TestMACGateReturnsErrorAfterAgentCallTimeout` 覆盖 Agent 内部 Core Call 超时：客户端收到原 `request_id` 的 `INTERNAL`，目标 Service 之后完成的迟到内部回复不会再生成第二条客户端响应，超时归 Agent/Runtime 而不是 Gate。该测试锁定内部调用的错误归属，不定义客户端业务请求的超时数值或重试策略。
 
 `TestMACGateRejectsLateAgentResponseAfterDisconnect` 已锁定断开后的迟到写回：Gate 先使 `ClientSession` 失效，再通知 Agent；Agent 后续写回得到 `ErrClientSessionClosed`，不会重新进入出站队列。
+
+## Sproto 开发切片
+
+当前工作树按 [ADR 0013](adr/0013-client-protocol-boundaries.md) 新增独立 protocol/sproto 和原生 package(type/session) 分发，复用上述安全模式、字节投递与生命周期。上文 Protobuf 的 Envelope、MessageRoute 与 ErrorResponse 规则仅属于 Protobuf，Sproto 不借用它们；接口及错误契约见 [双协议指南](SPROTO-INTEGRATION.md)。GSR 新增 API 尚未发布。

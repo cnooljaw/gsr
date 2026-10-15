@@ -4,14 +4,16 @@ v1.0.1 API 按 [ADR 0012](docs/adr/0012-node-capabilities-and-service-logging.md
 
 当前版本为 **GSR 1.0.1**（见 [VERSION](VERSION)），于 2026-10-14 发布，继续处于正式内部发布阶段。版本变化和迁移见 [1.0.1 发布说明](docs/RELEASE-1.0.1.md)，最初的内部接入范围见 [1.0 发布说明](docs/RELEASE-1.0.md)。历史 Core/Cluster 切片编号不作为当前产品版本号。
 
-当前开发切片按 [ADR 0013](docs/adr/0013-client-protocol-boundaries.md) 将 Gate 模式改名为 SecurityMode，尚未发布；Sproto 边界已确认，接入仍在按步骤验证，不能将本计划描述为已支持双协议。
+当前开发切片按 [ADR 0013](docs/adr/0013-client-protocol-boundaries.md) 将 Gate 模式改名为 SecurityMode，尚未发布；新增独立 protocol/sproto，Go/TypeScript Echo 已接通 Protobuf/Sproto；本开发切片尚未发布，不表示 v1.0.1 标签支持新 API。
 
 ## Glossary
 
 - **Node 能力**：self.Node() 提供 RegisterService/OpenCluster/ClusterListenAddress/OpenHTTP/CreateGate，保存节点运行状态，Run 管理生命周期，业务借用同一对象；同 Run 共享、不同 Run 隔离，不提供关闭、业务通信或内部组件访问，仅在当前回调使用。名称归目标 ServiceID，HTTP/Cluster 归运行环境，Gate 资源归独立 GateService。
 - **应用配置**：gsr.RuntimeConfig 与 gsr.ClusterConfig 不暴露 Logger，Run 转换到底层配置并统一注入；底层基础设施配置仍可借用 Logger。
 
-- **Gate / 客户端协议边界**：Gate 只收发不透明字节并拥有连接、安全封装、有界队列和关闭；具体协议负责自身的编解码、校验和分发，只依赖字节发送窄接口。现有 protocol 包为 Protobuf 实现，其 Envelope/Registry/MessageRoute/Direction/Kind 不作为其它协议的公共模型；Sproto 使用自身的协议与 package(type/session)，实现尚待完成。Gate 与协议实现互不依赖，业务 Agent 是组合点。ClientSession.Send 接纳时复制字节快照，成功只表示本地入队，不保证送达或执行一次。
+- **Gate / 客户端协议边界**：Gate 只收发不透明字节并拥有连接、安全封装、有界队列和关闭；具体协议负责自身的编解码、校验和分发，只依赖字节发送窄接口。现有 protocol 包为 Protobuf 实现，其 Envelope/Registry/MessageRoute/Direction/Kind 不作为其它协议的公共模型；Sproto 使用自身的协议与 package(type/session)，实现位于 protocol/sproto，使用独立维护的 github.com/cnooljaw/gosproto v0.3.0。Gate 与协议实现互不依赖，业务 Agent 是组合点。ClientSession.Send 接纳时复制字节快照，成功只表示本地入队，不保证送达或执行一次。
+
+- **Sproto 客户端关联**：客户端 Request 使用正 int32 session，Response 沿原 session；Notify/Push 不带 session，不进入 Core/Cluster Session。每连接 Agent 持有独立 Dispatcher；Context 只在当前同步 Handler 有效。业务失败由自身 Response 表达；坏包、未知协议、框架失败和遗漏响应返回诊断，由 Agent 关闭连接。首版不支持服务端等待客户端回应。
 
 - **协议 Handler 上下文**：`protocol.Dispatcher[gsr.CommandContext]` 将当前 `HandleClientMessage` 的 self 原样传到强类型 Handler；self 提供 Agent 的 Service 能力，独立的 `protocol.Context` 提供客户端请求关联和 Response/Push。两者仅在当前同步 Handler 内使用，不存入 Agent 字段或异步任务。协议包只透传类型参数，不依赖应用层 `gsr`。
 

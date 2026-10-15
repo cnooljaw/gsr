@@ -4,6 +4,22 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## GSR 升级 gosproto v0.3.0（2026-10-15）
+
+GSR 已正常 require github.com/cnooljaw/gosproto v0.3.0，go.sum 固定发布校验和，无 replace。更新现有 sprotodump 包装脚本，生成时剔除已移除的 MethodName 字段；C2S/S2C 产物重新生成，两次生成结果哈希一致。GSR 的 Agent/Dispatcher 未依赖被删的网络 Service helper，无需增加兼容层。
+
+使用正式依赖与真实生成物（无临时 modfile/overlay）运行 protocol/sproto 和 Go Echo package race，通过。`npm run test:sproto:integration` 五项全部通过（零跳过），覆盖 Plain/MAC、Unicode 请求、业务拒绝、Notify/Push 和坏包关闭。`go test ./... -timeout=2m` 与 `go vet ./...` 通过；新增验证集中在依赖和生成接线，没有重复添加底层编解码测试。
+
+## Sproto 修复库与双协议纵向切片（2026-10-15）
+
+独立 cnooljaw/gosproto v0.2.0 保留 xjdrew v0.1.0 基线和许可证，修复负整数数组、空数组、坏宽度、原生 double、溢出、schema 缓存失败及有限字节/深度/元素预算；回归、官方 C/Lua 对照、race、vet 和 30 秒有限 fuzz 通过；同一提交的 GitHub CI 在 Ubuntu/Lua 5.4 下也通过官方对照、race、vet 和 fuzz。固定官方版本自身的 64 位 todword 解码缺陷已记录；完整边界采用独立官方编码向量与 Go 编码逐字节比对，并验证 Go 解码，不复制错误解码。
+
+独立 module 正常安装已发布 v0.2.0，64 位整数数组和 double 往返通过；GSR 已移除开发 replace，go.sum 固定校验和，发布模块下相关 package 全测通过。
+
+GSR 新增 protocol/sproto 的构造校验、原生零 type、Response/Notify/Push、session、同步 Context、重复响应、坏包与错误契约测试。复用原 Echo 业务和连接夹具，Go 与 TypeScript 通过真正的 Plain/MAC WebSocket 链路验证 Unicode 请求、业务拒绝、Notify→Push 和坏包关闭；MainService 打开 Gate 后退出，连接 Agent 继续运行。`npm run test:sproto:integration` 全部五项通过（零跳过），认证固定向量 `test:crypto` 保持通过；固定 sprotodump 能重建 Go 产物。
+
+`GSR_PROCESS_TEST=1 go test -race ./... -timeout=2m` 通过（Gate 约 35 秒），覆盖现有 Protobuf 和跨进程回归；全仓 go vet 通过。新增验证的增量为 Sproto 原生分发及跨语言接线，未为相同 Core 契约重复建立夹具。TS 示例仅验收扁平 Echo 与安全整数，不扩展为完整浏览器 SDK、map、BigInt 或 double 支持结论。新 GSR API 尚未发布；历史记录中的“尚未接入”保留当时含义。
+
 ## Sproto 官方与第二候选库对照（2026-10-14）
 
 固定官方 cloudwu/sproto 提交编译 C/Lua 实现，实际验证负整数数组、标量、double、规范空数组、非规范空数组和非法非空零宽度数组。用官方向量检查 davyxu/gosproto 固定提交及 xjdrew/gosproto v0.1.0：davyxu 五条门禁均未通过，xjdrew 通过负整数标量，其余四条未通过。另更正此前将零宽度无元素输入笼统称为坏包的表述：官方接受该输入，Go 候选库触发 panic，仍属于兼容性缺陷。

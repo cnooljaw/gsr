@@ -4,7 +4,7 @@ GSR 是使用 Go 实现的游戏服务器 Service Runtime，借鉴 Skynet 的 Se
 
 当前版本为 **1.0.1**（见 [VERSION](VERSION)），处于正式内部发布阶段。相对 v1.0.0 的变化、迁移说明和验证结果见 [1.0.1 发布说明](docs/RELEASE-1.0.1.md)；最初的接入范围见 [1.0 内部发布说明](docs/RELEASE-1.0.md)。
 
-当前开发改动将 Gate 模式命名为 SecurityMode，以区分握手/传输认证与业务协议；此改名尚未发布。Sproto 扩展按 [双协议接入计划](docs/SPROTO-INTEGRATION.md) 逐步推进，当前可运行实现仍为 Protobuf。
+当前开发改动将 Gate 模式命名为 SecurityMode，以区分握手/传输认证与业务协议；此改名尚未发布。当前工作树新增独立 `protocol/sproto` 和 Go/TypeScript Echo，支持 Protobuf 或 Sproto，由 Agent 选择；接入方式与限制见 [双协议指南](docs/SPROTO-INTEGRATION.md)。GSR 新增 API 尚未发布，v1.0.1 标签保持原实现。
 
 ## 快速开始
 
