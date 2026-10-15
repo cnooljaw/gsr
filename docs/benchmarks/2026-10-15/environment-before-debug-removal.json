@@ -1,0 +1,10 @@
+{
+  "date": "2026-10-15T03:17:36.049Z",
+  "commit": "06d5941f41570cb0f042ead6b11cd5432e39d08c",
+  "workingTree": " M examples/websocket-gate/package.json\n?? examples/websocket-gate/benchmarks/\n?? examples/websocket-gate/client/src/protocol_benchmark.ts\n?? examples/websocket-gate/scripts/benchmark-protocol.mjs\n",
+  "go": "go version go1.24.13 darwin/arm64",
+  "node": "v23.11.0",
+  "cpu": "Apple M2",
+  "os": "darwin 23.4.0 arm64",
+  "goCommand": "GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks -run ^$ -bench ^BenchmarkProtocolCodec$ -benchmem -benchtime=200ms -count=5 -timeout=2m"
+}

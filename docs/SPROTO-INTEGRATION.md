@@ -66,6 +66,10 @@ go get github.com/cnooljaw/gosproto@v0.3.0
 
 默认 packed 输入/输出上限 1 MiB，解包和编码 8 MiB，深度 64，字段/集合元素合计 100000。TS Echo 最多等待 32 个请求，字符串最多 64 KiB，关闭时清理会话；它是 Node.js 联调参考，不是通用浏览器生产 SDK。有限 fuzz、race 和固定向量不能证明所有官方类型/输入组合已穷尽。
 
+编解码速度使用共用消息夹具分别测 Go/TS 的 payload 和应用帧，不将网络或业务调度混入；命令及比较口径见 [Benchmark 使用说明](../examples/websocket-gate/benchmarks/README.md)，本机大小、耗时和分配结果见 [2026-10-15 报告](benchmarks/2026-10-15/report.md)。当前性能基线只覆盖 Echo 字符串，未覆盖全部类型。测量发现并删除 TS `write_ff` 中未使用的逐字节十六进制调试字符串，保留优化前后数据；wire 不变。
+
+随后补充 [官方 AddressBook 与游戏数值/数组报告](benchmarks/2026-10-15-representative/report.md)，Go/TS 分别测纯 Encode/Decode、Pack/Unpack 及组合路径，Sproto 固定 wire 与官方 C/Lua 对照通过。额外 TS 探针确认 boolean 会被安全整数检查拒绝，混合正负 int64 数组也未通过往返；正式性能数组限定在 int32，不将其解释为通用类型支持。CPU/分配证据与尚未实施的修复、优化顺序见 [分析与方案](benchmarks/2026-10-15-representative/ANALYSIS-AND-PLAN.md)。
+
 ## 独立修复库与官方对照（2026-10-15）
 
 [cnooljaw/gosproto v0.2.0](https://github.com/cnooljaw/gosproto/releases/tag/v0.2.0) 基于 xjdrew v0.1.0，保留上游历史与 MIT 许可证，自己的 module 路径和标签避免给业务项目传播 replace。标准库没有 Sproto 实现，使用这个依赖专门解决原生编解码与 pack/unpack，不引入通用协议框架或运行时 C/Lua。

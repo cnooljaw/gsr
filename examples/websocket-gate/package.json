@@ -13,7 +13,11 @@
     "generate:sproto": "node scripts/generate-sproto.mjs",
     "test:sproto": "npm run build && node --test client/dist/sproto_client.test.js",
     "client:sproto": "npm run build && node client/dist/sproto_client.js",
-    "test:sproto:integration": "npm run build && go build -o ../../tmp/sproto-echo ./cmd/debugserver && GSR_SPROTO_SERVER_BIN=../../tmp/sproto-echo node --test client/dist/sproto_client.test.js"
+    "test:sproto:integration": "npm run build && go build -o ../../tmp/sproto-echo ./cmd/debugserver && GSR_SPROTO_SERVER_BIN=../../tmp/sproto-echo node --test client/dist/sproto_client.test.js",
+    "bench:protocol": "npm run build && node scripts/benchmark-protocol.mjs",
+    "bench:representative": "npm run build && node scripts/benchmark-representative.mjs",
+    "profile:protocol": "npm run build && node scripts/profile-protocol.mjs",
+    "generate:benchmark": "node scripts/generate-benchmark-schema.mjs"
   },
   "dependencies": {
     "@bufbuild/protobuf": "2.15.0"

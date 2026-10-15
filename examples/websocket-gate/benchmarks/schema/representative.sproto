@@ -1,0 +1,39 @@
+# PhoneNumber 提至顶层以适应 TS 参考 parser，字段布局与官方嵌套声明相同。
+.PhoneNumber {
+    number 0 : string
+    type 1 : integer
+}
+.Person {
+    name 0 : string
+    id 1 : integer
+    email 2 : string
+    phone 3 : *PhoneNumber
+}
+.AddressBook {
+    person 0 : *Person
+}
+.Item {
+    id 0 : integer
+    count 1 : integer
+    power 2 : integer
+}
+.GameState {
+    playerId 0 : integer
+    tick 1 : integer
+    hp 2 : integer
+    mp 3 : integer
+    level 4 : integer
+    x 5 : integer
+    y 6 : integer
+    state 7 : integer
+    attributes 8 : *integer
+    skillIds 9 : *integer
+    items 10 : *Item
+    labels 11 : *string
+}
+.IntArrays {
+    values 0 : *integer
+}
+.EchoRequest {
+    text 0 : string
+}

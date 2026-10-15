@@ -4,6 +4,18 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## AddressBook、数值/数组与分阶段 Profile（2026-10-15）
+
+补充独立代表性消息套件：官方 AddressBook、两档游戏状态、896 元素 int32 边界数组、4 KiB ASCII。五组 Sproto raw/packed 与固定官方 C/Lua 逐组 SHA-256 对照通过，六份官方源码由 GitHub API 验证固定版本一致；AddressBook 复现 Sproto 130/83 字节、PB 69 字节。Go 与 TS 固定 wire、完整语义和 padding 检查通过，Go 夹具测试通过。两种语言各 40 项、五轮采样全部完成，分开报告 Encode、Decode、Pack、Unpack 及组合路径。
+
+对 AddressBook/game_large 各六步骤采集 Go CPU/分配与 TS CPU/V8 分配，共 24 组，完整 profile 留在 tmp，环境、命令和 top 汇总随报告保存。CPU 与分配采集分开，profile 不用作计时结果。新 TS 能力探针暴露 boolean 与混合正负 int64 数组问题，明确列为未通过，没有跳过后宣称支持；本轮只测 int32 数组，不修改编解码器。未重复运行无关全仓/race 测试。结果、profile 限制和待实施优化方案见 [新报告](benchmarks/2026-10-15-representative/report.md) 与 [分析](benchmarks/2026-10-15-representative/ANALYSIS-AND-PLAN.md)。
+
+## Protobuf / Sproto Go 与 TS 编解码 Benchmark（2026-10-15）
+
+新增共用 Echo 字符串夹具及固定 wire SHA-256，Go/TS 各测 32 项，覆盖短 ASCII、UTF-8、4 KiB ASCII、零字节密集输入的 payload/frame 编码和解码。两种语言在计时前均验证字节签名与语义往返；TS 具名 payload schema 的应用帧另与真实 Echo 客户端逐字节核对。五轮采样、环境、分配、包大小、波动范围及命令见 [报告](benchmarks/2026-10-15/report.md)。仅报告本机微基准，不扩展到数组、嵌套结构或端到端吞吐。
+
+测量定位到 TS write_ff 中逐字节生成未使用的十六进制调试字符串；删除该无用计算后，同口径 4 KiB ASCII 帧编码中位耗时由约 452 µs 降至 19.6 µs。保留独立前后原始数据，最终横向比较统一为每次构造外层头对象。移除调试计算后，现有 Go/TS Sproto Plain/MAC 集成测试五项全通过、零跳过；最终基准全部完成，wire 检查通过，TS 构建与 diff 检查通过。部分本机样本存在明显负载波动，报告中显式列出；没有重复运行无关全仓/race 测试。
+
 ## TS Sproto 长报文与解包扩容（2026-10-15）
 
 扩展现有 Plain/MAC Go↔TS 集成用例，验证 2 KiB、4 KiB 附近的非零长字符串，以及零字节密集、零/非零混合字符串的 Request/Response 和 Notify/Push。非零边界通过后，高压缩率字符串在两种模式下均复现 truncated Sproto data；问题来自示例 TS 参考解包器在缓冲区不足时提前停止扫描，或跳过放不下的 FF 块而未计入输出长度。

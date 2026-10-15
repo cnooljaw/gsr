@@ -178,3 +178,11 @@ SPROTODUMP_DIR=/path/to/sprotodump npm run generate:sproto
 生成文件已包含在示例中，普通运行不需要 Lua。脚本规范模块导入、来源路径和工具添加的协议名前缀，并剔除 gosproto v0.3.0 已移除的 MethodName 方法绑定字段，不另建 generator。TS 加载同一份 schema；参考源码来源、许可证与本地修正见 `client/src/vendor/`。当前 TS 客户端面向扁平 Echo schema，支持安全整数、字符串、session 与 Push，限制 pending/报文/字符串；它不是包含 map、double 或 BigInt 的通用客户端 SDK。
 
 阅读 [`sproto_agent.go`](cmd/debugserver/sproto_agent.go) 及 [Sproto Dispatcher](../../protocol/sproto/README.md)。Go 编码器完整支持范围和官方对照证据见 [双协议指南](../../docs/SPROTO-INTEGRATION.md)。
+
+## 编解码 Benchmark
+
+在仓库根目录执行 `npm --prefix examples/websocket-gate run bench:protocol`，顺序测量 Go 和 TypeScript 对相同 Echo 内容的 Protobuf/Sproto 编解码速度，分别报告 payload、应用帧和包大小。需先安装本示例锁定的 npm 依赖；不需要启动服务器或安装 Lua。
+
+口径与单独运行命令见 [Benchmark 使用说明](benchmarks/README.md)，已保存的本机结果见 [2026-10-15 报告](../../docs/benchmarks/2026-10-15/report.md)。默认输出位于仓库的 `tmp/protocol-benchmark/`，包含 Markdown 报告、Go 原始采样、TS 五轮 JSON 和运行环境。该微基准不包含网络、MAC 或 Service 调度。
+
+官方 AddressBook、游戏数值与数组的独立消息体套件运行 `npm --prefix examples/websocket-gate run bench:representative`；CPU/分配分析运行 `npm --prefix examples/websocket-gate run profile:protocol`。两条命令顺序执行，采样口径、TS 已知能力缺口及后续优化顺序见 [代表性消息报告](../../docs/benchmarks/2026-10-15-representative/report.md) 和 [分析与方案](../../docs/benchmarks/2026-10-15-representative/ANALYSIS-AND-PLAN.md)。

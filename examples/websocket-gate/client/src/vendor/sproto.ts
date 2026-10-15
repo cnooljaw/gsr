@@ -937,11 +937,8 @@ class Sproto {
 		dstbuffer[ff_desstart + 1] = align8_n / 8 - 1;
 
 		let start = ff_desstart + 2;
-		let str = "";
-
 		for (let i = start; i < start + n; ++i) {
 			dstbuffer[i] = buffer[ff_srcstart + i - start];
-			str += dstbuffer.toString("hex", i, i + 1) + " ";
 		}
 
 		start += n;

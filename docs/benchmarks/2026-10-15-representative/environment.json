@@ -1,0 +1,40 @@
+{
+  "date": "2026-10-15T03:41:21.780Z",
+  "commit": "06d5941f41570cb0f042ead6b11cd5432e39d08c",
+  "workingTree": " M docs/SPROTO-INTEGRATION.md\n M docs/VALIDATION-STATUS.md\n M examples/websocket-gate/README.md\n M examples/websocket-gate/client/src/vendor/sproto.ts\n M examples/websocket-gate/package.json\n?? docs/benchmarks/\n?? examples/websocket-gate/benchmarks/\n?? examples/websocket-gate/client/src/gen/benchmark/\n?? examples/websocket-gate/client/src/protocol_benchmark.ts\n?? examples/websocket-gate/client/src/representative_benchmark.ts\n?? examples/websocket-gate/scripts/benchmark-oracle.py\n?? examples/websocket-gate/scripts/benchmark-protocol.mjs\n?? examples/websocket-gate/scripts/benchmark-representative.mjs\n?? examples/websocket-gate/scripts/generate-benchmark-schema.mjs\n",
+  "go": "go version go1.24.13 darwin/arm64",
+  "node": "v23.11.0",
+  "cpu": "Apple M2",
+  "cpuCount": 8,
+  "os": "darwin 23.4.0 arm64",
+  "loadBefore": [
+    4.90869140625,
+    5.40478515625,
+    5.63720703125
+  ],
+  "commands": {
+    "go": [
+      "GOMAXPROCS=1",
+      "go",
+      "test",
+      "./examples/websocket-gate/benchmarks",
+      "-run",
+      "^TestRepresentativeFixtures$",
+      "-bench",
+      "^BenchmarkRepresentativeCodec$",
+      "-benchmem",
+      "-benchtime=200ms",
+      "-count=5",
+      "-timeout=2m"
+    ],
+    "typescript": [
+      "/opt/homebrew/Cellar/node/23.11.0/bin/node",
+      "client/dist/representative_benchmark.js"
+    ]
+  },
+  "loadAfter": [
+    5.45556640625,
+    5.529296875,
+    5.66455078125
+  ]
+}
