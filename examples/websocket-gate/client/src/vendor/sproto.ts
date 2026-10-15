@@ -1024,85 +1024,53 @@ class Sproto {
 	}
 
 	unpack(buffer: Buffer) {
-		// let osz = ENCODE_BUFFERSIZE;
-		let osz = buffer.length * 2;
-		let outbuffer = Buffer.allocUnsafe(osz);
-		let sz = this.lunpack(buffer, outbuffer);
-
-		if (sz < 0) {
-			console.error("[sproto error]: Invalid unpack stream");
+		const maxSize = 8 * 1024 * 1024;
+		const capacity = Math.min(maxSize, Math.max(8, buffer.length * 2));
+		let outbuffer = Buffer.allocUnsafe(capacity);
+		const size = this.lunpack(buffer, outbuffer);
+		if (size < 0) {
 			return null;
 		}
-
-		if (sz > osz) {
-			do {
-				osz *= 2;
-                if (osz > 8 * 1024 * 1024) throw new Error("Sproto unpack size limit");
-				outbuffer = Buffer.allocUnsafe(osz);
-			} while (sz > osz);
-
-			sz = this.lunpack(buffer, outbuffer);
-			if (sz < 0) {
-				console.error("[sproto error]: Invalid unpack stream");
+		if (size > capacity) {
+			// 首次扫描计算完整输出长度；按确切大小分配，再写入完整内容。
+			outbuffer = Buffer.allocUnsafe(size);
+			if (this.lunpack(buffer, outbuffer) !== size) {
 				return null;
 			}
 		}
-
-		return outbuffer.slice(0, sz);
+		return outbuffer.subarray(0, size);
 	}
 
 	lunpack(buffer: Buffer, outbuffer: Buffer) {
 		let srcidx = 0;
 		let outidx = 0;
-
-		let srcsz = buffer.length;
-		let outsz = outbuffer.length;
-
-		while (srcsz > 0) {
+		while (srcidx < buffer.length) {
 			let bits = buffer[srcidx++];
-			--srcsz;
-
 			if (bits === 0xff) {
-				let n = (buffer[srcidx++] + 1) * 8;
-				--srcsz;
-
-				if (srcsz < n)
-					return -1;
-
-				if (outsz - outidx >= n) {
-					for (let j = 0; j < n; ++j) {
-						outbuffer[outidx++] = buffer[srcidx++];
-					}
+				if (srcidx >= buffer.length) return -1;
+				const length = (buffer[srcidx++] + 1) * 8;
+				if (length > buffer.length - srcidx) return -1;
+				if (length <= outbuffer.length - outidx) {
+					buffer.copy(outbuffer, outidx, srcidx, srcidx + length);
 				}
-				srcsz -= n;
-
+				// 即使缓冲区暂时不足，仍完整扫描并累计所需长度。
+				srcidx += length;
+				outidx += length;
 			} else {
-				for (let i = 0; i < 8; ++i) {
-					if ((bits & 1) === 1) {
-						if (srcsz <= 0) {
-							return -1;
-						}
-						if (outidx < outsz) {
-							outbuffer[outidx] = buffer[srcidx];
-						}
-						--srcsz;
-						++outidx;
-						++srcidx;
-					} else {
-						if (outidx < outsz) {
-							outbuffer[outidx] = 0;
-						} else {
-							return outidx + 1;
-						}
-						++outidx;
+				for (let index = 0; index < 8; index++) {
+					let value = 0;
+					if ((bits & 1) !== 0) {
+						if (srcidx >= buffer.length) return -1;
+						value = buffer[srcidx++];
 					}
+					if (outidx < outbuffer.length) outbuffer[outidx] = value;
+					outidx++;
 					bits >>>= 1;
 				}
 			}
+			if (outidx > 8 * 1024 * 1024) throw new Error("Sproto unpack size limit");
 		}
-
 		return outidx;
-
 	}
 
 	private toword(p, pos) {

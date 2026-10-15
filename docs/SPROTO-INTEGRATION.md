@@ -70,7 +70,7 @@ go get github.com/cnooljaw/gosproto@v0.3.0
 
 [cnooljaw/gosproto v0.2.0](https://github.com/cnooljaw/gosproto/releases/tag/v0.2.0) 基于 xjdrew v0.1.0，保留上游历史与 MIT 许可证，自己的 module 路径和标签避免给业务项目传播 replace。标准库没有 Sproto 实现，使用这个依赖专门解决原生编解码与 pack/unpack，不引入通用协议框架或运行时 C/Lua。
 
-修复覆盖负整数数组、官方空数组、畸形宽度、原生 double、整数溢出、schema 缓存失败、有限资源预算、解码失败保留原值、有界 Unpack，以及 RPC 等待上限和显式清理。生成工具固定 `lvzixun/sprotodump 3a45d3e49ea2bc8e2b607e2c8060b32281d730dd`；TS 参考固定 `sealindx/sproto-ts bbee46fd76e2c9a7401ff9efd1dcadb538908130`，保留其 BSD 许可证并修正实例间 host/会话共享、整数安全范围及包边界。
+修复覆盖负整数数组、官方空数组、畸形宽度、原生 double、整数溢出、schema 缓存失败、有限资源预算、解码失败保留原值、有界 Unpack，以及 RPC 等待上限和显式清理。生成工具固定 `lvzixun/sprotodump 3a45d3e49ea2bc8e2b607e2c8060b32281d730dd`；TS 参考固定 `sealindx/sproto-ts bbee46fd76e2c9a7401ff9efd1dcadb538908130`，保留其 BSD 许可证并修正实例间 host/会话共享、整数安全范围、包边界和高压缩率输入的解包扩容。
 
 官方参考仍为 `cloudwu/sproto e93fd5a0653b2bcab38d3b830958bf2e3a901b5f`，未修改其编解码源码。实际扩大边界验证时发现：`sproto.c` 的 `todword` 在 signed int 中计算后返回 size_t，本机 64 位 C/Lua 构建会对低 32 位最高位为 1 的部分 64 位值错误扩展，例如数组里的 MaxInt64 解为 -1。这是固定实现的缺陷，不应改变 Go wire 去复制错误。
 

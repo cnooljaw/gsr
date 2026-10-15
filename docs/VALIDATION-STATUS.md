@@ -4,6 +4,12 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## TS Sproto 长报文与解包扩容（2026-10-15）
+
+扩展现有 Plain/MAC Go↔TS 集成用例，验证 2 KiB、4 KiB 附近的非零长字符串，以及零字节密集、零/非零混合字符串的 Request/Response 和 Notify/Push。非零边界通过后，高压缩率字符串在两种模式下均复现 truncated Sproto data；问题来自示例 TS 参考解包器在缓冲区不足时提前停止扫描，或跳过放不下的 FF 块而未计入输出长度。
+
+按官方 sproto_unpack 的行为，缓冲不足时仍完整扫描、推进输入和输出计数，计算有限的完整输出长度后按确切大小重新分配，并保留 8 MiB 上限。现有单元用例增加高压缩率和 FF 连续块的往返断言，以及超预算拒绝；无需启动 Go 服务端即可保护此回归。修复后 `npm run test:sproto:integration` 五项全部通过（零跳过），包含新增的长报文场景；diff 检查通过。修复只影响 TS 联调参考，不新增 SDK 或公共协议模型。
+
 ## GSR 升级 gosproto v0.3.0（2026-10-15）
 
 GSR 已正常 require github.com/cnooljaw/gosproto v0.3.0，go.sum 固定发布校验和，无 replace。更新现有 sprotodump 包装脚本，生成时剔除已移除的 MethodName 字段；C2S/S2C 产物重新生成，两次生成结果哈希一致。GSR 的 Agent/Dispatcher 未依赖被删的网络 Service helper，无需增加兼容层。

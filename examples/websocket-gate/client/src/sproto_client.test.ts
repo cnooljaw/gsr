@@ -49,6 +49,17 @@ test("Sproto pending and packet limits", () => {
   assert.throws(() => client.decode(Uint8Array.of(255)), /truncated/);
   assert.throws(() => client.decode(new Uint8Array((1 << 20) + 1)), /size/);
   client.close();
+
+  // 原生解包器必须完整统计输出长度，包括首次缓冲区放不下的 FF 连续块。
+  const codec = new Sproto(c2sSchema);
+  for (const raw of [
+    Buffer.alloc(4096),
+    Buffer.concat([Buffer.alloc(4096), Buffer.alloc(2048, 1)]),
+    Buffer.concat([Buffer.alloc(2048, 1), Buffer.alloc(4096)]),
+  ]) {
+    assert.deepEqual(codec.unpack(codec.pack(raw)), raw);
+  }
+  assert.throws(() => codec.unpack(Buffer.alloc((8 << 20) / 8 + 1)), /size limit/);
 });
 
 const binary = process.env.GSR_SPROTO_SERVER_BIN;
@@ -76,18 +87,29 @@ for (const secure of [false, true]) {
       server.once("exit", code => { clearTimeout(timer); reject(new Error(`server exited ${code}: ${diagnostics}`)); });
     });
     try {
-      const response = await exchange(url, "中文🙂", false, secure);
-      assert.equal(response.replay, "RESPONSE");
-      assert.equal(response.session, 1);
-      assert.equal(response.result.code, 1);
-      assert.equal(response.result.text, "中文🙂");
+      // 大量非零字节会跨越连续 packing 块；在真实 TS→Go→TS 链路验证长度与内容。
+      const texts = [
+        "中文🙂",
+        ...[2045, 2046, 2047, 2048, 2049, 4094, 4095, 4096].map(length => "x".repeat(length)),
+        "\0".repeat(4096),
+        "\0".repeat(2048) + "x".repeat(2046),
+      ];
+      for (const text of texts) {
+        const response = await exchange(url, text, false, secure);
+        assert.equal(response.replay, "RESPONSE");
+        assert.equal(response.session, 1);
+        assert.equal(response.result.code, 1);
+        assert.equal(response.result.text, text, `Echo changed ${Buffer.byteLength(text)} bytes`);
+      }
       const rejection = await exchange(url, "", false, secure);
       assert.equal(rejection.result.code, 2);
       assert.equal(rejection.result.message, "text is required");
-      const push = await exchange(url, "notice", true, secure);
-      assert.equal(push.replay, "REQUEST");
-      assert.equal(push.name, "push");
-      assert.equal(push.result.text, "notice");
+      for (const text of ["notice", "x".repeat(4094), "\0".repeat(4096)]) {
+        const push = await exchange(url, text, true, secure);
+        assert.equal(push.replay, "REQUEST");
+        assert.equal(push.name, "push");
+        assert.equal(push.result.text, text, `Push changed ${Buffer.byteLength(text)} bytes`);
+      }
       if (!secure) {
         const connection = new WebSocket(url);
         connection.binaryType = "arraybuffer";
