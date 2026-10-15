@@ -76,14 +76,13 @@ TS 采样前 load average：6.06 / 5.86 / 5.63；采样后：11.20 / 7.30 / 6.19
 
 ## 复现
 
-先按 [本地 Go 优化版说明](RESULTS.md#复现本地-go-优化版) 检出独立库提交并准备临时 modfile，再执行：
+本表保留发布前同一源码的原始采样；当前 GSR 已依赖正式 v0.4.0，可按 [正式依赖说明](RESULTS.md#使用正式依赖复现) 直接执行：
 
 ```sh
-GOFLAGS=-modfile=/tmp/gsr-codec.mod npm --prefix examples/websocket-gate run bench:representative
-GOFLAGS=-modfile=/tmp/gsr-codec.mod GSR_PROFILE_SCENARIO=game_large \
-  npm --prefix examples/websocket-gate run profile:protocol
+npm --prefix examples/websocket-gate run bench:representative
+GSR_PROFILE_SCENARIO=game_large npm --prefix examples/websocket-gate run profile:protocol
 ```
 
-原始数据：[Go](go.txt)、[TS](typescript.json)、[环境](environment.json)。默认新结果位于 tmp/protocol-representative/；默认 profile 位于 tmp/protocol-profile/，本轮原始 profile 保存在 tmp/protocol-profile-optimized/。方法、汇总及边界见 [Profile 验收](RESULTS.md#profile-验收)。不设临时 modfile 时 Go 仍测正式 v0.3.0，不能当作此表的优化结果。
+原始数据：[Go](go.txt)、[TS](typescript.json)、[环境](environment.json)。默认新结果位于 tmp/protocol-representative/；默认 profile 位于 tmp/protocol-profile/，本轮原始 profile 保存在 tmp/protocol-profile-optimized/。方法、汇总及边界见 [Profile 验收](RESULTS.md#profile-验收)。发布版与采样时的五份 Go 源码哈希一致，原始环境仍记录当时的 v0.3.0 + 本地覆盖，不改写历史数据。
 
 本轮没有重跑官方历史 C/Lua 对 pbc-lua 的速度排名，不宣称复现它的性能倍数，也没有测 BigInt、完整 int64、浮点和浏览器。

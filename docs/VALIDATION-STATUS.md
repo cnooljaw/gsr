@@ -4,6 +4,12 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## gosproto v0.4.0 发布与 GSR 正式依赖升级（2026-10-15）
+
+[gosproto v0.4.0](https://github.com/cnooljaw/gosproto/releases/tag/v0.4.0) 已正式发布，标签指向 `3f2491f7b2701c710fdfc9dfa7952c8e7002dd1d`。本机官方 C/Lua 对照、完整 race 与 vet 通过；GitHub 分支和标签两次 CI 均通过，包含固定官方对照、race、vet 和三个各 30 秒的有限 fuzz 入口。发布版五份 Go 编解码源文件与优化 Benchmark 保存的哈希一致，未改写历史采样环境或重新宣称性能结果。
+
+GSR 已正常 require v0.4.0，go.sum 使用发布校验和，无 replace 或临时 modfile。`go mod tidy` 仅移除旧版校验和；`GSR_PROCESS_TEST=1 go test -race ./... -timeout=2m` 与 `go vet ./...` 通过，包含跨进程回归、Sproto Dispatcher 和 Benchmark 固定 wire 验证。真实 Plain/MAC Go↔TS 集成六项全部通过、零跳过，覆盖官方向量、安全整数、会话隔离、长报文、Request/Response、Notify/Push 和坏包关闭。协议类型未变化，无需重新生成。
+
 ## Sproto 正确性与五步优化验收（2026-10-15）
 
 基线提交为 `d942321`。TS boolean 与混合正负 int64 数组缺陷先由现有测试新增用例复现，再修复；20 组独立官方 C/Lua raw/packed 向量、非法整数拒绝及输出快照检查通过。固定官方源码哈希检查通过，真实 Plain/MAC Go↔TS Echo 六项测试全部通过、零跳过，包含长报文、Notify/Push 与坏包关闭。
@@ -12,7 +18,7 @@ Go 库已完成头部流式解码、数组一次分配、最终缓冲直写及 P
 
 两种语言各 40 项五轮基准、32 字节小包专项及 game_large 六步骤的独立 CPU/分配 profile 已完成。大型游戏消息 TS Encode 约 34.6 → 18.0 µs；Go Encode 320 → 1 次分配，Decode 1143 → 534 次分配。TS/Go 中出现回退的尝试已撤回，完整结果与限制见 [优化实施与验收](benchmarks/2026-10-15-optimized/RESULTS.md)。
 
-Go 优化已在独立库本地提交为 `931e2a6`，尚未推送或发布；GSR 正式依赖仍是 v0.3.0。优化接线和测量使用临时 modfile，并保存实际依赖覆盖及源码哈希。GSR 默认依赖的全仓 race/vet 亦通过，与本地优化库验收分开记录，不混为已升级正式依赖。
+上述采样发生在 Go 优化提交 `931e2a6` 发布前，当时 GSR 正式依赖为 v0.3.0；优化接线和测量使用临时 modfile，并保存实际依赖覆盖及源码哈希。当时 GSR 默认依赖的全仓 race/vet 亦通过，与本地优化库验收分开记录。后续 v0.4.0 发布和正式依赖升级结果见上一节。
 
 ## AddressBook、数值/数组与分阶段 Profile（2026-10-15）
 

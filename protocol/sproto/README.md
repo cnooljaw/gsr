@@ -1,6 +1,6 @@
 # GSR Sproto 客户端分发
 
-本包使用独立修复库 `github.com/cnooljaw/gosproto v0.3.0`，只处理原生 Sproto，不依赖 Protobuf、Gate、Core 或 GSR 应用上下文。业务 Agent 透传自己的 `gsr.CommandContext`，并借用连接的 `Send([]byte) error`。
+本包使用独立修复库 `github.com/cnooljaw/gosproto v0.4.0`，只处理原生 Sproto，不依赖 Protobuf、Gate、Core 或 GSR 应用上下文。业务 Agent 透传自己的 `gsr.CommandContext`，并借用连接的 `Send([]byte) error`。
 
 ```go
 agent.protocolDispatcher = sproto.MustDispatcher[gsr.CommandContext](

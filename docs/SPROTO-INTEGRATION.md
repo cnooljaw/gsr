@@ -1,6 +1,6 @@
 # Protobuf / Sproto 接入指南
 
-本计划按 [ADR 0013](adr/0013-client-protocol-boundaries.md) 推进。当前工作树已实现 Protobuf 与独立 `protocol/sproto`，通过 Go/TypeScript Echo 验证。Go 编解码依赖独立维护的 `github.com/cnooljaw/gosproto v0.3.0`。新增 GSR API 尚未发布；已有 GSR 标签及原有协议保持不变。
+本计划按 [ADR 0013](adr/0013-client-protocol-boundaries.md) 推进。当前工作树已实现 Protobuf 与独立 `protocol/sproto`，通过 Go/TypeScript Echo 验证。Go 编解码依赖独立维护的 `github.com/cnooljaw/gosproto v0.4.0`。新增 GSR API 尚未发布；已有 GSR 标签及原有协议保持不变。
 
 ## 边界与步骤
 
@@ -22,7 +22,7 @@ Go/TS 已复用并验证现有工具；本轮没有新增 GSR generator。Sproto
 - [lvzixun/sprotodump](https://github.com/lvzixun/sprotodump)：现有 Go 类型、协议定义及 schema 生成工具，需实际核对产物。
 - [sealindx/sproto-ts](https://github.com/sealindx/sproto-ts)：候选 TypeScript 客户端，需核对整数精度、浏览器字节缓冲与坏包行为。
 
-不能混用仓库主分支说明与已发布版本的能力。历史候选验证固定 `v0.1.0`；当前采用自己的修复版本 `v0.3.0`，正常 require，不使用本地 replace。RPC session 使用正 int32。业务字段的 integer 为有符号 64 位，TS 端超过安全整数范围的表达方式需验证，不能静默丢精度。
+不能混用仓库主分支说明与已发布版本的能力。历史候选验证固定 `v0.1.0`；当前采用自己的修复版本 `v0.4.0`，正常 require，不使用本地 replace。RPC session 使用正 int32。业务字段的 integer 为有符号 64 位，TS 端超过安全整数范围的表达方式需验证，不能静默丢精度。
 
 ## 必须保护的行为
 
@@ -47,7 +47,7 @@ Go/TS 已复用并验证现有工具；本轮没有新增 GSR generator。Sproto
 修复库可以在独立项目直接使用：
 
 ```sh
-go get github.com/cnooljaw/gosproto@v0.3.0
+go get github.com/cnooljaw/gosproto@v0.4.0
 ```
 
 本轮已在独立 module 验证普通安装与 64 位整数数组、double 的 Pack/Unpack 往返，无 replace。GSR 新 API 的外部项目接入需等待对应 GSR 发布版本；当前本地开发以该工作树为准。
@@ -70,7 +70,7 @@ go get github.com/cnooljaw/gosproto@v0.3.0
 
 随后补充 [官方 AddressBook 与游戏数值/数组基线](benchmarks/2026-10-15-representative/report.md)，Go/TS 分别测纯 Encode/Decode、Pack/Unpack 及组合路径，Sproto 固定 wire 与官方 C/Lua 对照通过。基线探针发现 TS boolean 与混合正负 int64 数组缺陷；这两项现已修复，并由 20 组独立官方 raw/packed 向量保护，覆盖布尔、整数宽度与符号、缺失字段及 packing 边界。TS 仍只接受安全整数，正式性能数组继续使用相同 int32 夹具以便比较。
 
-五步优化已完成，结果、原始采样、profile 与撤回的回退方案见 [优化实施与验收](benchmarks/2026-10-15-optimized/RESULTS.md)。TS 改动直接位于示例参考实现；Go 优化在独立 gosproto 库本地提交为 `931e2a6`，尚未推送或发布，GSR 不保存源码补丁副本。GSR 正式依赖仍为 v0.3.0，优化测量通过临时 modfile 完成，未将本地 replace 写入 go.mod。资源预算、官方 wire 和解码失败原子性保持不变。
+五步优化已完成，结果、原始采样、profile 与撤回的回退方案见 [优化实施与验收](benchmarks/2026-10-15-optimized/RESULTS.md)。TS 改动直接位于示例参考实现；Go 优化已随 [gosproto v0.4.0](https://github.com/cnooljaw/gosproto/releases/tag/v0.4.0) 发布，GSR 正式依赖已升级，GSR 不保存源码补丁副本。报告中的性能测量使用发布前同一源码与临时 modfile；正式接入不使用 replace。资源预算、官方 wire 和解码失败原子性保持不变。
 
 ## 独立修复库与官方对照（2026-10-15）
 
@@ -86,7 +86,11 @@ go get github.com/cnooljaw/gosproto@v0.3.0
 
 用户确认 gosproto 对齐官方 Sproto 的协议职责：删除上游额外的 Service 网络 helper、阻塞 Call/异步 Go、Done channel、两字节 TCP 分帧、反射方法注册及其旧网络示例；保留结构体编解码、Pack/Unpack 和原生 type/session RPC。官方 host:dispatch/attach 处理协议消息，连接、调度、Handler 和超时由外部负责。GSR 一直使用自己的 Dispatcher，没有调用被删的 helper。
 
-同时删除只为 Go 方法绑定服务的 Protocol.MethodName、MatchMethod 和 GetProtocolByMethod。此变更已随 [gosproto v0.3.0](https://github.com/cnooljaw/gosproto/releases/tag/v0.3.0) 发布，独立模块的正常安装、RPC 与打包边界验证通过。GSR 当前已正常 require v0.3.0，go.sum 固定发布版本校验和，不使用 replace。sprotodump 包装脚本在生成时剔除 MethodName，C2S/S2C 产物已重新生成；后续重生成会保持相同格式。
+同时删除只为 Go 方法绑定服务的 Protocol.MethodName、MatchMethod 和 GetProtocolByMethod。此变更已随 [gosproto v0.3.0](https://github.com/cnooljaw/gosproto/releases/tag/v0.3.0) 发布，独立模块的正常安装、RPC 与打包边界验证通过。GSR 当时正常 require v0.3.0，go.sum 固定发布版本校验和，不使用 replace。sprotodump 包装脚本在生成时剔除 MethodName，C2S/S2C 产物已重新生成；后续重生成会保持相同格式。
+
+### 修复库 v0.4.0 性能优化与 GSR 升级
+
+[gosproto v0.4.0](https://github.com/cnooljaw/gosproto/releases/tag/v0.4.0) 发布提交为 `3f2491f7b2701c710fdfc9dfa7952c8e7002dd1d`，包含优化提交 `931e2a6`。本版本减少编解码临时分配，直接写入最终输出，并优化 Pack/Unpack；公开 API、官方 wire 和默认资源预算不变，协议类型无需重生成。GSR 正常 require v0.4.0，go.sum 固定发布校验和，不使用本地 replace 或临时 modfile。
 
 以下历史记录保留候选版本的失败证据；“未引入/尚未验证”描述当时状态，不覆盖上述实施结果。
 

@@ -39,4 +39,4 @@ Accepted，2026-10-14 用户确认双协议方案并要求调整 Gate 模式命�
 
 ## 修复库职责收敛与版本升级（2026-10-15）
 
-用户确认删除 gosproto 上游额外的 Service 网络 helper 及专属反射方法绑定，使库保持编解码、Packing 和原生 RPC 职责；连接、调度与业务 Handler 归外层。修复库已发布 v0.3.0，GSR 正常 require 此版本，并同步剔除旧生成模板输出的 MethodName；不增加兼容字段或本地 replace。首轮 v0.2.0 的接入结果保留为历史记录。
+用户确认删除 gosproto 上游额外的 Service 网络 helper 及专属反射方法绑定，使库保持编解码、Packing 和原生 RPC 职责；连接、调度与业务 Handler 归外层。职责收敛随修复库 v0.3.0 发布，GSR 接入时同步剔除旧生成模板输出的 MethodName；后续性能优化随 v0.4.0 发布，GSR 正常 require v0.4.0；不增加兼容字段或本地 replace。首轮 v0.2.0 的接入结果保留为历史记录。

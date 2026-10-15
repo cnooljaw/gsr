@@ -11,7 +11,7 @@ v1.0.1 API 按 [ADR 0012](docs/adr/0012-node-capabilities-and-service-logging.md
 - **Node 能力**：self.Node() 提供 RegisterService/OpenCluster/ClusterListenAddress/OpenHTTP/CreateGate，保存节点运行状态，Run 管理生命周期，业务借用同一对象；同 Run 共享、不同 Run 隔离，不提供关闭、业务通信或内部组件访问，仅在当前回调使用。名称归目标 ServiceID，HTTP/Cluster 归运行环境，Gate 资源归独立 GateService。
 - **应用配置**：gsr.RuntimeConfig 与 gsr.ClusterConfig 不暴露 Logger，Run 转换到底层配置并统一注入；底层基础设施配置仍可借用 Logger。
 
-- **Gate / 客户端协议边界**：Gate 只收发不透明字节并拥有连接、安全封装、有界队列和关闭；具体协议负责自身的编解码、校验和分发，只依赖字节发送窄接口。现有 protocol 包为 Protobuf 实现，其 Envelope/Registry/MessageRoute/Direction/Kind 不作为其它协议的公共模型；Sproto 使用自身的协议与 package(type/session)，实现位于 protocol/sproto，使用独立维护的 github.com/cnooljaw/gosproto v0.3.0。Gate 与协议实现互不依赖，业务 Agent 是组合点。ClientSession.Send 接纳时复制字节快照，成功只表示本地入队，不保证送达或执行一次。
+- **Gate / 客户端协议边界**：Gate 只收发不透明字节并拥有连接、安全封装、有界队列和关闭；具体协议负责自身的编解码、校验和分发，只依赖字节发送窄接口。现有 protocol 包为 Protobuf 实现，其 Envelope/Registry/MessageRoute/Direction/Kind 不作为其它协议的公共模型；Sproto 使用自身的协议与 package(type/session)，实现位于 protocol/sproto，使用独立维护的 github.com/cnooljaw/gosproto v0.4.0。Gate 与协议实现互不依赖，业务 Agent 是组合点。ClientSession.Send 接纳时复制字节快照，成功只表示本地入队，不保证送达或执行一次。
 
 - **Sproto 客户端关联**：客户端 Request 使用正 int32 session，Response 沿原 session；Notify/Push 不带 session，不进入 Core/Cluster Session。每连接 Agent 持有独立 Dispatcher；Context 只在当前同步 Handler 有效。业务失败由自身 Response 表达；坏包、未知协议、框架失败和遗漏响应返回诊断，由 Agent 关闭连接。首版不支持服务端等待客户端回应。
 

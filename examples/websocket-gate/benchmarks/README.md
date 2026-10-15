@@ -71,7 +71,7 @@ Profile 默认对 AddressBook/game_large 的六个独立步骤逐个采集，Go 
 
 [新套件结果](../../../docs/benchmarks/2026-10-15-representative/report.md) 与前述 Echo 报告分开保存，避免将 body 与应用帧数据混为同一口径。
 
-[优化实施与验收](../../../docs/benchmarks/2026-10-15-optimized/RESULTS.md) 保存修复后五轮数据、小包回退检查、profile 摘要及独立 Go 库提交。Go 优化尚未发布，GSR 正式依赖仍为 v0.3.0；按该报告的临时 modfile 命令复现优化版。采集器会记录实际模块覆盖及 Go/TS 源码哈希，避免把本地优化结果误标为正式版本。Profile 可设 `GSR_PROFILE_SCENARIO=game_large` 只采大型游戏消息，默认仍采两组。
+[优化实施与验收](../../../docs/benchmarks/2026-10-15-optimized/RESULTS.md) 保存修复后五轮数据、小包回退检查、profile 摘要及独立 Go 库提交。Go 优化已随 gosproto v0.4.0 发布，GSR 正式依赖已升级；当前可直接用正式依赖复现，报告保留当时的临时 modfile 采样来源。采集器会记录实际模块覆盖及 Go/TS 源码哈希，避免把本地优化结果误标为正式版本。Profile 可设 `GSR_PROFILE_SCENARIO=game_large` 只采大型游戏消息，默认仍采两组。
 
 ### 结果文件入库规则
 

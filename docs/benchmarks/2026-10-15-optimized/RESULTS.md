@@ -1,12 +1,12 @@
 # Sproto 优化实施与验收
 
-基线已提交为 `d942321`。本报告记录随后按五步方案实施的结果；TS 实现随本报告提交，Go 优化已在独立库本地提交为 `931e2a62b48d5f12ce670a233cfd701ed1c87410`，尚未推送或发布新版本。
+基线已提交为 `d942321`，TS 实现和本报告提交为 `77bbbaa`。Go 优化提交为 `931e2a62b48d5f12ce670a233cfd701ed1c87410`，已随 [gosproto v0.4.0](https://github.com/cnooljaw/gosproto/releases/tag/v0.4.0) 发布，发布提交为 `3f2491f7b2701c710fdfc9dfa7952c8e7002dd1d`。
 
 ## 实际接入范围
 
-TS 实现已直接修改 GSR 示例内的 vendor/sproto.ts。Go 实现在独立 gosproto 工作树完成，基于 v0.3.0 提交 `23bdb69608490c5c25955a529aee03459451baf5`；GSR 正式 go.mod/go.sum 仍固定 v0.3.0。本轮用临时 modfile 覆盖依赖进行接线、Benchmark 和 profile 验证，不把本地路径写入正式依赖。
+TS 实现位于 GSR 示例内的 vendor/sproto.ts。Go 实现基于 v0.3.0 提交 `23bdb69608490c5c25955a529aee03459451baf5`；采样时用临时 modfile 覆盖依赖进行接线、Benchmark 和 profile 验证。后续发布的 v0.4.0 与本报告采样的五份 Go 源文件哈希一致，GSR 正式 go.mod/go.sum 已升级为 v0.4.0，无本地 replace。
 
-完整 Go 改动由独立 gosproto 提交 `931e2a62b48d5f12ce670a233cfd701ed1c87410` 管理，GSR 不再存放源码补丁副本。发布新版本并升级 GSR 依赖属于后续发布步骤，本轮未执行。实际参与测试的五份 Go 文件、TS 文件哈希与模块覆盖记录见 [环境](environment.json)。
+完整 Go 改动由独立 gosproto 仓库管理，GSR 不存放源码补丁副本。实际参与采样的五份 Go 文件、TS 文件哈希与当时模块覆盖记录见 [环境](environment.json)；原始环境保留当时状态，不改写为使用已发布版本测得的数据。
 
 ## TS 编码结果
 
@@ -85,18 +85,14 @@ Go profile 仍含 runtime.kevent 等运行时归因；V8 sampling heap 不完整
 
 分阶段中间采样留在已忽略的 tmp/protocol-optimized-intermediate/，不纳入版本管理；仓库只保留最终采样及必要分析摘要。最终小包数据：[Go](small-go.txt)、[TS](small-typescript.json)。
 
-## 复现本地 Go 优化版
+## 使用正式依赖复现
 
-先在独立 gosproto 仓库检出提交 `931e2a62b48d5f12ce670a233cfd701ed1c87410`，再从 GSR 根目录执行（路径替换为本机绝对路径；该提交推送前需使用持有此提交的本地仓库）：
+当前工作树正常依赖已发布的 v0.4.0，从 GSR 根目录执行，不需要临时 modfile：
 
 ```sh
-cp go.mod /tmp/gsr-codec.mod
-cp go.sum /tmp/gsr-codec.sum
-go mod edit -modfile=/tmp/gsr-codec.mod \
-  -replace=github.com/cnooljaw/gosproto=/absolute/path/to/gosproto
-GOFLAGS=-modfile=/tmp/gsr-codec.mod npm --prefix examples/websocket-gate run bench:representative
-GOFLAGS=-modfile=/tmp/gsr-codec.mod GSR_PROFILE_SCENARIO=game_large \
-  npm --prefix examples/websocket-gate run profile:protocol
+go mod download github.com/cnooljaw/gosproto
+npm --prefix examples/websocket-gate run bench:representative
+GSR_PROFILE_SCENARIO=game_large npm --prefix examples/websocket-gate run profile:protocol
 ```
 
-若不设置临时 modfile，Go 部分继续测正式依赖 v0.3.0，不能直接拿来当本报告的优化后结果。TS 改动则直接来自当前工作树。公开 API、官方 wire、Go 8 MiB/64 层/100000 元素默认预算与失败原子性保持不变；TS 原有字节与安全整数边界保持。
+采样时使用的临时 modfile 仅用于选择同一优化源码，未传播到正式依赖；发布后验证也使用正式 v0.4.0。这里没有重新执行五轮性能采样，表中的原始结果仍来自发布前测量。公开 API、官方 wire、Go 8 MiB/64 层/100000 元素默认预算与失败原子性保持不变；TS 原有字节与安全整数边界保持。
