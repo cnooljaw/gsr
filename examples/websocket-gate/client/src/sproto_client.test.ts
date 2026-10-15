@@ -21,6 +21,29 @@ test("official Sproto vectors and safe integer boundary", () => {
   assert.throws(() => schema.decode("Scalar", Buffer.from("01000000080000000000000000000080", "hex")), /safe/);
 });
 
+// 官方编码向量保护布尔、数组宽度切换与正负安全 int64，而非只做 TS 自身往返。
+test("official Sproto boolean and mixed signed int64 arrays", () => {
+  const vectors = JSON.parse(readFileSync(new URL("../../benchmarks/correctness.json", import.meta.url), "utf8"));
+  for (const vector of vectors) {
+    const codec = new Sproto(vector.schema);
+    const raw = Buffer.from(vector.wire.sproto_encode.hex, "hex");
+    const packed = Buffer.from(vector.wire.sproto_pack.hex, "hex");
+    assert.deepEqual(codec.encode(vector.type, vector.data), raw, `${vector.name} encode`);
+    assert.deepEqual(codec.decode(vector.type, raw), vector.data, `${vector.name} decode`);
+    assert.deepEqual(codec.pack(raw), packed, `${vector.name} pack`);
+    assert.deepEqual(codec.decode(vector.type, codec.unpack(packed)!), vector.data, `${vector.name} unpack/decode`);
+  }
+  const integer = new Sproto(".Probe { value 0 : integer } .Array { value 0 : *integer }");
+  for (const value of [NaN, Infinity, 1.5, Number.MAX_SAFE_INTEGER + 1, Number.MIN_SAFE_INTEGER - 1]) {
+    assert.throws(() => integer.encode("Probe", { value }), /safe/);
+    assert.throws(() => integer.encode("Array", { value: [1, value] }), /safe/);
+  }
+  const encoded = integer.encode("Array", { value: [1, 4294967296, -1] })!;
+  const snapshot = Buffer.from(encoded);
+  integer.encode("Array", { value: [7, 8, 9] });
+  assert.deepEqual(encoded, snapshot, "encoded buffers remain owned by the caller");
+});
+
 // 每连接 host 保留独立会话；一个客户端关闭不清理另一个的等待。
 test("Sproto sessions stay independent and close clears pending", () => {
   const first = new SprotoEchoClient();

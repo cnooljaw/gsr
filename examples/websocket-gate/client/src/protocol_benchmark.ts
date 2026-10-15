@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { performance } from "node:perf_hooks";
+import { parseArgs } from "node:util";
 import { create, fromBinary, toBinary } from "@bufbuild/protobuf";
 import { EnvelopeSchema } from "./gen/gsr/common/v1/common_pb.js";
 import { EchoRequestSchema, MsgId } from "./gen/gsr/example/echo/v1/echo_pb.js";
@@ -28,9 +29,11 @@ const directory = new URL("../../benchmarks/", import.meta.url);
 const cases: Sample[] = JSON.parse(readFileSync(new URL("cases.json", directory), "utf8"));
 const schema = readFileSync(new URL("echo.sproto", directory), "utf8");
 const operations: Operation[] = [];
+const { values } = parseArgs({ options: { case: { type: "string" } } });
 let sink: unknown;
 
 for (const sample of cases) {
+  if (values.case && sample.name !== values.case) continue;
   const text = sample.pattern.repeat(sample.repeat);
   const protobufMessage = create(EchoRequestSchema, { text });
   const sprotoMessage = { text };
@@ -91,6 +94,7 @@ function batch(operation: Operation, iterations: number): number {
 }
 
 const targetMilliseconds = 100;
+assert.ok(operations.length > 0, "unknown benchmark case");
 for (const operation of operations) {
   // 每个操作独立热身并校准；schema 解析、断言和初次扩容不计时。
   let iterations = 128;

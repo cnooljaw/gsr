@@ -3,6 +3,7 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { cpus, arch, platform, release } from "node:os";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { codecEnvironment } from "./benchmark-environment.mjs";
 
 const example = fileURLToPath(new URL("../", import.meta.url));
 const root = resolve(example, "../..");
@@ -18,6 +19,7 @@ const metadata = {
   go: command("go", ["version"]).trim(),
   node: process.version, cpu: cpus()[0]?.model,
   os: `${platform()} ${release()} ${arch()}`,
+  codecs: codecEnvironment(root),
   goCommand: "GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks -run ^$ -bench ^BenchmarkProtocolCodec$ -benchmem -benchtime=200ms -count=5 -timeout=2m",
 };
 console.error("运行 Go 编解码基准（单线程，5 轮）…");
@@ -60,7 +62,7 @@ const lines = [
   `采样时间：${metadata.date}。CPU：${metadata.cpu}；系统：${metadata.os}。`, "",
   `${metadata.go}；Node ${metadata.node}；V8 ${ts.v8}。`, "",
   `基于提交 ${metadata.commit}${metadata.workingTree.trim() ? "，包含本报告随附的工作树修改" : ""}。`, "",
-  "Go：google.golang.org/protobuf v1.36.1、cnooljaw/gosproto v0.3.0。TS：@bufbuild/protobuf 2.15.0、示例内固定并修复的 sealindx/sproto-ts 参考实现。", "",
+  `Go：google.golang.org/protobuf v1.36.1、cnooljaw/gosproto ${metadata.codecs.module.Version}${metadata.codecs.module.Replace ? " 基础的本地工作树（未发布优化版）" : ""}。TS：@bufbuild/protobuf 2.15.0、示例内修正的 sealindx/sproto-ts；源码哈希见 environment.json。`, "",
   "## 测量范围", "",
   "共用 cases.json 的 EchoRequest{text} 内容和 UTF-8 字节；两端在计时前验证固定 SHA-256、字节数和解码内容。TS Sproto 应用帧还与真实 SprotoEchoClient 的输出逐字节核对。", "",
   "payload 仅测消息体，不做 packing；frame 测实际应用层格式：Protobuf Envelope(msg_id=1001, request_id=1, payload)，Sproto package(type=1, session=1)+payload 后 pack，解码包含 unpack。两种协议编号沿用现有 Echo 定义。", "",

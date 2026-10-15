@@ -14,6 +14,8 @@ const SIZEOF_INT64 = 8;
 const SIZEOF_INT32 = 4;
 
 const ERROR_TYPE = -3;
+const NONZERO_COUNT = new Uint8Array(256);
+for (let mask = 1; mask < 256; mask++) NONZERO_COUNT[mask] = NONZERO_COUNT[mask >>> 1] + (mask & 1);
 
 const ENCODE_BUFFERSIZE = 2050;
 
@@ -31,15 +33,12 @@ const RESPONSE = 1;
  * gettype.call(function(){})     输出   [object Function]
 */
 function checktype(value, type) {
-	const typestr = gettype.call(value);
-	let cmp = typestr.substring(8, typestr.length - 1);
-	cmp = cmp.toLowerCase();
-
-	if (cmp == type) {
-		return true;
-	} else {
-		return cmp;
-	}
+	if (type === "array" && Array.isArray(value)) return true;
+	if (typeof value === type && type !== "object") return true;
+	const description = gettype.call(value);
+	if (type === "object" && description === "[object Object]") return true;
+	const actual = description.slice(8, -1).toLowerCase();
+	return actual === type ? true : actual;
 }
 
 
@@ -55,20 +54,15 @@ function uint64_rshift(num, offset){
     return Math.floor(num / Math.pow(2, offset));
 }
 
-function hi_low_uint64(low, hi){
-    var value = (hi & 0xFFFFFFFF) * 0x100000000 + low;
+function hi_low_int64(low, hi){
+    const value = hi * 0x100000000 + (low >>> 0);
     if (!Number.isSafeInteger(value)) throw new Error("Sproto integer exceeds JavaScript safe range");
     return value;
 }
 
-function checkInteger(num, offset:number = 31) {
-    if (!Number.isSafeInteger(num)) throw new Error("Sproto integer requires a safe number");
-	let numh = uint64_rshift(num, offset);
-    if (numh === 0 || numh === -1) {
-	return 4;
-    } else {
-	return 8;
-    }
+function checkInteger(num) {
+	if (!Number.isSafeInteger(num)) throw new Error("Sproto integer requires a safe number");
+	return num >= -0x80000000 && num <= 0x7fffffff ? SIZEOF_INT32 : SIZEOF_INT64;
 }
 
 function fill_size(data, data_idx, sz){
@@ -125,14 +119,12 @@ function decode_uint64(data, data_idx) {
 }
 
 
-function checkvalue(args, type: string) {
-	let value = args.value;
-	let res = checktype(value, type);
-	if (res !== true) {
-		console.error("[sproto error]: .%s[%d] is not an %s (Is a %s)", args.name, args.i, type, res, value);
+function checkvalue(value, type, name, index = 0) {
+	const actual = checktype(value, type);
+	if (actual !== true) {
+		console.error("[sproto error]: .%s[%d] is not a %s (is %s)", name, index, type, actual);
 		return null;
 	}
-
 	return type;
 }
 
@@ -168,8 +160,9 @@ function gen_response(self, response, spindex, session) {
 }
 
 class Field {
+	public elementType: string | null;
 	constructor(public name: string, public tag: number, public type: string) {
-
+		this.elementType = type.startsWith("*") ? type.slice(1) : null;
 	}
 }
 
@@ -329,193 +322,83 @@ class Sproto {
 	}
 
 	private encode_integer_array(v, args, data, data_idx, size) {
-		let fillflag = data_idx;
-		let array_index = data_idx + 1;
-		let intlen = SIZEOF_INT32;
-
-		size -= (1 + SIZEOF_LENGTH);
-		if (size < 0) {
-			return -1;
+		if (v.length === 0) return 0;
+		let width = SIZEOF_INT32;
+		for (let index = 0; index < v.length; index++) {
+			if (checkvalue(v[index], "number", args.name, index) === null) return ERROR_TYPE;
+			if (checkInteger(v[index]) === SIZEOF_INT64) width = SIZEOF_INT64;
 		}
-
-		for (let i = 0; i < v.length; i++) {
-			args.value = v[i];
-			args.i = i;
-			if (checkvalue(args, "number") === null) {
-				return ERROR_TYPE;
+		const length = 1 + width * v.length;
+		if (length > size) return -1;
+		data[data_idx] = width;
+		let offset = data_idx + 1;
+		for (const value of v) {
+			data.writeUInt32LE(value >>> 0, offset);
+			if (width === SIZEOF_INT64) {
+				data.writeInt32LE(Math.floor(value / 0x100000000), offset + 4);
 			}
-
-			let value = v[i];
-			let sz = checkInteger(value);
-
-			if (sz === SIZEOF_INT32) {
-				data[array_index++] = value & 0xff;
-				data[array_index++] = (value >> 8) & 0xff;
-				data[array_index++] = (value >> 16) & 0xff;
-				data[array_index++] = (value >> 24) & 0xff;
-				if (intlen === SIZEOF_INT64) {
-					uint32_to_uint64(data, array_index, value & 0x80000000);
-					array_index += 4;
-				}
-			} else {
-				if (sz != SIZEOF_INT64)
-					return -1;
-
-				if (intlen === SIZEOF_INT32) {
-					size -= (SIZEOF_INT64 * (i - 1));
-					if (size < 0) {
-						return -1;
-					}
-
-					// 对前面 i-1 个32位的整数重新编码
-					for (let j = i - 1; j >= 0; --j) {
-						let start8 = data_idx + 1 + j * SIZEOF_INT64;
-						let start4 = data_idx + 1 + j * SIZEOF_INT32;
-						let k = start8;
-
-						for (; k < start8 + 4; ++k) {
-							data[k] = data[start4 + k - start8];
-						}
-
-						//根据第三位决定后4位是否全为 0 或者全 0xff
-						uint32_to_uint64(data, k, data[start8 + 3] & 0x80);
-					}
-
-					array_index = (data_idx + 1) + i * SIZEOF_INT64; //重新设置 array_index 起始位置
-				}
-
-				data[array_index++] = value & 0xff;
-				data[array_index++] = (value >> 8) & 0xff;
-				data[array_index++] = (value >> 16) & 0xff;
-				data[array_index++] = (value >> 24) & 0xff;
-
-				let hi =  uint64_rshift(value, 32);
-				data[data_idx + 8] = hi & 0xff;
-				data[data_idx + 9] = (hi >> 8) & 0xff;
-				data[data_idx + 10] = (hi >> 16) & 0xff;
-				data[data_idx + 11] = (hi >> 24) & 0xff;
-
-				intlen = SIZEOF_INT64;
-			}
-
-			size -= intlen;
-			if (size < 0 || size < SIZEOF_INT64) {
-				return -1;
-			}
+			offset += width;
 		}
-
-		if (array_index === data_idx + 1) {
-			return 0;
-		}
-
-		data[fillflag] = intlen;
-		return array_index - data_idx;
+		return length;
 	}
 
-	private encode_string_array(v, args, data, data_idx, size) {
-		let start = data_idx;
-
-		for (var i = 0; i < v.length; ++i) {
-			args.value = v[i];
-			args.i = i;
-			if (checkvalue(args, "string") === null) {
-				return ERROR_TYPE;
-			}
-
-			let tu = Buffer.from(v[i]);
-			let len = tu.length;
-			size -= (SIZEOF_LENGTH + len);
-			if (size < 0) {
-				return -1;
-			}
-
-
-			let sz = fill_size(data, data_idx, len);
-			let pos = data_idx + SIZEOF_LENGTH;
-			data.fill(tu, pos, pos + len);
-
-			data_idx += sz;
+	private encode_string_array(values, field, output, offset, available) {
+		const start = offset;
+		for (let index = 0; index < values.length; index++) {
+			if (checkvalue(values[index], "string", field.name, index) === null) return ERROR_TYPE;
+			const text = typeof values[index] === "string" ? values[index] : String(values[index]);
+			const length = Buffer.byteLength(text);
+			if (length + SIZEOF_LENGTH > available) return -1;
+			fill_size(output, offset, length);
+			output.write(text, offset + SIZEOF_LENGTH, length, "utf8");
+			offset += SIZEOF_LENGTH + length;
+			available -= SIZEOF_LENGTH + length;
 		}
-
-		return data_idx - start;
+		return offset - start;
 	}
 
-
-	private encode_boolean_array(v, args, data, data_idx, size) {
-		let start = data_idx;
-		for (var i = 0; i < v.length; ++i) {
-			args.value = v[i];
-			args.i = i;
-			if (checkvalue(args, "boolean") === null) {
-				return ERROR_TYPE;
-			}
-
-			size -= SIZEOF_LENGTH;
-			if (size < 0) {
-				return -1;
-			}
-
-			data[data_idx++] = v[i] ? 1 : 0;
+	private encode_boolean_array(values, field, output, offset, available) {
+		if (values.length > available) return -1;
+		for (let index = 0; index < values.length; index++) {
+			if (checkvalue(values[index], "boolean", field.name, index) === null) return ERROR_TYPE;
+			output[offset + index] = values[index] ? 1 : 0;
 		}
-
-		return data_idx - start;
+		return values.length;
 	}
 
-	private encode_object_array(v, args, data, data_idx, size) {
-		let sz = 0;
-		let start = data_idx;
-		let total = 0;
-		for (let i = 0; i < v.length; ++i) {
-			size -= SIZEOF_LENGTH;
-			if (size < 0) {
-				return -1;
-			}
-			sz = this.lencode(args.type, v[i], start + SIZEOF_LENGTH, null, args.spindex);
-			if (sz < 0) {
-				if (sz === ERROR_TYPE) {
-					return ERROR_TYPE;
-				}
-				return sz;
-			}
-
-			let tmpsz = fill_size(data, start, sz);
-			size -= tmpsz;
-			start += tmpsz;
-
-			total += sz + SIZEOF_LENGTH;
+	private encode_object_array(values, field, output, offset, available, spindex) {
+		const start = offset;
+		const type = this.vquerytype(field.elementType, spindex);
+		for (let index = 0; index < values.length; index++) {
+			if (available < SIZEOF_LENGTH) return -1;
+			const length = this.lencode(field.elementType, values[index], offset + SIZEOF_LENGTH, type, spindex);
+			if (length < 0) return length;
+			if (length + SIZEOF_LENGTH > available) return -1;
+			fill_size(output, offset, length);
+			offset += SIZEOF_LENGTH + length;
+			available -= SIZEOF_LENGTH + length;
 		}
-
-		return total;
+		return offset - start;
 	}
 
-	private encode_array(v, args, data, data_idx, size) {
-		let value = null;
-		let sz = 0;
-		size -= SIZEOF_LENGTH;
-
-		if (size < 0) {
-			return -1;
-		}
-
-		switch(args.type) {
+	private encode_array(values, field, output, offset, available, spindex) {
+		available -= SIZEOF_LENGTH;
+		if (available < 0) return -1;
+		let length;
+		switch (field.elementType) {
 		case "integer":
-			sz = this.encode_integer_array(v, args, data, data_idx + SIZEOF_LENGTH, size);
+			length = this.encode_integer_array(values, field, output, offset + SIZEOF_LENGTH, available);
 			break;
 		case "string":
-			sz = this.encode_string_array(v, args, data, data_idx + SIZEOF_LENGTH, size);
+			length = this.encode_string_array(values, field, output, offset + SIZEOF_LENGTH, available);
 			break;
 		case "boolean":
-			sz = this.encode_boolean_array(v, args, data, data_idx + SIZEOF_LENGTH, size);
+			length = this.encode_boolean_array(values, field, output, offset + SIZEOF_LENGTH, available);
 			break;
 		default:
-			sz = this.encode_object_array(v, args, data, data_idx + SIZEOF_LENGTH, size);
-			break;
+			length = this.encode_object_array(values, field, output, offset + SIZEOF_LENGTH, available, spindex);
 		}
-
-		if (sz < 0) {
-			return sz;
-		}
-		return fill_size(data, data_idx, sz);
+		return length < 0 ? length : fill_size(output, offset, length);
 	}
 
 	encode(typeName: string, tbl: any, st?, spindex?) {
@@ -544,167 +427,73 @@ class Sproto {
 		return result;
 	}
 
-	private lencode(typename: string, tbl: any, startpoint: number, st?, spindex?) {
-		let type = null;
-
-		if (st) {
-			type = st;
-		} else {
-			type = this.vquerytype(typename, spindex);
-		}
-
-		if (type === undefined) {
-			console.error("[sproto error]: Invalid field type %s", typename, spindex);
-			return ERROR_TYPE;
-		}
-
-		let header_sz = startpoint + SIZEOF_HEADER + type.maxn * SIZEOF_FIELD;
-		let fieldidx = startpoint + SIZEOF_HEADER;
-		let lasttag = -1;
-		let tag = 0;
-		let index = 0;
-		let data = header_sz;
-		let sumsz = this.buffer.length - startpoint - header_sz;
-		if (sumsz < 0) {
-			return -1;
-		}
-
-		let args = {name: null, value: null, i: 0};
-
-		for (let f of type.f) {
-			let sz = -1;
-			let value = 0;
-			let tu = tbl[f.name];
-			let deatail_type = null;
-
-			args.name = f.name;
-			args.value = tu;
-
-			if (isNull(tu)) {
-				continue;
-			}
-
-			if (f.type.charAt(0) === "*") {
-				deatail_type = checkvalue(args, "array");
-				if (deatail_type === null) {
-					return ERROR_TYPE;
-				}
-				let t = f.type.substring(1, f.type.length);
-
-				sz = this.encode_array(tu, {type: t, name: f.name, spindex: spindex}, this.buffer, data, sumsz);
+	private lencode(typename: string, message: any, startpoint: number, st?, spindex?) {
+		const type = st || this.vquerytype(typename, spindex);
+		if (type === undefined) return ERROR_TYPE;
+		const bodyStart = startpoint + SIZEOF_HEADER + type.maxn * SIZEOF_FIELD;
+		if (bodyStart > this.buffer.length) return -1;
+		let fieldOffset = startpoint + SIZEOF_HEADER;
+		let bodyOffset = bodyStart;
+		let count = 0;
+		let previousTag = -1;
+		for (const field of type.f) {
+			const value = message[field.name];
+			if (isNull(value)) continue;
+			let header = 0;
+			let length = 0;
+			const available = this.buffer.length - bodyOffset;
+			if (field.elementType !== null) {
+				if (checkvalue(value, "array", field.name) === null) return ERROR_TYPE;
+				length = this.encode_array(value, field, this.buffer, bodyOffset, available, spindex);
 			} else {
-				switch(f.type) {
+				switch (field.type) {
 				case "boolean":
-					deatail_type = checkvalue(args, "boolean");
-					if (deatail_type === null) {
-						return ERROR_TYPE;
-					}
+					if (checkvalue(value, "boolean", field.name) === null) return ERROR_TYPE;
+					header = (Number(value) + 1) * 2;
+					break;
 				case "integer":
-					if (deatail_type === null) {
-						deatail_type = checkvalue(args, "number");
-						if (deatail_type === null) {
-							return ERROR_TYPE;
-						}
-					}
-
-					sz = checkInteger(tu);
-					if (sz == 4) {
-						value = tu >>> 0;
-						if (value < 0x7fff) {
-							value = (value + 1) * 2;
-						} else {
-							sz = encode_integer(value, this.buffer, data, sumsz);
-							value = 0;
-						}
-					} else if (sz == 8) {	//value is int64
-						sz = encode_uint64(tu, this.buffer, data, sumsz);
-					}
-
+					if (checkvalue(value, "number", field.name) === null) return ERROR_TYPE;
+					const width = checkInteger(value);
+					if (value >= 0 && value < 0x7fff) header = (value + 1) * 2;
+					else if (width === SIZEOF_INT32) length = encode_integer(value, this.buffer, bodyOffset, available);
+					else length = encode_uint64(value, this.buffer, bodyOffset, available);
 					break;
 				case "string":
-					deatail_type = checkvalue(args, "string");
-					if (deatail_type === null) {
-						return ERROR_TYPE;
-					}
-				default:
-					let isstring = deatail_type;
-					if (deatail_type === null) {
-						deatail_type = checkvalue(args, "object");
-						if (deatail_type === null) {
-							return ERROR_TYPE;
-						}
-					}
-
-					let fsz = 0;
-					if (isstring) {
-						tu = Buffer.from(tu);
-						if (sumsz - data - tu.length - SIZEOF_LENGTH < 0) {
-							sz = -1;
-							break;
-						}
-						fsz = tu.length;
-						let value_idx = data + SIZEOF_LENGTH;
-						this.buffer.fill(tu, value_idx, value_idx + fsz);
-					} else {
-						fsz = this.lencode(f.type, tu, data + SIZEOF_LENGTH, null, spindex);
-					}
-					if (fsz < 0) {
-						if (fsz === ERROR_TYPE) {
-							return ERROR_TYPE;
-						}
-						sz = -1;
-					} else {
-						sz = fill_size(this.buffer, data, fsz);
-					}
+					if (checkvalue(value, "string", field.name) === null) return ERROR_TYPE;
+					const text = typeof value === "string" ? value : String(value);
+					const bytes = Buffer.byteLength(text);
+					if (bytes + SIZEOF_LENGTH > available) return -1;
+					fill_size(this.buffer, bodyOffset, bytes);
+					this.buffer.write(text, bodyOffset + SIZEOF_LENGTH, bytes, "utf8");
+					length = SIZEOF_LENGTH + bytes;
 					break;
+				default:
+					if (checkvalue(value, "object", field.name) === null) return ERROR_TYPE;
+					if (available < SIZEOF_LENGTH) return -1;
+					const nested = this.lencode(field.type, value, bodyOffset + SIZEOF_LENGTH, null, spindex);
+					length = nested < 0 ? nested : fill_size(this.buffer, bodyOffset, nested);
 				}
 			}
-
-			if (sz < 0) {
-				if (sz === ERROR_TYPE) {
-					return ERROR_TYPE;
-				}
-				return -1;
+			if (length < 0) return length;
+			bodyOffset += length;
+			const gap = field.tag - previousTag - 1;
+			if (gap > 0) {
+				const skip = (gap - 1) * 2 + 1;
+				if (skip > 0xffff) return -1;
+				this.buffer.writeUInt16LE(skip, fieldOffset);
+				fieldOffset += SIZEOF_FIELD;
+				count++;
 			}
-			if (sz > 0) {
-				if (value === 0) {
-					data += sz;
-					sumsz -= sz;
-				}
-
-				tag = f.tag - lasttag - 1;
-				if (tag > 0) {
-					tag = (tag - 1) * 2 + 1;
-					if (tag > 0xffff)
-						return -1;
-
-					this.buffer[fieldidx++] = tag & 0xff;
-					this.buffer[fieldidx++] = (tag >> 8) & 0xff;
-					++index;
-				}
-
-				this.buffer[fieldidx++] = value & 0xff;
-				this.buffer[fieldidx++] = (value >> 8) & 0xff;
-
-				lasttag = f.tag;
-				++index;
-			}
+			this.buffer.writeUInt16LE(header, fieldOffset);
+			fieldOffset += SIZEOF_FIELD;
+			count++;
+			previousTag = field.tag;
 		}
-
-		this.buffer[startpoint + 0] = index & 0xff;
-		this.buffer[startpoint + 1] = (index >> 8) & 0xff;
-
-		let data_sz = data - header_sz;
-		data = header_sz;
-
-		if (index != type.maxn) {
-			let start = startpoint + SIZEOF_HEADER + index * SIZEOF_FIELD;
-			for (var i = start; i < start + data_sz; i++) {
-				this.buffer[i] = this.buffer[data + i - start];
-			}
-		}
-
-		return SIZEOF_HEADER + index * SIZEOF_FIELD + data_sz;
+		this.buffer.writeUInt16LE(count, startpoint);
+		const bodyLength = bodyOffset - bodyStart;
+		// copy 对同一 Buffer 的重叠区间使用安全搬移，不再逐字节压紧 header 后的数据。
+		if (fieldOffset !== bodyStart) this.buffer.copy(this.buffer, fieldOffset, bodyStart, bodyOffset);
+		return SIZEOF_HEADER + count * SIZEOF_FIELD + bodyLength;
 	}
 
 	decode_array(type: string, buffer, data_idx: number, sz: number, st?, reqdecode?) {
@@ -730,9 +519,9 @@ class Sproto {
 
 				for (let i = 0; i < sz/SIZEOF_INT64; ++i) {
 					let	low = this.todword(buffer, data_idx, true);
-					let	hi = this.todword(buffer, data_idx + SIZEOF_INT32, true);
+					let	hi = this.todword(buffer, data_idx + SIZEOF_INT32);
 
-					result[i] = hi_low_uint64(low, hi);
+					result[i] = hi_low_int64(low, hi);
 					data_idx += SIZEOF_INT64;
 				}
 			} else {
@@ -860,12 +649,12 @@ class Sproto {
 						let hi = 0;
 						if (sz === SIZEOF_INT64) {
 							low = this.todword(buffer, currentdata_idx, true);
-							hi = this.todword(buffer, currentdata_idx + SIZEOF_INT32, true);
+							hi = this.todword(buffer, currentdata_idx + SIZEOF_INT32);
 						} else if (sz !== SIZEOF_INT32) {
 							return -1;
 						}
 
-						result[f.name] = hi_low_uint64(low, hi);
+						result[f.name] = sz === SIZEOF_INT32 ? low : hi_low_int64(low, hi);
 						break;
 					default:
 						let subres = {};
@@ -903,6 +692,12 @@ class Sproto {
 	}
 
 	pack_seg(srcbuffer, srcidx, dstbuffer, dstidx, n) {
+		if (n > 0) {
+			const low = srcbuffer.readUInt32LE(srcidx);
+			const high = srcbuffer.readUInt32LE(srcidx + 4);
+			if (((low - 0x01010101) & ~low & 0x80808080) === 0
+				&& ((high - 0x01010101) & ~high & 0x80808080) === 0) return 8;
+		}
 		let header = dstidx++;
 		let notzero = 0;
 		let bits = 0;
@@ -930,29 +725,21 @@ class Sproto {
 		return notzero + 1;
 	}
 
-	write_ff(buffer, ff_srcstart, dstbuffer, ff_desstart, n) {
-		let i;
-		let align8_n = (n + 7) & (~7); //8的倍数
-		dstbuffer[ff_desstart] = 0xff;
-		dstbuffer[ff_desstart + 1] = align8_n / 8 - 1;
-
-		let start = ff_desstart + 2;
-		for (let i = start; i < start + n; ++i) {
-			dstbuffer[i] = buffer[ff_srcstart + i - start];
-		}
-
-		start += n;
-		for(let i = 0; i < align8_n - n; ++i){
-			dstbuffer[start + i] = 0;
-		}
+	write_ff(source, sourceStart, output, destination, length) {
+		const aligned = (length + 7) & ~7;
+		const available = Math.min(length, source.length - sourceStart);
+		output[destination] = 0xff;
+		output[destination + 1] = aligned / 8 - 1;
+		source.copy(output, destination + 2, sourceStart, sourceStart + available);
+		if (available < aligned) output.fill(0, destination + 2 + available, destination + 2 + aligned);
 	}
 
 	pack(buffer:Buffer) {
 		const srcsz = buffer.length;
-		let dstsz = (srcsz + 2047) / 2048 * 2 + srcsz + 2;
+		let dstsz = srcsz + Math.ceil(srcsz / 2048) * 2 + 8;
 
 		let dstbuffer = Buffer.allocUnsafe(dstsz);
-		let tmp = Buffer.allocUnsafe(8);
+		let tmp: Buffer | null = null;
 		let dstidx = 0;
 		let srcidx;
 		let ff_n = 0;
@@ -966,6 +753,7 @@ class Sproto {
 			let n = 0;
 			let padding = i + 8 - srcsz;
 			if (padding > 0) {
+				tmp = Buffer.allocUnsafe(8);
 				let data_end = 8 - padding
 
 				for (let j = 0; j < 8; ++j) {
@@ -1038,36 +826,39 @@ class Sproto {
 		return outbuffer.subarray(0, size);
 	}
 
-	lunpack(buffer: Buffer, outbuffer: Buffer) {
-		let srcidx = 0;
-		let outidx = 0;
-		while (srcidx < buffer.length) {
-			let bits = buffer[srcidx++];
-			if (bits === 0xff) {
-				if (srcidx >= buffer.length) return -1;
-				const length = (buffer[srcidx++] + 1) * 8;
-				if (length > buffer.length - srcidx) return -1;
-				if (length <= outbuffer.length - outidx) {
-					buffer.copy(outbuffer, outidx, srcidx, srcidx + length);
-				}
-				// 即使缓冲区暂时不足，仍完整扫描并累计所需长度。
-				srcidx += length;
-				outidx += length;
-			} else {
+	lunpack(source: Buffer, output: Buffer) {
+		let sourceOffset = 0;
+		let destination = 0;
+		while (sourceOffset < source.length) {
+			let mask = source[sourceOffset++];
+			if (mask === 255) {
+				if (sourceOffset >= source.length) return -1;
+				const length = (source[sourceOffset++] + 1) * 8;
+				if (length > source.length - sourceOffset) return -1;
+				if (length > 8 * 1024 * 1024 - destination) throw new Error("Sproto unpack size limit");
+				if (length <= output.length - destination) source.copy(output, destination, sourceOffset, sourceOffset + length);
+				sourceOffset += length;
+				destination += length;
+				continue;
+			}
+			if (NONZERO_COUNT[mask] > source.length - sourceOffset) return -1;
+			if (8 > 8 * 1024 * 1024 - destination) throw new Error("Sproto unpack size limit");
+			if (destination + 8 <= output.length) {
 				for (let index = 0; index < 8; index++) {
-					let value = 0;
-					if ((bits & 1) !== 0) {
-						if (srcidx >= buffer.length) return -1;
-						value = buffer[srcidx++];
-					}
-					if (outidx < outbuffer.length) outbuffer[outidx] = value;
-					outidx++;
-					bits >>>= 1;
+					output[destination + index] = (mask & 1) !== 0 ? source[sourceOffset++] : 0;
+					mask >>>= 1;
+				}
+			} else {
+				// 保留缓冲不足时的完整计数与前缀写入语义。
+				for (let index = 0; index < 8; index++) {
+					const value = (mask & 1) !== 0 ? source[sourceOffset++] : 0;
+					if (destination + index < output.length) output[destination + index] = value;
+					mask >>>= 1;
 				}
 			}
-			if (outidx > 8 * 1024 * 1024) throw new Error("Sproto unpack size limit");
+			destination += 8;
 		}
-		return outidx;
+		return destination;
 	}
 
 	private toword(p, pos) {

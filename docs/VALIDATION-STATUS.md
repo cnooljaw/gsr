@@ -4,6 +4,16 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## Sproto 正确性与五步优化验收（2026-10-15）
+
+基线提交为 `d942321`。TS boolean 与混合正负 int64 数组缺陷先由现有测试新增用例复现，再修复；20 组独立官方 C/Lua raw/packed 向量、非法整数拒绝及输出快照检查通过。固定官方源码哈希检查通过，真实 Plain/MAC Go↔TS Echo 六项测试全部通过、零跳过，包含长报文、Notify/Push 与坏包关闭。
+
+Go 库已完成头部流式解码、数组一次分配、最终缓冲直写及 Pack/Unpack 优化。独立库完整回归、官方对照、race 和 vet 通过；有限 FuzzDecode 10 秒、FuzzPackRoundTrip 15 秒及 FuzzCodecRoundTrip 15 秒通过，数组写入调整后另跑一轮 CodecRoundTrip。保留官方 wire、资源预算和解码失败原子性，未改变公开 API。
+
+两种语言各 40 项五轮基准、32 字节小包专项及 game_large 六步骤的独立 CPU/分配 profile 已完成。大型游戏消息 TS Encode 约 34.6 → 18.0 µs；Go Encode 320 → 1 次分配，Decode 1143 → 534 次分配。TS/Go 中出现回退的尝试已撤回，完整结果与限制见 [优化实施与验收](benchmarks/2026-10-15-optimized/RESULTS.md)。
+
+Go 优化已在独立库本地提交为 `931e2a6`，尚未推送或发布；GSR 正式依赖仍是 v0.3.0。优化接线和测量使用临时 modfile，并保存实际依赖覆盖及源码哈希。GSR 默认依赖的全仓 race/vet 亦通过，与本地优化库验收分开记录，不混为已升级正式依赖。
+
 ## AddressBook、数值/数组与分阶段 Profile（2026-10-15）
 
 补充独立代表性消息套件：官方 AddressBook、两档游戏状态、896 元素 int32 边界数组、4 KiB ASCII。五组 Sproto raw/packed 与固定官方 C/Lua 逐组 SHA-256 对照通过，六份官方源码由 GitHub API 验证固定版本一致；AddressBook 复现 Sproto 130/83 字节、PB 69 字节。Go 与 TS 固定 wire、完整语义和 padding 检查通过，Go 夹具测试通过。两种语言各 40 项、五轮采样全部完成，分开报告 Encode、Decode、Pack、Unpack 及组合路径。

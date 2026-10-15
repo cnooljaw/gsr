@@ -186,3 +186,5 @@ SPROTODUMP_DIR=/path/to/sprotodump npm run generate:sproto
 口径与单独运行命令见 [Benchmark 使用说明](benchmarks/README.md)，已保存的本机结果见 [2026-10-15 报告](../../docs/benchmarks/2026-10-15/report.md)。默认输出位于仓库的 `tmp/protocol-benchmark/`，包含 Markdown 报告、Go 原始采样、TS 五轮 JSON 和运行环境。该微基准不包含网络、MAC 或 Service 调度。
 
 官方 AddressBook、游戏数值与数组的独立消息体套件运行 `npm --prefix examples/websocket-gate run bench:representative`；CPU/分配分析运行 `npm --prefix examples/websocket-gate run profile:protocol`。两条命令顺序执行，采样口径、TS 已知能力缺口及后续优化顺序见 [代表性消息报告](../../docs/benchmarks/2026-10-15-representative/report.md) 和 [分析与方案](../../docs/benchmarks/2026-10-15-representative/ANALYSIS-AND-PLAN.md)。
+
+TS 布尔/混合正负 int64 数组修复及五步性能优化已完成，当前结果与 32 字节小包检查见 [优化实施与验收](../../docs/benchmarks/2026-10-15-optimized/RESULTS.md)。TS 改动已在示例中；Go 优化尚未发布，正式依赖仍为 v0.3.0，报告明确记录了测试用的临时模块覆盖。

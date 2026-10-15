@@ -56,7 +56,7 @@ go get github.com/cnooljaw/gosproto@v0.3.0
 
 | 能力 | Go 修复库 | 本轮 TS Echo 客户端 |
 | --- | --- | --- |
-| string / binary / boolean | 支持，沿用原有类型回归；binary 是 []byte，不新增 binary 数组 | Echo 使用字符串；不宣称验证所有类型 |
+| string / binary / boolean | 支持，沿用原有类型回归；binary 是 []byte，不新增 binary 数组 | Echo 使用字符串；参考编码器的 boolean/数组已有官方向量，不扩展为所有 binary 能力结论 |
 | signed integer / 数组 | 修复负值、空数组与宽度检查，保留 64 位位模式 | 只接受 JavaScript 安全整数，超范围报错 |
 | 原生 double / 数组 | 新增 IEEE-754 支持，官方编码向量对照 | 不作为已验收能力 |
 | 嵌套结构与数组 | 沿用原有类型回归，增加深度/元素预算 | 当前预检限于扁平 Echo schema |
@@ -68,7 +68,9 @@ go get github.com/cnooljaw/gosproto@v0.3.0
 
 编解码速度使用共用消息夹具分别测 Go/TS 的 payload 和应用帧，不将网络或业务调度混入；命令及比较口径见 [Benchmark 使用说明](../examples/websocket-gate/benchmarks/README.md)，本机大小、耗时和分配结果见 [2026-10-15 报告](benchmarks/2026-10-15/report.md)。当前性能基线只覆盖 Echo 字符串，未覆盖全部类型。测量发现并删除 TS `write_ff` 中未使用的逐字节十六进制调试字符串，保留优化前后数据；wire 不变。
 
-随后补充 [官方 AddressBook 与游戏数值/数组报告](benchmarks/2026-10-15-representative/report.md)，Go/TS 分别测纯 Encode/Decode、Pack/Unpack 及组合路径，Sproto 固定 wire 与官方 C/Lua 对照通过。额外 TS 探针确认 boolean 会被安全整数检查拒绝，混合正负 int64 数组也未通过往返；正式性能数组限定在 int32，不将其解释为通用类型支持。CPU/分配证据与尚未实施的修复、优化顺序见 [分析与方案](benchmarks/2026-10-15-representative/ANALYSIS-AND-PLAN.md)。
+随后补充 [官方 AddressBook 与游戏数值/数组基线](benchmarks/2026-10-15-representative/report.md)，Go/TS 分别测纯 Encode/Decode、Pack/Unpack 及组合路径，Sproto 固定 wire 与官方 C/Lua 对照通过。基线探针发现 TS boolean 与混合正负 int64 数组缺陷；这两项现已修复，并由 20 组独立官方 raw/packed 向量保护，覆盖布尔、整数宽度与符号、缺失字段及 packing 边界。TS 仍只接受安全整数，正式性能数组继续使用相同 int32 夹具以便比较。
+
+五步优化已完成，结果、原始采样、profile 与撤回的回退方案见 [优化实施与验收](benchmarks/2026-10-15-optimized/RESULTS.md)。TS 改动直接位于示例参考实现；Go 优化在独立 gosproto 库本地提交为 `931e2a6`，尚未推送或发布，GSR 不保存源码补丁副本。GSR 正式依赖仍为 v0.3.0，优化测量通过临时 modfile 完成，未将本地 replace 写入 go.mod。资源预算、官方 wire 和解码失败原子性保持不变。
 
 ## 独立修复库与官方对照（2026-10-15）
 

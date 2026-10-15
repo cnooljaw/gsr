@@ -3,6 +3,7 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { cpus, loadavg } from "node:os";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { codecEnvironment } from "./benchmark-environment.mjs";
 
 const example = fileURLToPath(new URL("../", import.meta.url));
 const root = resolve(example, "../..");
@@ -12,11 +13,13 @@ const command = (program, args, options = {}) => execFileSync(program, args, {
   cwd: root, encoding: "utf8", maxBuffer: 32 << 20, timeout: 60000, ...options,
 });
 const steps = ["protobuf_encode", "protobuf_decode", "sproto_encode", "sproto_decode", "sproto_pack", "sproto_unpack"];
-const scenarios = ["addressbook", "game_large"];
+const scenarios = process.env.GSR_PROFILE_SCENARIO ? [process.env.GSR_PROFILE_SCENARIO] : ["addressbook", "game_large"];
+if (scenarios.some(name => !["addressbook", "game_large"].includes(name))) throw new Error("unknown profile scenario");
 const targets = scenarios.flatMap(scenario => steps.map(step => ({ scenario, step })));
 const metadata = { date: new Date().toISOString(), cpu: cpus()[0]?.model, node: process.version,
   go: command("go", ["version"]).trim(), loadBefore: loadavg(),
   commit: command("git", ["rev-parse", "HEAD"]).trim(),
+  codecs: codecEnvironment(root),
   secondsPerCPU: 2, goAllocationIterations: 1000, nodeHeapIntervalBytes: 16384,
   scenarios, steps, commands: [] };
 const binary = resolve(output, "codec.test");

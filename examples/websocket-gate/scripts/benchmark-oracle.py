@@ -9,9 +9,11 @@ import subprocess
 example = Path(__file__).resolve().parent.parent
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--output", type=Path, help="输出独立签名证据；省略时只检查夹具")
+parser.add_argument("--correctness", action="store_true", help="检查布尔与安全 int64 正确性夹具")
 args = parser.parse_args()
 oracle = Path(os.environ["SPROTO_ORACLE_DIR"]).resolve()
-fixtures = json.loads((example / "benchmarks/representative.json").read_text())
+fixture_name = "correctness.json" if args.correctness else "representative.json"
+fixtures = json.loads((example / "benchmarks" / fixture_name).read_text())
 source = json.loads((example / "benchmarks/oracle-source.json").read_text())
 for name, digest in source["files"].items():
     actual = hashlib.sha256((oracle / name).read_bytes()).hexdigest()
@@ -20,6 +22,8 @@ for name, digest in source["files"].items():
 
 
 def lua_literal(value):
+    if isinstance(value, str):
+        return '"' + "".join(f"\\{byte:03d}" for byte in value.encode("utf8")) + '"'
     if isinstance(value, dict):
         return "{" + ",".join("[" + lua_literal(k) + "]=" + lua_literal(v) for k, v in value.items()) + "}"
     if isinstance(value, list):
@@ -31,6 +35,8 @@ schema = (example / "benchmarks/schema/representative.sproto").read_text()
 script = "local sproto=require 'sproto'\nlocal sp=sproto.parse(" + lua_literal(schema) + ")\n"
 script += "local function hex(s) return (s:gsub('.',function(c) return string.format('%02x',string.byte(c)) end)) end\n"
 for fixture in fixtures:
+    if args.correctness:
+        script += "sp=sproto.parse(" + lua_literal(fixture["schema"]) + ")\n"
     script += "do local raw=sp:encode(" + lua_literal(fixture["type"]) + "," + lua_literal(fixture["data"]) + ")\n"
     script += "print(" + lua_literal(fixture["name"]) + ",hex(raw),hex(sproto.pack(raw))) end\n"
 environment = {**os.environ, "LUA_PATH": str(oracle / "?.lua") + ";;"}
@@ -43,6 +49,8 @@ for line in result.stdout.splitlines():
     for key, wire in [("sproto_encode", raw), ("sproto_pack", packed)]:
         content = bytes.fromhex(wire)
         signatures[name][key] = {"bytes": len(content), "sha256": hashlib.sha256(content).hexdigest()}
+        if args.correctness:
+            signatures[name][key]["hex"] = wire
 if args.output:
     args.output.write_text(json.dumps(signatures, indent=2) + "\n")
 else:

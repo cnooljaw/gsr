@@ -3,6 +3,7 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { cpus, arch, platform, release, loadavg } from "node:os";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { codecEnvironment } from "./benchmark-environment.mjs";
 
 const example = fileURLToPath(new URL("../", import.meta.url));
 const root = resolve(example, "../..");
@@ -18,6 +19,7 @@ const metadata = {
   workingTree: command("git", ["status", "--short"]), go: command("go", ["version"]).trim(),
   node: process.version, cpu: cpus()[0]?.model, cpuCount: cpus().length,
   os: `${platform()} ${release()} ${arch()}`, loadBefore: loadavg(),
+  codecs: codecEnvironment(root),
   commands: { go: ["GOMAXPROCS=1", "go", ...goArgs], typescript: [process.execPath, "client/dist/representative_benchmark.js"] },
 };
 console.error("运行代表性消息 Go 基准（40 项、5 轮）…");
@@ -52,7 +54,7 @@ const steps = ["protobuf_encode", "protobuf_decode", "sproto_encode", "sproto_de
 const lines = ["# AddressBook 与游戏消息编解码基准", "",
   `时间：${metadata.date}；CPU：${metadata.cpu}；${metadata.os}。`, "",
   `${metadata.go}；Node ${metadata.node}；V8 ${ts.v8}；基础提交 ${metadata.commit}，包含随附工作树修改。`, "",
-  "Go：google.golang.org/protobuf v1.36.1、cnooljaw/gosproto v0.3.0；TS：@bufbuild/protobuf 2.15.0、示例内固定并修正的 sealindx/sproto-ts。未修改编解码库实现。", "",
+  `Go：google.golang.org/protobuf v1.36.1、cnooljaw/gosproto ${metadata.codecs.module.Version}${metadata.codecs.module.Replace ? " 基础的本地工作树（未发布优化版）" : ""}；TS：@bufbuild/protobuf 2.15.0、示例内修正的 sealindx/sproto-ts。实际源码哈希和依赖覆盖见 environment.json。`, "",
   "## 口径", "",
   "共用 representative.json 数据；AddressBook 对应官方 Alice/Bob/三条电话，Protobuf 使用官方 proto2 required/optional 定义。Sproto PhoneNumber 提至顶层以适应 TS parser，字段布局不变。游戏消息用整数状态位、正负坐标、数值数组、物品结构体数组和字符串数组；int32_edges 为 896 个正负 int32 边界值。两侧 Protobuf 数值数组显式 packed，负值使用 sint32。", "",
   "纯 payload 编解码与 Pack/Unpack 分开测；PEncode/PDecode 是组合路径。不含 Envelope/package、网络、MAC、Dispatcher、RPC、schema 构造和 fixture 校验。输入对象复用，编码输出分配计时；每次解码创建新对象。Go 的 Sproto 资源预算与失败原子性保留。Pack 只处理预先编码的 Sproto body，Unpack 只处理预先 packed 的 body，不与 Protobuf 强造对应操作。", "",
