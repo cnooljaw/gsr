@@ -1,0 +1,2691 @@
+{
+  "date": "2026-10-15T08:51:32.051Z",
+  "node": "v23.11.0",
+  "v8": "12.9.202.28-node.14",
+  "startedAt": "2026-10-15T08:49:31.225Z",
+  "startLoad": [
+    5.3056640625,
+    6.4169921875,
+    5.92919921875
+  ],
+  "endLoad": [
+    8.0322265625,
+    6.8251953125,
+    6.1376953125
+  ],
+  "platform": "darwin",
+  "arch": "arm64",
+  "cpu": "Apple M2",
+  "protobufVersion": "2.15.0",
+  "fixtures": {
+    "benchmarks/representative.json": "5d4ead8bcf974f35e9ca9b7c4b41e946790ea5d68534fdf231813f6f7ff9ea33",
+    "benchmarks/cases.json": "aa77345f5b8560ae6a10beeb3b492bd5b2d722230da3df667d776eaa9b580d70",
+    "benchmarks/schema/representative.sproto": "c93fa610143b4f2b0d6921ad05664cf2e9b35472b96c6729c3739e88a614b82c",
+    "benchmarks/echo.sproto": "0a209e721912d3ceb8bc042a322cfd28213660c1f991686a40ae6d2c116f81cf",
+    "sproto/c2s.sproto": "18578c8c6fe71a09bfe1ba86e766fef1e32e20eb8f0eea6d3531151a8942bbbe"
+  },
+  "scriptSha256": "b324a0e6886449cd46358d9921950d0d3baa33bbfd56a864d1ec4aa7f2998fcb",
+  "unpackShapes": [
+    {
+      "name": "ascii32",
+      "rawBytes": 32,
+      "packedBytes": 34,
+      "rawSha256": "17a7384bf1c50a94b712ce507c5ccd58638cd091278078c6e7dc00ae0aa152fc",
+      "packedSha256": "2d0291f1165ffdbce37c1336f6eba6038e2f80813011d3befb12d1b17d64d5a9"
+    },
+    {
+      "name": "zero32",
+      "rawBytes": 32,
+      "packedBytes": 4,
+      "rawSha256": "66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+      "packedSha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119"
+    },
+    {
+      "name": "sparse32",
+      "rawBytes": 32,
+      "packedBytes": 12,
+      "rawSha256": "0df94b82399ae10c4e2bd8bad364e2fa0216c9a6b132169b907914797add52d5",
+      "packedSha256": "027e3157be23fc1e84a0eeada988ddefadd8987e628f0dd48fc4d67bdd917a1d"
+    },
+    {
+      "name": "ascii256",
+      "rawBytes": 256,
+      "packedBytes": 258,
+      "rawSha256": "22527f13f62eb6f2d8cdc5800222cebe9fec473fbab698764198b94d0ab81a5f",
+      "packedSha256": "413b4e1f4230b23d7139e40c66e04c6635e34932cea507ee298eaa2d67787e96"
+    },
+    {
+      "name": "zero256",
+      "rawBytes": 256,
+      "packedBytes": 32,
+      "rawSha256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "packedSha256": "66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925"
+    },
+    {
+      "name": "sparse256",
+      "rawBytes": 256,
+      "packedBytes": 96,
+      "rawSha256": "349e41450f522adda995a39826876934e7a5a48bfb28cca7a48af3516dd90eb8",
+      "packedSha256": "ffd2d33324bdf2723a32e50ef78ed002ed38d76ea835fda38e8eba65aa085c03"
+    },
+    {
+      "name": "ascii1024",
+      "rawBytes": 1024,
+      "packedBytes": 1026,
+      "rawSha256": "b7975b373ba36ffaeae620de5275af2d87e9f7bdf47988d02818b5005d27d7ef",
+      "packedSha256": "b81822feffa10623c9d34425144dbf2d7966d810b98aabf55715ff400b556478"
+    },
+    {
+      "name": "zero1024",
+      "rawBytes": 1024,
+      "packedBytes": 128,
+      "rawSha256": "5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+      "packedSha256": "38723a2e5e8a17aa7950dc008209944e898f69a7bd10a23c839d341e935fd5ca"
+    },
+    {
+      "name": "sparse1024",
+      "rawBytes": 1024,
+      "packedBytes": 384,
+      "rawSha256": "768fcdcb3540c2c47b035409685dc40c9d5ae97af3ca18db8f4ad760dec009bc",
+      "packedSha256": "c1f7e668a0baa2ce555994ac1ec4cecc54bf45882bcadca24740bc2f1b157422"
+    },
+    {
+      "name": "ascii2048",
+      "rawBytes": 2048,
+      "packedBytes": 2050,
+      "rawSha256": "b4758096eb81f1dcff1156a38703175acdfad150d4d51f6404e5f0ec2f5394f9",
+      "packedSha256": "54d57ce2f6ec2e2aea527f05c8e44c325e4125e1b47be24165bd9051f38b4554"
+    },
+    {
+      "name": "zero2048",
+      "rawBytes": 2048,
+      "packedBytes": 256,
+      "rawSha256": "e5a00aa9991ac8a5ee3109844d84a55583bd20572ad3ffcd42792f3c36b183ad",
+      "packedSha256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1"
+    },
+    {
+      "name": "sparse2048",
+      "rawBytes": 2048,
+      "packedBytes": 768,
+      "rawSha256": "f1a322b9646d4d0e5b34f81bc2d29c4102f29f9621a912701292cd610ee9b704",
+      "packedSha256": "824a66671e1aeaeff52fdd306ad3e8d78080173a65a2f5035c2eabbe77a17fb4"
+    },
+    {
+      "name": "ascii4096",
+      "rawBytes": 4096,
+      "packedBytes": 4100,
+      "rawSha256": "71cbdbeec021b7f441e73b1594b1a99d2366ffe2011bb71d9a0c256d616c34c3",
+      "packedSha256": "65d22f100690100fd17846ae45a12e0aab26a3dc682e3703e89681d3a382bdf5"
+    },
+    {
+      "name": "zero4096",
+      "rawBytes": 4096,
+      "packedBytes": 512,
+      "rawSha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+      "packedSha256": "076a27c79e5ace2a3d47f9dd2e83e4ff6ea8872b3c2218f66c92b89b55f36560"
+    },
+    {
+      "name": "sparse4096",
+      "rawBytes": 4096,
+      "packedBytes": 1536,
+      "rawSha256": "48b800c8a4ba1dbe6b97e9940560d679b924626d55eaff9c48aa3ab62dfa2b0f",
+      "packedSha256": "ba1983a280fe928396b5d50f084bce393a5718f97501c990ae6b6ecede6e1034"
+    },
+    {
+      "name": "ascii16384",
+      "rawBytes": 16384,
+      "packedBytes": 16400,
+      "rawSha256": "727bc2ef92e6aad906112db84d107bf9ca834e93fe7ae0b2b6dbbb5afd73b57a",
+      "packedSha256": "dee5842fe4f16dc73bf5b558dd4d09c7aff204142c5d496cfc3d93060b49df45"
+    },
+    {
+      "name": "zero16384",
+      "rawBytes": 16384,
+      "packedBytes": 2048,
+      "rawSha256": "4fe7b59af6de3b665b67788cc2f99892ab827efae3a467342b3bb4e3bc8e5bfe",
+      "packedSha256": "e5a00aa9991ac8a5ee3109844d84a55583bd20572ad3ffcd42792f3c36b183ad"
+    },
+    {
+      "name": "sparse16384",
+      "rawBytes": 16384,
+      "packedBytes": 6144,
+      "rawSha256": "e9ad578d52c49c4fb43d24d5d316bc25be7cf0c4c5be3f47219a9be954f59043",
+      "packedSha256": "b210eead8fdf2b61596fe8eb4e0828377d64bcfa4986f12e80f0dbf6acd60225"
+    },
+    {
+      "name": "ascii65536",
+      "rawBytes": 65536,
+      "packedBytes": 65600,
+      "rawSha256": "9662a06286605025468c3c9b248a401feeb9fecb82d99453dde79f2a078084bb",
+      "packedSha256": "701603c89802562e9cf63a6b45765ce575cb2a7e954c2918c54dd92ffc682bdf"
+    },
+    {
+      "name": "zero65536",
+      "rawBytes": 65536,
+      "packedBytes": 8192,
+      "rawSha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+      "packedSha256": "9f1dcbc35c350d6027f98be0f5c8b43b42ca52b7604459c0c42be3aa88913d47"
+    },
+    {
+      "name": "sparse65536",
+      "rawBytes": 65536,
+      "packedBytes": 24576,
+      "rawSha256": "73cd46978e8ca01d538d907f9a8d982ed21415e0ca0226478a8752a4eadd59a7",
+      "packedSha256": "1a01c5b7250385875dcd0b5896a78ff9429f97ab7bf28eb9faa32e4ce898e081"
+    },
+    {
+      "name": "FF512-sparse4096",
+      "rawBytes": 4608,
+      "packedBytes": 2050,
+      "rawSha256": "41be4e1e0db6f41607773d13bc582723f66765b6c8bba66a621433f8a219984b",
+      "packedSha256": "594725602bf215f248bf7bfa0e7f95bcfa865b03af6782e87a3127eed2b96f55"
+    },
+    {
+      "name": "FF512-sparse16384",
+      "rawBytes": 16896,
+      "packedBytes": 6658,
+      "rawSha256": "e502220d9a0fbd525e77d30b2f3140477bbd5af6acc1e32c058f564b72af7c64",
+      "packedSha256": "950e07f7ee7dd78625407dfda49fa2e9e75d3d9532f3d419b755e77d59a086dd"
+    },
+    {
+      "name": "FF1024-sparse4096",
+      "rawBytes": 5120,
+      "packedBytes": 2562,
+      "rawSha256": "1f7298113cb693d92d17592c5dd9f81d9b67d7537467149eec8ee3ffadc0bbeb",
+      "packedSha256": "1092b23c3b8c85791c68e6b9f2fd49b19a30e14dfdb0d5f18d425ea03d935a0b"
+    },
+    {
+      "name": "FF1024-sparse16384",
+      "rawBytes": 17408,
+      "packedBytes": 7170,
+      "rawSha256": "984d3df2bd2f11d21673fec43b57661b40cd285ff840567845f5fea26534d602",
+      "packedSha256": "8f08eb98bc331a91766db35a8262f1c54cdc8941007e65432f7eed96c84f7df7"
+    },
+    {
+      "name": "FF2048-sparse4096",
+      "rawBytes": 6144,
+      "packedBytes": 3586,
+      "rawSha256": "3657617706ab3b7e113df9ac02fa91e0cb7e9db4edbeabb73f49b9b99eb7b041",
+      "packedSha256": "0a81a772dadd28358a1936209e707b8dab646ccf75bf7a90121557501d230b34"
+    },
+    {
+      "name": "FF2048-sparse16384",
+      "rawBytes": 18432,
+      "packedBytes": 8194,
+      "rawSha256": "c0036099752e5d75a8f506a3a3ee83bc07d3709e1dd372037066f803b48868c0",
+      "packedSha256": "9c0a776cd59f6208d914f9223c094bd3e4f4133df680c590dd35434fd2ce18c6"
+    },
+    {
+      "name": "FF4096-sparse4096",
+      "rawBytes": 8192,
+      "packedBytes": 5636,
+      "rawSha256": "dbd5527282720065a38a064563e8443036c90467887e2c97f231084cf739846e",
+      "packedSha256": "e77cf0625fba5afa9e9ef78b08a0dfc86304121be1c23298d87e24fe6bfd119c"
+    },
+    {
+      "name": "FF4096-sparse16384",
+      "rawBytes": 20480,
+      "packedBytes": 10244,
+      "rawSha256": "36a9067476d20a488f7b009a16678b55c9b8293672ed6a6539bf91ef5fd9dfb7",
+      "packedSha256": "d614aaa4156aa13b6fcbfb6562d10e7b4db8ae04027a96ddb0e77732df8cb61e"
+    }
+  ],
+  "rounds": 5,
+  "targetMilliseconds": 100,
+  "sources": {
+    "before": {
+      "path": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/sproto-round3/before-sproto.mjs",
+      "sha256": "3e4f49f76f4826a02b29183d96fb2c3abc3e141e1c0d25742a7ada697b70f84d"
+    },
+    "after": {
+      "path": "/Users/lijiawang/Documents/cocos/laya/gsr/examples/websocket-gate/client/dist/vendor/sproto.js",
+      "sha256": "07c12dde1e746349c989838658036f82f339c4cf430d47df162b810e2122578d"
+    }
+  },
+  "results": [
+    {
+      "name": "addressbook/encode",
+      "version": "protobuf",
+      "iterations": 80271,
+      "samples": [
+        1274.9607579325059,
+        1281.9116866614065,
+        1274.14061117962,
+        1281.0858466941695,
+        1294.898954790663
+      ],
+      "nsPerOp": 1281.0858466941695
+    },
+    {
+      "name": "addressbook/decode",
+      "version": "protobuf",
+      "iterations": 67843,
+      "samples": [
+        1447.0763380157528,
+        1468.810960600248,
+        1436.123977418415,
+        1466.6785814305806,
+        1435.7812744128632
+      ],
+      "nsPerOp": 1447.0763380157528
+    },
+    {
+      "name": "game_small/encode",
+      "version": "protobuf",
+      "iterations": 36038,
+      "samples": [
+        2708.7842555080956,
+        2731.2651368000456,
+        2741.3066207892325,
+        2718.0996448192413,
+        2716.5283867028797
+      ],
+      "nsPerOp": 2718.0996448192413
+    },
+    {
+      "name": "game_small/decode",
+      "version": "protobuf",
+      "iterations": 32201,
+      "samples": [
+        3037.7796341727726,
+        3043.2129436974224,
+        3027.3904537126355,
+        3030.4946740784385,
+        3035.5009471759176
+      ],
+      "nsPerOp": 3035.5009471759176
+    },
+    {
+      "name": "game_large/encode",
+      "version": "protobuf",
+      "iterations": 3878,
+      "samples": [
+        25509.165033522604,
+        25261.668385765646,
+        25621.454357916602,
+        25280.610881899363,
+        25305.774110366416
+      ],
+      "nsPerOp": 25305.774110366416
+    },
+    {
+      "name": "game_large/decode",
+      "version": "protobuf",
+      "iterations": 2943,
+      "samples": [
+        32246.12062521285,
+        31990.146109411213,
+        31959.31022765687,
+        32253.497111792592,
+        32037.079510701624
+      ],
+      "nsPerOp": 32037.079510701624
+    },
+    {
+      "name": "int32_edges/encode",
+      "version": "protobuf",
+      "iterations": 8171,
+      "samples": [
+        12704.666870639989,
+        12666.386244034107,
+        12460.06204870972,
+        12631.088606045685,
+        12498.755843836714
+      ],
+      "nsPerOp": 12631.088606045685
+    },
+    {
+      "name": "int32_edges/decode",
+      "version": "protobuf",
+      "iterations": 9027,
+      "samples": [
+        11162.72936745319,
+        16157.005871274949,
+        11164.086407444707,
+        16454.843801928557,
+        11127.59864849919
+      ],
+      "nsPerOp": 11164.086407444707
+    },
+    {
+      "name": "echo_ascii4k/encode",
+      "version": "protobuf",
+      "iterations": 17401,
+      "samples": [
+        5729.876616286364,
+        5632.43968737393,
+        5663.225791621427,
+        5601.926613412908,
+        5616.633584276343
+      ],
+      "nsPerOp": 5632.43968737393
+    },
+    {
+      "name": "echo_ascii4k/decode",
+      "version": "protobuf",
+      "iterations": 145974,
+      "samples": [
+        937.6812514557346,
+        668.4595064874367,
+        673.8888432186052,
+        666.3110142901811,
+        667.2007206762887
+      ],
+      "nsPerOp": 668.4595064874367
+    },
+    {
+      "name": "ascii32/rpc_encode",
+      "version": "protobuf",
+      "iterations": 112943,
+      "samples": [
+        905.6135307190278,
+        928.0942599363884,
+        897.1929734467672,
+        909.0156893300976,
+        906.7936923934856
+      ],
+      "nsPerOp": 906.7936923934856
+    },
+    {
+      "name": "ascii32/rpc_decode",
+      "version": "protobuf",
+      "iterations": 99486,
+      "samples": [
+        642.5372313692526,
+        649.2710029551569,
+        645.1020746637764,
+        651.3956737630992,
+        646.230796292857
+      ],
+      "nsPerOp": 646.230796292857
+    },
+    {
+      "name": "utf8_1k/rpc_encode",
+      "version": "protobuf",
+      "iterations": 34709,
+      "samples": [
+        3004.2652338010635,
+        3155.376357716936,
+        3030.096660808513,
+        3011.3191103175745,
+        2968.153072689906
+      ],
+      "nsPerOp": 3011.3191103175745
+    },
+    {
+      "name": "utf8_1k/rpc_decode",
+      "version": "protobuf",
+      "iterations": 20961,
+      "samples": [
+        4694.462334812368,
+        4714.588998616576,
+        6437.741519965689,
+        4764.924526502008,
+        5922.073517484791
+      ],
+      "nsPerOp": 4764.924526502008
+    },
+    {
+      "name": "ascii4k/rpc_encode",
+      "version": "protobuf",
+      "iterations": 12732,
+      "samples": [
+        7974.912346842419,
+        7902.571551994912,
+        7906.626374488873,
+        8329.484762801776,
+        7946.31636820614
+      ],
+      "nsPerOp": 7946.31636820614
+    },
+    {
+      "name": "ascii4k/rpc_decode",
+      "version": "protobuf",
+      "iterations": 92658,
+      "samples": [
+        1058.6075568218469,
+        1046.6765740680837,
+        1047.1514386236229,
+        1052.346176261074,
+        1048.0215847525049
+      ],
+      "nsPerOp": 1048.0215847525049
+    },
+    {
+      "name": "zeros4k/rpc_encode",
+      "version": "protobuf",
+      "iterations": 12827,
+      "samples": [
+        7767.956887814777,
+        7898.875419038316,
+        7933.9738832156,
+        7760.141342480187,
+        7848.519373197951
+      ],
+      "nsPerOp": 7848.519373197951
+    },
+    {
+      "name": "zeros4k/rpc_decode",
+      "version": "protobuf",
+      "iterations": 93867,
+      "samples": [
+        1045.2892603364392,
+        1051.6395538367824,
+        1051.856616276347,
+        1032.7098447804724,
+        1046.5476898164575
+      ],
+      "nsPerOp": 1046.5476898164575
+    },
+    {
+      "name": "addressbook/encode",
+      "version": "before",
+      "iterations": 121162,
+      "samples": [
+        817.7484772453498,
+        846.9167313184007,
+        819.3155939980373,
+        816.9417143989089,
+        817.9867945395207
+      ],
+      "nsPerOp": 817.9867945395207
+    },
+    {
+      "name": "addressbook/decode",
+      "version": "before",
+      "iterations": 116375,
+      "samples": [
+        864.621911922683,
+        887.7984274972894,
+        862.6398195488334,
+        845.520232008594,
+        862.327604726028
+      ],
+      "nsPerOp": 862.6398195488334
+    },
+    {
+      "name": "addressbook/pack",
+      "version": "before",
+      "iterations": 265589,
+      "samples": [
+        372.9410555406991,
+        369.9397075933168,
+        371.96523575896464,
+        366.5047309941594,
+        373.73739876270884
+      ],
+      "nsPerOp": 371.96523575896464
+    },
+    {
+      "name": "addressbook/unpack",
+      "version": "before",
+      "iterations": 416385,
+      "samples": [
+        242.35823336575675,
+        242.88469085100556,
+        243.02768591565743,
+        241.08217154797032,
+        239.1559686347764
+      ],
+      "nsPerOp": 242.35823336575675
+    },
+    {
+      "name": "addressbook/pencode",
+      "version": "before",
+      "iterations": 86415,
+      "samples": [
+        1159.7432043048382,
+        1612.8083434589003,
+        1158.730162587615,
+        1166.237539778994,
+        1160.5223861598292
+      ],
+      "nsPerOp": 1160.5223861598292
+    },
+    {
+      "name": "addressbook/pdecode",
+      "version": "before",
+      "iterations": 90590,
+      "samples": [
+        1100.4783530190903,
+        1121.1612760790254,
+        1103.183762004567,
+        1105.423700187692,
+        1102.755546969882
+      ],
+      "nsPerOp": 1103.183762004567
+    },
+    {
+      "name": "addressbook/combined_encode",
+      "version": "before",
+      "iterations": 73417,
+      "samples": [
+        1186.6035795524156,
+        1234.927428252275,
+        1192.5734775324327,
+        1170.943596169656,
+        1188.6762057834949
+      ],
+      "nsPerOp": 1188.6762057834949
+    },
+    {
+      "name": "addressbook/combined_decode",
+      "version": "before",
+      "iterations": 62126,
+      "samples": [
+        1102.287415896712,
+        1155.1282876734526,
+        1111.6038373628276,
+        1110.118291858399,
+        1105.6193542158228
+      ],
+      "nsPerOp": 1110.118291858399
+    },
+    {
+      "name": "game_small/encode",
+      "version": "before",
+      "iterations": 58126,
+      "samples": [
+        1737.767952379316,
+        1814.284192960141,
+        1734.8834256613504,
+        1721.813388156777,
+        1733.2547741113115
+      ],
+      "nsPerOp": 1734.8834256613504
+    },
+    {
+      "name": "game_small/decode",
+      "version": "before",
+      "iterations": 68291,
+      "samples": [
+        1470.4475406715057,
+        1538.2755414329692,
+        1471.814851151556,
+        1461.175952907331,
+        1453.6090553658858
+      ],
+      "nsPerOp": 1470.4475406715057
+    },
+    {
+      "name": "game_small/pack",
+      "version": "before",
+      "iterations": 164950,
+      "samples": [
+        608.909008790541,
+        1077.8114580175582,
+        615.207893301071,
+        784.1494877236174,
+        618.2535131857745
+      ],
+      "nsPerOp": 618.2535131857745
+    },
+    {
+      "name": "game_small/unpack",
+      "version": "before",
+      "iterations": 204083,
+      "samples": [
+        490.9299549693063,
+        494.5965612030456,
+        488.41361602875645,
+        486.65228362972414,
+        489.74028704007856
+      ],
+      "nsPerOp": 489.74028704007856
+    },
+    {
+      "name": "game_small/pencode",
+      "version": "before",
+      "iterations": 43746,
+      "samples": [
+        2753.0145613312507,
+        2315.607895579102,
+        2309.744502354341,
+        2305.442211859386,
+        2218.1161477623164
+      ],
+      "nsPerOp": 2309.744502354341
+    },
+    {
+      "name": "game_small/pdecode",
+      "version": "before",
+      "iterations": 51304,
+      "samples": [
+        2126.2093014189613,
+        2126.9459106501167,
+        1932.259979728773,
+        1947.242573678497,
+        1886.267815375027
+      ],
+      "nsPerOp": 1947.242573678497
+    },
+    {
+      "name": "game_small/combined_encode",
+      "version": "before",
+      "iterations": 42562,
+      "samples": [
+        2340.214463606049,
+        3465.1498754757786,
+        2341.985409520338,
+        2368.4027771250676,
+        2338.2271744749028
+      ],
+      "nsPerOp": 2341.985409520338
+    },
+    {
+      "name": "game_small/combined_decode",
+      "version": "before",
+      "iterations": 51419,
+      "samples": [
+        1944.9400999630316,
+        1960.1671366614598,
+        1970.665823917045,
+        1964.0907641146268,
+        1945.064878741237
+      ],
+      "nsPerOp": 1960.1671366614598
+    },
+    {
+      "name": "game_large/encode",
+      "version": "before",
+      "iterations": 4766,
+      "samples": [
+        17825.430130088534,
+        19431.004406210348,
+        23941.88879563644,
+        17926.92152748748,
+        23747.963071759732
+      ],
+      "nsPerOp": 19431.004406210348
+    },
+    {
+      "name": "game_large/decode",
+      "version": "before",
+      "iterations": 331,
+      "samples": [
+        14101.084592145728,
+        14097.555891242795,
+        14344.283987893203,
+        15304.50755285185,
+        13322.507552888732
+      ],
+      "nsPerOp": 14101.084592145728
+    },
+    {
+      "name": "game_large/pack",
+      "version": "before",
+      "iterations": 7562,
+      "samples": [
+        5274.453319227848,
+        5743.635942872325,
+        5344.518645861606,
+        5326.62761174474,
+        5245.702195185211
+      ],
+      "nsPerOp": 5326.62761174474
+    },
+    {
+      "name": "game_large/unpack",
+      "version": "before",
+      "iterations": 22903,
+      "samples": [
+        4381.92594856559,
+        4359.181504606385,
+        4355.293673317909,
+        4280.645548618299,
+        4331.004671877016
+      ],
+      "nsPerOp": 4355.293673317909
+    },
+    {
+      "name": "game_large/pencode",
+      "version": "before",
+      "iterations": 4474,
+      "samples": [
+        22934.519892713466,
+        22792.094993295315,
+        22739.448368350786,
+        22660.3524810015,
+        22845.524139470217
+      ],
+      "nsPerOp": 22792.094993295315
+    },
+    {
+      "name": "game_large/pdecode",
+      "version": "before",
+      "iterations": 5475,
+      "samples": [
+        18537.80821917821,
+        18453.272328766267,
+        18428.59963470481,
+        18384.36073059329,
+        18534.619543378743
+      ],
+      "nsPerOp": 18453.272328766267
+    },
+    {
+      "name": "game_large/combined_encode",
+      "version": "before",
+      "iterations": 4270,
+      "samples": [
+        33350.80983606553,
+        23052.527166277527,
+        23174.765807959804,
+        22983.440749412777,
+        23054.90819672428
+      ],
+      "nsPerOp": 23054.90819672428
+    },
+    {
+      "name": "game_large/combined_decode",
+      "version": "before",
+      "iterations": 5419,
+      "samples": [
+        19260.84148366889,
+        18435.18176785362,
+        18431.2681306515,
+        18475.948883558736,
+        18466.43753459848
+      ],
+      "nsPerOp": 18466.43753459848
+    },
+    {
+      "name": "int32_edges/encode",
+      "version": "before",
+      "iterations": 10282,
+      "samples": [
+        9816.122836024091,
+        9759.178661738832,
+        9605.248687026278,
+        9723.460902547724,
+        9763.320268430383
+      ],
+      "nsPerOp": 9759.178661738832
+    },
+    {
+      "name": "int32_edges/decode",
+      "version": "before",
+      "iterations": 21166,
+      "samples": [
+        4648.0066616270005,
+        4675.015354814179,
+        4614.206321459333,
+        4597.90465841446,
+        4624.4625814984975
+      ],
+      "nsPerOp": 4624.4625814984975
+    },
+    {
+      "name": "int32_edges/pack",
+      "version": "before",
+      "iterations": 18101,
+      "samples": [
+        5539.033313076542,
+        5626.500856306179,
+        5604.920556875209,
+        5582.672670018031,
+        5547.262582178185
+      ],
+      "nsPerOp": 5582.672670018031
+    },
+    {
+      "name": "int32_edges/unpack",
+      "version": "before",
+      "iterations": 21920,
+      "samples": [
+        4604.282618613176,
+        4625.815465328576,
+        4551.2716697082205,
+        4529.001322992432,
+        4520.5729014598855
+      ],
+      "nsPerOp": 4551.2716697082205
+    },
+    {
+      "name": "int32_edges/pencode",
+      "version": "before",
+      "iterations": 6744,
+      "samples": [
+        14906.515717674465,
+        14853.802046263107,
+        13898.224347567122,
+        14829.786921709478,
+        14936.505338079176
+      ],
+      "nsPerOp": 14853.802046263107
+    },
+    {
+      "name": "int32_edges/pdecode",
+      "version": "before",
+      "iterations": 10954,
+      "samples": [
+        9383.337867445578,
+        9078.685137848977,
+        8897.385247398199,
+        9110.884151908298,
+        9076.128902685181
+      ],
+      "nsPerOp": 9078.685137848977
+    },
+    {
+      "name": "int32_edges/combined_encode",
+      "version": "before",
+      "iterations": 6600,
+      "samples": [
+        15227.752424242211,
+        15284.696969697094,
+        15262.866212122555,
+        15179.10984848365,
+        15252.051818181028
+      ],
+      "nsPerOp": 15252.051818181028
+    },
+    {
+      "name": "int32_edges/combined_decode",
+      "version": "before",
+      "iterations": 10939,
+      "samples": [
+        9101.296553615513,
+        13186.721089679588,
+        9035.358990766174,
+        9154.35213456487,
+        8468.998537344396
+      ],
+      "nsPerOp": 9101.296553615513
+    },
+    {
+      "name": "echo_ascii4k/encode",
+      "version": "before",
+      "iterations": 61173,
+      "samples": [
+        1246.7666944566881,
+        1310.8540532587876,
+        1219.6264528468143,
+        1659.6292481977268,
+        1169.4817811781024
+      ],
+      "nsPerOp": 1246.7666944566881
+    },
+    {
+      "name": "echo_ascii4k/decode",
+      "version": "before",
+      "iterations": 208561,
+      "samples": [
+        484.4947425453544,
+        487.0175871807543,
+        489.3931895225037,
+        505.42826798872846,
+        482.90348147540004
+      ],
+      "nsPerOp": 487.0175871807543
+    },
+    {
+      "name": "echo_ascii4k/pack",
+      "version": "before",
+      "iterations": 67056,
+      "samples": [
+        977.5119601527405,
+        910.2460480792057,
+        922.6815497496182,
+        909.7247077070258,
+        913.4081961344369
+      ],
+      "nsPerOp": 913.4081961344369
+    },
+    {
+      "name": "echo_ascii4k/unpack",
+      "version": "before",
+      "iterations": 105457,
+      "samples": [
+        1475.5836502081527,
+        980.676171330495,
+        989.6344007509739,
+        984.4735294954695,
+        1004.1932541224195
+      ],
+      "nsPerOp": 989.6344007509739
+    },
+    {
+      "name": "echo_ascii4k/pencode",
+      "version": "before",
+      "iterations": 65711,
+      "samples": [
+        1513.2702287287757,
+        1501.3575961406575,
+        1544.8244281777515,
+        1520.1919617721173,
+        1482.8935185890539
+      ],
+      "nsPerOp": 1513.2702287287757
+    },
+    {
+      "name": "echo_ascii4k/pdecode",
+      "version": "before",
+      "iterations": 67662,
+      "samples": [
+        1436.2770092518713,
+        1457.5537229168392,
+        1502.3825485502527,
+        1454.2954834322873,
+        1441.7016345953496
+      ],
+      "nsPerOp": 1454.2954834322873
+    },
+    {
+      "name": "echo_ascii4k/combined_encode",
+      "version": "before",
+      "iterations": 46494,
+      "samples": [
+        2052.8114595432075,
+        2083.620123026753,
+        3177.0649761258496,
+        2076.1549877403036,
+        2037.990557921234
+      ],
+      "nsPerOp": 2076.1549877403036
+    },
+    {
+      "name": "echo_ascii4k/combined_decode",
+      "version": "before",
+      "iterations": 69320,
+      "samples": [
+        1505.3646133871941,
+        1461.4517166762687,
+        1473.5189555683337,
+        1457.8380409694792,
+        2067.237694748997
+      ],
+      "nsPerOp": 1473.5189555683337
+    },
+    {
+      "name": "ascii32/rpc_encode",
+      "version": "before",
+      "iterations": 169115,
+      "samples": [
+        601.1944534784147,
+        591.1500103479775,
+        606.1329036454867,
+        602.0856103833993,
+        604.3227507909488
+      ],
+      "nsPerOp": 602.0856103833993
+    },
+    {
+      "name": "ascii32/rpc_decode",
+      "version": "before",
+      "iterations": 362823,
+      "samples": [
+        284.9827381395282,
+        285.7069204543255,
+        285.0526730664881,
+        284.52394969447363,
+        285.66305057836865
+      ],
+      "nsPerOp": 285.0526730664881
+    },
+    {
+      "name": "ascii32/rpc_encode_manual",
+      "version": "before",
+      "iterations": 135463,
+      "samples": [
+        765.5193078552434,
+        767.2125746514157,
+        768.5674907538494,
+        762.0263466776786,
+        762.7953094201991
+      ],
+      "nsPerOp": 765.5193078552434
+    },
+    {
+      "name": "ascii32/rpc_decode_manual",
+      "version": "before",
+      "iterations": 344501,
+      "samples": [
+        320.09558753094586,
+        344.3319729115319,
+        317.91344582450563,
+        322.39529057969924,
+        321.49580117330646
+      ],
+      "nsPerOp": 321.49580117330646
+    },
+    {
+      "name": "utf8_1k/rpc_encode",
+      "version": "before",
+      "iterations": 27842,
+      "samples": [
+        3536.5993822280393,
+        3551.949393003364,
+        3586.4416349398425,
+        3557.504525537024,
+        3593.1356583578718
+      ],
+      "nsPerOp": 3557.504525537024
+    },
+    {
+      "name": "utf8_1k/rpc_decode",
+      "version": "before",
+      "iterations": 22690,
+      "samples": [
+        4390.274746584481,
+        4401.840017628896,
+        4410.020934332212,
+        4445.113486117114,
+        4416.314103128983
+      ],
+      "nsPerOp": 4410.020934332212
+    },
+    {
+      "name": "utf8_1k/rpc_encode_manual",
+      "version": "before",
+      "iterations": 25842,
+      "samples": [
+        3859.303652968124,
+        3845.3147976164078,
+        3906.037961458528,
+        3911.929572014686,
+        3887.2781518458874
+      ],
+      "nsPerOp": 3887.2781518458874
+    },
+    {
+      "name": "utf8_1k/rpc_decode_manual",
+      "version": "before",
+      "iterations": 13644,
+      "samples": [
+        4480.015684550273,
+        4416.93535620073,
+        4477.221342714541,
+        4477.401568455546,
+        4408.262532981866
+      ],
+      "nsPerOp": 4477.221342714541
+    },
+    {
+      "name": "ascii4k/rpc_encode",
+      "version": "before",
+      "iterations": 13588,
+      "samples": [
+        7163.805710921346,
+        7080.552031204031,
+        7249.558433912113,
+        7236.863408889991,
+        7175.924197821862
+      ],
+      "nsPerOp": 7175.924197821862
+    },
+    {
+      "name": "ascii4k/rpc_decode",
+      "version": "before",
+      "iterations": 34390,
+      "samples": [
+        1495.3099156732212,
+        1528.943733643435,
+        1497.5865077055287,
+        1482.2307938352924,
+        1515.4865658621484
+      ],
+      "nsPerOp": 1497.5865077055287
+    },
+    {
+      "name": "ascii4k/rpc_encode_manual",
+      "version": "before",
+      "iterations": 11785,
+      "samples": [
+        8479.472549851638,
+        8585.440560033889,
+        8481.858973270344,
+        8508.679762410136,
+        8461.17946542185
+      ],
+      "nsPerOp": 8481.858973270344
+    },
+    {
+      "name": "ascii4k/rpc_decode_manual",
+      "version": "before",
+      "iterations": 64152,
+      "samples": [
+        1497.120775657732,
+        1544.9459876543272,
+        1543.4573357026643,
+        1551.9748721783856,
+        1512.6821299414823
+      ],
+      "nsPerOp": 1543.4573357026643
+    },
+    {
+      "name": "zeros4k/rpc_encode",
+      "version": "before",
+      "iterations": 13727,
+      "samples": [
+        7352.714212865147,
+        7397.158228309131,
+        7435.012457201686,
+        7211.763313178975,
+        7341.185838128666
+      ],
+      "nsPerOp": 7352.714212865147
+    },
+    {
+      "name": "zeros4k/rpc_decode",
+      "version": "before",
+      "iterations": 39327,
+      "samples": [
+        2506.298675210415,
+        3339.9223180003723,
+        2576.7411701884466,
+        2524.570702062247,
+        2541.2577109874132
+      ],
+      "nsPerOp": 2541.2577109874132
+    },
+    {
+      "name": "zeros4k/rpc_encode_manual",
+      "version": "before",
+      "iterations": 11349,
+      "samples": [
+        8721.469556789456,
+        8815.894263811853,
+        8788.281610714179,
+        12508.32302405456,
+        8778.291743765476
+      ],
+      "nsPerOp": 8788.281610714179
+    },
+    {
+      "name": "zeros4k/rpc_decode_manual",
+      "version": "before",
+      "iterations": 40120,
+      "samples": [
+        2708.2242771685596,
+        2509.7291375872046,
+        2624.692597208282,
+        2565.7807826521544,
+        2457.949077766483
+      ],
+      "nsPerOp": 2565.7807826521544
+    },
+    {
+      "name": "unpack_shape/ascii32",
+      "version": "before",
+      "iterations": 1140262,
+      "samples": [
+        112.93910171522343,
+        92.43924554181365,
+        92.92889791995813,
+        92.59834581876706,
+        87.90519898058596
+      ],
+      "nsPerOp": 92.59834581876706
+    },
+    {
+      "name": "unpack_shape/zero32",
+      "version": "before",
+      "iterations": 578252,
+      "samples": [
+        178.36586125079504,
+        180.27326321395896,
+        178.52294501358767,
+        180.6318145030011,
+        180.1740417672598
+      ],
+      "nsPerOp": 180.1740417672598
+    },
+    {
+      "name": "unpack_shape/sparse32",
+      "version": "before",
+      "iterations": 610350,
+      "samples": [
+        168.98630621774117,
+        168.05459981977353,
+        170.48995002868153,
+        168.526937003352,
+        169.7470025395301
+      ],
+      "nsPerOp": 168.98630621774117
+    },
+    {
+      "name": "unpack_shape/ascii256",
+      "version": "before",
+      "iterations": 734342,
+      "samples": [
+        139.04817782449834,
+        137.05273973162002,
+        184.7780053435588,
+        141.18149309177136,
+        139.05072976896207
+      ],
+      "nsPerOp": 139.05072976896207
+    },
+    {
+      "name": "unpack_shape/zero256",
+      "version": "before",
+      "iterations": 398831,
+      "samples": [
+        253.499394480365,
+        254.04212561208575,
+        256.56063094392573,
+        250.88801271716363,
+        326.43536234646837
+      ],
+      "nsPerOp": 254.04212561208575
+    },
+    {
+      "name": "unpack_shape/sparse256",
+      "version": "before",
+      "iterations": 74996,
+      "samples": [
+        640.478052162783,
+        635.0260947250398,
+        630.8003093497699,
+        637.3367646274233,
+        636.8617392926845
+      ],
+      "nsPerOp": 636.8617392926845
+    },
+    {
+      "name": "unpack_shape/ascii1024",
+      "version": "before",
+      "iterations": 254936,
+      "samples": [
+        376.7406329431737,
+        395.03280431169,
+        380.1736867292426,
+        377.8018443844404,
+        372.7301518812895
+      ],
+      "nsPerOp": 377.8018443844404
+    },
+    {
+      "name": "unpack_shape/zero1024",
+      "version": "before",
+      "iterations": 172186,
+      "samples": [
+        552.890478900749,
+        571.2824155273547,
+        567.2777751965896,
+        578.3563994749891,
+        575.8153043801959
+      ],
+      "nsPerOp": 571.2824155273547
+    },
+    {
+      "name": "unpack_shape/sparse1024",
+      "version": "before",
+      "iterations": 44717,
+      "samples": [
+        2238.1178746338787,
+        2254.3691437260513,
+        2238.7878211866255,
+        2205.2500614981745,
+        2219.6955296641772
+      ],
+      "nsPerOp": 2238.1178746338787
+    },
+    {
+      "name": "unpack_shape/ascii2048",
+      "version": "before",
+      "iterations": 129547,
+      "samples": [
+        741.6500729465207,
+        753.98857557486,
+        771.596725512677,
+        752.9127112167595,
+        764.2888912904366
+      ],
+      "nsPerOp": 753.98857557486
+    },
+    {
+      "name": "unpack_shape/zero2048",
+      "version": "before",
+      "iterations": 101655,
+      "samples": [
+        994.429688652822,
+        1167.7274408538494,
+        993.1922581280933,
+        1125.1090354630885,
+        985.4507894347765
+      ],
+      "nsPerOp": 994.429688652822
+    },
+    {
+      "name": "unpack_shape/sparse2048",
+      "version": "before",
+      "iterations": 22616,
+      "samples": [
+        4397.60567739634,
+        4599.787407145266,
+        4419.225725150234,
+        4348.1808454191,
+        4430.604041386895
+      ],
+      "nsPerOp": 4419.225725150234
+    },
+    {
+      "name": "unpack_shape/ascii4096",
+      "version": "before",
+      "iterations": 106240,
+      "samples": [
+        956.9877164909782,
+        1014.2656532380042,
+        986.7822853916879,
+        1007.7238610692638,
+        966.0870011294631
+      ],
+      "nsPerOp": 986.7822853916879
+    },
+    {
+      "name": "unpack_shape/zero4096",
+      "version": "before",
+      "iterations": 47799,
+      "samples": [
+        2040.22138538475,
+        2408.822192932903,
+        2021.2487081319234,
+        2421.237892006321,
+        2012.3642754032194
+      ],
+      "nsPerOp": 2040.22138538475
+    },
+    {
+      "name": "unpack_shape/sparse4096",
+      "version": "before",
+      "iterations": 11414,
+      "samples": [
+        8808.55388119848,
+        9258.914490976122,
+        8750.16795163826,
+        9404.287804450478,
+        8774.454617136727
+      ],
+      "nsPerOp": 8808.55388119848
+    },
+    {
+      "name": "unpack_shape/ascii16384",
+      "version": "before",
+      "iterations": 47479,
+      "samples": [
+        2195.881337012284,
+        2251.3216369342517,
+        2263.045241053761,
+        5038.259019777268,
+        3133.926746561439
+      ],
+      "nsPerOp": 2263.045241053761
+    },
+    {
+      "name": "unpack_shape/zero16384",
+      "version": "before",
+      "iterations": 14665,
+      "samples": [
+        6861.614933515234,
+        6944.527787248706,
+        6862.186021138169,
+        7886.5638595298515,
+        6929.1055574503125
+      ],
+      "nsPerOp": 6929.1055574503125
+    },
+    {
+      "name": "unpack_shape/sparse16384",
+      "version": "before",
+      "iterations": 2971,
+      "samples": [
+        33215.75227196267,
+        45711.83944799698,
+        33405.79771121086,
+        50477.013800067936,
+        33103.64086166388
+      ],
+      "nsPerOp": 33405.79771121086
+    },
+    {
+      "name": "unpack_shape/ascii65536",
+      "version": "before",
+      "iterations": 11232,
+      "samples": [
+        7640.135327635192,
+        7579.616274928376,
+        8137.234419515681,
+        9835.670405982844,
+        8170.773237180451
+      ],
+      "nsPerOp": 8137.234419515681
+    },
+    {
+      "name": "unpack_shape/zero65536",
+      "version": "before",
+      "iterations": 4277,
+      "samples": [
+        24186.56955810068,
+        23443.59364040238,
+        24315.028057049007,
+        23884.644610707404,
+        23855.262567222326
+      ],
+      "nsPerOp": 23884.644610707404
+    },
+    {
+      "name": "unpack_shape/sparse65536",
+      "version": "before",
+      "iterations": 690,
+      "samples": [
+        130216.36521738982,
+        134864.85507246866,
+        135324.03333332352,
+        135588.94927536248,
+        133272.82608695078
+      ],
+      "nsPerOp": 134864.85507246866
+    },
+    {
+      "name": "unpack_shape/FF512-sparse4096",
+      "version": "before",
+      "iterations": 10794,
+      "samples": [
+        12813.10987585659,
+        9174.004817491435,
+        9071.706503612957,
+        9217.979896239092,
+        9201.114785991278
+      ],
+      "nsPerOp": 9201.114785991278
+    },
+    {
+      "name": "unpack_shape/FF512-sparse16384",
+      "version": "before",
+      "iterations": 2937,
+      "samples": [
+        32990.31052093774,
+        33860.884235613266,
+        34178.186244466306,
+        33785.75076608606,
+        33830.11304052126
+      ],
+      "nsPerOp": 33830.11304052126
+    },
+    {
+      "name": "unpack_shape/FF1024-sparse4096",
+      "version": "before",
+      "iterations": 20540,
+      "samples": [
+        4777.109737098236,
+        4805.341187926023,
+        4745.506718597913,
+        4841.502385589374,
+        4881.568500486635
+      ],
+      "nsPerOp": 4805.341187926023
+    },
+    {
+      "name": "unpack_shape/FF1024-sparse16384",
+      "version": "before",
+      "iterations": 2932,
+      "samples": [
+        34810.12687585229,
+        34244.99761255082,
+        46723.197817192435,
+        34346.67735334497,
+        39459.29945429597
+      ],
+      "nsPerOp": 34810.12687585229
+    },
+    {
+      "name": "unpack_shape/FF2048-sparse4096",
+      "version": "before",
+      "iterations": 20314,
+      "samples": [
+        5020.747169439637,
+        4897.552180762171,
+        5031.236634833078,
+        5007.246627941412,
+        6451.948163827725
+      ],
+      "nsPerOp": 5020.747169439637
+    },
+    {
+      "name": "unpack_shape/FF2048-sparse16384",
+      "version": "before",
+      "iterations": 2863,
+      "samples": [
+        35102.165560599955,
+        35094.641634650034,
+        35365.35103038905,
+        35424.32169053184,
+        35515.71777855608
+      ],
+      "nsPerOp": 35365.35103038905
+    },
+    {
+      "name": "unpack_shape/FF4096-sparse4096",
+      "version": "before",
+      "iterations": 18889,
+      "samples": [
+        5170.057070252748,
+        5183.177616602561,
+        5155.668219598586,
+        5221.420773996008,
+        5318.818730477804
+      ],
+      "nsPerOp": 5183.177616602561
+    },
+    {
+      "name": "unpack_shape/FF4096-sparse16384",
+      "version": "before",
+      "iterations": 5423,
+      "samples": [
+        18315.154711414954,
+        18140.128342245403,
+        18137.79273464904,
+        18419.194541766446,
+        18411.580306104555
+      ],
+      "nsPerOp": 18315.154711414954
+    },
+    {
+      "name": "addressbook/encode",
+      "version": "after",
+      "iterations": 123469,
+      "samples": [
+        804.7026622067194,
+        801.8071985680285,
+        805.381642355617,
+        799.7014068308737,
+        802.4966428819679
+      ],
+      "nsPerOp": 802.4966428819679
+    },
+    {
+      "name": "addressbook/decode",
+      "version": "after",
+      "iterations": 115915,
+      "samples": [
+        869.4808696027383,
+        870.2835439762051,
+        865.0314885907385,
+        867.4973817021507,
+        858.0055126601533
+      ],
+      "nsPerOp": 867.4973817021507
+    },
+    {
+      "name": "addressbook/pack",
+      "version": "after",
+      "iterations": 318426,
+      "samples": [
+        314.5759674147212,
+        313.1723163309504,
+        311.41510743468456,
+        314.93777204123694,
+        314.95478070258986
+      ],
+      "nsPerOp": 314.5759674147212
+    },
+    {
+      "name": "addressbook/unpack",
+      "version": "after",
+      "iterations": 419754,
+      "samples": [
+        236.72347374892396,
+        235.7220919872202,
+        239.02760188110432,
+        237.4055208526794,
+        235.08253167329062
+      ],
+      "nsPerOp": 236.72347374892396
+    },
+    {
+      "name": "addressbook/pencode",
+      "version": "after",
+      "iterations": 92741,
+      "samples": [
+        1082.8027301840955,
+        1080.5055692735734,
+        1080.0836954529796,
+        1075.0733224787023,
+        1077.7415921760098
+      ],
+      "nsPerOp": 1080.0836954529796
+    },
+    {
+      "name": "addressbook/pdecode",
+      "version": "after",
+      "iterations": 93846,
+      "samples": [
+        1050.36087846044,
+        1057.8239029899921,
+        1059.9612663298333,
+        1064.084159154362,
+        1057.5956886815611
+      ],
+      "nsPerOp": 1057.8239029899921
+    },
+    {
+      "name": "addressbook/combined_encode",
+      "version": "after",
+      "iterations": 43813,
+      "samples": [
+        1129.4659575926062,
+        1114.5921301896537,
+        1118.3524296444007,
+        1123.4413073742294,
+        1113.3510601874402
+      ],
+      "nsPerOp": 1118.3524296444007
+    },
+    {
+      "name": "addressbook/combined_decode",
+      "version": "after",
+      "iterations": 90301,
+      "samples": [
+        1103.1420803756287,
+        1106.3738718286943,
+        1096.3306054196817,
+        1116.7036799148987,
+        1110.4292864973268
+      ],
+      "nsPerOp": 1106.3738718286943
+    },
+    {
+      "name": "game_small/encode",
+      "version": "after",
+      "iterations": 64544,
+      "samples": [
+        1542.3884017104153,
+        1554.7023425880732,
+        1521.4633893156602,
+        2004.8707083540705,
+        1445.0988318046573
+      ],
+      "nsPerOp": 1542.3884017104153
+    },
+    {
+      "name": "game_small/decode",
+      "version": "after",
+      "iterations": 68275,
+      "samples": [
+        1454.5947711461051,
+        2058.703156352949,
+        1446.2327499083967,
+        1605.454046136902,
+        1462.2964628340205
+      ],
+      "nsPerOp": 1462.2964628340205
+    },
+    {
+      "name": "game_small/pack",
+      "version": "after",
+      "iterations": 151933,
+      "samples": [
+        611.5436804380903,
+        617.8367569915534,
+        630.4259114214894,
+        622.950576899027,
+        612.7328032751338
+      ],
+      "nsPerOp": 617.8367569915534
+    },
+    {
+      "name": "game_small/unpack",
+      "version": "after",
+      "iterations": 201511,
+      "samples": [
+        477.0998853660823,
+        475.47115045831544,
+        465.01638620223866,
+        476.39665824695305,
+        480.2175811742593
+      ],
+      "nsPerOp": 476.39665824695305
+    },
+    {
+      "name": "game_small/pencode",
+      "version": "after",
+      "iterations": 47149,
+      "samples": [
+        2095.130140618035,
+        2186.478864875199,
+        2073.324269867922,
+        2104.6089842838915,
+        2093.039279730393
+      ],
+      "nsPerOp": 2095.130140618035
+    },
+    {
+      "name": "game_small/pdecode",
+      "version": "after",
+      "iterations": 53569,
+      "samples": [
+        2537.6189400587145,
+        1862.8505665590992,
+        1815.1970729338711,
+        1867.4458922138158,
+        1861.8246373836314
+      ],
+      "nsPerOp": 1862.8505665590992
+    },
+    {
+      "name": "game_small/combined_encode",
+      "version": "after",
+      "iterations": 45802,
+      "samples": [
+        2159.224291515637,
+        2144.8435657832297,
+        2395.3966857342607,
+        2150.9559189555625,
+        2178.925046940973
+      ],
+      "nsPerOp": 2159.224291515637
+    },
+    {
+      "name": "game_small/combined_decode",
+      "version": "after",
+      "iterations": 51884,
+      "samples": [
+        1925.0981227353286,
+        1912.9749248322985,
+        1983.659856603113,
+        1935.0964073703462,
+        1922.4913653533556
+      ],
+      "nsPerOp": 1925.0981227353286
+    },
+    {
+      "name": "game_large/encode",
+      "version": "after",
+      "iterations": 6440,
+      "samples": [
+        15387.97220496885,
+        15351.999223602439,
+        20484.957298136826,
+        15363.11459627394,
+        15219.53928571499
+      ],
+      "nsPerOp": 15363.11459627394
+    },
+    {
+      "name": "game_large/decode",
+      "version": "after",
+      "iterations": 7118,
+      "samples": [
+        13946.983000843702,
+        13922.971059285628,
+        14126.393228433892,
+        13874.239112110114,
+        17599.940292217096
+      ],
+      "nsPerOp": 13946.983000843702
+    },
+    {
+      "name": "game_large/pack",
+      "version": "after",
+      "iterations": 18138,
+      "samples": [
+        5352.923861506046,
+        5351.380141140051,
+        5371.292314477545,
+        5379.226871761067,
+        5422.960965927724
+      ],
+      "nsPerOp": 5371.292314477545
+    },
+    {
+      "name": "game_large/unpack",
+      "version": "after",
+      "iterations": 22525,
+      "samples": [
+        4314.443196448344,
+        4383.3869478357,
+        4391.933052164123,
+        4414.156492785695,
+        4417.415849056165
+      ],
+      "nsPerOp": 4391.933052164123
+    },
+    {
+      "name": "game_large/pencode",
+      "version": "after",
+      "iterations": 4877,
+      "samples": [
+        20272.23867131391,
+        20397.751281526525,
+        20114.76481443393,
+        20302.55956530661,
+        20363.372360056677
+      ],
+      "nsPerOp": 20302.55956530661
+    },
+    {
+      "name": "game_large/pdecode",
+      "version": "after",
+      "iterations": 2040,
+      "samples": [
+        18055.33088235297,
+        18081.066176473185,
+        17804.04411764917,
+        17970.057352937933,
+        18280.45343137609
+      ],
+      "nsPerOp": 18055.33088235297
+    },
+    {
+      "name": "game_large/combined_encode",
+      "version": "after",
+      "iterations": 4934,
+      "samples": [
+        20858.355289825606,
+        21076.602756385484,
+        20880.573571138397,
+        20839.202472640365,
+        21129.72922578033
+      ],
+      "nsPerOp": 20880.573571138397
+    },
+    {
+      "name": "game_large/combined_decode",
+      "version": "after",
+      "iterations": 5469,
+      "samples": [
+        18437.36661181256,
+        18539.716218686408,
+        18381.140793563834,
+        18381.346498447685,
+        18499.62662278453
+      ],
+      "nsPerOp": 18437.36661181256
+    },
+    {
+      "name": "int32_edges/encode",
+      "version": "after",
+      "iterations": 33931,
+      "samples": [
+        2912.657304529815,
+        2910.9663729332233,
+        2979.7333706639806,
+        2916.1767115619978,
+        2910.7539418231636
+      ],
+      "nsPerOp": 2912.657304529815
+    },
+    {
+      "name": "int32_edges/decode",
+      "version": "after",
+      "iterations": 21850,
+      "samples": [
+        4753.779588100443,
+        4618.724256292922,
+        4621.067917620037,
+        4627.141510297595,
+        4627.572448512735
+      ],
+      "nsPerOp": 4627.141510297595
+    },
+    {
+      "name": "int32_edges/pack",
+      "version": "after",
+      "iterations": 17702,
+      "samples": [
+        5677.519941249532,
+        5624.074963281209,
+        5539.286973223726,
+        5599.026042254819,
+        5603.0580160434565
+      ],
+      "nsPerOp": 5603.0580160434565
+    },
+    {
+      "name": "int32_edges/unpack",
+      "version": "after",
+      "iterations": 21799,
+      "samples": [
+        4582.243818523571,
+        4567.067296665105,
+        4072.7135648421668,
+        4381.064911234414,
+        4650.842194596154
+      ],
+      "nsPerOp": 4567.067296665105
+    },
+    {
+      "name": "int32_edges/pencode",
+      "version": "after",
+      "iterations": 12297,
+      "samples": [
+        8109.793038952675,
+        8077.77644954036,
+        8055.26412946316,
+        8069.36984630387,
+        8186.427583963549
+      ],
+      "nsPerOp": 8077.77644954036
+    },
+    {
+      "name": "int32_edges/pdecode",
+      "version": "after",
+      "iterations": 11339,
+      "samples": [
+        8869.752623688726,
+        8846.896375341334,
+        8966.090484168983,
+        8921.484081488297,
+        8872.28450480556
+      ],
+      "nsPerOp": 8872.28450480556
+    },
+    {
+      "name": "int32_edges/combined_encode",
+      "version": "after",
+      "iterations": 11525,
+      "samples": [
+        8474.276876356098,
+        10585.89301518467,
+        8524.660216919661,
+        11674.168503253848,
+        8597.744034706522
+      ],
+      "nsPerOp": 8597.744034706522
+    },
+    {
+      "name": "int32_edges/combined_decode",
+      "version": "after",
+      "iterations": 11032,
+      "samples": [
+        9099.645667150025,
+        9607.460116026406,
+        9133.713288614728,
+        9126.831762145437,
+        9243.277193618229
+      ],
+      "nsPerOp": 9133.713288614728
+    },
+    {
+      "name": "echo_ascii4k/encode",
+      "version": "after",
+      "iterations": 79856,
+      "samples": [
+        1216.3655079142147,
+        1240.401472650794,
+        1251.3002529554199,
+        1264.220396714214,
+        1261.0422760968816
+      ],
+      "nsPerOp": 1251.3002529554199
+    },
+    {
+      "name": "echo_ascii4k/decode",
+      "version": "after",
+      "iterations": 206247,
+      "samples": [
+        487.6858814915997,
+        488.41821699222606,
+        489.94005730990256,
+        486.6280915601158,
+        486.6923300702324
+      ],
+      "nsPerOp": 487.6858814915997
+    },
+    {
+      "name": "echo_ascii4k/pack",
+      "version": "after",
+      "iterations": 103630,
+      "samples": [
+        1411.1526584965766,
+        946.6402875615375,
+        954.2683971823341,
+        931.4496284859979,
+        948.8195117243938
+      ],
+      "nsPerOp": 948.8195117243938
+    },
+    {
+      "name": "echo_ascii4k/unpack",
+      "version": "after",
+      "iterations": 76044,
+      "samples": [
+        700.7850718005733,
+        710.3617642417931,
+        676.5726684549766,
+        689.1514517910298,
+        690.8341486508074
+      ],
+      "nsPerOp": 690.8341486508074
+    },
+    {
+      "name": "echo_ascii4k/pencode",
+      "version": "after",
+      "iterations": 62154,
+      "samples": [
+        1537.708755671393,
+        1537.9849406312962,
+        1543.4498664606906,
+        1547.8891141359215,
+        1527.3862824596258
+      ],
+      "nsPerOp": 1537.9849406312962
+    },
+    {
+      "name": "echo_ascii4k/pdecode",
+      "version": "after",
+      "iterations": 166983,
+      "samples": [
+        629.0061503266785,
+        585.7310325003106,
+        606.312468933964,
+        603.9901247431864,
+        613.3850451842222
+      ],
+      "nsPerOp": 606.312468933964
+    },
+    {
+      "name": "echo_ascii4k/combined_encode",
+      "version": "after",
+      "iterations": 46064,
+      "samples": [
+        2011.7418157346958,
+        2027.989123827673,
+        2977.8604984370427,
+        2136.8612148316247,
+        2826.2128126085827
+      ],
+      "nsPerOp": 2136.8612148316247
+    },
+    {
+      "name": "echo_ascii4k/combined_decode",
+      "version": "after",
+      "iterations": 92624,
+      "samples": [
+        1055.2947940059078,
+        1027.2962946968264,
+        1070.8455691829495,
+        1091.012232250793,
+        1068.7443319225881
+      ],
+      "nsPerOp": 1068.7443319225881
+    },
+    {
+      "name": "ascii32/rpc_encode",
+      "version": "after",
+      "iterations": 184667,
+      "samples": [
+        543.0854402789971,
+        540.5385098583056,
+        543.8372421709971,
+        537.7677603469918,
+        538.8979460326074
+      ],
+      "nsPerOp": 540.5385098583056
+    },
+    {
+      "name": "ascii32/rpc_decode",
+      "version": "after",
+      "iterations": 406111,
+      "samples": [
+        250.22397324867958,
+        248.738748765734,
+        246.2322493111578,
+        247.3780764372035,
+        247.29497107933886
+      ],
+      "nsPerOp": 247.3780764372035
+    },
+    {
+      "name": "ascii32/rpc_encode_manual",
+      "version": "after",
+      "iterations": 141334,
+      "samples": [
+        707.8501422163253,
+        705.9188447223843,
+        702.437134730518,
+        706.3755005872647,
+        707.2549209673087
+      ],
+      "nsPerOp": 706.3755005872647
+    },
+    {
+      "name": "ascii32/rpc_decode_manual",
+      "version": "after",
+      "iterations": 312194,
+      "samples": [
+        320.7044337815453,
+        321.6664413793826,
+        312.5826152968943,
+        321.5716829919828,
+        320.84910664522465
+      ],
+      "nsPerOp": 320.84910664522465
+    },
+    {
+      "name": "utf8_1k/rpc_encode",
+      "version": "after",
+      "iterations": 51657,
+      "samples": [
+        1904.4135547941323,
+        1898.9117254195155,
+        1917.2433939251102,
+        1921.0239270573268,
+        1928.6664924403703
+      ],
+      "nsPerOp": 1917.2433939251102
+    },
+    {
+      "name": "utf8_1k/rpc_decode",
+      "version": "after",
+      "iterations": 23771,
+      "samples": [
+        4214.434941735747,
+        4186.256362795024,
+        3870.782676369995,
+        4241.840562029408,
+        4230.7521349540975
+      ],
+      "nsPerOp": 4214.434941735747
+    },
+    {
+      "name": "utf8_1k/rpc_encode_manual",
+      "version": "after",
+      "iterations": 43510,
+      "samples": [
+        2249.271225005666,
+        2267.394461043406,
+        2272.0495288438906,
+        2257.6294644909585,
+        2297.682532751089
+      ],
+      "nsPerOp": 2267.394461043406
+    },
+    {
+      "name": "utf8_1k/rpc_decode_manual",
+      "version": "after",
+      "iterations": 22581,
+      "samples": [
+        4416.670342322952,
+        4453.932509632218,
+        4460.972011868948,
+        4480.542270049789,
+        4435.9453965722
+      ],
+      "nsPerOp": 4453.932509632218
+    },
+    {
+      "name": "ascii4k/rpc_encode",
+      "version": "after",
+      "iterations": 13986,
+      "samples": [
+        7179.903117403388,
+        7266.596954097329,
+        7280.247533247901,
+        7240.690118690685,
+        7377.511440012106
+      ],
+      "nsPerOp": 7266.596954097329
+    },
+    {
+      "name": "ascii4k/rpc_decode",
+      "version": "after",
+      "iterations": 100792,
+      "samples": [
+        691.9712477180789,
+        693.0692316849999,
+        684.606258433199,
+        693.5446265576403,
+        695.394555123509
+      ],
+      "nsPerOp": 693.0692316849999
+    },
+    {
+      "name": "ascii4k/rpc_encode_manual",
+      "version": "after",
+      "iterations": 11741,
+      "samples": [
+        8274.160292990195,
+        8550.755131590395,
+        9321.451835448197,
+        8612.132016012682,
+        8502.232177838354
+      ],
+      "nsPerOp": 8550.755131590395
+    },
+    {
+      "name": "ascii4k/rpc_decode_manual",
+      "version": "after",
+      "iterations": 84424,
+      "samples": [
+        1157.2928432673796,
+        1204.7452975457866,
+        1441.8668388136168,
+        1780.422332512093,
+        1176.526118165413
+      ],
+      "nsPerOp": 1204.7452975457866
+    },
+    {
+      "name": "zeros4k/rpc_encode",
+      "version": "after",
+      "iterations": 13910,
+      "samples": [
+        7133.144644140994,
+        9308.563982745865,
+        25669.2547807326,
+        7195.162329259156,
+        7213.6592379586045
+      ],
+      "nsPerOp": 7213.6592379586045
+    },
+    {
+      "name": "zeros4k/rpc_decode",
+      "version": "after",
+      "iterations": 77329,
+      "samples": [
+        1277.638945285686,
+        1157.5282235642085,
+        1268.1993042714614,
+        1285.2304180837161,
+        1287.4299033998605
+      ],
+      "nsPerOp": 1277.638945285686
+    },
+    {
+      "name": "zeros4k/rpc_encode_manual",
+      "version": "after",
+      "iterations": 11076,
+      "samples": [
+        8536.031329000049,
+        8679.103466955585,
+        8934.358884073928,
+        8709.048031780929,
+        8877.294781508741
+      ],
+      "nsPerOp": 8709.048031780929
+    },
+    {
+      "name": "zeros4k/rpc_decode_manual",
+      "version": "after",
+      "iterations": 39854,
+      "samples": [
+        3312.3661865809772,
+        2539.0906057108523,
+        2586.9496662819997,
+        2635.568801124314,
+        2598.721784513427
+      ],
+      "nsPerOp": 2598.721784513427
+    },
+    {
+      "name": "unpack_shape/ascii32",
+      "version": "after",
+      "iterations": 1065478,
+      "samples": [
+        98.43551438884265,
+        94.02872795121645,
+        139.89523199916334,
+        93.50005349711617,
+        94.08703605329131
+      ],
+      "nsPerOp": 94.08703605329131
+    },
+    {
+      "name": "unpack_shape/zero32",
+      "version": "after",
+      "iterations": 539000,
+      "samples": [
+        185.7670055658619,
+        185.3260667903635,
+        185.6318033395211,
+        187.9802115027968,
+        184.6311057513938
+      ],
+      "nsPerOp": 185.6318033395211
+    },
+    {
+      "name": "unpack_shape/sparse32",
+      "version": "after",
+      "iterations": 589494,
+      "samples": [
+        170.8142220277116,
+        170.8002965254895,
+        164.30772323381717,
+        169.64118040215524,
+        170.51975931902163
+      ],
+      "nsPerOp": 170.51975931902163
+    },
+    {
+      "name": "unpack_shape/ascii256",
+      "version": "after",
+      "iterations": 709639,
+      "samples": [
+        138.8651483359854,
+        137.44406240355514,
+        137.49179794235098,
+        138.18675129185073,
+        175.09260624064066
+      ],
+      "nsPerOp": 138.18675129185073
+    },
+    {
+      "name": "unpack_shape/zero256",
+      "version": "after",
+      "iterations": 381577,
+      "samples": [
+        264.56619502748003,
+        260.036417289309,
+        260.41521894662725,
+        261.11549438254815,
+        262.8642659279784
+      ],
+      "nsPerOp": 261.11549438254815
+    },
+    {
+      "name": "unpack_shape/sparse256",
+      "version": "after",
+      "iterations": 156678,
+      "samples": [
+        625.569371577371,
+        592.7951467340953,
+        629.8608228341495,
+        644.567469587372,
+        631.6848887527983
+      ],
+      "nsPerOp": 629.8608228341495
+    },
+    {
+      "name": "unpack_shape/ascii1024",
+      "version": "after",
+      "iterations": 142291,
+      "samples": [
+        371.886661840848,
+        370.59997469973155,
+        406.3740855007883,
+        372.2808118573878,
+        390.43843250806776
+      ],
+      "nsPerOp": 372.2808118573878
+    },
+    {
+      "name": "unpack_shape/zero1024",
+      "version": "after",
+      "iterations": 167586,
+      "samples": [
+        576.9734166338654,
+        565.7368932965882,
+        575.3826870979584,
+        581.626496246726,
+        587.4245163677698
+      ],
+      "nsPerOp": 576.9734166338654
+    },
+    {
+      "name": "unpack_shape/sparse1024",
+      "version": "after",
+      "iterations": 44532,
+      "samples": [
+        2231.798661636595,
+        2279.591080571322,
+        2784.986077427319,
+        2213.5290353004134,
+        2256.1744139046586
+      ],
+      "nsPerOp": 2256.1744139046586
+    },
+    {
+      "name": "unpack_shape/ascii2048",
+      "version": "after",
+      "iterations": 321582,
+      "samples": [
+        299.33073057572085,
+        304.78087081989077,
+        369.03184879750444,
+        312.0011661100309,
+        308.5949555634285
+      ],
+      "nsPerOp": 308.5949555634285
+    },
+    {
+      "name": "unpack_shape/zero2048",
+      "version": "after",
+      "iterations": 99272,
+      "samples": [
+        992.2217040051744,
+        1009.7644149407499,
+        1016.9685309049908,
+        1013.1062434522895,
+        1030.3425638649896
+      ],
+      "nsPerOp": 1013.1062434522895
+    },
+    {
+      "name": "unpack_shape/sparse2048",
+      "version": "after",
+      "iterations": 22619,
+      "samples": [
+        4397.541889561584,
+        4339.900437685219,
+        4789.472699942747,
+        4434.990141031964,
+        4414.529820062615
+      ],
+      "nsPerOp": 4414.529820062615
+    },
+    {
+      "name": "unpack_shape/ascii4096",
+      "version": "after",
+      "iterations": 157523,
+      "samples": [
+        624.2601588339191,
+        618.53269046427,
+        636.8117671705085,
+        627.6932574925264,
+        640.9611612272893
+      ],
+      "nsPerOp": 627.6932574925264
+    },
+    {
+      "name": "unpack_shape/zero4096",
+      "version": "after",
+      "iterations": 48611,
+      "samples": [
+        2031.5172080393286,
+        1976.8605253954845,
+        2001.6654460926095,
+        2208.0239040546353,
+        2018.998601139769
+      ],
+      "nsPerOp": 2018.998601139769
+    },
+    {
+      "name": "unpack_shape/sparse4096",
+      "version": "after",
+      "iterations": 11440,
+      "samples": [
+        8689.765472028064,
+        8475.025437062463,
+        8614.50681818083,
+        8676.103583916207,
+        8685.056031468152
+      ],
+      "nsPerOp": 8676.103583916207
+    },
+    {
+      "name": "unpack_shape/ascii16384",
+      "version": "after",
+      "iterations": 60413,
+      "samples": [
+        1678.2115107675659,
+        1802.687335507347,
+        1646.713737109582,
+        1842.3587141840162,
+        1695.9153327926992
+      ],
+      "nsPerOp": 1695.9153327926992
+    },
+    {
+      "name": "unpack_shape/zero16384",
+      "version": "after",
+      "iterations": 14475,
+      "samples": [
+        6907.443868739564,
+        8091.560207253656,
+        7623.218169257114,
+        8565.915371329542,
+        6737.227979275383
+      ],
+      "nsPerOp": 7623.218169257114
+    },
+    {
+      "name": "unpack_shape/sparse16384",
+      "version": "after",
+      "iterations": 2993,
+      "samples": [
+        33182.92682926857,
+        47511.70798530115,
+        33246.28299365182,
+        33251.21115937253,
+        33549.96358169068
+      ],
+      "nsPerOp": 33251.21115937253
+    },
+    {
+      "name": "unpack_shape/ascii65536",
+      "version": "after",
+      "iterations": 12715,
+      "samples": [
+        8797.876523790637,
+        8968.878647267109,
+        8570.159889893688,
+        8092.908690522586,
+        7592.453165552508
+      ],
+      "nsPerOp": 8570.159889893688
+    },
+    {
+      "name": "unpack_shape/zero65536",
+      "version": "after",
+      "iterations": 4180,
+      "samples": [
+        28228.847607655527,
+        26255.61196172293,
+        23687.081339713503,
+        26716.40741626794,
+        23568.101913876257
+      ],
+      "nsPerOp": 26255.61196172293
+    },
+    {
+      "name": "unpack_shape/sparse65536",
+      "version": "after",
+      "iterations": 754,
+      "samples": [
+        207326.70159150774,
+        138087.47745357463,
+        188615.0530503826,
+        134018.62334217847,
+        132738.1750663084
+      ],
+      "nsPerOp": 138087.47745357463
+    },
+    {
+      "name": "unpack_shape/FF512-sparse4096",
+      "version": "after",
+      "iterations": 5846,
+      "samples": [
+        9841.700821074335,
+        9890.901128976697,
+        9247.327232296662,
+        9218.646595963864,
+        8998.118371536571
+      ],
+      "nsPerOp": 9247.327232296662
+    },
+    {
+      "name": "unpack_shape/FF512-sparse16384",
+      "version": "after",
+      "iterations": 2925,
+      "samples": [
+        35037.763760684844,
+        35697.122393163525,
+        33867.69230769545,
+        34024.60136751815,
+        33810.09948717999
+      ],
+      "nsPerOp": 34024.60136751815
+    },
+    {
+      "name": "unpack_shape/FF1024-sparse4096",
+      "version": "after",
+      "iterations": 20344,
+      "samples": [
+        5286.663143924728,
+        5209.302103814156,
+        4926.806871805335,
+        4817.732894219562,
+        4859.504030672257
+      ],
+      "nsPerOp": 4926.806871805335
+    },
+    {
+      "name": "unpack_shape/FF1024-sparse16384",
+      "version": "after",
+      "iterations": 2906,
+      "samples": [
+        35099.20543702805,
+        35869.2071576042,
+        33838.49483826401,
+        34450.633860974485,
+        49888.57811424891
+      ],
+      "nsPerOp": 35099.20543702805
+    },
+    {
+      "name": "unpack_shape/FF2048-sparse4096",
+      "version": "after",
+      "iterations": 19880,
+      "samples": [
+        5535.850503018254,
+        5403.894215291719,
+        5063.4368712273,
+        5153.007645875141,
+        5082.017102615366
+      ],
+      "nsPerOp": 5153.007645875141
+    },
+    {
+      "name": "unpack_shape/FF2048-sparse16384",
+      "version": "after",
+      "iterations": 2869,
+      "samples": [
+        35903.450679678564,
+        37002.80306727073,
+        35272.46741024614,
+        35543.510979437284,
+        35216.49529452726
+      ],
+      "nsPerOp": 35543.510979437284
+    },
+    {
+      "name": "unpack_shape/FF4096-sparse4096",
+      "version": "after",
+      "iterations": 19243,
+      "samples": [
+        5681.347347087214,
+        5822.706074936257,
+        5230.993088395961,
+        5408.176583692639,
+        5296.060021825513
+      ],
+      "nsPerOp": 5408.176583692639
+    },
+    {
+      "name": "unpack_shape/FF4096-sparse16384",
+      "version": "after",
+      "iterations": 5366,
+      "samples": [
+        18038.723630264038,
+        18933.08945210613,
+        18614.60268356298,
+        18612.560566530003,
+        18715.958628400116
+      ],
+      "nsPerOp": 18614.60268356298
+    }
+  ]
+}

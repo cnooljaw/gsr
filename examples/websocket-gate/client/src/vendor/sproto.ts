@@ -17,6 +17,8 @@ const ERROR_TYPE = -3;
 const NONZERO_COUNT = new Uint8Array(256);
 for (let mask = 1; mask < 256; mask++) NONZERO_COUNT[mask] = NONZERO_COUNT[mask >>> 1] + (mask & 1);
 const ZERO_BLOCK = Buffer.alloc(2048);
+const EMPTY_UNPACK = Buffer.alloc(0);
+const UNPACK_RETAIN_LIMIT = 16 * 1024;
 
 const ENCODE_BUFFERSIZE = 2050;
 
@@ -202,6 +204,8 @@ class Sproto {
 	public t: Stype[] = [];
 	public p: Protocol[] = [];
 	private buffer: Buffer;
+	private integerView: DataView | null = null;
+	private unpackBuffer: Buffer | null = null;
 	private sz: number;
 	private peer: Sproto | null = null;
 	public header_tmp;
@@ -348,12 +352,18 @@ class Sproto {
 		if (length > size) return -1;
 		data[data_idx] = width;
 		let offset = data_idx + 1;
-		for (const value of v) {
-			data.writeUInt32LE(value >>> 0, offset);
-			if (width === SIZEOF_INT64) {
-				data.writeInt32LE(Math.floor(value / 0x100000000), offset + 4);
+		// data 始终是实例编码缓冲；扩容时失效视图，保留实际 byteOffset 和有界长度。
+		const view = this.integerView ??= new DataView(data.buffer, data.byteOffset, data.byteLength);
+		if (width === SIZEOF_INT32) {
+			for (let index = 0; index < v.length; index++, offset += SIZEOF_INT32) {
+				view.setUint32(offset, v[index] >>> 0, true);
 			}
-			offset += width;
+		} else {
+			for (let index = 0; index < v.length; index++, offset += SIZEOF_INT64) {
+				const value = v[index];
+				view.setUint32(offset, value >>> 0, true);
+				view.setInt32(offset + SIZEOF_INT32, Math.floor(value / 0x100000000), true);
+			}
 		}
 		return length;
 	}
@@ -424,6 +434,7 @@ class Sproto {
 			const capacity = this.buffer.length * 2;
 			if (capacity > 8 * 1024 * 1024) throw new Error("Sproto encode size limit");
 			this.buffer = Buffer.allocUnsafe(capacity);
+			this.integerView = null;
 		}
 		if (size > 8 * 1024 * 1024) throw new Error("Sproto encode size limit");
 		const result = Buffer.allocUnsafe(size);
@@ -445,6 +456,7 @@ class Sproto {
 			// body 扩容时只保留已完成的 package；当前未完成的 body 会重新编码。
 			if (start > 0) this.buffer.copy(expanded, 0, 0, start);
 			this.buffer = expanded;
+			this.integerView = null;
 		}
 	}
 
@@ -710,7 +722,7 @@ class Sproto {
 	}
 
 	pdecode(typename: string, buffer) {
-		return this.decode(typename, this.unpack(buffer));
+		return this.decode(typename, this.unpackBuffered(buffer));
 	}
 
 	pack_seg(source, sourceIndex, output, outputIndex, ffCount) {
@@ -752,12 +764,23 @@ class Sproto {
 		if (available < aligned) output.fill(0, destination + 2 + available, destination + 2 + aligned);
 	}
 
+	// 最后不足八字节的 word 隐含补零，不为最多七个字节另分配临时 Buffer。
+	private packTail(source, start, output, destination, ffCount) {
+		let count = 0, mask = 0;
+		for (let index = 0; index < source.length - start; index++) {
+			const value = source[start + index];
+			if (value !== 0) { output[destination + ++count] = value; mask |= 1 << index; }
+		}
+		if (ffCount > 0 && count >= 6) return 8;
+		output[destination] = mask;
+		return count + 1;
+	}
+
 	pack(buffer:Buffer) {
 		const srcsz = buffer.length;
 		let dstsz = srcsz + Math.ceil(srcsz / 2048) * 2 + 8;
 
 		let dstbuffer = Buffer.allocUnsafe(dstsz);
-		let tmp: Buffer | null = null;
 		let dstidx = 0;
 		let srcidx;
 		let ff_n = 0;
@@ -769,24 +792,9 @@ class Sproto {
 			srcidx = i;
 
 			let n = 0;
-			let padding = i + 8 - srcsz;
-			if (padding > 0) {
-				tmp = Buffer.allocUnsafe(8);
-				let data_end = 8 - padding
-
-				for (let j = 0; j < 8; ++j) {
-					if (j < data_end) {
-						tmp[j] = buffer[i + j];
-						continue;
-					}
-					tmp[j] = 0;
-				}
-
-				buffer = tmp;
-				srcidx = 0;
-			}
-
-			n = this.pack_seg(buffer, srcidx, dstbuffer, dstidx, ff_n);
+			n = i + 8 <= srcsz
+				? this.pack_seg(buffer, srcidx, dstbuffer, dstidx, ff_n)
+				: this.packTail(buffer, srcidx, dstbuffer, dstidx, ff_n);
 			dstsz -= n;
 
 			if (n === 10) {
@@ -794,7 +802,7 @@ class Sproto {
 				ff_desstart = dstidx;
 				ff_buffer = buffer;
 				ff_n = 1;
-				if (srcsz - i >= 1024) {
+				if (srcsz - i >= 64) {
 					const words = this.nonzeroWords(buffer, srcidx + 8, srcsz - i - 8);
 					ff_n += words;
 					i += words * 8;
@@ -861,7 +869,11 @@ class Sproto {
 
 	unpack(buffer: Buffer) {
 		const maxSize = 8 * 1024 * 1024;
-		const capacity = Math.min(maxSize, Math.max(8, buffer.length * 2));
+		// 长 FF 块使尺寸扫描可以整块跳过，避免大段原始字节分配双倍空间。
+		// 混合数值包保留单遍路径，计数沿用 lunpack 的完整边界和预算检查。
+		const capacity = buffer.length >= 2048 && this.preferExactUnpack(buffer)
+			? this.lunpack(buffer, EMPTY_UNPACK) : Math.min(maxSize, Math.max(8, buffer.length * 2));
+		if (capacity < 0) return null;
 		let outbuffer = Buffer.allocUnsafe(capacity);
 		const size = this.lunpack(buffer, outbuffer);
 		if (size < 0) {
@@ -875,6 +887,42 @@ class Sproto {
 			}
 		}
 		return outbuffer.subarray(0, size);
+	}
+
+	// 最多看八个 packed 段；FF 字节已占输入的四分之三才值得完整预扫描。
+	private preferExactUnpack(buffer: Buffer) {
+		let offset = 0, literalBytes = 0;
+		for (let word = 0; word < 8 && offset < buffer.length; word++) {
+			const mask = buffer[offset++];
+			if (mask !== 255) {
+				offset += NONZERO_COUNT[mask];
+				continue;
+			}
+			if (offset >= buffer.length) return false;
+			const length = (buffer[offset++] + 1) * 8;
+			if (length > buffer.length - offset) return false;
+			literalBytes += length;
+			if (literalBytes * 4 >= buffer.length * 3) return true;
+			offset += length;
+		}
+		return false;
+	}
+
+	// 只在同步解码期间借用；ldecode 产出的数字、字符串和数组均不保留字节视图。
+	private unpackBuffered(buffer: Buffer) {
+		if (buffer.length > UNPACK_RETAIN_LIMIT) return this.unpack(buffer);
+		let output = this.unpackBuffer ?? Buffer.allocUnsafe(2048);
+		const size = this.lunpack(buffer, output);
+		if (size < 0) return null;
+		if (size > output.length) {
+			const capacity = size <= UNPACK_RETAIN_LIMIT
+				? Math.min(UNPACK_RETAIN_LIMIT, Math.max(size, output.length * 2)) : size;
+			output = Buffer.allocUnsafe(capacity);
+			if (this.lunpack(buffer, output) !== size) return null;
+		}
+		// 偶发大包仅使用调用内临时缓冲，不抬高每个连接长期保留的容量。
+		if (output.length <= UNPACK_RETAIN_LIMIT) this.unpackBuffer = output;
+		return output.subarray(0, size);
 	}
 
 	lunpack(source: Buffer, output: Buffer) {
@@ -995,7 +1043,7 @@ class Sproto {
 	}
 
 	dispatch(buffer: Buffer, spindex: number = 0) {
-		let bin = this.unpack(buffer);
+		let bin = this.unpackBuffered(buffer);
 		this.header_tmp.type = null;
 		this.header_tmp.session = null;
 

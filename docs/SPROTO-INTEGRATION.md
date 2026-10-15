@@ -78,6 +78,8 @@ go get github.com/cnooljaw/gosproto@v0.4.0
 
 第二轮继续优化数值 packing、TS 字段查询、Go 标量写出与原生 optional 值构造，以及 TS 实际 RPC 的中间复制。修复 TS 未知 body 字段导致后续字段错位的问题，并保护合并缓冲后的独立 body 编码预算。原有分阶段基准保持口径，pencode/attach 的融合收益另行测量，结果见 [第二轮验收](benchmarks/2026-10-15-sproto-round2/RESULTS.md)。正式 Go 依赖尚未改变。
 
+第三轮按 [TS 性能方案](RFC-SPROTO-TS-PERFORMANCE.md) 完成 FF 扫描门槛、数值数组 DataView 写出、Pack 尾部分配和有界解包缓冲优化。原生 pdecode/dispatch 同步借用实例私有缓冲，最多保留 16 KiB；公开 unpack 和编码输出仍独占。公开解包只在 FF 占优时采用精确分配，数值与高压缩率路径保留原策略；完整 PB/SP 同进程采样、29 种解包形态及内存代价见 [第三轮验收](benchmarks/2026-10-15-sproto-round3/RESULTS.md)。未更换 Go 依赖。
+
 ## 独立修复库与官方对照（2026-10-15）
 
 [cnooljaw/gosproto v0.2.0](https://github.com/cnooljaw/gosproto/releases/tag/v0.2.0) 基于 xjdrew v0.1.0，保留上游历史与 MIT 许可证，自己的 module 路径和标签避免给业务项目传播 replace。标准库没有 Sproto 实现，使用这个依赖专门解决原生编解码与 pack/unpack，不引入通用协议框架或运行时 C/Lua。

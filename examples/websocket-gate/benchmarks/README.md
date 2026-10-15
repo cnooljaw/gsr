@@ -79,7 +79,7 @@ Profile 默认对 AddressBook/game_large 的六个独立步骤逐个采集，Go 
 
 [优化实施与验收](../../../docs/benchmarks/2026-10-15-optimized/RESULTS.md) 保存修复后五轮数据、小包回退检查、profile 摘要及独立 Go 库提交。Go 优化已随 gosproto v0.4.0 发布，GSR 正式依赖已升级；当前可直接用正式依赖复现，报告保留当时的临时 modfile 采样来源。采集器会记录实际模块覆盖及 Go/TS 源码哈希，避免把本地优化结果误标为正式版本。Profile 可设 `GSR_PROFILE_SCENARIO=game_large` 只采大型游戏消息，默认仍采两组。
 
-### PEncode 与实际 RPC 编码
+### 原生 API、Protobuf 对照与解包形态
 
 原套件有意分开调用 encode/pack，Echo frame 也分别编码头和 body 后拼接，因此不会体现 pencode/attach 内部减少复制的全部收益。补充脚本复用上述五组 body 和四组 Echo 数据，不更改 wire 签名：
 
@@ -90,7 +90,11 @@ node examples/websocket-gate/scripts/benchmark-sproto-api.mjs /absolute/output/a
 node examples/websocket-gate/scripts/benchmark-sproto-api.mjs /absolute/output/api /absolute/baseline/sproto.mjs
 ```
 
-每操作独立热身至少约 50 ms，五轮各约 100 ms，并反转执行顺序；结果保存模块指纹。代表性消息同时测原生 Encode/Decode、Pack/Unpack、PEncode/PDecode，可用于同进程交错复核前后变化。RPC 使用已有 attach、真实 C2S schema 和固定 session=1，覆盖同一个等待项，不包含外层客户端安全预检、会话分配、网络或 MAC。它与原手工组帧结果分开报告，不能拿两种入口的数字直接计算优化比例。
+每操作独立热身至少约 50 ms，五轮各约 100 ms，并反转执行顺序；结果保存模块、脚本、夹具指纹及运行环境。代表性消息同时测 Encode/Decode、Pack/Unpack、原生 PEncode/PDecode 与分阶段组合；PB Encode/Decode 作为同进程控制项。可选基线参数只用于 Sproto 前后对照，不更换 PB 依赖。
+
+RPC 使用已有 attach/dispatch、真实 C2S schema 和固定 session=1，覆盖同一个等待项，不包含外层客户端安全预检、会话分配、网络或 MAC。原生收发与手工组帧/固定 schema 解码分别计时，不能混用两种入口计算优化比例。内部解包缓冲在热身时已建立，原生解码数据代表热缓冲；冷启动、超保留容量和失败复用由回归与缓冲观测单独验证。
+
+另测 29 种公开 unpack 数据形态：32 B–64 KiB 的 ASCII、零块、稀疏 word，以及 512 B–4 KiB FF 前缀后接稀疏数据。它们专门检查容量策略在混合消息中的回退，不与 PB 编解码排名混合。有基线时共 188 项、五轮 940 个样本。
 
 ### 结果文件入库规则
 

@@ -51,6 +51,25 @@ test("official Sproto boolean and mixed signed int64 arrays", () => {
   const current = new Sproto(".Current { later 60000 : string }");
   const evolved = future.encode("Future", { unknown: "skip", middle: 7, later: "keep" })!;
   assert.deepEqual(current.decode("Current", evolved), { later: "keep" });
+  // 数组宽值在末尾、扩容前后和非对齐 body 均不能改变低/高位写出。
+  for (const value of [
+    [1, -1, 4294967296],
+    [Number.MIN_SAFE_INTEGER, 0, Number.MAX_SAFE_INTEGER],
+    Array.from({ length: 1024 }, (_, index) => index % 2 ? -2147483648 : 2147483647),
+    [7, -7],
+  ]) {
+    const width = value.some(n => n < -2147483648 || n > 2147483647) ? 8 : 4;
+    const expected = Buffer.alloc(9 + value.length * width);
+    expected.writeUInt16LE(1, 0);
+    expected.writeUInt32LE(1 + value.length * width, 4);
+    expected[8] = width;
+    value.forEach((n, index) => {
+      if (width === 8) expected.writeBigInt64LE(BigInt(n), 9 + index * width);
+      else expected.writeInt32LE(n, 9 + index * width);
+    });
+    assert.deepEqual(integer.encode("Array", { value }), expected);
+    assert.deepEqual(integer.decode("Array", expected), { value });
+  }
   // 合并 scratch 后，package 不挤占原本属于单条 body 的 8 MiB 编码预算。
   const large = new Sproto(c2sSchema + "\n.Text { text 0 : string }");
   const request = large.attach();
@@ -59,6 +78,28 @@ test("official Sproto boolean and mixed signed int64 arrays", () => {
   assert.ok(frame.length > 8 << 20);
   assert.throws(() => request("echo", { text: text + "x" }, 1), /size limit/);
   assert.throws(() => large.encode("Text", { text: text + "x" }), /size limit/);
+});
+
+// 同步解码复用缓冲时，大小交替、失败和大包均不污染已经返回的值或字节快照。
+test("Sproto decoded results and unpacked buffers stay independent", () => {
+  const codec = new Sproto(".Data { text 0 : string values 1 : *integer }");
+  const original = { text: "first".repeat(1000), values: [1, -1, 4294967296] };
+  const wire = codec.pencode("Data", original)!;
+  const first = codec.pdecode("Data", wire);
+  const unpacked = codec.unpack(wire)!;
+  const snapshot = Buffer.from(unpacked);
+  for (const length of [0, 32, 4096, 12000, 20000, 65536, 8, 4096]) {
+    const message = { text: (length % 3 ? "\0" : "x").repeat(length), values: [length, length === 0 ? 0 : -length] };
+    const packed = codec.pencode("Data", message)!;
+    assert.deepEqual(codec.pdecode("Data", packed), message);
+    assert.deepEqual(codec.unpack(packed)!.subarray(0, codec.encode("Data", message)!.length), codec.encode("Data", message));
+  }
+  assert.deepEqual(first, original);
+  assert.deepEqual(unpacked, snapshot);
+  assert.throws(() => codec.pdecode("Data", Buffer.from([255])), TypeError);
+  assert.deepEqual(codec.pdecode("Data", wire), original);
+  assert.throws(() => codec.pdecode("Data", Buffer.alloc((8 << 20) / 8 + 1)), /size limit/);
+  assert.deepEqual(codec.pdecode("Data", wire), original);
 });
 
 // 每连接 host 保留独立会话；一个客户端关闭不清理另一个的等待。
@@ -102,6 +143,16 @@ test("Sproto pending and packet limits", () => {
       assert.deepEqual(codec.pack(raw), Buffer.from(expected));
     }
   }
+  // 批量扫描门槛附近及 FF 的 256-word 分段必须保持确定的官方 wire。
+  for (const length of [32, 64, 128, 256, 1016, 1024, 1032, 2048, 2056, 4096]) {
+    const raw = Buffer.alloc(length + 3, 0x80).subarray(3);
+    const blocks: Buffer[] = [];
+    for (let offset = 0; offset < length; offset += 2048) {
+      const chunk = raw.subarray(offset, Math.min(offset + 2048, length));
+      blocks.push(Buffer.from([255, chunk.length / 8 - 1]), chunk);
+    }
+    assert.deepEqual(codec.pack(raw), Buffer.concat(blocks), `FF length ${length}`);
+  }
   for (const raw of [
     Buffer.alloc(4096),
     Buffer.concat([Buffer.alloc(4096), Buffer.alloc(2048, 1)]),
@@ -121,6 +172,13 @@ test("Sproto pending and packet limits", () => {
   for (const malformed of [[255], [255, 0, 1], [3, 1], [0, 0, 255]]) {
     assert.equal(codec.unpack(Buffer.from(malformed)), null);
   }
+  // 大输入的计数路径同样拒绝末尾截断，恰好达到解包额度仍可接受。
+  for (const prefix of [Buffer.alloc(2048), codec.pack(Buffer.alloc(2048, 1))]) {
+    assert.equal(codec.unpack(Buffer.concat([prefix, Buffer.from([255])])), null);
+  }
+  const limit = codec.unpack(Buffer.alloc((8 << 20) / 8))!;
+  assert.equal(limit.length, 8 << 20);
+  assert.ok(limit.every(byte => byte === 0));
   assert.throws(() => codec.unpack(Buffer.alloc((8 << 20) / 8 + 1)), /size limit/);
 });
 
