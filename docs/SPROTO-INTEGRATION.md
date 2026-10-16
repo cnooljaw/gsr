@@ -86,6 +86,8 @@ go get github.com/cnooljaw/gosproto@v0.4.0
 
 2026-10-16，TS 性能阶段以提交 `9801808` 收尾，后续重点转向 gosproto。经验与适用边界见 [TS → Go 优化经验](SPROTO-OPTIMIZATION-LESSONS.md)。Go 下一轮从独立库已提交的 `6012b06` 做增量，先重建当前基线/profile，不将正式 v0.4.0 或 TS 数据冒充当前 Go 结果；执行入口见 [Go 性能方案](RFC-GOSPROTO-PERFORMANCE.md#7-ts-阶段收尾后的-go-增量入口)。
 
+Go 第三轮已重建基线并筛选候选：仅保留布局记录内存收窄，大型消息 Encode/PEncode 各减少 512 B/op，未取得明显 CPU 加速。解包与原生指针赋值候选未合入；正式依赖未升级，改动仍在独立库未发布工作树。验证、数据与复现见 [第三轮报告](benchmarks/2026-10-16-gosproto-round3/RESULTS.md)。
+
 ## 独立修复库与官方对照（2026-10-15）
 
 [cnooljaw/gosproto v0.2.0](https://github.com/cnooljaw/gosproto/releases/tag/v0.2.0) 基于 xjdrew v0.1.0，保留上游历史与 MIT 许可证，自己的 module 路径和标签避免给业务项目传播 replace。标准库没有 Sproto 实现，使用这个依赖专门解决原生编解码与 pack/unpack，不引入通用协议框架或运行时 C/Lua。

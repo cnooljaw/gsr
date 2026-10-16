@@ -1,0 +1,82 @@
+{
+  "library": [
+    {
+      "name": "race",
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "./...",
+        "-timeout=2m"
+      ],
+      "exitCode": 0,
+      "seconds": 3.5263452073559165
+    },
+    {
+      "name": "vet",
+      "command": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "exitCode": 0,
+      "seconds": 0.36979274917393923
+    },
+    {
+      "name": "FuzzDecode",
+      "command": [
+        "go",
+        "test",
+        "-run=^$",
+        "-fuzz=^FuzzDecode$",
+        "-fuzztime=10s",
+        "-parallel=2",
+        "-timeout=45s"
+      ],
+      "exitCode": 0,
+      "seconds": 12.129894082434475
+    },
+    {
+      "name": "FuzzPackRoundTrip",
+      "command": [
+        "go",
+        "test",
+        "-run=^$",
+        "-fuzz=^FuzzPackRoundTrip$",
+        "-fuzztime=10s",
+        "-parallel=2",
+        "-timeout=45s"
+      ],
+      "exitCode": 0,
+      "seconds": 11.730575875379145
+    },
+    {
+      "name": "FuzzCodecRoundTrip",
+      "command": [
+        "go",
+        "test",
+        "-run=^$",
+        "-fuzz=^FuzzCodecRoundTrip$",
+        "-fuzztime=10s",
+        "-parallel=2",
+        "-timeout=45s"
+      ],
+      "exitCode": 0,
+      "seconds": 10.723552249372005
+    }
+  ],
+  "officialOracleDir": "/private/tmp/gsr-official-sproto-review",
+  "gsrPackages": [
+    "protocol/sproto",
+    "examples/websocket-gate/cmd/debugserver",
+    "examples/websocket-gate/benchmarks"
+  ],
+  "gsrPackagesPassed": true,
+  "goTsIntegration": {
+    "tests": 7,
+    "passed": 7,
+    "failed": 0,
+    "skipped": 0
+  },
+  "scope": "GSR 验收使用临时 modfile，正式依赖未升级；未重复 GSR 全仓测试。"
+}

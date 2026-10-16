@@ -34,6 +34,8 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 
 ## 报告
 
+[Go 当前基线与第三轮筛选](../../../docs/benchmarks/2026-10-16-gosproto-round3/RESULTS.md) 从 gosproto `6012b06` 重新采样；保留布局记录的内存收窄，解包展开/窗口和原生指针赋值候选未采用。完整主套件、配对复核、profile 与失败值分别记录，TS 实现冻结，正式 Go 依赖仍为 v0.4.0。
+
 [数值 packing、字段查询与类型化构造](../../../docs/benchmarks/2026-10-15-sproto-round2/RESULTS.md) 是第二轮结果；保留与首轮及正式 v0.4.0 的对照。原有两套基准不改变调用方式，实际 pencode/attach 的缓冲融合收益单独测量。
 
 [TS 长块与 Go 反射路径优化验收](../../../docs/benchmarks/2026-10-15-sproto-next/RESULTS.md) 保存相对 v0.4.0 的前后对照、两套完整五轮采样、分配代价、profile 和撤回的尝试。TS 修改在当前工作树；Go 使用独立库未发布优化源码及临时 modfile，正式依赖仍为 v0.4.0，复现时需按该报告指定源码。
@@ -106,6 +108,17 @@ node examples/websocket-gate/scripts/analyze-sproto-pack.mjs tmp/sproto-pack-bef
 ```
 
 该脚本保存代表性消息的 mask/非零字节数分布、显式 Buffer 工厂与 subarray 调用次数，以及独立的 Pack/PEncode 和解包 CPU profile。分布计数使用包装后的实例，profile 使用新实例；不与计时 Benchmark 并发运行。Buffer 调用观测不等于完整堆分配统计，profile 百分比也不能直接换算为绝对加速。
+
+### Go 解包形态
+
+Go 单独覆盖 18 种 Unpack 形态：32 B/4 KiB/64 KiB 零字节与 ASCII、每 word 一至七个非零字节的旋转 mask、FF 前缀接稀疏尾部、重复短零段和确定性随机输入。它们用于发现只测业务消息会漏掉的回退，不作为 PB 直接比较项，也不冒充与 TS 形态逐字节相同的跨语言夹具。
+
+```sh
+GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
+  -run '^$' -bench '^BenchmarkUnpackShapes$' -benchmem -benchtime=100ms -count=5 -timeout=2m
+```
+
+比较未发布库时使用显式临时 modfile；固定同一份 Benchmark 分别编译前后二进制，按操作配对并交替先后。source、二进制和实际模块覆盖一起保存；固定次数复核与自动迭代全量分别报告。
 
 ### 结果文件入库规则
 
