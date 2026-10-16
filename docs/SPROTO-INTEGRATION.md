@@ -90,7 +90,9 @@ Go 第三轮已重建基线并筛选候选：仅保留布局记录内存收窄�
 
 大型 Encode 优化随后按用户同意实施：原生 `*int64` 使用受控只读字段绑定，命名类型等保留反射；预算、wire 与所有权不变。同进程大型 Encode 14.345 → 8.456 µs，仍比同次 PB 慢约 7.5%。该切片已本地提交为 gosproto `819047e`、GSR `bf3ed8c`，见 [实施结果](benchmarks/2026-10-16-gosproto-encoder/RESULTS.md)。
 
-后续修复父字段描述替换导致的嵌套 Go 布局不匹配，并将重复校验收敛到同构整数结构数组入口。大型 Encode 相对上一提交 8.382 → 6.528 µs，同场 PB 7.606 µs；AddressBook 有类型安全修复成本，未宣称全部消息胜出。完整独立库 race/checkptr/官方对照、有限 fuzz 及 GSR Go/TS 7/7 接线通过，新增改动未提交，正式依赖仍为 v0.4.0。见 [当前结果与复现](benchmarks/2026-10-16-gosproto-bindings/RESULTS.md)。
+后续修复父字段描述替换导致的嵌套 Go 布局不匹配，并将重复校验收敛到同构整数结构数组入口。大型 Encode 相对上一提交 8.382 → 6.528 µs，同场 PB 7.606 µs；AddressBook 有类型安全修复成本，未宣称全部消息胜出。完整独立库 race/checkptr/官方对照、有限 fuzz 及 GSR Go/TS 7/7 接线通过，该切片已本地提交为 gosproto `5e491ff`、GSR `70c84af`。见 [结果与复现](benchmarks/2026-10-16-gosproto-bindings/RESULTS.md)。
+
+最新 Pack 切片只调整混合 word 写出和 FF 状态，资源及 wire 契约不变。整数数组 Pack/PEncode 约少 10.3%/6.8% 耗时，大型消息约少 5.0%/1.3%，仍不代表全部组合胜出 PB。新增改动未提交/发布，正式依赖仍为 v0.4.0；见 [Pack 验收](benchmarks/2026-10-16-gosproto-pack/RESULTS.md)。
 
 ## 独立修复库与官方对照（2026-10-15）
 

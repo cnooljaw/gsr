@@ -4,13 +4,21 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## Pack 混合数值 word 优化（2026-10-16）
+
+上一轮已本地提交为 gosproto `5e491ff`、GSR `70c84af`，未推送。本轮只改 Pack 的稀疏/混合 word 写出和 FF 状态处理；Encoder、Decoder、RPC 与 TS 生产源码冻结，输出预留、wire、预算和所有权不变。所有 word 使用条件展开的候选造成稀疏回退，已撤回。
+
+最终同进程五轮共 115 项、575 样本，另保留三个候选共 1035 样本。整数数组 Pack 3.664 → 3.287 µs、PEncode 5.902 → 5.498 µs；大型消息分别为 3.473 → 3.301 µs、10.045 → 9.917 µs。分配不变，无 SP 项中位数回退超过 10%，但单非零字节 4 KiB 形态 +3.2%，不称为全项加速或全面胜出 PB。
+
+扩展既有全部 mask 的精确字节用例保护 FF 合并/退出，9216 组旧新 Pack 差分、完整独立库 race/严格 checkptr（启用固定官方 C/Lua 对照）、vet 及 Pack/Codec 有限 fuzz 通过。GSR 临时覆盖三包测试、TypeScript 构建与 Go/TS Plain/MAC 集成 7/7、零跳过。最终验证范围与原始数据见 [Pack 结果](benchmarks/2026-10-16-gosproto-pack/RESULTS.md)。本轮新增改动未提交/发布，正式依赖仍为 v0.4.0。
+
 ## 嵌套类型校验与整数记录数组（2026-10-16）
 
 上一轮已本地提交为 gosproto `819047e`、GSR `bf3ed8c`，未推送。后续发现父 Fields 描述替换可能使子 schema 与实际 Go 布局不一致，单独的字段 owner 检查不足；新回归在上一提交失败、在原安全反射基线通过。当前已修复类型事实传递/回落，并仅在同构整数结构数组入口复用 owner/形状校验。
 
 两组最终配对各 49 项 × 五轮，共 490 样本，另保留 380 个候选样本。大型 Encode 相对上一提交 8.382 → 6.528 µs，同场 PB 7.606 µs；相对最小类型修复版 9.730 → 6.544 µs，同场 PB 7.588 µs。AddressBook 相对上一提交 +12.0%，相对最小修复版 +1.3%；分配不变，不称为全项胜出。
 
-新增嵌套描述替换三种情况、同构记录数组预算/tag/命名类型对照，Codec fuzz 增加整数记录数组。完整独立库 race + 严格 checkptr（启用固定官方 C/Lua oracle）、vet、Codec/Decode 有限 fuzz 通过；GSR 临时覆盖三包测试及 Go/TS Plain/MAC 集成 7/7、零跳过。Decode、Pack 和 TS 生产源码冻结，未重复全矩阵计时、GSR 全仓测试或跨平台验证。当前新增实现和文档未提交，正式依赖仍为 v0.4.0，详见 [结果与复现](benchmarks/2026-10-16-gosproto-bindings/RESULTS.md)。
+新增嵌套描述替换三种情况、同构记录数组预算/tag/命名类型对照，Codec fuzz 增加整数记录数组。完整独立库 race + 严格 checkptr（启用固定官方 C/Lua oracle）、vet、Codec/Decode 有限 fuzz 通过；GSR 临时覆盖三包测试及 Go/TS Plain/MAC 集成 7/7、零跳过。该切片 Decode、Pack 和 TS 生产源码冻结，未重复全矩阵计时、GSR 全仓测试或跨平台验证。随后已本地提交为 gosproto `5e491ff`、GSR `70c84af`，正式依赖仍为 v0.4.0，详见 [结果与复现](benchmarks/2026-10-16-gosproto-bindings/RESULTS.md)。
 
 ## 大型 Encoder 字段绑定实施（2026-10-16）
 

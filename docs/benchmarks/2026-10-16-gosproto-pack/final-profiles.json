@@ -1,0 +1,110 @@
+[
+  {
+    "sample": "game_large",
+    "operation": "sproto_pack",
+    "commands": [
+      [
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack/run/final.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkPairedPacking$/^game_large$/^sproto_pack$",
+        "-test.benchtime=2s",
+        "-test.cpuprofile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack/final-game_large-sproto_pack.pprof",
+        "-test.timeout=30s"
+      ],
+      [
+        "go",
+        "tool",
+        "pprof",
+        "-top",
+        "-nodecount=20",
+        "-relative_percentages",
+        "-focus=github.com/cnooljaw/gosproto\\.",
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack/run/final.test",
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack/final-game_large-sproto_pack.pprof"
+      ]
+    ],
+    "benchmark": "goos: darwin\ngoarch: arm64\npkg: encoderbench\ncpu: Apple M2\nBenchmarkPairedPacking/game_large/sproto_pack         \t  741220\t      3483 ns/op\t    3456 B/op\t       1 allocs/op\nPASS\n",
+    "top": "File: final.test\nType: cpu\nTime: 2026-10-16 14:03:11 CST\nDuration: 2.76s, Total samples = 1.49s (54.08%)\nActive filters:\n   focus=github.com/cnooljaw/gosproto\\.\nShowing nodes accounting for 1.49s, 100% of 1.49s total\nShowing top 20 nodes out of 32\n      flat  flat%   sum%        cum   cum%\n     0.89s 59.73% 59.73%      0.89s 59.73%  github.com/cnooljaw/gosproto.packWord\n     0.43s 28.86% 88.59%      1.49s   100%  github.com/cnooljaw/gosproto.Pack\n     0.06s  4.03% 92.62%      0.06s  4.03%  runtime.scanobject\n     0.05s  3.36% 95.97%      0.05s  3.36%  runtime.memclrNoHeapPointers\n     0.02s  1.34% 97.32%      0.17s 11.41%  runtime.mallocgc\n     0.02s  1.34% 98.66%      0.02s  1.34%  runtime.scanblock\n     0.01s  0.67% 99.33%      0.02s  1.34%  runtime.(*mheap).allocSpan\n     0.01s  0.67%   100%      0.01s  0.67%  runtime.(*pallocBits).summarize\n         0     0%   100%      1.49s   100%  encoderbench.representativeOperations.func5\n         0     0%   100%      1.49s   100%  encoderbench.runPaired.func1\n         0     0%   100%      0.02s  1.34%  runtime.(*mcache).nextFree\n         0     0%   100%      0.02s  1.34%  runtime.(*mcache).refill\n         0     0%   100%      0.02s  1.34%  runtime.(*mcentral).cacheSpan\n         0     0%   100%      0.02s  1.34%  runtime.(*mcentral).grow\n         0     0%   100%      0.02s  1.34%  runtime.(*mheap).alloc\n         0     0%   100%      0.02s  1.34%  runtime.(*mheap).alloc.func1\n         0     0%   100%      0.01s  0.67%  runtime.(*pageAlloc).alloc\n         0     0%   100%      0.01s  0.67%  runtime.(*pageAlloc).allocRange\n         0     0%   100%      0.01s  0.67%  runtime.(*pageAlloc).update\n         0     0%   100%      0.08s  5.37%  runtime.deductAssistCredit\n"
+  },
+  {
+    "sample": "game_large",
+    "operation": "sproto_pencode",
+    "commands": [
+      [
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack/run/final.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkPairedPacking$/^game_large$/^sproto_pencode$",
+        "-test.benchtime=2s",
+        "-test.cpuprofile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack/final-game_large-sproto_pencode.pprof",
+        "-test.timeout=30s"
+      ],
+      [
+        "go",
+        "tool",
+        "pprof",
+        "-top",
+        "-nodecount=20",
+        "-relative_percentages",
+        "-focus=github.com/cnooljaw/gosproto\\.",
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack/run/final.test",
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack/final-game_large-sproto_pencode.pprof"
+      ]
+    ],
+    "benchmark": "goos: darwin\ngoarch: arm64\npkg: encoderbench\ncpu: Apple M2\nBenchmarkPairedPacking/game_large/sproto_pencode         \t  240819\t     10114 ns/op\t    7424 B/op\t       3 allocs/op\nPASS\n",
+    "top": "File: final.test\nType: cpu\nTime: 2026-10-16 14:03:14 CST\nDuration: 2.65s, Total samples = 1.28s (48.24%)\nActive filters:\n   focus=github.com/cnooljaw/gosproto\\.\nShowing nodes accounting for 1.16s, 90.62% of 1.28s total\nShowing top 20 nodes out of 60\n      flat  flat%   sum%        cum   cum%\n     0.27s 21.09% 21.09%      0.27s 21.09%  github.com/cnooljaw/gosproto.packWord\n     0.17s 13.28% 34.38%      0.33s 25.78%  github.com/cnooljaw/gosproto.encodedIntegerRecordSize\n     0.11s  8.59% 42.97%      0.26s 20.31%  github.com/cnooljaw/gosproto.encodeIntegerRecordInto\n     0.10s  7.81% 50.78%      0.38s 29.69%  github.com/cnooljaw/gosproto.Pack\n     0.07s  5.47% 56.25%      0.07s  5.47%  github.com/cnooljaw/gosproto.integerWidth (inline)\n     0.06s  4.69% 60.94%      0.07s  5.47%  reflect.Value.Index\n     0.05s  3.91% 64.84%      0.06s  4.69%  reflect.Value.IsNil (inline)\n     0.05s  3.91% 68.75%      0.05s  3.91%  reflect.flag.kind (inline)\n     0.04s  3.12% 71.88%      0.05s  3.91%  github.com/cnooljaw/gosproto.encodeIntegerInto (inline)\n     0.04s  3.12% 75.00%      0.42s 32.81%  github.com/cnooljaw/gosproto.fieldSize\n     0.03s  2.34% 77.34%      0.03s  2.34%  encoding/binary.littleEndian.PutUint32 (inline)\n     0.03s  2.34% 79.69%      0.03s  2.34%  github.com/cnooljaw/gosproto.(*encodeLayout).next (inline)\n     0.03s  2.34% 82.03%      0.39s 30.47%  github.com/cnooljaw/gosproto.encodeMessageInto\n     0.02s  1.56% 83.59%      0.03s  2.34%  github.com/cnooljaw/gosproto.(*encodeLayout).add (inline)\n     0.02s  1.56% 85.16%      0.35s 27.34%  github.com/cnooljaw/gosproto.encodeFieldInto\n     0.02s  1.56% 86.72%      0.02s  1.56%  github.com/cnooljaw/gosproto.encodePointer.integer (inline)\n     0.02s  1.56% 88.28%      0.02s  1.56%  runtime.findObject\n     0.01s  0.78% 89.06%      0.01s  0.78%  github.com/cnooljaw/gosproto.(*decodeBudget).add (inline)\n     0.01s  0.78% 89.84%      0.01s  0.78%  github.com/cnooljaw/gosproto.(*encodeLayout).set (inline)\n     0.01s  0.78% 90.62%      0.43s 33.59%  github.com/cnooljaw/gosproto.encodedSize\n"
+  },
+  {
+    "sample": "int32_edges",
+    "operation": "sproto_pack",
+    "commands": [
+      [
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack/run/final.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkPairedPacking$/^int32_edges$/^sproto_pack$",
+        "-test.benchtime=2s",
+        "-test.cpuprofile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack/final-int32_edges-sproto_pack.pprof",
+        "-test.timeout=30s"
+      ],
+      [
+        "go",
+        "tool",
+        "pprof",
+        "-top",
+        "-nodecount=20",
+        "-relative_percentages",
+        "-focus=github.com/cnooljaw/gosproto\\.",
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack/run/final.test",
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack/final-int32_edges-sproto_pack.pprof"
+      ]
+    ],
+    "benchmark": "goos: darwin\ngoarch: arm64\npkg: encoderbench\ncpu: Apple M2\nBenchmarkPairedPacking/int32_edges/sproto_pack         \t  735480\t      3463 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n",
+    "top": "File: final.test\nType: cpu\nTime: 2026-10-16 14:03:17 CST\nDuration: 2.71s, Total samples = 1.12s (41.31%)\nActive filters:\n   focus=github.com/cnooljaw/gosproto\\.\nShowing nodes accounting for 1.12s, 100% of 1.12s total\nShowing top 20 nodes out of 39\n      flat  flat%   sum%        cum   cum%\n     0.58s 51.79% 51.79%      0.58s 51.79%  github.com/cnooljaw/gosproto.packWord\n     0.36s 32.14% 83.93%      1.12s   100%  github.com/cnooljaw/gosproto.Pack\n     0.04s  3.57% 87.50%      0.04s  3.57%  runtime.memclrNoHeapPointers\n     0.02s  1.79% 89.29%      0.02s  1.79%  runtime.scanblock\n     0.02s  1.79% 91.07%      0.06s  5.36%  runtime.scanobject\n     0.02s  1.79% 92.86%      0.02s  1.79%  runtime.typePointers.next\n     0.01s  0.89% 93.75%      0.01s  0.89%  github.com/cnooljaw/gosproto.packSegment (inline)\n     0.01s  0.89% 94.64%      0.01s  0.89%  runtime.(*activeSweep).end\n     0.01s  0.89% 95.54%      0.01s  0.89%  runtime.(*consistentHeapStats).acquire\n     0.01s  0.89% 96.43%      0.04s  3.57%  runtime.(*mcache).refill\n     0.01s  0.89% 97.32%      0.01s  0.89%  runtime.(*mspan).base (inline)\n     0.01s  0.89% 98.21%      0.01s  0.89%  runtime.markrootSpans\n     0.01s  0.89% 99.11%      0.01s  0.89%  runtime.newMarkBits\n     0.01s  0.89%   100%      0.01s  0.89%  runtime.typePointers.nextFast (inline)\n         0     0%   100%      1.12s   100%  encoderbench.representativeOperations.func5\n         0     0%   100%      1.12s   100%  encoderbench.runPaired.func1\n         0     0%   100%      0.04s  3.57%  runtime.(*mcache).nextFree\n         0     0%   100%      0.03s  2.68%  runtime.(*mcentral).cacheSpan\n         0     0%   100%      0.01s  0.89%  runtime.(*mcentral).grow\n         0     0%   100%      0.01s  0.89%  runtime.(*mheap).alloc\n"
+  },
+  {
+    "sample": "int32_edges",
+    "operation": "sproto_pencode",
+    "commands": [
+      [
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack/run/final.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkPairedPacking$/^int32_edges$/^sproto_pencode$",
+        "-test.benchtime=2s",
+        "-test.cpuprofile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack/final-int32_edges-sproto_pencode.pprof",
+        "-test.timeout=30s"
+      ],
+      [
+        "go",
+        "tool",
+        "pprof",
+        "-top",
+        "-nodecount=20",
+        "-relative_percentages",
+        "-focus=github.com/cnooljaw/gosproto\\.",
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack/run/final.test",
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack/final-int32_edges-sproto_pencode.pprof"
+      ]
+    ],
+    "benchmark": "goos: darwin\ngoarch: arm64\npkg: encoderbench\ncpu: Apple M2\nBenchmarkPairedPacking/int32_edges/sproto_pencode         \t  424248\t      5895 ns/op\t    8192 B/op\t       2 allocs/op\nPASS\n",
+    "top": "File: final.test\nType: cpu\nTime: 2026-10-16 14:03:19 CST\nDuration: 2.73s, Total samples = 1.07s (39.24%)\nActive filters:\n   focus=github.com/cnooljaw/gosproto\\.\nShowing nodes accounting for 1.07s, 100% of 1.07s total\nShowing top 20 nodes out of 53\n      flat  flat%   sum%        cum   cum%\n     0.29s 27.10% 27.10%      0.29s 27.10%  github.com/cnooljaw/gosproto.packWord\n     0.22s 20.56% 47.66%      0.58s 54.21%  github.com/cnooljaw/gosproto.Pack\n     0.18s 16.82% 64.49%      0.27s 25.23%  github.com/cnooljaw/gosproto.encodeInt64Slice (inline)\n     0.10s  9.35% 73.83%      0.10s  9.35%  github.com/cnooljaw/gosproto.fieldSize\n     0.09s  8.41% 82.24%      0.09s  8.41%  encoding/binary.littleEndian.PutUint32 (inline)\n     0.05s  4.67% 86.92%      0.06s  5.61%  runtime.typePointers.next\n     0.03s  2.80% 89.72%      0.10s  9.35%  runtime.scanobject\n     0.02s  1.87% 91.59%      0.02s  1.87%  runtime.scanblock\n     0.01s  0.93% 92.52%      0.01s  0.93%  encoding/binary.littleEndian.Uint64 (inline)\n     0.01s  0.93% 93.46%      0.01s  0.93%  reflect.Value.Field\n     0.01s  0.93% 94.39%      0.01s  0.93%  runtime.(*mheap).allocSpan\n     0.01s  0.93% 95.33%      0.01s  0.93%  runtime.add (inline)\n     0.01s  0.93% 96.26%      0.01s  0.93%  runtime.findfunc\n     0.01s  0.93% 97.20%      0.14s 13.08%  runtime.gcDrainN\n     0.01s  0.93% 98.13%      0.01s  0.93%  runtime.memclrNoHeapPointers\n     0.01s  0.93% 99.07%      0.01s  0.93%  runtime.spanOf (inline)\n     0.01s  0.93%   100%      0.01s  0.93%  runtime.typePointers.nextFast (inline)\n         0     0%   100%      1.07s   100%  encoderbench.representativeOperations.func7\n         0     0%   100%      1.07s   100%  encoderbench.runPaired.func1\n         0     0%   100%      0.49s 45.79%  github.com/cnooljaw/gosproto.Encode (inline)\n"
+  }
+]

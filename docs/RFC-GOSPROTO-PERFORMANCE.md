@@ -1,6 +1,6 @@
 # gosproto 后续性能优化方案
 
-状态：2026-10-16，两轮 Go 优化已实施并在独立库提交为 `6012b06`，尚未发布；GSR 正式依赖仍为 v0.4.0。TS 长块和 Go 安全路径见 [首轮结果](benchmarks/2026-10-15-sproto-next/RESULTS.md)，数值 packing、字段查询及类型化构造见 [第二轮结果](benchmarks/2026-10-15-sproto-round2/RESULTS.md)。TS 优化阶段已在 GSR `9801808` 收尾，可迁移经验见 [TS → Go 优化经验](SPROTO-OPTIMIZATION-LESSONS.md)，下一轮入口见本文第 7 节。用户已同意编码执行层优化；原生 `*int64` 的受控只读字段访问已在独立库本地提交为 `819047e`、GSR `bf3ed8c`，未推送/发布。随后修复嵌套布局校验并优化整数记录数组，大型 Encode 约 6.54 µs，同场 PB 7.59 µs，新增改动未提交。公开 API 与 generator 不变，见第 9 节。
+状态：2026-10-16，GSR 正式依赖仍为 v0.4.0，后续独立库优化尚未发布。TS 长块和 Go 安全路径见 [首轮结果](benchmarks/2026-10-15-sproto-next/RESULTS.md)，数值 packing、字段查询及类型化构造见 [第二轮结果](benchmarks/2026-10-15-sproto-round2/RESULTS.md)。TS 优化阶段已在 GSR `9801808` 收尾，可迁移经验见 [TS → Go 优化经验](SPROTO-OPTIMIZATION-LESSONS.md)。编码执行层改进见第 9 节，最新已本地提交为独立库 `5e491ff`、GSR `70c84af`，未推送；大型 Encode 约 6.54 µs，同场 PB 7.59 µs。随后完成 Pack 混合 word 切片，新增改动未提交，见第 10 节。公开 API、generator 与预算/所有权契约不变。
 
 第三轮已完成当前基线与候选筛选，只保留调用内布局记录的内存收窄，独立库已本地提交为 `a579920`，GSR 记录提交为 `fdbc736`，均未推送/发布；未取得新的明显 CPU 加速。实测和取舍见 [第三轮结果](benchmarks/2026-10-16-gosproto-round3/RESULTS.md) 及第 8 节。
 
@@ -227,4 +227,12 @@ TS 经验提取已在 GSR `f45a8c6` 提交。Go 从 `6012b06` 重建两套主基
 
 后续发现父 Fields 替换后子 schema 可能与实际 Go 布局不同，单独核对字段 owner 不够。当前调用内传递已验证类型事实，描述变化时核对实际类型或回落；同构整数结构数组在入口核对全部字段后复用，保留逐元素预算与 wire 规则。通用循环增加同构分支的候选因 AddressBook 回退撤回。
 
-最终相对上一提交大型 Encode 8.382 → 6.528 µs，同场 PB 7.606 µs；相对最小类型修复版 9.730 → 6.544 µs，同场 PB 7.588 µs。AddressBook 相对上一提交 +12.0%、相对修复版 +1.3%，两组分别记录，分配不变。新增回归、结构数组 fuzz、完整库 race/checkptr/官方对照及 GSR 接线通过，新增改动尚未提交。下一切片应重新 profile packing 与组合路径，不以扩大 unsafe 追求全项胜出。详见 [嵌套绑定与整数记录数组结果](benchmarks/2026-10-16-gosproto-bindings/RESULTS.md)。
+最终相对上一提交大型 Encode 8.382 → 6.528 µs，同场 PB 7.606 µs；相对最小类型修复版 9.730 → 6.544 µs，同场 PB 7.588 µs。AddressBook 相对上一提交 +12.0%、相对修复版 +1.3%，两组分别记录，分配不变。新增回归、结构数组 fuzz、完整库 race/checkptr/官方对照及 GSR 接线通过，该切片已本地提交为独立库 `5e491ff`、GSR `70c84af`。详见 [嵌套绑定与整数记录数组结果](benchmarks/2026-10-16-gosproto-bindings/RESULTS.md)。
+
+## 10. Pack 混合数值 word 切片
+
+从 `5e491ff` 重采纯 Pack 与实际 PEncode profile，确认成本集中在 packWord，且大型/整数数组主要是四至六个非零字节的混合 word。参考官方 FF 段规则和固定字节展开思想，只改变内部执行方式：稀疏 word 仍提取有效字节，混合 word 固定位置写出并按 mask 递增目标游标；用至多两个置位的判断替代完整计数，FF 状态集中在连续段内。尾块、256-word、输出预留、wire 和独占语义不变；未扩展 unsafe。
+
+所有 word 使用条件展开的首个候选因稀疏/全零回退撤回。最终同进程 115 项 × 五轮：整数数组 Pack 3.664 → 3.287 µs（-10.3%）、PEncode 5.902 → 5.498 µs（-6.8%）；大型分别为 3.473 → 3.301 µs（-5.0%）、10.045 → 9.917 µs（-1.3%）。所有分配不变，无 SP 中位数回退超过 10%，但部分稀疏形态有小幅损失；不能将纯 Pack 降幅直接归给组合路径，也不代表 Go 全面胜出 PB。
+
+扩展既有全部 mask 的 FF 合并/退出精确字节检查，9216 组旧新差分、官方对照与完整库 race/checkptr/vet 通过。源码、失败值、组合与小包代价、最终验收见 [Pack 结果](benchmarks/2026-10-16-gosproto-pack/RESULTS.md)。后续从新 profile 选择热点，不默认扩大分派或放宽资源约束；当前新增改动未提交/发布。

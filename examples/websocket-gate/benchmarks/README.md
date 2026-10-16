@@ -34,7 +34,9 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 
 ## 报告
 
-[嵌套类型校验与整数记录数组](../../../docs/benchmarks/2026-10-16-gosproto-bindings/RESULTS.md) 是最新编码专项：修复描述替换时的 Go 布局核对，数组入口复用当前字段验证。大型 Encode 相对上一提交 8.382 → 6.528 µs，同场 PB 7.606 µs；AddressBook 的校验成本及最小修复版对照分别公开。两组共 490 个配对样本、失败候选与复现补丁保留，正式依赖仍为 v0.4.0。
+[Pack 混合数值 word 优化](../../../docs/benchmarks/2026-10-16-gosproto-pack/RESULTS.md) 是最新 packing 专项：稀疏/混合写出分开，简化 FF 状态，wire 和输出容量不变。115 项五轮配对中，整数数组 Pack/PEncode 约 -10.3%/-6.8%，大型消息约 -5.0%/-1.3%；记录 28 种合成形态、失败候选、9216 组差分与小包代价。正式依赖仍为 v0.4.0。
+
+[嵌套类型校验与整数记录数组](../../../docs/benchmarks/2026-10-16-gosproto-bindings/RESULTS.md) 是上一轮编码专项：修复描述替换时的 Go 布局核对，数组入口复用当前字段验证。大型 Encode 相对上一提交 8.382 → 6.528 µs，同场 PB 7.606 µs；AddressBook 的校验成本及最小修复版对照分别公开。两组共 490 个配对样本、失败候选与复现补丁保留，正式依赖仍为 v0.4.0。
 
 [大型结构体 Encoder 字段绑定](../../../docs/benchmarks/2026-10-16-gosproto-encoder/RESULTS.md) 保存原生 `*int64` 只读 offset 访问的完整 Go 主矩阵、同进程专项、候选回退与平台范围。大型 Encode 同进程 14.345 → 8.456 µs，同次 PB 7.863 µs；分配不变，少数小 body 有固定开销，正式依赖仍为 v0.4.0。复现脚本仅在忽略目录建立新旧库并列的临时测试模块，不改生产依赖。
 
