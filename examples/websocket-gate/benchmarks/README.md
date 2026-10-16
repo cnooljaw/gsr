@@ -34,7 +34,9 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 
 ## 报告
 
-[长 FF 段有界搜索](../../../docs/benchmarks/2026-10-16-gosproto-ffscan/RESULTS.md) 是最新 packing 专项：137 项五轮配对，4 KiB ASCII Pack/PEncode 约 -71.8%/-57.4%，完整帧约 -43.1%，UTF-8 帧约 -34.2%。保留小包约 5% 的 Pack 代价、39 种合成形态、失败候选与 17984 组差分。预算、wire、输出容量不变，正式依赖仍为 v0.4.0。
+[连续零 mask 有界解包](../../../docs/benchmarks/2026-10-16-gosproto-zero-unpack/RESULTS.md) 是最新 Unpack 专项：129 项五轮配对，4 KiB/64 KiB 零块约 -64.0%/-68.3%，4 KiB 零字节帧约 -51.2%。AddressBook Unpack 约 +10%、PDecode +1.6% 和普通形态代价原样保留；35 种形态、45824 组输入/预算差分、失败候选与 profile 一并记录。完整预检、分配和 wire 不变，正式依赖仍为 v0.4.0。
+
+[长 FF 段有界搜索](../../../docs/benchmarks/2026-10-16-gosproto-ffscan/RESULTS.md) 是上一轮 Pack 专项：137 项五轮配对，4 KiB ASCII Pack/PEncode 约 -71.8%/-57.4%，完整帧约 -43.1%，UTF-8 帧约 -34.2%。保留小包约 5% 的 Pack 代价、39 种合成形态、失败候选与 17984 组差分。预算、wire、输出容量不变，正式依赖仍为 v0.4.0。
 
 [Pack 混合数值 word 优化](../../../docs/benchmarks/2026-10-16-gosproto-pack/RESULTS.md) 是上一轮 packing 专项：稀疏/混合写出分开，简化 FF 状态，wire 和输出容量不变。115 项五轮配对中，整数数组 Pack/PEncode 约 -10.3%/-6.8%，大型消息约 -5.0%/-1.3%；记录 28 种合成形态、失败候选、9216 组差分与小包代价。正式依赖仍为 v0.4.0。
 

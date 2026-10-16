@@ -1,0 +1,106 @@
+[
+  {
+    "pattern": "^BenchmarkPairedUnpackShapes$/^zero4096$/^sproto_unpack$",
+    "commands": [
+      [
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-zero-unpack/run/baseline.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkPairedUnpackShapes$/^zero4096$/^sproto_unpack$",
+        "-test.benchtime=2s",
+        "-test.cpuprofile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-zero-unpack/baseline-BenchmarkPairedUnpackShapes-zero4096-sproto_unpack.pprof",
+        "-test.timeout=30s"
+      ],
+      [
+        "go",
+        "tool",
+        "pprof",
+        "-top",
+        "-nodecount=20",
+        "-relative_percentages",
+        "-focus=github.com/cnooljaw/gosproto\\.",
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-zero-unpack/run/baseline.test",
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-zero-unpack/baseline-BenchmarkPairedUnpackShapes-zero4096-sproto_unpack.pprof"
+      ]
+    ],
+    "benchmark": "goos: darwin\ngoarch: arm64\npkg: encoderbench\ncpu: Apple M2\nBenchmarkPairedUnpackShapes/zero4096/sproto_unpack         \t 1440409\t      1701 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n",
+    "top": "File: baseline.test\nType: cpu\nTime: 2026-10-16 14:42:47 CST\nDuration: 4.25s, Total samples = 1.34s (31.52%)\nActive filters:\n   focus=github.com/cnooljaw/gosproto\\.\nShowing nodes accounting for 1.34s, 100% of 1.34s total\nShowing top 20 nodes out of 64\n      flat  flat%   sum%        cum   cum%\n     0.79s 58.96% 58.96%      1.34s   100%  github.com/cnooljaw/gosproto.UnpackWithLimit\n     0.16s 11.94% 70.90%      0.19s 14.18%  runtime.typePointers.next\n     0.10s  7.46% 78.36%      0.10s  7.46%  math/bits.OnesCount8 (inline)\n     0.06s  4.48% 82.84%      0.29s 21.64%  runtime.scanobject\n     0.03s  2.24% 85.07%      0.03s  2.24%  runtime.findObject\n     0.03s  2.24% 87.31%      0.03s  2.24%  runtime.getGCMask (inline)\n     0.03s  2.24% 89.55%      0.03s  2.24%  runtime.pcvalue\n     0.02s  1.49% 91.04%      0.02s  1.49%  runtime.(*mheap).setSpans\n     0.02s  1.49% 92.54%      0.04s  2.99%  runtime.(*sweepLocked).sweep\n     0.01s  0.75% 93.28%      0.01s  0.75%  internal/abi.(*Type).Pointers (inline)\n     0.01s  0.75% 94.03%      0.01s  0.75%  internal/runtime/atomic.(*Uint32).Add (inline)\n     0.01s  0.75% 94.78%      0.02s  1.49%  runtime.(*consistentHeapStats).acquire\n     0.01s  0.75% 95.52%      0.03s  2.24%  runtime.(*mheap).allocSpan\n     0.01s  0.75% 96.27%      0.01s  0.75%  runtime.(*pallocBits).summarize\n     0.01s  0.75% 97.01%      0.01s  0.75%  runtime.(*stackScanState).findObject (inline)\n     0.01s  0.75% 97.76%      0.01s  0.75%  runtime.greyobject\n     0.01s  0.75% 98.51%      0.01s  0.75%  runtime.markrootSpans\n     0.01s  0.75% 99.25%      0.01s  0.75%  runtime.nextFreeFast (inline)\n     0.01s  0.75%   100%      0.01s  0.75%  runtime.spanHasSpecials (inline)\n         0     0%   100%      1.34s   100%  encoderbench.BenchmarkPairedUnpackShapes.func2\n"
+  },
+  {
+    "pattern": "^BenchmarkPairedUnpacking$/^game_large$/^sproto_unpack$",
+    "commands": [
+      [
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-zero-unpack/run/baseline.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkPairedUnpacking$/^game_large$/^sproto_unpack$",
+        "-test.benchtime=2s",
+        "-test.cpuprofile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-zero-unpack/baseline-BenchmarkPairedUnpacking-game_large-sproto_unpack.pprof",
+        "-test.timeout=30s"
+      ],
+      [
+        "go",
+        "tool",
+        "pprof",
+        "-top",
+        "-nodecount=20",
+        "-relative_percentages",
+        "-focus=github.com/cnooljaw/gosproto\\.",
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-zero-unpack/run/baseline.test",
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-zero-unpack/baseline-BenchmarkPairedUnpacking-game_large-sproto_unpack.pprof"
+      ]
+    ],
+    "benchmark": "goos: darwin\ngoarch: arm64\npkg: encoderbench\ncpu: Apple M2\nBenchmarkPairedUnpacking/game_large/sproto_unpack         \t  479618\t      5267 ns/op\t    3456 B/op\t       1 allocs/op\nPASS\n",
+    "top": "File: baseline.test\nType: cpu\nTime: 2026-10-16 14:42:52 CST\nDuration: 2.75s, Total samples = 1.19s (43.24%)\nActive filters:\n   focus=github.com/cnooljaw/gosproto\\.\nShowing nodes accounting for 1.19s, 100% of 1.19s total\nShowing top 20 nodes out of 41\n      flat  flat%   sum%        cum   cum%\n     0.96s 80.67% 80.67%      1.19s   100%  github.com/cnooljaw/gosproto.UnpackWithLimit\n     0.09s  7.56% 88.24%      0.09s  7.56%  math/bits.OnesCount8 (inline)\n     0.02s  1.68% 89.92%      0.02s  1.68%  runtime.greyobject\n     0.02s  1.68% 91.60%      0.02s  1.68%  runtime.memclrNoHeapPointers\n     0.02s  1.68% 93.28%      0.02s  1.68%  runtime.typePointers.next\n     0.01s  0.84% 94.12%      0.01s  0.84%  runtime.(*mspan).init\n     0.01s  0.84% 94.96%      0.01s  0.84%  runtime.(*mspan).typePointersOfUnchecked\n     0.01s  0.84% 95.80%      0.01s  0.84%  runtime.(*pageAlloc).find\n     0.01s  0.84% 96.64%      0.01s  0.84%  runtime.(*spanSet).reset\n     0.01s  0.84% 97.48%      0.01s  0.84%  runtime.asyncPreempt\n     0.01s  0.84% 98.32%      0.01s  0.84%  runtime.memmove\n     0.01s  0.84% 99.16%      0.01s  0.84%  runtime.scanblock\n     0.01s  0.84%   100%      0.06s  5.04%  runtime.scanobject\n         0     0%   100%      1.19s   100%  encoderbench.representativeOperations.func6\n         0     0%   100%      1.19s   100%  encoderbench.runPaired.func1\n         0     0%   100%      1.19s   100%  github.com/cnooljaw/gosproto.Unpack (inline)\n         0     0%   100%      0.02s  1.68%  runtime.(*mcache).nextFree\n         0     0%   100%      0.02s  1.68%  runtime.(*mcache).refill\n         0     0%   100%      0.02s  1.68%  runtime.(*mcentral).cacheSpan\n         0     0%   100%      0.02s  1.68%  runtime.(*mcentral).grow\n"
+  },
+  {
+    "pattern": "^BenchmarkPairedUnpacking$/^game_large$/^sproto_pdecode$",
+    "commands": [
+      [
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-zero-unpack/run/baseline.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkPairedUnpacking$/^game_large$/^sproto_pdecode$",
+        "-test.benchtime=2s",
+        "-test.cpuprofile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-zero-unpack/baseline-BenchmarkPairedUnpacking-game_large-sproto_pdecode.pprof",
+        "-test.timeout=30s"
+      ],
+      [
+        "go",
+        "tool",
+        "pprof",
+        "-top",
+        "-nodecount=20",
+        "-relative_percentages",
+        "-focus=github.com/cnooljaw/gosproto\\.",
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-zero-unpack/run/baseline.test",
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-zero-unpack/baseline-BenchmarkPairedUnpacking-game_large-sproto_pdecode.pprof"
+      ]
+    ],
+    "benchmark": "goos: darwin\ngoarch: arm64\npkg: encoderbench\ncpu: Apple M2\nBenchmarkPairedUnpacking/game_large/sproto_pdecode         \t   98091\t     24033 ns/op\t   13872 B/op\t     533 allocs/op\nPASS\n",
+    "top": "File: baseline.test\nType: cpu\nTime: 2026-10-16 14:42:55 CST\nDuration: 4.71s, Total samples = 3120ms (66.30%)\nActive filters:\n   focus=github.com/cnooljaw/gosproto\\.\nShowing nodes accounting for 2360ms, 75.64% of 3120ms total\nDropped 37 nodes (cum <= 15.60ms)\nShowing top 20 nodes out of 83\n      flat  flat%   sum%        cum   cum%\n     580ms 18.59% 18.59%      700ms 22.44%  github.com/cnooljaw/gosproto.UnpackWithLimit\n     300ms  9.62% 28.21%     2380ms 76.28%  github.com/cnooljaw/gosproto.decodeMessage\n     220ms  7.05% 35.26%      950ms 30.45%  runtime.mallocgc\n     170ms  5.45% 40.71%      450ms 14.42%  reflect.Value.Set\n     140ms  4.49% 45.19%      270ms  8.65%  runtime.mallocgcTiny\n     110ms  3.53% 48.72%      290ms  9.29%  runtime.mallocgcSmallScanNoHeader\n     100ms  3.21% 51.92%      150ms  4.81%  reflect.Value.Field\n      90ms  2.88% 54.81%     1010ms 32.37%  github.com/cnooljaw/gosproto.decodeInt64Pointer\n      90ms  2.88% 57.69%       90ms  2.88%  reflect.flag.mustBeAssignable (inline)\n      70ms  2.24% 59.94%      100ms  3.21%  reflect.Value.assignTo\n      60ms  1.92% 61.86%       90ms  2.88%  github.com/cnooljaw/gosproto.decodeIntSlice\n      60ms  1.92% 63.78%       60ms  1.92%  math/bits.OnesCount8 (inline)\n      60ms  1.92% 65.71%       60ms  1.92%  reflect.Value.Elem\n      60ms  1.92% 67.63%       60ms  1.92%  runtime.nextFreeFast (inline)\n      50ms  1.60% 69.23%     2200ms 70.51%  github.com/cnooljaw/gosproto.decodeStructSlice\n      40ms  1.28% 70.51%       40ms  1.28%  encoding/binary.littleEndian.Uint16 (inline)\n      40ms  1.28% 71.79%       60ms  1.92%  github.com/cnooljaw/gosproto.countChunks\n      40ms  1.28% 73.08%       40ms  1.28%  internal/abi.Name.IsExported (inline)\n      40ms  1.28% 74.36%       40ms  1.28%  runtime.memclrNoHeapPointers\n      40ms  1.28% 75.64%      490ms 15.71%  runtime.newobject\n"
+  },
+  {
+    "pattern": "^BenchmarkPairedUnpackEcho$/^zeros4k$/^sproto_frame$",
+    "commands": [
+      [
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-zero-unpack/run/baseline.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkPairedUnpackEcho$/^zeros4k$/^sproto_frame$",
+        "-test.benchtime=2s",
+        "-test.cpuprofile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-zero-unpack/baseline-BenchmarkPairedUnpackEcho-zeros4k-sproto_frame.pprof",
+        "-test.timeout=30s"
+      ],
+      [
+        "go",
+        "tool",
+        "pprof",
+        "-top",
+        "-nodecount=20",
+        "-relative_percentages",
+        "-focus=github.com/cnooljaw/gosproto\\.",
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-zero-unpack/run/baseline.test",
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-zero-unpack/baseline-BenchmarkPairedUnpackEcho-zeros4k-sproto_frame.pprof"
+      ]
+    ],
+    "benchmark": "goos: darwin\ngoarch: arm64\npkg: encoderbench\ncpu: Apple M2\nBenchmarkPairedUnpackEcho/zeros4k/sproto_frame         \t  770637\t      3304 ns/op\t    9136 B/op\t      11 allocs/op\nPASS\n",
+    "top": "File: baseline.test\nType: cpu\nTime: 2026-10-16 14:42:59 CST\nDuration: 2.68s, Total samples = 940ms (35.06%)\nActive filters:\n   focus=github.com/cnooljaw/gosproto\\.\nShowing nodes accounting for 810ms, 86.17% of 940ms total\nShowing top 20 nodes out of 82\n      flat  flat%   sum%        cum   cum%\n     410ms 43.62% 43.62%      670ms 71.28%  github.com/cnooljaw/gosproto.UnpackWithLimit\n      90ms  9.57% 53.19%       90ms  9.57%  math/bits.OnesCount8 (inline)\n      50ms  5.32% 58.51%      150ms 15.96%  runtime.scanobject\n      50ms  5.32% 63.83%       70ms  7.45%  runtime.typePointers.next\n      40ms  4.26% 68.09%       40ms  4.26%  runtime.memmove\n      30ms  3.19% 71.28%       30ms  3.19%  runtime.memclrNoHeapPointers\n      10ms  1.06% 72.34%      270ms 28.72%  github.com/cnooljaw/gosproto.DecodeWithLimits\n      10ms  1.06% 73.40%      220ms 23.40%  github.com/cnooljaw/gosproto.decodeMessage\n      10ms  1.06% 74.47%       10ms  1.06%  reflect.toType (inline)\n      10ms  1.06% 75.53%       10ms  1.06%  runtime.(*gcControllerState).heapGoalInternal\n      10ms  1.06% 76.60%       80ms  8.51%  runtime.(*mcache).refill\n      10ms  1.06% 77.66%       40ms  4.26%  runtime.(*mcentral).grow\n      10ms  1.06% 78.72%       10ms  1.06%  runtime.(*mheap).setSpans\n      10ms  1.06% 79.79%       10ms  1.06%  runtime.(*mspan).base (inline)\n      10ms  1.06% 80.85%       10ms  1.06%  runtime.(*mspan).writeHeapBitsSmall\n      10ms  1.06% 81.91%       10ms  1.06%  runtime.(*spanSet).pop\n      10ms  1.06% 82.98%       10ms  1.06%  runtime.(*stkframe).getStackMap\n      10ms  1.06% 84.04%       10ms  1.06%  runtime.(*sweepLocked).sweep\n      10ms  1.06% 85.11%       10ms  1.06%  runtime.(*sysMemStat).add\n      10ms  1.06% 86.17%      180ms 19.15%  runtime.deductAssistCredit\n"
+  }
+]

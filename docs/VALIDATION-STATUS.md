@@ -4,13 +4,21 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## 连续零 mask 有界解包（2026-10-16）
+
+上一轮已本地提交为 gosproto `07350a9`、GSR `3a78dbd`，未推送。当前仅改 Unpack 的连续零 mask 扫描及分类，保留完整预检、有限输出预算、错误优先级和独占输出；Pack、Encoder、Decoder、RPC、元信息与 TS 生产源码冻结。
+
+最终 129 项五轮配对中，4 KiB/64 KiB 零块 Unpack 耗时约 -64.0%/-68.3%；4 KiB 零字节 Echo 完整帧约 -51.2%，比同场 PB 约低 11.5%。AddressBook Unpack 约 +10%、PDecode +1.6%，部分普通形态约 +5% 的代价和全部失败候选原样保留，分配不变。
+
+45824 组输入/预算差分、完整独立库 race/严格 checkptr（启用固定官方 C/Lua 对照）、vet、FuzzDecode 与 FuzzPackRoundTrip 各约十秒通过。GSR 临时覆盖三包、TS 构建和 Go/TS Plain/MAC 集成 7/7、零跳过通过。未重复 GSR 全仓/race、TS 性能或跨平台执行，详见 [解包结果](benchmarks/2026-10-16-gosproto-zero-unpack/RESULTS.md)。新增改动未提交/发布，正式依赖仍为 v0.4.0。
+
 ## 长 FF 段有界搜索（2026-10-16）
 
 上一轮已本地提交为 gosproto `7dc6713`、GSR `e9e1f74`，未推送。当前新增切片只在长 FF 起点搜索最多 255 个后续完整非零 word，含零 word 仍走原合并规则；主循环去掉中间 input 切片与重复长度判断。输出容量、wire、预算及独占语义不变，Unpack/Encoder/Decoder/RPC/TS 生产源码冻结。
 
 最终同进程 137 项 × 五轮、685 样本：4 KiB ASCII Pack 2.075 → 0.5851 µs、PEncode 2.682 → 1.142 µs，完整帧 3.352 → 1.906 µs；UTF-8 帧 1.035 → 0.6813 µs。AddressBook/小型游戏 Pack 各约 +5%，最终无 SP 中位数回退 >10%，但不称为全项加速。前缀计算、直接内嵌扫描和容量收窄等候选及中间回退分别保留，共 1780 个非最终样本，不与最终值混算。
 
-全部 mask 的长输入独立预期字节、17984 组旧新差分、完整独立库 race/严格 checkptr（启用固定官方 C/Lua 对照）、vet 及 Pack/Codec 有限 fuzz 通过。GSR 临时覆盖三包、TypeScript 构建和 Go/TS Plain/MAC 集成 7/7、零跳过。最终来源、接线验收与范围见 [FF 搜索结果](benchmarks/2026-10-16-gosproto-ffscan/RESULTS.md)。新增改动未提交/发布，正式 Go 依赖仍为 v0.4.0。
+全部 mask 的长输入独立预期字节、17984 组旧新差分、完整独立库 race/严格 checkptr（启用固定官方 C/Lua 对照）、vet 及 Pack/Codec 有限 fuzz 通过。GSR 临时覆盖三包、TypeScript 构建和 Go/TS Plain/MAC 集成 7/7、零跳过。最终来源、接线验收与范围见 [FF 搜索结果](benchmarks/2026-10-16-gosproto-ffscan/RESULTS.md)。该切片已本地提交为 gosproto `07350a9`、GSR `3a78dbd`，未发布，正式 Go 依赖仍为 v0.4.0。
 
 ## Pack 混合数值 word 优化（2026-10-16）
 

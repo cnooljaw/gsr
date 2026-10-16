@@ -1,0 +1,3550 @@
+{
+  "variant": "classified",
+  "baseCommit": "07350a9",
+  "goSource": {
+    "limits.go": "42865809572cb856d39a62ae3f1d95c8b6395da5a5cac5539c75d2aa6ce34fd9",
+    "fuzz_test.go": "de339d3fbf5d589377ca304c82496f316478ac19bbf42c230eb0cf2fca0cf8ab",
+    "sproto_test.go": "4127e6f7a2b08474f8d126b47817617c4066737851bc787f22c0102b5e2bc800",
+    "encode.go": "73fe791f2e3d5d9011bc2011b9413c94457baea06c887426992f4a665fe0784a",
+    "rpc_limits_test.go": "486c8f73eb0e3cb63412796c669e55cb94c7ad49c0813cbb6dff36ad414e2b7c",
+    "pack.go": "3757072e0169f6c1471557ddecbbf0fb843cce84bc6c34d15142b5add1fa872c",
+    "encode_integer_record.go": "1ec4e5d0531c1de565aaa6b60c8ea8e185b9c36a95ffc9e49b848e5ed267fdcb",
+    "encode_pointer.go": "e7a239568a0fc8788404de6f5bc0d5e2ac092fa559f0a6bfd4561fdc155f81c1",
+    "rpc_test.go": "d8e1c353c96ff3577e6bdd86a1d1fbee8422486f491735bab278f65682c6102d",
+    "sproto.go": "b3cde4699d2fc07a453e521b0fac46534e43a8681fbbc5cb75d3ef27b9234164",
+    "rpc.go": "4368b24cb51c43c083c9430fd5264e94255149d5d4c9d9742626bc504450a376",
+    "meta.go": "6badd4a5ac60d8a15caaa1f35634268101c436b275cf4a0fe120b91db417d217",
+    "limits_test.go": "7c92f3ea4b512013b942d2817f6f4d34306002699a24e8e9f90c8919d619696e",
+    "decode.go": "b5bb24108008236b222a81c45a29cd78e73f114ffc0d843ce358dd237824bb74",
+    "pack_test.go": "32339307abca0a7bc1e63577dbf389071ef7a8eaf0eda4a80617774c5770c741",
+    "encode_test.go": "d28095ae5b5b820eb0d5aed634397bb86159361b5876c3126100d59e37d41099",
+    "official_compat_test.go": "adfe1ee5982544a937b72eed95592e4d6c521731db8c88c91dbe39440e1827ef"
+  },
+  "binarySha256": "8bfe5a5b700f718e960f021601c87360e27a812fdde1ec40ba96cb9a53c192ec",
+  "goVersion": "go version go1.24.13 darwin/arm64",
+  "pattern": "^BenchmarkPaired(Unpacking|UnpackEcho|UnpackShapes)$",
+  "commands": [
+    {
+      "args": [
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-zero-unpack/run/classified.test",
+        "-test.run=^TestRepresentativeFixtures$",
+        "-test.bench=^BenchmarkPaired(Unpacking|UnpackEcho|UnpackShapes)$",
+        "-test.benchtime=60000x",
+        "-test.benchmem",
+        "-test.timeout=55s"
+      ],
+      "reverse": 0
+    },
+    {
+      "args": [
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-zero-unpack/run/classified.test",
+        "-test.run=^TestRepresentativeFixtures$",
+        "-test.bench=^BenchmarkPaired(Unpacking|UnpackEcho|UnpackShapes)$",
+        "-test.benchtime=60000x",
+        "-test.benchmem",
+        "-test.timeout=55s"
+      ],
+      "reverse": 1
+    },
+    {
+      "args": [
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-zero-unpack/run/classified.test",
+        "-test.run=^TestRepresentativeFixtures$",
+        "-test.bench=^BenchmarkPaired(Unpacking|UnpackEcho|UnpackShapes)$",
+        "-test.benchtime=60000x",
+        "-test.benchmem",
+        "-test.timeout=55s"
+      ],
+      "reverse": 0
+    }
+  ],
+  "iterations": 60000,
+  "rounds": 3,
+  "rows": [
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpacking/addressbook/before_unpack",
+      "ns": 155.5,
+      "bytes": 144,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpacking/addressbook/before_pdecode",
+      "ns": 1218.0,
+      "bytes": 672,
+      "allocs": 30
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpacking/addressbook/before_decode",
+      "ns": 1011.0,
+      "bytes": 528,
+      "allocs": 29
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpacking/addressbook/protobuf_decode",
+      "ns": 831.0,
+      "bytes": 648,
+      "allocs": 26
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpacking/addressbook/sproto_decode",
+      "ns": 1569.0,
+      "bytes": 528,
+      "allocs": 29
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpacking/addressbook/sproto_unpack",
+      "ns": 178.0,
+      "bytes": 144,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpacking/addressbook/sproto_pdecode",
+      "ns": 1218.0,
+      "bytes": 672,
+      "allocs": 30
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpacking/game_small/before_unpack",
+      "ns": 484.9,
+      "bytes": 352,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpacking/game_small/before_pdecode",
+      "ns": 2360.0,
+      "bytes": 1552,
+      "allocs": 53
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpacking/game_small/before_decode",
+      "ns": 1834.0,
+      "bytes": 1200,
+      "allocs": 52
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpacking/game_small/protobuf_decode",
+      "ns": 1614.0,
+      "bytes": 1208,
+      "allocs": 53
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpacking/game_small/sproto_decode",
+      "ns": 2025.0,
+      "bytes": 1200,
+      "allocs": 52
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpacking/game_small/sproto_unpack",
+      "ns": 447.9,
+      "bytes": 352,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpacking/game_small/sproto_pdecode",
+      "ns": 2331.0,
+      "bytes": 1552,
+      "allocs": 53
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpacking/game_large/before_unpack",
+      "ns": 5061.0,
+      "bytes": 3456,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpacking/game_large/before_pdecode",
+      "ns": 23330.0,
+      "bytes": 13872,
+      "allocs": 533
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpacking/game_large/before_decode",
+      "ns": 17865.0,
+      "bytes": 10416,
+      "allocs": 532
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpacking/game_large/protobuf_decode",
+      "ns": 17846.0,
+      "bytes": 13560,
+      "allocs": 537
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpacking/game_large/sproto_decode",
+      "ns": 17516.0,
+      "bytes": 10416,
+      "allocs": 532
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpacking/game_large/sproto_unpack",
+      "ns": 4998.0,
+      "bytes": 3456,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpacking/game_large/sproto_pdecode",
+      "ns": 23362.0,
+      "bytes": 13872,
+      "allocs": 533
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpacking/int32_edges/before_unpack",
+      "ns": 5331.0,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpacking/int32_edges/before_pdecode",
+      "ns": 7656.0,
+      "bytes": 12384,
+      "allocs": 5
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpacking/int32_edges/before_decode",
+      "ns": 2886.0,
+      "bytes": 8288,
+      "allocs": 4
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpacking/int32_edges/protobuf_decode",
+      "ns": 4177.0,
+      "bytes": 4160,
+      "allocs": 2
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpacking/int32_edges/sproto_decode",
+      "ns": 2273.0,
+      "bytes": 8288,
+      "allocs": 4
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpacking/int32_edges/sproto_unpack",
+      "ns": 5384.0,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpacking/int32_edges/sproto_pdecode",
+      "ns": 7712.0,
+      "bytes": 12384,
+      "allocs": 5
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpacking/echo_ascii4k/before_unpack",
+      "ns": 536.8,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpacking/echo_ascii4k/before_pdecode",
+      "ns": 1174.0,
+      "bytes": 9040,
+      "allocs": 6
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpacking/echo_ascii4k/before_decode",
+      "ns": 627.7,
+      "bytes": 4176,
+      "allocs": 5
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpacking/echo_ascii4k/protobuf_decode",
+      "ns": 606.1,
+      "bytes": 4160,
+      "allocs": 3
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpacking/echo_ascii4k/sproto_decode",
+      "ns": 629.4,
+      "bytes": 4176,
+      "allocs": 5
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpacking/echo_ascii4k/sproto_unpack",
+      "ns": 524.5,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpacking/echo_ascii4k/sproto_pdecode",
+      "ns": 1221.0,
+      "bytes": 9040,
+      "allocs": 6
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackEcho/ascii32/before_payload",
+      "ns": 155.3,
+      "bytes": 112,
+      "allocs": 5
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackEcho/ascii32/sproto_payload",
+      "ns": 168.7,
+      "bytes": 112,
+      "allocs": 5
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackEcho/ascii32/protobuf_payload",
+      "ns": 103.0,
+      "bytes": 96,
+      "allocs": 2
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackEcho/ascii32/before_frame",
+      "ns": 375.4,
+      "bytes": 256,
+      "allocs": 11
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackEcho/ascii32/sproto_frame",
+      "ns": 382.4,
+      "bytes": 256,
+      "allocs": 11
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackEcho/ascii32/protobuf_frame",
+      "ns": 252.6,
+      "bytes": 224,
+      "allocs": 4
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackEcho/utf8_1k/before_payload",
+      "ns": 284.1,
+      "bytes": 1104,
+      "allocs": 5
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackEcho/utf8_1k/sproto_payload",
+      "ns": 286.2,
+      "bytes": 1104,
+      "allocs": 5
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackEcho/utf8_1k/protobuf_payload",
+      "ns": 1364.0,
+      "bytes": 1088,
+      "allocs": 2
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackEcho/utf8_1k/before_frame",
+      "ns": 635.1,
+      "bytes": 2224,
+      "allocs": 11
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackEcho/utf8_1k/sproto_frame",
+      "ns": 617.0,
+      "bytes": 2224,
+      "allocs": 11
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackEcho/utf8_1k/protobuf_frame",
+      "ns": 1623.0,
+      "bytes": 2192,
+      "allocs": 4
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackEcho/ascii4k/before_payload",
+      "ns": 645.8,
+      "bytes": 4176,
+      "allocs": 5
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackEcho/ascii4k/sproto_payload",
+      "ns": 1305.0,
+      "bytes": 4176,
+      "allocs": 5
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackEcho/ascii4k/protobuf_payload",
+      "ns": 1012.0,
+      "bytes": 4160,
+      "allocs": 2
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackEcho/ascii4k/before_frame",
+      "ns": 1424.0,
+      "bytes": 9136,
+      "allocs": 11
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackEcho/ascii4k/sproto_frame",
+      "ns": 1402.0,
+      "bytes": 9136,
+      "allocs": 11
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackEcho/ascii4k/protobuf_frame",
+      "ns": 1550.0,
+      "bytes": 9104,
+      "allocs": 4
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackEcho/zeros4k/before_payload",
+      "ns": 632.9,
+      "bytes": 4176,
+      "allocs": 5
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackEcho/zeros4k/sproto_payload",
+      "ns": 640.4,
+      "bytes": 4176,
+      "allocs": 5
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackEcho/zeros4k/protobuf_payload",
+      "ns": 999.3,
+      "bytes": 4160,
+      "allocs": 2
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackEcho/zeros4k/before_frame",
+      "ns": 3021.0,
+      "bytes": 9136,
+      "allocs": 11
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackEcho/zeros4k/sproto_frame",
+      "ns": 1409.0,
+      "bytes": 9136,
+      "allocs": 11
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackEcho/zeros4k/protobuf_frame",
+      "ns": 1658.0,
+      "bytes": 9104,
+      "allocs": 4
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zero32/before_unpack",
+      "ns": 27.27,
+      "bytes": 32,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zero32/sproto_unpack",
+      "ns": 25.41,
+      "bytes": 32,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/ascii32/before_unpack",
+      "ns": 21.34,
+      "bytes": 32,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/ascii32/sproto_unpack",
+      "ns": 19.89,
+      "bytes": 32,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zero4096/before_unpack",
+      "ns": 1591.0,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zero4096/sproto_unpack",
+      "ns": 625.2,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/ascii4096/before_unpack",
+      "ns": 556.5,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/ascii4096/sproto_unpack",
+      "ns": 517.3,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zero65536/before_unpack",
+      "ns": 24032.0,
+      "bytes": 65536,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zero65536/sproto_unpack",
+      "ns": 7746.0,
+      "bytes": 65536,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/ascii65536/before_unpack",
+      "ns": 6970.0,
+      "bytes": 65536,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/ascii65536/sproto_unpack",
+      "ns": 7058.0,
+      "bytes": 65536,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero1x256/before_unpack",
+      "ns": 1065.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero1x256/sproto_unpack",
+      "ns": 1085.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero2x256/before_unpack",
+      "ns": 1336.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero2x256/sproto_unpack",
+      "ns": 1363.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero3x256/before_unpack",
+      "ns": 2369.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero3x256/sproto_unpack",
+      "ns": 1712.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero4x256/before_unpack",
+      "ns": 2091.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero4x256/sproto_unpack",
+      "ns": 1954.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero5x256/before_unpack",
+      "ns": 2291.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero5x256/sproto_unpack",
+      "ns": 2213.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero6x256/before_unpack",
+      "ns": 2466.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero6x256/sproto_unpack",
+      "ns": 2504.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero7x256/before_unpack",
+      "ns": 2678.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero7x256/sproto_unpack",
+      "ns": 2826.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/FF512-sparse4096/before_unpack",
+      "ns": 4223.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/FF512-sparse4096/sproto_unpack",
+      "ns": 4249.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun8x64/before_unpack",
+      "ns": 4606.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun8x64/sproto_unpack",
+      "ns": 1239.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun16x64/before_unpack",
+      "ns": 7390.0,
+      "bytes": 9472,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun16x64/sproto_unpack",
+      "ns": 2154.0,
+      "bytes": 9472,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun64x64/before_unpack",
+      "ns": 28143.0,
+      "bytes": 40960,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun64x64/sproto_unpack",
+      "ns": 5230.0,
+      "bytes": 40960,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/random4096/before_unpack",
+      "ns": 554.0,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/random4096/sproto_unpack",
+      "ns": 546.5,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords1/before_unpack",
+      "ns": 14.28,
+      "bytes": 8,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords1/sproto_unpack",
+      "ns": 15.49,
+      "bytes": 8,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords2/before_unpack",
+      "ns": 21.22,
+      "bytes": 16,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords2/sproto_unpack",
+      "ns": 20.56,
+      "bytes": 16,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords3/before_unpack",
+      "ns": 24.5,
+      "bytes": 24,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords3/sproto_unpack",
+      "ns": 24.62,
+      "bytes": 24,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords7/before_unpack",
+      "ns": 37.17,
+      "bytes": 64,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords7/sproto_unpack",
+      "ns": 34.79,
+      "bytes": 64,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords8/before_unpack",
+      "ns": 41.65,
+      "bytes": 64,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords8/sproto_unpack",
+      "ns": 38.19,
+      "bytes": 64,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords9/before_unpack",
+      "ns": 45.16,
+      "bytes": 80,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords9/sproto_unpack",
+      "ns": 39.51,
+      "bytes": 80,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords15/before_unpack",
+      "ns": 73.16,
+      "bytes": 128,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords15/sproto_unpack",
+      "ns": 54.76,
+      "bytes": 128,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords16/before_unpack",
+      "ns": 80.95,
+      "bytes": 128,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords16/sproto_unpack",
+      "ns": 60.88,
+      "bytes": 128,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords17/before_unpack",
+      "ns": 78.89,
+      "bytes": 144,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords17/sproto_unpack",
+      "ns": 45.78,
+      "bytes": 144,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords63/before_unpack",
+      "ns": 252.3,
+      "bytes": 512,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords63/sproto_unpack",
+      "ns": 124.4,
+      "bytes": 512,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords64/before_unpack",
+      "ns": 259.9,
+      "bytes": 512,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords64/sproto_unpack",
+      "ns": 127.3,
+      "bytes": 512,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords65/before_unpack",
+      "ns": 274.8,
+      "bytes": 576,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords65/sproto_unpack",
+      "ns": 137.1,
+      "bytes": 576,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun1x64/before_unpack",
+      "ns": 932.4,
+      "bytes": 1024,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun1x64/sproto_unpack",
+      "ns": 671.9,
+      "bytes": 1024,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun2x64/before_unpack",
+      "ns": 1448.0,
+      "bytes": 1536,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun2x64/sproto_unpack",
+      "ns": 1025.0,
+      "bytes": 1536,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun3x64/before_unpack",
+      "ns": 2007.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun3x64/sproto_unpack",
+      "ns": 1084.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun7x64/before_unpack",
+      "ns": 3789.0,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun7x64/sproto_unpack",
+      "ns": 1298.0,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun9x64/before_unpack",
+      "ns": 4591.0,
+      "bytes": 5376,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun9x64/sproto_unpack",
+      "ns": 1356.0,
+      "bytes": 5376,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpacking/addressbook/sproto_pdecode",
+      "ns": 1465.0,
+      "bytes": 672,
+      "allocs": 30
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpacking/addressbook/sproto_unpack",
+      "ns": 399.8,
+      "bytes": 144,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpacking/addressbook/sproto_decode",
+      "ns": 1044.0,
+      "bytes": 528,
+      "allocs": 29
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpacking/addressbook/protobuf_decode",
+      "ns": 851.1,
+      "bytes": 648,
+      "allocs": 26
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpacking/addressbook/before_decode",
+      "ns": 1043.0,
+      "bytes": 528,
+      "allocs": 29
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpacking/addressbook/before_pdecode",
+      "ns": 1225.0,
+      "bytes": 672,
+      "allocs": 30
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpacking/addressbook/before_unpack",
+      "ns": 172.4,
+      "bytes": 144,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpacking/game_small/sproto_pdecode",
+      "ns": 2347.0,
+      "bytes": 1552,
+      "allocs": 53
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpacking/game_small/sproto_unpack",
+      "ns": 503.9,
+      "bytes": 352,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpacking/game_small/sproto_decode",
+      "ns": 1831.0,
+      "bytes": 1200,
+      "allocs": 52
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpacking/game_small/protobuf_decode",
+      "ns": 1655.0,
+      "bytes": 1208,
+      "allocs": 53
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpacking/game_small/before_decode",
+      "ns": 1823.0,
+      "bytes": 1200,
+      "allocs": 52
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpacking/game_small/before_pdecode",
+      "ns": 2335.0,
+      "bytes": 1552,
+      "allocs": 53
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpacking/game_small/before_unpack",
+      "ns": 478.3,
+      "bytes": 352,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpacking/game_large/sproto_pdecode",
+      "ns": 23572.0,
+      "bytes": 13872,
+      "allocs": 533
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpacking/game_large/sproto_unpack",
+      "ns": 5042.0,
+      "bytes": 3456,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpacking/game_large/sproto_decode",
+      "ns": 17918.0,
+      "bytes": 10416,
+      "allocs": 532
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpacking/game_large/protobuf_decode",
+      "ns": 21690.0,
+      "bytes": 13560,
+      "allocs": 537
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpacking/game_large/before_decode",
+      "ns": 17869.0,
+      "bytes": 10416,
+      "allocs": 532
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpacking/game_large/before_pdecode",
+      "ns": 23732.0,
+      "bytes": 13872,
+      "allocs": 533
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpacking/game_large/before_unpack",
+      "ns": 5690.0,
+      "bytes": 3456,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpacking/int32_edges/sproto_pdecode",
+      "ns": 8591.0,
+      "bytes": 12384,
+      "allocs": 5
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpacking/int32_edges/sproto_unpack",
+      "ns": 5373.0,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpacking/int32_edges/sproto_decode",
+      "ns": 2266.0,
+      "bytes": 8288,
+      "allocs": 4
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpacking/int32_edges/protobuf_decode",
+      "ns": 4177.0,
+      "bytes": 4160,
+      "allocs": 2
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpacking/int32_edges/before_decode",
+      "ns": 2253.0,
+      "bytes": 8288,
+      "allocs": 4
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpacking/int32_edges/before_pdecode",
+      "ns": 7674.0,
+      "bytes": 12384,
+      "allocs": 5
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpacking/int32_edges/before_unpack",
+      "ns": 5372.0,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpacking/echo_ascii4k/sproto_pdecode",
+      "ns": 1173.0,
+      "bytes": 9040,
+      "allocs": 6
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpacking/echo_ascii4k/sproto_unpack",
+      "ns": 533.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpacking/echo_ascii4k/sproto_decode",
+      "ns": 623.1,
+      "bytes": 4176,
+      "allocs": 5
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpacking/echo_ascii4k/protobuf_decode",
+      "ns": 605.5,
+      "bytes": 4160,
+      "allocs": 3
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpacking/echo_ascii4k/before_decode",
+      "ns": 633.7,
+      "bytes": 4176,
+      "allocs": 5
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpacking/echo_ascii4k/before_pdecode",
+      "ns": 1163.0,
+      "bytes": 9040,
+      "allocs": 6
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpacking/echo_ascii4k/before_unpack",
+      "ns": 536.2,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackEcho/ascii32/protobuf_frame",
+      "ns": 386.4,
+      "bytes": 224,
+      "allocs": 4
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackEcho/ascii32/sproto_frame",
+      "ns": 561.2,
+      "bytes": 256,
+      "allocs": 11
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackEcho/ascii32/before_frame",
+      "ns": 379.2,
+      "bytes": 256,
+      "allocs": 11
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackEcho/ascii32/protobuf_payload",
+      "ns": 102.9,
+      "bytes": 96,
+      "allocs": 2
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackEcho/ascii32/sproto_payload",
+      "ns": 165.8,
+      "bytes": 112,
+      "allocs": 5
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackEcho/ascii32/before_payload",
+      "ns": 162.7,
+      "bytes": 112,
+      "allocs": 5
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackEcho/utf8_1k/protobuf_frame",
+      "ns": 1632.0,
+      "bytes": 2192,
+      "allocs": 4
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackEcho/utf8_1k/sproto_frame",
+      "ns": 610.0,
+      "bytes": 2224,
+      "allocs": 11
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackEcho/utf8_1k/before_frame",
+      "ns": 623.1,
+      "bytes": 2224,
+      "allocs": 11
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackEcho/utf8_1k/protobuf_payload",
+      "ns": 1361.0,
+      "bytes": 1088,
+      "allocs": 2
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackEcho/utf8_1k/sproto_payload",
+      "ns": 274.2,
+      "bytes": 1104,
+      "allocs": 5
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackEcho/utf8_1k/before_payload",
+      "ns": 281.0,
+      "bytes": 1104,
+      "allocs": 5
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackEcho/ascii4k/protobuf_frame",
+      "ns": 1607.0,
+      "bytes": 9104,
+      "allocs": 4
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackEcho/ascii4k/sproto_frame",
+      "ns": 1372.0,
+      "bytes": 9136,
+      "allocs": 11
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackEcho/ascii4k/before_frame",
+      "ns": 1395.0,
+      "bytes": 9136,
+      "allocs": 11
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackEcho/ascii4k/protobuf_payload",
+      "ns": 996.4,
+      "bytes": 4160,
+      "allocs": 2
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackEcho/ascii4k/sproto_payload",
+      "ns": 646.4,
+      "bytes": 4176,
+      "allocs": 5
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackEcho/ascii4k/before_payload",
+      "ns": 634.9,
+      "bytes": 4176,
+      "allocs": 5
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackEcho/zeros4k/protobuf_frame",
+      "ns": 1631.0,
+      "bytes": 9104,
+      "allocs": 4
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackEcho/zeros4k/sproto_frame",
+      "ns": 1430.0,
+      "bytes": 9136,
+      "allocs": 11
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackEcho/zeros4k/before_frame",
+      "ns": 2907.0,
+      "bytes": 9136,
+      "allocs": 11
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackEcho/zeros4k/protobuf_payload",
+      "ns": 1050.0,
+      "bytes": 4160,
+      "allocs": 2
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackEcho/zeros4k/sproto_payload",
+      "ns": 738.9,
+      "bytes": 4176,
+      "allocs": 5
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackEcho/zeros4k/before_payload",
+      "ns": 680.5,
+      "bytes": 4176,
+      "allocs": 5
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zero32/sproto_unpack",
+      "ns": 25.96,
+      "bytes": 32,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zero32/before_unpack",
+      "ns": 25.63,
+      "bytes": 32,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/ascii32/sproto_unpack",
+      "ns": 21.65,
+      "bytes": 32,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/ascii32/before_unpack",
+      "ns": 22.35,
+      "bytes": 32,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zero4096/sproto_unpack",
+      "ns": 559.6,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zero4096/before_unpack",
+      "ns": 1631.0,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/ascii4096/sproto_unpack",
+      "ns": 544.5,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/ascii4096/before_unpack",
+      "ns": 549.7,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zero65536/sproto_unpack",
+      "ns": 7529.0,
+      "bytes": 65536,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zero65536/before_unpack",
+      "ns": 24114.0,
+      "bytes": 65536,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/ascii65536/sproto_unpack",
+      "ns": 6864.0,
+      "bytes": 65536,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/ascii65536/before_unpack",
+      "ns": 7514.0,
+      "bytes": 65536,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero1x256/sproto_unpack",
+      "ns": 1089.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero1x256/before_unpack",
+      "ns": 1072.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero2x256/sproto_unpack",
+      "ns": 1387.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero2x256/before_unpack",
+      "ns": 1356.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero3x256/sproto_unpack",
+      "ns": 1683.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero3x256/before_unpack",
+      "ns": 1883.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero4x256/sproto_unpack",
+      "ns": 1958.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero4x256/before_unpack",
+      "ns": 2077.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero5x256/sproto_unpack",
+      "ns": 2198.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero5x256/before_unpack",
+      "ns": 2270.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero6x256/sproto_unpack",
+      "ns": 2476.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero6x256/before_unpack",
+      "ns": 2463.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero7x256/sproto_unpack",
+      "ns": 2727.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero7x256/before_unpack",
+      "ns": 2668.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/FF512-sparse4096/sproto_unpack",
+      "ns": 5047.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/FF512-sparse4096/before_unpack",
+      "ns": 4433.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun8x64/sproto_unpack",
+      "ns": 1256.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun8x64/before_unpack",
+      "ns": 4063.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun16x64/sproto_unpack",
+      "ns": 2137.0,
+      "bytes": 9472,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun16x64/before_unpack",
+      "ns": 7524.0,
+      "bytes": 9472,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun64x64/sproto_unpack",
+      "ns": 5006.0,
+      "bytes": 40960,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun64x64/before_unpack",
+      "ns": 29530.0,
+      "bytes": 40960,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/random4096/sproto_unpack",
+      "ns": 535.5,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/random4096/before_unpack",
+      "ns": 526.9,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords1/sproto_unpack",
+      "ns": 14.39,
+      "bytes": 8,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords1/before_unpack",
+      "ns": 13.55,
+      "bytes": 8,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords2/sproto_unpack",
+      "ns": 19.1,
+      "bytes": 16,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords2/before_unpack",
+      "ns": 18.18,
+      "bytes": 16,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords3/sproto_unpack",
+      "ns": 23.3,
+      "bytes": 24,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords3/before_unpack",
+      "ns": 22.54,
+      "bytes": 24,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords7/sproto_unpack",
+      "ns": 34.74,
+      "bytes": 64,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords7/before_unpack",
+      "ns": 36.97,
+      "bytes": 64,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords8/sproto_unpack",
+      "ns": 36.9,
+      "bytes": 64,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords8/before_unpack",
+      "ns": 41.68,
+      "bytes": 64,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords9/sproto_unpack",
+      "ns": 40.26,
+      "bytes": 80,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords9/before_unpack",
+      "ns": 45.27,
+      "bytes": 80,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords15/sproto_unpack",
+      "ns": 61.53,
+      "bytes": 128,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords15/before_unpack",
+      "ns": 88.89,
+      "bytes": 128,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords16/sproto_unpack",
+      "ns": 71.54,
+      "bytes": 128,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords16/before_unpack",
+      "ns": 95.13,
+      "bytes": 128,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords17/sproto_unpack",
+      "ns": 53.54,
+      "bytes": 144,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords17/before_unpack",
+      "ns": 80.21,
+      "bytes": 144,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords63/sproto_unpack",
+      "ns": 109.5,
+      "bytes": 512,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords63/before_unpack",
+      "ns": 258.9,
+      "bytes": 512,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords64/sproto_unpack",
+      "ns": 128.3,
+      "bytes": 512,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords64/before_unpack",
+      "ns": 262.7,
+      "bytes": 512,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords65/sproto_unpack",
+      "ns": 140.9,
+      "bytes": 576,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords65/before_unpack",
+      "ns": 274.0,
+      "bytes": 576,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun1x64/sproto_unpack",
+      "ns": 673.3,
+      "bytes": 1024,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun1x64/before_unpack",
+      "ns": 933.9,
+      "bytes": 1024,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun2x64/sproto_unpack",
+      "ns": 1003.0,
+      "bytes": 1536,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun2x64/before_unpack",
+      "ns": 1388.0,
+      "bytes": 1536,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun3x64/sproto_unpack",
+      "ns": 1055.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun3x64/before_unpack",
+      "ns": 1971.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun7x64/sproto_unpack",
+      "ns": 1311.0,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun7x64/before_unpack",
+      "ns": 4390.0,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun9x64/sproto_unpack",
+      "ns": 1307.0,
+      "bytes": 5376,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun9x64/before_unpack",
+      "ns": 4590.0,
+      "bytes": 5376,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpacking/addressbook/before_unpack",
+      "ns": 155.7,
+      "bytes": 144,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpacking/addressbook/before_pdecode",
+      "ns": 1198.0,
+      "bytes": 672,
+      "allocs": 30
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpacking/addressbook/before_decode",
+      "ns": 1005.0,
+      "bytes": 528,
+      "allocs": 29
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpacking/addressbook/protobuf_decode",
+      "ns": 822.1,
+      "bytes": 648,
+      "allocs": 26
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpacking/addressbook/sproto_decode",
+      "ns": 1006.0,
+      "bytes": 528,
+      "allocs": 29
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpacking/addressbook/sproto_unpack",
+      "ns": 175.0,
+      "bytes": 144,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpacking/addressbook/sproto_pdecode",
+      "ns": 1206.0,
+      "bytes": 672,
+      "allocs": 30
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpacking/game_small/before_unpack",
+      "ns": 479.9,
+      "bytes": 352,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpacking/game_small/before_pdecode",
+      "ns": 2337.0,
+      "bytes": 1552,
+      "allocs": 53
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpacking/game_small/before_decode",
+      "ns": 1822.0,
+      "bytes": 1200,
+      "allocs": 52
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpacking/game_small/protobuf_decode",
+      "ns": 1630.0,
+      "bytes": 1208,
+      "allocs": 53
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpacking/game_small/sproto_decode",
+      "ns": 1801.0,
+      "bytes": 1200,
+      "allocs": 52
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpacking/game_small/sproto_unpack",
+      "ns": 492.0,
+      "bytes": 352,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpacking/game_small/sproto_pdecode",
+      "ns": 2332.0,
+      "bytes": 1552,
+      "allocs": 53
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpacking/game_large/before_unpack",
+      "ns": 5099.0,
+      "bytes": 3456,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpacking/game_large/before_pdecode",
+      "ns": 24490.0,
+      "bytes": 13872,
+      "allocs": 533
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpacking/game_large/before_decode",
+      "ns": 18535.0,
+      "bytes": 10416,
+      "allocs": 532
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpacking/game_large/protobuf_decode",
+      "ns": 17054.0,
+      "bytes": 13560,
+      "allocs": 537
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpacking/game_large/sproto_decode",
+      "ns": 21454.0,
+      "bytes": 10416,
+      "allocs": 532
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpacking/game_large/sproto_unpack",
+      "ns": 4989.0,
+      "bytes": 3456,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpacking/game_large/sproto_pdecode",
+      "ns": 23581.0,
+      "bytes": 13872,
+      "allocs": 533
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpacking/int32_edges/before_unpack",
+      "ns": 5397.0,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpacking/int32_edges/before_pdecode",
+      "ns": 7674.0,
+      "bytes": 12384,
+      "allocs": 5
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpacking/int32_edges/before_decode",
+      "ns": 2242.0,
+      "bytes": 8288,
+      "allocs": 4
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpacking/int32_edges/protobuf_decode",
+      "ns": 4140.0,
+      "bytes": 4160,
+      "allocs": 2
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpacking/int32_edges/sproto_decode",
+      "ns": 2264.0,
+      "bytes": 8288,
+      "allocs": 4
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpacking/int32_edges/sproto_unpack",
+      "ns": 5326.0,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpacking/int32_edges/sproto_pdecode",
+      "ns": 8054.0,
+      "bytes": 12384,
+      "allocs": 5
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpacking/echo_ascii4k/before_unpack",
+      "ns": 522.6,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpacking/echo_ascii4k/before_pdecode",
+      "ns": 1113.0,
+      "bytes": 9040,
+      "allocs": 6
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpacking/echo_ascii4k/before_decode",
+      "ns": 600.2,
+      "bytes": 4176,
+      "allocs": 5
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpacking/echo_ascii4k/protobuf_decode",
+      "ns": 608.2,
+      "bytes": 4160,
+      "allocs": 3
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpacking/echo_ascii4k/sproto_decode",
+      "ns": 628.1,
+      "bytes": 4176,
+      "allocs": 5
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpacking/echo_ascii4k/sproto_unpack",
+      "ns": 524.1,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpacking/echo_ascii4k/sproto_pdecode",
+      "ns": 1199.0,
+      "bytes": 9040,
+      "allocs": 6
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackEcho/ascii32/before_payload",
+      "ns": 151.5,
+      "bytes": 112,
+      "allocs": 5
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackEcho/ascii32/sproto_payload",
+      "ns": 157.7,
+      "bytes": 112,
+      "allocs": 5
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackEcho/ascii32/protobuf_payload",
+      "ns": 106.0,
+      "bytes": 96,
+      "allocs": 2
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackEcho/ascii32/before_frame",
+      "ns": 373.6,
+      "bytes": 256,
+      "allocs": 11
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackEcho/ascii32/sproto_frame",
+      "ns": 375.5,
+      "bytes": 256,
+      "allocs": 11
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackEcho/ascii32/protobuf_frame",
+      "ns": 250.0,
+      "bytes": 224,
+      "allocs": 4
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackEcho/utf8_1k/before_payload",
+      "ns": 305.8,
+      "bytes": 1104,
+      "allocs": 5
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackEcho/utf8_1k/sproto_payload",
+      "ns": 272.3,
+      "bytes": 1104,
+      "allocs": 5
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackEcho/utf8_1k/protobuf_payload",
+      "ns": 1368.0,
+      "bytes": 1088,
+      "allocs": 2
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackEcho/utf8_1k/before_frame",
+      "ns": 636.9,
+      "bytes": 2224,
+      "allocs": 11
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackEcho/utf8_1k/sproto_frame",
+      "ns": 617.4,
+      "bytes": 2224,
+      "allocs": 11
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackEcho/utf8_1k/protobuf_frame",
+      "ns": 1625.0,
+      "bytes": 2192,
+      "allocs": 4
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackEcho/ascii4k/before_payload",
+      "ns": 689.5,
+      "bytes": 4176,
+      "allocs": 5
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackEcho/ascii4k/sproto_payload",
+      "ns": 692.5,
+      "bytes": 4176,
+      "allocs": 5
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackEcho/ascii4k/protobuf_payload",
+      "ns": 1034.0,
+      "bytes": 4160,
+      "allocs": 2
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackEcho/ascii4k/before_frame",
+      "ns": 1394.0,
+      "bytes": 9136,
+      "allocs": 11
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackEcho/ascii4k/sproto_frame",
+      "ns": 1382.0,
+      "bytes": 9136,
+      "allocs": 11
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackEcho/ascii4k/protobuf_frame",
+      "ns": 1671.0,
+      "bytes": 9104,
+      "allocs": 4
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackEcho/zeros4k/before_payload",
+      "ns": 683.0,
+      "bytes": 4176,
+      "allocs": 5
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackEcho/zeros4k/sproto_payload",
+      "ns": 658.5,
+      "bytes": 4176,
+      "allocs": 5
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackEcho/zeros4k/protobuf_payload",
+      "ns": 998.6,
+      "bytes": 4160,
+      "allocs": 2
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackEcho/zeros4k/before_frame",
+      "ns": 2938.0,
+      "bytes": 9136,
+      "allocs": 11
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackEcho/zeros4k/sproto_frame",
+      "ns": 1452.0,
+      "bytes": 9136,
+      "allocs": 11
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackEcho/zeros4k/protobuf_frame",
+      "ns": 1538.0,
+      "bytes": 9104,
+      "allocs": 4
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zero32/before_unpack",
+      "ns": 25.04,
+      "bytes": 32,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zero32/sproto_unpack",
+      "ns": 22.75,
+      "bytes": 32,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/ascii32/before_unpack",
+      "ns": 20.38,
+      "bytes": 32,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/ascii32/sproto_unpack",
+      "ns": 20.04,
+      "bytes": 32,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zero4096/before_unpack",
+      "ns": 1611.0,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zero4096/sproto_unpack",
+      "ns": 585.7,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/ascii4096/before_unpack",
+      "ns": 511.8,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/ascii4096/sproto_unpack",
+      "ns": 506.1,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zero65536/before_unpack",
+      "ns": 24144.0,
+      "bytes": 65536,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zero65536/sproto_unpack",
+      "ns": 7682.0,
+      "bytes": 65536,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/ascii65536/before_unpack",
+      "ns": 7558.0,
+      "bytes": 65536,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/ascii65536/sproto_unpack",
+      "ns": 7253.0,
+      "bytes": 65536,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero1x256/before_unpack",
+      "ns": 1065.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero1x256/sproto_unpack",
+      "ns": 1095.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero2x256/before_unpack",
+      "ns": 1341.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero2x256/sproto_unpack",
+      "ns": 1390.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero3x256/before_unpack",
+      "ns": 1833.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero3x256/sproto_unpack",
+      "ns": 1658.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero4x256/before_unpack",
+      "ns": 2094.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero4x256/sproto_unpack",
+      "ns": 1943.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero5x256/before_unpack",
+      "ns": 2268.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero5x256/sproto_unpack",
+      "ns": 2189.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero6x256/before_unpack",
+      "ns": 2463.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero6x256/sproto_unpack",
+      "ns": 2518.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero7x256/before_unpack",
+      "ns": 3089.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/nonzero7x256/sproto_unpack",
+      "ns": 2813.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/FF512-sparse4096/before_unpack",
+      "ns": 4251.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/FF512-sparse4096/sproto_unpack",
+      "ns": 4291.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun8x64/before_unpack",
+      "ns": 4086.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun8x64/sproto_unpack",
+      "ns": 1238.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun16x64/before_unpack",
+      "ns": 7597.0,
+      "bytes": 9472,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun16x64/sproto_unpack",
+      "ns": 2126.0,
+      "bytes": 9472,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun64x64/before_unpack",
+      "ns": 29143.0,
+      "bytes": 40960,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun64x64/sproto_unpack",
+      "ns": 5322.0,
+      "bytes": 40960,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/random4096/before_unpack",
+      "ns": 537.6,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/random4096/sproto_unpack",
+      "ns": 531.1,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords1/before_unpack",
+      "ns": 14.02,
+      "bytes": 8,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords1/sproto_unpack",
+      "ns": 15.62,
+      "bytes": 8,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords2/before_unpack",
+      "ns": 20.58,
+      "bytes": 16,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords2/sproto_unpack",
+      "ns": 20.63,
+      "bytes": 16,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords3/before_unpack",
+      "ns": 24.04,
+      "bytes": 24,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords3/sproto_unpack",
+      "ns": 25.83,
+      "bytes": 24,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords7/before_unpack",
+      "ns": 40.61,
+      "bytes": 64,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords7/sproto_unpack",
+      "ns": 36.35,
+      "bytes": 64,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords8/before_unpack",
+      "ns": 42.72,
+      "bytes": 64,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords8/sproto_unpack",
+      "ns": 37.37,
+      "bytes": 64,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords9/before_unpack",
+      "ns": 45.53,
+      "bytes": 80,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords9/sproto_unpack",
+      "ns": 37.69,
+      "bytes": 80,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords15/before_unpack",
+      "ns": 67.76,
+      "bytes": 128,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords15/sproto_unpack",
+      "ns": 50.62,
+      "bytes": 128,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords16/before_unpack",
+      "ns": 76.91,
+      "bytes": 128,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords16/sproto_unpack",
+      "ns": 56.12,
+      "bytes": 128,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords17/before_unpack",
+      "ns": 78.94,
+      "bytes": 144,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords17/sproto_unpack",
+      "ns": 50.03,
+      "bytes": 144,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords63/before_unpack",
+      "ns": 251.3,
+      "bytes": 512,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords63/sproto_unpack",
+      "ns": 126.6,
+      "bytes": 512,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords64/before_unpack",
+      "ns": 257.2,
+      "bytes": 512,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords64/sproto_unpack",
+      "ns": 128.1,
+      "bytes": 512,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords65/before_unpack",
+      "ns": 270.2,
+      "bytes": 576,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords65/sproto_unpack",
+      "ns": 139.4,
+      "bytes": 576,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun1x64/before_unpack",
+      "ns": 1027.0,
+      "bytes": 1024,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun1x64/sproto_unpack",
+      "ns": 677.1,
+      "bytes": 1024,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun2x64/before_unpack",
+      "ns": 1456.0,
+      "bytes": 1536,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun2x64/sproto_unpack",
+      "ns": 1482.0,
+      "bytes": 1536,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun3x64/before_unpack",
+      "ns": 1997.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun3x64/sproto_unpack",
+      "ns": 1041.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun7x64/before_unpack",
+      "ns": 3793.0,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun7x64/sproto_unpack",
+      "ns": 1315.0,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun9x64/before_unpack",
+      "ns": 4498.0,
+      "bytes": 5376,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun9x64/sproto_unpack",
+      "ns": 1359.0,
+      "bytes": 5376,
+      "allocs": 1
+    }
+  ],
+  "summary": [
+    {
+      "operation": "BenchmarkPairedUnpackEcho/ascii32/before_frame",
+      "ns": 375.4,
+      "bytes": 256,
+      "allocs": 11
+    },
+    {
+      "operation": "BenchmarkPairedUnpackEcho/ascii32/before_payload",
+      "ns": 155.3,
+      "bytes": 112,
+      "allocs": 5
+    },
+    {
+      "operation": "BenchmarkPairedUnpackEcho/ascii32/protobuf_frame",
+      "ns": 252.6,
+      "bytes": 224,
+      "allocs": 4
+    },
+    {
+      "operation": "BenchmarkPairedUnpackEcho/ascii32/protobuf_payload",
+      "ns": 103.0,
+      "bytes": 96,
+      "allocs": 2
+    },
+    {
+      "operation": "BenchmarkPairedUnpackEcho/ascii32/sproto_frame",
+      "ns": 382.4,
+      "bytes": 256,
+      "allocs": 11
+    },
+    {
+      "operation": "BenchmarkPairedUnpackEcho/ascii32/sproto_payload",
+      "ns": 165.8,
+      "bytes": 112,
+      "allocs": 5
+    },
+    {
+      "operation": "BenchmarkPairedUnpackEcho/ascii4k/before_frame",
+      "ns": 1395.0,
+      "bytes": 9136,
+      "allocs": 11
+    },
+    {
+      "operation": "BenchmarkPairedUnpackEcho/ascii4k/before_payload",
+      "ns": 645.8,
+      "bytes": 4176,
+      "allocs": 5
+    },
+    {
+      "operation": "BenchmarkPairedUnpackEcho/ascii4k/protobuf_frame",
+      "ns": 1607.0,
+      "bytes": 9104,
+      "allocs": 4
+    },
+    {
+      "operation": "BenchmarkPairedUnpackEcho/ascii4k/protobuf_payload",
+      "ns": 1012.0,
+      "bytes": 4160,
+      "allocs": 2
+    },
+    {
+      "operation": "BenchmarkPairedUnpackEcho/ascii4k/sproto_frame",
+      "ns": 1382.0,
+      "bytes": 9136,
+      "allocs": 11
+    },
+    {
+      "operation": "BenchmarkPairedUnpackEcho/ascii4k/sproto_payload",
+      "ns": 692.5,
+      "bytes": 4176,
+      "allocs": 5
+    },
+    {
+      "operation": "BenchmarkPairedUnpackEcho/utf8_1k/before_frame",
+      "ns": 635.1,
+      "bytes": 2224,
+      "allocs": 11
+    },
+    {
+      "operation": "BenchmarkPairedUnpackEcho/utf8_1k/before_payload",
+      "ns": 284.1,
+      "bytes": 1104,
+      "allocs": 5
+    },
+    {
+      "operation": "BenchmarkPairedUnpackEcho/utf8_1k/protobuf_frame",
+      "ns": 1625.0,
+      "bytes": 2192,
+      "allocs": 4
+    },
+    {
+      "operation": "BenchmarkPairedUnpackEcho/utf8_1k/protobuf_payload",
+      "ns": 1364.0,
+      "bytes": 1088,
+      "allocs": 2
+    },
+    {
+      "operation": "BenchmarkPairedUnpackEcho/utf8_1k/sproto_frame",
+      "ns": 617.0,
+      "bytes": 2224,
+      "allocs": 11
+    },
+    {
+      "operation": "BenchmarkPairedUnpackEcho/utf8_1k/sproto_payload",
+      "ns": 274.2,
+      "bytes": 1104,
+      "allocs": 5
+    },
+    {
+      "operation": "BenchmarkPairedUnpackEcho/zeros4k/before_frame",
+      "ns": 2938.0,
+      "bytes": 9136,
+      "allocs": 11
+    },
+    {
+      "operation": "BenchmarkPairedUnpackEcho/zeros4k/before_payload",
+      "ns": 680.5,
+      "bytes": 4176,
+      "allocs": 5
+    },
+    {
+      "operation": "BenchmarkPairedUnpackEcho/zeros4k/protobuf_frame",
+      "ns": 1631.0,
+      "bytes": 9104,
+      "allocs": 4
+    },
+    {
+      "operation": "BenchmarkPairedUnpackEcho/zeros4k/protobuf_payload",
+      "ns": 999.3,
+      "bytes": 4160,
+      "allocs": 2
+    },
+    {
+      "operation": "BenchmarkPairedUnpackEcho/zeros4k/sproto_frame",
+      "ns": 1430.0,
+      "bytes": 9136,
+      "allocs": 11
+    },
+    {
+      "operation": "BenchmarkPairedUnpackEcho/zeros4k/sproto_payload",
+      "ns": 658.5,
+      "bytes": 4176,
+      "allocs": 5
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/FF512-sparse4096/before_unpack",
+      "ns": 4251.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/FF512-sparse4096/sproto_unpack",
+      "ns": 4291.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/ascii32/before_unpack",
+      "ns": 21.34,
+      "bytes": 32,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/ascii32/sproto_unpack",
+      "ns": 20.04,
+      "bytes": 32,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/ascii4096/before_unpack",
+      "ns": 549.7,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/ascii4096/sproto_unpack",
+      "ns": 517.3,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/ascii65536/before_unpack",
+      "ns": 7514.0,
+      "bytes": 65536,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/ascii65536/sproto_unpack",
+      "ns": 7058.0,
+      "bytes": 65536,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/nonzero1x256/before_unpack",
+      "ns": 1065.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/nonzero1x256/sproto_unpack",
+      "ns": 1089.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/nonzero2x256/before_unpack",
+      "ns": 1341.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/nonzero2x256/sproto_unpack",
+      "ns": 1387.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/nonzero3x256/before_unpack",
+      "ns": 1883.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/nonzero3x256/sproto_unpack",
+      "ns": 1683.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/nonzero4x256/before_unpack",
+      "ns": 2091.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/nonzero4x256/sproto_unpack",
+      "ns": 1954.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/nonzero5x256/before_unpack",
+      "ns": 2270.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/nonzero5x256/sproto_unpack",
+      "ns": 2198.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/nonzero6x256/before_unpack",
+      "ns": 2463.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/nonzero6x256/sproto_unpack",
+      "ns": 2504.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/nonzero7x256/before_unpack",
+      "ns": 2678.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/nonzero7x256/sproto_unpack",
+      "ns": 2813.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/random4096/before_unpack",
+      "ns": 537.6,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/random4096/sproto_unpack",
+      "ns": 535.5,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zero32/before_unpack",
+      "ns": 25.63,
+      "bytes": 32,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zero32/sproto_unpack",
+      "ns": 25.41,
+      "bytes": 32,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zero4096/before_unpack",
+      "ns": 1611.0,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zero4096/sproto_unpack",
+      "ns": 585.7,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zero65536/before_unpack",
+      "ns": 24114.0,
+      "bytes": 65536,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zero65536/sproto_unpack",
+      "ns": 7682.0,
+      "bytes": 65536,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun16x64/before_unpack",
+      "ns": 7524.0,
+      "bytes": 9472,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun16x64/sproto_unpack",
+      "ns": 2137.0,
+      "bytes": 9472,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun1x64/before_unpack",
+      "ns": 933.9,
+      "bytes": 1024,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun1x64/sproto_unpack",
+      "ns": 673.3,
+      "bytes": 1024,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun2x64/before_unpack",
+      "ns": 1448.0,
+      "bytes": 1536,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun2x64/sproto_unpack",
+      "ns": 1025.0,
+      "bytes": 1536,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun3x64/before_unpack",
+      "ns": 1997.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun3x64/sproto_unpack",
+      "ns": 1055.0,
+      "bytes": 2048,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun64x64/before_unpack",
+      "ns": 29143.0,
+      "bytes": 40960,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun64x64/sproto_unpack",
+      "ns": 5230.0,
+      "bytes": 40960,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun7x64/before_unpack",
+      "ns": 3793.0,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun7x64/sproto_unpack",
+      "ns": 1311.0,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun8x64/before_unpack",
+      "ns": 4086.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun8x64/sproto_unpack",
+      "ns": 1239.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun9x64/before_unpack",
+      "ns": 4590.0,
+      "bytes": 5376,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroRun9x64/sproto_unpack",
+      "ns": 1356.0,
+      "bytes": 5376,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords1/before_unpack",
+      "ns": 14.02,
+      "bytes": 8,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords1/sproto_unpack",
+      "ns": 15.49,
+      "bytes": 8,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords15/before_unpack",
+      "ns": 73.16,
+      "bytes": 128,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords15/sproto_unpack",
+      "ns": 54.76,
+      "bytes": 128,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords16/before_unpack",
+      "ns": 80.95,
+      "bytes": 128,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords16/sproto_unpack",
+      "ns": 60.88,
+      "bytes": 128,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords17/before_unpack",
+      "ns": 78.94,
+      "bytes": 144,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords17/sproto_unpack",
+      "ns": 50.03,
+      "bytes": 144,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords2/before_unpack",
+      "ns": 20.58,
+      "bytes": 16,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords2/sproto_unpack",
+      "ns": 20.56,
+      "bytes": 16,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords3/before_unpack",
+      "ns": 24.04,
+      "bytes": 24,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords3/sproto_unpack",
+      "ns": 24.62,
+      "bytes": 24,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords63/before_unpack",
+      "ns": 252.3,
+      "bytes": 512,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords63/sproto_unpack",
+      "ns": 124.4,
+      "bytes": 512,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords64/before_unpack",
+      "ns": 259.9,
+      "bytes": 512,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords64/sproto_unpack",
+      "ns": 128.1,
+      "bytes": 512,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords65/before_unpack",
+      "ns": 274.0,
+      "bytes": 576,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords65/sproto_unpack",
+      "ns": 139.4,
+      "bytes": 576,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords7/before_unpack",
+      "ns": 37.17,
+      "bytes": 64,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords7/sproto_unpack",
+      "ns": 34.79,
+      "bytes": 64,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords8/before_unpack",
+      "ns": 41.68,
+      "bytes": 64,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords8/sproto_unpack",
+      "ns": 37.37,
+      "bytes": 64,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords9/before_unpack",
+      "ns": 45.27,
+      "bytes": 80,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords9/sproto_unpack",
+      "ns": 39.51,
+      "bytes": 80,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpacking/addressbook/before_decode",
+      "ns": 1011.0,
+      "bytes": 528,
+      "allocs": 29
+    },
+    {
+      "operation": "BenchmarkPairedUnpacking/addressbook/before_pdecode",
+      "ns": 1218.0,
+      "bytes": 672,
+      "allocs": 30
+    },
+    {
+      "operation": "BenchmarkPairedUnpacking/addressbook/before_unpack",
+      "ns": 155.7,
+      "bytes": 144,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpacking/addressbook/protobuf_decode",
+      "ns": 831.0,
+      "bytes": 648,
+      "allocs": 26
+    },
+    {
+      "operation": "BenchmarkPairedUnpacking/addressbook/sproto_decode",
+      "ns": 1044.0,
+      "bytes": 528,
+      "allocs": 29
+    },
+    {
+      "operation": "BenchmarkPairedUnpacking/addressbook/sproto_pdecode",
+      "ns": 1218.0,
+      "bytes": 672,
+      "allocs": 30
+    },
+    {
+      "operation": "BenchmarkPairedUnpacking/addressbook/sproto_unpack",
+      "ns": 178.0,
+      "bytes": 144,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpacking/echo_ascii4k/before_decode",
+      "ns": 627.7,
+      "bytes": 4176,
+      "allocs": 5
+    },
+    {
+      "operation": "BenchmarkPairedUnpacking/echo_ascii4k/before_pdecode",
+      "ns": 1163.0,
+      "bytes": 9040,
+      "allocs": 6
+    },
+    {
+      "operation": "BenchmarkPairedUnpacking/echo_ascii4k/before_unpack",
+      "ns": 536.2,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpacking/echo_ascii4k/protobuf_decode",
+      "ns": 606.1,
+      "bytes": 4160,
+      "allocs": 3
+    },
+    {
+      "operation": "BenchmarkPairedUnpacking/echo_ascii4k/sproto_decode",
+      "ns": 628.1,
+      "bytes": 4176,
+      "allocs": 5
+    },
+    {
+      "operation": "BenchmarkPairedUnpacking/echo_ascii4k/sproto_pdecode",
+      "ns": 1199.0,
+      "bytes": 9040,
+      "allocs": 6
+    },
+    {
+      "operation": "BenchmarkPairedUnpacking/echo_ascii4k/sproto_unpack",
+      "ns": 524.5,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpacking/game_large/before_decode",
+      "ns": 17869.0,
+      "bytes": 10416,
+      "allocs": 532
+    },
+    {
+      "operation": "BenchmarkPairedUnpacking/game_large/before_pdecode",
+      "ns": 23732.0,
+      "bytes": 13872,
+      "allocs": 533
+    },
+    {
+      "operation": "BenchmarkPairedUnpacking/game_large/before_unpack",
+      "ns": 5099.0,
+      "bytes": 3456,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpacking/game_large/protobuf_decode",
+      "ns": 17846.0,
+      "bytes": 13560,
+      "allocs": 537
+    },
+    {
+      "operation": "BenchmarkPairedUnpacking/game_large/sproto_decode",
+      "ns": 17918.0,
+      "bytes": 10416,
+      "allocs": 532
+    },
+    {
+      "operation": "BenchmarkPairedUnpacking/game_large/sproto_pdecode",
+      "ns": 23572.0,
+      "bytes": 13872,
+      "allocs": 533
+    },
+    {
+      "operation": "BenchmarkPairedUnpacking/game_large/sproto_unpack",
+      "ns": 4998.0,
+      "bytes": 3456,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpacking/game_small/before_decode",
+      "ns": 1823.0,
+      "bytes": 1200,
+      "allocs": 52
+    },
+    {
+      "operation": "BenchmarkPairedUnpacking/game_small/before_pdecode",
+      "ns": 2337.0,
+      "bytes": 1552,
+      "allocs": 53
+    },
+    {
+      "operation": "BenchmarkPairedUnpacking/game_small/before_unpack",
+      "ns": 479.9,
+      "bytes": 352,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpacking/game_small/protobuf_decode",
+      "ns": 1630.0,
+      "bytes": 1208,
+      "allocs": 53
+    },
+    {
+      "operation": "BenchmarkPairedUnpacking/game_small/sproto_decode",
+      "ns": 1831.0,
+      "bytes": 1200,
+      "allocs": 52
+    },
+    {
+      "operation": "BenchmarkPairedUnpacking/game_small/sproto_pdecode",
+      "ns": 2332.0,
+      "bytes": 1552,
+      "allocs": 53
+    },
+    {
+      "operation": "BenchmarkPairedUnpacking/game_small/sproto_unpack",
+      "ns": 492.0,
+      "bytes": 352,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpacking/int32_edges/before_decode",
+      "ns": 2253.0,
+      "bytes": 8288,
+      "allocs": 4
+    },
+    {
+      "operation": "BenchmarkPairedUnpacking/int32_edges/before_pdecode",
+      "ns": 7674.0,
+      "bytes": 12384,
+      "allocs": 5
+    },
+    {
+      "operation": "BenchmarkPairedUnpacking/int32_edges/before_unpack",
+      "ns": 5372.0,
+      "bytes": 4096,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedUnpacking/int32_edges/protobuf_decode",
+      "ns": 4177.0,
+      "bytes": 4160,
+      "allocs": 2
+    },
+    {
+      "operation": "BenchmarkPairedUnpacking/int32_edges/sproto_decode",
+      "ns": 2266.0,
+      "bytes": 8288,
+      "allocs": 4
+    },
+    {
+      "operation": "BenchmarkPairedUnpacking/int32_edges/sproto_pdecode",
+      "ns": 8054.0,
+      "bytes": 12384,
+      "allocs": 5
+    },
+    {
+      "operation": "BenchmarkPairedUnpacking/int32_edges/sproto_unpack",
+      "ns": 5373.0,
+      "bytes": 4096,
+      "allocs": 1
+    }
+  ]
+}

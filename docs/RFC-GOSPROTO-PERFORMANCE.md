@@ -1,6 +1,6 @@
 # gosproto 后续性能优化方案
 
-状态：2026-10-16，GSR 正式依赖仍为 v0.4.0，后续独立库优化尚未发布。TS 长块和 Go 安全路径见 [首轮结果](benchmarks/2026-10-15-sproto-next/RESULTS.md)，数值 packing、字段查询及类型化构造见 [第二轮结果](benchmarks/2026-10-15-sproto-round2/RESULTS.md)。TS 优化阶段已在 GSR `9801808` 收尾，可迁移经验见 [TS → Go 优化经验](SPROTO-OPTIMIZATION-LESSONS.md)。编码执行层改进见第 9 节，大型 Encode 约 6.54 µs，同场 PB 7.59 µs。混合 word Pack 已本地提交为独立库 `7dc6713`、GSR `e9e1f74`，未推送；当前长 FF 有界搜索新增改动未提交，见第 11 节。公开 API、generator 与预算/所有权契约不变。
+状态：2026-10-16，GSR 正式依赖仍为 v0.4.0，后续独立库优化尚未发布。TS 长块和 Go 安全路径见 [首轮结果](benchmarks/2026-10-15-sproto-next/RESULTS.md)，数值 packing、字段查询及类型化构造见 [第二轮结果](benchmarks/2026-10-15-sproto-round2/RESULTS.md)。TS 优化阶段已在 GSR `9801808` 收尾，可迁移经验见 [TS → Go 优化经验](SPROTO-OPTIMIZATION-LESSONS.md)。编码执行层改进见第 9 节，大型 Encode 约 6.54 µs，同场 PB 7.59 µs。混合 word Pack 已本地提交为独立库 `7dc6713`、GSR `e9e1f74`，未推送；长 FF 有界搜索已本地提交为独立库 `07350a9`、GSR `3a78dbd`，见第 11 节。当前连续零 mask 解包新增改动未提交，见第 12 节。公开 API、generator 与预算/所有权契约不变。
 
 第三轮已完成当前基线与候选筛选，只保留调用内布局记录的内存收窄，独立库已本地提交为 `a579920`，GSR 记录提交为 `fdbc736`，均未推送/发布；未取得新的明显 CPU 加速。实测和取舍见 [第三轮结果](benchmarks/2026-10-16-gosproto-round3/RESULTS.md) 及第 8 节。
 
@@ -243,4 +243,12 @@ TS 经验提取已在 GSR `f45a8c6` 提交。Go 从 `6012b06` 重建两套主基
 
 最终 137 项 × 五轮：4 KiB ASCII Pack 2.075 → 0.5851 µs（-71.8%）、PEncode 2.682 → 1.142 µs（-57.4%），完整帧 3.352 → 1.906 µs（-43.1%）；UTF-8 帧 -34.2%。数值组合基本持平，部分小包 Pack 约 +5%，不是所有场景都加速。直接内嵌扫描、中间五轮及容量收窄等失败/未采用数据单独保留，不混用中位数。
 
-新增全部 mask 长输入的独立预期字节，17984 组差分、官方对照与完整库 race/checkptr、vet、有限 fuzz 通过。最终源码、接线、profile 和代价见 [FF 搜索结果](benchmarks/2026-10-16-gosproto-ffscan/RESULTS.md)。输入/输出和公开 API 不变，未扩大 unsafe。新增改动未提交/发布，不因字符串收益扩大为协议总体或跨平台结论。
+新增全部 mask 长输入的独立预期字节，17984 组差分、官方对照与完整库 race/checkptr、vet、有限 fuzz 通过。最终源码、接线、profile 和代价见 [FF 搜索结果](benchmarks/2026-10-16-gosproto-ffscan/RESULTS.md)。输入/输出和公开 API 不变，未扩大 unsafe。该切片已本地提交为独立库 `07350a9`、GSR `3a78dbd`，未发布；不因字符串收益扩大为协议总体或跨平台结论。
+
+## 12. 连续零 mask 的有界解包
+
+从 `07350a9` 重采 Unpack/PDecode profile，确认长零块仍消耗在逐 mask 预检和游标推进。两个连续零 mask 后按有效切片长度批量计数；预检 helper 的扫描范围由剩余输出预算加一个 mask 限制，超额在长度乘法及输出分配前拒绝。完整预检后仍按确切长度分配独占输出，零段批量推进；合并零、FF、普通分类，保留原错误优先级及 bounds check，不扩展 unsafe。
+
+最终同进程 129 项、五轮 645 样本：4 KiB 零块 Unpack 1.620 → 0.5839 µs，64 KiB 23.940 → 7.593 µs；4 KiB 零字节 Echo 完整帧 2.891 → 1.411 µs，同场 PB 1.595 µs。数值业务组合基本持平，AddressBook Unpack 增加约 16 ns（约 10%）、PDecode 增加约 19 ns（1.6%）；普通稀疏/ASCII 形态的约 5% 代价与失败候选分别保留，不宣称全面无回退。
+
+45824 组输入/预算差分、完整独立库 race/严格 checkptr/官方对照、vet、相关有限 fuzz，以及 GSR 三包和 Go/TS Plain/MAC 集成通过。Pack、Encoder、Decoder、RPC、元信息与 TS 生产源码冻结，分配次数和字节数不变。源码指纹、原始样本、profile、复现及未验证范围见 [解包结果](benchmarks/2026-10-16-gosproto-zero-unpack/RESULTS.md)。本轮新增改动未提交/发布，正式依赖仍为 v0.4.0。
