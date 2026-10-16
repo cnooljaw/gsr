@@ -725,13 +725,7 @@ class Sproto {
 		return this.decode(typename, this.unpackBuffered(buffer));
 	}
 
-	pack_seg(source, sourceIndex, output, outputIndex, ffCount) {
-		if (ffCount > 0) {
-			const low = source.readUInt32LE(sourceIndex);
-			const high = source.readUInt32LE(sourceIndex + 4);
-			if (((low - 0x01010101) & ~low & 0x80808080) === 0
-				&& ((high - 0x01010101) & ~high & 0x80808080) === 0) return 8;
-		}
+	pack_seg(source, sourceIndex, output, outputIndex) {
 		let count = 0, mask = 0;
 		const value0 = source[sourceIndex + 0];
 		if (value0 !== 0) { output[outputIndex + ++count] = value0; mask |= 1; }
@@ -749,7 +743,6 @@ class Sproto {
 		if (value6 !== 0) { output[outputIndex + ++count] = value6; mask |= 64; }
 		const value7 = source[sourceIndex + 7];
 		if (value7 !== 0) { output[outputIndex + ++count] = value7; mask |= 128; }
-		if (ffCount > 0 && count >= 6) return 8;
 		if (count === 8) return 10;
 		output[outputIndex] = mask;
 		return count + 1;
@@ -765,13 +758,12 @@ class Sproto {
 	}
 
 	// 最后不足八字节的 word 隐含补零，不为最多七个字节另分配临时 Buffer。
-	private packTail(source, start, output, destination, ffCount) {
+	private packTail(source, start, output, destination) {
 		let count = 0, mask = 0;
 		for (let index = 0; index < source.length - start; index++) {
 			const value = source[start + index];
 			if (value !== 0) { output[destination + ++count] = value; mask |= 1 << index; }
 		}
-		if (ffCount > 0 && count >= 6) return 8;
 		output[destination] = mask;
 		return count + 1;
 	}
@@ -793,9 +785,16 @@ class Sproto {
 
 			let n = 0;
 			n = i + 8 <= srcsz
-				? this.pack_seg(buffer, srcidx, dstbuffer, dstidx, ff_n)
-				: this.packTail(buffer, srcidx, dstbuffer, dstidx, ff_n);
+				? this.pack_seg(buffer, srcidx, dstbuffer, dstidx)
+				: this.packTail(buffer, srcidx, dstbuffer, dstidx);
+			// FF 合并规则集中在段状态所在处，逐 word 写出只负责 mask 和非零字节。
+			if (ff_n > 0 && n >= 7) n = 8;
 			dstsz -= n;
+			// 普通混合 word 不参与 FF 收尾和长零段扫描。
+			if (n < 10 && n > 1 && ff_n === 0) {
+				dstidx += n;
+				continue;
+			}
 
 			if (n === 10) {
 				ff_srcstart = srcidx;

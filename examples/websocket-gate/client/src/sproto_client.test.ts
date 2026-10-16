@@ -153,6 +153,30 @@ test("Sproto pending and packet limits", () => {
     }
     assert.deepEqual(codec.pack(raw), Buffer.concat(blocks), `FF length ${length}`);
   }
+  // 六/七个非零字节只在 FF 段内合并；遇到五个或达到 256 word 后恢复普通 mask。
+  const fullWord = Buffer.alloc(8, 0x80);
+  const sparseWord = Buffer.from([1, 2, 3, 4, 5, 0, 0, 0]);
+  for (let mask = 0; mask < 256; mask++) {
+    const count = mask.toString(2).replaceAll("0", "").length;
+    if (count !== 6 && count !== 7) continue;
+    const word = Buffer.alloc(8);
+    for (let index = 0; index < 8; index++) if (mask & (1 << index)) word[index] = 0xff;
+    const raw = Buffer.concat([fullWord, word, sparseWord]);
+    assert.deepEqual(codec.pack(raw), Buffer.concat([
+      Buffer.from([255, 1]), fullWord, word, Buffer.from([31, 1, 2, 3, 4, 5]),
+    ]), `FF join mask ${mask}`);
+  }
+  for (const count of [6, 7]) {
+    const tail = Buffer.alloc(count, 0x80);
+    const padded = Buffer.alloc(8); tail.copy(padded);
+    assert.deepEqual(codec.pack(Buffer.concat([fullWord, tail])), Buffer.concat([
+      Buffer.from([255, 1]), fullWord, padded,
+    ]));
+    const prefix = Buffer.alloc(255 * 8, 0x80);
+    assert.deepEqual(codec.pack(Buffer.concat([prefix, padded, padded])), Buffer.concat([
+      Buffer.from([255, 255]), prefix, padded, Buffer.from([(1 << count) - 1]), tail,
+    ]));
+  }
   for (const raw of [
     Buffer.alloc(4096),
     Buffer.concat([Buffer.alloc(4096), Buffer.alloc(2048, 1)]),

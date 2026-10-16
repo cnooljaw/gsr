@@ -82,6 +82,8 @@ go get github.com/cnooljaw/gosproto@v0.4.0
 
 第三轮已提交为 `72fc11a`。第四轮继续按四个零头展开解包计数，保持资源与所有权检查；4 KiB 零字节原生 RPC 解码耗时约减少 21%，公开 4–64 KiB 零块解包约减少 30%–45%。同时修正 Echo 基准为 PB/SP 共享同一份预构造文本，避免 V8 字符串内部表示差异混入编码对照；历史数据保留，早期 Echo 编码百分比需谨慎解读。新增短零段混合形态后，完整同进程 222 项、1110 个样本及验证结果见 [第四轮验收](benchmarks/2026-10-15-sproto-round4/RESULTS.md)。未修改 Go 或生产 Pack。
 
+第四轮已提交为 `d9655b8`。第五轮先分析 Pack 的 mask/非零字节分布，再集中 FF 合并状态、缩短普通混合 word 路径；大型游戏和整数数组 Pack 约快 7.3%/4.9%。公开/私有解包省略视图的候选因形态回退未保留，输出与预算契约不变。完整 250 项逐操作配对采样、14 种 Pack/46 种 Unpack 形态及独立 profile 见 [第五轮验收](benchmarks/2026-10-15-sproto-round5/RESULTS.md)。本轮未修改 Go 依赖，未推送或发布。
+
 ## 独立修复库与官方对照（2026-10-15）
 
 [cnooljaw/gosproto v0.2.0](https://github.com/cnooljaw/gosproto/releases/tag/v0.2.0) 基于 xjdrew v0.1.0，保留上游历史与 MIT 许可证，自己的 module 路径和标签避免给业务项目传播 replace。标准库没有 Sproto 实现，使用这个依赖专门解决原生编解码与 pack/unpack，不引入通用协议框架或运行时 C/Lua。

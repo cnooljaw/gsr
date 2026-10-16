@@ -56,6 +56,32 @@ for (const prefix of [64, 512, 4096, 16384]) {
   unpackShapes.push({ name: `zero${prefix}-ascii4096`, raw: Buffer.concat([Buffer.alloc(prefix), Buffer.alloc(4096, 127)]) });
 }
 const referenceShapes = new Map();
+// Pack 不按业务类型特判，另测非零字节密度、短包和 FF 中六/七字节 word 的转换。
+const packShapes = unpackShapes.filter(({ name }) =>
+  ["ascii32", "zero32", "ascii4096", "zero4096", "sparse4096"].includes(name));
+for (let count = 1; count <= 7; count++) {
+  const raw = Buffer.alloc(2048);
+  for (let word = 0; word < 256; word++) {
+    for (let index = 0; index < 8; index++) {
+      if ((index + word) % 8 < count) raw[word * 8 + index] = ((word * 17 + index * 31) & 255) || 128;
+    }
+  }
+  packShapes.push({ name: `nonzero${count}x256`, raw });
+}
+const randomRaw = Buffer.alloc(4096);
+let seed = 12;
+for (let index = 0; index < randomRaw.length; index++) {
+  seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+  randomRaw[index] = seed >>> 24;
+}
+packShapes.push({ name: "random4096", raw: randomRaw });
+const ffMixed = Buffer.alloc(771 * 8);
+for (let word = 0; word < 771; word++) {
+  const count = word % 257 === 0 ? 8 : word % 2 === 0 ? 6 : 7;
+  ffMixed.fill(0x80, word * 8, word * 8 + count);
+}
+packShapes.push({ name: "FF-mixed6-7", raw: ffMixed });
+const referencePackShapes = new Map();
 const hash = bytes => createHash("sha256").update(bytes).digest("hex");
 const startedAt = new Date().toISOString(), startLoad = loadavg();
 // PB 与 SP 交错采样；原生组合入口和历史分阶段组合分别保留。
@@ -142,8 +168,20 @@ for (const [version, modulePath] of variants) {
     operations.push({ name: `unpack_shape/${name}`, version,
       run: () => shapeCodec.unpack(packed), samples: [] });
   }
+  for (const { name, raw } of packShapes) {
+    const packed = shapeCodec.pack(raw);
+    if (!referencePackShapes.has(name)) referencePackShapes.set(name, packed);
+    assert.deepEqual(packed, referencePackShapes.get(name));
+    assert.deepEqual(shapeCodec.unpack(packed), raw);
+    operations.push({ name: `pack_shape/${name}`, version,
+      run: () => shapeCodec.pack(raw), samples: [] });
+  }
 }
 let sink;
+// 同一操作的 PB/SP 前后版本紧邻计时，避免整个版本分组带来的时间和 GC 偏差。
+// 每个奇数轮再反转，平衡版本在配对中的先后顺序。
+const versionOrder = { protobuf: 0, before: 1, after: 2 };
+operations.sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : versionOrder[a.version] - versionOrder[b.version]);
 function batch(operation, iterations) {
   const start = performance.now();
   for (let index = 0; index < iterations; index++) sink = operation.run();
@@ -171,8 +209,11 @@ writeFileSync(resolve(output, "typescript.json"), JSON.stringify({
   scriptSha256: hash(readFileSync(fileURLToPath(import.meta.url))),
   unpackShapes: unpackShapes.map(({ name, raw }) => ({ name, rawBytes: raw.length,
     packedBytes: referenceShapes.get(name).length, rawSha256: hash(raw), packedSha256: hash(referenceShapes.get(name)) })),
+  packShapes: packShapes.map(({ name, raw }) => ({ name, rawBytes: raw.length,
+    packedBytes: referencePackShapes.get(name).length, rawSha256: hash(raw), packedSha256: hash(referencePackShapes.get(name)) })),
   rounds: 5, targetMilliseconds: 100, sources,
   echoInputsShared: true,
+  samplingOrder: "operation-name, protobuf/before/after; reverse on odd rounds",
   results: operations.map(({ name, version, iterations, samples }) => ({
     name, version, iterations, samples, nsPerOp: [...samples].sort((a, b) => a - b)[2],
   })),
