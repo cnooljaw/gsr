@@ -1,0 +1,45 @@
+goos: darwin
+goarch: arm64
+pkg: github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks
+cpu: Apple M2
+BenchmarkRepresentativeCodec/addressbook/protobuf_encode         	  444561	       353.1 ns/op	      80 B/op	       1 allocs/op
+BenchmarkRepresentativeCodec/addressbook/protobuf_decode         	  201164	      1005 ns/op	     648 B/op	      26 allocs/op
+BenchmarkRepresentativeCodec/addressbook/sproto_encode           	  373246	       588.8 ns/op	     144 B/op	       1 allocs/op
+BenchmarkRepresentativeCodec/addressbook/sproto_decode           	  181089	      1028 ns/op	     528 B/op	      29 allocs/op
+BenchmarkRepresentativeCodec/addressbook/sproto_pack             	 1000000	       180.7 ns/op	     144 B/op	       1 allocs/op
+BenchmarkRepresentativeCodec/addressbook/sproto_unpack           	 1000000	       397.8 ns/op	     144 B/op	       1 allocs/op
+BenchmarkRepresentativeCodec/addressbook/sproto_pencode          	  194728	       850.8 ns/op	     288 B/op	       2 allocs/op
+BenchmarkRepresentativeCodec/addressbook/sproto_pdecode          	  119372	      1433 ns/op	     672 B/op	      30 allocs/op
+BenchmarkRepresentativeCodec/game_small/protobuf_encode          	  268458	       819.1 ns/op	     192 B/op	       1 allocs/op
+BenchmarkRepresentativeCodec/game_small/protobuf_decode          	   83136	      2003 ns/op	    1208 B/op	      53 allocs/op
+BenchmarkRepresentativeCodec/game_small/sproto_encode            	  158799	      1136 ns/op	     352 B/op	       1 allocs/op
+BenchmarkRepresentativeCodec/game_small/sproto_decode            	   69277	      4062 ns/op	    1200 B/op	      52 allocs/op
+BenchmarkRepresentativeCodec/game_small/sproto_pack              	  513496	       436.6 ns/op	     352 B/op	       1 allocs/op
+BenchmarkRepresentativeCodec/game_small/sproto_unpack            	  416344	       503.2 ns/op	     352 B/op	       1 allocs/op
+BenchmarkRepresentativeCodec/game_small/sproto_pencode           	  141793	      1248 ns/op	     704 B/op	       2 allocs/op
+BenchmarkRepresentativeCodec/game_small/sproto_pdecode           	   73482	      3010 ns/op	    1552 B/op	      53 allocs/op
+BenchmarkRepresentativeCodec/game_large/protobuf_encode          	   23294	      8346 ns/op	    2304 B/op	       1 allocs/op
+BenchmarkRepresentativeCodec/game_large/protobuf_decode          	    6985	     26694 ns/op	   13560 B/op	     537 allocs/op
+BenchmarkRepresentativeCodec/game_large/sproto_encode            	   16516	     13591 ns/op	    3968 B/op	       2 allocs/op
+BenchmarkRepresentativeCodec/game_large/sproto_decode            	   10000	     18951 ns/op	   10416 B/op	     532 allocs/op
+BenchmarkRepresentativeCodec/game_large/sproto_pack              	   51972	      3930 ns/op	    3456 B/op	       1 allocs/op
+BenchmarkRepresentativeCodec/game_large/sproto_unpack            	   32395	      5295 ns/op	    3456 B/op	       1 allocs/op
+BenchmarkRepresentativeCodec/game_large/sproto_pencode           	   15038	     11754 ns/op	    7424 B/op	       3 allocs/op
+BenchmarkRepresentativeCodec/game_large/sproto_pdecode           	    8914	     23886 ns/op	   13872 B/op	     533 allocs/op
+BenchmarkRepresentativeCodec/int32_edges/protobuf_encode         	   37875	      5003 ns/op	    2688 B/op	       1 allocs/op
+BenchmarkRepresentativeCodec/int32_edges/protobuf_decode         	   41994	      4552 ns/op	    4160 B/op	       2 allocs/op
+BenchmarkRepresentativeCodec/int32_edges/sproto_encode           	   76044	      2269 ns/op	    4096 B/op	       1 allocs/op
+BenchmarkRepresentativeCodec/int32_edges/sproto_decode           	   78094	      2928 ns/op	    8288 B/op	       4 allocs/op
+BenchmarkRepresentativeCodec/int32_edges/sproto_pack             	   46981	      4507 ns/op	    4096 B/op	       1 allocs/op
+BenchmarkRepresentativeCodec/int32_edges/sproto_unpack           	   33925	      5297 ns/op	    4096 B/op	       1 allocs/op
+BenchmarkRepresentativeCodec/int32_edges/sproto_pencode          	   30519	      5623 ns/op	    8192 B/op	       2 allocs/op
+BenchmarkRepresentativeCodec/int32_edges/sproto_pdecode          	   23086	      8499 ns/op	   12384 B/op	       5 allocs/op
+BenchmarkRepresentativeCodec/echo_ascii4k/protobuf_encode        	  197920	       820.0 ns/op	    4864 B/op	       1 allocs/op
+BenchmarkRepresentativeCodec/echo_ascii4k/protobuf_decode        	  253861	       746.1 ns/op	    4160 B/op	       3 allocs/op
+BenchmarkRepresentativeCodec/echo_ascii4k/sproto_encode          	  182571	       887.0 ns/op	    4864 B/op	       1 allocs/op
+BenchmarkRepresentativeCodec/echo_ascii4k/sproto_decode          	  259848	       669.3 ns/op	    4176 B/op	       5 allocs/op
+BenchmarkRepresentativeCodec/echo_ascii4k/sproto_pack            	   87100	      2038 ns/op	    4864 B/op	       1 allocs/op
+BenchmarkRepresentativeCodec/echo_ascii4k/sproto_unpack          	  340652	       673.9 ns/op	    4864 B/op	       1 allocs/op
+BenchmarkRepresentativeCodec/echo_ascii4k/sproto_pencode         	   68767	      3099 ns/op	    9728 B/op	       2 allocs/op
+BenchmarkRepresentativeCodec/echo_ascii4k/sproto_pdecode         	  130510	      1323 ns/op	    9040 B/op	       6 allocs/op
+PASS

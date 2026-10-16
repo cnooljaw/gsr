@@ -34,6 +34,8 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 
 ## 报告
 
+[大型结构体 Encoder 字段绑定](../../../docs/benchmarks/2026-10-16-gosproto-encoder/RESULTS.md) 保存原生 `*int64` 只读 offset 访问的完整 Go 主矩阵、同进程专项、候选回退与平台范围。大型 Encode 同进程 14.345 → 8.456 µs，同次 PB 7.863 µs；分配不变，少数小 body 有固定开销，正式依赖仍为 v0.4.0。复现脚本仅在忽略目录建立新旧库并列的临时测试模块，不改生产依赖。
+
 [Go 当前基线与第三轮筛选](../../../docs/benchmarks/2026-10-16-gosproto-round3/RESULTS.md) 从 gosproto `6012b06` 重新采样；保留布局记录的内存收窄，解包展开/窗口和原生指针赋值候选未采用。完整主套件、配对复核、profile 与失败值分别记录，TS 实现冻结，正式 Go 依赖仍为 v0.4.0。
 
 [数值 packing、字段查询与类型化构造](../../../docs/benchmarks/2026-10-15-sproto-round2/RESULTS.md) 是第二轮结果；保留与首轮及正式 v0.4.0 的对照。原有两套基准不改变调用方式，实际 pencode/attach 的缓冲融合收益单独测量。

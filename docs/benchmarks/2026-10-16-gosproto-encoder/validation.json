@@ -1,0 +1,140 @@
+{
+  "commands": [
+    {
+      "name": "vet",
+      "args": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "seconds": 0.606577125377953,
+      "exitCode": 0,
+      "extraEnv": {}
+    },
+    {
+      "name": "fuzz-codec",
+      "args": [
+        "go",
+        "test",
+        "-run=^$",
+        "-fuzz=^FuzzCodecRoundTrip$",
+        "-fuzztime=10s",
+        "-parallel=2",
+        "-timeout=45s"
+      ],
+      "seconds": 11.474413624964654,
+      "exitCode": 0,
+      "extraEnv": {}
+    },
+    {
+      "name": "fuzz-decode",
+      "args": [
+        "go",
+        "test",
+        "-run=^$",
+        "-fuzz=^FuzzDecode$",
+        "-fuzztime=10s",
+        "-parallel=2",
+        "-timeout=45s"
+      ],
+      "seconds": 11.444335999898612,
+      "exitCode": 0,
+      "extraEnv": {}
+    },
+    {
+      "name": "gsr-packages",
+      "args": [
+        "go",
+        "test",
+        "-modfile=/private/tmp/gsr-next-codec.mod",
+        "./protocol/sproto",
+        "./examples/websocket-gate/cmd/debugserver",
+        "./examples/websocket-gate/benchmarks",
+        "-timeout=2m"
+      ],
+      "seconds": 1.848629292100668,
+      "exitCode": 0,
+      "extraEnv": {}
+    },
+    {
+      "name": "go-ts-integration",
+      "args": [
+        "npm",
+        "--prefix",
+        "examples/websocket-gate",
+        "run",
+        "test:sproto:integration"
+      ],
+      "seconds": 2.83048745803535,
+      "exitCode": 0,
+      "extraEnv": {
+        "GOFLAGS": "-modfile=/private/tmp/gsr-next-codec.mod"
+      }
+    },
+    {
+      "name": "linux-386-compile",
+      "args": [
+        "go",
+        "test",
+        "-c",
+        "-o",
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-encoder/linux-386.test",
+        "."
+      ],
+      "seconds": 4.341155707836151,
+      "exitCode": 1,
+      "extraEnv": {
+        "GOOS": "linux",
+        "GOARCH": "386",
+        "CGO_ENABLED": "0"
+      }
+    },
+    {
+      "name": "baseline-linux-386-test-compile",
+      "args": [
+        "go",
+        "test",
+        "-c",
+        "-o",
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-encoder/baseline-linux-386.test",
+        "."
+      ],
+      "seconds": 0.34328870847821236,
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "GOARCH": "386"
+    },
+    {
+      "name": "linux-386-library-build",
+      "args": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "seconds": 0.4098431244492531,
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "GOARCH": "386"
+    },
+    {
+      "name": "linux-amd64-compile",
+      "args": [
+        "go",
+        "test",
+        "-c",
+        "-o",
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-encoder/linux-amd64.test",
+        "."
+      ],
+      "seconds": 6.687177125364542,
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "GOARCH": "amd64"
+    }
+  ],
+  "alreadyPassed": {
+    "command": "SPROTO_ORACLE_DIR=/private/tmp/gsr-official-sproto-review GOMAXPROCS=2 go test -race -gcflags=all=-d=checkptr=2 ./... -timeout=2m",
+    "packageSeconds": 2.292,
+    "exitCode": 0
+  }
+}

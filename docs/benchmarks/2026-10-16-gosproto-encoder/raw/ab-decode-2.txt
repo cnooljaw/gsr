@@ -1,0 +1,14 @@
+goos: darwin
+goarch: arm64
+pkg: encoderbench
+cpu: Apple M2
+BenchmarkPairedDecode/addressbook/before_pdecode         	   60000	      1187 ns/op	     672 B/op	      30 allocs/op
+BenchmarkPairedDecode/addressbook/protobuf_decode        	   60000	       822.7 ns/op	     648 B/op	      26 allocs/op
+BenchmarkPairedDecode/addressbook/sproto_pdecode         	   60000	      1205 ns/op	     672 B/op	      30 allocs/op
+BenchmarkPairedDecode/ascii4k/before_payload             	   60000	       651.5 ns/op	    4176 B/op	       5 allocs/op
+BenchmarkPairedDecode/ascii4k/sproto_payload             	   60000	       630.9 ns/op	    4176 B/op	       5 allocs/op
+BenchmarkPairedDecode/ascii4k/protobuf_payload           	   60000	       959.1 ns/op	    4160 B/op	       2 allocs/op
+BenchmarkPairedDecode/ascii4k/before_frame               	   60000	      1563 ns/op	    9136 B/op	      11 allocs/op
+BenchmarkPairedDecode/ascii4k/sproto_frame               	   60000	      1377 ns/op	    9136 B/op	      11 allocs/op
+BenchmarkPairedDecode/ascii4k/protobuf_frame             	   60000	      1692 ns/op	    9104 B/op	       4 allocs/op
+PASS

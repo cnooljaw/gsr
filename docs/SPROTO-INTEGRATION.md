@@ -86,7 +86,9 @@ go get github.com/cnooljaw/gosproto@v0.4.0
 
 2026-10-16，TS 性能阶段以提交 `9801808` 收尾，后续重点转向 gosproto。经验与适用边界见 [TS → Go 优化经验](SPROTO-OPTIMIZATION-LESSONS.md)。Go 下一轮从独立库已提交的 `6012b06` 做增量，先重建当前基线/profile，不将正式 v0.4.0 或 TS 数据冒充当前 Go 结果；执行入口见 [Go 性能方案](RFC-GOSPROTO-PERFORMANCE.md#7-ts-阶段收尾后的-go-增量入口)。
 
-Go 第三轮已重建基线并筛选候选：仅保留布局记录内存收窄，大型消息 Encode/PEncode 各减少 512 B/op，未取得明显 CPU 加速。解包与原生指针赋值候选未合入；正式依赖未升级，改动仍在独立库未发布工作树。验证、数据与复现见 [第三轮报告](benchmarks/2026-10-16-gosproto-round3/RESULTS.md)。
+Go 第三轮已重建基线并筛选候选：仅保留布局记录内存收窄，大型消息 Encode/PEncode 各减少 512 B/op，未取得明显 CPU 加速。解包与原生指针赋值候选未合入；正式依赖未升级，独立库已本地提交为 `a579920`、GSR 记录为 `fdbc736`，均未推送/发布。验证、数据与复现见 [第三轮报告](benchmarks/2026-10-16-gosproto-round3/RESULTS.md)。
+
+大型 Encode 优化随后按用户同意实施：原生 `*int64` 使用受控只读字段绑定，命名类型等保留反射；预算、wire 与所有权不变。同进程大型 Encode 14.345 → 8.456 µs，仍比同次 PB 慢约 7.5%。独立库和 GSR 临时接线验证通过，正式依赖仍未升级；改动留在工作树供审查，见 [实施结果](benchmarks/2026-10-16-gosproto-encoder/RESULTS.md)。
 
 ## 独立修复库与官方对照（2026-10-15）
 

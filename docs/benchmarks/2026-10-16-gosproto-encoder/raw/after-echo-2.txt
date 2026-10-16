@@ -1,0 +1,37 @@
+goos: darwin
+goarch: arm64
+pkg: github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks
+cpu: Apple M2
+BenchmarkProtocolCodec/ascii32/protobuf_payload/encode         	 2701196	        67.68 ns/op	 472.79 MB/s	      48 B/op	       1 allocs/op
+BenchmarkProtocolCodec/ascii32/protobuf_payload/decode         	 1674382	       119.9 ns/op	 266.89 MB/s	      96 B/op	       2 allocs/op
+BenchmarkProtocolCodec/ascii32/sproto_payload/encode           	 1571563	       105.6 ns/op	 303.12 MB/s	      48 B/op	       1 allocs/op
+BenchmarkProtocolCodec/ascii32/sproto_payload/decode           	 1000000	       187.1 ns/op	 171.04 MB/s	     112 B/op	       5 allocs/op
+BenchmarkProtocolCodec/ascii32/protobuf_frame/encode           	  733608	       325.1 ns/op	  98.43 MB/s	     176 B/op	       3 allocs/op
+BenchmarkProtocolCodec/ascii32/protobuf_frame/decode           	  582607	       270.7 ns/op	 118.22 MB/s	     224 B/op	       4 allocs/op
+BenchmarkProtocolCodec/ascii32/sproto_frame/encode             	  572655	       329.3 ns/op	  97.17 MB/s	     184 B/op	       5 allocs/op
+BenchmarkProtocolCodec/ascii32/sproto_frame/decode             	  400047	       425.5 ns/op	  75.20 MB/s	     256 B/op	      11 allocs/op
+BenchmarkProtocolCodec/utf8_1k/protobuf_payload/encode         	  121704	      1543 ns/op	 647.92 MB/s	    1024 B/op	       1 allocs/op
+BenchmarkProtocolCodec/utf8_1k/protobuf_payload/decode         	  102451	      1600 ns/op	 624.97 MB/s	    1088 B/op	       2 allocs/op
+BenchmarkProtocolCodec/utf8_1k/sproto_payload/encode           	  735444	       249.8 ns/op	4003.71 MB/s	    1024 B/op	       1 allocs/op
+BenchmarkProtocolCodec/utf8_1k/sproto_payload/decode           	  607628	       420.8 ns/op	2376.15 MB/s	    1104 B/op	       5 allocs/op
+BenchmarkProtocolCodec/utf8_1k/protobuf_frame/encode           	  113898	      1568 ns/op	 637.71 MB/s	    2128 B/op	       3 allocs/op
+BenchmarkProtocolCodec/utf8_1k/protobuf_frame/decode           	  105676	      5213 ns/op	 191.81 MB/s	    2192 B/op	       4 allocs/op
+BenchmarkProtocolCodec/utf8_1k/sproto_frame/encode             	  136568	      1701 ns/op	 587.80 MB/s	    3096 B/op	       5 allocs/op
+BenchmarkProtocolCodec/utf8_1k/sproto_frame/decode             	  272221	       717.6 ns/op	1393.57 MB/s	    2224 B/op	      11 allocs/op
+BenchmarkProtocolCodec/ascii4k/protobuf_payload/encode         	  171031	      1013 ns/op	4041.70 MB/s	    4864 B/op	       1 allocs/op
+BenchmarkProtocolCodec/ascii4k/protobuf_payload/decode         	  163561	      1194 ns/op	3431.62 MB/s	    4160 B/op	       2 allocs/op
+BenchmarkProtocolCodec/ascii4k/sproto_payload/encode           	  287068	       614.6 ns/op	6664.78 MB/s	    4864 B/op	       1 allocs/op
+BenchmarkProtocolCodec/ascii4k/sproto_payload/decode           	  284167	       932.0 ns/op	4395.04 MB/s	    4176 B/op	       5 allocs/op
+BenchmarkProtocolCodec/ascii4k/protobuf_frame/encode           	  112334	      1502 ns/op	2727.41 MB/s	    9808 B/op	       3 allocs/op
+BenchmarkProtocolCodec/ascii4k/protobuf_frame/decode           	   97099	      1960 ns/op	2090.22 MB/s	    9104 B/op	       4 allocs/op
+BenchmarkProtocolCodec/ascii4k/sproto_frame/encode             	   46948	      3379 ns/op	1212.37 MB/s	   14616 B/op	       5 allocs/op
+BenchmarkProtocolCodec/ascii4k/sproto_frame/decode             	  121958	      1400 ns/op	2925.32 MB/s	    9136 B/op	      11 allocs/op
+BenchmarkProtocolCodec/zeros4k/protobuf_payload/encode         	  200452	      1180 ns/op	3470.08 MB/s	    4864 B/op	       1 allocs/op
+BenchmarkProtocolCodec/zeros4k/protobuf_payload/decode         	  173223	      1048 ns/op	3907.29 MB/s	    4160 B/op	       2 allocs/op
+BenchmarkProtocolCodec/zeros4k/sproto_payload/encode           	  293493	       720.1 ns/op	5688.24 MB/s	    4864 B/op	       1 allocs/op
+BenchmarkProtocolCodec/zeros4k/sproto_payload/decode           	  277930	      1009 ns/op	4060.93 MB/s	    4176 B/op	       5 allocs/op
+BenchmarkProtocolCodec/zeros4k/protobuf_frame/encode           	  104533	      2653 ns/op	1543.84 MB/s	    9808 B/op	       3 allocs/op
+BenchmarkProtocolCodec/zeros4k/protobuf_frame/decode           	   85120	      2270 ns/op	1804.13 MB/s	    9104 B/op	       4 allocs/op
+BenchmarkProtocolCodec/zeros4k/sproto_frame/encode             	   37956	      4823 ns/op	 849.28 MB/s	   14616 B/op	       5 allocs/op
+BenchmarkProtocolCodec/zeros4k/sproto_frame/decode             	   60104	      2892 ns/op	1416.48 MB/s	    9136 B/op	      11 allocs/op
+PASS
