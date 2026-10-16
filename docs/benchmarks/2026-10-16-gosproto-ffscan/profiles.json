@@ -1,0 +1,110 @@
+[
+  {
+    "label": "before",
+    "operation": "before_pack",
+    "commands": [
+      [
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-prefix/run/direct.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkPairedPacking$/^echo_ascii4k$/^before_pack$",
+        "-test.benchtime=2s",
+        "-test.cpuprofile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-prefix/before-ascii4k-before_pack.pprof",
+        "-test.timeout=30s"
+      ],
+      [
+        "go",
+        "tool",
+        "pprof",
+        "-top",
+        "-nodecount=20",
+        "-relative_percentages",
+        "-focus=github.com/cnooljaw/gosproto-before",
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-prefix/run/direct.test",
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-prefix/before-ascii4k-before_pack.pprof"
+      ]
+    ],
+    "benchmark": "goos: darwin\ngoarch: arm64\npkg: encoderbench\ncpu: Apple M2\nBenchmarkPairedPacking/echo_ascii4k/before_pack         \t 1000000\t      2658 ns/op\t    4864 B/op\t       1 allocs/op\nPASS\n",
+    "top": "File: direct.test\nType: cpu\nTime: 2026-10-16 14:28:36 CST\nDuration: 2.83s, Total samples = 1.33s (47.08%)\nActive filters:\n   focus=github.com/cnooljaw/gosproto-before\nShowing nodes accounting for 1.32s, 99.25% of 1.33s total\nShowing top 20 nodes out of 56\n      flat  flat%   sum%        cum   cum%\n     0.90s 67.67% 67.67%      1.33s   100%  github.com/cnooljaw/gosproto-before.Pack\n     0.08s  6.02% 73.68%      0.08s  6.02%  runtime.memmove\n     0.07s  5.26% 78.95%      0.21s 15.79%  runtime.scanobject\n     0.06s  4.51% 83.46%      0.06s  4.51%  runtime.findObject\n     0.05s  3.76% 87.22%      0.08s  6.02%  runtime.typePointers.next\n     0.02s  1.50% 88.72%      0.02s  1.50%  runtime.greyobject\n     0.01s  0.75% 89.47%      0.09s  6.77%  github.com/cnooljaw/gosproto-before.writeFF (inline)\n     0.01s  0.75% 90.23%      0.01s  0.75%  internal/runtime/atomic.(*UnsafePointer).Load (inline)\n     0.01s  0.75% 90.98%      0.01s  0.75%  runtime.(*mspan).countAlloc (inline)\n     0.01s  0.75% 91.73%      0.01s  0.75%  runtime.(*pageCache).allocN\n     0.01s  0.75% 92.48%      0.02s  1.50%  runtime.(*sweepLocked).sweep\n     0.01s  0.75% 93.23%      0.01s  0.75%  runtime.(*unwinder).initAt\n     0.01s  0.75% 93.98%      0.01s  0.75%  runtime.(*unwinder).next\n     0.01s  0.75% 94.74%      0.01s  0.75%  runtime.getGCMask (inline)\n     0.01s  0.75% 95.49%      0.07s  5.26%  runtime.mallocgcSmallNoscan\n     0.01s  0.75% 96.24%      0.01s  0.75%  runtime.memclrNoHeapPointers\n     0.01s  0.75% 96.99%      0.01s  0.75%  runtime.readUintptr (inline)\n     0.01s  0.75% 97.74%      0.03s  2.26%  runtime.scanblock\n     0.01s  0.75% 98.50%      0.01s  0.75%  runtime.suspendG\n     0.01s  0.75% 99.25%      0.01s  0.75%  runtime.typePointers.nextFast (inline)\n"
+  },
+  {
+    "label": "before",
+    "operation": "before_pencode",
+    "commands": [
+      [
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-prefix/run/direct.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkPairedPacking$/^echo_ascii4k$/^before_pencode$",
+        "-test.benchtime=2s",
+        "-test.cpuprofile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-prefix/before-ascii4k-before_pencode.pprof",
+        "-test.timeout=30s"
+      ],
+      [
+        "go",
+        "tool",
+        "pprof",
+        "-top",
+        "-nodecount=20",
+        "-relative_percentages",
+        "-focus=github.com/cnooljaw/gosproto-before",
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-prefix/run/direct.test",
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-prefix/before-ascii4k-before_pencode.pprof"
+      ]
+    ],
+    "benchmark": "goos: darwin\ngoarch: arm64\npkg: encoderbench\ncpu: Apple M2\nBenchmarkPairedPacking/echo_ascii4k/before_pencode         \t  813367\t      3158 ns/op\t    9728 B/op\t       2 allocs/op\nPASS\n",
+    "top": "File: direct.test\nType: cpu\nTime: 2026-10-16 14:28:39 CST\nDuration: 2.70s, Total samples = 790ms (29.24%)\nActive filters:\n   focus=github.com/cnooljaw/gosproto-before\nShowing nodes accounting for 770ms, 97.47% of 790ms total\nShowing top 20 nodes out of 69\n      flat  flat%   sum%        cum   cum%\n     460ms 58.23% 58.23%      560ms 70.89%  github.com/cnooljaw/gosproto-before.Pack\n      40ms  5.06% 63.29%       40ms  5.06%  runtime.greyobject\n      40ms  5.06% 68.35%       40ms  5.06%  runtime.memmove\n      30ms  3.80% 72.15%       30ms  3.80%  runtime.(*pallocBits).summarize\n      30ms  3.80% 75.95%       30ms  3.80%  runtime.typePointers.next\n      20ms  2.53% 78.48%       20ms  2.53%  runtime.scanblock\n      20ms  2.53% 81.01%      110ms 13.92%  runtime.scanobject\n      10ms  1.27% 82.28%       10ms  1.27%  internal/sync.(*Mutex).Unlock\n      10ms  1.27% 83.54%       10ms  1.27%  runtime.(*lfstack).push\n      10ms  1.27% 84.81%       70ms  8.86%  runtime.(*mcache).refill\n      10ms  1.27% 86.08%       30ms  3.80%  runtime.(*mheap).freeSpanLocked\n      10ms  1.27% 87.34%       10ms  1.27%  runtime.(*moduledata).textAddr\n      10ms  1.27% 88.61%       10ms  1.27%  runtime.(*spanSet).pop\n      10ms  1.27% 89.87%       20ms  2.53%  runtime.(*stkframe).getStackMap\n      10ms  1.27% 91.14%       20ms  2.53%  runtime.findObject\n      10ms  1.27% 92.41%       10ms  1.27%  runtime.gcTrigger.test\n      10ms  1.27% 93.67%       10ms  1.27%  runtime.gcmarknewobject\n      10ms  1.27% 94.94%      110ms 13.92%  runtime.mallocgcSmallNoscan\n      10ms  1.27% 96.20%       10ms  1.27%  runtime.nextFreeFast (inline)\n      10ms  1.27% 97.47%       10ms  1.27%  runtime.save_g\n"
+  },
+  {
+    "label": "after",
+    "operation": "sproto_pack",
+    "commands": [
+      [
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-prefix/run/direct.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkPairedPacking$/^echo_ascii4k$/^sproto_pack$",
+        "-test.benchtime=2s",
+        "-test.cpuprofile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-prefix/after-ascii4k-sproto_pack.pprof",
+        "-test.timeout=30s"
+      ],
+      [
+        "go",
+        "tool",
+        "pprof",
+        "-top",
+        "-nodecount=20",
+        "-relative_percentages",
+        "-focus=github.com/cnooljaw/gosproto\\.",
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-prefix/run/direct.test",
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-prefix/after-ascii4k-sproto_pack.pprof"
+      ]
+    ],
+    "benchmark": "goos: darwin\ngoarch: arm64\npkg: encoderbench\ncpu: Apple M2\nBenchmarkPairedPacking/echo_ascii4k/sproto_pack         \t 3174610\t       789.7 ns/op\t    4864 B/op\t       1 allocs/op\nPASS\n",
+    "top": "File: direct.test\nType: cpu\nTime: 2026-10-16 14:28:41 CST\nDuration: 3.37s, Total samples = 540ms (16.01%)\nActive filters:\n   focus=github.com/cnooljaw/gosproto\\.\nShowing nodes accounting for 540ms, 100% of 540ms total\nShowing top 20 nodes out of 62\n      flat  flat%   sum%        cum   cum%\n     110ms 20.37% 20.37%      110ms 20.37%  runtime.typePointers.next\n      70ms 12.96% 33.33%       70ms 12.96%  runtime.memmove\n      50ms  9.26% 42.59%       50ms  9.26%  indexbytebody\n      50ms  9.26% 51.85%      220ms 40.74%  runtime.scanobject\n      40ms  7.41% 59.26%       40ms  7.41%  runtime.scanblock\n      30ms  5.56% 64.81%       30ms  5.56%  runtime.greyobject\n      20ms  3.70% 68.52%      540ms   100%  github.com/cnooljaw/gosproto.Pack\n      20ms  3.70% 72.22%       20ms  3.70%  github.com/cnooljaw/gosproto.packWord\n      20ms  3.70% 75.93%       20ms  3.70%  runtime.(*pallocBits).summarize\n      20ms  3.70% 79.63%       30ms  5.56%  runtime.findObject\n      20ms  3.70% 83.33%       90ms 16.67%  runtime.mallocgcSmallNoscan\n      10ms  1.85% 85.19%       10ms  1.85%  runtime.(*consistentHeapStats).release\n      10ms  1.85% 87.04%       30ms  5.56%  runtime.(*mheap).allocSpan\n      10ms  1.85% 88.89%       10ms  1.85%  runtime.(*mspan).base (inline)\n      10ms  1.85% 90.74%       10ms  1.85%  runtime.(*pageAlloc).chunkOf (inline)\n      10ms  1.85% 92.59%       10ms  1.85%  runtime.(*unwinder).initAt\n      10ms  1.85% 94.44%      290ms 53.70%  runtime.gcDrainN\n      10ms  1.85% 96.30%       20ms  3.70%  runtime.markroot.func1\n      10ms  1.85% 98.15%       10ms  1.85%  runtime.markrootSpans\n      10ms  1.85%   100%       10ms  1.85%  runtime.pcvalue\n"
+  },
+  {
+    "label": "after",
+    "operation": "sproto_pencode",
+    "commands": [
+      [
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-prefix/run/direct.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkPairedPacking$/^echo_ascii4k$/^sproto_pencode$",
+        "-test.benchtime=2s",
+        "-test.cpuprofile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-prefix/after-ascii4k-sproto_pencode.pprof",
+        "-test.timeout=30s"
+      ],
+      [
+        "go",
+        "tool",
+        "pprof",
+        "-top",
+        "-nodecount=20",
+        "-relative_percentages",
+        "-focus=github.com/cnooljaw/gosproto\\.",
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-prefix/run/direct.test",
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-prefix/after-ascii4k-sproto_pencode.pprof"
+      ]
+    ],
+    "benchmark": "goos: darwin\ngoarch: arm64\npkg: encoderbench\ncpu: Apple M2\nBenchmarkPairedPacking/echo_ascii4k/sproto_pencode         \t 1530721\t      1533 ns/op\t    9728 B/op\t       2 allocs/op\nPASS\n",
+    "top": "File: direct.test\nType: cpu\nTime: 2026-10-16 14:28:45 CST\nDuration: 4.04s, Total samples = 910ms (22.54%)\nActive filters:\n   focus=github.com/cnooljaw/gosproto\\.\nShowing nodes accounting for 750ms, 82.42% of 910ms total\nShowing top 20 nodes out of 94\n      flat  flat%   sum%        cum   cum%\n     150ms 16.48% 16.48%      150ms 16.48%  runtime.memmove\n     150ms 16.48% 32.97%      200ms 21.98%  runtime.typePointers.next\n      90ms  9.89% 42.86%       90ms  9.89%  runtime.scanblock\n      60ms  6.59% 49.45%       60ms  6.59%  runtime.memclrNoHeapPointers\n      40ms  4.40% 53.85%       40ms  4.40%  runtime.findObject\n      30ms  3.30% 57.14%      340ms 37.36%  github.com/cnooljaw/gosproto.Pack\n      30ms  3.30% 60.44%       30ms  3.30%  runtime.greyobject\n      30ms  3.30% 63.74%       30ms  3.30%  runtime.readUintptr (inline)\n      30ms  3.30% 67.03%      310ms 34.07%  runtime.scanobject\n      20ms  2.20% 69.23%       80ms  8.79%  github.com/cnooljaw/gosproto.writeFF (inline)\n      20ms  2.20% 71.43%       20ms  2.20%  indexbytebody\n      20ms  2.20% 73.63%       20ms  2.20%  runtime.getGCMask (inline)\n      10ms  1.10% 74.73%       10ms  1.10%  github.com/cnooljaw/gosproto.(*encodeLayout).next (inline)\n      10ms  1.10% 75.82%      570ms 62.64%  github.com/cnooljaw/gosproto.EncodeWithLimits\n      10ms  1.10% 76.92%      110ms 12.09%  github.com/cnooljaw/gosproto.encodeMessageInto\n      10ms  1.10% 78.02%       10ms  1.10%  github.com/cnooljaw/gosproto.packWord\n      10ms  1.10% 79.12%       10ms  1.10%  internal/runtime/atomic.(*UnsafePointer).Load (inline)\n      10ms  1.10% 80.22%       10ms  1.10%  internal/runtime/maps.(*Map).getWithKeySmall\n      10ms  1.10% 81.32%       10ms  1.10%  reflect.(*rtype).Kind\n      10ms  1.10% 82.42%       10ms  1.10%  reflect.ValueOf (inline)\n"
+  }
+]

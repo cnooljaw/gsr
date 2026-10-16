@@ -1,6 +1,6 @@
 # gosproto Pack 混合数值 word 优化
 
-2026-10-16，上一轮已本地提交为 gosproto `5e491ff`、GSR `70c84af`，提交后两个工作树干净，未推送。本轮只改 Pack 热循环及对应测试，Encoder、Decoder、RPC 与 TS 生产源码冻结；新增改动未提交/发布，正式 Go 依赖仍为 v0.4.0。
+2026-10-16，上一轮已本地提交为 gosproto `5e491ff`、GSR `70c84af`，提交后两个工作树干净，未推送。本轮只改 Pack 热循环及对应测试，Encoder、Decoder、RPC 与 TS 生产源码冻结；该切片随后已本地提交为 gosproto `7dc6713`、GSR `e9e1f74`，未发布，正式 Go 依赖仍为 v0.4.0。后续见 [长 FF 搜索](../2026-10-16-gosproto-ffscan/RESULTS.md)。
 
 ## 诊断与实现
 

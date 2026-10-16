@@ -1,0 +1,607 @@
+{
+  "variant": "bounds",
+  "baseCommit": "7dc6713",
+  "goSource": {
+    "limits.go": "42865809572cb856d39a62ae3f1d95c8b6395da5a5cac5539c75d2aa6ce34fd9",
+    "fuzz_test.go": "de339d3fbf5d589377ca304c82496f316478ac19bbf42c230eb0cf2fca0cf8ab",
+    "sproto_test.go": "4127e6f7a2b08474f8d126b47817617c4066737851bc787f22c0102b5e2bc800",
+    "encode.go": "73fe791f2e3d5d9011bc2011b9413c94457baea06c887426992f4a665fe0784a",
+    "rpc_limits_test.go": "486c8f73eb0e3cb63412796c669e55cb94c7ad49c0813cbb6dff36ad414e2b7c",
+    "pack.go": "e77b904aef1f39664fda68c624247a87a7cd359dc07e434518fcbf589616cf13",
+    "encode_integer_record.go": "1ec4e5d0531c1de565aaa6b60c8ea8e185b9c36a95ffc9e49b848e5ed267fdcb",
+    "encode_pointer.go": "e7a239568a0fc8788404de6f5bc0d5e2ac092fa559f0a6bfd4561fdc155f81c1",
+    "rpc_test.go": "d8e1c353c96ff3577e6bdd86a1d1fbee8422486f491735bab278f65682c6102d",
+    "sproto.go": "b3cde4699d2fc07a453e521b0fac46534e43a8681fbbc5cb75d3ef27b9234164",
+    "rpc.go": "4368b24cb51c43c083c9430fd5264e94255149d5d4c9d9742626bc504450a376",
+    "meta.go": "6badd4a5ac60d8a15caaa1f35634268101c436b275cf4a0fe120b91db417d217",
+    "limits_test.go": "7c92f3ea4b512013b942d2817f6f4d34306002699a24e8e9f90c8919d619696e",
+    "decode.go": "b5bb24108008236b222a81c45a29cd78e73f114ffc0d843ce358dd237824bb74",
+    "pack_test.go": "a8e6ef6cca448710a5bfb4f24062723f68ece7b8c3936eb8cfc0ffc77915c299",
+    "encode_test.go": "d28095ae5b5b820eb0d5aed634397bb86159361b5876c3126100d59e37d41099",
+    "official_compat_test.go": "adfe1ee5982544a937b72eed95592e4d6c521731db8c88c91dbe39440e1827ef"
+  },
+  "binarySha256": "d0827f5ff75a6bc6898eb51fc40ae941caf5e96885d957ac6d14136d5b5bd88e",
+  "goVersion": "go version go1.24.13 darwin/arm64",
+  "pattern": "^BenchmarkPairedPacking$/^(addressbook|game_small|game_large|echo_ascii4k)$/^(before_pack|sproto_pack|before_pencode|sproto_pencode|protobuf_encode)$",
+  "commands": [
+    {
+      "args": [
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-prefix/run/bounds.test",
+        "-test.run=^TestRepresentativeFixtures$",
+        "-test.bench=^BenchmarkPairedPacking$/^(addressbook|game_small|game_large|echo_ascii4k)$/^(before_pack|sproto_pack|before_pencode|sproto_pencode|protobuf_encode)$",
+        "-test.benchtime=60000x",
+        "-test.benchmem",
+        "-test.timeout=55s"
+      ],
+      "reverse": 0
+    },
+    {
+      "args": [
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-prefix/run/bounds.test",
+        "-test.run=^TestRepresentativeFixtures$",
+        "-test.bench=^BenchmarkPairedPacking$/^(addressbook|game_small|game_large|echo_ascii4k)$/^(before_pack|sproto_pack|before_pencode|sproto_pencode|protobuf_encode)$",
+        "-test.benchtime=60000x",
+        "-test.benchmem",
+        "-test.timeout=55s"
+      ],
+      "reverse": 1
+    },
+    {
+      "args": [
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-prefix/run/bounds.test",
+        "-test.run=^TestRepresentativeFixtures$",
+        "-test.bench=^BenchmarkPairedPacking$/^(addressbook|game_small|game_large|echo_ascii4k)$/^(before_pack|sproto_pack|before_pencode|sproto_pencode|protobuf_encode)$",
+        "-test.benchtime=60000x",
+        "-test.benchmem",
+        "-test.timeout=55s"
+      ],
+      "reverse": 0
+    }
+  ],
+  "iterations": 60000,
+  "rounds": 3,
+  "rows": [
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedPacking/addressbook/before_pack",
+      "ns": 130.2,
+      "bytes": 144,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedPacking/addressbook/before_pencode",
+      "ns": 681.9,
+      "bytes": 288,
+      "allocs": 2
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedPacking/addressbook/protobuf_encode",
+      "ns": 335.9,
+      "bytes": 80,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedPacking/addressbook/sproto_pack",
+      "ns": 150.2,
+      "bytes": 144,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedPacking/addressbook/sproto_pencode",
+      "ns": 678.3,
+      "bytes": 288,
+      "allocs": 2
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedPacking/game_small/before_pack",
+      "ns": 345.2,
+      "bytes": 352,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedPacking/game_small/before_pencode",
+      "ns": 1097.0,
+      "bytes": 704,
+      "allocs": 2
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedPacking/game_small/protobuf_encode",
+      "ns": 669.1,
+      "bytes": 192,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedPacking/game_small/sproto_pack",
+      "ns": 356.2,
+      "bytes": 352,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedPacking/game_small/sproto_pencode",
+      "ns": 1111.0,
+      "bytes": 704,
+      "allocs": 2
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedPacking/game_large/before_pack",
+      "ns": 3818.0,
+      "bytes": 3456,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedPacking/game_large/before_pencode",
+      "ns": 9590.0,
+      "bytes": 7424,
+      "allocs": 3
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedPacking/game_large/protobuf_encode",
+      "ns": 7213.0,
+      "bytes": 2304,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedPacking/game_large/sproto_pack",
+      "ns": 3175.0,
+      "bytes": 3456,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedPacking/game_large/sproto_pencode",
+      "ns": 9896.0,
+      "bytes": 7424,
+      "allocs": 3
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedPacking/echo_ascii4k/before_pack",
+      "ns": 2075.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedPacking/echo_ascii4k/before_pencode",
+      "ns": 3208.0,
+      "bytes": 9728,
+      "allocs": 2
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedPacking/echo_ascii4k/protobuf_encode",
+      "ns": 589.4,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedPacking/echo_ascii4k/sproto_pack",
+      "ns": 596.5,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "round": 0,
+      "operation": "BenchmarkPairedPacking/echo_ascii4k/sproto_pencode",
+      "ns": 1180.0,
+      "bytes": 9728,
+      "allocs": 2
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedPacking/addressbook/sproto_pencode",
+      "ns": 682.2,
+      "bytes": 288,
+      "allocs": 2
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedPacking/addressbook/sproto_pack",
+      "ns": 152.0,
+      "bytes": 144,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedPacking/addressbook/protobuf_encode",
+      "ns": 338.4,
+      "bytes": 80,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedPacking/addressbook/before_pencode",
+      "ns": 676.4,
+      "bytes": 288,
+      "allocs": 2
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedPacking/addressbook/before_pack",
+      "ns": 144.9,
+      "bytes": 144,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedPacking/game_small/sproto_pencode",
+      "ns": 1111.0,
+      "bytes": 704,
+      "allocs": 2
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedPacking/game_small/sproto_pack",
+      "ns": 363.5,
+      "bytes": 352,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedPacking/game_small/protobuf_encode",
+      "ns": 672.7,
+      "bytes": 192,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedPacking/game_small/before_pencode",
+      "ns": 1088.0,
+      "bytes": 704,
+      "allocs": 2
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedPacking/game_small/before_pack",
+      "ns": 343.3,
+      "bytes": 352,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedPacking/game_large/sproto_pencode",
+      "ns": 9913.0,
+      "bytes": 7424,
+      "allocs": 3
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedPacking/game_large/sproto_pack",
+      "ns": 3257.0,
+      "bytes": 3456,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedPacking/game_large/protobuf_encode",
+      "ns": 7556.0,
+      "bytes": 2304,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedPacking/game_large/before_pencode",
+      "ns": 10390.0,
+      "bytes": 7424,
+      "allocs": 3
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedPacking/game_large/before_pack",
+      "ns": 3315.0,
+      "bytes": 3456,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedPacking/echo_ascii4k/sproto_pencode",
+      "ns": 1176.0,
+      "bytes": 9728,
+      "allocs": 2
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedPacking/echo_ascii4k/sproto_pack",
+      "ns": 586.6,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedPacking/echo_ascii4k/protobuf_encode",
+      "ns": 571.5,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedPacking/echo_ascii4k/before_pencode",
+      "ns": 2647.0,
+      "bytes": 9728,
+      "allocs": 2
+    },
+    {
+      "round": 1,
+      "operation": "BenchmarkPairedPacking/echo_ascii4k/before_pack",
+      "ns": 2061.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedPacking/addressbook/before_pack",
+      "ns": 141.2,
+      "bytes": 144,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedPacking/addressbook/before_pencode",
+      "ns": 683.3,
+      "bytes": 288,
+      "allocs": 2
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedPacking/addressbook/protobuf_encode",
+      "ns": 333.9,
+      "bytes": 80,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedPacking/addressbook/sproto_pack",
+      "ns": 150.1,
+      "bytes": 144,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedPacking/addressbook/sproto_pencode",
+      "ns": 679.2,
+      "bytes": 288,
+      "allocs": 2
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedPacking/game_small/before_pack",
+      "ns": 335.4,
+      "bytes": 352,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedPacking/game_small/before_pencode",
+      "ns": 1076.0,
+      "bytes": 704,
+      "allocs": 2
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedPacking/game_small/protobuf_encode",
+      "ns": 671.0,
+      "bytes": 192,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedPacking/game_small/sproto_pack",
+      "ns": 365.9,
+      "bytes": 352,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedPacking/game_small/sproto_pencode",
+      "ns": 1180.0,
+      "bytes": 704,
+      "allocs": 2
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedPacking/game_large/before_pack",
+      "ns": 3808.0,
+      "bytes": 3456,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedPacking/game_large/before_pencode",
+      "ns": 10183.0,
+      "bytes": 7424,
+      "allocs": 3
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedPacking/game_large/protobuf_encode",
+      "ns": 7525.0,
+      "bytes": 2304,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedPacking/game_large/sproto_pack",
+      "ns": 3300.0,
+      "bytes": 3456,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedPacking/game_large/sproto_pencode",
+      "ns": 9889.0,
+      "bytes": 7424,
+      "allocs": 3
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedPacking/echo_ascii4k/before_pack",
+      "ns": 2133.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedPacking/echo_ascii4k/before_pencode",
+      "ns": 2738.0,
+      "bytes": 9728,
+      "allocs": 2
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedPacking/echo_ascii4k/protobuf_encode",
+      "ns": 601.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedPacking/echo_ascii4k/sproto_pack",
+      "ns": 607.3,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "round": 2,
+      "operation": "BenchmarkPairedPacking/echo_ascii4k/sproto_pencode",
+      "ns": 1230.0,
+      "bytes": 9728,
+      "allocs": 2
+    }
+  ],
+  "summary": [
+    {
+      "operation": "BenchmarkPairedPacking/addressbook/before_pack",
+      "ns": 141.2,
+      "bytes": 144,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedPacking/addressbook/before_pencode",
+      "ns": 681.9,
+      "bytes": 288,
+      "allocs": 2
+    },
+    {
+      "operation": "BenchmarkPairedPacking/addressbook/protobuf_encode",
+      "ns": 335.9,
+      "bytes": 80,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedPacking/addressbook/sproto_pack",
+      "ns": 150.2,
+      "bytes": 144,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedPacking/addressbook/sproto_pencode",
+      "ns": 679.2,
+      "bytes": 288,
+      "allocs": 2
+    },
+    {
+      "operation": "BenchmarkPairedPacking/echo_ascii4k/before_pack",
+      "ns": 2075.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedPacking/echo_ascii4k/before_pencode",
+      "ns": 2738.0,
+      "bytes": 9728,
+      "allocs": 2
+    },
+    {
+      "operation": "BenchmarkPairedPacking/echo_ascii4k/protobuf_encode",
+      "ns": 589.4,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedPacking/echo_ascii4k/sproto_pack",
+      "ns": 596.5,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedPacking/echo_ascii4k/sproto_pencode",
+      "ns": 1180.0,
+      "bytes": 9728,
+      "allocs": 2
+    },
+    {
+      "operation": "BenchmarkPairedPacking/game_large/before_pack",
+      "ns": 3808.0,
+      "bytes": 3456,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedPacking/game_large/before_pencode",
+      "ns": 10183.0,
+      "bytes": 7424,
+      "allocs": 3
+    },
+    {
+      "operation": "BenchmarkPairedPacking/game_large/protobuf_encode",
+      "ns": 7525.0,
+      "bytes": 2304,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedPacking/game_large/sproto_pack",
+      "ns": 3257.0,
+      "bytes": 3456,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedPacking/game_large/sproto_pencode",
+      "ns": 9896.0,
+      "bytes": 7424,
+      "allocs": 3
+    },
+    {
+      "operation": "BenchmarkPairedPacking/game_small/before_pack",
+      "ns": 343.3,
+      "bytes": 352,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedPacking/game_small/before_pencode",
+      "ns": 1088.0,
+      "bytes": 704,
+      "allocs": 2
+    },
+    {
+      "operation": "BenchmarkPairedPacking/game_small/protobuf_encode",
+      "ns": 671.0,
+      "bytes": 192,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedPacking/game_small/sproto_pack",
+      "ns": 363.5,
+      "bytes": 352,
+      "allocs": 1
+    },
+    {
+      "operation": "BenchmarkPairedPacking/game_small/sproto_pencode",
+      "ns": 1111.0,
+      "bytes": 704,
+      "allocs": 2
+    }
+  ]
+}

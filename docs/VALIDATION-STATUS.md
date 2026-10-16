@@ -4,13 +4,21 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## 长 FF 段有界搜索（2026-10-16）
+
+上一轮已本地提交为 gosproto `7dc6713`、GSR `e9e1f74`，未推送。当前新增切片只在长 FF 起点搜索最多 255 个后续完整非零 word，含零 word 仍走原合并规则；主循环去掉中间 input 切片与重复长度判断。输出容量、wire、预算及独占语义不变，Unpack/Encoder/Decoder/RPC/TS 生产源码冻结。
+
+最终同进程 137 项 × 五轮、685 样本：4 KiB ASCII Pack 2.075 → 0.5851 µs、PEncode 2.682 → 1.142 µs，完整帧 3.352 → 1.906 µs；UTF-8 帧 1.035 → 0.6813 µs。AddressBook/小型游戏 Pack 各约 +5%，最终无 SP 中位数回退 >10%，但不称为全项加速。前缀计算、直接内嵌扫描和容量收窄等候选及中间回退分别保留，共 1780 个非最终样本，不与最终值混算。
+
+全部 mask 的长输入独立预期字节、17984 组旧新差分、完整独立库 race/严格 checkptr（启用固定官方 C/Lua 对照）、vet 及 Pack/Codec 有限 fuzz 通过。GSR 临时覆盖三包、TypeScript 构建和 Go/TS Plain/MAC 集成 7/7、零跳过。最终来源、接线验收与范围见 [FF 搜索结果](benchmarks/2026-10-16-gosproto-ffscan/RESULTS.md)。新增改动未提交/发布，正式 Go 依赖仍为 v0.4.0。
+
 ## Pack 混合数值 word 优化（2026-10-16）
 
 上一轮已本地提交为 gosproto `5e491ff`、GSR `70c84af`，未推送。本轮只改 Pack 的稀疏/混合 word 写出和 FF 状态处理；Encoder、Decoder、RPC 与 TS 生产源码冻结，输出预留、wire、预算和所有权不变。所有 word 使用条件展开的候选造成稀疏回退，已撤回。
 
 最终同进程五轮共 115 项、575 样本，另保留三个候选共 1035 样本。整数数组 Pack 3.664 → 3.287 µs、PEncode 5.902 → 5.498 µs；大型消息分别为 3.473 → 3.301 µs、10.045 → 9.917 µs。分配不变，无 SP 项中位数回退超过 10%，但单非零字节 4 KiB 形态 +3.2%，不称为全项加速或全面胜出 PB。
 
-扩展既有全部 mask 的精确字节用例保护 FF 合并/退出，9216 组旧新 Pack 差分、完整独立库 race/严格 checkptr（启用固定官方 C/Lua 对照）、vet 及 Pack/Codec 有限 fuzz 通过。GSR 临时覆盖三包测试、TypeScript 构建与 Go/TS Plain/MAC 集成 7/7、零跳过。最终验证范围与原始数据见 [Pack 结果](benchmarks/2026-10-16-gosproto-pack/RESULTS.md)。本轮新增改动未提交/发布，正式依赖仍为 v0.4.0。
+扩展既有全部 mask 的精确字节用例保护 FF 合并/退出，9216 组旧新 Pack 差分、完整独立库 race/严格 checkptr（启用固定官方 C/Lua 对照）、vet 及 Pack/Codec 有限 fuzz 通过。GSR 临时覆盖三包测试、TypeScript 构建与 Go/TS Plain/MAC 集成 7/7、零跳过。最终验证范围与原始数据见 [Pack 结果](benchmarks/2026-10-16-gosproto-pack/RESULTS.md)。该切片随后已本地提交为 gosproto `7dc6713`、GSR `e9e1f74`，未发布，正式依赖仍为 v0.4.0。
 
 ## 嵌套类型校验与整数记录数组（2026-10-16）
 

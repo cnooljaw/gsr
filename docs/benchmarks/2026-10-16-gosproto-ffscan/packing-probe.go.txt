@@ -1,0 +1,139 @@
+package benchmarks
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"math/bits"
+	"os"
+	"testing"
+
+	sproto "github.com/cnooljaw/gosproto"
+	before "github.com/cnooljaw/gosproto-before"
+)
+
+// 同一输入的 Pack、组合与纯 Encode 并列执行，不把分段耗时相加当组合耗时。
+func BenchmarkPairedPacking(b *testing.B) {
+	for _, sample := range representativeCases(b) {
+		operations, wires := representativeOperations(b, sample)
+		checkRepresentativeWire(b, sample, wires)
+		_, factory := representativeMessages(sample.Type)
+		message := factory()
+		if err := json.Unmarshal(sample.Data, message); err != nil {
+			b.Fatal(err)
+		}
+		raw := wires["sproto_encode"]
+		if !bytes.Equal(before.Pack(raw), wires["sproto_pack"]) {
+			b.Fatal("baseline packing wire")
+		}
+		pair := []representativeOperation{
+			{"before_pack", func() error { encodedSink = before.Pack(raw); return nil }},
+			{"before_pencode", func() error { var err error; encodedSink, err = before.EncodePacked(message); return err }},
+			{"before_encode", func() error { var err error; encodedSink, err = before.Encode(message); return err }},
+		}
+		for _, op := range operations {
+			if op.name == "sproto_pack" || op.name == "sproto_pencode" || op.name == "sproto_encode" || op.name == "protobuf_encode" {
+				pair = append(pair, op)
+			}
+		}
+		runPaired(b, sample.Name, pair)
+	}
+}
+
+type packPattern struct {
+	name string
+	raw  []byte
+}
+
+func packPatterns() []packPattern {
+	var cases []packPattern
+	for _, size := range []int{32, 4096} {
+		for count := 0; count <= 8; count++ {
+			raw := make([]byte, size)
+			for word := 0; word < size/8; word++ {
+				mask := bits.RotateLeft8(uint8((1<<count)-1), word%8)
+				for bit := 0; bit < 8; bit++ {
+					if mask&(1<<bit) != 0 {
+						raw[word*8+bit] = byte(1 + (word*13+bit*7)%255)
+					}
+				}
+			}
+			cases = append(cases, packPattern{fmt.Sprintf("n%d_%d", count, size), raw})
+		}
+	}
+	random := make([]byte, 4096)
+	state := uint32(0x12345678)
+	for i := range random {
+		state ^= state << 13
+		state ^= state >> 17
+		state ^= state << 5
+		random[i] = byte(state)
+	}
+	cases = append(cases, packPattern{"random4096", random})
+	for _, count := range []int{6, 7} {
+		raw := bytes.Repeat([]byte{1}, 8)
+		for i := 0; i < 511; i++ {
+			word := make([]byte, 8)
+			for j := 0; j < count; j++ {
+				word[(j+i)%8] = byte(j + 1)
+			}
+			raw = append(raw, word...)
+		}
+		cases = append(cases, packPattern{fmt.Sprintf("ff_n%d_4096", count), raw})
+	}
+	for _, size := range []int{63, 64, 65, 127, 128, 129, 255, 256, 257, 2046, 2047, 2048, 2049, 4094, 4095, 4096} {
+		cases = append(cases, packPattern{fmt.Sprintf("ff_tail%d", size), bytes.Repeat([]byte{0xee}, size)})
+	}
+	for _, size := range []int{256, 4096} {
+		raw := bytes.Repeat([]byte{1}, size)
+		raw[8] = 0
+		cases = append(cases, packPattern{fmt.Sprintf("ff_earlyzero%d", size), raw})
+	}
+	return cases
+}
+
+// 合成分布只用于回退门禁，不能替代真实业务夹具。
+func BenchmarkPairedPatterns(b *testing.B) {
+	for _, sample := range packPatterns() {
+		raw := sample.raw
+		if !bytes.Equal(before.Pack(raw), sproto.Pack(raw)) {
+			b.Fatal(sample.name, " wire")
+		}
+		runPaired(b, sample.name, []representativeOperation{
+			{"before_pack", func() error { encodedSink = before.Pack(raw); return nil }},
+			{"sproto_pack", func() error { encodedSink = sproto.Pack(raw); return nil }},
+		})
+	}
+}
+
+// 字节分布在计时前导出，记录每个完整 word 的非零字节数。
+func TestPackDistribution(t *testing.T) {
+	path := os.Getenv("GSR_PACK_DISTRIBUTION")
+	if path == "" {
+		return
+	}
+	rows := map[string]any{}
+	for _, sample := range representativeCases(t) {
+		_, wires := representativeOperations(t, sample)
+		checkRepresentativeWire(t, sample, wires)
+		raw := wires["sproto_encode"]
+		counts := [9]int{}
+		for start := 0; start+8 <= len(raw); start += 8 {
+			n := 0
+			for _, v := range raw[start : start+8] {
+				if v != 0 {
+					n++
+				}
+			}
+			counts[n]++
+		}
+		rows[sample.Name] = map[string]any{"bytes": len(raw), "packedBytes": len(wires["sproto_pack"]), "tailBytes": len(raw) % 8, "nonzeroCounts": counts}
+	}
+	data, err := json.MarshalIndent(rows, "", "  ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(path, append(data, '\n'), 0644); err != nil {
+		t.Fatal(err)
+	}
+}
