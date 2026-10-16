@@ -114,6 +114,8 @@ self/cumulative 存在包含关系，不能相加；占比随总耗时分母变�
 | 性能形态 | 32 B 小包、UTF-8、4 KiB ASCII/零、不同非零字节密度、随机数据、FF/零前缀接稀疏尾部、重复短段 |
 | 集成 | 现有官方对照、有限 fuzz、库 race/vet，以及临时依赖下 GSR Sproto Dispatcher 与 Plain/MAC Echo |
 
+Go offset 访问的后续回归说明：字段属于当前 schema，不等于实际嵌套 Go 值具有该 schema 的布局。公开父描述被替换时，两者可能分离；验证矩阵需覆盖根字段替换、子描述替换与子 schema 内字段替换。校验可在同构数组入口复用，但必须依赖实际类型事实，不能把安全检查移出循环后静默取消。正确性修复与加速同时发生时，分别报告上一提交和最小修复版对照，保留必要校验的成本。见 [Go 实例](benchmarks/2026-10-16-gosproto-bindings/RESULTS.md)。
+
 14 种 Pack 和 46 种 Unpack 形态来自 TS 的回退排查，不是 Go 已覆盖数量。将其中缺失且相关的形态补入现有 Go Benchmark 后，才报告 Go 的覆盖情况；不要求不加区分地复制所有 TS 微基准。
 
 ## 8. 转入 gosproto 的下一步

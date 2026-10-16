@@ -1,0 +1,68 @@
+{
+  "platform": "darwin/arm64 only",
+  "commands": [
+    {
+      "cwd": "/private/tmp/gsr-gosproto-fork",
+      "command": "SPROTO_ORACLE_DIR=/private/tmp/gsr-official-sproto-review GOMAXPROCS=2 go test -race -gcflags=all=-d=checkptr=2 ./... -timeout=2m",
+      "exitCode": 0,
+      "output": "ok github.com/cnooljaw/gosproto 2.329s; examples/echo [no test files]",
+      "officialOracleEnabled": true
+    },
+    {
+      "cwd": "/private/tmp/gsr-gosproto-fork",
+      "command": "go vet ./...",
+      "exitCode": 0
+    },
+    {
+      "cwd": "/private/tmp/gsr-gosproto-fork",
+      "command": "go test -run=^$ -fuzz=^FuzzCodecRoundTrip$ -fuzztime=10s -parallel=2 -timeout=45s",
+      "exitCode": 0,
+      "executions": 589498,
+      "elapsedSeconds": 10.379
+    },
+    {
+      "cwd": "/private/tmp/gsr-gosproto-fork",
+      "command": "go test -run=^$ -fuzz=^FuzzDecode$ -fuzztime=10s -parallel=2 -timeout=45s",
+      "exitCode": 0,
+      "executions": 17768,
+      "elapsedSeconds": 11.209
+    },
+    {
+      "cwd": "gsr",
+      "command": "go test -modfile=/private/tmp/gsr-next-codec.mod ./protocol/sproto ./examples/websocket-gate/cmd/debugserver ./examples/websocket-gate/benchmarks -timeout=2m",
+      "exitCode": 0,
+      "packages": [
+        "protocol/sproto",
+        "examples/websocket-gate/cmd/debugserver",
+        "examples/websocket-gate/benchmarks"
+      ]
+    },
+    {
+      "cwd": "gsr",
+      "command": "GOFLAGS=-modfile=/private/tmp/gsr-next-codec.mod npm --prefix examples/websocket-gate run test:sproto:integration",
+      "exitCode": 0,
+      "typescriptBuild": true,
+      "tests": 7,
+      "passed": 7,
+      "skipped": 0,
+      "failed": 0
+    },
+    {
+      "cwd": "gsr",
+      "command": "python3 docs/benchmarks/2026-10-16-gosproto-bindings/reproduce-pairs.py --library /private/tmp/gsr-gosproto-fork --output tmp/gosproto-bindings/reproduce-check --corrected-baseline --prepare-only",
+      "exitCode": 0,
+      "byteComparison": "four baseline production files, four Go harness files and three JSON fixtures identical to measured inputs"
+    }
+  ],
+  "regressions": {
+    "TestEncodeReplacedNestedMetadata": "child/children fail on 819047e, pass on a579920; current child/children/child_fields pass",
+    "TestIntegerRecordArrayBudgetsAndTags": "passes; covers named-type reference, nil/empty records, int64 edges, sparse tags and exact/minus-one budgets"
+  },
+  "notRepeated": [
+    "GSR whole repository tests/race",
+    "TS performance matrix",
+    "unchanged Go Decode and Pack performance matrix",
+    "cross compilation from previous slice"
+  ],
+  "productionScope": "Encoder, private schema metadata and tests only; public API/wire/budgets/ownership unchanged"
+}

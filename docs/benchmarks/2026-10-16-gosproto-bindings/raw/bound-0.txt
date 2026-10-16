@@ -1,0 +1,20 @@
+goos: darwin
+goarch: arm64
+pkg: encoderbench
+cpu: Apple M2
+BenchmarkPairedEncoder/addressbook/before_encode         	   60000	       490.6 ns/op	     144 B/op	       1 allocs/op
+BenchmarkPairedEncoder/addressbook/protobuf_encode       	   60000	       332.5 ns/op	      80 B/op	       1 allocs/op
+BenchmarkPairedEncoder/addressbook/sproto_encode         	   60000	       584.5 ns/op	     144 B/op	       1 allocs/op
+BenchmarkPairedEncoder/game_small/before_encode          	   60000	       848.2 ns/op	     352 B/op	       1 allocs/op
+BenchmarkPairedEncoder/game_small/protobuf_encode        	   60000	       693.0 ns/op	     192 B/op	       1 allocs/op
+BenchmarkPairedEncoder/game_small/sproto_encode          	   60000	       889.1 ns/op	     352 B/op	       1 allocs/op
+BenchmarkPairedEncoder/game_large/before_encode          	   60000	      8255 ns/op	    3968 B/op	       2 allocs/op
+BenchmarkPairedEncoder/game_large/protobuf_encode        	   60000	      7712 ns/op	    2304 B/op	       1 allocs/op
+BenchmarkPairedEncoder/game_large/sproto_encode          	   60000	      7782 ns/op	    3968 B/op	       2 allocs/op
+BenchmarkPairedEncoder/int32_edges/before_encode         	   60000	      2214 ns/op	    4096 B/op	       1 allocs/op
+BenchmarkPairedEncoder/int32_edges/protobuf_encode       	   60000	      5253 ns/op	    2688 B/op	       1 allocs/op
+BenchmarkPairedEncoder/int32_edges/sproto_encode         	   60000	      2148 ns/op	    4096 B/op	       1 allocs/op
+BenchmarkPairedEncoder/echo_ascii4k/before_encode        	   60000	       608.5 ns/op	    4864 B/op	       1 allocs/op
+BenchmarkPairedEncoder/echo_ascii4k/protobuf_encode      	   60000	       572.9 ns/op	    4864 B/op	       1 allocs/op
+BenchmarkPairedEncoder/echo_ascii4k/sproto_encode        	   60000	       608.5 ns/op	    4864 B/op	       1 allocs/op
+PASS

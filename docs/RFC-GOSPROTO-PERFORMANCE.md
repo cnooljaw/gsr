@@ -1,6 +1,6 @@
 # gosproto 后续性能优化方案
 
-状态：2026-10-16，两轮 Go 优化已实施并在独立库提交为 `6012b06`，尚未发布；GSR 正式依赖仍为 v0.4.0。TS 长块和 Go 安全路径见 [首轮结果](benchmarks/2026-10-15-sproto-next/RESULTS.md)，数值 packing、字段查询及类型化构造见 [第二轮结果](benchmarks/2026-10-15-sproto-round2/RESULTS.md)。TS 优化阶段已在 GSR `9801808` 收尾，可迁移经验见 [TS → Go 优化经验](SPROTO-OPTIMIZATION-LESSONS.md)，下一轮入口见本文第 7 节。用户已同意编码执行层优化；原生 `*int64` 的受控只读字段访问已在独立库本地提交为 `819047e`，未推送/发布。公开 API 与 generator 不变，见第 9 节。
+状态：2026-10-16，两轮 Go 优化已实施并在独立库提交为 `6012b06`，尚未发布；GSR 正式依赖仍为 v0.4.0。TS 长块和 Go 安全路径见 [首轮结果](benchmarks/2026-10-15-sproto-next/RESULTS.md)，数值 packing、字段查询及类型化构造见 [第二轮结果](benchmarks/2026-10-15-sproto-round2/RESULTS.md)。TS 优化阶段已在 GSR `9801808` 收尾，可迁移经验见 [TS → Go 优化经验](SPROTO-OPTIMIZATION-LESSONS.md)，下一轮入口见本文第 7 节。用户已同意编码执行层优化；原生 `*int64` 的受控只读字段访问已在独立库本地提交为 `819047e`、GSR `bf3ed8c`，未推送/发布。随后修复嵌套布局校验并优化整数记录数组，大型 Encode 约 6.54 µs，同场 PB 7.59 µs，新增改动未提交。公开 API 与 generator 不变，见第 9 节。
 
 第三轮已完成当前基线与候选筛选，只保留调用内布局记录的内存收窄，独立库已本地提交为 `a579920`，GSR 记录提交为 `fdbc736`，均未推送/发布；未取得新的明显 CPU 加速。实测和取舍见 [第三轮结果](benchmarks/2026-10-16-gosproto-round3/RESULTS.md) 及第 8 节。
 
@@ -223,4 +223,8 @@ TS 经验提取已在 GSR `f45a8c6` 提交。Go 从 `6012b06` 重建两套主基
 
 同进程五轮固定次数复核：大型 Encode 14.345 → 8.456 µs（-41.1%），同次 PB 7.863 µs，仍慢约 7.5%；大型 PEncode 18.301 → 11.880 µs。分配均不增加。32 B Echo 纯 body 增加约 6.6 ns，完整帧反而减少约 30.5 ns，代价明确保留；未声称所有入口都加速。完整矩阵 720 样本与同进程 245+45 样本分别报告，不混用中位数。
 
-独立库官方对照、race/严格 checkptr、vet 与两项有限 fuzz 通过；GSR 三包及 Go/TS 集成 7/7 通过。32 位库构建通过，但旧测试的 int 常量溢出阻塞 32 位测试二进制；仅本机执行了运行验证。当前未提交、发布或升级正式依赖。数据、来源、验证与复现见 [本轮结果](benchmarks/2026-10-16-gosproto-encoder/RESULTS.md)。
+独立库官方对照、race/严格 checkptr、vet 与两项有限 fuzz 通过；GSR 三包及 Go/TS 集成 7/7 通过。32 位库构建通过，但旧测试的 int 常量溢出阻塞 32 位测试二进制；仅本机执行了运行验证。该切片已本地提交为独立库 `819047e`、GSR `bf3ed8c`，未发布或升级正式依赖。数据、来源、验证与复现见 [本轮结果](benchmarks/2026-10-16-gosproto-encoder/RESULTS.md)。
+
+后续发现父 Fields 替换后子 schema 可能与实际 Go 布局不同，单独核对字段 owner 不够。当前调用内传递已验证类型事实，描述变化时核对实际类型或回落；同构整数结构数组在入口核对全部字段后复用，保留逐元素预算与 wire 规则。通用循环增加同构分支的候选因 AddressBook 回退撤回。
+
+最终相对上一提交大型 Encode 8.382 → 6.528 µs，同场 PB 7.606 µs；相对最小类型修复版 9.730 → 6.544 µs，同场 PB 7.588 µs。AddressBook 相对上一提交 +12.0%、相对修复版 +1.3%，两组分别记录，分配不变。新增回归、结构数组 fuzz、完整库 race/checkptr/官方对照及 GSR 接线通过，新增改动尚未提交。下一切片应重新 profile packing 与组合路径，不以扩大 unsafe 追求全项胜出。详见 [嵌套绑定与整数记录数组结果](benchmarks/2026-10-16-gosproto-bindings/RESULTS.md)。
