@@ -84,6 +84,8 @@ go get github.com/cnooljaw/gosproto@v0.4.0
 
 第四轮已提交为 `d9655b8`。第五轮先分析 Pack 的 mask/非零字节分布，再集中 FF 合并状态、缩短普通混合 word 路径；大型游戏和整数数组 Pack 约快 7.3%/4.9%。公开/私有解包省略视图的候选因形态回退未保留，输出与预算契约不变。完整 250 项逐操作配对采样、14 种 Pack/46 种 Unpack 形态及独立 profile 见 [第五轮验收](benchmarks/2026-10-15-sproto-round5/RESULTS.md)。本轮未修改 Go 依赖，未推送或发布。
 
+2026-10-16，TS 性能阶段以提交 `9801808` 收尾，后续重点转向 gosproto。经验与适用边界见 [TS → Go 优化经验](SPROTO-OPTIMIZATION-LESSONS.md)。Go 下一轮从独立库已提交的 `6012b06` 做增量，先重建当前基线/profile，不将正式 v0.4.0 或 TS 数据冒充当前 Go 结果；执行入口见 [Go 性能方案](RFC-GOSPROTO-PERFORMANCE.md#7-ts-阶段收尾后的-go-增量入口)。
+
 ## 独立修复库与官方对照（2026-10-15）
 
 [cnooljaw/gosproto v0.2.0](https://github.com/cnooljaw/gosproto/releases/tag/v0.2.0) 基于 xjdrew v0.1.0，保留上游历史与 MIT 许可证，自己的 module 路径和标签避免给业务项目传播 replace。标准库没有 Sproto 实现，使用这个依赖专门解决原生编解码与 pack/unpack，不引入通用协议框架或运行时 C/Lua。

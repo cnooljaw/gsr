@@ -1,6 +1,6 @@
 # TypeScript Sproto 剩余性能差距排查与改进方案
 
-状态：用户已批准，P1–P4 已完成并提交为 `72fc11a`，第四轮零头计数与基准修正已提交为 `d9655b8`。以下保留 2026-10-15 的排查与隔离原型证据；实现、取舍与验收见 [第三轮结果](benchmarks/2026-10-15-sproto-round3/RESULTS.md) 和 [第四轮结果](benchmarks/2026-10-15-sproto-round4/RESULTS.md)。原型数据不替换正式验收数据。
+状态：2026-10-16，TS 性能优化阶段基本完成。P1–P4 为 `72fc11a`，第四轮为 `d9655b8`，第五轮 Pack 优化及最终验收已提交为 `9801808`。默认停止无业务证据的微调，转向 gosproto；可迁移经验、失败尝试及测量规则见 [TS → Go 优化经验](SPROTO-OPTIMIZATION-LESSONS.md)，后续实施见 [Go 方案](RFC-GOSPROTO-PERFORMANCE.md)。以下保留各轮排查与隔离原型证据，原型数据不替换正式验收数据。
 
 范围为第二轮之后相对正式 TypeScript Protobuf 基线仍慢 10% 以上的六项。Go 后续工作仍见 [Gosproto 性能方案](RFC-GOSPROTO-PERFORMANCE.md)。
 
@@ -148,4 +148,4 @@ Sproto 当前字符串为 `Buffer.byteLength` 后 `Buffer.write`；PB 使用预�
 
 基准收紧为同操作的 PB/SP 前后版本紧邻采样，并在奇数轮反转；新增 14 种 Pack 字节形态，连同 46 种 Unpack 形态共 250 项、1250 个样本。大型游戏与整数数组 Pack 约 -7.3%/-4.9%，FF 六/七字节混合段约 -35%；没有 SP 项耗时中位数回退超过 10%。五种代表性消息的原生组合编码/解码当前为 10/10 低于 PB，不扩大为协议整体或 Go/浏览器结论。阶段中位数相除不等于业务 CPU 占比。
 
-增加独立诊断脚本记录 mask 分布、显式 Buffer 工厂/视图调用以及 Pack/PEncode CPU profile。实际 pencode profile 中，整数数组 Pack 累计样本占比约 73% → 70%，大型游戏消息约 27% → 29%；后者其余编码工作仍占主要部分，不把两类消息一概归为 Pack 主导。最终数据、失败候选和口径限制见 [第五轮验收](benchmarks/2026-10-15-sproto-round5/RESULTS.md)。第五轮修改留在工作树审查。
+增加独立诊断脚本记录 mask 分布、显式 Buffer 工厂/视图调用以及 Pack/PEncode CPU profile。实际 pencode profile 中，整数数组 Pack 累计样本占比约 73% → 70%，大型游戏消息约 27% → 29%；后者其余编码工作仍占主要部分，不把两类消息一概归为 Pack 主导。最终数据、失败候选和口径限制见 [第五轮验收](benchmarks/2026-10-15-sproto-round5/RESULTS.md)。第五轮已提交为 `9801808`，未推送。

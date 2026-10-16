@@ -1,8 +1,8 @@
 # gosproto 后续性能优化方案
 
-状态：两轮已实施，2026-10-15。TS 长块和 Go 安全路径见 [首轮结果](benchmarks/2026-10-15-sproto-next/RESULTS.md)，数值 packing、字段查询及类型化构造见 [第二轮结果](benchmarks/2026-10-15-sproto-round2/RESULTS.md)。Go 改动位于独立库未发布工作树，GSR 正式依赖仍为 v0.4.0。新的公开 API、unsafe 路径和 generator 未纳入本轮。
+状态：2026-10-16，两轮 Go 优化已实施并在独立库提交为 `6012b06`，尚未发布；GSR 正式依赖仍为 v0.4.0。TS 长块和 Go 安全路径见 [首轮结果](benchmarks/2026-10-15-sproto-next/RESULTS.md)，数值 packing、字段查询及类型化构造见 [第二轮结果](benchmarks/2026-10-15-sproto-round2/RESULTS.md)。TS 优化阶段已在 GSR `9801808` 收尾，可迁移经验见 [TS → Go 优化经验](SPROTO-OPTIMIZATION-LESSONS.md)，下一轮入口见本文第 7 节。新的公开 API、unsafe 路径和 generator 不在既定范围内。
 
-目标版本基线为已发布的 gosproto v0.4.0。实现改动应在独立 gosproto 仓库进行，GSR 提供真实接线和跨语言 Benchmark；不修改 Go module cache，也不将库源码复制到 GSR。
+前两轮以已发布的 gosproto v0.4.0 为版本基线；下一轮从已提交的 `6012b06` 做增量，不从 v0.4.0 重复实施。实现改动应在独立 gosproto 仓库进行，GSR 提供真实接线和跨语言 Benchmark；不修改 Go module cache，也不将库源码复制到 GSR。
 
 ## 1. 目标与证据
 
@@ -163,3 +163,36 @@ TS 的零块与双遍解包优化属于独立切片，使用同一套 wire 和�
 - Go 解包查表、TS 预清零输出后只写非零字节的尝试分别在数值或 ASCII 输入回退，均撤回；高压缩率路径继续采用首轮的有界计数和重分配。
 
 原有两套基准继续保持逐阶段调用方式，TS `pack(encode(...))` 和手工组帧仍计入其中间复制成本。新增小型 [API 基准脚本](../examples/websocket-gate/scripts/benchmark-sproto-api.mjs) 复用相同夹具，单独测量已存在的 pencode 和 attach，不以不同调用路径替换旧样本。报告分别保存最终原始值、来源和撤回的尝试。
+
+## 7. TS 阶段收尾后的 Go 增量入口
+
+TS 当前阶段基本完成，默认冻结于 GSR `9801808`。其五种代表性消息 × pencode/pdecode 为 10/10 低于同进程 PB，但这是 Node.js 中的实现结果，不是 Go 的性能预测。下一轮采用 [优化经验](SPROTO-OPTIMIZATION-LESSONS.md) 中的输入、所有权和测量规则，重新回答当前 Go 的瓶颈在哪里。
+
+### G0：绑定当前实现并重建基线
+
+- 独立 Go 起点为 `6012b06533657721aff66e1ea16ab158153f6e44`，正式依赖 v0.4.0 作为另一份固定对照。保存工作树状态及实际源码哈希，不能只记录 go.mod 的 require 行。
+- 通过临时 modfile 接入当前库；用相同 GOFLAGS 执行 `go list -m -json github.com/cnooljaw/gosproto`，保存 Replace/Dir 与 [环境采集器](../examples/websocket-gate/scripts/benchmark-environment.mjs) 的实际源码指纹。不提交 replace，不修改 module cache。
+- 复用现有 [代表性消息与 Echo 基准](../examples/websocket-gate/benchmarks/README.md)，固定同一 Go 工具链、GOMAXPROCS 和 PB 版本。前后固定二进制配对、交替先后，保存五轮原始 ns/op、B/op、allocs/op；不把历史不同版本/输入谱的值拼接成当前收益。
+- 对 Pack 的非零字节密度、FF 六/七字节转换和 Unpack 的前缀/稀疏尾部、重复短段，先查 Go 已有用例，再补实际缺口。TS 的 14/46 种形态及 9560 组差分不冒充 Go 已覆盖数量。
+
+### G1：按当前 profile 选择切片
+
+单独采 game_large、int32_edges、AddressBook 与小帧的 CPU/分配 profile，区分纯编解码、packing 和完整组合。TS 的整数数组 pencode 中 Pack 约占 70% 累计样本，大型状态约 29%，已经说明不同消息的优先级不同；Go 更不能按 TS 的占比直接排序。
+
+| 当前证据若指向 | 优先检验 | 必须保持的代价与语义 |
+| --- | --- | --- |
+| 字段访问、反射或重复判定 | 已有元信息是否仍有可消除的 Kind/Elem/Field 查询、presence/inline 重读 | 命名类型和 nil/presence；类型事实可缓存，消息值与布局不跨调用缓存 |
+| 尺寸/布局遍历 | 当前布局记录是否真正复用预检信息，是否存在昂贵重复扫描 | 完整预算检查、双游标和独占输出；同时记录布局分配，不唯 allocs/op |
+| reflect.New/结果构造 | 原生类型的安全构造、元素一次分配，区分必要对象与临时对象 | optional 和命名类型、独占子对象、临时根对象及失败原子性 |
+| Pack/Unpack | 当前 mask/有效字节写出、FF 快路径、普通 word 以及失败探测成本 | 高位字节精确 mask、256-word/尾部与预算；不得普遍重算 FF mask 或机械移植 TS 扫描门槛 |
+| 小帧装箱或逃逸 | 构造一次与复用对象分别测量，检查类型断言和辅助函数的逃逸/内联 | 既有额外 16 B package 分配明确记录，不能通过复用本不允许共享的对象抹掉成本 |
+
+前两轮已增加的布局记录、类型化访问和 tag 索引不再当作新方案重复提出；需要新 profile 证明哪里仍有重复工作。检查编译器内联、逃逸和边界检查结果，不默认函数指针、查表、无分支写出或池一定更快。
+
+### G2：逐切片验收，再比较 PB
+
+每次只改变一个主要机制，先复用最相关回归和有限专项，再进入受影响库验证与 GSR 接线；完整矩阵和验证层级沿用第 4 节。计时、CPU、分配与测试顺序执行，专项复核不替换失败全量。
+
+收益要同时落在真实组合路径、合理的小包成本和可解释的内存代价上。即使没有超过 10% 的回退，也不忽略持续的小幅损失；反之，未改方法体的采样差异也不能直接归因于算法变化。TS 的公开/私有视图候选最终均撤回，是这一规则的直接案例。
+
+稳定后重跑现有 Go/TS × PB/SP 两套完整基准；TS 作为冻结控制，不修改其实现来配合 Go 排名。是否能追平或超过 Go Protobuf 由数据回答，不以去掉预算、失败原子性或 ownership 换取结论。unsafe、generator、对象池或新公开 API 若确有必要，另行以具体热点和预期收益讨论，不因“剩余差距较大”默认启用。
