@@ -1,6 +1,6 @@
 # gosproto 后续性能优化方案
 
-状态：2026-10-17，GSR 正式依赖仍为 v0.4.0，后续独立库优化尚未发布。TS 长块和 Go 安全路径见 [首轮结果](benchmarks/2026-10-15-sproto-next/RESULTS.md)，数值 packing、字段查询及类型化构造见 [第二轮结果](benchmarks/2026-10-15-sproto-round2/RESULTS.md)。TS 优化阶段已在 GSR `9801808` 收尾，可迁移经验见 [TS → Go 优化经验](SPROTO-OPTIMIZATION-LESSONS.md)。编码执行层改进见第 9 节，大型 Encode 约 6.54 µs，同场 PB 7.59 µs。混合 word Pack 已本地提交为独立库 `7dc6713`、GSR `e9e1f74`，未推送；长 FF 有界搜索已本地提交为独立库 `07350a9`、GSR `3a78dbd`，见第 11 节。连续零 mask 解包已本地提交为独立库 `22e287e`、GSR `1af93f4`，见第 12 节。普通 Unpack 五个候选已撤回，回归与记录已本地提交为独立库 `d66644a`、GSR `acfb070`，见第 13 节。安全 inline 处理已本地提交为独立库 `70d985c`、GSR `d0328fd`，见第 14 节；后续整数记录 parser 已撤回，受控写入仅在隔离副本验证并形成提案，见第 15 节。公开 API、generator 与预算/所有权契约不变。
+状态：2026-10-17，GSR 正式依赖仍为 v0.4.0，后续独立库优化尚未发布。TS 长块和 Go 安全路径见 [首轮结果](benchmarks/2026-10-15-sproto-next/RESULTS.md)，数值 packing、字段查询及类型化构造见 [第二轮结果](benchmarks/2026-10-15-sproto-round2/RESULTS.md)。TS 优化阶段已在 GSR `9801808` 收尾，可迁移经验见 [TS → Go 优化经验](SPROTO-OPTIMIZATION-LESSONS.md)。编码执行层改进见第 9 节，大型 Encode 约 6.54 µs，同场 PB 7.59 µs。混合 word Pack 已本地提交为独立库 `7dc6713`、GSR `e9e1f74`，未推送；长 FF 有界搜索已本地提交为独立库 `07350a9`、GSR `3a78dbd`，见第 11 节。连续零 mask 解包已本地提交为独立库 `22e287e`、GSR `1af93f4`，见第 12 节。普通 Unpack 五个候选已撤回，回归与记录已本地提交为独立库 `d66644a`、GSR `acfb070`，见第 13 节。安全 inline 处理已本地提交为独立库 `70d985c`、GSR `d0328fd`，见第 14 节；后续整数记录 parser 已撤回，原型与提案已本地提交为独立库 `5be3b26`、GSR `2872d46`，见第 15 节；按用户要求实施的私有 Decode 写入及新验收见第 16 节，工作树待审查。公开 API、generator 与预算/所有权契约不变。
 
 第三轮已完成当前基线与候选筛选，只保留调用内布局记录的内存收窄，独立库已本地提交为 `a579920`，GSR 记录提交为 `fdbc736`，均未推送/发布；未取得新的明显 CPU 加速。实测和取舍见 [第三轮结果](benchmarks/2026-10-16-gosproto-round3/RESULTS.md) 及第 8 节。
 
@@ -275,4 +275,12 @@ TS 经验提取已在 GSR `f45a8c6` 提交。Go 从 `6012b06` 重建两套主基
 
 另在完整通用 parser 的临时副本验证原生 *int64 类型化写入，保留实际类型、字段 owner/形状、scalar 校验与反射回落。129 项五轮中，大型 Decode 17.535 → 15.565 µs（-11.2%），PDecode 22.715 → 20.636 µs（-9.2%），分配不变；字符串约 +4.9% 和未改极小 Unpack +11.6% 的代价原样保留。
 
-隔离原型通过官方对照、完整库 race/checkptr/vet、131068 组差分与 GC/padding 探针、两项有限 fuzz、GSR 三包与 Go/TS 7/7。原型未放入正式库，正式生产源码仍为 `70d985c`。推荐范围、Go 写屏障/布局责任和正式化门槛见 [受控写入提案](RFC-GOSPROTO-DECODER-WRITES.md)，数据、未验证范围及复现见 [实验记录](benchmarks/2026-10-17-gosproto-decode-writes/RESULTS.md)。提案为 Proposed，不替代先前仅编码 offset 读取的已实施范围。新增测试与文档未提交/发布。
+隔离原型通过官方对照、完整库 race/checkptr/vet、131068 组差分与 GC/padding 探针、两项有限 fuzz、GSR 三包与 Go/TS 7/7。原型未放入正式库，正式生产源码仍为 `70d985c`。推荐范围、Go 写屏障/布局责任和正式化门槛见 [受控写入提案](RFC-GOSPROTO-DECODER-WRITES.md)，数据、未验证范围及复现见 [实验记录](benchmarks/2026-10-17-gosproto-decode-writes/RESULTS.md)。该轮提案与回归已本地提交为独立库 `5be3b26`、GSR `2872d46`；当时尚未采用写入原型。正式封装后的新数据见下一节，未发布。
+
+## 16. 原生整数 Decode 的私有类型化写入
+
+按受控写入提案的最小范围实施：类型核对和地址取得封装于 decodePointer，通用 parser 保留完整校验，逐字段核对 native/owner/Wire/Array 后做 Go 类型化指针赋值；不满足时回落反射索引。每字段独占分配和根结果失败原子性不变。没有更改 Encode、Pack/Unpack、元信息、API 或生成类型。
+
+封装后重新采样 129 项五轮：大型 Decode 17.484 → 16.189 µs（-7.4%），PDecode 22.904 → 21.548 µs（-5.9%）；小型约 -7.7%/-5.6%，分配不变。大型纯 Decode 低于同场 PB 17.777 µs，但 PDecode 仍高约 21.2%。AddressBook 约 +2%、未改极小 Unpack +16.6% 与独立 A/A +2.6% 原值保留，不宣称全面无回退。setInteger 内联、入口 helper 未内联和实际 Go 写屏障证据均记录。
+
+新增库内 GC/padding/独占回归；完整库 race/checkptr/官方对照/vet、131068 差分、两项有限 fuzz、GSR 三包及 GoTS 7/7 通过。缺失 Decode owner guard 的隔离副本按预期失败。Linux 三架构构建通过，未跨平台运行。数据、复现与边界见 [受控写入实施](benchmarks/2026-10-17-gosproto-decode-store/RESULTS.md)。本轮实现和记录未提交/发布，正式依赖仍为 v0.4.0。

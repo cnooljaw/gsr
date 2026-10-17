@@ -1,0 +1,181 @@
+{
+  "baseCommit": "5be3b26",
+  "commands": [
+    {
+      "cwd": "/private/tmp/gsr-gosproto-fork",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "-gcflags=all=-d=checkptr=2",
+        "./...",
+        "-timeout=2m"
+      ],
+      "env": {
+        "SPROTO_ORACLE_DIR": "/private/tmp/gsr-official-sproto-review",
+        "GOMAXPROCS": "2"
+      },
+      "exitCode": 0,
+      "elapsedSeconds": 3.377,
+      "output": "ok  \tgithub.com/cnooljaw/gosproto\t2.292s\n?   \tgithub.com/cnooljaw/gosproto/examples/echo\t[no test files]\n"
+    },
+    {
+      "cwd": "/private/tmp/gsr-gosproto-fork",
+      "args": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "env": {},
+      "exitCode": 0,
+      "elapsedSeconds": 0.221,
+      "output": ""
+    },
+    {
+      "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-decode-store/differential",
+      "args": [
+        "go",
+        "test",
+        "-mod=mod",
+        "-race",
+        "-gcflags=all=-d=checkptr=2",
+        "-v",
+        ".",
+        "-timeout=1m"
+      ],
+      "env": {},
+      "exitCode": 0,
+      "elapsedSeconds": 2.744,
+      "output": "=== RUN   TestTypedStorePaddingAndGC\n--- PASS: TestTypedStorePaddingAndGC (0.01s)\n=== RUN   TestTypedStoreForeignOffsetFallback\n--- PASS: TestTypedStoreForeignOffsetFallback (0.00s)\n=== RUN   TestInlineDifferential\n    inline_test.go:81: 131068 inline/budget/malformed/packed differential cases\n--- PASS: TestInlineDifferential (0.98s)\nPASS\nok  \tstorediff\t2.397s\n"
+    },
+    {
+      "cwd": "/private/tmp/gsr-gosproto-fork",
+      "args": [
+        "go",
+        "test",
+        "-run=^$",
+        "-fuzz=^FuzzDecode$",
+        "-fuzztime=10s",
+        "-parallel=2",
+        "-timeout=45s"
+      ],
+      "env": {},
+      "exitCode": 0,
+      "elapsedSeconds": 12.09,
+      "output": "fuzz: elapsed: 0s, gathering baseline coverage: 0/62 completed\nfuzz: elapsed: 0s, gathering baseline coverage: 62/62 completed, now fuzzing with 2 workers\nfuzz: elapsed: 3s, execs: 11304 (3768/sec), new interesting: 0 (total: 62)\nfuzz: elapsed: 6s, execs: 11304 (0/sec), new interesting: 0 (total: 62)\nfuzz: elapsed: 9s, execs: 11304 (0/sec), new interesting: 0 (total: 62)\nfuzz: elapsed: 11s, execs: 11304 (0/sec), new interesting: 0 (total: 62)\nPASS\nok  \tgithub.com/cnooljaw/gosproto\t11.388s\n"
+    },
+    {
+      "cwd": "/private/tmp/gsr-gosproto-fork",
+      "args": [
+        "go",
+        "test",
+        "-run=^$",
+        "-fuzz=^FuzzCodecRoundTrip$",
+        "-fuzztime=10s",
+        "-parallel=2",
+        "-timeout=45s"
+      ],
+      "env": {},
+      "exitCode": 0,
+      "elapsedSeconds": 10.703,
+      "output": "fuzz: elapsed: 0s, gathering baseline coverage: 0/5 completed\nfuzz: elapsed: 0s, gathering baseline coverage: 5/5 completed, now fuzzing with 2 workers\nfuzz: elapsed: 3s, execs: 162109 (54018/sec), new interesting: 0 (total: 5)\nfuzz: elapsed: 6s, execs: 332815 (56902/sec), new interesting: 0 (total: 5)\nfuzz: elapsed: 9s, execs: 498388 (55191/sec), new interesting: 0 (total: 5)\nfuzz: elapsed: 10s, execs: 554691 (52730/sec), new interesting: 0 (total: 5)\nPASS\nok  \tgithub.com/cnooljaw/gosproto\t10.268s\n"
+    },
+    {
+      "cwd": "/private/tmp/gsr-gosproto-fork",
+      "args": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "env": {
+        "GOOS": "linux",
+        "GOARCH": "amd64",
+        "CGO_ENABLED": "0"
+      },
+      "exitCode": 0,
+      "elapsedSeconds": 0.484,
+      "output": ""
+    },
+    {
+      "cwd": "/private/tmp/gsr-gosproto-fork",
+      "args": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "env": {
+        "GOOS": "linux",
+        "GOARCH": "arm64",
+        "CGO_ENABLED": "0"
+      },
+      "exitCode": 0,
+      "elapsedSeconds": 2.458,
+      "output": ""
+    },
+    {
+      "cwd": "/private/tmp/gsr-gosproto-fork",
+      "args": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "env": {
+        "GOOS": "linux",
+        "GOARCH": "386",
+        "CGO_ENABLED": "0"
+      },
+      "exitCode": 0,
+      "elapsedSeconds": 0.345,
+      "output": ""
+    },
+    {
+      "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+      "args": [
+        "go",
+        "test",
+        "-modfile=/private/tmp/gsr-next-codec.mod",
+        "./protocol/sproto",
+        "./examples/websocket-gate/cmd/debugserver",
+        "./examples/websocket-gate/benchmarks",
+        "-timeout=2m"
+      ],
+      "env": {},
+      "exitCode": 0,
+      "elapsedSeconds": 1.549,
+      "output": "ok  \tgithub.com/cnooljaw/gsr/protocol/sproto\t0.331s\nok  \tgithub.com/cnooljaw/gsr/examples/websocket-gate/cmd/debugserver\t0.479s\nok  \tgithub.com/cnooljaw/gsr/examples/websocket-gate/benchmarks\t0.797s\n"
+    },
+    {
+      "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+      "args": [
+        "npm",
+        "--prefix",
+        "examples/websocket-gate",
+        "run",
+        "test:sproto:integration"
+      ],
+      "env": {
+        "GOFLAGS": "-modfile=/private/tmp/gsr-next-codec.mod"
+      },
+      "exitCode": 0,
+      "elapsedSeconds": 2.241,
+      "output": "\n> test:sproto:integration\n> npm run build && go build -o ../../tmp/sproto-echo ./cmd/debugserver && GSR_SPROTO_SERVER_BIN=../../tmp/sproto-echo node --test client/dist/sproto_client.test.js\n\n\n> build\n> tsc --project tsconfig.json\n\n✔ official Sproto vectors and safe integer boundary (1.703541ms)\n✔ official Sproto boolean and mixed signed int64 arrays (120.045958ms)\n✔ Sproto decoded results and unpacked buffers stay independent (4.436ms)\n✔ Sproto sessions stay independent and close clears pending (1.295833ms)\n✔ Sproto pending and packet limits (66.7665ms)\n✔ Go/TS Sproto Echo Plain (390.086709ms)\n✔ Go/TS Sproto Echo MAC (26.384208ms)\nℹ tests 7\nℹ suites 0\nℹ pass 7\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 662.195292\n"
+    }
+  ],
+  "newCoverage": "TestNativePointerDecodePaddingAndGC promotes nonzero-offset/padding, repeated GC, per-record/per-call independent pointers into the library. Existing strong foreign-offset, exact quota, native/named type and failure-atomicity tests retained.",
+  "differentialCases": 131068,
+  "integration": {
+    "passed": 7,
+    "failed": 0,
+    "skipped": 0
+  },
+  "oracleSource": "inputs.json pinned archive hashes verified before validation",
+  "negativeOwner": "negative-owner.json: formal regression rejects Decode-only missing-owner mutant",
+  "notRun": [
+    "Cross-platform execution (Linux amd64/arm64/386 compilation only)",
+    "GSR whole repository tests/race",
+    "New TypeScript performance matrix",
+    "New CPU/alloc profile (compiler inlining and write barrier inspected)"
+  ],
+  "sourceAudit": "All timed Go sources unchanged through verification; reproduce-pairs.py --prepare-only reconstructs exact complete sources, seven harnesses and three fixture hashes.",
+  "fuzzNote": "FuzzDecode passed 11304 executions; reported no new executions after first 3 seconds through the 11-second shutdown. No retry or extended timeout."
+}

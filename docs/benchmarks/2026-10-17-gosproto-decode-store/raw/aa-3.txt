@@ -1,0 +1,9 @@
+goos: darwin
+goarch: arm64
+pkg: encoderbench
+cpu: Apple M2
+BenchmarkPairedUnpackShapes/nonzero1x256/sproto_unpack         	   60000	      1181 ns/op	    2048 B/op	       1 allocs/op
+BenchmarkPairedUnpackShapes/nonzero1x256/before_unpack         	   60000	      1262 ns/op	    2048 B/op	       1 allocs/op
+BenchmarkPairedUnpackShapes/zeroWords15/sproto_unpack          	   60000	        50.35 ns/op	     128 B/op	       1 allocs/op
+BenchmarkPairedUnpackShapes/zeroWords15/before_unpack          	   60000	        50.71 ns/op	     128 B/op	       1 allocs/op
+PASS

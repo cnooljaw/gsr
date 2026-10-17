@@ -1,0 +1,14 @@
+{
+  "platform": "Go 1.24.13 darwin/arm64 Apple M2",
+  "binarySha256": "f58fc69daddda8718bc3c527d3b365f5b5c6adcc3a35d5c6a0dd1c02e12c8050",
+  "command": "go tool objdump -s ^github.com/cnooljaw/gosproto.decodeMessage$ store.test",
+  "writeBarrierExcerpts": [
+    "  decode_pointer.go:23\t0x100209e68\t\t37000205\t\tTBNZ $0, R5, 16(PC)\t\t\t\t\t\t\n  decode_pointer.go:27\t0x100209e6c\t\tf9404885\t\tMOVD 144(R4), R5\t\t\t\t\t\t\n  decode_pointer.go:27\t0x100209e70\t\tf000181b\t\tADRP 3158016(PC), R27\t\t\t\t\t\t\n  decode_pointer.go:27\t0x100209e74\t\tb9491367\t\tMOVWU 2320(R27), R7\t\t\t\t\t\t\n  decode_pointer.go:27\t0x100209e78\t\t340000a7\t\tCBZW R7, 5(PC)\t\t\t\t\t\t\t\n  decode_pointer.go:27\t0x100209e7c\t\t97f9b905\t\tCALL runtime.gcWriteBarrier2(SB)\t\t\t\t\n  decode_pointer.go:27\t0x100209e80\t\tf9000320\t\tMOVD R0, (R25)\t\t\t\t\t\t\t\n  decode_pointer.go:27\t0x100209e84\t\tf8656827\t\tMOVD (R1)(R5), R7\t\t\t\t\t\t\n  decode_pointer.go:27\t0x100209e88\t\tf9000727\t\tMOVD R7, 8(R25)\t\t\t\t\t\t\t\n  decode_pointer.go:27\t0x100209e8c\t\tf8256820\t\tMOVD R0, (R1)(R5)\t\t\t\t\t\t\n  decode_pointer.go:27\t0x100209e90\t\tb24003e2\t\tORR $1, ZR, R2\t\t\t\t\t\t\t\n  decode.go:337\t\t0x100209e94\t\t14000006\t\tJMP 6(PC)\t\t\t\t\t\t\t"
+  ],
+  "compiler": [
+    "/private/tmp/gsr-gosproto-fork/decode_pointer.go:14:6: cannot inline messageDecodePointer: function too complex: cost 216 exceeds budget 80",
+    "/private/tmp/gsr-gosproto-fork/decode_pointer.go:22:6: can inline decodePointer.setInteger with cost 39 as: method(decodePointer) func(*SprotoType, *SprotoField, *int64) bool { if pointer.value == nil || !(*SprotoField).nativeInteger(field, schema) { return false }; *(**int64)(unsafe.Add(pointer.value, field.encOffset)) = value; return true }",
+    "/private/tmp/gsr-gosproto-fork/decode.go:337:26: inlining call to decodePointer.setInteger"
+  ],
+  "scope": "Compiler evidence for current darwin/arm64 toolchain; not a proof of every target architecture."
+}

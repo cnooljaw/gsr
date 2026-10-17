@@ -102,7 +102,7 @@ Go 第三轮已重建基线并筛选候选：仅保留布局记录内存收窄�
 
 2026-10-17，同分配探针确认大型 Decode 仍有反射执行成本；落地已确认 inline 原生整数的安全快捷处理。大型 Decode/PDecode 约 -5.3%/-4.1%，分配、wire、预算及独占不变，未新增 unsafe。完整库/官方对照、差分、有限 fuzz 与 GSR/GoTS 集成通过，控制中的波动和代价分别保留，见 [Decode 诊断与验收](benchmarks/2026-10-17-gosproto-decode-analysis/RESULTS.md)。已本地提交为 gosproto `70d985c`、GSR `d0328fd`，未发布，正式依赖仍为 v0.4.0。
 
-后续整数记录专用 parser 已因组合收益不足撤回。原生整数指针类型化写入在隔离副本的五轮数据中带来大型 Decode/PDecode 约 -11.2%/-9.2%，并通过官方/GC/差分及 GoTS 集成；正式生产代码仍为 `70d985c`。数据与局限见 [实验记录](benchmarks/2026-10-17-gosproto-decode-writes/RESULTS.md)，正式化范围见 [Proposed 提案](RFC-GOSPROTO-DECODER-WRITES.md)。新增测试与文档未提交，正式依赖仍为 v0.4.0。
+后续整数记录专用 parser 已因组合收益不足撤回。原生整数指针类型化写入在隔离副本的五轮数据中带来大型 Decode/PDecode 约 -11.2%/-9.2%，并通过官方/GC/差分及 GoTS 集成；正式生产代码仍为 `70d985c`。数据与局限见 [实验记录](benchmarks/2026-10-17-gosproto-decode-writes/RESULTS.md)，正式化范围见 [受控写入提案](RFC-GOSPROTO-DECODER-WRITES.md)。该轮已本地提交为 gosproto `5be3b26`、GSR `2872d46`，正式依赖仍为 v0.4.0。
 
 ## 独立修复库与官方对照（2026-10-15）
 
@@ -161,3 +161,5 @@ davyxu 的五条最小 Go 用例均未通过；xjdrew 的标量用例通过，�
 davyxu 的 `float32/float64` 是生成器扩展：生成整数字段，用精度因子缩放，默认因子为 1000；它不是官方 double 的 IEEE-754 wire，不能当作 double 支持。源码的顶层解析分支与生成模板主要处理结构体/enum，未覆盖原生 `echo 1 { request ... response ... }` 的完整 RPC 定义生成，不能直接替代原生协议工具链；本轮没有运行其生成器。
 
 结论：这两个候选版本均不能直接作为满足接入门禁的依赖。优先验证修复实现，并以官方 schema、编码向量和错误行为验收；若采用某库的修复分支，明确锁定提交和修复范围。不改官方协议来迁就第三方扩展，不把临时 recover 当作兼容性或资源上限的解决方案。
+
+受控写入现按提案的最小范围封装到私有 decodePointer；新五轮大型 Decode/PDecode 约 -7.4%/-5.9%，分配不变，AddressBook 与控制代价保留。完整库/官方/GC/差分/fuzz 及 GSR 三包/GoTS 7/7 验收通过，见 [实施验收](benchmarks/2026-10-17-gosproto-decode-store/RESULTS.md)。本轮实现与文档未提交/发布，正式依赖未升级。

@@ -1,0 +1,78 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "-race",
+    "-gcflags=all=-d=checkptr=2",
+    "-run",
+    "^TestDecodeIntegerRecordFieldsReplacement$",
+    ".",
+    "-timeout=1m"
+  ],
+  "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-decode-store/mutant-no-owner",
+  "expectedFailure": true,
+  "exitCode": 1,
+  "elapsedSeconds": 1.282,
+  "mutation": "Only remove owner check from decodePointer.setInteger; keep native flag, Wire and Array checks. Formal source unchanged.",
+  "events": [
+    {
+      "Time": "2026-10-17T15:04:24.489443+08:00",
+      "Action": "start",
+      "Package": "github.com/cnooljaw/gosproto"
+    },
+    {
+      "Time": "2026-10-17T15:04:24.823313+08:00",
+      "Action": "run",
+      "Package": "github.com/cnooljaw/gosproto",
+      "Test": "TestDecodeIntegerRecordFieldsReplacement"
+    },
+    {
+      "Time": "2026-10-17T15:04:24.82335+08:00",
+      "Action": "output",
+      "Package": "github.com/cnooljaw/gosproto",
+      "Test": "TestDecodeIntegerRecordFieldsReplacement",
+      "Output": "=== RUN   TestDecodeIntegerRecordFieldsReplacement\n"
+    },
+    {
+      "Time": "2026-10-17T15:04:24.823524+08:00",
+      "Action": "output",
+      "Package": "github.com/cnooljaw/gosproto",
+      "Test": "TestDecodeIntegerRecordFieldsReplacement",
+      "Output": "    limits_test.go:605: replacement index semantics: {Items:[0xc0000d6230 0xc0000d6280]} <nil>\n"
+    },
+    {
+      "Time": "2026-10-17T15:04:24.82358+08:00",
+      "Action": "output",
+      "Package": "github.com/cnooljaw/gosproto",
+      "Test": "TestDecodeIntegerRecordFieldsReplacement",
+      "Output": "--- FAIL: TestDecodeIntegerRecordFieldsReplacement (0.00s)\n"
+    },
+    {
+      "Time": "2026-10-17T15:04:24.823584+08:00",
+      "Action": "fail",
+      "Package": "github.com/cnooljaw/gosproto",
+      "Test": "TestDecodeIntegerRecordFieldsReplacement",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-17T15:04:24.823637+08:00",
+      "Action": "output",
+      "Package": "github.com/cnooljaw/gosproto",
+      "Output": "FAIL\n"
+    },
+    {
+      "Time": "2026-10-17T15:04:24.824153+08:00",
+      "Action": "output",
+      "Package": "github.com/cnooljaw/gosproto",
+      "Output": "FAIL\tgithub.com/cnooljaw/gosproto\t0.334s\n"
+    },
+    {
+      "Time": "2026-10-17T15:04:24.824158+08:00",
+      "Action": "fail",
+      "Package": "github.com/cnooljaw/gosproto",
+      "Elapsed": 0.335
+    }
+  ],
+  "stderr": ""
+}

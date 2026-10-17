@@ -4,13 +4,21 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## 原生整数 Decode 受控写入（2026-10-17）
+
+前轮已本地提交为 gosproto `5be3b26`、GSR `2872d46`，未推送。按提案新增私有 decodePointer，仅写原生 *int64 标量；实际类型、字段 owner/形状与反射回落、Go 写屏障、独占分配和失败原子性均保留。新实现和文档留在工作树待审查，正式依赖仍为 v0.4.0。
+
+封装后 129 项五轮：大型 Decode/PDecode 约 -7.4%/-5.9%，小型约 -7.7%/-5.6%，分配不变。AddressBook 约 +2%；未改极小 Unpack +16.6% 与单独 A/A +2.6% 一并保留。纯 Decode 与完整 packing 路径区分报告，不称为全面胜 PB。
+
+新增正式 GC/padding/跨记录独占回归。完整库 race/checkptr/固定官方 C/Lua 对照、vet、131068 差分、有限 Decode/Codec fuzz、GSR 三包与 TS 构建/GoTS Plain/MAC 7/7、零跳过通过；缺失 owner guard 的副本按预期失败。Linux amd64/arm64/386 构建通过，未跨架构运行。具体数据、编译器/写屏障证据、复现与未验证项见 [实施验收](benchmarks/2026-10-17-gosproto-decode-store/RESULTS.md)。
+
 ## Decode 记录候选与类型化写入原型（2026-10-17）
 
 上一轮已本地提交为 gosproto `70d985c`、GSR `d0328fd`，未推送。整数叶子记录 parser 只带来约 -3.1% Decode/-1.3% PDecode，已撤回。正式库仅新增精确稀疏 header 解码预算、失败原数组与 Fields 替换语义回归，生产 Go 源码全部保持 `70d985c`。
 
 类型化写入只在隔离副本验证：129 项五轮中，大型 Decode/PDecode 约 -11.2%/-9.2%，分配不变。字符串/未改 Unpack 控制的代价与原值一并保留。原型完整库官方对照/race/严格 checkptr/vet、131068 组差分与 GC/padding 检查、Decode/Codec 有限 fuzz，以及临时覆盖 GSR 三包和 Go/TS Plain/MAC 7/7、零跳过通过。没有跨架构运行或新的极小项 A/A 复核。
 
-原型不等于正式依赖已升级或写入边界已采用；[实验记录](benchmarks/2026-10-17-gosproto-decode-writes/RESULTS.md) 与 [Proposed 提案](RFC-GOSPROTO-DECODER-WRITES.md) 记录范围、代价和后续门槛。新增正式库测试、诊断和文档未提交。
+原型不等于正式依赖已升级或写入边界已采用；[实验记录](benchmarks/2026-10-17-gosproto-decode-writes/RESULTS.md) 与 [受控写入提案](RFC-GOSPROTO-DECODER-WRITES.md) 记录范围、代价和后续门槛。该轮新增正式库测试、诊断和文档已本地提交为 gosproto `5be3b26`、GSR `2872d46`；后续实施见上节。
 
 ## Decode 同分配诊断与安全 inline（2026-10-17）
 

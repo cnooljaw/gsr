@@ -34,7 +34,7 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 
 ## 报告
 
-[Decode 记录候选与受控写入原型](../../../docs/benchmarks/2026-10-17-gosproto-decode-writes/RESULTS.md) 保存被撤回的整数叶子 parser，以及完整通用流程中的类型化整数写入隔离原型。后者五轮大型 Decode/PDecode 约 -11.2%/-9.2%，分配不变；字符串与未改 Unpack 控制的代价保留。正式库生产源码仍为 `70d985c`，受控写入仅形成 Proposed 提案。
+[Decode 记录候选与受控写入原型](../../../docs/benchmarks/2026-10-17-gosproto-decode-writes/RESULTS.md) 保存被撤回的整数叶子 parser，以及完整通用流程中的类型化整数写入隔离原型。后者五轮大型 Decode/PDecode 约 -11.2%/-9.2%，分配不变；字符串与未改 Unpack 控制的代价保留。该轮提案与回归已本地提交为独立库 `5be3b26`、GSR `2872d46`；原型未作为当时正式实现。
 
 [Decode 同分配诊断与安全 inline 验收](../../../docs/benchmarks/2026-10-17-gosproto-decode-analysis/RESULTS.md) 区分固定流程、反射赋值与构造成本；保留通用/固定探针各自数据。安全 inline 最终 129 项五轮中，大型 Decode/PDecode 约 -5.3%/-4.1%，分配不变；原三轮波动、完整矩阵极小项代价及 A/A 控制分别公开。固定 Item 探针不作为生产结果，正式依赖仍为 v0.4.0。
 
@@ -164,3 +164,5 @@ SPROTO_ORACLE_DIR=/path/to/pinned/sproto \
 ```
 
 脚本先验证 `oracle-source.json` 的六份源码哈希，再用官方 C/Lua 编码五组数据，与固定签名比较。可加 `--output /absolute/file.json` 导出独立证据；Go 侧可设 `GSR_BENCH_EXPORT_WIRE=/absolute/file.json` 运行夹具测试导出独立签名。两种导出都不自动覆盖 `representative.json`，更新夹具时应先比较独立结果再审查变更。
+
+[原生整数 Decode 受控写入](../../../docs/benchmarks/2026-10-17-gosproto-decode-store/RESULTS.md) 记录私有 helper 封装后的五轮新采样：大型 Decode/PDecode 约 -7.4%/-5.9%，分配不变，完整矩阵/A/A 控制和 GC/布局验收一并保留。本轮工作树待审查，正式依赖仍为 v0.4.0。
