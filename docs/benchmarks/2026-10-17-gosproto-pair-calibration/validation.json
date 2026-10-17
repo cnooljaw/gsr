@@ -1,0 +1,153 @@
+{
+  "formalLibraryHead": "bba332607df669a46fd0547f6a3bdeff432ac6df",
+  "formalLibraryStatus": "",
+  "formalGoSource": {
+    "limits.go": "42865809572cb856d39a62ae3f1d95c8b6395da5a5cac5539c75d2aa6ce34fd9",
+    "fuzz_test.go": "de339d3fbf5d589377ca304c82496f316478ac19bbf42c230eb0cf2fca0cf8ab",
+    "sproto_test.go": "4127e6f7a2b08474f8d126b47817617c4066737851bc787f22c0102b5e2bc800",
+    "encode.go": "73fe791f2e3d5d9011bc2011b9413c94457baea06c887426992f4a665fe0784a",
+    "rpc_limits_test.go": "486c8f73eb0e3cb63412796c669e55cb94c7ad49c0813cbb6dff36ad414e2b7c",
+    "pack.go": "03e4fc26bec682dfb6f0fcae31b33e70c7986773d268a89a73bbd119ab2cd6e4",
+    "decode_pointer.go": "5cf91e619c80895785046b396dbf1861a61281cb0b6c3d954cd07d99b8bfd961",
+    "encode_integer_record.go": "1ec4e5d0531c1de565aaa6b60c8ea8e185b9c36a95ffc9e49b848e5ed267fdcb",
+    "encode_pointer.go": "e7a239568a0fc8788404de6f5bc0d5e2ac092fa559f0a6bfd4561fdc155f81c1",
+    "rpc_test.go": "d8e1c353c96ff3577e6bdd86a1d1fbee8422486f491735bab278f65682c6102d",
+    "sproto.go": "b3cde4699d2fc07a453e521b0fac46534e43a8681fbbc5cb75d3ef27b9234164",
+    "rpc.go": "4368b24cb51c43c083c9430fd5264e94255149d5d4c9d9742626bc504450a376",
+    "meta.go": "6badd4a5ac60d8a15caaa1f35634268101c436b275cf4a0fe120b91db417d217",
+    "limits_test.go": "133e730777dc7ed132e5fd6c683cac8597870e908a3363f9b4ee37f1c19728d0",
+    "decode.go": "b3cbbe248d17fe770add10ba93e5942fe5c54c13eba1c416135d83cff890e65e",
+    "pack_test.go": "70e79e8fa5273d4a9f31fb6afc885efbb1f2f86ca9d68b1bba4c1c97e8deed56",
+    "encode_test.go": "d28095ae5b5b820eb0d5aed634397bb86159361b5876c3126100d59e37d41099",
+    "official_compat_test.go": "adfe1ee5982544a937b72eed95592e4d6c521731db8c88c91dbe39440e1827ef"
+  },
+  "toolSha256": {
+    "run.py": "2673fb4e6a405930001dc5d9d91e2fc21d0eff53565ae0c7e0e48b66cf01ba57",
+    "test_run.py": "82a3edcdf51827e78d536cb4d9315532cb96c79de8677ab570f793aae2ac6bff",
+    "README.md": "5924dfe6c9bcc2cca000bdd7888e0872590b1f4138ba5cf769784fe3ebeb39c9",
+    "sampler_test.go.txt": "a87b3a254bac81ec3d4c0f758d3509ab08d6257c18d9b353afe71b5736f45b37"
+  },
+  "newCommands": [
+    {
+      "args": [
+        "python3",
+        "/Users/lijiawang/Documents/cocos/laya/gsr/examples/websocket-gate/benchmarks/tools/go-pairs/run.py",
+        "--library",
+        "/private/tmp/gsr-gosproto-fork",
+        "--baseline",
+        "bba3326",
+        "--output",
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pair-calibration/reproduce-self",
+        "--mode",
+        "self",
+        "--prepare-only"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.208,
+      "output": ""
+    },
+    {
+      "args": [
+        "python3",
+        "/Users/lijiawang/Documents/cocos/laya/gsr/examples/websocket-gate/benchmarks/tools/go-pairs/run.py",
+        "--library",
+        "/private/tmp/gsr-gosproto-fork",
+        "--baseline",
+        "bba3326",
+        "--output",
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pair-calibration/reproduce-compare",
+        "--mode",
+        "compare",
+        "--prepare-only",
+        "--candidate-patch",
+        "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-17-gosproto-pack-sparse/patches/unroll.patch"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.181,
+      "output": ""
+    },
+    {
+      "args": [
+        "python3",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "/Users/lijiawang/Documents/cocos/laya/gsr/examples/websocket-gate/benchmarks/tools/go-pairs",
+        "-p",
+        "test_run.py",
+        "-v"
+      ],
+      "exitCode": 0,
+      "output": "test_allocation_difference_rejects_control (test_run.ControlDecisionTests.test_allocation_difference_rejects_control) ... ok\ntest_comparison_never_grants_automatic_adoption (test_run.ControlDecisionTests.test_comparison_never_grants_automatic_adoption) ... ok\ntest_good_median_does_not_hide_dispersion (test_run.ControlDecisionTests.test_good_median_does_not_hide_dispersion) ... ok\ntest_stable_control_preserves_all_rounds (test_run.ControlDecisionTests.test_stable_control_preserves_all_rounds) ... ok\n\n----------------------------------------------------------------------\nRan 4 tests in 0.000s\n\nOK\n"
+    }
+  ],
+  "goValidation": [
+    {
+      "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pair-calibration/mutant",
+      "args": [
+        "go",
+        "test",
+        "-mod=mod",
+        "-run",
+        "^TestPairStatistics$",
+        ".",
+        "-timeout=1m"
+      ],
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "elapsedSeconds": 1.81,
+      "output": "--- FAIL: TestPairStatistics (0.00s)\n    sampler_test.go:211: ABBA ratio=2.4000011647090247 err=<nil>\nFAIL\nFAIL\tcodecpairstool\t0.573s\nFAIL\n"
+    },
+    {
+      "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pair-calibration/self/harness",
+      "args": [
+        "go",
+        "vet",
+        "."
+      ],
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "elapsedSeconds": 0.28,
+      "output": ""
+    }
+  ],
+  "scope": "Paired tool statistics, fixed fixtures, candidate wire and reproducible archives only. Formal library unchanged; no new full library/oracle/fuzz/GSR/GoTS acceptance.",
+  "negativeControl": {
+    "originalSamplerSha256": "a87b3a254bac81ec3d4c0f758d3509ab08d6257c18d9b353afe71b5736f45b37",
+    "mutatedSamplerSha256": "90baeb25dad80cc0ab042912f67a57202e3516037f905075d275f18fe859b0e6",
+    "patch": "normalization-negative.patch",
+    "expected": "TestPairStatistics fails when elapsed nanoseconds are not divided by each block call count"
+  },
+  "gsrHead": "8f0003fb530110b14618e437acc29371384d6cb7",
+  "generatedGoInputs": {
+    "examples/websocket-gate/gen/go/gsr/example/echo/v1/echo_registry.pb.go": "8f986de4ce5ae3ce65a8322b63e2577ee9365e94fbd07cf03f12028af0eb07b5",
+    "examples/websocket-gate/gen/go/gsr/example/echo/v1/echo.pb.go": "7fb0ba8bbdb0855614bb62e7e0881855921e4bbda584c4ac910330f1ebf8b52f",
+    "examples/websocket-gate/gen/sproto/c2s/c2s.go": "11ccc6602e33c58dcc8654d3ff718924416026b646db76bb16a2834c3e334b90",
+    "examples/websocket-gate/gen/sproto/s2c/s2c.go": "90a6f2b4374e45deee46882a9d60ae82ca4e9795872e007df76e2f76673ac5cd",
+    "examples/websocket-gate/benchmarks/gen/pb/representative.pb.go": "bde7cba1e55f7782c1572124de9aa86d85893ee80ed8e2ad5eab2b5d3db82450",
+    "examples/websocket-gate/benchmarks/gen/sproto/representative.go": "25f6aa66a2d35e5acaea7f90f8cd47f957772c96a30ab4e8ae34b4e2509bdbec",
+    "protocol/gen/go/gsr/protocol/v1/options.pb.go": "e8ff490a21a3ad701cb5d63fc7d86bbb2ac6394e800a04ad77a33d3cd358294a",
+    "protocol/gen/go/gsr/common/v1/common_registry.pb.go": "7bde4808497ae0fa7a98ea2b0e850f24415de2f0789fb38c110697410e43aefd",
+    "protocol/gen/go/gsr/common/v1/common_test.go": "ac74eb32e8510bd183e0861a84f1e8b82765d08bc2cc661fb00a9f1739e20f1a",
+    "protocol/gen/go/gsr/common/v1/doc.go": "03009f1fd60f1b12f997e869033ab19664005e649348b8a95998efe887caea5c",
+    "protocol/gen/go/gsr/common/v1/common.pb.go": "49d7ca5b04cbd1f0b6cbf031b64f4fb0ebb067a7b135c900d647b76b1eea41b4"
+  },
+  "samplingEnvironment": {
+    "GOGC": null,
+    "GOMEMLIMIT": null,
+    "GOFLAGS": null,
+    "GOTOOLCHAIN": null
+  },
+  "cpu": "Apple M2",
+  "cpuCommand": {
+    "args": [
+      "sysctl",
+      "-n",
+      "machdep.cpu.brand_string"
+    ],
+    "exitCode": 0,
+    "output": "Apple M2\n"
+  }
+}

@@ -1,0 +1,11 @@
+--- a/sampler_test.go
++++ b/sampler_test.go
+@@ -72,7 +72,7 @@
+ 		if block.Calls < 1 || block.Nanoseconds < 1 {
+ 			return 0, fmt.Errorf("invalid measured block")
+ 		}
+-		value := math.Log(float64(block.Nanoseconds) / float64(block.Calls))
++		value := math.Log(float64(block.Nanoseconds))
+ 		if block.Arm == "A" {
+ 			difference -= value
+ 		} else {

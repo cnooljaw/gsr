@@ -22,6 +22,12 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 
 这里的 `-count=5` 用于性能采样；不改变日常测试保留缓存的规则。Node 基准在构建后运行 `node examples/websocket-gate/client/dist/protocol_benchmark.js`，标准输出为五轮原始数据及中位数 JSON。追加 `--case ascii32` 可单独复测 32 字节小包。
 
+## Go 局部优化的配对校准
+
+小幅优化先用 [Go 配对工具](tools/go-pairs/README.md) 校准同函数和同源码 A/A，再解释候选差值。工具在独立归档中交错采样并保留全部轮次，不修改正式依赖；控制未通过的项目标记为无法判定。它不代替上面的四实现完整 Benchmark。
+
+首轮 [校准与原候选复测](../../../docs/benchmarks/2026-10-17-gosproto-pair-calibration/RESULTS.md) 中，9/19 项同时通过两类控制；原候选仍未达到保留门槛，正式库未改。新工具和记录待审查。
+
 ## 比较口径
 
 `cases.json` 是两种语言共用的消息内容：32 字节 ASCII、1000 字节 UTF-8、4096 字节 ASCII 和 4096 字节零字节文本。每条消息均是现有 EchoRequest 的一个 text 字段，复用现有 Protobuf 生成物与 Go Sproto 生成物。`echo.sproto` 仅把现有 echo.request 的同一字段布局命名为 EchoRequest，便于 TS 单独测量 payload；TS 在计时前核对其应用帧与真实 SprotoEchoClient 输出一致。
@@ -175,4 +181,4 @@ SPROTO_ORACLE_DIR=/path/to/pinned/sproto \
 
 [连续零 word Pack 筛选](../../../docs/benchmarks/2026-10-17-gosproto-zero-pack/RESULTS.md) 保存三个候选各 191 项三轮的全部原值，共 1719 样本。零块有收益，但其他路径代价不合适，全部撤回；只保留精确字节回归和记录，已本地提交为 gosproto `bba3326` / GSR `a27ec4e`，未推送/发布。新增 27 种零段/尾块 benchmark 控制及完整复现脚本，不作为新的协议总体性能基线。
 
-[稀疏 word 与 A/A 诊断](../../../docs/benchmarks/2026-10-17-gosproto-pack-sparse/RESULTS.md) 保存 191 项三轮候选筛选和 59 项三轮独立 A/A，共 750 个样本。候选组合回退未过门；同源码 A/A 也有明显差值，下一步应先校准测量，不能以约 6% 的纯 Pack 差值作为稳定收益。正式库未改，新记录待审查。
+[稀疏 word 与 A/A 诊断](../../../docs/benchmarks/2026-10-17-gosproto-pack-sparse/RESULTS.md) 保存 191 项三轮候选筛选和 59 项三轮独立 A/A，共 750 个样本。候选组合回退未过门；同源码 A/A 也有明显差值，下一步应先校准测量，不能以约 6% 的纯 Pack 差值作为稳定收益。正式库未改，该轮诊断已本地提交为 GSR `8f0003f`，未推送。

@@ -172,4 +172,6 @@ Decode 性能阶段已按用户决定冻结于独立库 `a09fb00`（Decode 生�
 
 后续连续零 word Pack 的三个候选虽改善零块，但因 ASCII、数值组合或短包代价全部未采用，正式生产代码保持 `faa6a21`。仅新增精确零段/FF/尾块回归和 1719 个筛选样本，未重复集成验收，见 [筛选记录](benchmarks/2026-10-17-gosproto-zero-pack/RESULTS.md)。该轮已本地提交为 gosproto `bba3326` / GSR `a27ec4e`，未推送/发布；Decode 阶段基线与正式依赖保持不变。
 
-后续稀疏 word 写出候选未通过组合路径门槛，未采用；额外 A/A 发现同源码计时差值可大于候选收益，下一步先校准测量方法。750 个配对样本、四项 CPU 摘要和汇编核对见 [诊断记录](benchmarks/2026-10-17-gosproto-pack-sparse/RESULTS.md)。独立库保持 `bba3326` 且工作树干净，正式依赖与 Decode 阶段基线不变；本轮未重复接线验收，新记录未提交。
+后续稀疏 word 写出候选未通过组合路径门槛，未采用；额外 A/A 发现同源码计时差值可大于候选收益，下一步先校准测量方法。750 个配对样本、四项 CPU 摘要和汇编核对见 [诊断记录](benchmarks/2026-10-17-gosproto-pack-sparse/RESULTS.md)。独立库保持 `bba3326` 且工作树干净，正式依赖与 Decode 阶段基线不变；该轮未重复接线验收，诊断已本地提交为 GSR `8f0003f`。
+
+后续新增同函数/同源码 A/A 与 ABBA/BAAB 配对工具，9/19 项同时通过两类控制。原候选复测仍未达保留门槛，正式库保持 `bba3326`；新工具和记录待审查，未重复接线验收，见 [校准记录](benchmarks/2026-10-17-gosproto-pair-calibration/RESULTS.md)。该工具只服务局部优化，不替代完整 Go/TS 对照或发布验收。

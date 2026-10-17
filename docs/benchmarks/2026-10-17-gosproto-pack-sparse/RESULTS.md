@@ -1,6 +1,6 @@
 # 稀疏 word Pack 筛选与 A/A 诊断
 
-2026-10-17。上一轮已本地提交为 gosproto `bba3326` / GSR `a27ec4e`，未推送/发布。**本轮稀疏 word 候选未通过预设门槛，未采用；独立库工作树保持干净，全部源码仍为 `bba3326`。** 新增诊断记录留在 GSR 工作树供审查。Decode 继续阶段性冻结，正式依赖仍为 v0.4.0。
+2026-10-17。上一轮已本地提交为 gosproto `bba3326` / GSR `a27ec4e`，未推送/发布。**本轮稀疏 word 候选未通过预设门槛，未采用；独立库工作树保持干净，全部源码仍为 `bba3326`。** 该轮诊断记录已本地提交为 GSR `8f0003f`。Decode 继续阶段性冻结，正式依赖仍为 v0.4.0。
 
 ## 定位与候选
 
@@ -58,4 +58,4 @@ python3 docs/benchmarks/2026-10-17-gosproto-pack-sparse/reproduce-pairs.py \
 
 --candidate baseline 重跑独立 A/A 的 59 项三轮，默认 unroll 重跑 191 项三轮；--prepare-only 只重建与核对，不修改传入库。固定输入见 [inputs.json](inputs.json)。共保留 750 个配对样本和四项独立 CPU profile，不保证复现相同耗时。
 
-正式库保持 `bba3326`，Decode 阶段基线、公开 API、wire、输出容量、预算与所有权不变。下一步优先校准测量方法，暂不堆叠更多普通 Pack 微调。新记录未提交，未推送/发布，GSR 正式依赖仍为 v0.4.0。
+正式库保持 `bba3326`，Decode 阶段基线、公开 API、wire、输出容量、预算与所有权不变。下一步优先校准测量方法，暂不堆叠更多普通 Pack 微调。该轮记录已本地提交为 GSR `8f0003f`，未推送/发布，GSR 正式依赖仍为 v0.4.0。

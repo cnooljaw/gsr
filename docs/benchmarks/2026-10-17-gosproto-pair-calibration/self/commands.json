@@ -1,0 +1,88 @@
+[
+  {
+    "args": [
+      "git",
+      "rev-parse",
+      "--verify",
+      "bba3326^{commit}"
+    ],
+    "cwd": "/private/tmp/gsr-gosproto-fork",
+    "env": {},
+    "elapsedSeconds": 0.013,
+    "exitCode": 0,
+    "output": "bba332607df669a46fd0547f6a3bdeff432ac6df\n"
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "before_echo_test.go",
+      "sampler_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pair-calibration/self/harness",
+    "env": {},
+    "elapsedSeconds": 0.031,
+    "exitCode": 0,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "version"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {},
+    "elapsedSeconds": 0.115,
+    "exitCode": 0,
+    "output": "go version go1.24.13 darwin/arm64\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-run",
+      "^(TestPairStatistics|TestRepresentativeFixtures)$",
+      ".",
+      "-timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pair-calibration/self/harness",
+    "env": {},
+    "elapsedSeconds": 1.679,
+    "exitCode": 0,
+    "output": "ok  \tcodecpairstool\t0.574s\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-c",
+      "-o",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pair-calibration/self/pairs.test",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pair-calibration/self/harness",
+    "env": {},
+    "elapsedSeconds": 0.441,
+    "exitCode": 0,
+    "output": ""
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pair-calibration/self/pairs.test",
+      "-test.run=^TestPairSampling$",
+      "-test.v",
+      "-test.timeout=90s"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pair-calibration/self/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GSR_PAIR_MODE": "self",
+      "GSR_PAIR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pair-calibration/self/raw.json"
+    },
+    "elapsedSeconds": 20.442,
+    "exitCode": 0,
+    "output": "=== RUN   TestPairSampling\n    sampler_test.go:341: self addressbook/sproto_encode: completed 1/19\n    sampler_test.go:341: self addressbook/sproto_pack: completed 2/19\n    sampler_test.go:341: self addressbook/sproto_pencode: completed 3/19\n    sampler_test.go:341: self game_small/sproto_encode: completed 4/19\n    sampler_test.go:341: self game_small/sproto_pack: completed 5/19\n    sampler_test.go:341: self game_small/sproto_pencode: completed 6/19\n    sampler_test.go:341: self game_large/sproto_encode: completed 7/19\n    sampler_test.go:341: self game_large/sproto_pack: completed 8/19\n    sampler_test.go:341: self game_large/sproto_pencode: completed 9/19\n    sampler_test.go:341: self int32_edges/sproto_encode: completed 10/19\n    sampler_test.go:341: self int32_edges/sproto_pack: completed 11/19\n    sampler_test.go:341: self int32_edges/sproto_pencode: completed 12/19\n    sampler_test.go:341: self echo_ascii4k/sproto_encode: completed 13/19\n    sampler_test.go:341: self echo_ascii4k/sproto_pack: completed 14/19\n    sampler_test.go:341: self echo_ascii4k/sproto_pencode: completed 15/19\n    sampler_test.go:341: self ascii32/frame: completed 16/19\n    sampler_test.go:341: self utf8_1k/frame: completed 17/19\n    sampler_test.go:341: self ascii4k/frame: completed 18/19\n    sampler_test.go:341: self zeros4k/frame: completed 19/19\n--- PASS: TestPairSampling (20.11s)\nPASS\n"
+  }
+]
