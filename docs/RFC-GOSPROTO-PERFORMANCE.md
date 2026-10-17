@@ -6,7 +6,7 @@
 
 前两轮以已发布的 gosproto v0.4.0 为版本基线；下一轮从已提交的 `6012b06` 做增量，不从 v0.4.0 重复实施。实现改动应在独立 gosproto 仓库进行，GSR 提供真实接线和跨语言 Benchmark；不修改 Go module cache，也不将库源码复制到 GSR。
 
-当前切片（2026-10-17）：RPC 共享工作区已本地提交为 gosproto dc4948d / GSR c4622bf，见第 28 节，未推送。后续仅将 RequestEncode 的 session 存储移入有响应分支，通知少一次逻辑分配及约 4 B/op；两轮测量与完整局部验收见第 29 节，新实现与记录未提交。正式 GSR 依赖仍为 v0.4.0，Decode 阶段性冻结。
+当前切片（2026-10-17）：通知 session 逃逸优化已本地提交为 gosproto 69cae73 / GSR 9ecc811，见第 29 节，未推送。后续基于独立 RPC profile，固定私有两字段 header 复用整数/tag写出与22 B栈缓冲，去掉反射遍历及header/session对象；19项两轮均更快并完成验收，见第 30 节，新实现与记录未提交。正式 GSR 依赖仍为 v0.4.0，Decode 阶段性冻结。
 
 ## 1. 目标与证据
 
@@ -400,4 +400,14 @@ RPC RequestEncode 原先在有响应分支取 &session，导致参数的堆存�
 
 固定 self/clone/两次19项真实RPC配对，共7296块独立复算一致。9种通知全部少一次逻辑分配、约4 B/op；32 B通知两轮约快2.71%/3.38%，AddressBook约快1.92%/2.13%。大型通知约慢0.73%/0.51%（68/48 ns），ASCII请求约慢1.06%/1.20%（18/20 ns），代价原样保留。self/clone原控制14/19、10/19，相同源码clone大型通知也有-2.51%偏差；不把大消息细微CPU差解释成已确认算法收益或回退。Go tiny allocator合并小值，少一次allocs/op不等同于每次少一个独立GC对象。
 
-按确定的分配减少、小包收益和极低维护成本保留，不设统一最低CPU收益线。库全测/官方C-Lua/race/checkptr/vet、GSR三包及Go/TS 7/7通过，源码与归档重建一致；新修改未提交。完整数据、控制失败及复现见 [session逃逸报告](benchmarks/2026-10-17-gosproto-rpc-session/RESULTS.md)。Decode、Pack/Unpack、body编解码、TS和正式依赖均不变，本轮未重复相关fuzz或PB/TS性能矩阵。
+按确定的分配减少、小包收益和极低维护成本保留，不设统一最低CPU收益线。库全测/官方C-Lua/race/checkptr/vet、GSR三包及Go/TS 7/7通过，源码与归档重建一致；该切片已提交为 gosproto 69cae73 / GSR 9ecc811，未推送。完整数据、控制失败及复现见 [session逃逸报告](benchmarks/2026-10-17-gosproto-rpc-session/RESULTS.md)。Decode、Pack/Unpack、body编解码、TS和正式依赖均不变，本轮未重复相关fuzz或PB/TS性能矩阵。
+
+## 30. 固定私有 RPC header 编码
+
+先对当前通知API分开采集CPU与分配profile。首次把memprofilerate=1与CPU合用，采样开销主导；保留该组诊断，另采CPU，不把profile ns/op当成基线。小包header仍走schema查询及反射预检/写出、产生16 B对象；大型消息内存主要在body/Pack缓冲。只针对库内固定type/session两字段，复用skipTag/encodeIntegerInto/writeUint函数，在22 B调用内栈缓冲编码并复制到原Pack工作区。元素与字节预算检查保留，固定深度1满足规范化默认深度下限；不删body预检、不新增业务消息专用编码框架。
+
+RequestEncode改用局部header值，避免字段指针赋值使session副本保守逃逸。首版2/3/2分配失败记录保留，最终通知/请求/响应的平坦消息均只承担body与Pack两个缓冲；大型消息另有布局记录。session登记、锁范围、错误顺序、默认预算、wire/cap/独占及Decode/Dispatch/通用codec/Pack/Unpack/TS均不变。
+
+固定四次19项配对共7296块独立复算一致。两轮19项均更快：32 B通知−37.18%/−38.40%，AddressBook约−13.6%～−17.4%，大型消息约−1.7%～−3.7%，整数数组约−2.1%～−4.0%；通知少1次16 B分配，请求/响应少2次约20 B分配。self/clone原控制14/19、11/19及全部失败/波动保留，不以固定最低CPU比例淘汰，也不扩展为PB/TS或网络排名。
+
+既有组合用例扩展至1008组/2016输出；新增39个官方C/Lua RPC头编码/解码对照，在旧实现也通过。有限随机fuzz仅58次，覆盖不足明确保留；随后单次固定3078种子/12312帧旧新差分通过，没有重试随机fuzz凑数字。最终库普通/官方/race/checkptr/vet、GSR三包及Go/TS 7/7通过；库Go源码与采样/归档重建一致。新实现未提交，完整依据及复现见 [RPC profile与header报告](benchmarks/2026-10-17-gosproto-rpc-profile/RESULTS.md)。

@@ -1,0 +1,80 @@
+[
+  {
+    "stage": "allocation regression before implementation",
+    "args": [
+      "go",
+      "test",
+      "-run",
+      "^TestRpcFrameAllocation$",
+      "-v",
+      ".",
+      "-timeout=1m"
+    ],
+    "exitCode": 1,
+    "output": "=== RUN   TestRpcFrameAllocation\n    rpc_test.go:263: notification=3 request=4 response=4 buffers=2, want no header/session heap objects\n--- FAIL: TestRpcFrameAllocation (0.00s)\nFAIL\nFAIL\tgithub.com/cnooljaw/gosproto\t0.606s\nFAIL\n"
+  },
+  {
+    "stage": "targeted after implementation",
+    "args": [
+      "go",
+      "test",
+      "-run",
+      "^TestRpc",
+      "-v",
+      ".",
+      "-timeout=1m"
+    ],
+    "exitCode": 1,
+    "output": "=== RUN   TestRpcPendingAdmissionAndCleanup\n--- PASS: TestRpcPendingAdmissionAndCleanup (0.00s)\n=== RUN   TestRpcInvalidDefinitionsAndMessages\n--- PASS: TestRpcInvalidDefinitionsAndMessages (0.00s)\n=== RUN   TestRpcSessionIsolationAndLateResponses\n--- PASS: TestRpcSessionIsolationAndLateResponses (0.00s)\n=== RUN   TestRpcRequest\n--- PASS: TestRpcRequest (0.00s)\n=== RUN   TestRpcResponse\n--- PASS: TestRpcResponse (0.00s)\n=== RUN   TestRpcFrameAssembly\n--- PASS: TestRpcFrameAssembly (0.01s)\n=== RUN   TestRpcFrameBodyBudget\n--- PASS: TestRpcFrameBodyBudget (0.01s)\n=== RUN   TestRpcFrameAllocation\n    rpc_test.go:263: notification=2 request=3 response=2 buffers=2, want no header/session heap objects\n--- FAIL: TestRpcFrameAllocation (0.00s)\nFAIL\nFAIL\tgithub.com/cnooljaw/gosproto\t0.585s\nFAIL\n"
+  },
+  {
+    "stage": "direct local header value after requestSession escape diagnosis",
+    "args": [
+      "go",
+      "test",
+      "-run",
+      "^TestRpcFrameAllocation$",
+      "-v",
+      ".",
+      "-timeout=1m"
+    ],
+    "exitCode": 0,
+    "output": "=== RUN   TestRpcFrameAllocation\n--- PASS: TestRpcFrameAllocation (0.00s)\nPASS\nok  \tgithub.com/cnooljaw/gosproto\t0.327s\n"
+  },
+  {
+    "stage": "RPC and new official39 header vectors",
+    "args": [
+      "go",
+      "test",
+      "-run",
+      "^(TestRpc|TestOfficialRPCHeader)",
+      "-v",
+      ".",
+      "-timeout=1m"
+    ],
+    "env": {
+      "SPROTO_ORACLE_DIR": "/private/tmp/gsr-official-sproto-review"
+    },
+    "exitCode": 0,
+    "output": "=== RUN   TestRpcPendingAdmissionAndCleanup\n--- PASS: TestRpcPendingAdmissionAndCleanup (0.00s)\n=== RUN   TestRpcInvalidDefinitionsAndMessages\n--- PASS: TestRpcInvalidDefinitionsAndMessages (0.00s)\n=== RUN   TestRpcSessionIsolationAndLateResponses\n--- PASS: TestRpcSessionIsolationAndLateResponses (0.00s)\n=== RUN   TestRpcRequest\n--- PASS: TestRpcRequest (0.00s)\n=== RUN   TestRpcResponse\n--- PASS: TestRpcResponse (0.00s)\n=== RUN   TestRpcFrameAssembly\n--- PASS: TestRpcFrameAssembly (0.01s)\n=== RUN   TestRpcFrameBodyBudget\n--- PASS: TestRpcFrameBodyBudget (0.01s)\n=== RUN   TestRpcFrameAllocation\n--- PASS: TestRpcFrameAllocation (0.00s)\n=== RUN   TestOfficialRPCHeader\n--- PASS: TestOfficialRPCHeader (0.64s)\nPASS\nok  \tgithub.com/cnooljaw/gosproto\t1.244s\n"
+  },
+  {
+    "stage": "allocation regression under race/checkptr before sampling",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-gcflags=all=-d=checkptr=2",
+      "-run",
+      "^TestRpcFrameAllocation$",
+      "-v",
+      ".",
+      "-timeout=1m"
+    ],
+    "env": {
+      "GOMAXPROCS": "2"
+    },
+    "exitCode": 0,
+    "output": "=== RUN   TestRpcFrameAllocation\n--- PASS: TestRpcFrameAllocation (0.00s)\nPASS\nok  \tgithub.com/cnooljaw/gosproto\t1.585s\n"
+  }
+]

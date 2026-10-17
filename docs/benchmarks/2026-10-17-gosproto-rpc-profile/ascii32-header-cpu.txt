@@ -1,0 +1,32 @@
+Total: 2.01s
+ROUTINE ======================== github.com/cnooljaw/gosproto.packRpcFrame in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/baseline/candidate/rpc.go
+      10ms      860ms (flat, cum) 42.79% of Total
+         .          .    124:func packRpcFrame(header *rpcHeader, body []byte) ([]byte, error) {
+         .      110ms    125:	schema, err := GetSprotoType(reflect.TypeOf(rpcHeader{}))
+         .          .    126:	if err != nil {
+         .          .    127:		return nil, err
+         .          .    128:	}
+         .          .    129:	limits, err := normalizeLimits(Limits{})
+         .          .    130:	if err != nil {
+         .          .    131:		return nil, err
+         .          .    132:	}
+      10ms       10ms    133:	budget := &decodeBudget{limits: limits}
+         .       10ms    134:	var layout encodeLayout
+         .          .    135:	binding := knownEncodeType(schema)
+         .          .    136:	value := reflect.ValueOf(header)
+         .      160ms    137:	headerSize, err := encodedSize(schema, value, budget, 1, &layout, binding)
+         .          .    138:	if err != nil {
+         .          .    139:		return nil, err
+         .          .    140:	}
+         .          .    141:	size := headerSize + len(body)
+         .      150ms    142:	output := make([]byte, packedBufferSize(size))
+         .          .    143:	start := len(output) - size
+         .      240ms    144:	encodeMessageInto(schema, value, output[start:start+headerSize], &layout, binding)
+         .          .    145:	runtime.KeepAlive(header)
+         .       10ms    146:	copy(output[start+headerSize:], body)
+         .      170ms    147:	return packInto(output, output[start:]), nil
+         .          .    148:}
+         .          .    149:
+         .          .    150:// ResponseEncode 将响应编码为独占的 Sproto RPC 帧，session 必须为正数。
+         .          .    151:func (rpc *Rpc) ResponseEncode(name string, session int32, response interface{}) (data []byte, err error) {
+         .          .    152:	if session <= 0 {

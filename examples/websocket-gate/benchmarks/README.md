@@ -36,7 +36,9 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 
 后续 [真实 RPC 工作区](../../../docs/benchmarks/2026-10-17-gosproto-rpc-workspace/RESULTS.md) 专门测 RequestEncode/ResponseEncode：五种代表消息的通知、请求加 CancelSession、响应，以及四种 Echo 通知，共 19 项。两轮均更快、少两次分配，大型约快 8%～10%、整数数组约快 18%～20%；控制失败与完整块、原未改路径对照一并保留。它包含真实 RPC 编码/session 成本，区别于下文原 frame 的手工组帧，不包含网络或 Dispatch，也不替换原四实现矩阵。该切片已本地提交为 gosproto dc4948d / GSR c4622bf，未推送。
 
-[通知 session 逃逸](../../../docs/benchmarks/2026-10-17-gosproto-rpc-session/RESULTS.md) 复用同一19项真实RPC探针，仅把session存储放入有响应分支；9种通知两轮全部少一次逻辑分配、约4 B/op，小包有约2%～3%的CPU改善。大型通知及ASCII请求的小幅计时代价、self/clone失败及原始数据完整保留；不设最低收益比例，不概括为全面加速。库与Go/TS验收通过，新改动待审查。
+[通知 session 逃逸](../../../docs/benchmarks/2026-10-17-gosproto-rpc-session/RESULTS.md) 复用同一19项真实RPC探针，仅把session存储放入有响应分支；9种通知两轮全部少一次逻辑分配、约4 B/op，小包有约2%～3%的CPU改善。大型通知及ASCII请求的小幅计时代价、self/clone失败及原始数据完整保留；不设最低收益比例，不概括为全面加速。库与Go/TS验收通过，该切片已提交为 gosproto 69cae73 / GSR 9ecc811，未推送。
+
+[RPC profile与固定私有头](../../../docs/benchmarks/2026-10-17-gosproto-rpc-profile/RESULTS.md) 保留分离CPU/内存采样及失败诊断。候选仅以有界栈头复用现有整数/tag写出，19项真实RPC两轮全部更快，32 B约快37%/38%，大型约快2%～4%；通知少一个、请求/响应少两个对象。1008组API边界、39官方头向量、3078固定差分及库/GoTS验收通过；控制失败与仅58次有限随机fuzz均公开。新实现待审查，正式依赖与原PB/TS矩阵未变。
 
 ## 比较口径
 

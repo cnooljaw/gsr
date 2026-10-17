@@ -1,0 +1,38 @@
+File: rpc.test
+Type: cpu
+Time: 2026-10-17 23:37:16 CST
+Duration: 2.56s, Total samples = 2.27s (88.63%)
+Showing nodes accounting for 2.01s, 88.55% of 2.27s total
+Dropped 39 nodes (cum <= 0.01s)
+Showing top 30 nodes out of 84
+      flat  flat%   sum%        cum   cum%
+     0.28s 12.33% 12.33%      0.28s 12.33%  runtime.kevent
+     0.27s 11.89% 24.23%      0.28s 12.33%  github.com/cnooljaw/gosproto.packInto
+     0.23s 10.13% 34.36%      0.26s 11.45%  runtime.step
+     0.17s  7.49% 41.85%      0.62s 27.31%  runtime.pcvalue
+     0.16s  7.05% 48.90%      0.24s 10.57%  github.com/cnooljaw/gosproto.encodeIntegerRecordInto
+     0.09s  3.96% 52.86%      0.09s  3.96%  runtime.(*moduledata).textAddr
+     0.07s  3.08% 55.95%      0.07s  3.08%  runtime.(*mspan).specialFindSplicePoint
+     0.06s  2.64% 58.59%      0.36s 15.86%  github.com/cnooljaw/gosproto.encodeFieldInto
+     0.06s  2.64% 61.23%      0.56s 24.67%  github.com/cnooljaw/gosproto.encodedIntegerRecordSize
+     0.05s  2.20% 63.44%      0.05s  2.20%  github.com/cnooljaw/gosproto.encodePointer.integer (inline)
+     0.05s  2.20% 65.64%      0.05s  2.20%  github.com/cnooljaw/gosproto.integerWidth (inline)
+     0.05s  2.20% 67.84%      0.05s  2.20%  runtime.acquirem (inline)
+     0.04s  1.76% 69.60%      0.04s  1.76%  github.com/cnooljaw/gosproto.encodeIntegerInto (inline)
+     0.04s  1.76% 71.37%      0.05s  2.20%  reflect.Value.Index
+     0.04s  1.76% 73.13%      0.04s  1.76%  runtime.releasem (inline)
+     0.03s  1.32% 74.45%      0.61s 26.87%  github.com/cnooljaw/gosproto.fieldSize
+     0.03s  1.32% 75.77%      0.22s  9.69%  runtime.(*unwinder).resolveInternal
+     0.03s  1.32% 77.09%      0.03s  1.32%  runtime.findfunc
+     0.03s  1.32% 78.41%      0.03s  1.32%  runtime.readvarint (inline)
+     0.03s  1.32% 79.74%      0.03s  1.32%  runtime.typePointers.next
+     0.02s  0.88% 80.62%      0.02s  0.88%  encoding/binary.littleEndian.PutUint32 (inline)
+     0.02s  0.88% 81.50%      0.64s 28.19%  github.com/cnooljaw/gosproto.encodedSize
+     0.02s  0.88% 82.38%      0.02s  0.88%  internal/abi.(*Type).Pointers (inline)
+     0.02s  0.88% 83.26%      0.04s  1.76%  reflect.Value.IsNil (inline)
+     0.02s  0.88% 84.14%      0.06s  2.64%  reflect.Value.UnsafePointer
+     0.02s  0.88% 85.02%      0.04s  1.76%  reflect.Value.pointer (inline)
+     0.02s  0.88% 85.90%      0.02s  0.88%  reflect.flag.kind (inline)
+     0.02s  0.88% 86.78%      0.05s  2.20%  runtime.(*unwinder).initAt
+     0.02s  0.88% 87.67%      0.02s  0.88%  runtime.memmove
+     0.02s  0.88% 88.55%      0.06s  2.64%  runtime.scanobject

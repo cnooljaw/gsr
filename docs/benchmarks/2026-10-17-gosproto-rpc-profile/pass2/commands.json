@@ -1,0 +1,65 @@
+[
+  {
+    "args": [
+      "git",
+      "rev-parse",
+      "--verify",
+      "69cae73^{commit}"
+    ],
+    "cwd": "/private/tmp/gsr-gosproto-fork",
+    "env": {},
+    "elapsedSeconds": 0.019,
+    "exitCode": 0,
+    "output": "69cae73f86cd39baf118e39945268c25d9ba2d97\n"
+  },
+  {
+    "args": [
+      "patch",
+      "--batch",
+      "-p1",
+      "-i",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-17-gosproto-rpc-profile/candidate.patch"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/measured/pass2/candidate",
+    "env": {},
+    "elapsedSeconds": 0.006,
+    "exitCode": 0,
+    "output": "patching file official_compat_test.go\npatching file rpc.go\npatching file rpc_test.go\n"
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "before_echo_test.go",
+      "sampler_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/measured/pass2/harness",
+    "env": {},
+    "elapsedSeconds": 0.013,
+    "exitCode": 0,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "version"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {},
+    "elapsedSeconds": 0.07,
+    "exitCode": 0,
+    "output": "go version go1.24.13 darwin/arm64\n"
+  },
+  {
+    "args": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {},
+    "elapsedSeconds": 0.01,
+    "exitCode": 0,
+    "output": "9ecc811abb5a62b00a5a7916c7b50c72aba8050a\n"
+  }
+]

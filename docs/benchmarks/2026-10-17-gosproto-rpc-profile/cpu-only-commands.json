@@ -1,0 +1,210 @@
+[
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/profiles/rpc.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkCurrentRPC/ascii32$",
+      "-test.benchtime=2s",
+      "-test.cpuprofile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/profiles/ascii32.cpu-only",
+      "-test.timeout=15s"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/baseline/harness",
+    "env": {
+      "GOMAXPROCS": "1"
+    },
+    "exitCode": 0,
+    "elapsedSeconds": 2.258,
+    "output": "goos: darwin\ngoarch: arm64\npkg: codecpairstool\ncpu: Apple M2\nBenchmarkCurrentRPC/ascii32         \t 7758714\t       268.6 ns/op\t     128 B/op\t       3 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-top",
+      "-nodecount=40",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/profiles/rpc.test",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/profiles/ascii32.cpu-only"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/baseline/harness",
+    "env": {
+      "GOMAXPROCS": "1"
+    },
+    "exitCode": 0,
+    "elapsedSeconds": 0.121,
+    "output": "File: rpc.test\nType: cpu\nTime: 2026-10-17 23:37:43 CST\nDuration: 2.23s, Total samples = 2.01s (90.29%)\nShowing nodes accounting for 1.71s, 85.07% of 2.01s total\nDropped 48 nodes (cum <= 0.01s)\nShowing top 40 nodes out of 75\n      flat  flat%   sum%        cum   cum%\n     0.26s 12.94% 12.94%      0.26s 12.94%  runtime.kevent\n     0.13s  6.47% 19.40%      0.37s 18.41%  github.com/cnooljaw/gosproto.encodeMessageInto\n     0.11s  5.47% 24.88%      0.11s  5.47%  reflect.Value.Elem\n     0.09s  4.48% 29.35%      0.17s  8.46%  github.com/cnooljaw/gosproto.packInto\n     0.07s  3.48% 32.84%      0.26s 12.94%  github.com/cnooljaw/gosproto.encodedSize\n     0.07s  3.48% 36.32%      0.08s  3.98%  reflect.Value.Field\n     0.06s  2.99% 39.30%      0.55s 27.36%  github.com/cnooljaw/gosproto.encodeWithLimits\n     0.06s  2.99% 42.29%      0.06s  2.99%  github.com/cnooljaw/gosproto.ffRunBytes\n     0.06s  2.99% 45.27%      0.09s  4.48%  internal/runtime/maps.(*Map).getWithKeySmall\n     0.06s  2.99% 48.26%      0.06s  2.99%  reflect.flag.kind (inline)\n     0.05s  2.49% 50.75%      0.12s  5.97%  github.com/cnooljaw/gosproto.encodeScalarInto\n     0.05s  2.49% 53.23%      0.27s 13.43%  runtime.makeslice\n     0.05s  2.49% 55.72%      0.09s  4.48%  runtime.mallocgcSmallScanNoHeader\n     0.05s  2.49% 58.21%      0.05s  2.49%  runtime.typePointers.next\n     0.04s  1.99% 60.20%      0.04s  1.99%  runtime.findObject\n     0.03s  1.49% 61.69%      1.66s 82.59%  github.com/cnooljaw/gosproto.(*Rpc).RequestEncode\n     0.03s  1.49% 63.18%      0.03s  1.49%  github.com/cnooljaw/gosproto.(*decodeBudget).add (inline)\n     0.03s  1.49% 64.68%      0.03s  1.49%  github.com/cnooljaw/gosproto.(*encodeLayout).add (inline)\n     0.03s  1.49% 66.17%      0.03s  1.49%  internal/sync.(*Mutex).Lock (inline)\n     0.03s  1.49% 67.66%      0.09s  4.48%  reflect.Value.IsNil (inline)\n     0.03s  1.49% 69.15%      0.03s  1.49%  runtime.memmove\n     0.03s  1.49% 70.65%      0.15s  7.46%  runtime.newobject\n     0.03s  1.49% 72.14%      0.08s  3.98%  runtime.scanobject\n     0.03s  1.49% 73.63%      0.03s  1.49%  runtime.typehash\n     0.02s     1% 74.63%      0.02s     1%  encoding/binary.littleEndian.PutUint64 (inline)\n     0.02s     1% 75.62%      0.07s  3.48%  gcWriteBarrier\n     0.02s     1% 76.62%      0.18s  8.96%  github.com/cnooljaw/gosproto.GetSprotoType\n     0.02s     1% 77.61%      0.04s  1.99%  internal/runtime/maps.(*Map).getWithoutKeySmallFastStr\n     0.02s     1% 78.61%      0.02s     1%  runtime.bool2int (inline)\n     0.02s     1% 79.60%      0.14s  6.97%  runtime.mallocgcSmallNoscan\n     0.02s     1% 80.60%      0.02s     1%  runtime.memclrNoHeapPointers\n     0.01s   0.5% 81.09%      1.72s 85.57%  codecpairstool.BenchmarkCurrentRPC.func1\n     0.01s   0.5% 81.59%      0.03s  1.49%  github.com/cnooljaw/gosproto.fieldSize\n     0.01s   0.5% 82.09%      0.04s  1.99%  github.com/cnooljaw/gosproto.getbase\n     0.01s   0.5% 82.59%      0.86s 42.79%  github.com/cnooljaw/gosproto.packRpcFrame\n     0.01s   0.5% 83.08%      0.02s     1%  reflect.elem\n     0.01s   0.5% 83.58%      0.02s     1%  runtime.(*mspan).writeHeapBitsSmall\n     0.01s   0.5% 84.08%      0.02s     1%  runtime.(*spanSet).push\n     0.01s   0.5% 84.58%      0.10s  4.98%  runtime.deductAssistCredit\n     0.01s   0.5% 85.07%      0.03s  1.49%  runtime.gcmarknewobject\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-list=packRpcFrame",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/profiles/rpc.test",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/profiles/ascii32.cpu-only"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/baseline/harness",
+    "env": {
+      "GOMAXPROCS": "1"
+    },
+    "exitCode": 0,
+    "elapsedSeconds": 0.021,
+    "output": "Total: 2.01s\nROUTINE ======================== github.com/cnooljaw/gosproto.packRpcFrame in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/baseline/candidate/rpc.go\n      10ms      860ms (flat, cum) 42.79% of Total\n         .          .    124:func packRpcFrame(header *rpcHeader, body []byte) ([]byte, error) {\n         .      110ms    125:\tschema, err := GetSprotoType(reflect.TypeOf(rpcHeader{}))\n         .          .    126:\tif err != nil {\n         .          .    127:\t\treturn nil, err\n         .          .    128:\t}\n         .          .    129:\tlimits, err := normalizeLimits(Limits{})\n         .          .    130:\tif err != nil {\n         .          .    131:\t\treturn nil, err\n         .          .    132:\t}\n      10ms       10ms    133:\tbudget := &decodeBudget{limits: limits}\n         .       10ms    134:\tvar layout encodeLayout\n         .          .    135:\tbinding := knownEncodeType(schema)\n         .          .    136:\tvalue := reflect.ValueOf(header)\n         .      160ms    137:\theaderSize, err := encodedSize(schema, value, budget, 1, &layout, binding)\n         .          .    138:\tif err != nil {\n         .          .    139:\t\treturn nil, err\n         .          .    140:\t}\n         .          .    141:\tsize := headerSize + len(body)\n         .      150ms    142:\toutput := make([]byte, packedBufferSize(size))\n         .          .    143:\tstart := len(output) - size\n         .      240ms    144:\tencodeMessageInto(schema, value, output[start:start+headerSize], &layout, binding)\n         .          .    145:\truntime.KeepAlive(header)\n         .       10ms    146:\tcopy(output[start+headerSize:], body)\n         .      170ms    147:\treturn packInto(output, output[start:]), nil\n         .          .    148:}\n         .          .    149:\n         .          .    150:// ResponseEncode \u5c06\u54cd\u5e94\u7f16\u7801\u4e3a\u72ec\u5360\u7684 Sproto RPC \u5e27\uff0csession \u5fc5\u987b\u4e3a\u6b63\u6570\u3002\n         .          .    151:func (rpc *Rpc) ResponseEncode(name string, session int32, response interface{}) (data []byte, err error) {\n         .          .    152:\tif session <= 0 {\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/profiles/rpc.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkCurrentRPC/game_large$",
+      "-test.benchtime=2s",
+      "-test.cpuprofile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/profiles/game_large.cpu-only",
+      "-test.timeout=15s"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/baseline/harness",
+    "env": {
+      "GOMAXPROCS": "1"
+    },
+    "exitCode": 0,
+    "elapsedSeconds": 2.709,
+    "output": "goos: darwin\ngoarch: arm64\npkg: codecpairstool\ncpu: Apple M2\nBenchmarkCurrentRPC/game_large         \t  247879\t     10152 ns/op\t    7440 B/op\t       4 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-top",
+      "-nodecount=40",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/profiles/rpc.test",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/profiles/game_large.cpu-only"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/baseline/harness",
+    "env": {
+      "GOMAXPROCS": "1"
+    },
+    "exitCode": 0,
+    "elapsedSeconds": 0.025,
+    "output": "File: rpc.test\nType: cpu\nTime: 2026-10-17 23:37:45 CST\nDuration: 2.70s, Total samples = 2.34s (86.57%)\nShowing nodes accounting for 2.17s, 92.74% of 2.34s total\nDropped 58 nodes (cum <= 0.01s)\nShowing top 40 nodes out of 50\n      flat  flat%   sum%        cum   cum%\n     0.59s 25.21% 25.21%      0.59s 25.21%  runtime.kevent\n     0.44s 18.80% 44.02%      0.45s 19.23%  github.com/cnooljaw/gosproto.packInto\n     0.21s  8.97% 52.99%      0.37s 15.81%  github.com/cnooljaw/gosproto.encodeIntegerRecordInto\n     0.17s  7.26% 60.26%      0.33s 14.10%  github.com/cnooljaw/gosproto.encodedIntegerRecordSize\n     0.08s  3.42% 63.68%      0.44s 18.80%  github.com/cnooljaw/gosproto.fieldSize\n     0.07s  2.99% 66.67%      0.54s 23.08%  github.com/cnooljaw/gosproto.encodeFieldInto\n     0.07s  2.99% 69.66%      0.07s  2.99%  github.com/cnooljaw/gosproto.encodePointer.integer (inline)\n     0.06s  2.56% 72.22%      0.06s  2.56%  github.com/cnooljaw/gosproto.encodeIntegerInto (inline)\n     0.06s  2.56% 74.79%      0.11s  4.70%  runtime.scanobject\n     0.04s  1.71% 76.50%      0.07s  2.99%  github.com/cnooljaw/gosproto.encodeInt64Slice (inline)\n     0.04s  1.71% 78.21%      0.49s 20.94%  github.com/cnooljaw/gosproto.encodedSize\n     0.04s  1.71% 79.91%      0.05s  2.14%  reflect.Value.Index\n     0.04s  1.71% 81.62%      0.06s  2.56%  reflect.Value.IsNil (inline)\n     0.04s  1.71% 83.33%      0.04s  1.71%  runtime.typePointers.next\n     0.03s  1.28% 84.62%      0.03s  1.28%  encoding/binary.littleEndian.PutUint32 (inline)\n     0.03s  1.28% 85.90%      0.03s  1.28%  runtime.memmove\n     0.02s  0.85% 86.75%      0.02s  0.85%  github.com/cnooljaw/gosproto.integerWidth (inline)\n     0.02s  0.85% 87.61%      0.02s  0.85%  internal/abi.(*Type).Pointers (inline)\n     0.02s  0.85% 88.46%      0.04s  1.71%  reflect.Value.UnsafePointer\n     0.02s  0.85% 89.32%      0.02s  0.85%  reflect.flag.kind (inline)\n     0.02s  0.85% 90.17%      0.02s  0.85%  runtime.madvise\n     0.01s  0.43% 90.60%      0.02s  0.85%  github.com/cnooljaw/gosproto.(*encodeLayout).add (inline)\n     0.01s  0.43% 91.03%      0.55s 23.50%  github.com/cnooljaw/gosproto.encodeMessageInto\n     0.01s  0.43% 91.45%      0.13s  5.56%  runtime.gcDrainN\n     0.01s  0.43% 91.88%      0.02s  0.85%  runtime.greyobject\n     0.01s  0.43% 92.31%      0.18s  7.69%  runtime.mallocgc\n     0.01s  0.43% 92.74%      0.04s  1.71%  runtime.mallocgcSmallNoscan\n         0     0% 92.74%      1.71s 73.08%  codecpairstool.BenchmarkCurrentRPC.func1\n         0     0% 92.74%      1.71s 73.08%  github.com/cnooljaw/gosproto.(*Rpc).RequestEncode\n         0     0% 92.74%      1.11s 47.44%  github.com/cnooljaw/gosproto.Encode\n         0     0% 92.74%      1.11s 47.44%  github.com/cnooljaw/gosproto.EncodeWithLimits (inline)\n         0     0% 92.74%      1.11s 47.44%  github.com/cnooljaw/gosproto.encodeWithLimits\n         0     0% 92.74%      0.04s  1.71%  github.com/cnooljaw/gosproto.messageEncodePointer (inline)\n         0     0% 92.74%      0.58s 24.79%  github.com/cnooljaw/gosproto.packRpcFrame\n         0     0% 92.74%      0.03s  1.28%  github.com/cnooljaw/gosproto.writeUint32 (inline)\n         0     0% 92.74%      0.02s  0.85%  reflect.Value.pointer (inline)\n         0     0% 92.74%      0.02s  0.85%  runtime.(*mheap).freeSpanLocked\n         0     0% 92.74%      0.13s  5.56%  runtime.deductAssistCredit\n         0     0% 92.74%      0.13s  5.56%  runtime.gcAssistAlloc\n         0     0% 92.74%      0.13s  5.56%  runtime.gcAssistAlloc.func2\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-list=packRpcFrame",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/profiles/rpc.test",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/profiles/game_large.cpu-only"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/baseline/harness",
+    "env": {
+      "GOMAXPROCS": "1"
+    },
+    "exitCode": 0,
+    "elapsedSeconds": 0.023,
+    "output": "Total: 2.34s\nROUTINE ======================== github.com/cnooljaw/gosproto.packRpcFrame in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/baseline/candidate/rpc.go\n         0      580ms (flat, cum) 24.79% of Total\n         .          .    124:func packRpcFrame(header *rpcHeader, body []byte) ([]byte, error) {\n         .          .    125:\tschema, err := GetSprotoType(reflect.TypeOf(rpcHeader{}))\n         .          .    126:\tif err != nil {\n         .          .    127:\t\treturn nil, err\n         .          .    128:\t}\n         .          .    129:\tlimits, err := normalizeLimits(Limits{})\n         .          .    130:\tif err != nil {\n         .          .    131:\t\treturn nil, err\n         .          .    132:\t}\n         .          .    133:\tbudget := &decodeBudget{limits: limits}\n         .          .    134:\tvar layout encodeLayout\n         .          .    135:\tbinding := knownEncodeType(schema)\n         .          .    136:\tvalue := reflect.ValueOf(header)\n         .       10ms    137:\theaderSize, err := encodedSize(schema, value, budget, 1, &layout, binding)\n         .          .    138:\tif err != nil {\n         .          .    139:\t\treturn nil, err\n         .          .    140:\t}\n         .          .    141:\tsize := headerSize + len(body)\n         .       90ms    142:\toutput := make([]byte, packedBufferSize(size))\n         .          .    143:\tstart := len(output) - size\n         .          .    144:\tencodeMessageInto(schema, value, output[start:start+headerSize], &layout, binding)\n         .          .    145:\truntime.KeepAlive(header)\n         .       30ms    146:\tcopy(output[start+headerSize:], body)\n         .      450ms    147:\treturn packInto(output, output[start:]), nil\n         .          .    148:}\n         .          .    149:\n         .          .    150:// ResponseEncode \u5c06\u54cd\u5e94\u7f16\u7801\u4e3a\u72ec\u5360\u7684 Sproto RPC \u5e27\uff0csession \u5fc5\u987b\u4e3a\u6b63\u6570\u3002\n         .          .    151:func (rpc *Rpc) ResponseEncode(name string, session int32, response interface{}) (data []byte, err error) {\n         .          .    152:\tif session <= 0 {\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/profiles/rpc.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkCurrentRPC/int32_edges$",
+      "-test.benchtime=2s",
+      "-test.cpuprofile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/profiles/int32_edges.cpu-only",
+      "-test.timeout=15s"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/baseline/harness",
+    "env": {
+      "GOMAXPROCS": "1"
+    },
+    "exitCode": 0,
+    "elapsedSeconds": 2.561,
+    "output": "goos: darwin\ngoarch: arm64\npkg: codecpairstool\ncpu: Apple M2\nBenchmarkCurrentRPC/int32_edges         \t  464666\t      5208 ns/op\t    8208 B/op\t       3 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-top",
+      "-nodecount=40",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/profiles/rpc.test",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/profiles/int32_edges.cpu-only"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/baseline/harness",
+    "env": {
+      "GOMAXPROCS": "1"
+    },
+    "exitCode": 0,
+    "elapsedSeconds": 0.022,
+    "output": "File: rpc.test\nType: cpu\nTime: 2026-10-17 23:37:48 CST\nDuration: 2.56s, Total samples = 2.29s (89.59%)\nShowing nodes accounting for 2.17s, 94.76% of 2.29s total\nDropped 31 nodes (cum <= 0.01s)\nShowing top 40 nodes out of 74\n      flat  flat%   sum%        cum   cum%\n     0.87s 37.99% 37.99%      0.87s 37.99%  runtime.kevent\n     0.65s 28.38% 66.38%      0.65s 28.38%  github.com/cnooljaw/gosproto.packInto\n     0.18s  7.86% 74.24%      0.18s  7.86%  encoding/binary.littleEndian.PutUint32 (inline)\n     0.13s  5.68% 79.91%      0.31s 13.54%  github.com/cnooljaw/gosproto.encodeInt64Slice (inline)\n     0.06s  2.62% 82.53%      0.07s  3.06%  github.com/cnooljaw/gosproto.fieldSize\n     0.05s  2.18% 84.72%      0.06s  2.62%  runtime.typePointers.next\n     0.03s  1.31% 86.03%      0.03s  1.31%  runtime.(*pallocBits).summarize\n     0.03s  1.31% 87.34%      0.03s  1.31%  runtime.madvise\n     0.03s  1.31% 88.65%      0.03s  1.31%  runtime.memclrNoHeapPointers\n     0.03s  1.31% 89.96%      0.03s  1.31%  runtime.memmove\n     0.03s  1.31% 91.27%      0.12s  5.24%  runtime.scanobject\n     0.02s  0.87% 92.14%      0.02s  0.87%  runtime.findObject\n     0.02s  0.87% 93.01%      0.02s  0.87%  runtime.resolveTypeOff\n     0.01s  0.44% 93.45%      0.34s 14.85%  github.com/cnooljaw/gosproto.encodeMessageInto\n     0.01s  0.44% 93.89%      0.02s  0.87%  github.com/cnooljaw/gosproto.omittedField (inline)\n     0.01s  0.44% 94.32%      0.02s  0.87%  runtime.nanotime1\n     0.01s  0.44% 94.76%      0.03s  1.31%  runtime.pcvalue\n         0     0% 94.76%      1.38s 60.26%  codecpairstool.BenchmarkCurrentRPC.func1\n         0     0% 94.76%      1.38s 60.26%  github.com/cnooljaw/gosproto.(*Rpc).RequestEncode\n         0     0% 94.76%      0.56s 24.45%  github.com/cnooljaw/gosproto.Encode\n         0     0% 94.76%      0.56s 24.45%  github.com/cnooljaw/gosproto.EncodeWithLimits (inline)\n         0     0% 94.76%      0.32s 13.97%  github.com/cnooljaw/gosproto.encodeFieldInto\n         0     0% 94.76%      0.56s 24.45%  github.com/cnooljaw/gosproto.encodeWithLimits\n         0     0% 94.76%      0.08s  3.49%  github.com/cnooljaw/gosproto.encodedSize\n         0     0% 94.76%      0.80s 34.93%  github.com/cnooljaw/gosproto.packRpcFrame\n         0     0% 94.76%      0.18s  7.86%  github.com/cnooljaw/gosproto.writeUint32 (inline)\n         0     0% 94.76%      0.02s  0.87%  reflect.(*rtype).ptrTo\n         0     0% 94.76%      0.02s  0.87%  reflect.(*rtype).typeOff (inline)\n         0     0% 94.76%      0.02s  0.87%  reflect.Value.Addr\n         0     0% 94.76%      0.02s  0.87%  reflect.ptrTo (inline)\n         0     0% 94.76%      0.02s  0.87%  reflect.resolveTypeOff\n         0     0% 94.76%      0.02s  0.87%  runtime.(*inlineUnwinder).resolveInternal (inline)\n         0     0% 94.76%      0.07s  3.06%  runtime.(*mcache).nextFree\n         0     0% 94.76%      0.07s  3.06%  runtime.(*mcache).refill\n         0     0% 94.76%      0.06s  2.62%  runtime.(*mcentral).cacheSpan\n         0     0% 94.76%      0.02s  0.87%  runtime.(*mcentral).grow\n         0     0% 94.76%      0.02s  0.87%  runtime.(*mheap).alloc\n         0     0% 94.76%      0.05s  2.18%  runtime.(*mheap).alloc.func1\n         0     0% 94.76%      0.05s  2.18%  runtime.(*mheap).allocSpan\n         0     0% 94.76%      0.04s  1.75%  runtime.(*mheap).freeSpan (inline)\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-list=packRpcFrame",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/profiles/rpc.test",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/profiles/int32_edges.cpu-only"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/baseline/harness",
+    "env": {
+      "GOMAXPROCS": "1"
+    },
+    "exitCode": 0,
+    "elapsedSeconds": 0.02,
+    "output": "Total: 2.29s\nROUTINE ======================== github.com/cnooljaw/gosproto.packRpcFrame in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/baseline/candidate/rpc.go\n         0      800ms (flat, cum) 34.93% of Total\n         .          .    124:func packRpcFrame(header *rpcHeader, body []byte) ([]byte, error) {\n         .       10ms    125:\tschema, err := GetSprotoType(reflect.TypeOf(rpcHeader{}))\n         .          .    126:\tif err != nil {\n         .          .    127:\t\treturn nil, err\n         .          .    128:\t}\n         .          .    129:\tlimits, err := normalizeLimits(Limits{})\n         .          .    130:\tif err != nil {\n         .          .    131:\t\treturn nil, err\n         .          .    132:\t}\n         .          .    133:\tbudget := &decodeBudget{limits: limits}\n         .          .    134:\tvar layout encodeLayout\n         .          .    135:\tbinding := knownEncodeType(schema)\n         .          .    136:\tvalue := reflect.ValueOf(header)\n         .       10ms    137:\theaderSize, err := encodedSize(schema, value, budget, 1, &layout, binding)\n         .          .    138:\tif err != nil {\n         .          .    139:\t\treturn nil, err\n         .          .    140:\t}\n         .          .    141:\tsize := headerSize + len(body)\n         .       80ms    142:\toutput := make([]byte, packedBufferSize(size))\n         .          .    143:\tstart := len(output) - size\n         .       20ms    144:\tencodeMessageInto(schema, value, output[start:start+headerSize], &layout, binding)\n         .          .    145:\truntime.KeepAlive(header)\n         .       30ms    146:\tcopy(output[start+headerSize:], body)\n         .      650ms    147:\treturn packInto(output, output[start:]), nil\n         .          .    148:}\n         .          .    149:\n         .          .    150:// ResponseEncode \u5c06\u54cd\u5e94\u7f16\u7801\u4e3a\u72ec\u5360\u7684 Sproto RPC \u5e27\uff0csession \u5fc5\u987b\u4e3a\u6b63\u6570\u3002\n         .          .    151:func (rpc *Rpc) ResponseEncode(name string, session int32, response interface{}) (data []byte, err error) {\n         .          .    152:\tif session <= 0 {\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/profiles/rpc.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkCurrentRPC/echo_ascii4k$",
+      "-test.benchtime=2s",
+      "-test.cpuprofile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/profiles/echo_ascii4k.cpu-only",
+      "-test.timeout=15s"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/baseline/harness",
+    "env": {
+      "GOMAXPROCS": "1"
+    },
+    "exitCode": 0,
+    "elapsedSeconds": 2.498,
+    "output": "goos: darwin\ngoarch: arm64\npkg: codecpairstool\ncpu: Apple M2\nBenchmarkCurrentRPC/echo_ascii4k         \t 1340412\t      1778 ns/op\t    9744 B/op\t       3 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-top",
+      "-nodecount=40",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/profiles/rpc.test",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/profiles/echo_ascii4k.cpu-only"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/baseline/harness",
+    "env": {
+      "GOMAXPROCS": "1"
+    },
+    "exitCode": 0,
+    "elapsedSeconds": 0.023,
+    "output": "File: rpc.test\nType: cpu\nTime: 2026-10-17 23:37:50 CST\nDuration: 2.49s, Total samples = 2.14s (85.87%)\nShowing nodes accounting for 1.87s, 87.38% of 2.14s total\nDropped 56 nodes (cum <= 0.01s)\nShowing top 40 nodes out of 63\n      flat  flat%   sum%        cum   cum%\n     1.25s 58.41% 58.41%      1.25s 58.41%  runtime.kevent\n     0.13s  6.07% 64.49%      0.13s  6.07%  runtime.memmove\n     0.13s  6.07% 70.56%      0.17s  7.94%  runtime.typePointers.next\n     0.07s  3.27% 73.83%      0.28s 13.08%  runtime.scanobject\n     0.05s  2.34% 76.17%      0.05s  2.34%  runtime.memclrNoHeapPointers\n     0.04s  1.87% 78.04%      0.20s  9.35%  runtime.mallocgcSmallNoscan\n     0.03s  1.40% 79.44%      0.03s  1.40%  indexbytebody\n     0.03s  1.40% 80.84%      0.03s  1.40%  runtime.readUintptr (inline)\n     0.02s  0.93% 81.78%      0.04s  1.87%  github.com/cnooljaw/gosproto.encodedSize\n     0.02s  0.93% 82.71%      0.02s  0.93%  github.com/cnooljaw/gosproto.integerBits\n     0.02s  0.93% 83.64%      0.02s  0.93%  runtime.scanblock\n     0.01s  0.47% 84.11%      0.02s  0.93%  github.com/cnooljaw/gosproto.GetSprotoType\n     0.01s  0.47% 84.58%      0.10s  4.67%  github.com/cnooljaw/gosproto.encodeScalarInto\n     0.01s  0.47% 85.05%      0.06s  2.80%  github.com/cnooljaw/gosproto.writeFF (inline)\n     0.01s  0.47% 85.51%      0.02s  0.93%  reflect.Value.IsNil (inline)\n     0.01s  0.47% 85.98%      0.02s  0.93%  runtime.(*mheap).initSpan\n     0.01s  0.47% 86.45%      0.33s 15.42%  runtime.gcDrainN\n     0.01s  0.47% 86.92%      0.02s  0.93%  runtime.greyobject\n     0.01s  0.47% 87.38%      0.55s 25.70%  runtime.mallocgc\n         0     0% 87.38%      0.04s  1.87%  bytes.IndexByte (inline)\n         0     0% 87.38%      0.86s 40.19%  codecpairstool.BenchmarkCurrentRPC.func1\n         0     0% 87.38%      0.86s 40.19%  github.com/cnooljaw/gosproto.(*Rpc).RequestEncode\n         0     0% 87.38%      0.35s 16.36%  github.com/cnooljaw/gosproto.Encode\n         0     0% 87.38%      0.35s 16.36%  github.com/cnooljaw/gosproto.EncodeWithLimits (inline)\n         0     0% 87.38%      0.11s  5.14%  github.com/cnooljaw/gosproto.encodeMessageInto\n         0     0% 87.38%      0.35s 16.36%  github.com/cnooljaw/gosproto.encodeWithLimits\n         0     0% 87.38%      0.04s  1.87%  github.com/cnooljaw/gosproto.ffRunBytes\n         0     0% 87.38%      0.04s  1.87%  github.com/cnooljaw/gosproto.followingFFWords\n         0     0% 87.38%      0.02s  0.93%  github.com/cnooljaw/gosproto.omittedField (inline)\n         0     0% 87.38%      0.10s  4.67%  github.com/cnooljaw/gosproto.packInto\n         0     0% 87.38%      0.44s 20.56%  github.com/cnooljaw/gosproto.packRpcFrame\n         0     0% 87.38%      0.10s  4.67%  runtime.(*mcache).nextFree\n         0     0% 87.38%      0.10s  4.67%  runtime.(*mcache).refill\n         0     0% 87.38%      0.08s  3.74%  runtime.(*mcentral).cacheSpan\n         0     0% 87.38%      0.02s  0.93%  runtime.(*mcentral).grow\n         0     0% 87.38%      0.02s  0.93%  runtime.(*mheap).alloc\n         0     0% 87.38%      0.03s  1.40%  runtime.(*mheap).alloc.func1\n         0     0% 87.38%      0.03s  1.40%  runtime.(*mheap).allocSpan\n         0     0% 87.38%      0.02s  0.93%  runtime.(*mheap).freeSpan (inline)\n         0     0% 87.38%      0.02s  0.93%  runtime.(*mheap).freeSpanLocked\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-list=packRpcFrame",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/profiles/rpc.test",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/profiles/echo_ascii4k.cpu-only"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/baseline/harness",
+    "env": {
+      "GOMAXPROCS": "1"
+    },
+    "exitCode": 0,
+    "elapsedSeconds": 0.019,
+    "output": "Total: 2.14s\nROUTINE ======================== github.com/cnooljaw/gosproto.packRpcFrame in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-profile/baseline/candidate/rpc.go\n         0      440ms (flat, cum) 20.56% of Total\n         .          .    124:func packRpcFrame(header *rpcHeader, body []byte) ([]byte, error) {\n         .       10ms    125:\tschema, err := GetSprotoType(reflect.TypeOf(rpcHeader{}))\n         .          .    126:\tif err != nil {\n         .          .    127:\t\treturn nil, err\n         .          .    128:\t}\n         .          .    129:\tlimits, err := normalizeLimits(Limits{})\n         .          .    130:\tif err != nil {\n         .          .    131:\t\treturn nil, err\n         .          .    132:\t}\n         .          .    133:\tbudget := &decodeBudget{limits: limits}\n         .          .    134:\tvar layout encodeLayout\n         .          .    135:\tbinding := knownEncodeType(schema)\n         .          .    136:\tvalue := reflect.ValueOf(header)\n         .       40ms    137:\theaderSize, err := encodedSize(schema, value, budget, 1, &layout, binding)\n         .          .    138:\tif err != nil {\n         .          .    139:\t\treturn nil, err\n         .          .    140:\t}\n         .          .    141:\tsize := headerSize + len(body)\n         .      250ms    142:\toutput := make([]byte, packedBufferSize(size))\n         .          .    143:\tstart := len(output) - size\n         .       30ms    144:\tencodeMessageInto(schema, value, output[start:start+headerSize], &layout, binding)\n         .          .    145:\truntime.KeepAlive(header)\n         .       10ms    146:\tcopy(output[start+headerSize:], body)\n         .      100ms    147:\treturn packInto(output, output[start:]), nil\n         .          .    148:}\n         .          .    149:\n         .          .    150:// ResponseEncode \u5c06\u54cd\u5e94\u7f16\u7801\u4e3a\u72ec\u5360\u7684 Sproto RPC \u5e27\uff0csession \u5fc5\u987b\u4e3a\u6b63\u6570\u3002\n         .          .    151:func (rpc *Rpc) ResponseEncode(name string, session int32, response interface{}) (data []byte, err error) {\n         .          .    152:\tif session <= 0 {\n"
+  }
+]

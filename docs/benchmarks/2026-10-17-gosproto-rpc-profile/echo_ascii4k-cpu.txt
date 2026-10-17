@@ -1,0 +1,48 @@
+File: rpc.test
+Type: cpu
+Time: 2026-10-17 23:37:50 CST
+Duration: 2.49s, Total samples = 2.14s (85.87%)
+Showing nodes accounting for 1.87s, 87.38% of 2.14s total
+Dropped 56 nodes (cum <= 0.01s)
+Showing top 40 nodes out of 63
+      flat  flat%   sum%        cum   cum%
+     1.25s 58.41% 58.41%      1.25s 58.41%  runtime.kevent
+     0.13s  6.07% 64.49%      0.13s  6.07%  runtime.memmove
+     0.13s  6.07% 70.56%      0.17s  7.94%  runtime.typePointers.next
+     0.07s  3.27% 73.83%      0.28s 13.08%  runtime.scanobject
+     0.05s  2.34% 76.17%      0.05s  2.34%  runtime.memclrNoHeapPointers
+     0.04s  1.87% 78.04%      0.20s  9.35%  runtime.mallocgcSmallNoscan
+     0.03s  1.40% 79.44%      0.03s  1.40%  indexbytebody
+     0.03s  1.40% 80.84%      0.03s  1.40%  runtime.readUintptr (inline)
+     0.02s  0.93% 81.78%      0.04s  1.87%  github.com/cnooljaw/gosproto.encodedSize
+     0.02s  0.93% 82.71%      0.02s  0.93%  github.com/cnooljaw/gosproto.integerBits
+     0.02s  0.93% 83.64%      0.02s  0.93%  runtime.scanblock
+     0.01s  0.47% 84.11%      0.02s  0.93%  github.com/cnooljaw/gosproto.GetSprotoType
+     0.01s  0.47% 84.58%      0.10s  4.67%  github.com/cnooljaw/gosproto.encodeScalarInto
+     0.01s  0.47% 85.05%      0.06s  2.80%  github.com/cnooljaw/gosproto.writeFF (inline)
+     0.01s  0.47% 85.51%      0.02s  0.93%  reflect.Value.IsNil (inline)
+     0.01s  0.47% 85.98%      0.02s  0.93%  runtime.(*mheap).initSpan
+     0.01s  0.47% 86.45%      0.33s 15.42%  runtime.gcDrainN
+     0.01s  0.47% 86.92%      0.02s  0.93%  runtime.greyobject
+     0.01s  0.47% 87.38%      0.55s 25.70%  runtime.mallocgc
+         0     0% 87.38%      0.04s  1.87%  bytes.IndexByte (inline)
+         0     0% 87.38%      0.86s 40.19%  codecpairstool.BenchmarkCurrentRPC.func1
+         0     0% 87.38%      0.86s 40.19%  github.com/cnooljaw/gosproto.(*Rpc).RequestEncode
+         0     0% 87.38%      0.35s 16.36%  github.com/cnooljaw/gosproto.Encode
+         0     0% 87.38%      0.35s 16.36%  github.com/cnooljaw/gosproto.EncodeWithLimits (inline)
+         0     0% 87.38%      0.11s  5.14%  github.com/cnooljaw/gosproto.encodeMessageInto
+         0     0% 87.38%      0.35s 16.36%  github.com/cnooljaw/gosproto.encodeWithLimits
+         0     0% 87.38%      0.04s  1.87%  github.com/cnooljaw/gosproto.ffRunBytes
+         0     0% 87.38%      0.04s  1.87%  github.com/cnooljaw/gosproto.followingFFWords
+         0     0% 87.38%      0.02s  0.93%  github.com/cnooljaw/gosproto.omittedField (inline)
+         0     0% 87.38%      0.10s  4.67%  github.com/cnooljaw/gosproto.packInto
+         0     0% 87.38%      0.44s 20.56%  github.com/cnooljaw/gosproto.packRpcFrame
+         0     0% 87.38%      0.10s  4.67%  runtime.(*mcache).nextFree
+         0     0% 87.38%      0.10s  4.67%  runtime.(*mcache).refill
+         0     0% 87.38%      0.08s  3.74%  runtime.(*mcentral).cacheSpan
+         0     0% 87.38%      0.02s  0.93%  runtime.(*mcentral).grow
+         0     0% 87.38%      0.02s  0.93%  runtime.(*mheap).alloc
+         0     0% 87.38%      0.03s  1.40%  runtime.(*mheap).alloc.func1
+         0     0% 87.38%      0.03s  1.40%  runtime.(*mheap).allocSpan
+         0     0% 87.38%      0.02s  0.93%  runtime.(*mheap).freeSpan (inline)
+         0     0% 87.38%      0.02s  0.93%  runtime.(*mheap).freeSpanLocked

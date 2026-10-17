@@ -1,0 +1,2956 @@
+{
+  "decision": "retain bounded private RPC header encoder in working tree; uncommitted",
+  "independentRecalculation": {
+    "blocks": 7296,
+    "quartets": 1824,
+    "pairedRounds": 456
+  },
+  "relativeTolerance": 1e-12,
+  "results": [
+    {
+      "name": "addressbook/notification",
+      "self": {
+        "name": "addressbook/notification",
+        "medianRatio": 0.9974496726455844,
+        "ratioIQR": 0.02914161727920228,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 304.0,
+            "mallocs": 3.0
+          },
+          "B": {
+            "bytes": 304.0,
+            "mallocs": 3.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          0.9577418157437918,
+          0.9909570462349606,
+          0.9818592703467515,
+          1.0039422990562081,
+          1.0210098376745838,
+          1.0163863424452722
+        ],
+        "leftNsPerOp": 841.3662733479937,
+        "rightNsPerOp": 842.1929026171472,
+        "roundGeometricDeltaNs": [
+          -33.89269642568104,
+          -7.28636175903398,
+          -17.73180356606167,
+          3.1634162558519847,
+          16.616770002456065,
+          12.766860017082081
+        ],
+        "medianRoundGeometricDeltaNs": -2.0614727515909976
+      },
+      "clone": {
+        "name": "addressbook/notification",
+        "medianRatio": 0.9806957076565146,
+        "ratioIQR": 0.007162540389873739,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 304.0,
+            "mallocs": 3.0
+          },
+          "B": {
+            "bytes": 304.0,
+            "mallocs": 3.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          0.9813768965024448,
+          0.9672622335760058,
+          1.026731099440033,
+          0.9780275860391752,
+          0.9871235139950533,
+          0.9800145188105843
+        ],
+        "leftNsPerOp": 814.1007444460525,
+        "rightNsPerOp": 803.0780929637938,
+        "roundGeometricDeltaNs": [
+          -15.274762533203784,
+          -26.230762705939583,
+          21.015940425462418,
+          -18.361596920518195,
+          -10.612412079726028,
+          -16.231160347029345
+        ],
+        "medianRoundGeometricDeltaNs": -15.752961440116565
+      },
+      "pass1": {
+        "name": "addressbook/notification",
+        "medianRatio": 0.8573991731658824,
+        "ratioIQR": 0.012096755042381724,
+        "roundsWithin5Pct": 0,
+        "allocationMedian": {
+          "A": {
+            "bytes": 304.0,
+            "mallocs": 3.0
+          },
+          "B": {
+            "bytes": 288.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.8781045352194315,
+          0.8380433815716151,
+          0.8509768218966428,
+          0.8531540003354459,
+          0.8642757133995274,
+          0.861644345996319
+        ],
+        "leftNsPerOp": 851.7652521922371,
+        "rightNsPerOp": 717.9079090476514,
+        "roundGeometricDeltaNs": [
+          -98.51311292234982,
+          -153.9428320230137,
+          -121.31411511174167,
+          -119.18069285179604,
+          -109.23395387591245,
+          -111.6886944748237
+        ],
+        "medianRoundGeometricDeltaNs": -115.43469366330987
+      },
+      "pass2": {
+        "name": "addressbook/notification",
+        "medianRatio": 0.8638783280815319,
+        "ratioIQR": 0.01544161162608293,
+        "roundsWithin5Pct": 0,
+        "allocationMedian": {
+          "A": {
+            "bytes": 304.0,
+            "mallocs": 3.0
+          },
+          "B": {
+            "bytes": 288.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.7870977908079152,
+          0.869838545983386,
+          0.8731190227343498,
+          0.8652204419430214,
+          0.8501444730562685,
+          0.8625362142200422
+        ],
+        "leftNsPerOp": 854.8029698021885,
+        "rightNsPerOp": 718.8892492634681,
+        "roundGeometricDeltaNs": [
+          -211.47197037455703,
+          -106.60133319387228,
+          -101.82482872650621,
+          -109.02741562387598,
+          -121.17445782581069,
+          -111.27402091199781
+        ],
+        "medianRoundGeometricDeltaNs": -110.1507182679369
+      }
+    },
+    {
+      "name": "addressbook/request_cancel",
+      "self": {
+        "name": "addressbook/request_cancel",
+        "medianRatio": 0.9971624327457116,
+        "ratioIQR": 0.01196172649103211,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 324.0,
+            "mallocs": 4.0
+          },
+          "B": {
+            "bytes": 324.0,
+            "mallocs": 4.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          0.9956164164704091,
+          0.9888468663227308,
+          0.988397819265401,
+          0.9987084490210141,
+          1.0037651574605722,
+          1.0104779741571486
+        ],
+        "leftNsPerOp": 888.3246123651279,
+        "rightNsPerOp": 886.2267598688508,
+        "roundGeometricDeltaNs": [
+          -3.8941403135977453,
+          -9.952222734725865,
+          -10.34266698370277,
+          -1.1419221423908539,
+          3.322216509052396,
+          9.332644355201182
+        ],
+        "medianRoundGeometricDeltaNs": -2.5180312279942996
+      },
+      "clone": {
+        "name": "addressbook/request_cancel",
+        "medianRatio": 1.0009725747637068,
+        "ratioIQR": 0.00757115541799025,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 324.0,
+            "mallocs": 4.0
+          },
+          "B": {
+            "bytes": 324.0,
+            "mallocs": 4.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          1.122774500133704,
+          1.0010672934827514,
+          1.0008778560446625,
+          0.9999425759908271,
+          1.0099743040687845,
+          0.9692588647507371
+        ],
+        "leftNsPerOp": 917.769025183808,
+        "rightNsPerOp": 952.5274919716048,
+        "roundGeometricDeltaNs": [
+          120.53314684834265,
+          0.9485280992302023,
+          0.7812577780425727,
+          -0.05154293600605797,
+          8.860123616217834,
+          -27.65221725988681
+        ],
+        "medianRoundGeometricDeltaNs": 0.8648929386363875
+      },
+      "pass1": {
+        "name": "addressbook/request_cancel",
+        "medianRatio": 0.8264689939327748,
+        "ratioIQR": 0.012951921032381852,
+        "roundsWithin5Pct": 0,
+        "allocationMedian": {
+          "A": {
+            "bytes": 324.0,
+            "mallocs": 4.0
+          },
+          "B": {
+            "bytes": 304.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.8360208718057637,
+          0.8338744868719881,
+          0.8197020307243094,
+          0.8163028884164079,
+          0.8311141517760205,
+          0.8218238360895291
+        ],
+        "leftNsPerOp": 891.1364088695326,
+        "rightNsPerOp": 736.7197773250913,
+        "roundGeometricDeltaNs": [
+          -146.33014778623135,
+          -149.06763535049038,
+          -161.4849112467972,
+          -158.4340646127406,
+          -151.5670903988722,
+          -160.31400242351015
+        ],
+        "medianRoundGeometricDeltaNs": -155.0005775058064
+      },
+      "pass2": {
+        "name": "addressbook/request_cancel",
+        "medianRatio": 0.8308406731224623,
+        "ratioIQR": 0.008898817663904435,
+        "roundsWithin5Pct": 0,
+        "allocationMedian": {
+          "A": {
+            "bytes": 324.0,
+            "mallocs": 4.0
+          },
+          "B": {
+            "bytes": 304.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.8261824687936423,
+          0.8302165570666864,
+          0.8376314816416642,
+          0.8255522880895461,
+          0.8314647891782383,
+          0.9322394882596268
+        ],
+        "leftNsPerOp": 900.1608598279631,
+        "rightNsPerOp": 787.4138241374394,
+        "roundGeometricDeltaNs": [
+          -155.36936283200032,
+          -150.75970305880344,
+          -144.43142680260564,
+          -154.98718415754627,
+          -150.78490870506585,
+          -63.41908474751756
+        ],
+        "medianRoundGeometricDeltaNs": -150.77230588193464
+      }
+    },
+    {
+      "name": "addressbook/response",
+      "self": {
+        "name": "addressbook/response",
+        "medianRatio": 1.0094063282190093,
+        "ratioIQR": 0.02556869625060454,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 324.0,
+            "mallocs": 4.0
+          },
+          "B": {
+            "bytes": 324.0,
+            "mallocs": 4.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          1.0275385381090842,
+          0.9510685142135338,
+          1.0005199749256755,
+          1.0182926815123432,
+          1.035466628890619,
+          0.9993711786371674
+        ],
+        "leftNsPerOp": 879.2228549855369,
+        "rightNsPerOp": 862.4461335857296,
+        "roundGeometricDeltaNs": [
+          22.155479245961374,
+          -47.8221218156209,
+          0.43408805282331286,
+          14.97806082097975,
+          29.093802952797546,
+          -0.5185020408196124
+        ],
+        "medianRoundGeometricDeltaNs": 7.706074436901531
+      },
+      "clone": {
+        "name": "addressbook/response",
+        "medianRatio": 1.0017640878764789,
+        "ratioIQR": 0.017984064751940587,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 324.0,
+            "mallocs": 4.0
+          },
+          "B": {
+            "bytes": 324.0,
+            "mallocs": 4.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          1.0059680663217312,
+          1.005547408687132,
+          0.9842508725174691,
+          1.0130365660826457,
+          0.9979807670658256,
+          0.9845115271929125
+        ],
+        "leftNsPerOp": 820.7104066935416,
+        "rightNsPerOp": 819.5156665546878,
+        "roundGeometricDeltaNs": [
+          4.86184213036438,
+          4.524067370581633,
+          -12.99116374223604,
+          10.691754125518855,
+          -1.6664568691207933,
+          -12.744773208326706
+        ],
+        "medianRoundGeometricDeltaNs": 1.42880525073042
+      },
+      "pass1": {
+        "name": "addressbook/response",
+        "medianRatio": 0.8471505630930966,
+        "ratioIQR": 0.008408644364163775,
+        "roundsWithin5Pct": 0,
+        "allocationMedian": {
+          "A": {
+            "bytes": 324.0,
+            "mallocs": 4.0
+          },
+          "B": {
+            "bytes": 304.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.870544592827914,
+          0.8522546942836483,
+          0.8475463453499925,
+          0.8363882086890018,
+          0.8467547808362006,
+          0.8413070233026938
+        ],
+        "leftNsPerOp": 870.9356291498857,
+        "rightNsPerOp": 736.4288691448061,
+        "roundGeometricDeltaNs": [
+          -124.25607458755098,
+          -123.00492732070052,
+          -128.91257906845,
+          -137.7496645995376,
+          -127.01095231547436,
+          -132.95490707658655
+        ],
+        "medianRoundGeometricDeltaNs": -127.96176569196217
+      },
+      "pass2": {
+        "name": "addressbook/response",
+        "medianRatio": 0.848097313836613,
+        "ratioIQR": 0.015442306199379918,
+        "roundsWithin5Pct": 0,
+        "allocationMedian": {
+          "A": {
+            "bytes": 324.0,
+            "mallocs": 4.0
+          },
+          "B": {
+            "bytes": 304.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.8704379151903532,
+          0.8403955126187559,
+          0.8413991922980655,
+          0.8603439966807258,
+          0.8456299080118438,
+          0.8505647196613823
+        ],
+        "leftNsPerOp": 820.1280772836035,
+        "rightNsPerOp": 698.3409587064308,
+        "roundGeometricDeltaNs": [
+          -105.9465302766655,
+          -130.8094833298752,
+          -130.4906679814619,
+          -113.69456562543519,
+          -127.126784780756,
+          -122.89904667740598
+        ],
+        "medianRoundGeometricDeltaNs": -125.01291572908099
+      }
+    },
+    {
+      "name": "game_small/notification",
+      "self": {
+        "name": "game_small/notification",
+        "medianRatio": 0.997603973260403,
+        "ratioIQR": 0.00997719036648137,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 720.0,
+            "mallocs": 3.0
+          },
+          "B": {
+            "bytes": 720.0,
+            "mallocs": 3.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          1.0095560360437033,
+          0.9916957931009608,
+          0.9989705954904303,
+          0.9680683548141947,
+          1.0040876321029177,
+          0.9962373510303757
+        ],
+        "leftNsPerOp": 1179.4443561011374,
+        "rightNsPerOp": 1171.2734118020053,
+        "roundGeometricDeltaNs": [
+          11.143791516157762,
+          -9.60278026507217,
+          -1.2035922970981119,
+          -39.11772696365006,
+          4.767922060355659,
+          -4.440795434401025
+        ],
+        "medianRoundGeometricDeltaNs": -2.8221938657495684
+      },
+      "clone": {
+        "name": "game_small/notification",
+        "medianRatio": 0.9849143143871935,
+        "ratioIQR": 0.018296773322302284,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 720.0,
+            "mallocs": 3.0
+          },
+          "B": {
+            "bytes": 720.0,
+            "mallocs": 3.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          0.8880409794838178,
+          1.0047461010391008,
+          0.9854098842312794,
+          0.9844187445431075,
+          0.9806807831720885,
+          1.008847496708675
+        ],
+        "leftNsPerOp": 1208.0580303784861,
+        "rightNsPerOp": 1164.7659072045153,
+        "roundGeometricDeltaNs": [
+          -145.24148813482952,
+          5.539811725316667,
+          -17.069026082235496,
+          -18.39061394291548,
+          -22.95684438558237,
+          10.349338812088718
+        ],
+        "medianRoundGeometricDeltaNs": -17.729820012575487
+      },
+      "pass1": {
+        "name": "game_small/notification",
+        "medianRatio": 0.9018088807067031,
+        "ratioIQR": 0.009839998536734895,
+        "roundsWithin5Pct": 0,
+        "allocationMedian": {
+          "A": {
+            "bytes": 720.0,
+            "mallocs": 3.0
+          },
+          "B": {
+            "bytes": 704.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9109799146074569,
+          0.9000991076036441,
+          0.8922678988160312,
+          0.9187506326017295,
+          0.8989997652938496,
+          0.9035186538097619
+        ],
+        "leftNsPerOp": 1177.1111570817818,
+        "rightNsPerOp": 1064.09227175562,
+        "roundGeometricDeltaNs": [
+          -104.83377047659064,
+          -117.24844763140868,
+          -128.51948364489658,
+          -94.6572707694811,
+          -119.4203188384538,
+          -112.89171577315778
+        ],
+        "medianRoundGeometricDeltaNs": -115.07008170228323
+      },
+      "pass2": {
+        "name": "game_small/notification",
+        "medianRatio": 0.9091128059851221,
+        "ratioIQR": 0.008691813004659155,
+        "roundsWithin5Pct": 0,
+        "allocationMedian": {
+          "A": {
+            "bytes": 720.0,
+            "mallocs": 3.0
+          },
+          "B": {
+            "bytes": 704.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.903676639040522,
+          0.9149903928753643,
+          0.9086998107280674,
+          0.9095258012421769,
+          1.2904911862443087,
+          0.9019949839968775
+        ],
+        "leftNsPerOp": 1249.9932940194135,
+        "rightNsPerOp": 1382.0069625647984,
+        "roundGeometricDeltaNs": [
+          -113.09107795132923,
+          -101.50840576494443,
+          -107.3923163920665,
+          -106.14740590623319,
+          404.05494374571026,
+          -116.23939722841669
+        ],
+        "medianRoundGeometricDeltaNs": -106.76986114914985
+      }
+    },
+    {
+      "name": "game_small/request_cancel",
+      "self": {
+        "name": "game_small/request_cancel",
+        "medianRatio": 1.001696687030028,
+        "ratioIQR": 0.012269229813569371,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 724.0,
+            "mallocs": 4.0
+          },
+          "B": {
+            "bytes": 724.0,
+            "mallocs": 4.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          1.0062910054970375,
+          1.557571836344536,
+          0.9889979724582284,
+          0.9909305583594973,
+          1.0031944759508562,
+          1.0001988981091994
+        ],
+        "leftNsPerOp": 1261.7480437941053,
+        "rightNsPerOp": 1558.4626141552512,
+        "roundGeometricDeltaNs": [
+          7.81582658543698,
+          708.1614849872276,
+          -14.054558230997145,
+          -11.415061347356641,
+          4.000136242591907,
+          0.25000176351613845
+        ],
+        "medianRoundGeometricDeltaNs": 2.1250690030540227
+      },
+      "clone": {
+        "name": "game_small/request_cancel",
+        "medianRatio": 0.9958865066331942,
+        "ratioIQR": 0.009236871303841099,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 724.0,
+            "mallocs": 4.0
+          },
+          "B": {
+            "bytes": 724.0,
+            "mallocs": 4.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          0.9958735601263818,
+          0.9859822031045365,
+          0.9823139393379742,
+          0.9982894005051164,
+          1.007550566733385,
+          0.9958994531400066
+        ],
+        "leftNsPerOp": 1253.7897488472681,
+        "rightNsPerOp": 1246.6737870812422,
+        "roundGeometricDeltaNs": [
+          -5.12611227143816,
+          -17.56569898324983,
+          -22.172666816399214,
+          -2.1281849225874794,
+          9.511204063998548,
+          -5.203982520477211
+        ],
+        "medianRoundGeometricDeltaNs": -5.165047395957686
+      },
+      "pass1": {
+        "name": "game_small/request_cancel",
+        "medianRatio": 0.8771590335951884,
+        "ratioIQR": 0.010587368231552818,
+        "roundsWithin5Pct": 0,
+        "allocationMedian": {
+          "A": {
+            "bytes": 724.0,
+            "mallocs": 4.0
+          },
+          "B": {
+            "bytes": 704.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.8773282826071417,
+          0.655104791648891,
+          0.8769897845832351,
+          0.8815880254664553,
+          0.8997744565264683,
+          0.8675843671656871
+        ],
+        "leftNsPerOp": 1387.4222287166926,
+        "rightNsPerOp": 1102.5064156089957,
+        "roundGeometricDeltaNs": [
+          -153.99437944370766,
+          -569.9326284716435,
+          -156.0549508978927,
+          -148.16046467615956,
+          -124.74088219353484,
+          -166.73380782169352
+        ],
+        "medianRoundGeometricDeltaNs": -155.02466517080018
+      },
+      "pass2": {
+        "name": "game_small/request_cancel",
+        "medianRatio": 0.8803875479016339,
+        "ratioIQR": 0.010492631980268396,
+        "roundsWithin5Pct": 0,
+        "allocationMedian": {
+          "A": {
+            "bytes": 724.0,
+            "mallocs": 4.0
+          },
+          "B": {
+            "bytes": 704.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.8830069228234221,
+          0.8759742440669186,
+          0.8685199424976934,
+          0.8893573317802412,
+          0.8777681729798458,
+          0.8882181700927511
+        ],
+        "leftNsPerOp": 1246.236992872807,
+        "rightNsPerOp": 1097.1806240862572,
+        "roundGeometricDeltaNs": [
+          -146.20298347741573,
+          -155.00693174180174,
+          -164.7075479849866,
+          -136.8312157810517,
+          -151.97761015734773,
+          -139.03238717680574
+        ],
+        "medianRoundGeometricDeltaNs": -149.09029681738173
+      }
+    },
+    {
+      "name": "game_small/response",
+      "self": {
+        "name": "game_small/response",
+        "medianRatio": 1.0001429054895652,
+        "ratioIQR": 0.0027899345648929597,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 724.0,
+            "mallocs": 4.0
+          },
+          "B": {
+            "bytes": 724.0,
+            "mallocs": 4.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          1.002621150754329,
+          0.9944073211790746,
+          1.0051383270717684,
+          1.0008750581637058,
+          0.9994107528154246,
+          0.9993893397838988
+        ],
+        "leftNsPerOp": 1171.7475285355001,
+        "rightNsPerOp": 1172.1006021474172,
+        "roundGeometricDeltaNs": [
+          3.0699924778882632,
+          -6.561922702496759,
+          5.976055267564789,
+          1.0234205689480405,
+          -0.6949774222666747,
+          -0.7165839493025032
+        ],
+        "medianRoundGeometricDeltaNs": 0.16422157334068288
+      },
+      "clone": {
+        "name": "game_small/response",
+        "medianRatio": 0.9980863359139246,
+        "ratioIQR": 0.005086687498393139,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 724.0,
+            "mallocs": 4.0
+          },
+          "B": {
+            "bytes": 724.0,
+            "mallocs": 4.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          0.9982950283330662,
+          0.997877643494783,
+          0.9526689178734098,
+          0.9966854420574325,
+          1.0088955067163219,
+          1.0033285637758622
+        ],
+        "leftNsPerOp": 1245.5143072289156,
+        "rightNsPerOp": 1214.1211914967562,
+        "roundGeometricDeltaNs": [
+          -2.010642912023968,
+          -2.499760406754831,
+          -65.47058316833386,
+          -3.8910007678416605,
+          10.477812972086667,
+          3.9283955914195303
+        ],
+        "medianRoundGeometricDeltaNs": -2.2552016593893995
+      },
+      "pass1": {
+        "name": "game_small/response",
+        "medianRatio": 0.9074396476744856,
+        "ratioIQR": 0.0065681861119586404,
+        "roundsWithin5Pct": 0,
+        "allocationMedian": {
+          "A": {
+            "bytes": 724.0,
+            "mallocs": 4.0
+          },
+          "B": {
+            "bytes": 704.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9131867556044785,
+          0.9066239760135488,
+          0.9082553193354224,
+          0.9042141154803247,
+          0.9003322471717802,
+          0.9124279158556451
+        ],
+        "leftNsPerOp": 1173.7122623778328,
+        "rightNsPerOp": 1065.0740432463394,
+        "roundGeometricDeltaNs": [
+          -102.01382275198944,
+          -109.62638364644909,
+          -106.52765253137454,
+          -113.29607298344945,
+          -117.56300256076065,
+          -102.34422943480399
+        ],
+        "medianRoundGeometricDeltaNs": -108.07701808891181
+      },
+      "pass2": {
+        "name": "game_small/response",
+        "medianRatio": 0.9052065101229025,
+        "ratioIQR": 0.017193985128480693,
+        "roundsWithin5Pct": 0,
+        "allocationMedian": {
+          "A": {
+            "bytes": 724.0,
+            "mallocs": 4.0
+          },
+          "B": {
+            "bytes": 704.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.8992481208209613,
+          0.9111648994248439,
+          0.8952239605666281,
+          0.9154776006703302,
+          0.9141770145366416,
+          0.8944979106093545
+        ],
+        "leftNsPerOp": 1214.6419000604474,
+        "rightNsPerOp": 1106.2746259822688,
+        "roundGeometricDeltaNs": [
+          -119.3286419666938,
+          -103.86610274008581,
+          -123.6963108711916,
+          -112.65330769418529,
+          -100.62971927257672,
+          -125.74453245487189
+        ],
+        "medianRoundGeometricDeltaNs": -115.99097483043954
+      }
+    },
+    {
+      "name": "game_large/notification",
+      "self": {
+        "name": "game_large/notification",
+        "medianRatio": 1.0035935564310754,
+        "ratioIQR": 0.007762655640997096,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 7440.0,
+            "mallocs": 4.0
+          },
+          "B": {
+            "bytes": 7440.0,
+            "mallocs": 4.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          0.9974616562301735,
+          1.1249030673963252,
+          0.9989141124436755,
+          1.0004419944935263,
+          1.0071632786733058,
+          1.0067451183686242
+        ],
+        "leftNsPerOp": 9541.752048546692,
+        "rightNsPerOp": 10068.80992965368,
+        "roundGeometricDeltaNs": [
+          -23.875426250027886,
+          1242.9047106758044,
+          -10.356211944003007,
+          4.170034543187285,
+          66.62866064230184,
+          62.89206792679397
+        ],
+        "medianRoundGeometricDeltaNs": 33.53105123499063
+      },
+      "clone": {
+        "name": "game_large/notification",
+        "medianRatio": 0.9873159702538508,
+        "ratioIQR": 0.00936368702159951,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 7440.0,
+            "mallocs": 4.0
+          },
+          "B": {
+            "bytes": 7440.0,
+            "mallocs": 4.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          0.987288868149477,
+          0.9979857645750493,
+          0.9814247907993566,
+          0.9855189166158322,
+          1.0052034291826637,
+          0.9873430723582245
+        ],
+        "leftNsPerOp": 9506.239170692432,
+        "rightNsPerOp": 9419.178542673108,
+        "roundGeometricDeltaNs": [
+          -121.19913516736597,
+          -19.113857218917474,
+          -176.71437173567756,
+          -137.40385175314077,
+          49.32900905084716,
+          -120.57316895451004
+        ],
+        "medianRoundGeometricDeltaNs": -120.886152060938
+      },
+      "pass1": {
+        "name": "game_large/notification",
+        "medianRatio": 0.977775738657678,
+        "ratioIQR": 0.0050940318948662355,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 7440.0,
+            "mallocs": 4.0
+          },
+          "B": {
+            "bytes": 7424.0,
+            "mallocs": 3.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9863315797491141,
+          0.9691581699553145,
+          0.9778522481346758,
+          0.9758157860084556,
+          0.9776992291806803,
+          0.9825568222169455
+        ],
+        "leftNsPerOp": 9840.488526838672,
+        "rightNsPerOp": 9605.341340450772,
+        "roundGeometricDeltaNs": [
+          -146.88537673000064,
+          -297.2349423252199,
+          -208.64336401877335,
+          -228.38949423618942,
+          -210.67627796004672,
+          -163.980227861226
+        ],
+        "medianRoundGeometricDeltaNs": -209.65982098941004
+      },
+      "pass2": {
+        "name": "game_large/notification",
+        "medianRatio": 0.9678164762263639,
+        "ratioIQR": 0.01775832522400922,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 7440.0,
+            "mallocs": 4.0
+          },
+          "B": {
+            "bytes": 7424.0,
+            "mallocs": 3.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9645304964366122,
+          0.9711024560161158,
+          0.9843867871447536,
+          0.9628996733725758,
+          1.0009087179803173,
+          0.9559400089041001
+        ],
+        "leftNsPerOp": 9369.246919285275,
+        "rightNsPerOp": 9121.950573783117,
+        "roundGeometricDeltaNs": [
+          -335.48619277810576,
+          -272.20352975013157,
+          -146.78594299029646,
+          -326.20779986163507,
+          8.65548414632758,
+          -422.71750322775006
+        ],
+        "medianRoundGeometricDeltaNs": -299.2056648058833
+      }
+    },
+    {
+      "name": "game_large/request_cancel",
+      "self": {
+        "name": "game_large/request_cancel",
+        "medianRatio": 0.9959149356239627,
+        "ratioIQR": 0.010618881094640042,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 7444.125,
+            "mallocs": 5.0
+          },
+          "B": {
+            "bytes": 7444.0,
+            "mallocs": 5.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": true,
+        "controlAccepted": false,
+        "roundRatios": [
+          0.9935159379403228,
+          1.008599215738664,
+          0.9946315459141064,
+          0.9861118252554447,
+          1.0068188529266056,
+          0.9971983253338189
+        ],
+        "leftNsPerOp": 9392.18661592866,
+        "rightNsPerOp": 9370.392988929889,
+        "roundGeometricDeltaNs": [
+          -61.12971659780851,
+          79.8805181390926,
+          -50.78303528080869,
+          -131.8277166135449,
+          63.533012723344655,
+          -26.22177890338753
+        ],
+        "medianRoundGeometricDeltaNs": -38.50240709209811
+      },
+      "clone": {
+        "name": "game_large/request_cancel",
+        "medianRatio": 0.9874287499302998,
+        "ratioIQR": 0.00806571669053957,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 7444.0,
+            "mallocs": 5.0
+          },
+          "B": {
+            "bytes": 7444.125,
+            "mallocs": 5.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": true,
+        "controlAccepted": false,
+        "roundRatios": [
+          0.9855604273091391,
+          0.9809454482934631,
+          0.7544782560328489,
+          0.9931435016985265,
+          0.9892970725514606,
+          0.9904541888000754
+        ],
+        "leftNsPerOp": 11420.59655214425,
+        "rightNsPerOp": 9550.669590643274,
+        "roundGeometricDeltaNs": [
+          -137.1740311775793,
+          -183.6149701647737,
+          -3303.6853362620404,
+          -64.95271872496596,
+          -102.07567393019417,
+          -90.40092608883606
+        ],
+        "medianRoundGeometricDeltaNs": -119.62485255388674
+      },
+      "pass1": {
+        "name": "game_large/request_cancel",
+        "medianRatio": 0.9830113209624113,
+        "ratioIQR": 0.005090717455594196,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 7444.0,
+            "mallocs": 5.0
+          },
+          "B": {
+            "bytes": 7424.0,
+            "mallocs": 3.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9817466226863433,
+          0.9842760192384793,
+          0.9803640602335425,
+          0.9863085513236227,
+          0.9888532185871065,
+          0.974374648215196
+        ],
+        "leftNsPerOp": 9461.816950404229,
+        "rightNsPerOp": 9298.155375466418,
+        "roundGeometricDeltaNs": [
+          -173.10982003478784,
+          -149.33789548255845,
+          -186.13083947802625,
+          -128.6984333301716,
+          -104.91769907448543,
+          -243.241914642349
+        ],
+        "medianRoundGeometricDeltaNs": -161.22385775867315
+      },
+      "pass2": {
+        "name": "game_large/request_cancel",
+        "medianRatio": 0.9629714074670764,
+        "ratioIQR": 0.02348383680031141,
+        "roundsWithin5Pct": 4,
+        "allocationMedian": {
+          "A": {
+            "bytes": 7444.0,
+            "mallocs": 5.0
+          },
+          "B": {
+            "bytes": 7424.0,
+            "mallocs": 3.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9711458818695369,
+          0.9646461708014475,
+          1.0110361060784052,
+          0.7876557749432735,
+          0.9409506083587023,
+          0.9612966441327053
+        ],
+        "leftNsPerOp": 10255.91670318434,
+        "rightNsPerOp": 9365.415662430616,
+        "roundGeometricDeltaNs": [
+          -275.5561714899068,
+          -339.24494918563687,
+          105.85815490845926,
+          -2579.550342190765,
+          -570.8392312592532,
+          -371.2969051458931
+        ],
+        "medianRoundGeometricDeltaNs": -355.270927165765
+      }
+    },
+    {
+      "name": "game_large/response",
+      "self": {
+        "name": "game_large/response",
+        "medianRatio": 1.0079144748616393,
+        "ratioIQR": 0.007992662937426731,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 7444.0,
+            "mallocs": 5.0
+          },
+          "B": {
+            "bytes": 7444.0,
+            "mallocs": 5.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          1.00050956635713,
+          1.0308382382932335,
+          1.008235356110563,
+          0.9910332069893786,
+          1.0075935936127154,
+          1.0109525294410828
+        ],
+        "leftNsPerOp": 9553.274760622382,
+        "rightNsPerOp": 9662.99184619988,
+        "roundGeometricDeltaNs": [
+          4.746664426920688,
+          323.00053627476336,
+          76.65441734780688,
+          -83.85831268834772,
+          70.6032413035282,
+          101.44791020045159
+        ],
+        "medianRoundGeometricDeltaNs": 73.62882932566754
+      },
+      "clone": {
+        "name": "game_large/response",
+        "medianRatio": 0.9890921750013942,
+        "ratioIQR": 0.023501680110571632,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 7444.0,
+            "mallocs": 5.0
+          },
+          "B": {
+            "bytes": 7444.125,
+            "mallocs": 5.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": true,
+        "controlAccepted": false,
+        "roundRatios": [
+          0.9929840301738821,
+          0.9852003198289063,
+          1.0235664419800938,
+          0.9408949547213664,
+          1.0006804876668125,
+          0.971939484301042
+        ],
+        "leftNsPerOp": 9590.34183633207,
+        "rightNsPerOp": 9449.752268781565,
+        "roundGeometricDeltaNs": [
+          -66.54915004316354,
+          -141.7636047651904,
+          222.75409602653417,
+          -583.890886258896,
+          6.49850271296782,
+          -268.3182229447957
+        ],
+        "medianRoundGeometricDeltaNs": -104.15637740417696
+      },
+      "pass1": {
+        "name": "game_large/response",
+        "medianRatio": 0.981788824610581,
+        "ratioIQR": 0.01440725405365284,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 7444.0,
+            "mallocs": 5.0
+          },
+          "B": {
+            "bytes": 7424.0,
+            "mallocs": 3.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          1.0730696593839448,
+          0.978678685609951,
+          0.9753417053358895,
+          0.9924779514070066,
+          0.9848989636112111,
+          0.9705172734800801
+        ],
+        "leftNsPerOp": 9746.973521505377,
+        "rightNsPerOp": 10076.043897849462,
+        "roundGeometricDeltaNs": [
+          778.7598869037065,
+          -202.8010136693665,
+          -230.79500376830947,
+          -70.36151958403025,
+          -142.79932086796362,
+          -276.8541273179944
+        ],
+        "medianRoundGeometricDeltaNs": -172.80016726866506
+      },
+      "pass2": {
+        "name": "game_large/response",
+        "medianRatio": 0.9725639619160125,
+        "ratioIQR": 0.01091351953280184,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 7444.0,
+            "mallocs": 5.0
+          },
+          "B": {
+            "bytes": 7424.0,
+            "mallocs": 3.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9773109869046194,
+          0.9943860953169678,
+          0.9788059027614787,
+          0.9678169369274057,
+          0.9674192267101476,
+          0.9624135467075615
+        ],
+        "leftNsPerOp": 9463.20952326987,
+        "rightNsPerOp": 9222.902104110002,
+        "roundGeometricDeltaNs": [
+          -215.11273951674957,
+          -52.24468522551433,
+          -201.4885629175369,
+          -308.48478596589484,
+          -306.4436288674169,
+          -356.40402530071515
+        ],
+        "medianRoundGeometricDeltaNs": -260.77818419208324
+      }
+    },
+    {
+      "name": "int32_edges/notification",
+      "self": {
+        "name": "int32_edges/notification",
+        "medianRatio": 1.0080844315087238,
+        "ratioIQR": 0.01488518203205147,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 8208.0,
+            "mallocs": 3.0
+          },
+          "B": {
+            "bytes": 8208.0,
+            "mallocs": 3.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          0.997730601248845,
+          0.9836415051913437,
+          1.0175763129995308,
+          1.0718628145617386,
+          1.0080826350706498,
+          1.008086227946798
+        ],
+        "leftNsPerOp": 4998.463240104677,
+        "rightNsPerOp": 5081.73268318613,
+        "roundGeometricDeltaNs": [
+          -11.367215804851185,
+          -81.28123729512663,
+          87.06969008592569,
+          358.15470730368634,
+          40.904988531488925,
+          40.48308561414706
+        ],
+        "medianRoundGeometricDeltaNs": 40.69403707281799
+      },
+      "clone": {
+        "name": "int32_edges/notification",
+        "medianRatio": 1.0094342908066936,
+        "ratioIQR": 0.07204317899400214,
+        "roundsWithin5Pct": 4,
+        "allocationMedian": {
+          "A": {
+            "bytes": 8208.0,
+            "mallocs": 3.0
+          },
+          "B": {
+            "bytes": 8208.0,
+            "mallocs": 3.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": false,
+        "controlAccepted": false,
+        "roundRatios": [
+          1.0064413722505794,
+          0.9239054147198343,
+          0.8843703649212692,
+          1.0179677076744278,
+          1.0198507165894268,
+          1.0124272093628077
+        ],
+        "leftNsPerOp": 5452.9169189371005,
+        "rightNsPerOp": 5172.012560965355,
+        "roundGeometricDeltaNs": [
+          32.220968644110144,
+          -425.87924062397724,
+          -688.776364899808,
+          89.76982141028839,
+          100.71321779574464,
+          64.16825513102776
+        ],
+        "medianRoundGeometricDeltaNs": 48.19461188756895
+      },
+      "pass1": {
+        "name": "int32_edges/notification",
+        "medianRatio": 0.9706920061839437,
+        "ratioIQR": 0.007836053230593887,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 8208.0,
+            "mallocs": 3.0
+          },
+          "B": {
+            "bytes": 8192.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9635689617209611,
+          0.9709597005099742,
+          0.973838569811066,
+          0.9247678304622248,
+          0.9831736407622625,
+          0.9704243118579131
+        ],
+        "leftNsPerOp": 5099.611594820588,
+        "rightNsPerOp": 4913.271381311902,
+        "roundGeometricDeltaNs": [
+          -187.21990568537785,
+          -146.08534796928507,
+          -131.77925855785452,
+          -395.4200616045455,
+          -84.34055236989207,
+          -150.67570764410448
+        ],
+        "medianRoundGeometricDeltaNs": -148.38052780669477
+      },
+      "pass2": {
+        "name": "int32_edges/notification",
+        "medianRatio": 0.960417253563827,
+        "ratioIQR": 0.07914772612348664,
+        "roundsWithin5Pct": 4,
+        "allocationMedian": {
+          "A": {
+            "bytes": 8208.0,
+            "mallocs": 3.0
+          },
+          "B": {
+            "bytes": 8192.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9783022063182583,
+          0.9576938765431716,
+          0.7480406702411879,
+          1.0206927531957586,
+          0.874587489500713,
+          0.9631406305844824
+        ],
+        "leftNsPerOp": 5986.281896219136,
+        "rightNsPerOp": 4989.083478009259,
+        "roundGeometricDeltaNs": [
+          -109.76510801087807,
+          -214.4815639565295,
+          -1666.4049777744158,
+          101.89701674718071,
+          -747.6047588591618,
+          -186.6171286147828
+        ],
+        "medianRoundGeometricDeltaNs": -200.54934628565616
+      }
+    },
+    {
+      "name": "int32_edges/request_cancel",
+      "self": {
+        "name": "int32_edges/request_cancel",
+        "medianRatio": 0.9929874186386509,
+        "ratioIQR": 0.018128720676252263,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 8212.0,
+            "mallocs": 4.0
+          },
+          "B": {
+            "bytes": 8212.0,
+            "mallocs": 4.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          0.8162260918239463,
+          0.9913859527903041,
+          1.009379038312029,
+          1.0078591636787038,
+          0.9847551800092651,
+          0.9945888844869977
+        ],
+        "leftNsPerOp": 5533.38782700422,
+        "rightNsPerOp": 5189.130189873417,
+        "roundGeometricDeltaNs": [
+          -1208.5657032141917,
+          -45.429790458518255,
+          48.06531897705827,
+          40.01983447480961,
+          -78.69863405940669,
+          -27.882303075912205
+        ],
+        "medianRoundGeometricDeltaNs": -36.65604676721523
+      },
+      "clone": {
+        "name": "int32_edges/request_cancel",
+        "medianRatio": 1.0006519462903878,
+        "ratioIQR": 0.014100391694198189,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 8212.0,
+            "mallocs": 4.0
+          },
+          "B": {
+            "bytes": 8212.0,
+            "mallocs": 4.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          1.0024585020720538,
+          0.9724555619990535,
+          0.9988453905087217,
+          1.012912207747128,
+          0.9863780840484511,
+          1.003974235786271
+        ],
+        "leftNsPerOp": 5142.634459116302,
+        "rightNsPerOp": 5123.575133316404,
+        "roundGeometricDeltaNs": [
+          12.583087507749951,
+          -142.03398535952965,
+          -5.93009731384609,
+          66.9783998656394,
+          -69.6175982621935,
+          20.436553270840704
+        ],
+        "medianRoundGeometricDeltaNs": 3.3264950969519305
+      },
+      "pass1": {
+        "name": "int32_edges/request_cancel",
+        "medianRatio": 0.968574313272262,
+        "ratioIQR": 0.022134791031762968,
+        "roundsWithin5Pct": 4,
+        "allocationMedian": {
+          "A": {
+            "bytes": 8212.0,
+            "mallocs": 4.0
+          },
+          "B": {
+            "bytes": 8192.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9608558015724512,
+          1.0682632862471664,
+          0.9732363660926714,
+          0.9473398692311223,
+          0.9872608210678624,
+          0.9639122604518524
+        ],
+        "leftNsPerOp": 5329.809259491553,
+        "rightNsPerOp": 5336.079936026092,
+        "roundGeometricDeltaNs": [
+          -200.56982674952906,
+          398.31734106370004,
+          -137.3743839750523,
+          -276.62941593849337,
+          -64.80380155484272,
+          -186.78562437582787
+        ],
+        "medianRoundGeometricDeltaNs": -162.08000417544008
+      },
+      "pass2": {
+        "name": "int32_edges/request_cancel",
+        "medianRatio": 0.960561036831105,
+        "ratioIQR": 0.023995492677266972,
+        "roundsWithin5Pct": 4,
+        "allocationMedian": {
+          "A": {
+            "bytes": 8212.0,
+            "mallocs": 4.0
+          },
+          "B": {
+            "bytes": 8192.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9498919537124142,
+          0.969375468869971,
+          0.9458266188872533,
+          1.0380575435061532,
+          0.9517466047922393,
+          0.9760096559228596
+        ],
+        "leftNsPerOp": 5234.1717854735425,
+        "rightNsPerOp": 5103.000631951466,
+        "roundGeometricDeltaNs": [
+          -257.15141282768127,
+          -159.04423255839538,
+          -284.17669922157984,
+          203.6312716395605,
+          -256.0589944755802,
+          -123.49458542826324
+        ],
+        "medianRoundGeometricDeltaNs": -207.5516135169878
+      }
+    },
+    {
+      "name": "int32_edges/response",
+      "self": {
+        "name": "int32_edges/response",
+        "medianRatio": 1.0037623312405528,
+        "ratioIQR": 0.0024898110308884114,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 8212.0,
+            "mallocs": 4.0
+          },
+          "B": {
+            "bytes": 8212.125,
+            "mallocs": 4.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": true,
+        "controlAccepted": false,
+        "roundRatios": [
+          1.0048517519888485,
+          1.002342434258511,
+          1.0049359018008317,
+          1.0098182310607033,
+          0.9951641312647692,
+          1.002672910492257
+        ],
+        "leftNsPerOp": 5038.1217240493315,
+        "rightNsPerOp": 5054.402460174718,
+        "roundGeometricDeltaNs": [
+          24.490625893013203,
+          11.86254673300482,
+          24.907038197525253,
+          49.11602133165252,
+          -24.383133556037137,
+          13.424398699919038
+        ],
+        "medianRoundGeometricDeltaNs": 18.95751229646612
+      },
+      "clone": {
+        "name": "int32_edges/response",
+        "medianRatio": 0.9886942599348205,
+        "ratioIQR": 0.035589414361026805,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 8212.0,
+            "mallocs": 4.0
+          },
+          "B": {
+            "bytes": 8212.0,
+            "mallocs": 4.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": false,
+        "controlAccepted": false,
+        "roundRatios": [
+          1.0147128557020109,
+          0.8279329275233365,
+          0.9653742482673606,
+          0.9849081270981914,
+          0.9924803927714496,
+          1.010302712190977
+        ],
+        "leftNsPerOp": 5465.649183665401,
+        "rightNsPerOp": 5118.01147414611,
+        "roundGeometricDeltaNs": [
+          72.97094587971696,
+          -1116.1361024631542,
+          -181.4356077653556,
+          -77.94701800693747,
+          -37.91447102164602,
+          51.63706889862715
+        ],
+        "medianRoundGeometricDeltaNs": -57.930744514291746
+      },
+      "pass1": {
+        "name": "int32_edges/response",
+        "medianRatio": 0.9788281243877983,
+        "ratioIQR": 0.010024539807759192,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 8212.0,
+            "mallocs": 4.0
+          },
+          "B": {
+            "bytes": 8192.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9867014568395207,
+          0.9771538607685885,
+          0.9606530951748316,
+          1.1842582659151972,
+          0.9805023880070083,
+          0.9744515795086484
+        ],
+        "leftNsPerOp": 5059.532282930439,
+        "rightNsPerOp": 5306.505786466042,
+        "roundGeometricDeltaNs": [
+          -66.58146079376002,
+          -116.05773179029256,
+          -199.7253941015333,
+          927.0344474082694,
+          -98.62121509284134,
+          -130.31910550975135
+        ],
+        "medianRoundGeometricDeltaNs": -107.33947344156695
+      },
+      "pass2": {
+        "name": "int32_edges/response",
+        "medianRatio": 0.9599245671544379,
+        "ratioIQR": 0.015703539898347052,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 8212.0,
+            "mallocs": 4.0
+          },
+          "B": {
+            "bytes": 8192.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9566333948232502,
+          0.8178111489534824,
+          0.969808806518064,
+          0.9632157394856254,
+          0.986745633872988,
+          0.9510648682077265
+        ],
+        "leftNsPerOp": 5528.061746231156,
+        "rightNsPerOp": 4992.912939698493,
+        "roundGeometricDeltaNs": [
+          -221.81821369516183,
+          -1186.4921854119175,
+          -156.22839065481276,
+          -186.92609709442695,
+          -66.91485226435634,
+          -242.66169381645068
+        ],
+        "medianRoundGeometricDeltaNs": -204.3721553947944
+      }
+    },
+    {
+      "name": "echo_ascii4k/notification",
+      "self": {
+        "name": "echo_ascii4k/notification",
+        "medianRatio": 0.9838185373384659,
+        "ratioIQR": 0.03070591426831304,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 9744.0,
+            "mallocs": 3.0
+          },
+          "B": {
+            "bytes": 9744.0,
+            "mallocs": 3.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": false,
+        "controlAccepted": false,
+        "roundRatios": [
+          0.9300164961079169,
+          0.9536944563413903,
+          0.9944197297052908,
+          0.9834946188476906,
+          1.0020414275839566,
+          0.9841424558292412
+        ],
+        "leftNsPerOp": 1719.6265793497505,
+        "rightNsPerOp": 1648.3906929019797,
+        "roundGeometricDeltaNs": [
+          -138.58981489492203,
+          -75.56213866771395,
+          -8.902689067665506,
+          -27.305868321966273,
+          3.218835015529976,
+          -25.04089444169881
+        ],
+        "medianRoundGeometricDeltaNs": -26.17338138183254
+      },
+      "clone": {
+        "name": "echo_ascii4k/notification",
+        "medianRatio": 1.0063416536256355,
+        "ratioIQR": 0.014099884761680226,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 9744.0,
+            "mallocs": 3.0
+          },
+          "B": {
+            "bytes": 9744.0,
+            "mallocs": 3.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          1.0133896894173735,
+          1.002439644318909,
+          0.8234258509670839,
+          1.0243797809237656,
+          0.9971911826062841,
+          1.0102436629323621
+        ],
+        "leftNsPerOp": 1826.8436591569769,
+        "rightNsPerOp": 1685.348907864987,
+        "roundGeometricDeltaNs": [
+          22.062896832362867,
+          4.15113714751601,
+          -369.28142147750305,
+          40.981503421128764,
+          -4.695250213399731,
+          16.413555896434673
+        ],
+        "medianRoundGeometricDeltaNs": 10.282346521975342
+      },
+      "pass1": {
+        "name": "echo_ascii4k/notification",
+        "medianRatio": 0.9369910765971863,
+        "ratioIQR": 0.012624674215397147,
+        "roundsWithin5Pct": 1,
+        "allocationMedian": {
+          "A": {
+            "bytes": 9744.0,
+            "mallocs": 3.0
+          },
+          "B": {
+            "bytes": 9728.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9375460697128623,
+          0.9485246816559214,
+          0.9320617781125093,
+          0.9590997497451581,
+          0.9364360834815103,
+          0.9277206132981467
+        ],
+        "leftNsPerOp": 1712.6860726709015,
+        "rightNsPerOp": 1580.3061794212542,
+        "roundGeometricDeltaNs": [
+          -118.66943820032634,
+          -84.16989060705532,
+          -113.10792318267727,
+          -65.58728845390965,
+          -100.92172109857438,
+          -114.6089617290495
+        ],
+        "medianRoundGeometricDeltaNs": -107.01482214062582
+      },
+      "pass2": {
+        "name": "echo_ascii4k/notification",
+        "medianRatio": 0.9345652668087276,
+        "ratioIQR": 0.007828458846802278,
+        "roundsWithin5Pct": 0,
+        "allocationMedian": {
+          "A": {
+            "bytes": 9744.0,
+            "mallocs": 3.0
+          },
+          "B": {
+            "bytes": 9728.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9386230571731714,
+          0.9373883315304157,
+          0.930067155191894,
+          0.9255325862003863,
+          0.9317422020870396,
+          0.9481434483418637
+        ],
+        "leftNsPerOp": 1653.9443866943866,
+        "rightNsPerOp": 1545.6975763538264,
+        "roundGeometricDeltaNs": [
+          -98.46214269423285,
+          -103.48119150299635,
+          -115.83714866381933,
+          -121.57768560394243,
+          -122.19842538181751,
+          -81.7083318280711
+        ],
+        "medianRoundGeometricDeltaNs": -109.65917008340784
+      }
+    },
+    {
+      "name": "echo_ascii4k/request_cancel",
+      "self": {
+        "name": "echo_ascii4k/request_cancel",
+        "medianRatio": 0.9925712909274071,
+        "ratioIQR": 0.0131967311290907,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 9748.125,
+            "mallocs": 4.0
+          },
+          "B": {
+            "bytes": 9748.0,
+            "mallocs": 4.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": true,
+        "controlAccepted": false,
+        "roundRatios": [
+          0.9816134792605151,
+          0.9980480551320831,
+          1.0093951299510269,
+          0.9895050988759884,
+          0.9956374829788258,
+          0.9824965416609078
+        ],
+        "leftNsPerOp": 1707.751728837684,
+        "rightNsPerOp": 1694.8865916048985,
+        "roundGeometricDeltaNs": [
+          -30.909264609845422,
+          -3.342869837502576,
+          15.998623097939571,
+          -17.618659195780538,
+          -7.497561136864533,
+          -30.562986538674295
+        ],
+        "medianRoundGeometricDeltaNs": -12.558110166322535
+      },
+      "clone": {
+        "name": "echo_ascii4k/request_cancel",
+        "medianRatio": 0.9967032865671371,
+        "ratioIQR": 0.01541585239914367,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 9748.0,
+            "mallocs": 4.0
+          },
+          "B": {
+            "bytes": 9748.125,
+            "mallocs": 4.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": true,
+        "controlAccepted": false,
+        "roundRatios": [
+          0.9288684924221332,
+          1.0026844475233612,
+          0.9831777329750617,
+          0.9982749195429751,
+          0.9951316535912992,
+          1.0111669799047827
+        ],
+        "leftNsPerOp": 2888.2328887682975,
+        "rightNsPerOp": 1898.6208535092114,
+        "roundGeometricDeltaNs": [
+          -186.27873809016273,
+          4.6839788210195366,
+          -28.45686915355941,
+          -2.926975024976173,
+          -8.538002696554258,
+          19.153168718928782
+        ],
+        "medianRoundGeometricDeltaNs": -5.732488860765216
+      },
+      "pass1": {
+        "name": "echo_ascii4k/request_cancel",
+        "medianRatio": 0.9189438252816677,
+        "ratioIQR": 0.007893806727780062,
+        "roundsWithin5Pct": 0,
+        "allocationMedian": {
+          "A": {
+            "bytes": 9748.0,
+            "mallocs": 4.0
+          },
+          "B": {
+            "bytes": 9728.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9246593169241564,
+          0.9191335684661105,
+          0.9276089802954731,
+          0.9187540820972249,
+          0.8824833650407665,
+          0.9142607367434116
+        ],
+        "leftNsPerOp": 1716.6619408611157,
+        "rightNsPerOp": 1567.025405567655,
+        "roundGeometricDeltaNs": [
+          -125.09112450291445,
+          -138.4910259836704,
+          -121.12373435214386,
+          -134.50535250090934,
+          -213.97912444963072,
+          -150.57115665615697
+        ],
+        "medianRoundGeometricDeltaNs": -136.49818924228987
+      },
+      "pass2": {
+        "name": "echo_ascii4k/request_cancel",
+        "medianRatio": 0.9024037341368232,
+        "ratioIQR": 0.033399531513790714,
+        "roundsWithin5Pct": 0,
+        "allocationMedian": {
+          "A": {
+            "bytes": 9748.0,
+            "mallocs": 4.0
+          },
+          "B": {
+            "bytes": 9728.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.6851538481586178,
+          0.8726452192013063,
+          0.9272161286373912,
+          0.9046710533563929,
+          0.9156663817399808,
+          0.9001364149172534
+        ],
+        "leftNsPerOp": 1934.6196754768832,
+        "rightNsPerOp": 1606.5294818946006,
+        "roundGeometricDeltaNs": [
+          -721.2236938453541,
+          -233.90464814886377,
+          -124.81964501587277,
+          -166.3161547762943,
+          -147.07488373245883,
+          -187.12608223974735
+        ],
+        "medianRoundGeometricDeltaNs": -176.72111850802082
+      }
+    },
+    {
+      "name": "echo_ascii4k/response",
+      "self": {
+        "name": "echo_ascii4k/response",
+        "medianRatio": 1.003668135993168,
+        "ratioIQR": 0.023552656984506593,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 9748.125,
+            "mallocs": 4.0
+          },
+          "B": {
+            "bytes": 9748.0,
+            "mallocs": 4.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": true,
+        "controlAccepted": false,
+        "roundRatios": [
+          1.1267593850884412,
+          0.9725933558940045,
+          0.9899742900826313,
+          1.0030477330870464,
+          1.0042885388992897,
+          1.0209642307912257
+        ],
+        "leftNsPerOp": 1788.0850243622815,
+        "rightNsPerOp": 1856.4564560045858,
+        "roundGeometricDeltaNs": [
+          258.65802426340997,
+          -46.84113353115117,
+          -16.62002113327162,
+          5.0249141994806905,
+          7.1381410387703,
+          35.26874453695518
+        ],
+        "medianRoundGeometricDeltaNs": 6.081527619125495
+      },
+      "clone": {
+        "name": "echo_ascii4k/response",
+        "medianRatio": 1.007549885826692,
+        "ratioIQR": 0.023609263268776548,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 9748.125,
+            "mallocs": 4.0
+          },
+          "B": {
+            "bytes": 9748.0,
+            "mallocs": 4.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": true,
+        "controlAccepted": false,
+        "roundRatios": [
+          0.9819497363568961,
+          1.0117387066774566,
+          1.0033610649759277,
+          0.9860196264484695,
+          1.017259907965753,
+          1.0147060969063286
+        ],
+        "leftNsPerOp": 1640.3611949429037,
+        "rightNsPerOp": 1644.720160413268,
+        "roundGeometricDeltaNs": [
+          -29.93475809796746,
+          19.007145660992364,
+          5.474470365443494,
+          -23.270189386307266,
+          28.408997173724856,
+          23.863986022680365
+        ],
+        "medianRoundGeometricDeltaNs": 12.24080801321793
+      },
+      "pass1": {
+        "name": "echo_ascii4k/response",
+        "medianRatio": 0.920746783929726,
+        "ratioIQR": 0.041284406421184916,
+        "roundsWithin5Pct": 0,
+        "allocationMedian": {
+          "A": {
+            "bytes": 9748.0,
+            "mallocs": 4.0
+          },
+          "B": {
+            "bytes": 9728.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.6920661667745633,
+          0.9171802512384357,
+          0.9297928864692767,
+          0.9243133166210162,
+          0.9396146087509462,
+          0.8771246997018904
+        ],
+        "leftNsPerOp": 1918.840670982166,
+        "rightNsPerOp": 1587.6917570061873,
+        "roundGeometricDeltaNs": [
+          -719.7451495684097,
+          -143.87872431579945,
+          -118.14210956496004,
+          -129.47864685114382,
+          -103.99670330402523,
+          -216.58891439179865
+        ],
+        "medianRoundGeometricDeltaNs": -136.67868558347163
+      },
+      "pass2": {
+        "name": "echo_ascii4k/response",
+        "medianRatio": 0.9427282594103198,
+        "ratioIQR": 0.00582438547184938,
+        "roundsWithin5Pct": 1,
+        "allocationMedian": {
+          "A": {
+            "bytes": 9748.0,
+            "mallocs": 4.0
+          },
+          "B": {
+            "bytes": 9728.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9446094451695826,
+          0.940847073651057,
+          0.9295969371663116,
+          0.9450142627875084,
+          0.9385025393312177,
+          0.9620629040733458
+        ],
+        "leftNsPerOp": 1661.902087021836,
+        "rightNsPerOp": 1567.6943572616556,
+        "roundGeometricDeltaNs": [
+          -94.59592334026661,
+          -98.85448319592797,
+          -115.88255061712994,
+          -90.05388716756215,
+          -102.5594781824584,
+          -62.096951703648756
+        ],
+        "medianRoundGeometricDeltaNs": -96.72520326809729
+      }
+    },
+    {
+      "name": "ascii32/notification",
+      "self": {
+        "name": "ascii32/notification",
+        "medianRatio": 0.9899705783416646,
+        "ratioIQR": 0.025303921218416736,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 128.0,
+            "mallocs": 3.0
+          },
+          "B": {
+            "bytes": 128.0,
+            "mallocs": 3.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          1.0167089779009395,
+          1.0226823180614424,
+          0.9822114995946182,
+          0.9937878634161329,
+          0.9861532932671964,
+          0.985515272992696
+        ],
+        "leftNsPerOp": 277.3314374476026,
+        "rightNsPerOp": 276.73572198033014,
+        "roundGeometricDeltaNs": [
+          4.588075547092728,
+          6.289896121779236,
+          -4.977983277409635,
+          -1.7252475948990877,
+          -3.8189795886418665,
+          -4.033482700556306
+        ],
+        "medianRoundGeometricDeltaNs": -2.772113591770477
+      },
+      "clone": {
+        "name": "ascii32/notification",
+        "medianRatio": 0.968920322564077,
+        "ratioIQR": 0.03905299538417917,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 128.0,
+            "mallocs": 3.0
+          },
+          "B": {
+            "bytes": 128.0,
+            "mallocs": 3.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": false,
+        "controlAccepted": false,
+        "roundRatios": [
+          0.9505588961955428,
+          0.9825852375775657,
+          0.9515096989761417,
+          0.9552554075505885,
+          1.0082573311107856,
+          0.9944704161460548
+        ],
+        "leftNsPerOp": 302.5868392777406,
+        "rightNsPerOp": 298.29321556150927,
+        "roundGeometricDeltaNs": [
+          -19.282865346888173,
+          -4.8289865958044516,
+          -13.477837988887245,
+          -12.431378637476769,
+          2.3218294911435464,
+          -1.5347378411335058
+        ],
+        "medianRoundGeometricDeltaNs": -8.63018261664061
+      },
+      "pass1": {
+        "name": "ascii32/notification",
+        "medianRatio": 0.6281869985073769,
+        "ratioIQR": 0.005457223576823544,
+        "roundsWithin5Pct": 0,
+        "allocationMedian": {
+          "A": {
+            "bytes": 128.0,
+            "mallocs": 3.0
+          },
+          "B": {
+            "bytes": 112.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.6287774024936249,
+          0.6307726442832478,
+          0.6354902062802068,
+          0.6275965945211288,
+          0.5723975739384031,
+          0.623889948838315
+        ],
+        "leftNsPerOp": 289.8148386691382,
+        "rightNsPerOp": 176.63282043628976,
+        "roundGeometricDeltaNs": [
+          -102.50265575030397,
+          -102.21228606000022,
+          -100.13054006807704,
+          -103.36669282188026,
+          -138.6706094164403,
+          -105.06490087096537
+        ],
+        "medianRoundGeometricDeltaNs": -102.93467428609212
+      },
+      "pass2": {
+        "name": "ascii32/notification",
+        "medianRatio": 0.6160007536928946,
+        "ratioIQR": 0.006507806199528732,
+        "roundsWithin5Pct": 0,
+        "allocationMedian": {
+          "A": {
+            "bytes": 128.0,
+            "mallocs": 3.0
+          },
+          "B": {
+            "bytes": 112.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.554157528621685,
+          0.6146417904172748,
+          0.6231146337353396,
+          0.6163071011148549,
+          0.6343608718096835,
+          0.6156944062709344
+        ],
+        "leftNsPerOp": 294.46459867054983,
+        "rightNsPerOp": 175.86703037780114,
+        "roundGeometricDeltaNs": [
+          -151.95870764569386,
+          -108.13748197740318,
+          -105.16202757342089,
+          -106.78186825857318,
+          -99.57989718479928,
+          -107.13970032801689
+        ],
+        "medianRoundGeometricDeltaNs": -106.96078429329503
+      }
+    },
+    {
+      "name": "utf8_1k/notification",
+      "self": {
+        "name": "utf8_1k/notification",
+        "medianRatio": 1.0037734363900666,
+        "ratioIQR": 0.01977805326028903,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 2064.0,
+            "mallocs": 3.0
+          },
+          "B": {
+            "bytes": 2064.0,
+            "mallocs": 3.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          1.1019660844502996,
+          1.018971812386904,
+          0.9950324986233001,
+          0.987967927609049,
+          1.0074205722652387,
+          1.0001263005148942
+        ],
+        "leftNsPerOp": 666.5689030723813,
+        "rightNsPerOp": 692.092560955609,
+        "roundGeometricDeltaNs": [
+          82.521926160774,
+          11.672213387619536,
+          -3.0938595249522223,
+          -7.486025851273439,
+          4.496643905454334,
+          0.07719211974733753
+        ],
+        "medianRoundGeometricDeltaNs": 2.286918012600836
+      },
+      "clone": {
+        "name": "utf8_1k/notification",
+        "medianRatio": 0.9962991389829062,
+        "ratioIQR": 0.013557656243596283,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 2064.0,
+            "mallocs": 3.0
+          },
+          "B": {
+            "bytes": 2064.0,
+            "mallocs": 3.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          0.997063670272092,
+          0.9955346076937205,
+          1.0074055779474875,
+          0.9884094870355905,
+          1.0059766745009284,
+          0.9806566512531073
+        ],
+        "leftNsPerOp": 634.8924015633758,
+        "rightNsPerOp": 632.3098651813596,
+        "roundGeometricDeltaNs": [
+          -1.8129792490016143,
+          -2.7645423657096444,
+          4.771239470471869,
+          -7.518236504385186,
+          3.781601550899154,
+          -12.455674434133698
+        ],
+        "medianRoundGeometricDeltaNs": -2.2887608073556294
+      },
+      "pass1": {
+        "name": "utf8_1k/notification",
+        "medianRatio": 0.8334703703889266,
+        "ratioIQR": 0.007582459354724458,
+        "roundsWithin5Pct": 0,
+        "allocationMedian": {
+          "A": {
+            "bytes": 2064.0,
+            "mallocs": 3.0
+          },
+          "B": {
+            "bytes": 2048.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.8420567010714413,
+          0.8320019024657843,
+          0.8333876495879631,
+          0.83355309118989,
+          0.8286605602458593,
+          0.8421462454625567
+        ],
+        "leftNsPerOp": 619.2271861829565,
+        "rightNsPerOp": 517.1601863753214,
+        "roundGeometricDeltaNs": [
+          -96.66037481326055,
+          -103.79134305398372,
+          -104.28044948640525,
+          -103.7015039505402,
+          -106.03971144944364,
+          -97.31813710363724
+        ],
+        "medianRoundGeometricDeltaNs": -103.74642350226196
+      },
+      "pass2": {
+        "name": "utf8_1k/notification",
+        "medianRatio": 0.8341984697039537,
+        "ratioIQR": 0.02154115102382237,
+        "roundsWithin5Pct": 0,
+        "allocationMedian": {
+          "A": {
+            "bytes": 2064.0,
+            "mallocs": 3.0
+          },
+          "B": {
+            "bytes": 2048.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.8344578992685645,
+          0.8243871742605762,
+          0.8221795686146571,
+          0.8529357559159321,
+          1.1514016304155426,
+          0.833939040139343
+        ],
+        "leftNsPerOp": 622.8846900517692,
+        "rightNsPerOp": 577.037998567896,
+        "roundGeometricDeltaNs": [
+          -101.82975969736697,
+          -109.66855443305917,
+          -112.56450650233467,
+          -91.62007115840504,
+          93.0552856871467,
+          -103.78147344652155
+        ],
+        "medianRoundGeometricDeltaNs": -102.80561657194426
+      }
+    },
+    {
+      "name": "ascii4k/notification",
+      "self": {
+        "name": "ascii4k/notification",
+        "medianRatio": 1.0106660791430007,
+        "ratioIQR": 0.027813487734039466,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 9744.0,
+            "mallocs": 3.0
+          },
+          "B": {
+            "bytes": 9744.0,
+            "mallocs": 3.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          1.003948074768934,
+          0.978700617477958,
+          1.0424704533892855,
+          0.9919672806520023,
+          1.0173840835170676,
+          1.0245732613813436
+        ],
+        "leftNsPerOp": 1683.2362852990034,
+        "rightNsPerOp": 1703.0813226744185,
+        "roundGeometricDeltaNs": [
+          6.58731373061255,
+          -35.901150848281304,
+          71.70336508713581,
+          -13.505753197778859,
+          29.193245551815608,
+          41.52779621759851
+        ],
+        "medianRoundGeometricDeltaNs": 17.89027964121408
+      },
+      "clone": {
+        "name": "ascii4k/notification",
+        "medianRatio": 0.9797325956449369,
+        "ratioIQR": 0.040267213414520775,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 9744.0,
+            "mallocs": 3.0
+          },
+          "B": {
+            "bytes": 9744.0,
+            "mallocs": 3.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": false,
+        "controlAccepted": false,
+        "roundRatios": [
+          0.9905185221268837,
+          1.019581886931581,
+          0.9574982859042525,
+          1.0039972861356488,
+          0.760935564387393,
+          0.96894666916299
+        ],
+        "leftNsPerOp": 1833.8364668297988,
+        "rightNsPerOp": 1667.593787384448,
+        "roundGeometricDeltaNs": [
+          -15.968271981764929,
+          33.147539718050666,
+          -72.60344873072927,
+          6.474011429809025,
+          -537.3900629641848,
+          -52.16215775377486
+        ],
+        "medianRoundGeometricDeltaNs": -34.065214867769896
+      },
+      "pass1": {
+        "name": "ascii4k/notification",
+        "medianRatio": 0.9403278996930418,
+        "ratioIQR": 0.013528256207279155,
+        "roundsWithin5Pct": 2,
+        "allocationMedian": {
+          "A": {
+            "bytes": 9744.0,
+            "mallocs": 3.0
+          },
+          "B": {
+            "bytes": 9728.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9325407081657379,
+          1.0000611570258184,
+          0.9394915015719917,
+          0.9411642978140917,
+          0.9299756383727121,
+          0.95002078436141
+        ],
+        "leftNsPerOp": 1762.579213604303,
+        "rightNsPerOp": 1694.5004725478257,
+        "roundGeometricDeltaNs": [
+          -117.3359374642198,
+          0.10471668314448834,
+          -121.06290270317663,
+          -98.03601757006072,
+          -116.9728128476188,
+          -84.29292121378217
+        ],
+        "medianRoundGeometricDeltaNs": -107.50441520883976
+      },
+      "pass2": {
+        "name": "ascii4k/notification",
+        "medianRatio": 0.9402620159785835,
+        "ratioIQR": 0.0050267950518119164,
+        "roundsWithin5Pct": 1,
+        "allocationMedian": {
+          "A": {
+            "bytes": 9744.0,
+            "mallocs": 3.0
+          },
+          "B": {
+            "bytes": 9728.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9443545950085983,
+          0.9574282829806319,
+          0.940448158744016,
+          0.9338402701879277,
+          0.940075873213151,
+          0.9377762967831373
+        ],
+        "leftNsPerOp": 1693.3926279631587,
+        "rightNsPerOp": 1596.0953212290503,
+        "roundGeometricDeltaNs": [
+          -92.34390073596956,
+          -76.46664572419422,
+          -102.8453411884409,
+          -112.17874373319023,
+          -99.1155090472289,
+          -100.84604900143927
+        ],
+        "medianRoundGeometricDeltaNs": -99.98077902433408
+      }
+    },
+    {
+      "name": "zeros4k/notification",
+      "self": {
+        "name": "zeros4k/notification",
+        "medianRatio": 0.9907225039372212,
+        "ratioIQR": 0.017991842811069914,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 9744.0,
+            "mallocs": 3.0
+          },
+          "B": {
+            "bytes": 9744.0,
+            "mallocs": 3.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          0.9723811681530057,
+          0.9939240578026899,
+          1.3077855855802198,
+          0.9875209500717526,
+          1.0085326104600625,
+          0.986677855955615
+        ],
+        "leftNsPerOp": 2941.3070768301745,
+        "rightNsPerOp": 3169.8069897342993,
+        "roundGeometricDeltaNs": [
+          -81.99879299581971,
+          -18.105918886971722,
+          947.1594506299348,
+          -34.957982957983404,
+          23.542627108852685,
+          -37.663655807172745
+        ],
+        "medianRoundGeometricDeltaNs": -26.531950922477563
+      },
+      "clone": {
+        "name": "zeros4k/notification",
+        "medianRatio": 1.0003376873834744,
+        "ratioIQR": 0.00577889792234787,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 9744.0,
+            "mallocs": 3.0
+          },
+          "B": {
+            "bytes": 9744.0,
+            "mallocs": 3.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          0.9978986982924883,
+          0.9976816774345427,
+          1.0027766764744603,
+          1.003760881937016,
+          1.0092492329293923,
+          0.9958513590179767
+        ],
+        "leftNsPerOp": 2800.210212991853,
+        "rightNsPerOp": 2803.605965071936,
+        "roundGeometricDeltaNs": [
+          -5.861530489051347,
+          -6.4862334662079775,
+          7.812870952920093,
+          10.530398492949644,
+          25.793595136139174,
+          -11.657061128524674
+        ],
+        "medianRoundGeometricDeltaNs": 0.9756702319343731
+      },
+      "pass1": {
+        "name": "zeros4k/notification",
+        "medianRatio": 0.9593960020662446,
+        "ratioIQR": 0.01263866220040255,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 9744.0,
+            "mallocs": 3.0
+          },
+          "B": {
+            "bytes": 9728.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.96240434038842,
+          0.971053587937985,
+          0.973112790764389,
+          0.9562075972188985,
+          0.9563876637440692,
+          0.9474040096270836
+        ],
+        "leftNsPerOp": 2815.892785700838,
+        "rightNsPerOp": 2705.9664525087073,
+        "roundGeometricDeltaNs": [
+          -107.05095170915365,
+          -80.59161056438097,
+          -74.66709717911635,
+          -122.79610288271806,
+          -122.71353165606752,
+          -150.3408668663933
+        ],
+        "medianRoundGeometricDeltaNs": -114.88224168261058
+      },
+      "pass2": {
+        "name": "zeros4k/notification",
+        "medianRatio": 0.9701142357300768,
+        "ratioIQR": 0.08015620994519967,
+        "roundsWithin5Pct": 4,
+        "allocationMedian": {
+          "A": {
+            "bytes": 9744.0,
+            "mallocs": 3.0
+          },
+          "B": {
+            "bytes": 9728.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9705242484618758,
+          0.9580617216095187,
+          1.0680438544248059,
+          1.1347199127022352,
+          0.9614422496524058,
+          0.9697042229982779
+        ],
+        "leftNsPerOp": 2826.6324099839785,
+        "rightNsPerOp": 2952.4594242769203,
+        "roundGeometricDeltaNs": [
+          -82.96093005654393,
+          -118.30782213323073,
+          187.95555229457113,
+          390.08617726674765,
+          -108.92832665696005,
+          -85.38526151264523
+        ],
+        "medianRoundGeometricDeltaNs": -84.17309578459458
+      }
+    }
+  ]
+}

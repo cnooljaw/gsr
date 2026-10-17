@@ -1,0 +1,18 @@
+File: rpc.test
+Type: alloc_space
+Time: 2026-10-17 23:37:19 CST
+Showing nodes accounting for 1071803.40kB, 99.73% of 1074702.75kB total
+Dropped 252 nodes (cum <= 5373.51kB)
+      flat  flat%   sum%        cum   cum%
+497869.88kB 46.33% 46.33% 571628.38kB 53.19%  github.com/cnooljaw/gosproto.encodeWithLimits
+497869.88kB 46.33% 92.65% 497870.89kB 46.33%  github.com/cnooljaw/gosproto.packRpcFrame
+73758.50kB  6.86% 99.52% 73758.50kB  6.86%  github.com/cnooljaw/gosproto.(*encodeLayout).add (inline)
+ 2304.95kB  0.21% 99.73% 1071804.22kB 99.73%  github.com/cnooljaw/gosproto.(*Rpc).RequestEncode
+    0.12kB 1.2e-05% 99.73% 1072029.34kB 99.75%  testing.(*B).runN
+    0.07kB 6.5e-06% 99.73% 1071920.31kB 99.74%  codecpairstool.BenchmarkCurrentRPC.func1
+         0     0% 99.73% 571628.38kB 53.19%  github.com/cnooljaw/gosproto.Encode
+         0     0% 99.73% 571628.38kB 53.19%  github.com/cnooljaw/gosproto.EncodeWithLimits (inline)
+         0     0% 99.73% 73758.50kB  6.86%  github.com/cnooljaw/gosproto.encodedIntegerRecordSize
+         0     0% 99.73% 73758.50kB  6.86%  github.com/cnooljaw/gosproto.encodedSize
+         0     0% 99.73% 73758.50kB  6.86%  github.com/cnooljaw/gosproto.fieldSize
+         0     0% 99.73% 1072026.79kB 99.75%  testing.(*B).run1.func1

@@ -1,0 +1,48 @@
+File: rpc.test
+Type: cpu
+Time: 2026-10-17 23:37:48 CST
+Duration: 2.56s, Total samples = 2.29s (89.59%)
+Showing nodes accounting for 2.17s, 94.76% of 2.29s total
+Dropped 31 nodes (cum <= 0.01s)
+Showing top 40 nodes out of 74
+      flat  flat%   sum%        cum   cum%
+     0.87s 37.99% 37.99%      0.87s 37.99%  runtime.kevent
+     0.65s 28.38% 66.38%      0.65s 28.38%  github.com/cnooljaw/gosproto.packInto
+     0.18s  7.86% 74.24%      0.18s  7.86%  encoding/binary.littleEndian.PutUint32 (inline)
+     0.13s  5.68% 79.91%      0.31s 13.54%  github.com/cnooljaw/gosproto.encodeInt64Slice (inline)
+     0.06s  2.62% 82.53%      0.07s  3.06%  github.com/cnooljaw/gosproto.fieldSize
+     0.05s  2.18% 84.72%      0.06s  2.62%  runtime.typePointers.next
+     0.03s  1.31% 86.03%      0.03s  1.31%  runtime.(*pallocBits).summarize
+     0.03s  1.31% 87.34%      0.03s  1.31%  runtime.madvise
+     0.03s  1.31% 88.65%      0.03s  1.31%  runtime.memclrNoHeapPointers
+     0.03s  1.31% 89.96%      0.03s  1.31%  runtime.memmove
+     0.03s  1.31% 91.27%      0.12s  5.24%  runtime.scanobject
+     0.02s  0.87% 92.14%      0.02s  0.87%  runtime.findObject
+     0.02s  0.87% 93.01%      0.02s  0.87%  runtime.resolveTypeOff
+     0.01s  0.44% 93.45%      0.34s 14.85%  github.com/cnooljaw/gosproto.encodeMessageInto
+     0.01s  0.44% 93.89%      0.02s  0.87%  github.com/cnooljaw/gosproto.omittedField (inline)
+     0.01s  0.44% 94.32%      0.02s  0.87%  runtime.nanotime1
+     0.01s  0.44% 94.76%      0.03s  1.31%  runtime.pcvalue
+         0     0% 94.76%      1.38s 60.26%  codecpairstool.BenchmarkCurrentRPC.func1
+         0     0% 94.76%      1.38s 60.26%  github.com/cnooljaw/gosproto.(*Rpc).RequestEncode
+         0     0% 94.76%      0.56s 24.45%  github.com/cnooljaw/gosproto.Encode
+         0     0% 94.76%      0.56s 24.45%  github.com/cnooljaw/gosproto.EncodeWithLimits (inline)
+         0     0% 94.76%      0.32s 13.97%  github.com/cnooljaw/gosproto.encodeFieldInto
+         0     0% 94.76%      0.56s 24.45%  github.com/cnooljaw/gosproto.encodeWithLimits
+         0     0% 94.76%      0.08s  3.49%  github.com/cnooljaw/gosproto.encodedSize
+         0     0% 94.76%      0.80s 34.93%  github.com/cnooljaw/gosproto.packRpcFrame
+         0     0% 94.76%      0.18s  7.86%  github.com/cnooljaw/gosproto.writeUint32 (inline)
+         0     0% 94.76%      0.02s  0.87%  reflect.(*rtype).ptrTo
+         0     0% 94.76%      0.02s  0.87%  reflect.(*rtype).typeOff (inline)
+         0     0% 94.76%      0.02s  0.87%  reflect.Value.Addr
+         0     0% 94.76%      0.02s  0.87%  reflect.ptrTo (inline)
+         0     0% 94.76%      0.02s  0.87%  reflect.resolveTypeOff
+         0     0% 94.76%      0.02s  0.87%  runtime.(*inlineUnwinder).resolveInternal (inline)
+         0     0% 94.76%      0.07s  3.06%  runtime.(*mcache).nextFree
+         0     0% 94.76%      0.07s  3.06%  runtime.(*mcache).refill
+         0     0% 94.76%      0.06s  2.62%  runtime.(*mcentral).cacheSpan
+         0     0% 94.76%      0.02s  0.87%  runtime.(*mcentral).grow
+         0     0% 94.76%      0.02s  0.87%  runtime.(*mheap).alloc
+         0     0% 94.76%      0.05s  2.18%  runtime.(*mheap).alloc.func1
+         0     0% 94.76%      0.05s  2.18%  runtime.(*mheap).allocSpan
+         0     0% 94.76%      0.04s  1.75%  runtime.(*mheap).freeSpan (inline)

@@ -1,0 +1,239 @@
+./rpc.go:35:6: can inline (*Protocol).HasRequest with cost 5 as: method(*Protocol) func() bool { return p.Request != nil }
+./rpc.go:39:6: can inline (*Protocol).HasResponse with cost 5 as: method(*Protocol) func() bool { return p.Response != nil }
+./rpc.go:51:6: cannot inline getRpcSprotoType: function too complex: cost 202 exceeds budget 80
+./rpc.go:63:6: cannot inline (*Rpc).Dispatch: unhandled op DEFER
+./rpc.go:100:3: can inline (*Rpc).Dispatch.deferwrap1 with cost 76 as: func() { (*sync.Mutex).Unlock(.autotmp_21) }
+./rpc.go:124:6: cannot inline packRpcFrame: function too complex: cost 472 exceeds budget 80
+./rpc.go:174:6: cannot inline (*Rpc).ResponseEncode: function too complex: cost 221 exceeds budget 80
+./rpc.go:198:6: cannot inline (*Rpc).RequestEncode: unhandled op DEFER
+./rpc.go:224:3: can inline (*Rpc).RequestEncode.deferwrap1 with cost 76 as: func() { (*sync.Mutex).Unlock(.autotmp_14) }
+./rpc.go:243:6: can inline (*Rpc).GetProtocolByName with cost 20 as: method(*Rpc) func(string) *Protocol { if ok { return rpc.protocols[index] }; return nil }
+./rpc.go:250:6: cannot inline NewRpc: function too complex: cost 296 exceeds budget 80
+./rpc.go:282:6: cannot inline (*Rpc).CancelSession: unhandled op DEFER
+./rpc.go:284:2: can inline (*Rpc).CancelSession.deferwrap1 with cost 76 as: func() { (*sync.Mutex).Unlock(.autotmp_2) }
+./rpc.go:289:6: cannot inline (*Rpc).ResetSessions: unhandled op DEFER
+./rpc.go:291:2: can inline (*Rpc).ResetSessions.deferwrap1 with cost 76 as: func() { (*sync.Mutex).Unlock(.autotmp_1) }
+./rpc.go:11:33: inlining call to errors.New
+./rpc.go:12:33: inlining call to errors.New
+./rpc.go:13:33: inlining call to errors.New
+./rpc.go:65:27: inlining call to Unpack
+./rpc.go:71:23: inlining call to Decode
+./rpc.go:84:52: inlining call to reflect.Value.Interface
+./rpc.go:85:22: inlining call to Decode
+./rpc.go:99:24: inlining call to sync.(*Mutex).Lock
+./rpc.go:110:53: inlining call to reflect.Value.Interface
+./rpc.go:111:22: inlining call to Decode
+./rpc.go:99:24: inlining call to sync.(*Mutex).Lock
+./rpc.go:100:32: inlining call to sync.(*Mutex).Unlock
+./rpc.go:100:32: inlining call to sync.(*Mutex).Unlock
+./rpc.go:125:32: inlining call to normalizeLimits
+./rpc.go:138:13: inlining call to writeUint16
+./rpc.go:144:23: inlining call to (*decodeBudget).add
+./rpc.go:147:21: inlining call to skipTag
+./rpc.go:148:15: inlining call to writeUint16
+./rpc.go:151:42: inlining call to encodeIntegerInto
+./rpc.go:152:14: inlining call to writeUint16
+./rpc.go:155:15: inlining call to writeUint32
+./rpc.go:166:41: inlining call to packedBufferSize
+./rpc.go:138:13: inlining call to binary.littleEndian.PutUint16
+./rpc.go:148:15: inlining call to binary.littleEndian.PutUint16
+./rpc.go:151:42: inlining call to integerWidth
+./rpc.go:151:42: inlining call to writeUint32
+./rpc.go:151:42: inlining call to writeUint64
+./rpc.go:152:14: inlining call to binary.littleEndian.PutUint16
+./rpc.go:155:15: inlining call to binary.littleEndian.PutUint32
+./rpc.go:151:42: inlining call to binary.littleEndian.PutUint32
+./rpc.go:151:42: inlining call to binary.littleEndian.PutUint64
+./rpc.go:186:20: inlining call to reflect.TypeOf
+./rpc.go:186:20: inlining call to abi.TypeOf
+./rpc.go:186:20: inlining call to reflect.toType
+./rpc.go:186:20: inlining call to abi.NoEscape
+./rpc.go:186:20: inlining call to reflect.toRType
+./rpc.go:207:20: inlining call to reflect.TypeOf
+./rpc.go:219:25: inlining call to (*Protocol).HasResponse
+./rpc.go:223:24: inlining call to sync.(*Mutex).Lock
+./rpc.go:207:20: inlining call to abi.TypeOf
+./rpc.go:207:20: inlining call to reflect.toType
+./rpc.go:223:24: inlining call to sync.(*Mutex).Lock
+./rpc.go:207:20: inlining call to abi.NoEscape
+./rpc.go:207:20: inlining call to reflect.toRType
+./rpc.go:224:32: inlining call to sync.(*Mutex).Unlock
+./rpc.go:224:32: inlining call to sync.(*Mutex).Unlock
+./rpc.go:283:23: inlining call to sync.(*Mutex).Lock
+./rpc.go:283:23: inlining call to sync.(*Mutex).Lock
+./rpc.go:284:31: inlining call to sync.(*Mutex).Unlock
+./rpc.go:284:31: inlining call to sync.(*Mutex).Unlock
+./rpc.go:290:23: inlining call to sync.(*Mutex).Lock
+./rpc.go:290:23: inlining call to sync.(*Mutex).Lock
+./rpc.go:291:31: inlining call to sync.(*Mutex).Unlock
+./rpc.go:291:31: inlining call to sync.(*Mutex).Unlock
+./rpc.go:35:7: p does not escape
+./rpc.go:39:7: p does not escape
+./rpc.go:51:23: parameter typ leaks to {heap} with derefs=0:
+./rpc.go:51:23:   flow: {heap} = typ:
+./rpc.go:51:23:     from typ.Kind() (call parameter) at ./rpc.go:56:13
+./rpc.go:51:23: leaking param: typ
+./rpc.go:100:25: (*Rpc).Dispatch capturing by value: .autotmp_21 (addr=false assign=false width=8)
+./rpc.go:63:7: parameter rpc leaks to {heap} with derefs=0:
+./rpc.go:63:7:   flow: .autotmp_21 = rpc:
+./rpc.go:63:7:     from rpc.sessionMutex (dot of pointer) at ./rpc.go:100:12
+./rpc.go:63:7:     from rpc.sessionMutex (address-of) at ./rpc.go:100:25
+./rpc.go:63:7:     from .autotmp_21 = rpc.sessionMutex (assign-pair) at ./rpc.go:100:3
+./rpc.go:63:7:   flow: sync.m = .autotmp_21:
+./rpc.go:63:7:     from sync.m := .autotmp_21 (assign-pair) at ./rpc.go:100:32
+./rpc.go:63:7:   flow: sync.m = sync.m:
+./rpc.go:63:7:     from sync.m.mu (dot of pointer) at ./rpc.go:100:32
+./rpc.go:63:7:     from sync.m.mu (address-of) at ./rpc.go:100:32
+./rpc.go:63:7:     from sync.m := sync.m.mu (assign-pair) at ./rpc.go:100:32
+./rpc.go:63:7:   flow: {heap} = sync.m:
+./rpc.go:63:7:     from (*sync.Mutex).unlockSlow(sync.m, sync.new) (call parameter) at ./rpc.go:100:32
+./rpc.go:70:2: header escapes to heap:
+./rpc.go:70:2:   flow: message = &header:
+./rpc.go:70:2:     from &header (address-of) at ./rpc.go:71:34
+./rpc.go:70:2:     from &header (interface-converted) at ./rpc.go:71:34
+./rpc.go:70:2:     from data, message := unpacked, &header (assign-pair) at ./rpc.go:71:23
+./rpc.go:70:2:   flow: {heap} = message:
+./rpc.go:70:2:     from DecodeWithLimits(data, message, Limits{}) (call parameter) at ./rpc.go:71:23
+./rpc.go:63:7: parameter rpc leaks to name with derefs=3:
+./rpc.go:63:7:   flow: proto = **rpc:
+./rpc.go:63:7:     from rpc.protocols (dot of pointer) at ./rpc.go:82:14
+./rpc.go:63:7:     from rpc.protocols[index] (dot of pointer) at ./rpc.go:82:24
+./rpc.go:63:7:     from proto = rpc.protocols[index] (assign) at ./rpc.go:82:9
+./rpc.go:63:7:   flow: name = *proto:
+./rpc.go:63:7:     from proto.Name (dot of pointer) at ./rpc.go:117:14
+./rpc.go:63:7:     from name = proto.Name (assign) at ./rpc.go:117:7
+./rpc.go:63:7: leaking param: rpc
+./rpc.go:63:26: packed does not escape
+./rpc.go:70:2: moved to heap: header
+./rpc.go:166:16: make([]byte, ~r0) escapes to heap:
+./rpc.go:166:16:   flow: {heap} = &{storage for make([]byte, ~r0)}:
+./rpc.go:166:16:     from make([]byte, ~r0) (non-constant size) at ./rpc.go:166:16
+./rpc.go:124:19: header does not escape
+./rpc.go:124:38: body does not escape
+./rpc.go:129:12: &decodeBudget{...} does not escape
+./rpc.go:166:16: make([]byte, ~r0) escapes to heap
+./rpc.go:174:60: parameter response leaks to {heap} with derefs=0:
+./rpc.go:174:60:   flow: {heap} = response:
+./rpc.go:174:60:     from Encode(response) (call parameter) at ./rpc.go:189:24
+./rpc.go:174:7: rpc does not escape
+./rpc.go:174:32: name does not escape
+./rpc.go:174:60: leaking param: response
+./rpc.go:194:22: &rpcHeader{...} does not escape
+./rpc.go:230:3: requestSession escapes to heap:
+./rpc.go:230:3:   flow: {heap} = &requestSession:
+./rpc.go:230:3:     from &requestSession (address-of) at ./rpc.go:231:20
+./rpc.go:230:3:     from header.Session = &requestSession (assign) at ./rpc.go:231:18
+./rpc.go:224:25: (*Rpc).RequestEncode capturing by value: .autotmp_14 (addr=false assign=false width=8)
+./rpc.go:226:52: session escapes to heap:
+./rpc.go:226:52:   flow: {storage for ... argument} = &{storage for session}:
+./rpc.go:226:52:     from session (spill) at ./rpc.go:226:52
+./rpc.go:226:52:     from ... argument (slice-literal-element) at ./rpc.go:226:20
+./rpc.go:226:52:   flow: {heap} = {storage for ... argument}:
+./rpc.go:226:52:     from ... argument (spill) at ./rpc.go:226:20
+./rpc.go:226:52:     from fmt.Errorf("sproto: repeated session:%d", ... argument...) (call parameter) at ./rpc.go:226:20
+./rpc.go:198:7: parameter rpc leaks to {heap} with derefs=0:
+./rpc.go:198:7:   flow: .autotmp_14 = rpc:
+./rpc.go:198:7:     from rpc.sessionMutex (dot of pointer) at ./rpc.go:224:12
+./rpc.go:198:7:     from rpc.sessionMutex (address-of) at ./rpc.go:224:25
+./rpc.go:198:7:     from .autotmp_14 = rpc.sessionMutex (assign-pair) at ./rpc.go:224:3
+./rpc.go:198:7:   flow: sync.m = .autotmp_14:
+./rpc.go:198:7:     from sync.m := .autotmp_14 (assign-pair) at ./rpc.go:224:32
+./rpc.go:198:7:   flow: sync.m = sync.m:
+./rpc.go:198:7:     from sync.m.mu (dot of pointer) at ./rpc.go:224:32
+./rpc.go:198:7:     from sync.m.mu (address-of) at ./rpc.go:224:32
+./rpc.go:198:7:     from sync.m := sync.m.mu (assign-pair) at ./rpc.go:224:32
+./rpc.go:198:7:   flow: {heap} = sync.m:
+./rpc.go:198:7:     from (*sync.Mutex).unlockSlow(sync.m, sync.new) (call parameter) at ./rpc.go:224:32
+./rpc.go:198:59: parameter req leaks to {heap} with derefs=0:
+./rpc.go:198:59:   flow: {heap} = req:
+./rpc.go:198:59:     from Encode(req) (call parameter) at ./rpc.go:210:24
+./rpc.go:198:7: leaking param: rpc
+./rpc.go:198:31: name does not escape
+./rpc.go:198:59: leaking param: req
+./rpc.go:230:3: moved to heap: requestSession
+./rpc.go:215:12: &rpcHeader{...} does not escape
+./rpc.go:226:20: ... argument does not escape
+./rpc.go:226:52: session escapes to heap
+./rpc.go:243:7: parameter rpc leaks to ~r0 with derefs=2:
+./rpc.go:243:7:   flow: ~r0 = **rpc:
+./rpc.go:243:7:     from rpc.protocols (dot of pointer) at ./rpc.go:245:13
+./rpc.go:243:7:     from rpc.protocols[index] (dot of pointer) at ./rpc.go:245:23
+./rpc.go:243:7:     from return rpc.protocols[index] (return) at ./rpc.go:245:3
+./rpc.go:243:7: leaking param: rpc to result ~r0 level=2
+./rpc.go:243:35: name does not escape
+./rpc.go:250:13: parameter protocols leaks to {heap} with derefs=2:
+./rpc.go:250:13:   flow: {temp} = protocols:
+./rpc.go:250:13:   flow: protocol = *{temp}:
+./rpc.go:250:13:     from for loop (range-deref) at ./rpc.go:253:21
+./rpc.go:250:13:   flow: {heap} = *protocol:
+./rpc.go:250:13:     from protocol.Request (dot of pointer) at ./rpc.go:257:41
+./rpc.go:250:13:     from getRpcSprotoType(protocol.Request) (call parameter) at ./rpc.go:257:32
+./rpc.go:255:81: i escapes to heap:
+./rpc.go:255:81:   flow: {storage for ... argument} = &{storage for i}:
+./rpc.go:255:81:     from i (spill) at ./rpc.go:255:81
+./rpc.go:255:81:     from ... argument (slice-literal-element) at ./rpc.go:255:26
+./rpc.go:255:81:   flow: {heap} = {storage for ... argument}:
+./rpc.go:255:81:     from ... argument (spill) at ./rpc.go:255:26
+./rpc.go:255:81:     from fmt.Errorf("%w: nil definition at index %d", ... argument...) (call parameter) at ./rpc.go:255:26
+./rpc.go:272:9: &Rpc{...} escapes to heap:
+./rpc.go:272:9:   flow: rpc = &{storage for &Rpc{...}}:
+./rpc.go:272:9:     from &Rpc{...} (spill) at ./rpc.go:272:9
+./rpc.go:272:9:     from rpc := &Rpc{...} (assign) at ./rpc.go:272:6
+./rpc.go:272:9:   flow: ~r0 = rpc:
+./rpc.go:272:9:     from return rpc, nil (return) at ./rpc.go:278:2
+./rpc.go:276:18: make(map[int32]int) escapes to heap:
+./rpc.go:276:18:   flow: {storage for &Rpc{...}} = &{storage for make(map[int32]int)}:
+./rpc.go:276:18:     from make(map[int32]int) (spill) at ./rpc.go:276:18
+./rpc.go:276:18:     from Rpc{...} (struct literal element) at ./rpc.go:272:13
+./rpc.go:252:17: make(map[string]int) escapes to heap:
+./rpc.go:252:17:   flow: nameMap = &{storage for make(map[string]int)}:
+./rpc.go:252:17:     from make(map[string]int) (spill) at ./rpc.go:252:17
+./rpc.go:252:17:     from nameMap := make(map[string]int) (assign) at ./rpc.go:252:10
+./rpc.go:252:17:   flow: {storage for &Rpc{...}} = nameMap:
+./rpc.go:252:17:     from Rpc{...} (struct literal element) at ./rpc.go:272:13
+./rpc.go:251:15: make(map[int32]int) escapes to heap:
+./rpc.go:251:15:   flow: idMap = &{storage for make(map[int32]int)}:
+./rpc.go:251:15:     from make(map[int32]int) (spill) at ./rpc.go:251:15
+./rpc.go:251:15:     from idMap := make(map[int32]int) (assign) at ./rpc.go:251:8
+./rpc.go:251:15:   flow: {storage for &Rpc{...}} = idMap:
+./rpc.go:251:15:     from Rpc{...} (struct literal element) at ./rpc.go:272:13
+./rpc.go:250:13: parameter protocols leaks to {storage for &Rpc{...}} with derefs=0:
+./rpc.go:250:13:   flow: {storage for &Rpc{...}} = protocols:
+./rpc.go:250:13:     from Rpc{...} (struct literal element) at ./rpc.go:272:13
+./rpc.go:250:13: leaking param: protocols
+./rpc.go:251:15: make(map[int32]int) escapes to heap
+./rpc.go:252:17: make(map[string]int) escapes to heap
+./rpc.go:255:26: ... argument does not escape
+./rpc.go:255:81: i escapes to heap
+./rpc.go:272:9: &Rpc{...} escapes to heap
+./rpc.go:276:18: make(map[int32]int) escapes to heap
+./rpc.go:284:24: (*Rpc).CancelSession capturing by value: .autotmp_2 (addr=false assign=false width=8)
+./rpc.go:282:7: parameter rpc leaks to {heap} with derefs=0:
+./rpc.go:282:7:   flow: .autotmp_2 = rpc:
+./rpc.go:282:7:     from rpc.sessionMutex (dot of pointer) at ./rpc.go:284:11
+./rpc.go:282:7:     from rpc.sessionMutex (address-of) at ./rpc.go:284:24
+./rpc.go:282:7:     from .autotmp_2 = rpc.sessionMutex (assign-pair) at ./rpc.go:284:2
+./rpc.go:282:7:   flow: sync.m = .autotmp_2:
+./rpc.go:282:7:     from sync.m := .autotmp_2 (assign-pair) at ./rpc.go:284:31
+./rpc.go:282:7:   flow: sync.m = sync.m:
+./rpc.go:282:7:     from sync.m.mu (dot of pointer) at ./rpc.go:284:31
+./rpc.go:282:7:     from sync.m.mu (address-of) at ./rpc.go:284:31
+./rpc.go:282:7:     from sync.m := sync.m.mu (assign-pair) at ./rpc.go:284:31
+./rpc.go:282:7:   flow: {heap} = sync.m:
+./rpc.go:282:7:     from (*sync.Mutex).unlockSlow(sync.m, sync.new) (call parameter) at ./rpc.go:284:31
+./rpc.go:282:7: leaking param: rpc
+./rpc.go:291:24: (*Rpc).ResetSessions capturing by value: .autotmp_1 (addr=false assign=false width=8)
+./rpc.go:289:7: parameter rpc leaks to {heap} with derefs=0:
+./rpc.go:289:7:   flow: .autotmp_1 = rpc:
+./rpc.go:289:7:     from rpc.sessionMutex (dot of pointer) at ./rpc.go:291:11
+./rpc.go:289:7:     from rpc.sessionMutex (address-of) at ./rpc.go:291:24
+./rpc.go:289:7:     from .autotmp_1 = rpc.sessionMutex (assign-pair) at ./rpc.go:291:2
+./rpc.go:289:7:   flow: sync.m = .autotmp_1:
+./rpc.go:289:7:     from sync.m := .autotmp_1 (assign-pair) at ./rpc.go:291:31
+./rpc.go:289:7:   flow: sync.m = sync.m:
+./rpc.go:289:7:     from sync.m.mu (dot of pointer) at ./rpc.go:291:31
+./rpc.go:289:7:     from sync.m.mu (address-of) at ./rpc.go:291:31
+./rpc.go:289:7:     from sync.m := sync.m.mu (assign-pair) at ./rpc.go:291:31
+./rpc.go:289:7:   flow: {heap} = sync.m:
+./rpc.go:289:7:     from (*sync.Mutex).unlockSlow(sync.m, sync.new) (call parameter) at ./rpc.go:291:31
+./rpc.go:289:7: leaking param: rpc

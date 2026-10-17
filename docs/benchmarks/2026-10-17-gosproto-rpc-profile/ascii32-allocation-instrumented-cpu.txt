@@ -1,0 +1,38 @@
+File: rpc.test
+Type: cpu
+Time: 2026-10-17 23:37:13 CST
+Duration: 3.33s, Total samples = 2.63s (78.93%)
+Showing nodes accounting for 2.37s, 90.11% of 2.63s total
+Dropped 35 nodes (cum <= 0.01s)
+Showing top 30 nodes out of 81
+      flat  flat%   sum%        cum   cum%
+     0.42s 15.97% 15.97%      1.05s 39.92%  runtime.pcvalue
+     0.36s 13.69% 29.66%      0.36s 13.69%  runtime.(*mspan).specialFindSplicePoint
+     0.33s 12.55% 42.21%      0.38s 14.45%  runtime.step
+     0.19s  7.22% 49.43%      0.19s  7.22%  runtime.(*moduledata).textAddr
+     0.12s  4.56% 53.99%      0.14s  5.32%  runtime.findfunc
+     0.12s  4.56% 58.56%      1.59s 60.46%  runtime.tracebackPCs
+     0.11s  4.18% 62.74%      0.11s  4.18%  runtime.madvise
+     0.07s  2.66% 65.40%      0.10s  3.80%  runtime.(*inlineUnwinder).next
+     0.07s  2.66% 68.06%      0.52s 19.77%  runtime.(*unwinder).resolveInternal
+     0.06s  2.28% 70.34%      0.65s 24.71%  runtime.(*unwinder).next
+     0.05s  1.90% 72.24%      0.05s  1.90%  runtime.cheaprand (inline)
+     0.05s  1.90% 74.14%      0.05s  1.90%  runtime.readvarint (inline)
+     0.04s  1.52% 75.67%      0.04s  1.52%  runtime.funcdata (inline)
+     0.04s  1.52% 77.19%      0.04s  1.52%  runtime.kevent
+     0.04s  1.52% 78.71%      0.04s  1.52%  runtime.lock2
+     0.04s  1.52% 80.23%      0.04s  1.52%  runtime.markrootSpans
+     0.04s  1.52% 81.75%      0.04s  1.52%  runtime.stkbucket
+     0.03s  1.14% 82.89%      0.03s  1.14%  runtime.acquirem (inline)
+     0.02s  0.76% 83.65%      0.02s  0.76%  github.com/cnooljaw/gosproto.ffRunBytes
+     0.02s  0.76% 84.41%      0.02s  0.76%  reflect.Value.Elem
+     0.02s  0.76% 85.17%      0.02s  0.76%  runtime.(*specialsIter).valid (inline)
+     0.02s  0.76% 85.93%      0.02s  0.76%  runtime.(*unwinder).cgoCallers
+     0.02s  0.76% 86.69%      0.02s  0.76%  runtime.memclrNoHeapPointers
+     0.02s  0.76% 87.45%      0.62s 23.57%  runtime.pcdatavalue1
+     0.02s  0.76% 88.21%      0.02s  0.76%  runtime.releasem (inline)
+     0.01s  0.38% 88.59%      0.03s  1.14%  github.com/cnooljaw/gosproto.encodedSize
+     0.01s  0.38% 88.97%      0.04s  1.52%  github.com/cnooljaw/gosproto.packInto
+     0.01s  0.38% 89.35%      0.02s  0.76%  runtime.(*inlineUnwinder).srcFunc (inline)
+     0.01s  0.38% 89.73%      0.08s  3.04%  runtime.(*sweepLocked).sweep
+     0.01s  0.38% 90.11%      0.08s  3.04%  runtime.(*unwinder).initAt

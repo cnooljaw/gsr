@@ -1,0 +1,38 @@
+File: rpc.test
+Type: cpu
+Time: 2026-10-17 23:37:19 CST
+Duration: 2.56s, Total samples = 2.34s (91.50%)
+Showing nodes accounting for 2.10s, 89.74% of 2.34s total
+Dropped 60 nodes (cum <= 0.01s)
+Showing top 30 nodes out of 67
+      flat  flat%   sum%        cum   cum%
+     0.61s 26.07% 26.07%      0.61s 26.07%  runtime.kevent
+     0.30s 12.82% 38.89%      0.30s 12.82%  github.com/cnooljaw/gosproto.packInto
+     0.18s  7.69% 46.58%      0.36s 15.38%  runtime.pcvalue
+     0.14s  5.98% 52.56%      0.14s  5.98%  encoding/binary.littleEndian.PutUint32 (inline)
+     0.12s  5.13% 57.69%      0.13s  5.56%  github.com/cnooljaw/gosproto.fieldSize
+     0.11s  4.70% 62.39%      0.25s 10.68%  github.com/cnooljaw/gosproto.encodeInt64Slice (inline)
+     0.08s  3.42% 65.81%      0.08s  3.42%  runtime.(*moduledata).textAddr
+     0.07s  2.99% 68.80%      0.07s  2.99%  runtime.(*mspan).specialFindSplicePoint (inline)
+     0.07s  2.99% 71.79%      0.07s  2.99%  runtime.findfunc
+     0.06s  2.56% 74.36%      0.06s  2.56%  runtime.step
+     0.06s  2.56% 76.92%      0.08s  3.42%  runtime.typePointers.next
+     0.04s  1.71% 78.63%      0.17s  7.26%  runtime.(*unwinder).resolveInternal
+     0.04s  1.71% 80.34%      0.04s  1.71%  runtime.acquirem (inline)
+     0.03s  1.28% 81.62%      0.23s  9.83%  runtime.(*unwinder).next
+     0.03s  1.28% 82.91%      0.03s  1.28%  runtime.memclrNoHeapPointers
+     0.02s  0.85% 83.76%      0.02s  0.85%  runtime.(*unwinder).valid (inline)
+     0.02s  0.85% 84.62%      0.02s  0.85%  runtime.findObject
+     0.02s  0.85% 85.47%      0.12s  5.13%  runtime.scanobject
+     0.02s  0.85% 86.32%      1.45s 61.97%  runtime.systemstack
+     0.01s  0.43% 86.75%      0.16s  6.84%  github.com/cnooljaw/gosproto.encodedSize
+     0.01s  0.43% 87.18%      0.05s  2.14%  runtime.(*mcache).refill
+     0.01s  0.43% 87.61%      0.02s  0.85%  runtime.(*unwinder).symPC
+     0.01s  0.43% 88.03%      0.10s  4.27%  runtime.addspecial
+     0.01s  0.43% 88.46%      0.57s 24.36%  runtime.mallocgcSmallNoscan
+     0.01s  0.43% 88.89%      0.22s  9.40%  runtime.newInlineUnwinder
+     0.01s  0.43% 89.32%      0.03s  1.28%  runtime.sweepone
+     0.01s  0.43% 89.74%      0.52s 22.22%  runtime.tracebackPCs
+         0     0% 89.74%      1.68s 71.79%  codecpairstool.BenchmarkCurrentRPC.func1
+         0     0% 89.74%      1.68s 71.79%  github.com/cnooljaw/gosproto.(*Rpc).RequestEncode
+         0     0% 89.74%      0.81s 34.62%  github.com/cnooljaw/gosproto.Encode
