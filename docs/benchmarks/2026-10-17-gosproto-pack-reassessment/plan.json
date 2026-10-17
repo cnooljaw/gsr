@@ -1,0 +1,78 @@
+{
+  "baselineCommit": "bba332607df669a46fd0547f6a3bdeff432ac6df",
+  "blockMs": 10,
+  "runs": [
+    {
+      "name": "control-start-self",
+      "mode": "self"
+    },
+    {
+      "name": "control-start-clone",
+      "mode": "clone"
+    },
+    {
+      "name": "pass1-sparse",
+      "mode": "compare",
+      "patch": "sparse"
+    },
+    {
+      "name": "pass1-ff-runs",
+      "mode": "compare",
+      "patch": "ff-runs"
+    },
+    {
+      "name": "pass1-combined",
+      "mode": "compare",
+      "patch": "combined"
+    },
+    {
+      "name": "pass2-combined",
+      "mode": "compare",
+      "patch": "combined"
+    },
+    {
+      "name": "pass2-ff-runs",
+      "mode": "compare",
+      "patch": "ff-runs"
+    },
+    {
+      "name": "pass2-sparse",
+      "mode": "compare",
+      "patch": "sparse"
+    },
+    {
+      "name": "control-end-clone",
+      "mode": "clone"
+    },
+    {
+      "name": "control-end-self",
+      "mode": "self"
+    }
+  ],
+  "cases": "all 19 existing business Encode/Pack/PEncode and full Echo frames",
+  "assessment": "No minimum percentage. Consider two independent passes, per-round direction, unchanged Encode controls, start/end self+clone, allocations, wire/ownership and maintenance cost. Preserve noisy items as unresolved; do not turn control failure into proof of no benefit or use CPU alone as acceptance.",
+  "patterns": [
+    "n0_32",
+    "n1_32",
+    "n2_32",
+    "n4_32",
+    "n6_32",
+    "n8_32",
+    "n0_4096",
+    "n1_4096",
+    "n2_4096",
+    "n4_4096",
+    "n6_4096",
+    "n8_4096",
+    "ff_n6_4096",
+    "ff_n7_4096",
+    "ff_tail2047",
+    "ff_tail2048",
+    "ff_tail2049",
+    "ff_earlyzero4096",
+    "zero_run1x64"
+  ],
+  "patternPasses": 1,
+  "noRetriesOrParameterSearch": true,
+  "correctness": "Existing Pack/FF/tail/zero tests and 17984-case differential for each candidate. Before adopting final source: full library/race/checkptr/vet/oracle, bounded fuzz and GSR Go/TS integration. No Decode optimization or release."
+}

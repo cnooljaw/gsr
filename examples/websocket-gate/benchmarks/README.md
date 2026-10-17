@@ -24,11 +24,13 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 
 ## Go 局部优化的配对校准
 
-小幅优化先用 [Go 配对工具](tools/go-pairs/README.md) 校准同函数和同源码 A/A，再解释候选差值。工具在独立归档中交错采样并保留全部轮次，不修改正式依赖；控制未通过的项目标记为无法判定。它不代替上面的四实现完整 Benchmark。
+小幅优化先用 [Go 配对工具](tools/go-pairs/README.md) 校准同函数和同源码 A/A，再解释候选差值。工具在独立归档中交错采样并保留全部轮次，不修改正式依赖；控制异常的项目需要解释或补证据，不能自动判为无价值优化。它不代替上面的四实现完整 Benchmark。
 
 首轮 [校准与原候选复测](../../../docs/benchmarks/2026-10-17-gosproto-pair-calibration/RESULTS.md) 中，9/19 项同时通过两类控制；原候选仍未达到保留门槛，正式库未改；该轮工具与记录已本地提交为 GSR `f064584`。
 
-后续 [GC 边界与聚焦校准](../../../docs/benchmarks/2026-10-17-gosproto-pair-resolution/RESULTS.md) 解释了 16 B 的 tiny 分配窗口差值，但单纯拉长到 40 ms 未稳定控制，已提交为 GSR `3a88564`。再做三项 [墙钟/进程 CPU 诊断](../../../docs/benchmarks/2026-10-17-gosproto-pair-cpu/RESULTS.md)，CPU 更稳定但不替换验收；新诊断记录待审查。工具默认与严格总门槛不变。
+后续 [GC 边界与聚焦校准](../../../docs/benchmarks/2026-10-17-gosproto-pair-resolution/RESULTS.md) 解释了 16 B 的 tiny 分配窗口差值，但单纯拉长到 40 ms 未稳定控制，已提交为 GSR `3a88564`。再做三项 [墙钟/进程 CPU 诊断](../../../docs/benchmarks/2026-10-17-gosproto-pair-cpu/RESULTS.md)，CPU 更稳定但不替换验收，已提交为 GSR `b2b3dd7`。后续 [FF 段集中处理候选](../../../docs/benchmarks/2026-10-17-gosproto-pack-runs/RESULTS.md) 未达收益与控制要求，已撤回，新记录待审查。工具默认与严格总门槛不变。
+
+上述撤回为旧标准下的历史判断。按用户裁决取消统一最低收益比例后，[两轮复评](../../../docs/benchmarks/2026-10-17-gosproto-pack-reassessment/RESULTS.md) 保留稀疏展开与 FF 段分离组合，真实业务的小幅累计收益与合成形态代价分别披露，库/GoTS 接线验收通过。工具的原始标记保持不变，当前工程判断以复评报告为准；新代码和记录待审查。
 
 ## 比较口径
 

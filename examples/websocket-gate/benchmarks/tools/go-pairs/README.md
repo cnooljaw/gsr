@@ -41,7 +41,7 @@ python3 examples/websocket-gate/benchmarks/tools/go-pairs/run.py \
 
 控制门槛在采样前写入 inputs.json：中位比值距 1 不超过 2%、六轮比值 IQR 不超过 3 个百分点、至少五轮距 1 不超过 5%，分配统计中位数相同。逐项标记 controlAccepted，并单列 timingAccepted；后者只描述计时门槛，不豁免分配差值，总控制仍要求两者同时满足。不要求通过的项目替失败项目背书。分配统计在计时外另采三次、每次 128 调用，保留字节/对象原始计数；极小差值也会保守地拒绝控制，不将其直接认定为实现增加了分配。
 
-同一个项目总控制通过 self 和 clone 后，才有条件解释 compare 的小幅差值；compare 自身若波动明显也不能确认收益。候选是否保留仍按事先规定的业务收益、回退、正确性和资源门槛判断。工具不自动批准候选；compare 的 controlAccepted 为 null。
+controlAccepted 是该组固定诊断要求的结果，不是最终工程决策。解释小幅差值时同时核对 self/clone、compare 自身离散、独立复测、未改路径和实现机制；控制异常需要补证据或说明限制，不能直接改称“候选没有收益”。按当前 [RFC 性能验收](../../../../../docs/RFC-GOSPROTO-PERFORMANCE.md#4-验证与验收)，取消统一最低收益比例，可靠的小收益可累积；也不以计数边界造成的单个布尔值代替内存分析。工具不自动批准候选，compare 的 controlAccepted 仍为 null，原始计数和历史标记保留。
 
 ## 输出与验证
 

@@ -1,0 +1,116 @@
+[
+  {
+    "args": [
+      "git",
+      "rev-parse",
+      "--verify",
+      "bba332607df669a46fd0547f6a3bdeff432ac6df^{commit}"
+    ],
+    "cwd": "/private/tmp/gsr-gosproto-fork",
+    "env": {},
+    "elapsedSeconds": 0.023,
+    "exitCode": 0,
+    "output": "bba332607df669a46fd0547f6a3bdeff432ac6df\n"
+  },
+  {
+    "args": [
+      "patch",
+      "--batch",
+      "-p1",
+      "-i",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-17-gosproto-pack-reassessment/patches/sparse.patch"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-reassessment/business/pass2-sparse/candidate",
+    "env": {},
+    "elapsedSeconds": 0.006,
+    "exitCode": 0,
+    "output": "patching file pack.go\n"
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "before_echo_test.go",
+      "sampler_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-reassessment/business/pass2-sparse/harness",
+    "env": {},
+    "elapsedSeconds": 0.012,
+    "exitCode": 0,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "version"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {},
+    "elapsedSeconds": 0.083,
+    "exitCode": 0,
+    "output": "go version go1.24.13 darwin/arm64\n"
+  },
+  {
+    "args": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {},
+    "elapsedSeconds": 0.01,
+    "exitCode": 0,
+    "output": "b2b3dd79f1f689432e87c18ee3b487739e371f68\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-run",
+      "^(TestPairStatistics|TestPairSelection|TestPairGCCounter|TestRepresentativeFixtures)$",
+      ".",
+      "-timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-reassessment/business/pass2-sparse/harness",
+    "env": {},
+    "elapsedSeconds": 1.466,
+    "exitCode": 0,
+    "output": "ok  \tcodecpairstool\t0.344s\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-c",
+      "-o",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-reassessment/business/pass2-sparse/pairs.test",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-reassessment/business/pass2-sparse/harness",
+    "env": {},
+    "elapsedSeconds": 0.608,
+    "exitCode": 0,
+    "output": ""
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-reassessment/business/pass2-sparse/pairs.test",
+      "-test.run=^TestPairSampling$",
+      "-test.v",
+      "-test.timeout=90s"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-reassessment/business/pass2-sparse/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GSR_PAIR_MODE": "compare",
+      "GSR_PAIR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-reassessment/business/pass2-sparse/raw.json",
+      "GSR_PAIR_BLOCK_TARGET": "10ms",
+      "GSR_PAIR_CASES": ""
+    },
+    "elapsedSeconds": 20.479,
+    "exitCode": 0,
+    "output": "=== RUN   TestPairSampling\n    sampler_test.go:371: compare addressbook/sproto_encode: completed 1/19\n    sampler_test.go:371: compare addressbook/sproto_pack: completed 2/19\n    sampler_test.go:371: compare addressbook/sproto_pencode: completed 3/19\n    sampler_test.go:371: compare game_small/sproto_encode: completed 4/19\n    sampler_test.go:371: compare game_small/sproto_pack: completed 5/19\n    sampler_test.go:371: compare game_small/sproto_pencode: completed 6/19\n    sampler_test.go:371: compare game_large/sproto_encode: completed 7/19\n    sampler_test.go:371: compare game_large/sproto_pack: completed 8/19\n    sampler_test.go:371: compare game_large/sproto_pencode: completed 9/19\n    sampler_test.go:371: compare int32_edges/sproto_encode: completed 10/19\n    sampler_test.go:371: compare int32_edges/sproto_pack: completed 11/19\n    sampler_test.go:371: compare int32_edges/sproto_pencode: completed 12/19\n    sampler_test.go:371: compare echo_ascii4k/sproto_encode: completed 13/19\n    sampler_test.go:371: compare echo_ascii4k/sproto_pack: completed 14/19\n    sampler_test.go:371: compare echo_ascii4k/sproto_pencode: completed 15/19\n    sampler_test.go:371: compare ascii32/frame: completed 16/19\n    sampler_test.go:371: compare utf8_1k/frame: completed 17/19\n    sampler_test.go:371: compare ascii4k/frame: completed 18/19\n    sampler_test.go:371: compare zeros4k/frame: completed 19/19\n--- PASS: TestPairSampling (20.14s)\nPASS\n"
+  }
+]

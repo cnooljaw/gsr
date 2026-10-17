@@ -1,0 +1,383 @@
+[
+  {
+    "args": [
+      "python3",
+      "-B",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/examples/websocket-gate/benchmarks/tools/go-pairs/run.py",
+      "--library",
+      "/private/tmp/gsr-gosproto-fork",
+      "--baseline",
+      "bba332607df669a46fd0547f6a3bdeff432ac6df",
+      "--mode",
+      "compare",
+      "--candidate-patch",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-17-gosproto-pack-reassessment/patches/sparse.patch",
+      "--output",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-reassessment/business/check-sparse",
+      "--prepare-only"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "exitCode": 0,
+    "elapsedSeconds": 0.253,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-run",
+      "^(TestPack|TestPackZeroRuns|TestPackPartialRunAtBlockLimit|TestUnpackOutputBudget)$",
+      ".",
+      "-timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-reassessment/business/check-sparse/candidate",
+    "exitCode": 0,
+    "elapsedSeconds": 1.555,
+    "output": "ok  \tgithub.com/cnooljaw/gosproto\t0.605s\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-run",
+      "^(TestPackDifferential|TestRepresentativeFixtures)$",
+      "-v",
+      ".",
+      "-timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-reassessment/business/check-sparse/harness",
+    "exitCode": 0,
+    "elapsedSeconds": 1.09,
+    "output": "=== RUN   TestPackDifferential\n    pack_differential_test.go:71: 17984 differential inputs\n--- PASS: TestPackDifferential (0.04s)\n=== RUN   TestRepresentativeFixtures\n--- PASS: TestRepresentativeFixtures (0.00s)\nPASS\nok  \tcodecpairstool\t0.379s\n"
+  },
+  {
+    "args": [
+      "python3",
+      "-B",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/examples/websocket-gate/benchmarks/tools/go-pairs/run.py",
+      "--library",
+      "/private/tmp/gsr-gosproto-fork",
+      "--baseline",
+      "bba332607df669a46fd0547f6a3bdeff432ac6df",
+      "--mode",
+      "compare",
+      "--candidate-patch",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-17-gosproto-pack-reassessment/patches/ff-runs.patch",
+      "--output",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-reassessment/business/check-ff-runs",
+      "--prepare-only"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "exitCode": 0,
+    "elapsedSeconds": 0.121,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-run",
+      "^(TestPack|TestPackZeroRuns|TestPackPartialRunAtBlockLimit|TestUnpackOutputBudget)$",
+      ".",
+      "-timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-reassessment/business/check-ff-runs/candidate",
+    "exitCode": 0,
+    "elapsedSeconds": 1.005,
+    "output": "ok  \tgithub.com/cnooljaw/gosproto\t0.378s\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-run",
+      "^(TestPackDifferential|TestRepresentativeFixtures)$",
+      "-v",
+      ".",
+      "-timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-reassessment/business/check-ff-runs/harness",
+    "exitCode": 0,
+    "elapsedSeconds": 0.844,
+    "output": "=== RUN   TestPackDifferential\n    pack_differential_test.go:71: 17984 differential inputs\n--- PASS: TestPackDifferential (0.06s)\n=== RUN   TestRepresentativeFixtures\n--- PASS: TestRepresentativeFixtures (0.00s)\nPASS\nok  \tcodecpairstool\t0.402s\n"
+  },
+  {
+    "args": [
+      "python3",
+      "-B",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/examples/websocket-gate/benchmarks/tools/go-pairs/run.py",
+      "--library",
+      "/private/tmp/gsr-gosproto-fork",
+      "--baseline",
+      "bba332607df669a46fd0547f6a3bdeff432ac6df",
+      "--mode",
+      "compare",
+      "--candidate-patch",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-17-gosproto-pack-reassessment/patches/combined.patch",
+      "--output",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-reassessment/business/check-combined",
+      "--prepare-only"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "exitCode": 0,
+    "elapsedSeconds": 0.128,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-run",
+      "^(TestPack|TestPackZeroRuns|TestPackPartialRunAtBlockLimit|TestUnpackOutputBudget)$",
+      ".",
+      "-timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-reassessment/business/check-combined/candidate",
+    "exitCode": 0,
+    "elapsedSeconds": 0.853,
+    "output": "ok  \tgithub.com/cnooljaw/gosproto\t0.343s\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-run",
+      "^(TestPackDifferential|TestRepresentativeFixtures)$",
+      "-v",
+      ".",
+      "-timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-reassessment/business/check-combined/harness",
+    "exitCode": 0,
+    "elapsedSeconds": 0.96,
+    "output": "=== RUN   TestPackDifferential\n    pack_differential_test.go:71: 17984 differential inputs\n--- PASS: TestPackDifferential (0.09s)\n=== RUN   TestRepresentativeFixtures\n--- PASS: TestRepresentativeFixtures (0.00s)\nPASS\nok  \tcodecpairstool\t0.437s\n"
+  },
+  {
+    "args": [
+      "python3",
+      "-B",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/examples/websocket-gate/benchmarks/tools/go-pairs/run.py",
+      "--library",
+      "/private/tmp/gsr-gosproto-fork",
+      "--baseline",
+      "bba332607df669a46fd0547f6a3bdeff432ac6df",
+      "--mode",
+      "self",
+      "--block-ms",
+      "10",
+      "--output",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-reassessment/business/control-start-self"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "exitCode": 0,
+    "elapsedSeconds": 22.148,
+    "output": "addressbook/sproto_encode: +1.37%; IQR 1.82pp; control=True\naddressbook/sproto_pack: -0.56%; IQR 7.56pp; control=False\naddressbook/sproto_pencode: +0.51%; IQR 0.43pp; control=True\ngame_small/sproto_encode: +0.86%; IQR 1.32pp; control=True\ngame_small/sproto_pack: +0.72%; IQR 1.00pp; control=True\ngame_small/sproto_pencode: +0.34%; IQR 1.85pp; control=True\ngame_large/sproto_encode: -0.03%; IQR 1.62pp; control=True\ngame_large/sproto_pack: +0.53%; IQR 1.36pp; control=False\ngame_large/sproto_pencode: -0.20%; IQR 1.80pp; control=True\nint32_edges/sproto_encode: -0.06%; IQR 1.30pp; control=True\nint32_edges/sproto_pack: -0.62%; IQR 1.97pp; control=True\nint32_edges/sproto_pencode: -0.24%; IQR 4.34pp; control=False\necho_ascii4k/sproto_encode: -1.32%; IQR 5.24pp; control=False\necho_ascii4k/sproto_pack: -0.10%; IQR 5.55pp; control=False\necho_ascii4k/sproto_pencode: -0.32%; IQR 3.07pp; control=False\nascii32/frame: -0.88%; IQR 1.48pp; control=True\nutf8_1k/frame: -0.24%; IQR 2.44pp; control=True\nascii4k/frame: +0.56%; IQR 4.87pp; control=False\nzeros4k/frame: -0.02%; IQR 1.12pp; control=True\n"
+  },
+  {
+    "args": [
+      "python3",
+      "-B",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/examples/websocket-gate/benchmarks/tools/go-pairs/run.py",
+      "--library",
+      "/private/tmp/gsr-gosproto-fork",
+      "--baseline",
+      "bba332607df669a46fd0547f6a3bdeff432ac6df",
+      "--mode",
+      "clone",
+      "--block-ms",
+      "10",
+      "--output",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-reassessment/business/control-start-clone"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "exitCode": 0,
+    "elapsedSeconds": 23.326,
+    "output": "addressbook/sproto_encode: -0.51%; IQR 0.61pp; control=True\naddressbook/sproto_pack: +0.15%; IQR 2.24pp; control=True\naddressbook/sproto_pencode: +0.20%; IQR 0.67pp; control=True\ngame_small/sproto_encode: -1.03%; IQR 2.27pp; control=True\ngame_small/sproto_pack: -0.17%; IQR 1.19pp; control=True\ngame_small/sproto_pencode: -2.49%; IQR 4.82pp; control=False\ngame_large/sproto_encode: -1.77%; IQR 0.78pp; control=True\ngame_large/sproto_pack: -1.17%; IQR 0.92pp; control=True\ngame_large/sproto_pencode: -1.11%; IQR 3.08pp; control=False\nint32_edges/sproto_encode: +0.99%; IQR 1.75pp; control=True\nint32_edges/sproto_pack: +0.17%; IQR 0.23pp; control=True\nint32_edges/sproto_pencode: +0.26%; IQR 1.55pp; control=True\necho_ascii4k/sproto_encode: -0.67%; IQR 4.14pp; control=False\necho_ascii4k/sproto_pack: -2.25%; IQR 3.59pp; control=False\necho_ascii4k/sproto_pencode: -0.52%; IQR 2.86pp; control=True\nascii32/frame: +0.39%; IQR 3.18pp; control=False\nutf8_1k/frame: -0.38%; IQR 0.88pp; control=True\nascii4k/frame: +0.59%; IQR 3.03pp; control=False\nzeros4k/frame: +0.29%; IQR 0.49pp; control=True\n"
+  },
+  {
+    "args": [
+      "python3",
+      "-B",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/examples/websocket-gate/benchmarks/tools/go-pairs/run.py",
+      "--library",
+      "/private/tmp/gsr-gosproto-fork",
+      "--baseline",
+      "bba332607df669a46fd0547f6a3bdeff432ac6df",
+      "--mode",
+      "compare",
+      "--block-ms",
+      "10",
+      "--output",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-reassessment/business/pass1-sparse",
+      "--candidate-patch",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-17-gosproto-pack-reassessment/patches/sparse.patch"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "exitCode": 0,
+    "elapsedSeconds": 23.68,
+    "output": "addressbook/sproto_encode: -1.00%; IQR 1.07pp; control=None\naddressbook/sproto_pack: -11.09%; IQR 5.04pp; control=None\naddressbook/sproto_pencode: -1.82%; IQR 2.64pp; control=None\ngame_small/sproto_encode: -1.77%; IQR 2.10pp; control=None\ngame_small/sproto_pack: -10.30%; IQR 2.47pp; control=None\ngame_small/sproto_pencode: -3.42%; IQR 5.98pp; control=None\ngame_large/sproto_encode: -2.44%; IQR 1.30pp; control=None\ngame_large/sproto_pack: -3.78%; IQR 0.71pp; control=None\ngame_large/sproto_pencode: -2.24%; IQR 0.81pp; control=None\nint32_edges/sproto_encode: -0.51%; IQR 3.27pp; control=None\nint32_edges/sproto_pack: -5.14%; IQR 3.06pp; control=None\nint32_edges/sproto_pencode: -2.59%; IQR 1.48pp; control=None\necho_ascii4k/sproto_encode: -0.80%; IQR 3.17pp; control=None\necho_ascii4k/sproto_pack: +0.65%; IQR 2.45pp; control=None\necho_ascii4k/sproto_pencode: -0.92%; IQR 3.17pp; control=None\nascii32/frame: -0.32%; IQR 0.57pp; control=None\nutf8_1k/frame: +2.64%; IQR 2.69pp; control=None\nascii4k/frame: -1.17%; IQR 0.96pp; control=None\nzeros4k/frame: -2.26%; IQR 6.68pp; control=None\n"
+  },
+  {
+    "args": [
+      "python3",
+      "-B",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/examples/websocket-gate/benchmarks/tools/go-pairs/run.py",
+      "--library",
+      "/private/tmp/gsr-gosproto-fork",
+      "--baseline",
+      "bba332607df669a46fd0547f6a3bdeff432ac6df",
+      "--mode",
+      "compare",
+      "--block-ms",
+      "10",
+      "--output",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-reassessment/business/pass1-ff-runs",
+      "--candidate-patch",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-17-gosproto-pack-reassessment/patches/ff-runs.patch"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "exitCode": 0,
+    "elapsedSeconds": 21.624,
+    "output": "addressbook/sproto_encode: +0.72%; IQR 0.76pp; control=None\naddressbook/sproto_pack: -5.34%; IQR 1.11pp; control=None\naddressbook/sproto_pencode: -0.70%; IQR 0.64pp; control=None\ngame_small/sproto_encode: +0.22%; IQR 0.72pp; control=None\ngame_small/sproto_pack: -6.18%; IQR 2.34pp; control=None\ngame_small/sproto_pencode: -3.25%; IQR 0.92pp; control=None\ngame_large/sproto_encode: -1.05%; IQR 1.35pp; control=None\ngame_large/sproto_pack: -1.83%; IQR 4.76pp; control=None\ngame_large/sproto_pencode: -3.32%; IQR 2.35pp; control=None\nint32_edges/sproto_encode: +0.29%; IQR 1.12pp; control=None\nint32_edges/sproto_pack: -1.66%; IQR 0.81pp; control=None\nint32_edges/sproto_pencode: +0.54%; IQR 0.74pp; control=None\necho_ascii4k/sproto_encode: -0.59%; IQR 2.42pp; control=None\necho_ascii4k/sproto_pack: -1.53%; IQR 1.39pp; control=None\necho_ascii4k/sproto_pencode: -1.00%; IQR 1.25pp; control=None\nascii32/frame: -3.12%; IQR 1.04pp; control=None\nutf8_1k/frame: -0.12%; IQR 1.36pp; control=None\nascii4k/frame: +0.04%; IQR 3.75pp; control=None\nzeros4k/frame: -16.70%; IQR 1.88pp; control=None\n"
+  },
+  {
+    "args": [
+      "python3",
+      "-B",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/examples/websocket-gate/benchmarks/tools/go-pairs/run.py",
+      "--library",
+      "/private/tmp/gsr-gosproto-fork",
+      "--baseline",
+      "bba332607df669a46fd0547f6a3bdeff432ac6df",
+      "--mode",
+      "compare",
+      "--block-ms",
+      "10",
+      "--output",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-reassessment/business/pass1-combined",
+      "--candidate-patch",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-17-gosproto-pack-reassessment/patches/combined.patch"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "exitCode": 0,
+    "elapsedSeconds": 23.291,
+    "output": "addressbook/sproto_encode: +0.35%; IQR 0.98pp; control=None\naddressbook/sproto_pack: -10.86%; IQR 1.49pp; control=None\naddressbook/sproto_pencode: -2.47%; IQR 1.68pp; control=None\ngame_small/sproto_encode: -1.74%; IQR 2.41pp; control=None\ngame_small/sproto_pack: -7.99%; IQR 2.44pp; control=None\ngame_small/sproto_pencode: -3.84%; IQR 2.65pp; control=None\ngame_large/sproto_encode: -1.93%; IQR 2.75pp; control=None\ngame_large/sproto_pack: -5.29%; IQR 1.26pp; control=None\ngame_large/sproto_pencode: -3.72%; IQR 0.89pp; control=None\nint32_edges/sproto_encode: +0.04%; IQR 0.71pp; control=None\nint32_edges/sproto_pack: -4.56%; IQR 0.51pp; control=None\nint32_edges/sproto_pencode: -2.83%; IQR 0.71pp; control=None\necho_ascii4k/sproto_encode: +0.37%; IQR 2.58pp; control=None\necho_ascii4k/sproto_pack: -1.46%; IQR 3.09pp; control=None\necho_ascii4k/sproto_pencode: +0.79%; IQR 2.21pp; control=None\nascii32/frame: -3.29%; IQR 2.08pp; control=None\nutf8_1k/frame: -0.65%; IQR 1.50pp; control=None\nascii4k/frame: +1.10%; IQR 2.08pp; control=None\nzeros4k/frame: -19.58%; IQR 0.68pp; control=None\n"
+  },
+  {
+    "args": [
+      "python3",
+      "-B",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/examples/websocket-gate/benchmarks/tools/go-pairs/run.py",
+      "--library",
+      "/private/tmp/gsr-gosproto-fork",
+      "--baseline",
+      "bba332607df669a46fd0547f6a3bdeff432ac6df",
+      "--mode",
+      "compare",
+      "--block-ms",
+      "10",
+      "--output",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-reassessment/business/pass2-combined",
+      "--candidate-patch",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-17-gosproto-pack-reassessment/patches/combined.patch"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "exitCode": 0,
+    "elapsedSeconds": 23.808,
+    "output": "addressbook/sproto_encode: -1.63%; IQR 1.41pp; control=None\naddressbook/sproto_pack: -11.44%; IQR 1.38pp; control=None\naddressbook/sproto_pencode: -2.01%; IQR 1.29pp; control=None\ngame_small/sproto_encode: +0.39%; IQR 3.11pp; control=None\ngame_small/sproto_pack: -8.06%; IQR 0.50pp; control=None\ngame_small/sproto_pencode: -4.27%; IQR 11.29pp; control=None\ngame_large/sproto_encode: -1.41%; IQR 1.63pp; control=None\ngame_large/sproto_pack: -4.21%; IQR 0.86pp; control=None\ngame_large/sproto_pencode: -4.24%; IQR 0.64pp; control=None\nint32_edges/sproto_encode: -0.70%; IQR 2.47pp; control=None\nint32_edges/sproto_pack: -5.87%; IQR 1.58pp; control=None\nint32_edges/sproto_pencode: -3.04%; IQR 0.91pp; control=None\necho_ascii4k/sproto_encode: -1.44%; IQR 2.96pp; control=None\necho_ascii4k/sproto_pack: -0.96%; IQR 0.74pp; control=None\necho_ascii4k/sproto_pencode: -0.85%; IQR 6.12pp; control=None\nascii32/frame: -4.06%; IQR 2.68pp; control=None\nutf8_1k/frame: -0.56%; IQR 10.39pp; control=None\nascii4k/frame: -1.14%; IQR 2.50pp; control=None\nzeros4k/frame: -20.32%; IQR 1.88pp; control=None\n"
+  },
+  {
+    "args": [
+      "python3",
+      "-B",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/examples/websocket-gate/benchmarks/tools/go-pairs/run.py",
+      "--library",
+      "/private/tmp/gsr-gosproto-fork",
+      "--baseline",
+      "bba332607df669a46fd0547f6a3bdeff432ac6df",
+      "--mode",
+      "compare",
+      "--block-ms",
+      "10",
+      "--output",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-reassessment/business/pass2-ff-runs",
+      "--candidate-patch",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-17-gosproto-pack-reassessment/patches/ff-runs.patch"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "exitCode": 0,
+    "elapsedSeconds": 22.401,
+    "output": "addressbook/sproto_encode: -2.49%; IQR 2.26pp; control=None\naddressbook/sproto_pack: -5.93%; IQR 0.36pp; control=None\naddressbook/sproto_pencode: -1.60%; IQR 1.23pp; control=None\ngame_small/sproto_encode: -3.25%; IQR 6.86pp; control=None\ngame_small/sproto_pack: -6.10%; IQR 0.88pp; control=None\ngame_small/sproto_pencode: -3.03%; IQR 2.80pp; control=None\ngame_large/sproto_encode: -1.00%; IQR 0.78pp; control=None\ngame_large/sproto_pack: -3.99%; IQR 1.45pp; control=None\ngame_large/sproto_pencode: -2.95%; IQR 0.67pp; control=None\nint32_edges/sproto_encode: -0.10%; IQR 1.03pp; control=None\nint32_edges/sproto_pack: -1.25%; IQR 1.16pp; control=None\nint32_edges/sproto_pencode: -0.76%; IQR 1.60pp; control=None\necho_ascii4k/sproto_encode: -0.52%; IQR 2.64pp; control=None\necho_ascii4k/sproto_pack: +0.60%; IQR 2.95pp; control=None\necho_ascii4k/sproto_pencode: -0.47%; IQR 1.42pp; control=None\nascii32/frame: -2.63%; IQR 4.80pp; control=None\nutf8_1k/frame: -0.59%; IQR 2.02pp; control=None\nascii4k/frame: +0.41%; IQR 2.73pp; control=None\nzeros4k/frame: -15.23%; IQR 1.04pp; control=None\n"
+  },
+  {
+    "args": [
+      "python3",
+      "-B",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/examples/websocket-gate/benchmarks/tools/go-pairs/run.py",
+      "--library",
+      "/private/tmp/gsr-gosproto-fork",
+      "--baseline",
+      "bba332607df669a46fd0547f6a3bdeff432ac6df",
+      "--mode",
+      "compare",
+      "--block-ms",
+      "10",
+      "--output",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-reassessment/business/pass2-sparse",
+      "--candidate-patch",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-17-gosproto-pack-reassessment/patches/sparse.patch"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "exitCode": 0,
+    "elapsedSeconds": 22.82,
+    "output": "addressbook/sproto_encode: -0.58%; IQR 0.61pp; control=None\naddressbook/sproto_pack: -10.46%; IQR 0.58pp; control=None\naddressbook/sproto_pencode: -1.80%; IQR 1.08pp; control=None\ngame_small/sproto_encode: -0.06%; IQR 2.31pp; control=None\ngame_small/sproto_pack: -10.01%; IQR 0.76pp; control=None\ngame_small/sproto_pencode: -3.39%; IQR 14.72pp; control=None\ngame_large/sproto_encode: -0.98%; IQR 0.56pp; control=None\ngame_large/sproto_pack: -4.22%; IQR 2.47pp; control=None\ngame_large/sproto_pencode: -2.22%; IQR 0.72pp; control=None\nint32_edges/sproto_encode: -0.13%; IQR 0.76pp; control=None\nint32_edges/sproto_pack: -5.56%; IQR 1.22pp; control=None\nint32_edges/sproto_pencode: -2.93%; IQR 5.24pp; control=None\necho_ascii4k/sproto_encode: -0.13%; IQR 1.59pp; control=None\necho_ascii4k/sproto_pack: -0.17%; IQR 2.73pp; control=None\necho_ascii4k/sproto_pencode: +0.66%; IQR 0.75pp; control=None\nascii32/frame: +0.49%; IQR 1.27pp; control=None\nutf8_1k/frame: -0.53%; IQR 3.16pp; control=None\nascii4k/frame: -0.13%; IQR 5.33pp; control=None\nzeros4k/frame: -4.82%; IQR 1.29pp; control=None\n"
+  },
+  {
+    "args": [
+      "python3",
+      "-B",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/examples/websocket-gate/benchmarks/tools/go-pairs/run.py",
+      "--library",
+      "/private/tmp/gsr-gosproto-fork",
+      "--baseline",
+      "bba332607df669a46fd0547f6a3bdeff432ac6df",
+      "--mode",
+      "clone",
+      "--block-ms",
+      "10",
+      "--output",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-reassessment/business/control-end-clone"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "exitCode": 0,
+    "elapsedSeconds": 22.084,
+    "output": "addressbook/sproto_encode: -0.52%; IQR 1.58pp; control=True\naddressbook/sproto_pack: +0.07%; IQR 3.78pp; control=False\naddressbook/sproto_pencode: -1.05%; IQR 1.02pp; control=True\ngame_small/sproto_encode: -0.20%; IQR 4.11pp; control=False\ngame_small/sproto_pack: +0.63%; IQR 1.54pp; control=True\ngame_small/sproto_pencode: -0.75%; IQR 0.75pp; control=True\ngame_large/sproto_encode: -2.40%; IQR 1.19pp; control=False\ngame_large/sproto_pack: -0.42%; IQR 2.02pp; control=True\ngame_large/sproto_pencode: -0.24%; IQR 3.20pp; control=False\nint32_edges/sproto_encode: +0.52%; IQR 1.53pp; control=True\nint32_edges/sproto_pack: +0.15%; IQR 0.93pp; control=True\nint32_edges/sproto_pencode: -0.31%; IQR 1.48pp; control=True\necho_ascii4k/sproto_encode: +0.05%; IQR 1.01pp; control=True\necho_ascii4k/sproto_pack: +0.95%; IQR 5.07pp; control=False\necho_ascii4k/sproto_pencode: +0.78%; IQR 3.13pp; control=False\nascii32/frame: -1.03%; IQR 2.73pp; control=False\nutf8_1k/frame: -2.47%; IQR 42.82pp; control=False\nascii4k/frame: +0.11%; IQR 1.85pp; control=False\nzeros4k/frame: -0.91%; IQR 1.28pp; control=False\n"
+  },
+  {
+    "args": [
+      "python3",
+      "-B",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/examples/websocket-gate/benchmarks/tools/go-pairs/run.py",
+      "--library",
+      "/private/tmp/gsr-gosproto-fork",
+      "--baseline",
+      "bba332607df669a46fd0547f6a3bdeff432ac6df",
+      "--mode",
+      "self",
+      "--block-ms",
+      "10",
+      "--output",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-reassessment/business/control-end-self"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "exitCode": 0,
+    "elapsedSeconds": 23.871,
+    "output": "addressbook/sproto_encode: +0.28%; IQR 1.74pp; control=False\naddressbook/sproto_pack: +0.02%; IQR 1.18pp; control=True\naddressbook/sproto_pencode: +0.34%; IQR 0.95pp; control=True\ngame_small/sproto_encode: +0.37%; IQR 1.24pp; control=True\ngame_small/sproto_pack: -0.39%; IQR 0.56pp; control=True\ngame_small/sproto_pencode: -1.13%; IQR 1.51pp; control=True\ngame_large/sproto_encode: -0.16%; IQR 0.76pp; control=True\ngame_large/sproto_pack: +0.60%; IQR 1.52pp; control=True\ngame_large/sproto_pencode: +0.97%; IQR 0.55pp; control=True\nint32_edges/sproto_encode: -0.53%; IQR 2.52pp; control=True\nint32_edges/sproto_pack: +0.03%; IQR 1.39pp; control=True\nint32_edges/sproto_pencode: -0.03%; IQR 0.74pp; control=True\necho_ascii4k/sproto_encode: +2.88%; IQR 7.10pp; control=False\necho_ascii4k/sproto_pack: +1.17%; IQR 3.06pp; control=False\necho_ascii4k/sproto_pencode: +0.27%; IQR 2.03pp; control=True\nascii32/frame: +0.75%; IQR 0.66pp; control=True\nutf8_1k/frame: -0.63%; IQR 4.39pp; control=False\nascii4k/frame: -0.91%; IQR 6.49pp; control=False\nzeros4k/frame: +0.30%; IQR 2.74pp; control=False\n"
+  }
+]

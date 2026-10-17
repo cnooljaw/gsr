@@ -178,4 +178,8 @@ Decode 性能阶段已按用户决定冻结于独立库 `a09fb00`（Decode 生�
 
 后续仅扩展工具的筛选和 GC 观测：隔离探针解释了 16 B 的 tiny 块窗口差值，40 ms 聚焦实验未使控制整体稳定，默认与总门槛不变。原始数据与验证见 [GC 边界诊断](benchmarks/2026-10-17-gosproto-pair-resolution/RESULTS.md)，已本地提交为 GSR `3a88564`，未推送。没有比较或采用生产候选；独立库、正式依赖和 Decode 阶段基线保持不变。
 
-再做三项同函数墙钟/进程 CPU 隔离诊断，CPU 配对结果明显比墙钟稳定，支持存在执行之外等待；具体原因仍未分离。CPU 只作交叉检查，不替代墙钟或分配验收，未采用生产候选；新记录待审查，见 [CPU 诊断](benchmarks/2026-10-17-gosproto-pair-cpu/RESULTS.md)。
+再做三项同函数墙钟/进程 CPU 隔离诊断，CPU 配对结果明显比墙钟稳定，支持存在执行之外等待；具体原因仍未分离。CPU 只作交叉检查，不替代墙钟或分配验收，未采用生产候选；已本地提交为 GSR `b2b3dd7`，见 [CPU 诊断](benchmarks/2026-10-17-gosproto-pair-cpu/RESULTS.md)。
+
+后续 FF 段集中处理候选通过既有字节/边界与 17984 组差分，但未达到预设性能及控制要求，已撤回。固定三模式共 1728 块，见 [FF 段实验](benchmarks/2026-10-17-gosproto-pack-runs/RESULTS.md)，新记录待审查。正式库、依赖与 Decode 阶段基线不变，未重复接线验收。
+
+用户随后修正统一收益淘汰线，稀疏展开与 FF 段分离重新进行两轮独立业务复测、前后控制及固定形态检查，组合保留到 gosproto 工作树。大型/整数数组 PEncode 两轮分别约快 3.72%～4.24% / 2.83%～3.04%，零字节完整帧约快 20%；合成四非零字节形态的约 3.33% 代价单列披露。最终库官方对照、race/checkptr/vet/fuzz、临时 modfile 三包及 Go/TS Plain/MAC 7/7 通过，见 [复评记录](benchmarks/2026-10-17-gosproto-pack-reassessment/RESULTS.md)。实现与记录未提交，正式依赖仍为 v0.4.0，Decode 冻结。
