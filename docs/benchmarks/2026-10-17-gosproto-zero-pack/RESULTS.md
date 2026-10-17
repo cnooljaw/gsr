@@ -1,6 +1,6 @@
 # 连续零 word Pack 候选筛选
 
-2026-10-17。上一轮已本地提交：gosproto `faa6a21`、GSR `3626b3d`，未推送/发布。**本轮三个候选全部撤回，正式生产代码保持 `faa6a21`；只保留 TestPackZeroRuns 和实验记录，尚未提交。** Decode 仍按当前阶段冻结，后续可以再优化；正式 GSR 依赖仍为 v0.4.0。
+2026-10-17。上一轮已本地提交：gosproto `faa6a21`、GSR `3626b3d`，未推送/发布。**本轮三个候选全部撤回，正式生产代码保持 `faa6a21`；只保留 TestPackZeroRuns 和实验记录，已本地提交为 gosproto `bba3326` / GSR `a27ec4e`，未推送/发布。** Decode 仍按当前阶段冻结，后续可以再优化；正式 GSR 依赖仍为 v0.4.0。
 
 ## 范围与候选
 

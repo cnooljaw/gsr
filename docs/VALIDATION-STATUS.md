@@ -4,11 +4,19 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## 稀疏 word Pack 与 A/A 诊断（2026-10-17）
+
+上一轮已本地提交为 gosproto `bba3326` / GSR `a27ec4e`，未推送。只展开已确认至多两个非零字节的提取循环；191 项三轮中目标 Pack 约快 6%，小型 PEncode 却 +11%，未通过预设门槛，未采用。另采四项 CPU profile，保留 kevent 干扰与源码行归因限制。
+
+另做 59 项三轮 A/A，两份 Go 源码完全相同，出现大型纯 Encode +19%、整数数组 Pack -23% 的差值。两份 Pack 的 640 条指令在解析位置差异后相同；尚未区分环境、顺序和代码位置等因素，不作为算法收益或替候选过门的理由。后续先校准测量。
+
+候选现有精确 wire 测试、候选/A/A 归档副本的源码/harness/夹具核对通过，共保留 750 个配对样本；正式库工作树干净，生产代码未改，Decode 继续阶段性冻结。未重复完整库/race/checkptr/官方/fuzz、GSR/GoTS 或 TS 性能验收。详情见 [诊断记录](benchmarks/2026-10-17-gosproto-pack-sparse/RESULTS.md)。新记录留在 GSR 工作树，正式依赖仍为 v0.4.0。
+
 ## 连续零 word Pack 候选筛选（2026-10-17）
 
 上一轮已本地提交为 gosproto `faa6a21` / GSR `3626b3d`，未推送。后续三个零段候选各 191 项三轮，共 1719 个样本，零字节帧约 -34%～-40%，但 ASCII、数值组合或短包出现代价，全部撤回；未进入五轮验收，没有新的 PB/SP 排名。正式生产 Go 文件保持 `faa6a21`，Decode 继续阶段性冻结。
 
-只保留 TestPackZeroRuns 的独立精确字节回归，先在基线通过；三个候选最终快照的 Pack/Unpack 相关测试、三个归档补丁副本的完整源码/harness/夹具指纹核对通过。没有采用生产改动，未重复完整库/race/checkptr/官方/fuzz、GSR/GoTS 或 TS 性能验收。原值、控制波动及复现见 [筛选记录](benchmarks/2026-10-17-gosproto-zero-pack/RESULTS.md)。新增回归与记录未提交，正式依赖仍为 v0.4.0。
+只保留 TestPackZeroRuns 的独立精确字节回归，先在基线通过；三个候选最终快照的 Pack/Unpack 相关测试、三个归档补丁副本的完整源码/harness/夹具指纹核对通过。没有采用生产改动，未重复完整库/race/checkptr/官方/fuzz、GSR/GoTS 或 TS 性能验收。原值、控制波动及复现见 [筛选记录](benchmarks/2026-10-17-gosproto-zero-pack/RESULTS.md)。该轮已本地提交为 gosproto `bba3326` / GSR `a27ec4e`，未推送/发布，正式依赖仍为 v0.4.0。
 
 ## Pack 普通 word 执行路径收敛（2026-10-17）
 
