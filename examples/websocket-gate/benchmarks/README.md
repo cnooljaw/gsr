@@ -28,7 +28,7 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 
 首轮 [校准与原候选复测](../../../docs/benchmarks/2026-10-17-gosproto-pair-calibration/RESULTS.md) 中，9/19 项同时通过两类控制；原候选仍未达到保留门槛，正式库未改；该轮工具与记录已本地提交为 GSR `f064584`。
 
-后续 [GC 边界与聚焦校准](../../../docs/benchmarks/2026-10-17-gosproto-pair-resolution/RESULTS.md) 解释了 16 B 的 tiny 分配窗口差值，但单纯拉长到 40 ms 未稳定控制。工具默认和严格总门槛不变，新增筛选和 GC 观测仅用于诊断，新改动待审查。
+后续 [GC 边界与聚焦校准](../../../docs/benchmarks/2026-10-17-gosproto-pair-resolution/RESULTS.md) 解释了 16 B 的 tiny 分配窗口差值，但单纯拉长到 40 ms 未稳定控制，已提交为 GSR `3a88564`。再做三项 [墙钟/进程 CPU 诊断](../../../docs/benchmarks/2026-10-17-gosproto-pair-cpu/RESULTS.md)，CPU 更稳定但不替换验收；新诊断记录待审查。工具默认与严格总门槛不变。
 
 ## 比较口径
 
