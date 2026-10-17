@@ -1,6 +1,6 @@
 # gosproto 后续性能优化方案
 
-状态：2026-10-17，GSR 正式依赖仍为 v0.4.0，后续独立库优化尚未发布。TS 长块和 Go 安全路径见 [首轮结果](benchmarks/2026-10-15-sproto-next/RESULTS.md)，数值 packing、字段查询及类型化构造见 [第二轮结果](benchmarks/2026-10-15-sproto-round2/RESULTS.md)。TS 优化阶段已在 GSR `9801808` 收尾，可迁移经验见 [TS → Go 优化经验](SPROTO-OPTIMIZATION-LESSONS.md)。编码执行层改进见第 9 节，大型 Encode 约 6.54 µs，同场 PB 7.59 µs。混合 word Pack 已本地提交为独立库 `7dc6713`、GSR `e9e1f74`，未推送；长 FF 有界搜索已本地提交为独立库 `07350a9`、GSR `3a78dbd`，见第 11 节。连续零 mask 解包已本地提交为独立库 `22e287e`、GSR `1af93f4`，见第 12 节。普通 Unpack 五个候选已撤回，回归与记录已本地提交为独立库 `d66644a`、GSR `acfb070`，见第 13 节。安全 inline 处理已本地提交为独立库 `70d985c`、GSR `d0328fd`，见第 14 节；后续整数记录 parser 已撤回，原型与提案已本地提交为独立库 `5be3b26`、GSR `2872d46`，见第 15 节；私有 Decode 写入及验收已本地提交为独立库 `fc3246a`、GSR `862fa8b`，见第 16 节；后续四个局部候选均未采用，见第 17 节。公开 API、generator 与预算/所有权契约不变。
+状态：2026-10-17，GSR 正式依赖仍为 v0.4.0，后续独立库优化尚未发布。TS 长块和 Go 安全路径见 [首轮结果](benchmarks/2026-10-15-sproto-next/RESULTS.md)，数值 packing、字段查询及类型化构造见 [第二轮结果](benchmarks/2026-10-15-sproto-round2/RESULTS.md)。TS 优化阶段已在 GSR `9801808` 收尾，可迁移经验见 [TS → Go 优化经验](SPROTO-OPTIMIZATION-LESSONS.md)。编码执行层改进见第 9 节，大型 Encode 约 6.54 µs，同场 PB 7.59 µs。混合 word Pack 已本地提交为独立库 `7dc6713`、GSR `e9e1f74`，未推送；长 FF 有界搜索已本地提交为独立库 `07350a9`、GSR `3a78dbd`，见第 11 节。连续零 mask 解包已本地提交为独立库 `22e287e`、GSR `1af93f4`，见第 12 节。普通 Unpack 五个候选已撤回，回归与记录已本地提交为独立库 `d66644a`、GSR `acfb070`，见第 13 节。安全 inline 处理已本地提交为独立库 `70d985c`、GSR `d0328fd`，见第 14 节；后续整数记录 parser 已撤回，原型与提案已本地提交为独立库 `5be3b26`、GSR `2872d46`，见第 15 节；私有 Decode 写入及验收已本地提交为独立库 `fc3246a`、GSR `862fa8b`，见第 16 节；后续四个局部候选均未采用，回归/记录已本地提交为独立库 `a09fb00`、GSR `d1beb28`，见第 17 节。最终入口专项未达门槛，Decode 性能阶段已按用户要求冻结于 `a09fb00`（Decode 生产源码同 `fc3246a`），见第 18 节。公开 API、generator 与预算/所有权契约不变。
 
 第三轮已完成当前基线与候选筛选，只保留调用内布局记录的内存收窄，独立库已本地提交为 `a579920`，GSR 记录提交为 `fdbc736`，均未推送/发布；未取得新的明显 CPU 加速。实测和取舍见 [第三轮结果](benchmarks/2026-10-16-gosproto-round3/RESULTS.md) 及第 8 节。
 
@@ -291,4 +291,14 @@ TS 经验提取已在 GSR `f45a8c6` 提交。Go 从 `6012b06` 重建两套主基
 
 随后另采已提交基线的 Decode/PDecode profile：入口 helper 在大型 PDecode 累计约 2.41%，普通 Unpack 恢复仍可见；kevent 样本保留，不归于业务成本。固定 body 的 mask 分布表明大型游戏主要为四/五/六字节普通 word，只有两个 FF word。新验证较密 word 固定八次恢复，129 项三轮中，大型/整数数组 Unpack 约 +20.0%/+12.1%，均撤回；不追加更多密度分支。
 
-共 918 个筛选样本，没有进入五轮验收，不产生新的 PB/SP 排名。全部生产代码保持 `fc3246a`，只保留 TestPack 新增 2048 组独立 mask 后继 FF/输入偏移回归，已在基线及单独候选副本通过。未重复完整库/fuzz/GSR/TS 验收。候选、profile、分布、复现和范围见 [局部候选筛选](benchmarks/2026-10-17-gosproto-decode-binding/RESULTS.md)。新回归和记录未提交，正式依赖仍为 v0.4.0。
+共 918 个筛选样本，没有进入五轮验收，不产生新的 PB/SP 排名。全部生产代码保持 `fc3246a`，只保留 TestPack 新增 2048 组独立 mask 后继 FF/输入偏移回归，已在基线及单独候选副本通过。未重复完整库/fuzz/GSR/TS 验收。候选、profile、分布、复现和范围见 [局部候选筛选](benchmarks/2026-10-17-gosproto-decode-binding/RESULTS.md)。该切片已本地提交为独立库 `a09fb00`、GSR `d1beb28`，未推送，正式依赖仍为 v0.4.0。
+
+## 18. 最终入口实验与 Decode 冻结
+
+按用户决定仅再做一次 messageDecodePointer 独立入口实验。微基准 18 项五轮显示，即时类型证明留在调用点、让私有地址借用 helper 内联，可把原生结构入口 8.079 → 4.988 ns（约 -38.3%），零分配；原生、无原生字段及实际类型不匹配三种状态能力一致。未删 native/owner/形状检查，未缓存事实。
+
+只让该候选进入 129 项五轮完整对照：大型 Decode 15.773 → 15.418 µs（-2.25%），PDecode 20.726 → 20.461 µs（-1.28%），两项五轮均更快，分配不变。但未达到计时前确定的至少 3%/2% 门槛，未采用；不事后降低门槛，也不继续扩展候选。
+
+**Decode 阶段性冻结于独立库 `a09fb00`，其生产源码与 `fc3246a` 一致。** 当前暂停入口、parser、构造/写入及其性能绑定的微调，后续可以回头继续优化，不是永久限制。Pack/Unpack 工作以此为控制；回到 Decode 时另定本轮范围与验证，正确性修复照常处理。
+
+本轮只新增独立实验与冻结文档，正式独立库工作树干净，未重复候选完整正确性验收或 GSR/TS 接线。735 个样本、门槛、逐轮方向、复现与范围见 [冻结报告](benchmarks/2026-10-17-gosproto-decode-freeze/RESULTS.md)。新记录未提交，未推送/发布，GSR 正式依赖仍为 v0.4.0。

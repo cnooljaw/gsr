@@ -1,0 +1,26 @@
+--- a/decode.go
++++ b/decode.go
+@@ -297,7 +297,8 @@
+ 		return 0, err
+ 	}
+ 	record := value.Elem()
+-	pointer := messageDecodePointer(schema, value)
++	exactNative := schema.nativeInt64Pointer && record.Type() == schema.typ
++	pointer := messageDecodePointer(value, exactNative)
+ 	tag := 0
+ 	for index := 0; index < count; index++ {
+ 		entry := int(readUint16(chunk[2+index*2:]))
+--- a/decode_pointer.go
++++ b/decode_pointer.go
+@@ -11,8 +11,9 @@
+ 	value unsafe.Pointer
+ }
+ 
+-func messageDecodePointer(schema *SprotoType, value reflect.Value) decodePointer {
+-	if !schema.nativeInt64Pointer || value.Type().Elem() != schema.typ {
++// exactNative 必须由调用点基于同一 value 即时核对原生能力及实际 Go 类型。
++func messageDecodePointer(value reflect.Value, exactNative bool) decodePointer {
++	if !exactNative {
+ 		return decodePointer{}
+ 	}
+ 	return decodePointer{value: value.UnsafePointer()}

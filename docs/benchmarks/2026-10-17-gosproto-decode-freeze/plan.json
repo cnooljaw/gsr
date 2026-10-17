@@ -1,0 +1,12 @@
+{
+  "scope": "Only messageDecodePointer entry. No store/parser/Pack/Unpack/Encoder/meta changes except call-site immediate type proof and pointer-helper argument signature. Decode frozen after bounded result, no further variants.",
+  "baselineCommit": "a09fb00",
+  "gate": {
+    "gameLargeDecodeMedianReductionPercent": 3,
+    "gameLargePDecodeMedianReductionPercent": 2,
+    "fasterRoundsRequiredPerOperation": 4,
+    "rounds": 5,
+    "allocationsMustNotIncrease": true
+  },
+  "microRole": "Select one candidate for complete-message acceptance; micro or inlining alone never permits adoption."
+}

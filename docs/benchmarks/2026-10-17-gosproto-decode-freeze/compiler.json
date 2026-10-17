@@ -1,0 +1,12 @@
+{
+  "micro": [
+    "./decode_pointer.go:14:6: cannot inline messageDecodePointer: function too complex: cost 216 exceeds budget 80",
+    "./entry_benchmark_test.go:35:6: can inline entryBorrow with cost 67 as: func(reflect.Value, bool) decodePointer { if !exactNative { return decodePointer{} }; return decodePointer{...} }",
+    "./entry_benchmark_test.go:86:15: inlining call to entryBorrow",
+    "./entry_benchmark_test.go:131:36: inlining call to entryBorrow"
+  ],
+  "fullCandidate": [
+    "../split/decode_pointer.go:15:6: can inline messageDecodePointer with cost 67 as: func(reflect.Value, bool) decodePointer { if !exactNative { return decodePointer{} }; return decodePointer{...} }",
+    "../split/decode.go:301:33: inlining call to messageDecodePointer"
+  ]
+}

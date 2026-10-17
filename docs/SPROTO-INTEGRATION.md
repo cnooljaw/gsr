@@ -164,4 +164,6 @@ davyxu 的 `float32/float64` 是生成器扩展：生成整数字段，用精度
 
 受控写入现按提案的最小范围封装到私有 decodePointer；新五轮大型 Decode/PDecode 约 -7.4%/-5.9%，分配不变，AddressBook 与控制代价保留。完整库/官方/GC/差分/fuzz 及 GSR 三包/GoTS 7/7 验收通过，见 [实施验收](benchmarks/2026-10-17-gosproto-decode-store/RESULTS.md)。该切片已本地提交为 gosproto `fc3246a`、GSR `862fa8b`，未推送/发布，正式依赖未升级。
 
-后续三个 Decode 入口写法与固定八字节普通 Unpack 恢复均因收益不足/回退未采用，全部生产代码保持 `fc3246a`。基线新 profile、mask 分布、918 个筛选样本和新增 FF 后继回归见 [局部候选筛选](benchmarks/2026-10-17-gosproto-decode-binding/RESULTS.md)。本轮未重复集成验收，新测试和记录未提交。
+后续三个 Decode 入口写法与固定八字节普通 Unpack 恢复均因收益不足/回退未采用，全部生产代码保持 `fc3246a`。基线新 profile、mask 分布、918 个筛选样本和新增 FF 后继回归见 [局部候选筛选](benchmarks/2026-10-17-gosproto-decode-binding/RESULTS.md)。该轮未重复集成验收，回归与记录已本地提交为 gosproto `a09fb00`、GSR `d1beb28`。
+
+Decode 性能阶段已按用户决定冻结于独立库 `a09fb00`（Decode 生产源码同 `fc3246a`）。最后的独立入口实验微基准约 -38.3%，完整大型 Decode/PDecode 仅 -2.25%/-1.28%，未达预设门槛，候选未采用；详见 [冻结报告](benchmarks/2026-10-17-gosproto-decode-freeze/RESULTS.md)。正式依赖仍为 v0.4.0，新实验与冻结文档未提交/发布。

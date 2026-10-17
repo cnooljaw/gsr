@@ -1,0 +1,23 @@
+goos: darwin
+goarch: arm64
+pkg: github.com/cnooljaw/gosproto
+cpu: Apple M2
+BenchmarkDecodeEntry/native/baseline         	 2000000	         7.050 ns/op	       0 B/op	       0 allocs/op
+BenchmarkDecodeEntry/native/record           	 2000000	         5.387 ns/op	       0 B/op	       0 allocs/op
+BenchmarkDecodeEntry/native/element          	 2000000	         7.404 ns/op	       0 B/op	       0 allocs/op
+BenchmarkDecodeEntry/native/address          	 2000000	        11.05 ns/op	       0 B/op	       0 allocs/op
+BenchmarkDecodeEntry/native/split            	 2000000	         5.192 ns/op	       0 B/op	       0 allocs/op
+BenchmarkDecodeEntry/no_native/baseline      	 2000000	         2.425 ns/op	       0 B/op	       0 allocs/op
+BenchmarkDecodeEntry/no_native/record        	 2000000	         2.337 ns/op	       0 B/op	       0 allocs/op
+BenchmarkDecodeEntry/no_native/element       	 2000000	         2.320 ns/op	       0 B/op	       0 allocs/op
+BenchmarkDecodeEntry/no_native/address       	 2000000	         2.354 ns/op	       0 B/op	       0 allocs/op
+BenchmarkDecodeEntry/no_native/split         	 2000000	         1.048 ns/op	       0 B/op	       0 allocs/op
+BenchmarkDecodeEntry/type_mismatch/baseline  	 2000000	         5.414 ns/op	       0 B/op	       0 allocs/op
+BenchmarkDecodeEntry/type_mismatch/record    	 2000000	         3.235 ns/op	       0 B/op	       0 allocs/op
+BenchmarkDecodeEntry/type_mismatch/element   	 2000000	         4.160 ns/op	       0 B/op	       0 allocs/op
+BenchmarkDecodeEntry/type_mismatch/address   	 2000000	         3.367 ns/op	       0 B/op	       0 allocs/op
+BenchmarkDecodeEntry/type_mismatch/split     	 2000000	         3.104 ns/op	       0 B/op	       0 allocs/op
+BenchmarkEntryComponents/pointer_type        	 2000000	         4.524 ns/op	       0 B/op	       0 allocs/op
+BenchmarkEntryComponents/record_type         	 2000000	         2.192 ns/op	       0 B/op	       0 allocs/op
+BenchmarkEntryComponents/address             	 2000000	         2.190 ns/op	       0 B/op	       0 allocs/op
+PASS

@@ -4,11 +4,19 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## Decode 性能阶段冻结（2026-10-17）
+
+上一轮回归/记录已本地提交为 gosproto `a09fb00`、GSR `d1beb28`，未推送。按用户决定单独验证 messageDecodePointer 入口：18 项五轮微基准与三种能力状态测试，选择一个候选进入 129 项五轮完整对照，共 735 个样本。
+
+入口微基准约 -38.3%，但大型 Decode/PDecode 只有 -2.25%/-1.28%；虽两项五轮方向一致、分配不变，仍未达预定 3%/2% 门槛，未采用。Decode 冻结于 `a09fb00`（生产源码同 `fc3246a`），不再扩展局部性能候选。独立库工作树干净，正式 GSR 依赖仍为 v0.4.0。
+
+实验与正式库分离，微基准、完整对照每轮分别运行能力/夹具用例，两份 prepare-only 副本核对完整源码与输入指纹通过。没有采用生产改动，因此未重复完整库/race/checkptr/官方对照/fuzz、GSR/GoTS 或 TS 性能；不把旧验收当成本轮重跑。预定门槛、逐轮原值、冻结范围和复现见 [冻结报告](benchmarks/2026-10-17-gosproto-decode-freeze/RESULTS.md)。新记录未提交。
+
 ## Decode 入口与固定 word 恢复筛选（2026-10-17）
 
 上一轮已本地提交为 gosproto `fc3246a`、GSR `862fa8b`，未推送。本轮三个入口候选各 59 项三轮，较密 word 固定恢复候选另做 129 项三轮，共 918 样本；全部因组合收益不足或回退未采用，没有进入五轮正式验收。生产代码仍为 `fc3246a`。
 
-另采基线 CPU/alloc profile 和五组固定 body mask 分布，kevent 与业务成本区分报告。只保留 TestPack 的独立普通 word 后继 FF 与八种输入偏移回归，新增 2048 组，先在未改生产实现通过，再在单独候选副本通过；计时副本保持原始测试指纹。四种归档/补丁副本全部重建出与实测相同的源码、harness 和夹具。未重复完整库/race/fuzz、GSR 接线或 TS 性能；详见 [筛选记录](benchmarks/2026-10-17-gosproto-decode-binding/RESULTS.md)。新回归和记录未提交，正式依赖仍为 v0.4.0。
+另采基线 CPU/alloc profile 和五组固定 body mask 分布，kevent 与业务成本区分报告。只保留 TestPack 的独立普通 word 后继 FF 与八种输入偏移回归，新增 2048 组，先在未改生产实现通过，再在单独候选副本通过；计时副本保持原始测试指纹。四种归档/补丁副本全部重建出与实测相同的源码、harness 和夹具。未重复完整库/race/fuzz、GSR 接线或 TS 性能；详见 [筛选记录](benchmarks/2026-10-17-gosproto-decode-binding/RESULTS.md)。该切片已本地提交为 gosproto `a09fb00`、GSR `d1beb28`，正式依赖仍为 v0.4.0。
 
 ## 原生整数 Decode 受控写入（2026-10-17）
 

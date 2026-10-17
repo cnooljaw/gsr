@@ -1,6 +1,6 @@
 # gosproto Decoder 原生整数指针的受控写入提案
 
-状态：2026-10-17，范围已按用户“提交，继续”采纳并完成最小实现，已本地提交为 gosproto `fc3246a`、GSR `862fa8b`。此前安全 inline 与提案/回归已分别本地提交为 gosproto `70d985c` / `5be3b26`、GSR `d0328fd` / `2872d46`；均未推送/发布。正式依赖仍为 v0.4.0。下文保留提案依据，封装后的新数据见 [实施验收](benchmarks/2026-10-17-gosproto-decode-store/RESULTS.md)。
+状态：2026-10-17，范围已按用户“提交，继续”采纳并完成最小实现，已本地提交为 gosproto `fc3246a`、GSR `862fa8b`。此前安全 inline 与提案/回归已分别本地提交为 gosproto `70d985c` / `5be3b26`、GSR `d0328fd` / `2872d46`；均未推送/发布。Decode 性能阶段已按用户决定冻结于 `a09fb00`（生产源码同 `fc3246a`），最终入口候选未达保留门槛，见 [冻结报告](benchmarks/2026-10-17-gosproto-decode-freeze/RESULTS.md)。正式依赖仍为 v0.4.0。下文保留提案依据，封装后的新数据见 [实施验收](benchmarks/2026-10-17-gosproto-decode-store/RESULTS.md)。
 
 ## 问题与本轮证据
 
@@ -55,3 +55,7 @@ gosproto 已为 Encode 建立受控 offset 读取。本提案将能力扩展到 
 已按最小范围新增私有 decodePointer；每字段 setInteger 可内联，每结构体入口仍显式检查实际类型，未改公共 API 或 wire。新 GC/padding 回归进入库内，既有 foreign owner 回落通过，移除 Decode owner 守卫的副本按预期失败。
 
 封装后另做 129 项五轮：大型 Decode 17.484 → 16.189 µs（-7.4%），PDecode 22.904 → 21.548 µs（-5.9%），分配不变。收益低于原型，AddressBook 约 +2%，未改极小 Unpack 的 +16.6% 与 A/A +2.6% 分开保留，不据此宣称全面无回退。完整库/官方对照、race/checkptr/vet、差分、有限 fuzz 与 GSR/GoTS 验收通过；跨架构仅有 Linux 三种架构构建。该切片已本地提交为 gosproto `fc3246a`、GSR `862fa8b`；后续入口写法和固定恢复候选均未采用，见 [候选筛选](benchmarks/2026-10-17-gosproto-decode-binding/RESULTS.md)。原始验收详见 [实施验收](benchmarks/2026-10-17-gosproto-decode-store/RESULTS.md)。
+
+## 性能阶段冻结
+
+最后一次独立入口实验显示微基准明显收益，但大型完整 Decode/PDecode 仅 -2.25%/-1.28%，未达预定 3%/2% 门槛，候选未采用。现有私有 decodePointer、即时类型核对和逐字段 store 守卫全部保留，基线为 `a09fb00`。本阶段先收尾，后续仍可回头优化；本文件记录已实施的边界，不能把旧提案当作新优化的直接证据。正确性修复仍按现有契约处理，阶段范围见 [冻结报告](benchmarks/2026-10-17-gosproto-decode-freeze/RESULTS.md)。
