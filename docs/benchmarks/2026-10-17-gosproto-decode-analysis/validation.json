@@ -1,0 +1,86 @@
+{
+  "platform": "Go 1.24.13 darwin/arm64 Apple M2",
+  "baseline": "d66644a",
+  "commands": [
+    {
+      "cwd": "tmp/gosproto-decode-analysis/bench",
+      "command": "go test -mod=mod -run '^TestDecodeDiagnosis$' -timeout=1m -v .",
+      "exitCode": 0,
+      "elapsedSeconds": 0.564,
+      "scope": "fixed Item probes only"
+    },
+    {
+      "cwd": "/private/tmp/gsr-gosproto-fork",
+      "command": "go test -run '^TestNativePointerDecodeOwnership$' . -timeout=1m",
+      "exitCode": 0,
+      "elapsedSeconds": 0.322,
+      "scope": "new boundary/ownership coverage on unchanged baseline before candidate reapplication"
+    },
+    {
+      "cwd": "tmp/gosproto-inline-decode/diff",
+      "command": "go test -mod=mod -v . -timeout=1m",
+      "exitCode": 0,
+      "elapsedSeconds": 0.392,
+      "comparisons": 131068
+    },
+    {
+      "cwd": "/private/tmp/gsr-gosproto-fork",
+      "command": "SPROTO_ORACLE_DIR=/private/tmp/gsr-official-sproto-review GOMAXPROCS=2 go test -race -gcflags=all=-d=checkptr=2 ./... -timeout=2m",
+      "exitCode": 0,
+      "elapsedSeconds": 2.083,
+      "officialOracleEnabled": true
+    },
+    {
+      "cwd": "/private/tmp/gsr-gosproto-fork",
+      "command": "go vet ./...",
+      "exitCode": 0
+    },
+    {
+      "cwd": "/private/tmp/gsr-gosproto-fork",
+      "command": "go test -run=^$ -fuzz=^FuzzDecode$ -fuzztime=10s -parallel=2 -timeout=45s",
+      "exitCode": 0,
+      "executions": 9787,
+      "elapsedSeconds": 11.388
+    },
+    {
+      "cwd": "/private/tmp/gsr-gosproto-fork",
+      "command": "go test -run=^$ -fuzz=^FuzzCodecRoundTrip$ -fuzztime=10s -parallel=2 -timeout=45s",
+      "exitCode": 0,
+      "executions": 539080,
+      "elapsedSeconds": 10.264
+    },
+    {
+      "cwd": "gsr",
+      "command": "go test -modfile=/private/tmp/gsr-next-codec.mod ./protocol/sproto ./examples/websocket-gate/cmd/debugserver ./examples/websocket-gate/benchmarks -timeout=2m",
+      "exitCode": 0
+    },
+    {
+      "cwd": "gsr",
+      "command": "GOFLAGS=-modfile=/private/tmp/gsr-next-codec.mod npm --prefix examples/websocket-gate run test:sproto:integration",
+      "exitCode": 0,
+      "typescriptBuild": true,
+      "passed": 7,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "cwd": "tmp/gosproto-decode-analysis/reproduce-final-check/bench",
+      "command": "go test -mod=mod -run '^TestDecodeDiagnosis$' . -timeout=1m",
+      "exitCode": 0
+    },
+    {
+      "cwd": "tmp/gosproto-inline-decode/reproduce-check/ab",
+      "command": "go test -mod=mod -run '^TestRepresentativeFixtures$' . -timeout=1m",
+      "exitCode": 0
+    }
+  ],
+  "reproductionAudit": "All four diagnostic modules, three harness files, three JSON fixtures match measurement hashes. Inline archived-and-patched module, seven harness files and three JSON fixtures match measurement hashes.",
+  "notRun": [
+    "GSR whole repository tests/race",
+    "TS performance matrix",
+    "cross-platform execution/compilation",
+    "generic correctness acceptance for fixed Item parsers"
+  ],
+  "scope": "Only production decode.go safe inline handling changed; no new unsafe, metadata, encoding, packing, API, ownership or resource model change; allocations unchanged",
+  "finalSourceAudit": "Final Go source matches five-round timings; all other production Go files match HEAD d66644a; TS frozen; 130 diagnostic / 387 screening / 645 final / 40 control samples retained separately; JSON, scripts, whitespace and report links checked."
+}

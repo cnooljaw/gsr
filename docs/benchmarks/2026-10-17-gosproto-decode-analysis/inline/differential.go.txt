@@ -1,0 +1,82 @@
+package inlinediff
+
+import (
+	"errors"
+	now "github.com/cnooljaw/gosproto"
+	old "github.com/cnooljaw/gosproto-before"
+	"reflect"
+	"testing"
+)
+
+type document struct {
+	First  *int64 `sproto:"integer,0"`
+	Second *int64 `sproto:"integer,1"`
+}
+
+func oldClass(err error) int {
+	switch {
+	case err == nil:
+		return 0
+	case errors.Is(err, old.ErrLimit):
+		return 1
+	case errors.Is(err, old.ErrDecode):
+		return 2
+	default:
+		return 3
+	}
+}
+func newClass(err error) int {
+	switch {
+	case err == nil:
+		return 0
+	case errors.Is(err, now.ErrLimit):
+		return 1
+	case errors.Is(err, now.ErrDecode):
+		return 2
+	default:
+		return 4
+	}
+}
+
+// 全部合法 inline 值与边界失败，保护旧新数值、消费长度和失败时的原指针。
+func TestInlineDifferential(t *testing.T) {
+	cases := 0
+	for number := 0; number <= 32766; number++ {
+		entry := uint16((number + 1) * 2)
+		valid := []byte{2, 0, byte(entry), byte(entry >> 8), 4, 0}
+		malformed := []byte{2, 0, byte(entry), byte(entry >> 8), 0, 0}
+		for mode := 0; mode < 3; mode++ {
+			wire := valid
+			limit := 2
+			if mode == 1 {
+				limit = 1
+			}
+			if mode == 2 {
+				wire = malformed
+			}
+			a, b := int64(-10), int64(-20)
+			left, right := document{First: &a, Second: &b}, document{First: &a, Second: &b}
+			used1, e1 := old.DecodeWithLimits(wire, &left, old.Limits{MaxElements: limit})
+			used2, e2 := now.DecodeWithLimits(wire, &right, now.Limits{MaxElements: limit})
+			if oldClass(e1) != newClass(e2) || used1 != used2 || !reflect.DeepEqual(left, right) {
+				t.Fatalf("value=%d mode=%d left=%+v/%v right=%+v/%v", number, mode, left, e1, right, e2)
+			}
+			if e2 != nil && (left.First != &a || left.Second != &b || right.First != &a || right.Second != &b) {
+				t.Fatal("failed decode replaced caller pointers")
+			}
+			if e2 == nil && (right.First == right.Second || *right.First != int64(number) || *right.Second != 1) {
+				t.Fatal("inline value or ownership")
+			}
+			cases++
+		}
+		wire := old.Pack(valid)
+		var left, right document
+		e1 := old.DecodePacked(wire, &left)
+		e2 := now.DecodePacked(wire, &right)
+		if oldClass(e1) != newClass(e2) || !reflect.DeepEqual(left, right) {
+			t.Fatalf("packed value=%d: %v/%v", number, e1, e2)
+		}
+		cases++
+	}
+	t.Logf("%d inline/budget/malformed/packed differential cases", cases)
+}

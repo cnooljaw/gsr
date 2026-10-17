@@ -1,0 +1,31 @@
+goos: darwin
+goarch: arm64
+pkg: decodediag
+cpu: Apple M2
+BenchmarkDecodeDiagnosis/addressbook/protobuf_decode         	   60000	       820.7 ns/op	     648 B/op	      26 allocs/op
+BenchmarkDecodeDiagnosis/addressbook/sproto_decode           	   60000	      1014 ns/op	     528 B/op	      29 allocs/op
+BenchmarkDecodeDiagnosis/addressbook/sproto_pdecode          	   60000	      1230 ns/op	     672 B/op	      30 allocs/op
+BenchmarkDecodeDiagnosis/game_small/protobuf_decode          	   60000	      1655 ns/op	    1208 B/op	      53 allocs/op
+BenchmarkDecodeDiagnosis/game_small/sproto_decode            	   60000	      1775 ns/op	    1200 B/op	      52 allocs/op
+BenchmarkDecodeDiagnosis/game_small/sproto_pdecode           	   60000	      2309 ns/op	    1552 B/op	      53 allocs/op
+BenchmarkDecodeDiagnosis/game_small/generic_decode           	   60000	      1811 ns/op	    1200 B/op	      52 allocs/op
+BenchmarkDecodeDiagnosis/game_small/generic_pdecode          	   60000	      2330 ns/op	    1552 B/op	      53 allocs/op
+BenchmarkDecodeDiagnosis/game_small/fixed_reflect_decode     	   60000	      1752 ns/op	    1200 B/op	      52 allocs/op
+BenchmarkDecodeDiagnosis/game_small/fixed_reflect_pdecode    	   60000	      2274 ns/op	    1552 B/op	      53 allocs/op
+BenchmarkDecodeDiagnosis/game_small/fixed_typed_decode       	   60000	      2336 ns/op	    1200 B/op	      52 allocs/op
+BenchmarkDecodeDiagnosis/game_small/fixed_typed_pdecode      	   60000	      2133 ns/op	    1552 B/op	      53 allocs/op
+BenchmarkDecodeDiagnosis/game_large/protobuf_decode          	   60000	     17243 ns/op	   13560 B/op	     537 allocs/op
+BenchmarkDecodeDiagnosis/game_large/sproto_decode            	   60000	     18230 ns/op	   10416 B/op	     532 allocs/op
+BenchmarkDecodeDiagnosis/game_large/sproto_pdecode           	   60000	     23136 ns/op	   13872 B/op	     533 allocs/op
+BenchmarkDecodeDiagnosis/game_large/generic_decode           	   60000	     18462 ns/op	   10416 B/op	     532 allocs/op
+BenchmarkDecodeDiagnosis/game_large/generic_pdecode          	   60000	     22978 ns/op	   13872 B/op	     533 allocs/op
+BenchmarkDecodeDiagnosis/game_large/fixed_reflect_decode     	   60000	     17667 ns/op	   10416 B/op	     532 allocs/op
+BenchmarkDecodeDiagnosis/game_large/fixed_reflect_pdecode    	   60000	     22725 ns/op	   13872 B/op	     533 allocs/op
+BenchmarkDecodeDiagnosis/game_large/fixed_typed_decode       	   60000	     14830 ns/op	   10416 B/op	     532 allocs/op
+BenchmarkDecodeDiagnosis/game_large/fixed_typed_pdecode      	   60000	     20648 ns/op	   13872 B/op	     533 allocs/op
+BenchmarkDecodeDiagnosis/int32_edges/protobuf_decode         	   60000	      4185 ns/op	    4160 B/op	       2 allocs/op
+BenchmarkDecodeDiagnosis/int32_edges/sproto_decode           	   60000	      2328 ns/op	    8288 B/op	       4 allocs/op
+BenchmarkDecodeDiagnosis/int32_edges/sproto_pdecode          	   60000	      7784 ns/op	   12384 B/op	       5 allocs/op
+BenchmarkConstructDiagnosis/reflect                          	   60000	     12478 ns/op	    7320 B/op	     514 allocs/op
+BenchmarkConstructDiagnosis/typed                            	   60000	      7674 ns/op	    7320 B/op	     514 allocs/op
+PASS

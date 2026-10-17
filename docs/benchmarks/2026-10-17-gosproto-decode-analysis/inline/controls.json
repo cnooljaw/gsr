@@ -1,0 +1,537 @@
+{
+  "commands": [
+    {
+      "args": [
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-inline-decode/aa.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkPairedUnpackShapes$/^(zeroWords16|FF512-sparse4096)$",
+        "-test.benchtime=60000x",
+        "-test.benchmem",
+        "-test.timeout=20s"
+      ],
+      "round": 0,
+      "variant": "aa",
+      "reverse": 0
+    },
+    {
+      "args": [
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-inline-decode/inline-final.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkPairedUnpackShapes$/^(zeroWords16|FF512-sparse4096)$",
+        "-test.benchtime=60000x",
+        "-test.benchmem",
+        "-test.timeout=20s"
+      ],
+      "round": 0,
+      "variant": "inline-final",
+      "reverse": 0
+    },
+    {
+      "args": [
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-inline-decode/inline-final.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkPairedUnpackShapes$/^(zeroWords16|FF512-sparse4096)$",
+        "-test.benchtime=60000x",
+        "-test.benchmem",
+        "-test.timeout=20s"
+      ],
+      "round": 1,
+      "variant": "inline-final",
+      "reverse": 1
+    },
+    {
+      "args": [
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-inline-decode/aa.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkPairedUnpackShapes$/^(zeroWords16|FF512-sparse4096)$",
+        "-test.benchtime=60000x",
+        "-test.benchmem",
+        "-test.timeout=20s"
+      ],
+      "round": 1,
+      "variant": "aa",
+      "reverse": 1
+    },
+    {
+      "args": [
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-inline-decode/aa.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkPairedUnpackShapes$/^(zeroWords16|FF512-sparse4096)$",
+        "-test.benchtime=60000x",
+        "-test.benchmem",
+        "-test.timeout=20s"
+      ],
+      "round": 2,
+      "variant": "aa",
+      "reverse": 0
+    },
+    {
+      "args": [
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-inline-decode/inline-final.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkPairedUnpackShapes$/^(zeroWords16|FF512-sparse4096)$",
+        "-test.benchtime=60000x",
+        "-test.benchmem",
+        "-test.timeout=20s"
+      ],
+      "round": 2,
+      "variant": "inline-final",
+      "reverse": 0
+    },
+    {
+      "args": [
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-inline-decode/inline-final.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkPairedUnpackShapes$/^(zeroWords16|FF512-sparse4096)$",
+        "-test.benchtime=60000x",
+        "-test.benchmem",
+        "-test.timeout=20s"
+      ],
+      "round": 3,
+      "variant": "inline-final",
+      "reverse": 1
+    },
+    {
+      "args": [
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-inline-decode/aa.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkPairedUnpackShapes$/^(zeroWords16|FF512-sparse4096)$",
+        "-test.benchtime=60000x",
+        "-test.benchmem",
+        "-test.timeout=20s"
+      ],
+      "round": 3,
+      "variant": "aa",
+      "reverse": 1
+    },
+    {
+      "args": [
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-inline-decode/aa.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkPairedUnpackShapes$/^(zeroWords16|FF512-sparse4096)$",
+        "-test.benchtime=60000x",
+        "-test.benchmem",
+        "-test.timeout=20s"
+      ],
+      "round": 4,
+      "variant": "aa",
+      "reverse": 0
+    },
+    {
+      "args": [
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-inline-decode/inline-final.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkPairedUnpackShapes$/^(zeroWords16|FF512-sparse4096)$",
+        "-test.benchtime=60000x",
+        "-test.benchmem",
+        "-test.timeout=20s"
+      ],
+      "round": 4,
+      "variant": "inline-final",
+      "reverse": 0
+    }
+  ],
+  "rows": [
+    {
+      "variant": "aa",
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/FF512-sparse4096/before_unpack",
+      "ns": 4300.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "variant": "aa",
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/FF512-sparse4096/sproto_unpack",
+      "ns": 4624.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "variant": "aa",
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords16/before_unpack",
+      "ns": 72.97,
+      "bytes": 128,
+      "allocs": 1
+    },
+    {
+      "variant": "aa",
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords16/sproto_unpack",
+      "ns": 71.95,
+      "bytes": 128,
+      "allocs": 1
+    },
+    {
+      "variant": "inline-final",
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/FF512-sparse4096/before_unpack",
+      "ns": 4161.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "variant": "inline-final",
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/FF512-sparse4096/sproto_unpack",
+      "ns": 3511.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "variant": "inline-final",
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords16/before_unpack",
+      "ns": 54.18,
+      "bytes": 128,
+      "allocs": 1
+    },
+    {
+      "variant": "inline-final",
+      "round": 0,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords16/sproto_unpack",
+      "ns": 54.89,
+      "bytes": 128,
+      "allocs": 1
+    },
+    {
+      "variant": "inline-final",
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/FF512-sparse4096/sproto_unpack",
+      "ns": 3475.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "variant": "inline-final",
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/FF512-sparse4096/before_unpack",
+      "ns": 4200.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "variant": "inline-final",
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords16/sproto_unpack",
+      "ns": 53.05,
+      "bytes": 128,
+      "allocs": 1
+    },
+    {
+      "variant": "inline-final",
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords16/before_unpack",
+      "ns": 53.31,
+      "bytes": 128,
+      "allocs": 1
+    },
+    {
+      "variant": "aa",
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/FF512-sparse4096/sproto_unpack",
+      "ns": 4119.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "variant": "aa",
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/FF512-sparse4096/before_unpack",
+      "ns": 4216.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "variant": "aa",
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords16/sproto_unpack",
+      "ns": 53.04,
+      "bytes": 128,
+      "allocs": 1
+    },
+    {
+      "variant": "aa",
+      "round": 1,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords16/before_unpack",
+      "ns": 54.61,
+      "bytes": 128,
+      "allocs": 1
+    },
+    {
+      "variant": "aa",
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/FF512-sparse4096/before_unpack",
+      "ns": 4174.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "variant": "aa",
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/FF512-sparse4096/sproto_unpack",
+      "ns": 4186.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "variant": "aa",
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords16/before_unpack",
+      "ns": 49.22,
+      "bytes": 128,
+      "allocs": 1
+    },
+    {
+      "variant": "aa",
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords16/sproto_unpack",
+      "ns": 49.32,
+      "bytes": 128,
+      "allocs": 1
+    },
+    {
+      "variant": "inline-final",
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/FF512-sparse4096/before_unpack",
+      "ns": 4745.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "variant": "inline-final",
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/FF512-sparse4096/sproto_unpack",
+      "ns": 3606.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "variant": "inline-final",
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords16/before_unpack",
+      "ns": 56.46,
+      "bytes": 128,
+      "allocs": 1
+    },
+    {
+      "variant": "inline-final",
+      "round": 2,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords16/sproto_unpack",
+      "ns": 70.33,
+      "bytes": 128,
+      "allocs": 1
+    },
+    {
+      "variant": "inline-final",
+      "round": 3,
+      "operation": "BenchmarkPairedUnpackShapes/FF512-sparse4096/sproto_unpack",
+      "ns": 3610.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "variant": "inline-final",
+      "round": 3,
+      "operation": "BenchmarkPairedUnpackShapes/FF512-sparse4096/before_unpack",
+      "ns": 4195.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "variant": "inline-final",
+      "round": 3,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords16/sproto_unpack",
+      "ns": 50.18,
+      "bytes": 128,
+      "allocs": 1
+    },
+    {
+      "variant": "inline-final",
+      "round": 3,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords16/before_unpack",
+      "ns": 51.24,
+      "bytes": 128,
+      "allocs": 1
+    },
+    {
+      "variant": "aa",
+      "round": 3,
+      "operation": "BenchmarkPairedUnpackShapes/FF512-sparse4096/sproto_unpack",
+      "ns": 4192.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "variant": "aa",
+      "round": 3,
+      "operation": "BenchmarkPairedUnpackShapes/FF512-sparse4096/before_unpack",
+      "ns": 4227.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "variant": "aa",
+      "round": 3,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords16/sproto_unpack",
+      "ns": 54.34,
+      "bytes": 128,
+      "allocs": 1
+    },
+    {
+      "variant": "aa",
+      "round": 3,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords16/before_unpack",
+      "ns": 58.53,
+      "bytes": 128,
+      "allocs": 1
+    },
+    {
+      "variant": "aa",
+      "round": 4,
+      "operation": "BenchmarkPairedUnpackShapes/FF512-sparse4096/before_unpack",
+      "ns": 4211.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "variant": "aa",
+      "round": 4,
+      "operation": "BenchmarkPairedUnpackShapes/FF512-sparse4096/sproto_unpack",
+      "ns": 4204.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "variant": "aa",
+      "round": 4,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords16/before_unpack",
+      "ns": 50.76,
+      "bytes": 128,
+      "allocs": 1
+    },
+    {
+      "variant": "aa",
+      "round": 4,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords16/sproto_unpack",
+      "ns": 50.66,
+      "bytes": 128,
+      "allocs": 1
+    },
+    {
+      "variant": "inline-final",
+      "round": 4,
+      "operation": "BenchmarkPairedUnpackShapes/FF512-sparse4096/before_unpack",
+      "ns": 4657.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "variant": "inline-final",
+      "round": 4,
+      "operation": "BenchmarkPairedUnpackShapes/FF512-sparse4096/sproto_unpack",
+      "ns": 3643.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "variant": "inline-final",
+      "round": 4,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords16/before_unpack",
+      "ns": 57.33,
+      "bytes": 128,
+      "allocs": 1
+    },
+    {
+      "variant": "inline-final",
+      "round": 4,
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords16/sproto_unpack",
+      "ns": 56.6,
+      "bytes": 128,
+      "allocs": 1
+    }
+  ],
+  "summary": [
+    {
+      "variant": "aa",
+      "operation": "BenchmarkPairedUnpackShapes/FF512-sparse4096/before_unpack",
+      "ns": 4216.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "variant": "aa",
+      "operation": "BenchmarkPairedUnpackShapes/FF512-sparse4096/sproto_unpack",
+      "ns": 4192.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "variant": "aa",
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords16/before_unpack",
+      "ns": 54.61,
+      "bytes": 128,
+      "allocs": 1
+    },
+    {
+      "variant": "aa",
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords16/sproto_unpack",
+      "ns": 53.04,
+      "bytes": 128,
+      "allocs": 1
+    },
+    {
+      "variant": "inline-final",
+      "operation": "BenchmarkPairedUnpackShapes/FF512-sparse4096/before_unpack",
+      "ns": 4200.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "variant": "inline-final",
+      "operation": "BenchmarkPairedUnpackShapes/FF512-sparse4096/sproto_unpack",
+      "ns": 3606.0,
+      "bytes": 4864,
+      "allocs": 1
+    },
+    {
+      "variant": "inline-final",
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords16/before_unpack",
+      "ns": 54.18,
+      "bytes": 128,
+      "allocs": 1
+    },
+    {
+      "variant": "inline-final",
+      "operation": "BenchmarkPairedUnpackShapes/zeroWords16/sproto_unpack",
+      "ns": 54.89,
+      "bytes": 128,
+      "allocs": 1
+    }
+  ],
+  "aaSource": {
+    "limits.go": "42865809572cb856d39a62ae3f1d95c8b6395da5a5cac5539c75d2aa6ce34fd9",
+    "fuzz_test.go": "de339d3fbf5d589377ca304c82496f316478ac19bbf42c230eb0cf2fca0cf8ab",
+    "sproto_test.go": "4127e6f7a2b08474f8d126b47817617c4066737851bc787f22c0102b5e2bc800",
+    "encode.go": "73fe791f2e3d5d9011bc2011b9413c94457baea06c887426992f4a665fe0784a",
+    "rpc_limits_test.go": "486c8f73eb0e3cb63412796c669e55cb94c7ad49c0813cbb6dff36ad414e2b7c",
+    "pack.go": "3757072e0169f6c1471557ddecbbf0fb843cce84bc6c34d15142b5add1fa872c",
+    "encode_integer_record.go": "1ec4e5d0531c1de565aaa6b60c8ea8e185b9c36a95ffc9e49b848e5ed267fdcb",
+    "encode_pointer.go": "e7a239568a0fc8788404de6f5bc0d5e2ac092fa559f0a6bfd4561fdc155f81c1",
+    "rpc_test.go": "d8e1c353c96ff3577e6bdd86a1d1fbee8422486f491735bab278f65682c6102d",
+    "sproto.go": "b3cde4699d2fc07a453e521b0fac46534e43a8681fbbc5cb75d3ef27b9234164",
+    "rpc.go": "4368b24cb51c43c083c9430fd5264e94255149d5d4c9d9742626bc504450a376",
+    "meta.go": "6badd4a5ac60d8a15caaa1f35634268101c436b275cf4a0fe120b91db417d217",
+    "limits_test.go": "215cd90d3533679f581c6b27748a31dd78a085830339c7f8428105710b87f164",
+    "decode.go": "b5bb24108008236b222a81c45a29cd78e73f114ffc0d843ce358dd237824bb74",
+    "pack_test.go": "aa15d3887fe36c647cfaf312479aafbd03ed4fa45fcb045ee0e6ab7146aa70ad",
+    "encode_test.go": "d28095ae5b5b820eb0d5aed634397bb86159361b5876c3126100d59e37d41099",
+    "official_compat_test.go": "adfe1ee5982544a937b72eed95592e4d6c521731db8c88c91dbe39440e1827ef"
+  },
+  "binarySha256": {
+    "aa": "42351ec9f2fb13235e81d9976f7ae05afee18992b6ef5c14f50362011dd677dd",
+    "inline-final": "3f4e224899f6ace1a17a8ad6ffa0b02ffd51507b6765a6a536d898b9a6cd6bc9"
+  }
+}

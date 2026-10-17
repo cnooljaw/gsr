@@ -34,6 +34,8 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 
 ## 报告
 
+[Decode 同分配诊断与安全 inline 验收](../../../docs/benchmarks/2026-10-17-gosproto-decode-analysis/RESULTS.md) 区分固定流程、反射赋值与构造成本；保留通用/固定探针各自数据。安全 inline 最终 129 项五轮中，大型 Decode/PDecode 约 -5.3%/-4.1%，分配不变；原三轮波动、完整矩阵极小项代价及 A/A 控制分别公开。固定 Item 探针不作为生产结果，正式依赖仍为 v0.4.0。
+
 [普通 Unpack 候选筛选](../../../docs/benchmarks/2026-10-16-gosproto-unpack-candidates/RESULTS.md) 记录五个未采用候选、1935 个三轮样本和可复现补丁。位置/计数表、游标及稀疏直接恢复均未通过业务收益与形态代价检查；生产代码仍为已提交的零段优化，只新增独立字节回归。额外保存大型 Decode 的对象构造/分配 profile，不作为新排名。
 
 [连续零 mask 有界解包](../../../docs/benchmarks/2026-10-16-gosproto-zero-unpack/RESULTS.md) 是最新 Unpack 专项：129 项五轮配对，4 KiB/64 KiB 零块约 -64.0%/-68.3%，4 KiB 零字节帧约 -51.2%。AddressBook Unpack 约 +10%、PDecode +1.6% 和普通形态代价原样保留；35 种形态、45824 组输入/预算差分、失败候选与 profile 一并记录。完整预检、分配和 wire 不变，正式依赖仍为 v0.4.0。

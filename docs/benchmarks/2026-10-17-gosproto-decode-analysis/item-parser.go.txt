@@ -1,0 +1,80 @@
+package sproto
+
+import "reflect"
+
+type DiagnosticItem struct {
+	Id    *int64 `sproto:"integer,0" json:"id"`
+	Count *int64 `sproto:"integer,1" json:"count"`
+	Power *int64 `sproto:"integer,2" json:"power"`
+}
+
+type DiagnosticGameState struct {
+	PlayerId   *int64            `sproto:"integer,0" json:"playerId"`
+	Tick       *int64            `sproto:"integer,1" json:"tick"`
+	Hp         *int64            `sproto:"integer,2" json:"hp"`
+	Mp         *int64            `sproto:"integer,3" json:"mp"`
+	Level      *int64            `sproto:"integer,4" json:"level"`
+	X          *int64            `sproto:"integer,5" json:"x"`
+	Y          *int64            `sproto:"integer,6" json:"y"`
+	State      *int64            `sproto:"integer,7" json:"state"`
+	Attributes []int64           `sproto:"integer,8,array" json:"attributes"`
+	SkillIds   []int64           `sproto:"integer,9,array" json:"skillIds"`
+	Items      []*DiagnosticItem `sproto:"struct,10,array" json:"items"`
+	Labels     []string          `sproto:"string,11,array" json:"labels"`
+}
+
+// diagnosticDecodeItem 只在临时副本处理固定三整数 Item，非通用生产 decoder。
+func diagnosticDecodeItem(chunk []byte, value reflect.Value, budget *decodeBudget) (int, error) {
+	budget.depth++
+	defer func() { budget.depth-- }()
+	if budget.depth > budget.limits.MaxDepth {
+		return 0, ErrLimit
+	}
+	if len(chunk) < 2 {
+		return 0, ErrDecode
+	}
+	count := int(readUint16(chunk))
+	total := 2 + count*2
+	if total > len(chunk) {
+		return 0, ErrDecode
+	}
+	if err := budget.add(count); err != nil {
+		return 0, err
+	}
+	RECORD
+	tag := 0
+	for index := 0; index < count; index++ {
+		entry := int(readUint16(chunk[2+index*2:]))
+		if entry%2 == 1 {
+			tag += (entry + 1) / 2
+			continue
+		}
+		if tag > 65535 {
+			return 0, ErrDecode
+		}
+		hasInline := entry != 0
+		inline := uint16(entry/2 - 1)
+		var content []byte
+		if !hasInline {
+			used, data, err := readChunk(chunk[total:])
+			if err != nil {
+				return 0, err
+			}
+			total += used
+			content = data
+		}
+		currentTag := tag
+		tag++
+		if currentTag > 2 {
+			continue
+		}
+		bits, err := scalarBits(inline, hasInline, content)
+		if err != nil {
+			return 0, err
+		}
+		result := new(int64)
+		*result = int64(bits)
+		STORE
+	}
+	return total, nil
+}

@@ -1,0 +1,16 @@
+--- a/decode.go
++++ b/decode.go
+@@ -326,6 +326,13 @@
+ 		if hasInline && (field.Array || field.Wire == WireBytesName || field.Wire == WireStructName) {
+ 			return 0, ErrDecode
+ 		}
++		// inline 原生整数已由字段元信息和本次 header 确认，可直接构造独占值。
++		if hasInline && field.nativeInt64Pointer {
++			result := new(int64)
++			*result = int64(inline)
++			record.Field(field.index[0]).Set(reflect.ValueOf(result))
++			continue
++		}
+ 		if err := field.dec(inline, hasInline, content, field, record.Field(field.index[0]), budget); err != nil {
+ 			return 0, err
+ 		}

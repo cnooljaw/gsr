@@ -1,6 +1,6 @@
 # gosproto 后续性能优化方案
 
-状态：2026-10-16，GSR 正式依赖仍为 v0.4.0，后续独立库优化尚未发布。TS 长块和 Go 安全路径见 [首轮结果](benchmarks/2026-10-15-sproto-next/RESULTS.md)，数值 packing、字段查询及类型化构造见 [第二轮结果](benchmarks/2026-10-15-sproto-round2/RESULTS.md)。TS 优化阶段已在 GSR `9801808` 收尾，可迁移经验见 [TS → Go 优化经验](SPROTO-OPTIMIZATION-LESSONS.md)。编码执行层改进见第 9 节，大型 Encode 约 6.54 µs，同场 PB 7.59 µs。混合 word Pack 已本地提交为独立库 `7dc6713`、GSR `e9e1f74`，未推送；长 FF 有界搜索已本地提交为独立库 `07350a9`、GSR `3a78dbd`，见第 11 节。连续零 mask 解包已本地提交为独立库 `22e287e`、GSR `1af93f4`，见第 12 节。普通 Unpack 五个候选已撤回，仅新增回归与筛选记录，见第 13 节。公开 API、generator 与预算/所有权契约不变。
+状态：2026-10-17，GSR 正式依赖仍为 v0.4.0，后续独立库优化尚未发布。TS 长块和 Go 安全路径见 [首轮结果](benchmarks/2026-10-15-sproto-next/RESULTS.md)，数值 packing、字段查询及类型化构造见 [第二轮结果](benchmarks/2026-10-15-sproto-round2/RESULTS.md)。TS 优化阶段已在 GSR `9801808` 收尾，可迁移经验见 [TS → Go 优化经验](SPROTO-OPTIMIZATION-LESSONS.md)。编码执行层改进见第 9 节，大型 Encode 约 6.54 µs，同场 PB 7.59 µs。混合 word Pack 已本地提交为独立库 `7dc6713`、GSR `e9e1f74`，未推送；长 FF 有界搜索已本地提交为独立库 `07350a9`、GSR `3a78dbd`，见第 11 节。连续零 mask 解包已本地提交为独立库 `22e287e`、GSR `1af93f4`，见第 12 节。普通 Unpack 五个候选已撤回，回归与记录已本地提交为独立库 `d66644a`、GSR `acfb070`，见第 13 节。当前已完成 Decode 同分配诊断并新增安全 inline 处理，尚未提交，见第 14 节。公开 API、generator 与预算/所有权契约不变。
 
 第三轮已完成当前基线与候选筛选，只保留调用内布局记录的内存收窄，独立库已本地提交为 `a579920`，GSR 记录提交为 `fdbc736`，均未推送/发布；未取得新的明显 CPU 加速。实测和取舍见 [第三轮结果](benchmarks/2026-10-16-gosproto-round3/RESULTS.md) 及第 8 节。
 
@@ -257,4 +257,14 @@ TS 经验提取已在 GSR `f45a8c6` 提交。Go 从 `6012b06` 重建两套主基
 
 从 `22e287e` 验证位置/计数表、仅计数表、源游标与固定输出区间、仅输出区间、单字节直接恢复五个候选。各 129 项、三轮，共 1935 样本；全部因稀疏回退或真实组合收益不足撤回，生产源码恢复为 `22e287e`。例如源游标使大型/整数数组纯 Unpack 约 -5.8%/-5.6%，但单字节形态 +12%；增加直接恢复后双字节 +14.1%，大型 PDecode 基本持平。没有进入五轮正式验收。
 
-保留 TestPack 的 2048 组独立 mask 字节、后继 word 与切片偏移回归，已在未改生产代码时验证。额外 CPU/alloc profile 显示大型纯 Decode 仍为 532 次分配，主要对象归于原生整数指针和结构体构造；CPU 中的 kevent 不当作业务耗时。下一步以隔离探针拆分构造、reflect.Set 与 wire 遍历，保留真实输出所有权和失败原子性。未新增 unsafe、API、池或缓存。原始值、五个候选补丁及复现见 [筛选记录](benchmarks/2026-10-16-gosproto-unpack-candidates/RESULTS.md)；本轮新增测试和文档未提交。
+保留 TestPack 的 2048 组独立 mask 字节、后继 word 与切片偏移回归，已在未改生产代码时验证。额外 CPU/alloc profile 显示大型纯 Decode 仍为 532 次分配，主要对象归于原生整数指针和结构体构造；CPU 中的 kevent 不当作业务耗时。下一步以隔离探针拆分构造、reflect.Set 与 wire 遍历，保留真实输出所有权和失败原子性。未新增 unsafe、API、池或缓存。原始值、五个候选补丁及复现见 [筛选记录](benchmarks/2026-10-16-gosproto-unpack-candidates/RESULTS.md)；该切片已本地提交为独立库 `d66644a`、GSR `acfb070`；补丁格式属性修正为 `ae2e1bc`，未推送。
+
+## 14. Decode 同分配诊断与安全 inline 处理
+
+大型夹具同场 SP Decode 10416 B / 532 次、PB 13560 B / 537 次，不应把 SP 当前问题概括为“对象数明显更多”。固定 Item 的通用/反射/类型化探针保留全部分配，Decode 为 18.208 / 17.261 / 15.390 µs；构造微基准也显示相同 514 次分配下仍有明显执行成本。它们只用于区分固定流程与反射赋值，不作为通用 decoder 或与分段耗时相加。
+
+从探针落地七行安全改动：已确认 inline 的原生 *int64 直接构造独占值并用 reflect.Set 赋值，省去重复 scalarBits 判定和间接分派；未使用 offset 写字段或新增 unsafe。完整 root 成功后才替换调用方值，预算、错误行为、presence、独占和分配不变。
+
+最终 129 项五轮：大型 Decode 18.225 → 17.253 µs（-5.3%），PDecode 23.488 → 22.515 µs（-4.1%）；小型 Decode/PDecode 约 -4.6%/-3.1%。大型纯 Decode 低于同场 PB 17.840 µs，但 PDecode 仍高约 26.2%。主矩阵未改的极小零段 +13% 原值与后续 A/A 复核分别保留，不声称全项无回退，也不把未改 Unpack 的约 -14% 计作算法收益。
+
+131068 组全部 inline 值/预算/坏帧/packed 差分、完整库 race/checkptr/官方对照、vet、有限 Decode/Codec fuzz 及 GSR 三包/GoTS 7/7 通过。指针独占回归增加 inline 边界与存在的零值。诊断、最终与筛选数据、控制、复现及验证见 [Decode 诊断与验收](benchmarks/2026-10-17-gosproto-decode-analysis/RESULTS.md)。新增实现、测试和文档未提交/发布，正式依赖仍为 v0.4.0。

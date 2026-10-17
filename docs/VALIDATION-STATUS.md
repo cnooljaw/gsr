@@ -4,11 +4,19 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## Decode 同分配诊断与安全 inline（2026-10-17）
+
+前轮已本地提交为 gosproto `d66644a`、GSR `acfb070`，GSR 补丁格式属性修正为 `ae2e1bc`，均未推送。先做同分配的固定 Item 构造/赋值诊断，再仅为已确认的 inline 原生 *int64 省去重复分派；仍用安全反射赋值，未新增 unsafe、API、池或缓存。
+
+129 项五轮中，大型 Decode/PDecode 约 -5.3%/-4.1%，小型约 -4.6%/-3.1%，分配不变。原三轮明显波动、完整矩阵极小零段约 +13% 与 A/A 复核分别保留，未改 Unpack 的耗时差异不称为算法收益。固定 Item 类型化探针不冒充通用 decoder。
+
+131068 组旧新差分覆盖全部合法 inline 值、低预算、迟到坏帧及 packed 路径；扩展既有指针独占回归覆盖 0/1/32766/32767/MaxInt64。完整库 race/严格 checkptr（固定官方 C/Lua oracle）、vet、Decode/Codec 各约十秒 fuzz、GSR 临时覆盖三包与 Go/TS Plain/MAC 集成 7/7、零跳过通过。未重复 GSR 全仓/race、TS 性能或跨平台运行。数据和具体范围见 [Decode 验收](benchmarks/2026-10-17-gosproto-decode-analysis/RESULTS.md)，新增实现、测试和文档未提交。
+
 ## 普通 Unpack 候选筛选（2026-10-16）
 
 上一轮已本地提交为 gosproto `22e287e`、GSR `1af93f4`，未推送。五个位置/计数表与游标候选各做 129 项三轮配对，共 1935 样本，均因稀疏回退或真实组合收益不足撤回；所有 Go 生产源码恢复为 `22e287e`，没有新的性能验收结论。
 
-只保留 TestPack 新增的 2048 组独立预期字节与偏移回归，已在未改生产代码时通过。复现副本的全部 Go 源码、七份 harness 和三份 JSON 指纹与实测一致。生产代码恢复后未重复全仓/race/vet/fuzz、GSR 集成或 TS 性能；额外采集三项基线 CPU/分配 profile，kevent 样本保留且不归于业务成本。数据、候选补丁与范围见 [筛选记录](benchmarks/2026-10-16-gosproto-unpack-candidates/RESULTS.md)。新增测试和文档未提交，正式依赖仍为 v0.4.0。
+只保留 TestPack 新增的 2048 组独立预期字节与偏移回归，已在未改生产代码时通过。复现副本的全部 Go 源码、七份 harness 和三份 JSON 指纹与实测一致。生产代码恢复后未重复全仓/race/vet/fuzz、GSR 集成或 TS 性能；额外采集三项基线 CPU/分配 profile，kevent 样本保留且不归于业务成本。数据、候选补丁与范围见 [筛选记录](benchmarks/2026-10-16-gosproto-unpack-candidates/RESULTS.md)。已本地提交为 gosproto `d66644a`、GSR `acfb070`，补丁格式属性修正为 `ae2e1bc`；未发布，正式依赖仍为 v0.4.0。
 
 ## 连续零 mask 有界解包（2026-10-16）
 
