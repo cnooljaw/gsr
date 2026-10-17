@@ -165,4 +165,6 @@ SPROTO_ORACLE_DIR=/path/to/pinned/sproto \
 
 脚本先验证 `oracle-source.json` 的六份源码哈希，再用官方 C/Lua 编码五组数据，与固定签名比较。可加 `--output /absolute/file.json` 导出独立证据；Go 侧可设 `GSR_BENCH_EXPORT_WIRE=/absolute/file.json` 运行夹具测试导出独立签名。两种导出都不自动覆盖 `representative.json`，更新夹具时应先比较独立结果再审查变更。
 
-[原生整数 Decode 受控写入](../../../docs/benchmarks/2026-10-17-gosproto-decode-store/RESULTS.md) 记录私有 helper 封装后的五轮新采样：大型 Decode/PDecode 约 -7.4%/-5.9%，分配不变，完整矩阵/A/A 控制和 GC/布局验收一并保留。本轮工作树待审查，正式依赖仍为 v0.4.0。
+[原生整数 Decode 受控写入](../../../docs/benchmarks/2026-10-17-gosproto-decode-store/RESULTS.md) 记录私有 helper 封装后的五轮新采样：大型 Decode/PDecode 约 -7.4%/-5.9%，分配不变，完整矩阵/A/A 控制和 GC/布局验收一并保留。该切片已本地提交为 gosproto `fc3246a`、GSR `862fa8b`，正式依赖仍为 v0.4.0。
+
+[Decode 入口与普通 mask 候选筛选](../../../docs/benchmarks/2026-10-17-gosproto-decode-binding/RESULTS.md) 保存三个入口写法与固定八字节恢复的 918 个筛选样本。四个候选全部未采用；新增基线 profile、mask 分布和独立 FF 后继回归，未改生产代码或正式依赖，新记录待审查。

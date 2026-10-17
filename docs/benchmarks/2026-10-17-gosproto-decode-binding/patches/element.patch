@@ -1,0 +1,11 @@
+--- a/decode_pointer.go
++++ b/decode_pointer.go
+@@ -12,7 +12,7 @@
+ }
+ 
+ func messageDecodePointer(schema *SprotoType, value reflect.Value) decodePointer {
+-	if !schema.nativeInt64Pointer || value.Type().Elem() != schema.typ {
++	if !schema.nativeInt64Pointer || value.Elem().Type() != schema.typ {
+ 		return decodePointer{}
+ 	}
+ 	return decodePointer{value: value.UnsafePointer()}

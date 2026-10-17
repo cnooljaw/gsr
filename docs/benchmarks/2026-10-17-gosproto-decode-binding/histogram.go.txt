@@ -1,0 +1,46 @@
+package benchmarks
+
+import (
+ "encoding/json"
+ "math/bits"
+ "testing"
+ before "github.com/cnooljaw/gosproto-before"
+)
+
+// 只统计固定 body wire 的 mask 形态，不进行性能计时。
+func TestWireMaskHistogram(t *testing.T) {
+ type histogram struct {
+  Name string `json:"name"`
+  BodyBytes int `json:"bodyBytes"`
+  PackedBytes int `json:"packedBytes"`
+  ZeroWords int `json:"zeroWords"`
+  FFSegments int `json:"ffSegments"`
+  FFWords int `json:"ffWords"`
+  Ordinary [8]int `json:"ordinaryByNonzeroByteCount"`
+ }
+ var all []histogram
+ for _,sample:=range representativeCases(t) {
+  _,wires:=representativeOperations(t,sample)
+  body:=wires["sproto_encode"]
+  packed:=before.Pack(body)
+  row:=histogram{Name:sample.Name,BodyBytes:len(body),PackedBytes:len(packed)}
+  for cursor:=0;cursor<len(packed); {
+   header:=packed[cursor];cursor++
+   switch header {
+   case 0:row.ZeroWords++
+   case 255:
+    if cursor>=len(packed){t.Fatal("missing FF length")}
+    words:=int(packed[cursor])+1;cursor++
+    if words*8>len(packed)-cursor{t.Fatal("truncated FF block")}
+    row.FFSegments++;row.FFWords+=words;cursor+=words*8
+   default:
+    count:=bits.OnesCount8(header)
+    if count>len(packed)-cursor{t.Fatal("truncated ordinary word")}
+    row.Ordinary[count]++;cursor+=count
+   }
+  }
+  all=append(all,row)
+ }
+ data,err:=json.Marshal(all);if err!=nil{t.Fatal(err)}
+ t.Log("MASK_HISTOGRAM "+string(data))
+}

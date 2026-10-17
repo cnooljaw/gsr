@@ -1,0 +1,64 @@
+goos: darwin
+goarch: arm64
+pkg: encoderbench
+cpu: Apple M2
+BenchmarkPairedUnpacking/addressbook/before_unpack         	   60000	       157.3 ns/op	     144 B/op	       1 allocs/op
+BenchmarkPairedUnpacking/addressbook/before_pdecode        	   60000	      1226 ns/op	     672 B/op	      30 allocs/op
+BenchmarkPairedUnpacking/addressbook/before_decode         	   60000	      1012 ns/op	     528 B/op	      29 allocs/op
+BenchmarkPairedUnpacking/addressbook/protobuf_decode       	   60000	       823.0 ns/op	     648 B/op	      26 allocs/op
+BenchmarkPairedUnpacking/addressbook/sproto_decode         	   60000	      1012 ns/op	     528 B/op	      29 allocs/op
+BenchmarkPairedUnpacking/addressbook/sproto_unpack         	   60000	       173.0 ns/op	     144 B/op	       1 allocs/op
+BenchmarkPairedUnpacking/addressbook/sproto_pdecode        	   60000	      1208 ns/op	     672 B/op	      30 allocs/op
+BenchmarkPairedUnpacking/game_small/before_unpack          	   60000	       484.6 ns/op	     352 B/op	       1 allocs/op
+BenchmarkPairedUnpacking/game_small/before_pdecode         	   60000	      2124 ns/op	    1552 B/op	      53 allocs/op
+BenchmarkPairedUnpacking/game_small/before_decode          	   60000	      1604 ns/op	    1200 B/op	      52 allocs/op
+BenchmarkPairedUnpacking/game_small/protobuf_decode        	   60000	      1627 ns/op	    1208 B/op	      53 allocs/op
+BenchmarkPairedUnpacking/game_small/sproto_decode          	   60000	      1569 ns/op	    1200 B/op	      52 allocs/op
+BenchmarkPairedUnpacking/game_small/sproto_unpack          	   60000	       453.2 ns/op	     352 B/op	       1 allocs/op
+BenchmarkPairedUnpacking/game_small/sproto_pdecode         	   60000	      2113 ns/op	    1552 B/op	      53 allocs/op
+BenchmarkPairedUnpacking/game_large/before_unpack          	   60000	      5000 ns/op	    3456 B/op	       1 allocs/op
+BenchmarkPairedUnpacking/game_large/before_pdecode         	   60000	     21455 ns/op	   13872 B/op	     533 allocs/op
+BenchmarkPairedUnpacking/game_large/before_decode          	   60000	     15266 ns/op	   10416 B/op	     532 allocs/op
+BenchmarkPairedUnpacking/game_large/protobuf_decode        	   60000	     17862 ns/op	   13560 B/op	     537 allocs/op
+BenchmarkPairedUnpacking/game_large/sproto_decode          	   60000	     15360 ns/op	   10416 B/op	     532 allocs/op
+BenchmarkPairedUnpacking/game_large/sproto_unpack          	   60000	      5001 ns/op	    3456 B/op	       1 allocs/op
+BenchmarkPairedUnpacking/game_large/sproto_pdecode         	   60000	     21539 ns/op	   13872 B/op	     533 allocs/op
+BenchmarkPairedUnpacking/int32_edges/before_unpack         	   60000	      5672 ns/op	    4096 B/op	       1 allocs/op
+BenchmarkPairedUnpacking/int32_edges/before_pdecode        	   60000	      7909 ns/op	   12384 B/op	       5 allocs/op
+BenchmarkPairedUnpacking/int32_edges/before_decode         	   60000	      2351 ns/op	    8288 B/op	       4 allocs/op
+BenchmarkPairedUnpacking/int32_edges/protobuf_decode       	   60000	      4664 ns/op	    4160 B/op	       2 allocs/op
+BenchmarkPairedUnpacking/int32_edges/sproto_decode         	   60000	      2399 ns/op	    8288 B/op	       4 allocs/op
+BenchmarkPairedUnpacking/int32_edges/sproto_unpack         	   60000	      5468 ns/op	    4096 B/op	       1 allocs/op
+BenchmarkPairedUnpacking/int32_edges/sproto_pdecode        	   60000	      7720 ns/op	   12384 B/op	       5 allocs/op
+BenchmarkPairedUnpacking/echo_ascii4k/before_unpack        	   60000	       534.8 ns/op	    4864 B/op	       1 allocs/op
+BenchmarkPairedUnpacking/echo_ascii4k/before_pdecode       	   60000	      1195 ns/op	    9040 B/op	       6 allocs/op
+BenchmarkPairedUnpacking/echo_ascii4k/before_decode        	   60000	       640.4 ns/op	    4176 B/op	       5 allocs/op
+BenchmarkPairedUnpacking/echo_ascii4k/protobuf_decode      	   60000	       585.8 ns/op	    4160 B/op	       3 allocs/op
+BenchmarkPairedUnpacking/echo_ascii4k/sproto_decode        	   60000	       643.1 ns/op	    4176 B/op	       5 allocs/op
+BenchmarkPairedUnpacking/echo_ascii4k/sproto_unpack        	   60000	       522.7 ns/op	    4864 B/op	       1 allocs/op
+BenchmarkPairedUnpacking/echo_ascii4k/sproto_pdecode       	   60000	      1136 ns/op	    9040 B/op	       6 allocs/op
+BenchmarkPairedUnpackEcho/ascii32/before_payload           	   60000	       152.9 ns/op	     112 B/op	       5 allocs/op
+BenchmarkPairedUnpackEcho/ascii32/sproto_payload           	   60000	       166.1 ns/op	     112 B/op	       5 allocs/op
+BenchmarkPairedUnpackEcho/ascii32/protobuf_payload         	   60000	       101.9 ns/op	      96 B/op	       2 allocs/op
+BenchmarkPairedUnpackEcho/ascii32/before_frame             	   60000	       371.1 ns/op	     256 B/op	      11 allocs/op
+BenchmarkPairedUnpackEcho/ascii32/sproto_frame             	   60000	       367.7 ns/op	     256 B/op	      11 allocs/op
+BenchmarkPairedUnpackEcho/ascii32/protobuf_frame           	   60000	       246.1 ns/op	     224 B/op	       4 allocs/op
+BenchmarkPairedUnpackEcho/utf8_1k/before_payload           	   60000	       280.7 ns/op	    1104 B/op	       5 allocs/op
+BenchmarkPairedUnpackEcho/utf8_1k/sproto_payload           	   60000	       280.1 ns/op	    1104 B/op	       5 allocs/op
+BenchmarkPairedUnpackEcho/utf8_1k/protobuf_payload         	   60000	      1374 ns/op	    1088 B/op	       2 allocs/op
+BenchmarkPairedUnpackEcho/utf8_1k/before_frame             	   60000	       619.4 ns/op	    2224 B/op	      11 allocs/op
+BenchmarkPairedUnpackEcho/utf8_1k/sproto_frame             	   60000	       618.8 ns/op	    2224 B/op	      11 allocs/op
+BenchmarkPairedUnpackEcho/utf8_1k/protobuf_frame           	   60000	      1623 ns/op	    2192 B/op	       4 allocs/op
+BenchmarkPairedUnpackEcho/ascii4k/before_payload           	   60000	       645.9 ns/op	    4176 B/op	       5 allocs/op
+BenchmarkPairedUnpackEcho/ascii4k/sproto_payload           	   60000	       656.2 ns/op	    4176 B/op	       5 allocs/op
+BenchmarkPairedUnpackEcho/ascii4k/protobuf_payload         	   60000	       979.7 ns/op	    4160 B/op	       2 allocs/op
+BenchmarkPairedUnpackEcho/ascii4k/before_frame             	   60000	      1378 ns/op	    9136 B/op	      11 allocs/op
+BenchmarkPairedUnpackEcho/ascii4k/sproto_frame             	   60000	      2146 ns/op	    9136 B/op	      11 allocs/op
+BenchmarkPairedUnpackEcho/ascii4k/protobuf_frame           	   60000	      1614 ns/op	    9104 B/op	       4 allocs/op
+BenchmarkPairedUnpackEcho/zeros4k/before_payload           	   60000	       645.4 ns/op	    4176 B/op	       5 allocs/op
+BenchmarkPairedUnpackEcho/zeros4k/sproto_payload           	   60000	       658.4 ns/op	    4176 B/op	       5 allocs/op
+BenchmarkPairedUnpackEcho/zeros4k/protobuf_payload         	   60000	       990.6 ns/op	    4160 B/op	       2 allocs/op
+BenchmarkPairedUnpackEcho/zeros4k/before_frame             	   60000	      1417 ns/op	    9136 B/op	      11 allocs/op
+BenchmarkPairedUnpackEcho/zeros4k/sproto_frame             	   60000	      1408 ns/op	    9136 B/op	      11 allocs/op
+BenchmarkPairedUnpackEcho/zeros4k/protobuf_frame           	   60000	      1578 ns/op	    9104 B/op	       4 allocs/op
+PASS

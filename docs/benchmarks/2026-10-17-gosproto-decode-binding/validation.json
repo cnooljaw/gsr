@@ -1,0 +1,50 @@
+{
+  "candidateScreen": {
+    "baseCommit": "fc3246a",
+    "rounds": 3,
+    "candidates": 4,
+    "samples": 918,
+    "test": "^TestRepresentativeFixtures$",
+    "allCommandsExitCode": 0,
+    "groups": {
+      "record": {
+        "operations": 59,
+        "samples": 177
+      },
+      "element": {
+        "operations": 59,
+        "samples": 177
+      },
+      "address": {
+        "operations": 59,
+        "samples": 177
+      },
+      "dense": {
+        "operations": 129,
+        "samples": 387
+      }
+    }
+  },
+  "formalProduction": "Every production .go file matches fc3246a. Only pack_test.go retained regression added after timings.",
+  "profiles": "profiles.json: fresh baseline CPU/alloc snapshots, separate from timings; verified full Go sources and existing binary before reuse.",
+  "reproduction": "All four prepare-only archive copies reconstructed exact recorded Go/harness/fixture hashes.",
+  "notRun": [
+    "Five-round acceptance / full 129-operation matrix (no candidate adopted)",
+    "Candidate full library/race/checkptr/fuzz/GoTS acceptance (no production changes)",
+    "GSR whole repository tests/race",
+    "New TS benchmarks"
+  ],
+  "scope": "Only retained diagnostics/docs. Previously committed fc3246a acceptance remains in preceding report, not claimed as new execution.",
+  "retainedTests": {
+    "baselineCommand": "go test -run '^TestPack$' . -timeout=1m",
+    "baselineExitCode": 0,
+    "baselineGoTestSeconds": 0.574,
+    "candidateCommand": "go test -run '^TestPack$' . -timeout=1m",
+    "candidateExitCode": 0,
+    "candidateOutput": "ok  \tgithub.com/cnooljaw/gosproto\t0.334s\n",
+    "candidateScope": "Separate dense-retained-tests copy; measured dense snapshot unchanged.",
+    "newCases": 2048,
+    "coverage": "All 256 masks with distinct bytes, following 0x81 word and independent FF word, eight input offsets. Adds ordinary/FF consumption checks and makes 3/4-byte masks have at least eight following bytes."
+  },
+  "maskHistogram": "histogram.json: separate harness against unchanged production; exit 0, no benchmark timing."
+}
