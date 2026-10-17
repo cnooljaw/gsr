@@ -1,0 +1,20 @@
+[
+  {
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-gcflags=all=-d=checkptr=2",
+      "./...",
+      "-timeout=2m"
+    ],
+    "cwd": "/private/tmp/gsr-gosproto-fork",
+    "env": {
+      "SPROTO_ORACLE_DIR": "/private/tmp/gsr-official-sproto-review",
+      "GOMAXPROCS": "2"
+    },
+    "exitCode": 1,
+    "elapsedSeconds": 3.873,
+    "output": "--- FAIL: TestEncodePackedAllocation (0.00s)\n    sproto_test.go:370: allocations=2, want at most one output allocation\nFAIL\nFAIL\tgithub.com/cnooljaw/gosproto\t1.868s\n?   \tgithub.com/cnooljaw/gosproto/examples/echo\t[no test files]\nFAIL\n"
+  }
+]

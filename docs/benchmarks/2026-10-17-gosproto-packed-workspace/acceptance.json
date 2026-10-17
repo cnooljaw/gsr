@@ -1,0 +1,111 @@
+[
+  {
+    "args": [
+      "go",
+      "test",
+      "./...",
+      "-timeout=2m"
+    ],
+    "cwd": "/private/tmp/gsr-gosproto-fork",
+    "env": {
+      "SPROTO_ORACLE_DIR": "/private/tmp/gsr-official-sproto-review"
+    },
+    "exitCode": 0,
+    "elapsedSeconds": 1.779,
+    "output": "ok  \tgithub.com/cnooljaw/gosproto\t0.718s\n?   \tgithub.com/cnooljaw/gosproto/examples/echo\t[no test files]\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-gcflags=all=-d=checkptr=2",
+      "./...",
+      "-timeout=2m"
+    ],
+    "cwd": "/private/tmp/gsr-gosproto-fork",
+    "env": {
+      "SPROTO_ORACLE_DIR": "/private/tmp/gsr-official-sproto-review",
+      "GOMAXPROCS": "2"
+    },
+    "exitCode": 0,
+    "elapsedSeconds": 2.501,
+    "output": "ok  \tgithub.com/cnooljaw/gosproto\t1.721s\n?   \tgithub.com/cnooljaw/gosproto/examples/echo\t[no test files]\n"
+  },
+  {
+    "args": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "cwd": "/private/tmp/gsr-gosproto-fork",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.269,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-run=^$",
+      "-fuzz=^FuzzPackRoundTrip$",
+      "-fuzztime=10s",
+      "-parallel=1",
+      "-timeout=30s"
+    ],
+    "cwd": "/private/tmp/gsr-gosproto-fork",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 12.361,
+    "output": "fuzz: elapsed: 0s, gathering baseline coverage: 0/46 completed\nfuzz: elapsed: 0s, gathering baseline coverage: 46/46 completed, now fuzzing with 1 workers\nfuzz: elapsed: 3s, execs: 44243 (14747/sec), new interesting: 2 (total: 48)\nfuzz: elapsed: 6s, execs: 44243 (0/sec), new interesting: 2 (total: 48)\nfuzz: elapsed: 9s, execs: 44243 (0/sec), new interesting: 2 (total: 48)\nfuzz: elapsed: 11s, execs: 44243 (0/sec), new interesting: 2 (total: 48)\nPASS\nok  \tgithub.com/cnooljaw/gosproto\t11.356s\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-run=^$",
+      "-fuzz=^FuzzCodecRoundTrip$",
+      "-fuzztime=10s",
+      "-parallel=1",
+      "-timeout=30s"
+    ],
+    "cwd": "/private/tmp/gsr-gosproto-fork",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 10.718,
+    "output": "fuzz: elapsed: 0s, gathering baseline coverage: 0/5 completed\nfuzz: elapsed: 0s, gathering baseline coverage: 5/5 completed, now fuzzing with 1 workers\nfuzz: elapsed: 3s, execs: 71465 (23814/sec), new interesting: 24 (total: 29)\nfuzz: elapsed: 6s, execs: 134553 (21033/sec), new interesting: 27 (total: 32)\nfuzz: elapsed: 9s, execs: 203882 (23109/sec), new interesting: 30 (total: 35)\nfuzz: elapsed: 10s, execs: 228585 (22443/sec), new interesting: 30 (total: 35)\nPASS\nok  \tgithub.com/cnooljaw/gosproto\t10.305s\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-modfile=/private/tmp/gsr-next-codec.mod",
+      "./protocol/sproto",
+      "./examples/websocket-gate/cmd/debugserver",
+      "./examples/websocket-gate/benchmarks",
+      "-timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 1.72,
+    "output": "ok  \tgithub.com/cnooljaw/gsr/protocol/sproto\t0.345s\nok  \tgithub.com/cnooljaw/gsr/examples/websocket-gate/cmd/debugserver\t0.396s\nok  \tgithub.com/cnooljaw/gsr/examples/websocket-gate/benchmarks\t0.718s\n"
+  },
+  {
+    "args": [
+      "npm",
+      "--prefix",
+      "examples/websocket-gate",
+      "run",
+      "test:sproto:integration"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {
+      "GOFLAGS": "-modfile=/private/tmp/gsr-next-codec.mod"
+    },
+    "exitCode": 0,
+    "elapsedSeconds": 2.895,
+    "output": "\n> test:sproto:integration\n> npm run build && go build -o ../../tmp/sproto-echo ./cmd/debugserver && GSR_SPROTO_SERVER_BIN=../../tmp/sproto-echo node --test client/dist/sproto_client.test.js\n\n\n> build\n> tsc --project tsconfig.json\n\n✔ official Sproto vectors and safe integer boundary (2.142791ms)\n✔ official Sproto boolean and mixed signed int64 arrays (125.8275ms)\n✔ Sproto decoded results and unpacked buffers stay independent (4.593125ms)\n✔ Sproto sessions stay independent and close clears pending (1.27975ms)\n✔ Sproto pending and packet limits (67.505958ms)\n✔ Go/TS Sproto Echo Plain (403.699833ms)\n✔ Go/TS Sproto Echo MAC (46.4075ms)\nℹ tests 7\nℹ suites 0\nℹ pass 7\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 810.538708\n"
+  }
+]

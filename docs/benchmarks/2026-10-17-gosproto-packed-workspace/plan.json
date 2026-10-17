@@ -1,0 +1,20 @@
+{
+  "baselineCommit": "d1ab622",
+  "candidate": "private shifted workspace for EncodePacked",
+  "publicAPIChanges": false,
+  "runtimeContract": "Encode, Pack and Decode unchanged externally; EncodePacked output exact wire/length/cap and ownership unchanged. Default preflight byte/depth/element limits and errors preserved. No pool/unsafe/cache/borrowed output.",
+  "correctness": "First add API wire/cap/ownership/error/boundary tests and one-buffer flat-message allocation regression; observe allocation regression failing before implementation. Add overlap to existing Pack fuzz and composition to existing Codec fuzz.",
+  "benchmark": {
+    "blockMs": 10,
+    "runs": [
+      "self",
+      "clone",
+      "pass1",
+      "pass2"
+    ],
+    "cases": "all original 19 business Encode/Pack/PEncode and full Echo frames",
+    "candidateFixedBeforeTiming": true
+  },
+  "assessment": "No minimum benefit percentage. Check allocation removal and stable business improvements, standalone Encode/Pack overhead, A/A and round direction. Keep unresolved items visible; no retries to pass.",
+  "scope": "One bounded implementation slice; Decode remains frozen; no dependency upgrade, new public API, commit or release."
+}

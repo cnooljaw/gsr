@@ -32,6 +32,8 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 
 上述撤回为旧标准下的历史判断。按用户裁决取消统一最低收益比例后，[两轮复评](../../../docs/benchmarks/2026-10-17-gosproto-pack-reassessment/RESULTS.md) 保留稀疏展开与 FF 段分离组合，真实业务的小幅累计收益与合成形态代价分别披露，库/GoTS 接线验收通过。工具的原始标记保持不变，当前工程判断以复评报告为准；新代码和记录待审查。
 
+上一切片已提交为 gosproto d1ab622 / GSR d3b3ef4。后续 [EncodePacked 工作区](../../../docs/benchmarks/2026-10-17-gosproto-packed-workspace/RESULTS.md) 在 API 不变的前提下省一次分配；两轮原 19 项同时检查公共 Encode/Pack 和手工帧。body PEncode 改善不等同于 RPC/完整帧改善，32 B 帧的小幅代价单列披露；新实现与记录待审查。
+
 ## 比较口径
 
 `cases.json` 是两种语言共用的消息内容：32 字节 ASCII、1000 字节 UTF-8、4096 字节 ASCII 和 4096 字节零字节文本。每条消息均是现有 EchoRequest 的一个 text 字段，复用现有 Protobuf 生成物与 Go Sproto 生成物。`echo.sproto` 仅把现有 echo.request 的同一字段布局命名为 EchoRequest，便于 TS 单独测量 payload；TS 在计时前核对其应用帧与真实 SprotoEchoClient 输出一致。

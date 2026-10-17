@@ -183,3 +183,5 @@ Decode 性能阶段已按用户决定冻结于独立库 `a09fb00`（Decode 生�
 后续 FF 段集中处理候选通过既有字节/边界与 17984 组差分，但未达到预设性能及控制要求，已撤回。固定三模式共 1728 块，见 [FF 段实验](benchmarks/2026-10-17-gosproto-pack-runs/RESULTS.md)，新记录待审查。正式库、依赖与 Decode 阶段基线不变，未重复接线验收。
 
 用户随后修正统一收益淘汰线，稀疏展开与 FF 段分离重新进行两轮独立业务复测、前后控制及固定形态检查，组合保留到 gosproto 工作树。大型/整数数组 PEncode 两轮分别约快 3.72%～4.24% / 2.83%～3.04%，零字节完整帧约快 20%；合成四非零字节形态的约 3.33% 代价单列披露。最终库官方对照、race/checkptr/vet/fuzz、临时 modfile 三包及 Go/TS Plain/MAC 7/7 通过，见 [复评记录](benchmarks/2026-10-17-gosproto-pack-reassessment/RESULTS.md)。实现与记录未提交，正式依赖仍为 v0.4.0，Decode 冻结。
+
+上述切片已本地提交为 gosproto d1ab622 / GSR d3b3ef4，未推送。后续仅优化 EncodePacked 私有工作区，省去中间字节分配；两轮 body PEncode 改善及 32 B 手工帧约 7～9 ns 代价分别披露，不将组合入口收益当成 RPC 帧收益。最终库官方对照、普通/race/checkptr/vet/fuzz、GSR 三包与 Go/TS 7/7 通过，见 [工作区报告](benchmarks/2026-10-17-gosproto-packed-workspace/RESULTS.md)。新实现待审查，正式依赖和 Decode 基线不变。

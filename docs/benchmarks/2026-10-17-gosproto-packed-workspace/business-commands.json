@@ -1,0 +1,86 @@
+[
+  {
+    "args": [
+      "python3",
+      "-B",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/examples/websocket-gate/benchmarks/tools/go-pairs/run.py",
+      "--library",
+      "/private/tmp/gsr-gosproto-fork",
+      "--baseline",
+      "d1ab622",
+      "--mode",
+      "self",
+      "--block-ms",
+      "10",
+      "--output",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-packed-workspace/business/self"
+    ],
+    "exitCode": 0,
+    "elapsedSeconds": 22.731,
+    "output": "addressbook/sproto_encode: +0.25%; IQR 2.17pp; control=True\naddressbook/sproto_pack: -0.51%; IQR 0.67pp; control=True\naddressbook/sproto_pencode: +1.26%; IQR 2.73pp; control=True\ngame_small/sproto_encode: +0.02%; IQR 1.45pp; control=True\ngame_small/sproto_pack: +0.25%; IQR 0.96pp; control=True\ngame_small/sproto_pencode: -0.33%; IQR 1.49pp; control=True\ngame_large/sproto_encode: -0.43%; IQR 0.15pp; control=True\ngame_large/sproto_pack: +0.87%; IQR 4.38pp; control=False\ngame_large/sproto_pencode: -0.59%; IQR 0.68pp; control=True\nint32_edges/sproto_encode: +0.00%; IQR 0.59pp; control=True\nint32_edges/sproto_pack: -0.02%; IQR 2.38pp; control=True\nint32_edges/sproto_pencode: -1.13%; IQR 4.53pp; control=False\necho_ascii4k/sproto_encode: +0.72%; IQR 0.81pp; control=True\necho_ascii4k/sproto_pack: -1.53%; IQR 2.62pp; control=True\necho_ascii4k/sproto_pencode: -0.54%; IQR 0.98pp; control=True\nascii32/frame: -0.44%; IQR 1.01pp; control=True\nutf8_1k/frame: -0.39%; IQR 6.62pp; control=False\nascii4k/frame: +0.58%; IQR 1.11pp; control=True\nzeros4k/frame: -0.60%; IQR 2.36pp; control=False\n"
+  },
+  {
+    "args": [
+      "python3",
+      "-B",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/examples/websocket-gate/benchmarks/tools/go-pairs/run.py",
+      "--library",
+      "/private/tmp/gsr-gosproto-fork",
+      "--baseline",
+      "d1ab622",
+      "--mode",
+      "clone",
+      "--block-ms",
+      "10",
+      "--output",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-packed-workspace/business/clone"
+    ],
+    "exitCode": 0,
+    "elapsedSeconds": 22.471,
+    "output": "addressbook/sproto_encode: -0.63%; IQR 1.95pp; control=True\naddressbook/sproto_pack: +0.07%; IQR 0.79pp; control=True\naddressbook/sproto_pencode: +1.71%; IQR 0.62pp; control=True\ngame_small/sproto_encode: -0.64%; IQR 1.07pp; control=True\ngame_small/sproto_pack: -0.08%; IQR 1.19pp; control=True\ngame_small/sproto_pencode: +1.76%; IQR 1.36pp; control=True\ngame_large/sproto_encode: -1.43%; IQR 0.39pp; control=True\ngame_large/sproto_pack: -0.39%; IQR 0.95pp; control=True\ngame_large/sproto_pencode: -1.35%; IQR 0.45pp; control=True\nint32_edges/sproto_encode: -1.54%; IQR 0.79pp; control=True\nint32_edges/sproto_pack: -1.50%; IQR 0.17pp; control=True\nint32_edges/sproto_pencode: -0.08%; IQR 1.02pp; control=True\necho_ascii4k/sproto_encode: -0.20%; IQR 1.34pp; control=True\necho_ascii4k/sproto_pack: +1.00%; IQR 2.50pp; control=False\necho_ascii4k/sproto_pencode: -0.38%; IQR 0.57pp; control=True\nascii32/frame: -0.55%; IQR 0.92pp; control=True\nutf8_1k/frame: -0.26%; IQR 0.45pp; control=True\nascii4k/frame: +0.67%; IQR 2.20pp; control=False\nzeros4k/frame: -0.21%; IQR 1.23pp; control=False\n"
+  },
+  {
+    "args": [
+      "python3",
+      "-B",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/examples/websocket-gate/benchmarks/tools/go-pairs/run.py",
+      "--library",
+      "/private/tmp/gsr-gosproto-fork",
+      "--baseline",
+      "d1ab622",
+      "--mode",
+      "compare",
+      "--block-ms",
+      "10",
+      "--output",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-packed-workspace/business/pass1",
+      "--candidate-patch",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-17-gosproto-packed-workspace/candidate.patch"
+    ],
+    "exitCode": 0,
+    "elapsedSeconds": 23.227,
+    "output": "addressbook/sproto_encode: -0.61%; IQR 1.84pp; control=None\naddressbook/sproto_pack: -0.63%; IQR 2.34pp; control=None\naddressbook/sproto_pencode: -7.12%; IQR 1.57pp; control=None\ngame_small/sproto_encode: -1.11%; IQR 1.07pp; control=None\ngame_small/sproto_pack: -0.27%; IQR 0.34pp; control=None\ngame_small/sproto_pencode: -6.62%; IQR 0.67pp; control=None\ngame_large/sproto_encode: -0.05%; IQR 0.29pp; control=None\ngame_large/sproto_pack: -1.39%; IQR 2.45pp; control=None\ngame_large/sproto_pencode: -4.82%; IQR 0.41pp; control=None\nint32_edges/sproto_encode: +0.75%; IQR 1.89pp; control=None\nint32_edges/sproto_pack: -0.81%; IQR 0.30pp; control=None\nint32_edges/sproto_pencode: -9.46%; IQR 2.49pp; control=None\necho_ascii4k/sproto_encode: -0.47%; IQR 2.14pp; control=None\necho_ascii4k/sproto_pack: -0.89%; IQR 2.74pp; control=None\necho_ascii4k/sproto_pencode: -40.03%; IQR 1.29pp; control=None\nascii32/frame: +3.07%; IQR 0.60pp; control=None\nutf8_1k/frame: +0.39%; IQR 1.32pp; control=None\nascii4k/frame: +0.75%; IQR 2.59pp; control=None\nzeros4k/frame: +0.02%; IQR 2.01pp; control=None\n"
+  },
+  {
+    "args": [
+      "python3",
+      "-B",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/examples/websocket-gate/benchmarks/tools/go-pairs/run.py",
+      "--library",
+      "/private/tmp/gsr-gosproto-fork",
+      "--baseline",
+      "d1ab622",
+      "--mode",
+      "compare",
+      "--block-ms",
+      "10",
+      "--output",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-packed-workspace/business/pass2",
+      "--candidate-patch",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-17-gosproto-packed-workspace/candidate.patch"
+    ],
+    "exitCode": 0,
+    "elapsedSeconds": 23.395,
+    "output": "addressbook/sproto_encode: -0.27%; IQR 0.97pp; control=None\naddressbook/sproto_pack: +0.05%; IQR 0.76pp; control=None\naddressbook/sproto_pencode: -6.20%; IQR 0.85pp; control=None\ngame_small/sproto_encode: +0.90%; IQR 10.16pp; control=None\ngame_small/sproto_pack: -0.40%; IQR 1.33pp; control=None\ngame_small/sproto_pencode: -6.86%; IQR 1.32pp; control=None\ngame_large/sproto_encode: -1.83%; IQR 0.53pp; control=None\ngame_large/sproto_pack: -0.15%; IQR 1.55pp; control=None\ngame_large/sproto_pencode: -5.52%; IQR 1.63pp; control=None\nint32_edges/sproto_encode: -0.28%; IQR 1.26pp; control=None\nint32_edges/sproto_pack: +0.94%; IQR 0.71pp; control=None\nint32_edges/sproto_pencode: -9.70%; IQR 0.64pp; control=None\necho_ascii4k/sproto_encode: +0.86%; IQR 2.08pp; control=None\necho_ascii4k/sproto_pack: +1.85%; IQR 1.11pp; control=None\necho_ascii4k/sproto_pencode: -40.71%; IQR 1.03pp; control=None\nascii32/frame: +2.25%; IQR 1.39pp; control=None\nutf8_1k/frame: +0.15%; IQR 1.31pp; control=None\nascii4k/frame: -1.33%; IQR 2.46pp; control=None\nzeros4k/frame: +1.48%; IQR 1.27pp; control=None\n"
+  }
+]

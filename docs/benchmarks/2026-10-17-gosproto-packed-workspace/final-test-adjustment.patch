@@ -1,0 +1,29 @@
+--- a/sproto_test.go
++++ b/sproto_test.go
+@@ -355,7 +355,7 @@
+ 	}
+ }
+ 
+-// 简单消息的 EncodePacked 只需一个独占字节缓冲，避免重新引入中间编码分配。
++// EncodePacked 比分步 Encode/Pack 少一次缓冲分配；相对比较也适用于检查插桩构建。
+ func TestEncodePackedAllocation(t *testing.T) {
+ 	input := &packedBufferMessage{Payload: bytes.Repeat([]byte{0x91}, 256)}
+ 	var packed []byte
+@@ -366,8 +366,15 @@
+ 			t.Fatal(err)
+ 		}
+ 	})
+-	if len(packed) == 0 || allocations > 1 {
+-		t.Fatalf("allocations=%v, want at most one output allocation", allocations)
++	separate := testing.AllocsPerRun(100, func() {
++		encoded, err := Encode(input)
++		if err != nil {
++			t.Fatal(err)
++		}
++		packed = Pack(encoded)
++	})
++	if len(packed) == 0 || separate-allocations != 1 {
++		t.Fatalf("combined=%v separate=%v, want one fewer allocation", allocations, separate)
+ 	}
+ }
+ 
