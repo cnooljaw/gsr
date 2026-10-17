@@ -6,7 +6,7 @@
 
 前两轮以已发布的 gosproto v0.4.0 为版本基线；下一轮从已提交的 `6012b06` 做增量，不从 v0.4.0 重复实施。实现改动应在独立 gosproto 仓库进行，GSR 提供真实接线和跨语言 Benchmark；不修改 Go module cache，也不将库源码复制到 GSR。
 
-当前切片（2026-10-18）：通知单缓冲已本地提交为 gosproto 0988af0 / GSR 9876a5b，见第 32 节，未推送。后续融合有响应请求，在锁外完成预检/写出、登记后Pack，重复session仍返回限长限容raw body。成功收益、失败工作区成本及共用writer代价见第 33 节，新修改未提交。正式 GSR 依赖仍为 v0.4.0，Decode 阶段性冻结。
+当前切片（2026-10-18）：有响应请求融合已本地提交为 gosproto 6d854d1 / GSR f715e6b，见第 33 节，未推送。后续只刷新融合后的八条body/RPC编码profile，定位记录数组遍历、整数数组写出/Pack与512 B布局外溢，见第 34 节；生产代码未改，诊断记录未提交。正式 GSR 依赖仍为 v0.4.0，Decode阶段性冻结。
 
 ## 1. 目标与证据
 
@@ -436,4 +436,12 @@ RequestEncode改用局部header值，避免字段指针赋值使session副本保
 
 失败路径现在先分配完整workspace，重复返回body仍保留底层header/slack；独立72窗口分配诊断显示32 B输入invalid/full为48→64 B，MaxInt32重复缓冲尺寸级别48→80 B，fmt池/GC尾差不归为确定新增对象。接受并披露失败成本，不以cap相同声称底层字节完全不变。
 
-既有1008组成功用例扩展504组重复raw body/cap/独占，补typed nil请求优先于session错误；语义在旧实现先通过，分配旧2对1失败、新普通/race通过。库全测/官方C-Lua/race/checkptr/vet、3078固定RPC差分/12312帧、Pack/Codec各10秒有限fuzz（3946/464565次）、GSR三包和Go/TS 7/7通过，源码/归档一致。Pack后段计数不增长如实保留，未凑随机次数。新代码/记录未提交，见 [请求工作区报告](benchmarks/2026-10-18-gosproto-request-workspace/RESULTS.md)。后续先重采当前profile再选热点，正式依赖仍v0.4.0，Decode继续冻结。
+既有1008组成功用例扩展504组重复raw body/cap/独占，补typed nil请求优先于session错误；语义在旧实现先通过，分配旧2对1失败、新普通/race通过。库全测/官方C-Lua/race/checkptr/vet、3078固定RPC差分/12312帧、Pack/Codec各10秒有限fuzz（3946/464565次）、GSR三包和Go/TS 7/7通过，源码/归档一致。Pack后段计数不增长如实保留，未凑随机次数。该切片已本地提交为 gosproto 6d854d1 / GSR f715e6b，未推送，见 [请求工作区报告](benchmarks/2026-10-18-gosproto-request-workspace/RESULTS.md)。后续先重采当前profile再选热点，正式依赖仍v0.4.0，Decode继续冻结。
+
+## 34. 融合后的 CPU 与分配热点刷新
+
+从6d854d1归档分别采集32 B ASCII、大型游戏、896整数数组、4 KiB ASCII的EncodePacked与RequestEncode+CancelSession，共八条路径。CPU各一次2秒；逐次分配另起进程各20000次，GC开启，不重试、混用插桩耗时或形成新PB/TS排名。独立harness的夹具/统计/选择用例、vet、构建及16次采样通过，归档重建/源码/二进制/profile指纹一致。模块replace绝对路径只规范化输出目录后比较，原始哈希仍各自保留；库工作树保持干净，未重复生产库/GoTS验收。
+
+大型消息的整数记录预检/写出累计份额各约19%/22%～24%，其内已用受验证offset读*int64，不能简单归咎于逐字段反射；Pack约18%～20%。整数数组Pack约29%～34%、encodeInt64Slice约23%～27%，下一轮先单独核对连续游标/固定宽度写出的BCE与汇编，再配对实测；不同时改Pack或记录遍历。小包仍有schema查询/通用遍历成本，但不为此改pending语义或新建codec API。
+
+大型分配仍为3968 B/2次（3456 B输出尺寸级别+512 B布局外溢），其他三项各一次最终buffer，header/session及中间body已不是分配主因。4 KiB ASCII的kevent归因达56%～64%，沿GC阶段栈出现，成因未确定，不作为算法排名或收益上限。累计父子份额不相加，profile耗时不作为配对基线；全部原值保留，见 [融合后热点报告](benchmarks/2026-10-18-gosproto-post-fusion-profile/RESULTS.md)。本轮只新增诊断与文档，未提交；正式依赖、Decode及生产实现不变。

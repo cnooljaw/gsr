@@ -1,0 +1,1350 @@
+{
+  "scope": "diagnostic sample attribution only; no paired timing/speedup claims",
+  "cpuDenominator": "all original process CPU samples; missing top40 row is not zero; nested cumulative percentages cannot be summed",
+  "rows": [
+    {
+      "case": "ascii32",
+      "entry": "packed_body",
+      "functionsInTop40": {
+        "codecpairstool.BenchmarkCurrentEncoding.func1.1": {
+          "flatPct": 0.85,
+          "cumPct": 89.41
+        },
+        "testing.(*B).run1.func1": {
+          "flatPct": 0.0,
+          "cumPct": 89.41
+        },
+        "testing.(*B).runN": {
+          "flatPct": 0.0,
+          "cumPct": 89.41
+        },
+        "github.com/cnooljaw/gosproto.EncodePacked": {
+          "flatPct": 1.27,
+          "cumPct": 87.29
+        },
+        "github.com/cnooljaw/gosproto.encodeWithLimits": {
+          "flatPct": 0.42,
+          "cumPct": 86.02
+        },
+        "github.com/cnooljaw/gosproto.encodeBufferWithLimits": {
+          "flatPct": 4.24,
+          "cumPct": 75.42
+        },
+        "github.com/cnooljaw/gosproto.encodeMessageInto": {
+          "flatPct": 5.93,
+          "cumPct": 19.49
+        },
+        "github.com/cnooljaw/gosproto.encodedSize": {
+          "flatPct": 6.36,
+          "cumPct": 15.68
+        },
+        "runtime.systemstack": {
+          "flatPct": 0.0,
+          "cumPct": 14.41
+        },
+        "runtime.makeslice": {
+          "flatPct": 2.12,
+          "cumPct": 11.44
+        },
+        "github.com/cnooljaw/gosproto.GetSprotoType": {
+          "flatPct": 0.42,
+          "cumPct": 10.17
+        },
+        "github.com/cnooljaw/gosproto.packInto": {
+          "flatPct": 5.51,
+          "cumPct": 10.17
+        },
+        "runtime.mallocgc": {
+          "flatPct": 1.69,
+          "cumPct": 9.32
+        },
+        "runtime.kevent": {
+          "flatPct": 8.05,
+          "cumPct": 8.05
+        },
+        "runtime.mapaccess2": {
+          "flatPct": 0.85,
+          "cumPct": 8.05
+        },
+        "runtime.netpoll": {
+          "flatPct": 0.0,
+          "cumPct": 8.05
+        },
+        "runtime.startTheWorldWithSema": {
+          "flatPct": 0.0,
+          "cumPct": 8.05
+        },
+        "github.com/cnooljaw/gosproto.encodeScalarInto": {
+          "flatPct": 2.97,
+          "cumPct": 7.63
+        },
+        "github.com/cnooljaw/gosproto.getbase": {
+          "flatPct": 2.12,
+          "cumPct": 7.63
+        },
+        "reflect.Value.Elem": {
+          "flatPct": 6.78,
+          "cumPct": 6.78
+        },
+        "runtime.mallocgcSmallNoscan": {
+          "flatPct": 1.27,
+          "cumPct": 6.78
+        },
+        "runtime.gcStart.func4": {
+          "flatPct": 0.0,
+          "cumPct": 5.08
+        },
+        "github.com/cnooljaw/gosproto.fieldSize": {
+          "flatPct": 2.54,
+          "cumPct": 4.24
+        },
+        "internal/runtime/maps.(*Map).getWithKeySmall": {
+          "flatPct": 0.85,
+          "cumPct": 3.81
+        },
+        "reflect.(*rtype).Elem": {
+          "flatPct": 0.42,
+          "cumPct": 3.81
+        },
+        "reflect.Value.IsNil": {
+          "flatPct": 3.39,
+          "cumPct": 3.81
+        },
+        "reflect.Value.Field": {
+          "flatPct": 2.12,
+          "cumPct": 2.97
+        },
+        "runtime.(*mheap).alloc.func1": {
+          "flatPct": 0.0,
+          "cumPct": 2.97
+        },
+        "runtime.(*mheap).allocSpan": {
+          "flatPct": 0.0,
+          "cumPct": 2.97
+        },
+        "runtime.gcMarkTermination.func3": {
+          "flatPct": 0.0,
+          "cumPct": 2.97
+        },
+        "runtime.interhash": {
+          "flatPct": 0.85,
+          "cumPct": 2.97
+        },
+        "runtime.memmove": {
+          "flatPct": 2.97,
+          "cumPct": 2.97
+        },
+        "github.com/cnooljaw/gosproto.ffRunBytes": {
+          "flatPct": 2.54,
+          "cumPct": 2.54
+        },
+        "github.com/cnooljaw/gosproto.normalizeLimits": {
+          "flatPct": 2.54,
+          "cumPct": 2.54
+        },
+        "runtime.interequal": {
+          "flatPct": 1.27,
+          "cumPct": 2.54
+        },
+        "github.com/cnooljaw/gosproto.writeFF": {
+          "flatPct": 0.85,
+          "cumPct": 2.12
+        },
+        "reflect.toType": {
+          "flatPct": 2.12,
+          "cumPct": 2.12
+        },
+        "runtime.(*mcache).nextFree": {
+          "flatPct": 0.0,
+          "cumPct": 2.12
+        },
+        "runtime.(*mcache).refill": {
+          "flatPct": 0.0,
+          "cumPct": 2.12
+        },
+        "runtime.duffzero": {
+          "flatPct": 2.12,
+          "cumPct": 2.12
+        }
+      },
+      "bytesPerOpInMemoryProfileRun": 64,
+      "allocsPerOpInMemoryProfileRun": 1
+    },
+    {
+      "case": "ascii32",
+      "entry": "request_cancel",
+      "functionsInTop40": {
+        "codecpairstool.BenchmarkCurrentEncoding.func1.2": {
+          "flatPct": 0.0,
+          "cumPct": 87.76
+        },
+        "testing.(*B).run1.func1": {
+          "flatPct": 0.0,
+          "cumPct": 87.76
+        },
+        "testing.(*B).runN": {
+          "flatPct": 0.0,
+          "cumPct": 87.76
+        },
+        "github.com/cnooljaw/gosproto.(*Rpc).RequestEncode": {
+          "flatPct": 5.06,
+          "cumPct": 75.11
+        },
+        "github.com/cnooljaw/gosproto.encodeBufferWithLimits": {
+          "flatPct": 2.53,
+          "cumPct": 44.3
+        },
+        "runtime.systemstack": {
+          "flatPct": 0.0,
+          "cumPct": 13.08
+        },
+        "github.com/cnooljaw/gosproto.encodedSize": {
+          "flatPct": 1.69,
+          "cumPct": 11.81
+        },
+        "github.com/cnooljaw/gosproto.(*Rpc).CancelSession": {
+          "flatPct": 0.84,
+          "cumPct": 11.39
+        },
+        "github.com/cnooljaw/gosproto.packInto": {
+          "flatPct": 6.33,
+          "cumPct": 10.97
+        },
+        "github.com/cnooljaw/gosproto.encodeMessageInto": {
+          "flatPct": 3.8,
+          "cumPct": 10.13
+        },
+        "runtime.mapdelete_fast32": {
+          "flatPct": 0.84,
+          "cumPct": 9.7
+        },
+        "internal/runtime/maps.(*Map).Delete": {
+          "flatPct": 0.84,
+          "cumPct": 8.86
+        },
+        "runtime.kevent": {
+          "flatPct": 8.86,
+          "cumPct": 8.86
+        },
+        "runtime.netpoll": {
+          "flatPct": 0.0,
+          "cumPct": 8.86
+        },
+        "runtime.startTheWorldWithSema": {
+          "flatPct": 0.0,
+          "cumPct": 8.86
+        },
+        "runtime.makeslice": {
+          "flatPct": 0.84,
+          "cumPct": 7.17
+        },
+        "runtime.mallocgc": {
+          "flatPct": 1.27,
+          "cumPct": 6.33
+        },
+        "github.com/cnooljaw/gosproto.GetSprotoType": {
+          "flatPct": 0.84,
+          "cumPct": 5.91
+        },
+        "github.com/cnooljaw/gosproto.getbase": {
+          "flatPct": 2.53,
+          "cumPct": 5.91
+        },
+        "internal/runtime/maps.(*Map).deleteSmall": {
+          "flatPct": 2.11,
+          "cumPct": 5.91
+        },
+        "runtime.gcStart.func4": {
+          "flatPct": 0.0,
+          "cumPct": 5.06
+        },
+        "runtime.mapaccess2_faststr": {
+          "flatPct": 1.69,
+          "cumPct": 4.64
+        },
+        "runtime.mapaccess2": {
+          "flatPct": 0.84,
+          "cumPct": 4.22
+        },
+        "runtime.mapassign_fast32": {
+          "flatPct": 1.27,
+          "cumPct": 4.22
+        },
+        "reflect.Value.Field": {
+          "flatPct": 2.11,
+          "cumPct": 3.8
+        },
+        "reflect.Value.IsNil": {
+          "flatPct": 2.11,
+          "cumPct": 3.8
+        },
+        "runtime.gcMarkTermination.func3": {
+          "flatPct": 0.0,
+          "cumPct": 3.8
+        },
+        "runtime.mallocgcSmallNoscan": {
+          "flatPct": 0.84,
+          "cumPct": 3.8
+        },
+        "reflect.Value.Elem": {
+          "flatPct": 3.38,
+          "cumPct": 3.38
+        },
+        "github.com/cnooljaw/gosproto.encodeScalarInto": {
+          "flatPct": 2.11,
+          "cumPct": 2.95
+        },
+        "internal/abi.(*SwissMapType).IndirectKey": {
+          "flatPct": 2.95,
+          "cumPct": 2.95
+        },
+        "internal/runtime/maps.(*Map).getWithoutKeySmallFastStr": {
+          "flatPct": 2.11,
+          "cumPct": 2.95
+        },
+        "github.com/cnooljaw/gosproto.encodeRpcHeader": {
+          "flatPct": 2.11,
+          "cumPct": 2.53
+        },
+        "github.com/cnooljaw/gosproto.ffRunBytes": {
+          "flatPct": 2.53,
+          "cumPct": 2.53
+        },
+        "internal/runtime/maps.(*Map).putSlotSmallFast32": {
+          "flatPct": 1.69,
+          "cumPct": 2.53
+        },
+        "github.com/cnooljaw/gosproto.fieldSize": {
+          "flatPct": 0.84,
+          "cumPct": 2.11
+        },
+        "github.com/cnooljaw/gosproto.writeFF": {
+          "flatPct": 1.69,
+          "cumPct": 2.11
+        },
+        "internal/runtime/maps.(*Map).getWithKeySmall": {
+          "flatPct": 0.42,
+          "cumPct": 2.11
+        },
+        "reflect.flag.kind": {
+          "flatPct": 2.11,
+          "cumPct": 2.11
+        },
+        "runtime.mapaccess2_fast32": {
+          "flatPct": 1.69,
+          "cumPct": 2.11
+        }
+      },
+      "bytesPerOpInMemoryProfileRun": 64,
+      "allocsPerOpInMemoryProfileRun": 1
+    },
+    {
+      "case": "game_large",
+      "entry": "packed_body",
+      "functionsInTop40": {
+        "codecpairstool.BenchmarkCurrentEncoding.func1.1": {
+          "flatPct": 0.41,
+          "cumPct": 83.82
+        },
+        "testing.(*B).run1.func1": {
+          "flatPct": 0.0,
+          "cumPct": 83.82
+        },
+        "testing.(*B).runN": {
+          "flatPct": 0.0,
+          "cumPct": 83.82
+        },
+        "github.com/cnooljaw/gosproto.EncodePacked": {
+          "flatPct": 0.0,
+          "cumPct": 83.4
+        },
+        "github.com/cnooljaw/gosproto.encodeWithLimits": {
+          "flatPct": 0.0,
+          "cumPct": 83.4
+        },
+        "github.com/cnooljaw/gosproto.encodeBufferWithLimits": {
+          "flatPct": 0.0,
+          "cumPct": 65.56
+        },
+        "github.com/cnooljaw/gosproto.encodeMessageInto": {
+          "flatPct": 1.24,
+          "cumPct": 33.2
+        },
+        "github.com/cnooljaw/gosproto.encodeFieldInto": {
+          "flatPct": 3.73,
+          "cumPct": 31.95
+        },
+        "github.com/cnooljaw/gosproto.encodedSize": {
+          "flatPct": 0.41,
+          "cumPct": 26.97
+        },
+        "github.com/cnooljaw/gosproto.fieldSize": {
+          "flatPct": 2.9,
+          "cumPct": 24.9
+        },
+        "github.com/cnooljaw/gosproto.encodeIntegerRecordInto": {
+          "flatPct": 13.28,
+          "cumPct": 23.65
+        },
+        "runtime.systemstack": {
+          "flatPct": 0.41,
+          "cumPct": 19.92
+        },
+        "github.com/cnooljaw/gosproto.encodedIntegerRecordSize": {
+          "flatPct": 10.79,
+          "cumPct": 19.09
+        },
+        "github.com/cnooljaw/gosproto.packInto": {
+          "flatPct": 17.84,
+          "cumPct": 17.84
+        },
+        "runtime.kevent": {
+          "flatPct": 14.52,
+          "cumPct": 14.52
+        },
+        "runtime.netpoll": {
+          "flatPct": 0.0,
+          "cumPct": 14.52
+        },
+        "runtime.startTheWorldWithSema": {
+          "flatPct": 0.0,
+          "cumPct": 14.52
+        },
+        "runtime.gcStart.func4": {
+          "flatPct": 0.0,
+          "cumPct": 8.3
+        },
+        "runtime.gcMarkTermination.func3": {
+          "flatPct": 0.0,
+          "cumPct": 6.22
+        },
+        "runtime.makeslice": {
+          "flatPct": 0.0,
+          "cumPct": 5.81
+        },
+        "runtime.mallocgc": {
+          "flatPct": 0.0,
+          "cumPct": 5.81
+        },
+        "github.com/cnooljaw/gosproto.messageEncodePointer": {
+          "flatPct": 0.0,
+          "cumPct": 5.39
+        },
+        "reflect.Value.UnsafePointer": {
+          "flatPct": 2.9,
+          "cumPct": 5.39
+        },
+        "reflect.Value.Index": {
+          "flatPct": 3.73,
+          "cumPct": 4.56
+        },
+        "github.com/cnooljaw/gosproto.encodeIntegerInto": {
+          "flatPct": 3.73,
+          "cumPct": 4.15
+        },
+        "runtime.deductAssistCredit": {
+          "flatPct": 0.0,
+          "cumPct": 3.73
+        },
+        "runtime.gcAssistAlloc": {
+          "flatPct": 0.0,
+          "cumPct": 3.73
+        },
+        "runtime.gcAssistAlloc.func2": {
+          "flatPct": 0.0,
+          "cumPct": 3.73
+        },
+        "runtime.gcAssistAlloc1": {
+          "flatPct": 0.0,
+          "cumPct": 3.73
+        },
+        "runtime.gcDrainN": {
+          "flatPct": 0.0,
+          "cumPct": 3.73
+        },
+        "runtime.scanobject": {
+          "flatPct": 0.41,
+          "cumPct": 3.32
+        },
+        "github.com/cnooljaw/gosproto.encodeInt64Slice": {
+          "flatPct": 1.24,
+          "cumPct": 2.49
+        },
+        "github.com/cnooljaw/gosproto.encodePointer.integer": {
+          "flatPct": 2.49,
+          "cumPct": 2.49
+        },
+        "github.com/cnooljaw/gosproto.integerWidth": {
+          "flatPct": 2.49,
+          "cumPct": 2.49
+        },
+        "reflect.Value.IsNil": {
+          "flatPct": 0.83,
+          "cumPct": 2.49
+        },
+        "reflect.flag.kind": {
+          "flatPct": 2.49,
+          "cumPct": 2.49
+        },
+        "runtime.mallocgcSmallNoscan": {
+          "flatPct": 0.41,
+          "cumPct": 2.07
+        },
+        "runtime.typePointers.next": {
+          "flatPct": 1.66,
+          "cumPct": 2.07
+        },
+        "github.com/cnooljaw/gosproto.(*encodeLayout).add": {
+          "flatPct": 0.41,
+          "cumPct": 1.66
+        },
+        "internal/abi.(*Type).Pointers": {
+          "flatPct": 1.66,
+          "cumPct": 1.66
+        }
+      },
+      "bytesPerOpInMemoryProfileRun": 3968,
+      "allocsPerOpInMemoryProfileRun": 2
+    },
+    {
+      "case": "game_large",
+      "entry": "request_cancel",
+      "functionsInTop40": {
+        "codecpairstool.BenchmarkCurrentEncoding.func1.2": {
+          "flatPct": 0.0,
+          "cumPct": 83.48
+        },
+        "github.com/cnooljaw/gosproto.(*Rpc).RequestEncode": {
+          "flatPct": 0.0,
+          "cumPct": 83.48
+        },
+        "testing.(*B).run1.func1": {
+          "flatPct": 0.0,
+          "cumPct": 83.48
+        },
+        "testing.(*B).runN": {
+          "flatPct": 0.0,
+          "cumPct": 83.48
+        },
+        "github.com/cnooljaw/gosproto.encodeBufferWithLimits": {
+          "flatPct": 0.0,
+          "cumPct": 63.48
+        },
+        "github.com/cnooljaw/gosproto.encodeMessageInto": {
+          "flatPct": 0.87,
+          "cumPct": 33.48
+        },
+        "github.com/cnooljaw/gosproto.encodeFieldInto": {
+          "flatPct": 3.91,
+          "cumPct": 32.61
+        },
+        "github.com/cnooljaw/gosproto.encodedSize": {
+          "flatPct": 0.43,
+          "cumPct": 25.22
+        },
+        "github.com/cnooljaw/gosproto.fieldSize": {
+          "flatPct": 3.48,
+          "cumPct": 24.35
+        },
+        "github.com/cnooljaw/gosproto.encodeIntegerRecordInto": {
+          "flatPct": 10.43,
+          "cumPct": 21.74
+        },
+        "runtime.systemstack": {
+          "flatPct": 0.0,
+          "cumPct": 21.74
+        },
+        "github.com/cnooljaw/gosproto.packInto": {
+          "flatPct": 20.0,
+          "cumPct": 20.0
+        },
+        "github.com/cnooljaw/gosproto.encodedIntegerRecordSize": {
+          "flatPct": 10.0,
+          "cumPct": 18.7
+        },
+        "runtime.kevent": {
+          "flatPct": 15.22,
+          "cumPct": 15.22
+        },
+        "runtime.netpoll": {
+          "flatPct": 0.0,
+          "cumPct": 15.22
+        },
+        "runtime.startTheWorldWithSema": {
+          "flatPct": 0.0,
+          "cumPct": 15.22
+        },
+        "runtime.gcMarkTermination.func3": {
+          "flatPct": 0.0,
+          "cumPct": 7.83
+        },
+        "runtime.gcStart.func4": {
+          "flatPct": 0.0,
+          "cumPct": 7.39
+        },
+        "github.com/cnooljaw/gosproto.encodeIntegerInto": {
+          "flatPct": 5.65,
+          "cumPct": 6.09
+        },
+        "runtime.makeslice": {
+          "flatPct": 0.0,
+          "cumPct": 6.09
+        },
+        "runtime.mallocgc": {
+          "flatPct": 0.0,
+          "cumPct": 6.09
+        },
+        "github.com/cnooljaw/gosproto.encodeInt64Slice": {
+          "flatPct": 1.74,
+          "cumPct": 5.22
+        },
+        "runtime.deductAssistCredit": {
+          "flatPct": 0.0,
+          "cumPct": 4.78
+        },
+        "runtime.gcAssistAlloc": {
+          "flatPct": 0.0,
+          "cumPct": 4.78
+        },
+        "runtime.gcAssistAlloc.func2": {
+          "flatPct": 0.0,
+          "cumPct": 4.78
+        },
+        "runtime.gcAssistAlloc1": {
+          "flatPct": 0.0,
+          "cumPct": 4.78
+        },
+        "runtime.gcDrainN": {
+          "flatPct": 0.43,
+          "cumPct": 4.78
+        },
+        "reflect.Value.Index": {
+          "flatPct": 2.17,
+          "cumPct": 3.91
+        },
+        "encoding/binary.littleEndian.PutUint32": {
+          "flatPct": 3.48,
+          "cumPct": 3.48
+        },
+        "github.com/cnooljaw/gosproto.writeUint32": {
+          "flatPct": 0.0,
+          "cumPct": 3.48
+        },
+        "github.com/cnooljaw/gosproto.encodePointer.integer": {
+          "flatPct": 3.04,
+          "cumPct": 3.04
+        },
+        "github.com/cnooljaw/gosproto.messageEncodePointer": {
+          "flatPct": 0.0,
+          "cumPct": 3.04
+        },
+        "reflect.Value.UnsafePointer": {
+          "flatPct": 2.17,
+          "cumPct": 3.04
+        },
+        "runtime.scanobject": {
+          "flatPct": 0.87,
+          "cumPct": 3.04
+        },
+        "github.com/cnooljaw/gosproto.(*encodeLayout).add": {
+          "flatPct": 0.43,
+          "cumPct": 2.17
+        },
+        "runtime.(*mheap).alloc.func1": {
+          "flatPct": 0.0,
+          "cumPct": 1.74
+        },
+        "runtime.(*mheap).allocSpan": {
+          "flatPct": 0.0,
+          "cumPct": 1.74
+        },
+        "github.com/cnooljaw/gosproto.(*encodeLayout).next": {
+          "flatPct": 1.3,
+          "cumPct": 1.3
+        },
+        "reflect.Value.IsNil": {
+          "flatPct": 1.3,
+          "cumPct": 1.3
+        },
+        "reflect.flag.ro": {
+          "flatPct": 1.3,
+          "cumPct": 1.3
+        }
+      },
+      "bytesPerOpInMemoryProfileRun": 3968,
+      "allocsPerOpInMemoryProfileRun": 2
+    },
+    {
+      "case": "int32_edges",
+      "entry": "packed_body",
+      "functionsInTop40": {
+        "codecpairstool.BenchmarkCurrentEncoding.func1.1": {
+          "flatPct": 0.43,
+          "cumPct": 81.47
+        },
+        "testing.(*B).run1.func1": {
+          "flatPct": 0.0,
+          "cumPct": 81.47
+        },
+        "testing.(*B).runN": {
+          "flatPct": 0.0,
+          "cumPct": 81.47
+        },
+        "github.com/cnooljaw/gosproto.EncodePacked": {
+          "flatPct": 0.0,
+          "cumPct": 81.03
+        },
+        "github.com/cnooljaw/gosproto.encodeWithLimits": {
+          "flatPct": 0.0,
+          "cumPct": 81.03
+        },
+        "github.com/cnooljaw/gosproto.encodeBufferWithLimits": {
+          "flatPct": 0.43,
+          "cumPct": 47.41
+        },
+        "github.com/cnooljaw/gosproto.packInto": {
+          "flatPct": 33.62,
+          "cumPct": 33.62
+        },
+        "github.com/cnooljaw/gosproto.encodeMessageInto": {
+          "flatPct": 0.43,
+          "cumPct": 28.02
+        },
+        "github.com/cnooljaw/gosproto.encodeFieldInto": {
+          "flatPct": 0.0,
+          "cumPct": 27.59
+        },
+        "runtime.systemstack": {
+          "flatPct": 0.0,
+          "cumPct": 27.16
+        },
+        "github.com/cnooljaw/gosproto.encodeInt64Slice": {
+          "flatPct": 11.21,
+          "cumPct": 26.72
+        },
+        "runtime.kevent": {
+          "flatPct": 17.67,
+          "cumPct": 17.67
+        },
+        "runtime.netpoll": {
+          "flatPct": 0.0,
+          "cumPct": 17.67
+        },
+        "runtime.startTheWorldWithSema": {
+          "flatPct": 0.0,
+          "cumPct": 17.67
+        },
+        "github.com/cnooljaw/gosproto.writeUint32": {
+          "flatPct": 0.43,
+          "cumPct": 15.52
+        },
+        "encoding/binary.littleEndian.PutUint32": {
+          "flatPct": 15.09,
+          "cumPct": 15.09
+        },
+        "runtime.makeslice": {
+          "flatPct": 0.0,
+          "cumPct": 11.64
+        },
+        "runtime.mallocgc": {
+          "flatPct": 0.0,
+          "cumPct": 11.64
+        },
+        "runtime.gcMarkTermination.func3": {
+          "flatPct": 0.0,
+          "cumPct": 10.34
+        },
+        "runtime.deductAssistCredit": {
+          "flatPct": 0.0,
+          "cumPct": 7.76
+        },
+        "runtime.gcAssistAlloc": {
+          "flatPct": 0.0,
+          "cumPct": 7.76
+        },
+        "runtime.gcAssistAlloc.func2": {
+          "flatPct": 0.0,
+          "cumPct": 7.76
+        },
+        "runtime.gcAssistAlloc1": {
+          "flatPct": 0.0,
+          "cumPct": 7.76
+        },
+        "runtime.gcDrainN": {
+          "flatPct": 0.86,
+          "cumPct": 7.76
+        },
+        "runtime.gcStart.func4": {
+          "flatPct": 0.0,
+          "cumPct": 7.33
+        },
+        "github.com/cnooljaw/gosproto.encodedSize": {
+          "flatPct": 0.0,
+          "cumPct": 6.9
+        },
+        "github.com/cnooljaw/gosproto.fieldSize": {
+          "flatPct": 6.9,
+          "cumPct": 6.9
+        },
+        "runtime.scanobject": {
+          "flatPct": 1.29,
+          "cumPct": 6.03
+        },
+        "runtime.mallocgcSmallNoscan": {
+          "flatPct": 0.0,
+          "cumPct": 3.88
+        },
+        "runtime.typePointers.next": {
+          "flatPct": 3.02,
+          "cumPct": 3.45
+        },
+        "runtime.(*mcache).nextFree": {
+          "flatPct": 0.0,
+          "cumPct": 2.16
+        },
+        "runtime.(*mcache).refill": {
+          "flatPct": 0.0,
+          "cumPct": 2.16
+        },
+        "runtime.(*mcentral).cacheSpan": {
+          "flatPct": 0.43,
+          "cumPct": 2.16
+        },
+        "runtime.memclrNoHeapPointers": {
+          "flatPct": 1.72,
+          "cumPct": 1.72
+        },
+        "runtime.markroot": {
+          "flatPct": 0.0,
+          "cumPct": 1.29
+        },
+        "reflect.Value.Addr": {
+          "flatPct": 0.43,
+          "cumPct": 0.86
+        },
+        "runtime.(*mcentral).grow": {
+          "flatPct": 0.0,
+          "cumPct": 0.86
+        },
+        "runtime.(*mheap).alloc": {
+          "flatPct": 0.0,
+          "cumPct": 0.86
+        },
+        "runtime.(*mheap).alloc.func1": {
+          "flatPct": 0.0,
+          "cumPct": 0.86
+        },
+        "runtime.(*mheap).allocSpan": {
+          "flatPct": 0.43,
+          "cumPct": 0.86
+        }
+      },
+      "bytesPerOpInMemoryProfileRun": 4096,
+      "allocsPerOpInMemoryProfileRun": 1
+    },
+    {
+      "case": "int32_edges",
+      "entry": "request_cancel",
+      "functionsInTop40": {
+        "codecpairstool.BenchmarkCurrentEncoding.func1.2": {
+          "flatPct": 0.0,
+          "cumPct": 76.6
+        },
+        "github.com/cnooljaw/gosproto.(*Rpc).RequestEncode": {
+          "flatPct": 0.0,
+          "cumPct": 76.6
+        },
+        "testing.(*B).run1.func1": {
+          "flatPct": 0.0,
+          "cumPct": 76.6
+        },
+        "testing.(*B).runN": {
+          "flatPct": 0.0,
+          "cumPct": 76.6
+        },
+        "github.com/cnooljaw/gosproto.encodeBufferWithLimits": {
+          "flatPct": 0.43,
+          "cumPct": 46.81
+        },
+        "runtime.systemstack": {
+          "flatPct": 0.0,
+          "cumPct": 32.34
+        },
+        "github.com/cnooljaw/gosproto.packInto": {
+          "flatPct": 28.94,
+          "cumPct": 28.94
+        },
+        "github.com/cnooljaw/gosproto.encodeFieldInto": {
+          "flatPct": 0.43,
+          "cumPct": 25.11
+        },
+        "github.com/cnooljaw/gosproto.encodeMessageInto": {
+          "flatPct": 0.0,
+          "cumPct": 25.11
+        },
+        "github.com/cnooljaw/gosproto.encodeInt64Slice": {
+          "flatPct": 6.81,
+          "cumPct": 23.4
+        },
+        "runtime.kevent": {
+          "flatPct": 20.0,
+          "cumPct": 20.0
+        },
+        "runtime.netpoll": {
+          "flatPct": 0.0,
+          "cumPct": 20.0
+        },
+        "runtime.startTheWorldWithSema": {
+          "flatPct": 0.0,
+          "cumPct": 20.0
+        },
+        "github.com/cnooljaw/gosproto.writeUint32": {
+          "flatPct": 0.85,
+          "cumPct": 16.6
+        },
+        "encoding/binary.littleEndian.PutUint32": {
+          "flatPct": 15.74,
+          "cumPct": 15.74
+        },
+        "runtime.gcStart.func4": {
+          "flatPct": 0.0,
+          "cumPct": 11.91
+        },
+        "runtime.makeslice": {
+          "flatPct": 0.0,
+          "cumPct": 10.21
+        },
+        "runtime.mallocgc": {
+          "flatPct": 0.0,
+          "cumPct": 10.21
+        },
+        "github.com/cnooljaw/gosproto.encodedSize": {
+          "flatPct": 0.0,
+          "cumPct": 9.79
+        },
+        "github.com/cnooljaw/gosproto.fieldSize": {
+          "flatPct": 8.51,
+          "cumPct": 8.94
+        },
+        "runtime.gcMarkTermination.func3": {
+          "flatPct": 0.0,
+          "cumPct": 8.09
+        },
+        "runtime.deductAssistCredit": {
+          "flatPct": 0.0,
+          "cumPct": 6.38
+        },
+        "runtime.gcAssistAlloc": {
+          "flatPct": 0.0,
+          "cumPct": 6.38
+        },
+        "runtime.gcAssistAlloc.func2": {
+          "flatPct": 0.0,
+          "cumPct": 6.38
+        },
+        "runtime.gcAssistAlloc1": {
+          "flatPct": 0.0,
+          "cumPct": 6.38
+        },
+        "runtime.gcDrainN": {
+          "flatPct": 0.0,
+          "cumPct": 6.38
+        },
+        "runtime.scanobject": {
+          "flatPct": 1.28,
+          "cumPct": 5.11
+        },
+        "runtime.(*mheap).alloc.func1": {
+          "flatPct": 0.0,
+          "cumPct": 3.83
+        },
+        "runtime.(*mheap).allocSpan": {
+          "flatPct": 0.0,
+          "cumPct": 3.83
+        },
+        "runtime.mallocgcSmallNoscan": {
+          "flatPct": 0.0,
+          "cumPct": 3.83
+        },
+        "runtime.typePointers.next": {
+          "flatPct": 2.13,
+          "cumPct": 3.4
+        },
+        "runtime.madvise": {
+          "flatPct": 2.98,
+          "cumPct": 2.98
+        },
+        "runtime.sysUsed": {
+          "flatPct": 0.0,
+          "cumPct": 2.98
+        },
+        "runtime.sysUsedOS": {
+          "flatPct": 0.0,
+          "cumPct": 2.98
+        },
+        "runtime.(*mcache).nextFree": {
+          "flatPct": 0.0,
+          "cumPct": 2.55
+        },
+        "runtime.(*mcache).refill": {
+          "flatPct": 0.0,
+          "cumPct": 2.55
+        },
+        "runtime.(*mcentral).cacheSpan": {
+          "flatPct": 0.0,
+          "cumPct": 2.13
+        },
+        "reflect.Value.Addr": {
+          "flatPct": 0.85,
+          "cumPct": 1.7
+        },
+        "runtime.(*mheap).freeSpan": {
+          "flatPct": 0.0,
+          "cumPct": 1.7
+        },
+        "runtime.(*sweepLocked).sweep": {
+          "flatPct": 0.0,
+          "cumPct": 1.7
+        }
+      },
+      "bytesPerOpInMemoryProfileRun": 4096,
+      "allocsPerOpInMemoryProfileRun": 1
+    },
+    {
+      "case": "echo_ascii4k",
+      "entry": "packed_body",
+      "functionsInTop40": {
+        "runtime.systemstack": {
+          "flatPct": 0.0,
+          "cumPct": 84.44
+        },
+        "runtime.kevent": {
+          "flatPct": 64.44,
+          "cumPct": 64.44
+        },
+        "runtime.netpoll": {
+          "flatPct": 0.0,
+          "cumPct": 64.44
+        },
+        "runtime.startTheWorldWithSema": {
+          "flatPct": 0.0,
+          "cumPct": 64.44
+        },
+        "codecpairstool.BenchmarkCurrentEncoding.func1.1": {
+          "flatPct": 0.0,
+          "cumPct": 35.11
+        },
+        "github.com/cnooljaw/gosproto.EncodePacked": {
+          "flatPct": 0.0,
+          "cumPct": 35.11
+        },
+        "github.com/cnooljaw/gosproto.encodeWithLimits": {
+          "flatPct": 0.0,
+          "cumPct": 35.11
+        },
+        "testing.(*B).run1.func1": {
+          "flatPct": 0.0,
+          "cumPct": 35.11
+        },
+        "testing.(*B).runN": {
+          "flatPct": 0.0,
+          "cumPct": 35.11
+        },
+        "runtime.gcMarkTermination.func3": {
+          "flatPct": 0.0,
+          "cumPct": 34.22
+        },
+        "runtime.gcStart.func4": {
+          "flatPct": 0.0,
+          "cumPct": 30.22
+        },
+        "github.com/cnooljaw/gosproto.encodeBufferWithLimits": {
+          "flatPct": 0.0,
+          "cumPct": 28.89
+        },
+        "runtime.makeslice": {
+          "flatPct": 0.0,
+          "cumPct": 22.22
+        },
+        "runtime.mallocgc": {
+          "flatPct": 0.44,
+          "cumPct": 22.22
+        },
+        "runtime.deductAssistCredit": {
+          "flatPct": 0.0,
+          "cumPct": 14.67
+        },
+        "runtime.gcAssistAlloc": {
+          "flatPct": 0.0,
+          "cumPct": 14.67
+        },
+        "runtime.gcAssistAlloc.func2": {
+          "flatPct": 0.0,
+          "cumPct": 14.67
+        },
+        "runtime.gcAssistAlloc1": {
+          "flatPct": 0.0,
+          "cumPct": 14.67
+        },
+        "runtime.gcDrainN": {
+          "flatPct": 0.0,
+          "cumPct": 14.67
+        },
+        "runtime.scanobject": {
+          "flatPct": 4.89,
+          "cumPct": 11.56
+        },
+        "runtime.mallocgcSmallNoscan": {
+          "flatPct": 0.0,
+          "cumPct": 7.11
+        },
+        "runtime.memmove": {
+          "flatPct": 6.67,
+          "cumPct": 6.67
+        },
+        "github.com/cnooljaw/gosproto.packInto": {
+          "flatPct": 0.89,
+          "cumPct": 6.22
+        },
+        "runtime.(*mcache).nextFree": {
+          "flatPct": 0.0,
+          "cumPct": 4.89
+        },
+        "runtime.(*mcache).refill": {
+          "flatPct": 0.44,
+          "cumPct": 4.89
+        },
+        "github.com/cnooljaw/gosproto.encodeMessageInto": {
+          "flatPct": 0.0,
+          "cumPct": 4.44
+        },
+        "github.com/cnooljaw/gosproto.encodeScalarInto": {
+          "flatPct": 0.44,
+          "cumPct": 4.44
+        },
+        "runtime.typePointers.next": {
+          "flatPct": 4.0,
+          "cumPct": 4.44
+        },
+        "runtime.(*mcentral).cacheSpan": {
+          "flatPct": 0.0,
+          "cumPct": 4.0
+        },
+        "runtime.(*mheap).alloc.func1": {
+          "flatPct": 0.0,
+          "cumPct": 3.56
+        },
+        "runtime.(*mheap).allocSpan": {
+          "flatPct": 0.0,
+          "cumPct": 3.56
+        },
+        "runtime.(*mcentral).grow": {
+          "flatPct": 0.0,
+          "cumPct": 3.11
+        },
+        "runtime.(*mheap).alloc": {
+          "flatPct": 0.0,
+          "cumPct": 3.11
+        },
+        "bytes.IndexByte": {
+          "flatPct": 0.0,
+          "cumPct": 2.67
+        },
+        "github.com/cnooljaw/gosproto.ffRunBytes": {
+          "flatPct": 0.0,
+          "cumPct": 2.67
+        },
+        "github.com/cnooljaw/gosproto.followingFFWords": {
+          "flatPct": 0.0,
+          "cumPct": 2.67
+        },
+        "github.com/cnooljaw/gosproto.writeFF": {
+          "flatPct": 0.0,
+          "cumPct": 2.67
+        },
+        "indexbytebody": {
+          "flatPct": 2.67,
+          "cumPct": 2.67
+        },
+        "runtime.markroot": {
+          "flatPct": 0.0,
+          "cumPct": 2.67
+        },
+        "runtime.findObject": {
+          "flatPct": 2.22,
+          "cumPct": 2.22
+        }
+      },
+      "bytesPerOpInMemoryProfileRun": 4864,
+      "allocsPerOpInMemoryProfileRun": 1
+    },
+    {
+      "case": "echo_ascii4k",
+      "entry": "request_cancel",
+      "functionsInTop40": {
+        "runtime.systemstack": {
+          "flatPct": 0.0,
+          "cumPct": 73.56
+        },
+        "runtime.kevent": {
+          "flatPct": 55.77,
+          "cumPct": 55.77
+        },
+        "runtime.netpoll": {
+          "flatPct": 0.0,
+          "cumPct": 55.77
+        },
+        "runtime.startTheWorldWithSema": {
+          "flatPct": 0.0,
+          "cumPct": 55.77
+        },
+        "codecpairstool.BenchmarkCurrentEncoding.func1.2": {
+          "flatPct": 0.0,
+          "cumPct": 43.75
+        },
+        "testing.(*B).run1.func1": {
+          "flatPct": 0.0,
+          "cumPct": 43.75
+        },
+        "testing.(*B).runN": {
+          "flatPct": 0.0,
+          "cumPct": 43.75
+        },
+        "github.com/cnooljaw/gosproto.(*Rpc).RequestEncode": {
+          "flatPct": 0.96,
+          "cumPct": 42.79
+        },
+        "github.com/cnooljaw/gosproto.encodeBufferWithLimits": {
+          "flatPct": 0.48,
+          "cumPct": 31.25
+        },
+        "runtime.gcStart.func4": {
+          "flatPct": 0.0,
+          "cumPct": 28.37
+        },
+        "runtime.gcMarkTermination.func3": {
+          "flatPct": 0.0,
+          "cumPct": 27.4
+        },
+        "runtime.makeslice": {
+          "flatPct": 0.0,
+          "cumPct": 21.63
+        },
+        "runtime.mallocgc": {
+          "flatPct": 0.48,
+          "cumPct": 21.63
+        },
+        "runtime.deductAssistCredit": {
+          "flatPct": 0.0,
+          "cumPct": 14.9
+        },
+        "runtime.gcAssistAlloc": {
+          "flatPct": 0.0,
+          "cumPct": 14.9
+        },
+        "runtime.gcAssistAlloc.func2": {
+          "flatPct": 0.0,
+          "cumPct": 14.9
+        },
+        "runtime.gcAssistAlloc1": {
+          "flatPct": 0.0,
+          "cumPct": 14.9
+        },
+        "runtime.gcDrainN": {
+          "flatPct": 0.0,
+          "cumPct": 14.9
+        },
+        "runtime.scanobject": {
+          "flatPct": 1.44,
+          "cumPct": 11.06
+        },
+        "github.com/cnooljaw/gosproto.encodeMessageInto": {
+          "flatPct": 0.96,
+          "cumPct": 7.21
+        },
+        "runtime.memmove": {
+          "flatPct": 7.21,
+          "cumPct": 7.21
+        },
+        "github.com/cnooljaw/gosproto.packInto": {
+          "flatPct": 1.44,
+          "cumPct": 6.73
+        },
+        "github.com/cnooljaw/gosproto.encodeScalarInto": {
+          "flatPct": 1.44,
+          "cumPct": 6.25
+        },
+        "runtime.mallocgcSmallNoscan": {
+          "flatPct": 0.0,
+          "cumPct": 6.25
+        },
+        "runtime.(*mcache).nextFree": {
+          "flatPct": 0.0,
+          "cumPct": 5.29
+        },
+        "runtime.(*mcache).refill": {
+          "flatPct": 0.96,
+          "cumPct": 5.29
+        },
+        "runtime.typePointers.next": {
+          "flatPct": 3.85,
+          "cumPct": 5.29
+        },
+        "runtime.(*mcentral).cacheSpan": {
+          "flatPct": 0.0,
+          "cumPct": 4.33
+        },
+        "runtime.markroot": {
+          "flatPct": 0.0,
+          "cumPct": 3.85
+        },
+        "github.com/cnooljaw/gosproto.writeFF": {
+          "flatPct": 0.0,
+          "cumPct": 2.88
+        },
+        "runtime.(*sweepLocked).sweep": {
+          "flatPct": 0.0,
+          "cumPct": 2.88
+        },
+        "runtime.deductSweepCredit": {
+          "flatPct": 0.0,
+          "cumPct": 2.88
+        },
+        "runtime.sweepone": {
+          "flatPct": 0.0,
+          "cumPct": 2.88
+        },
+        "github.com/cnooljaw/gosproto.ffRunBytes": {
+          "flatPct": 0.48,
+          "cumPct": 2.4
+        },
+        "runtime.findObject": {
+          "flatPct": 1.44,
+          "cumPct": 2.4
+        },
+        "bytes.IndexByte": {
+          "flatPct": 0.0,
+          "cumPct": 1.92
+        },
+        "github.com/cnooljaw/gosproto.followingFFWords": {
+          "flatPct": 0.0,
+          "cumPct": 1.92
+        },
+        "indexbytebody": {
+          "flatPct": 1.92,
+          "cumPct": 1.92
+        },
+        "runtime.(*mheap).alloc.func1": {
+          "flatPct": 0.0,
+          "cumPct": 1.92
+        },
+        "runtime.(*mheap).allocSpan": {
+          "flatPct": 0.48,
+          "cumPct": 1.92
+        }
+      },
+      "bytesPerOpInMemoryProfileRun": 4864,
+      "allocsPerOpInMemoryProfileRun": 1
+    }
+  ]
+}

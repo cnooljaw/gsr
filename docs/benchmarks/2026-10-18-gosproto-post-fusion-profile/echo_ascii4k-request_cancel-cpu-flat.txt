@@ -1,0 +1,48 @@
+File: encoding.test
+Type: cpu
+Time: 2026-10-18 00:56:39 CST
+Duration: 2.42s, Total samples = 2.08s (85.94%)
+Showing nodes accounting for 1.92s, 92.31% of 2.08s total
+Dropped 30 nodes (cum <= 0.01s)
+Showing top 40 nodes out of 69
+      flat  flat%   sum%        cum   cum%
+     1.16s 55.77% 55.77%      1.16s 55.77%  runtime.kevent
+     0.15s  7.21% 62.98%      0.15s  7.21%  runtime.memmove
+     0.08s  3.85% 66.83%      0.11s  5.29%  runtime.typePointers.next
+     0.04s  1.92% 68.75%      0.04s  1.92%  indexbytebody
+     0.03s  1.44% 70.19%      0.13s  6.25%  github.com/cnooljaw/gosproto.encodeScalarInto
+     0.03s  1.44% 71.63%      0.14s  6.73%  github.com/cnooljaw/gosproto.packInto
+     0.03s  1.44% 73.08%      0.05s  2.40%  runtime.findObject
+     0.03s  1.44% 74.52%      0.23s 11.06%  runtime.scanobject
+     0.03s  1.44% 75.96%      0.03s  1.44%  runtime.typePointers.nextFast (inline)
+     0.02s  0.96% 76.92%      0.89s 42.79%  github.com/cnooljaw/gosproto.(*Rpc).RequestEncode
+     0.02s  0.96% 77.88%      0.02s  0.96%  github.com/cnooljaw/gosproto.(*decodeBudget).add (inline)
+     0.02s  0.96% 78.85%      0.15s  7.21%  github.com/cnooljaw/gosproto.encodeMessageInto
+     0.02s  0.96% 79.81%      0.11s  5.29%  runtime.(*mcache).refill
+     0.02s  0.96% 80.77%      0.02s  0.96%  runtime.(*mspan).countAlloc (inline)
+     0.02s  0.96% 81.73%      0.02s  0.96%  runtime.(*pallocBits).summarize
+     0.02s  0.96% 82.69%      0.02s  0.96%  runtime.gcmarknewobject
+     0.02s  0.96% 83.65%      0.02s  0.96%  runtime.greyobject
+     0.02s  0.96% 84.62%      0.02s  0.96%  runtime.mapaccess2_faststr
+     0.02s  0.96% 85.58%      0.02s  0.96%  runtime.readUintptr (inline)
+     0.02s  0.96% 86.54%      0.04s  1.92%  runtime.scanblock
+     0.02s  0.96% 87.50%      0.02s  0.96%  runtime.spanOf (inline)
+     0.01s  0.48% 87.98%      0.02s  0.96%  github.com/cnooljaw/gosproto.GetSprotoType
+     0.01s  0.48% 88.46%      0.65s 31.25%  github.com/cnooljaw/gosproto.encodeBufferWithLimits
+     0.01s  0.48% 88.94%      0.03s  1.44%  github.com/cnooljaw/gosproto.encodeRpcHeader
+     0.01s  0.48% 89.42%      0.05s  2.40%  github.com/cnooljaw/gosproto.ffRunBytes
+     0.01s  0.48% 89.90%      0.02s  0.96%  internal/runtime/maps.(*Map).deleteSmall
+     0.01s  0.48% 90.38%      0.02s  0.96%  internal/runtime/maps.(*Map).putSlotSmallFast32
+     0.01s  0.48% 90.87%      0.04s  1.92%  runtime.(*mheap).allocSpan
+     0.01s  0.48% 91.35%      0.03s  1.44%  runtime.(*pageAlloc).update
+     0.01s  0.48% 91.83%      0.45s 21.63%  runtime.mallocgc
+     0.01s  0.48% 92.31%      0.02s  0.96%  runtime.scanframeworker
+         0     0% 92.31%      0.04s  1.92%  bytes.IndexByte (inline)
+         0     0% 92.31%      0.91s 43.75%  codecpairstool.BenchmarkCurrentEncoding.func1.2
+         0     0% 92.31%      0.02s  0.96%  github.com/cnooljaw/gosproto.(*Rpc).CancelSession
+         0     0% 92.31%      0.04s  1.92%  github.com/cnooljaw/gosproto.followingFFWords
+         0     0% 92.31%      0.06s  2.88%  github.com/cnooljaw/gosproto.writeFF (inline)
+         0     0% 92.31%      0.02s  0.96%  internal/runtime/maps.(*Map).Delete
+         0     0% 92.31%      0.11s  5.29%  runtime.(*mcache).nextFree
+         0     0% 92.31%      0.09s  4.33%  runtime.(*mcentral).cacheSpan
+         0     0% 92.31%      0.03s  1.44%  runtime.(*mcentral).grow

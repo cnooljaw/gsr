@@ -4,9 +4,13 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## 融合后编码热点诊断（2026-10-18）
+
+有响应请求切片已本地提交为 gosproto 6d854d1 / GSR f715e6b，未推送。随后只刷新四种既有消息的body EncodePacked与真实RequestEncode+CancelSession八条profile，CPU与逐次内存采样分开；大型消息集中在整数记录预检/写出，整数数组集中在Pack和连续写出，大型仍有512 B布局外溢。4 KiB ASCII的kevent/GC归因明显，完整保留而不据此排名。独立harness夹具/统计/选择/vet、16次采样及归档/指纹核对通过；库源码干净，未重复生产验收，见 [融合后热点报告](benchmarks/2026-10-18-gosproto-post-fusion-profile/RESULTS.md)。下一轮先单独实验整数数组写出，预算/wire/cap/独占不变；新诊断未提交，正式依赖与Decode继续冻结。
+
 ## RPC 有响应请求单缓冲（2026-10-18）
 
-上一切片已提交为 gosproto 0988af0 / GSR 9876a5b，提交后两库干净、未推送。后续融合声明Request且有Response的请求：锁外完成body预检和写出，原session接纳后Pack，重复session仍返回限长限容raw body。五项请求两轮均少一次分配，大型约快5.8%～6.2%、整数数组约快9.5%～11.6%、ASCII4KiB约快41%～42%。共用writer成本（ASCII纯Encode约+21 ns）、失败workspace分配（32 B invalid/full多16 B，MaxInt32重复缓冲级别多32 B）及self17/19、clone15/19控制失败全部披露。扩展504组重复body/cap/独占回归，库/官方/race/checkptr/vet、固定RPC差分、有限fuzz、GSR三包和Go/TS 7/7通过，源码/归档一致，见 [请求工作区报告](benchmarks/2026-10-18-gosproto-request-workspace/RESULTS.md)。新修改未提交，正式依赖与Decode/Pack/Unpack/TS不变；后续先重采profile再决定热点，不新增PB/TS排名。
+上一切片已提交为 gosproto 0988af0 / GSR 9876a5b，提交后两库干净、未推送。后续融合声明Request且有Response的请求：锁外完成body预检和写出，原session接纳后Pack，重复session仍返回限长限容raw body。五项请求两轮均少一次分配，大型约快5.8%～6.2%、整数数组约快9.5%～11.6%、ASCII4KiB约快41%～42%。共用writer成本（ASCII纯Encode约+21 ns）、失败workspace分配（32 B invalid/full多16 B，MaxInt32重复缓冲级别多32 B）及self17/19、clone15/19控制失败全部披露。扩展504组重复body/cap/独占回归，库/官方/race/checkptr/vet、固定RPC差分、有限fuzz、GSR三包和Go/TS 7/7通过，源码/归档一致，见 [请求工作区报告](benchmarks/2026-10-18-gosproto-request-workspace/RESULTS.md)。该切片已本地提交为 gosproto 6d854d1 / GSR f715e6b，未推送；正式依赖与Decode/Pack/Unpack/TS不变；后续先重采profile再决定热点，不新增PB/TS排名。
 
 ## RPC 通知单缓冲（2026-10-18）
 

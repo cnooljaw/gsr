@@ -1,0 +1,13 @@
+[
+  {
+    "stage": "archive reproduction",
+    "initialCheck": "Raw goModFiles hash equality assertion failed only for harness/go.mod.",
+    "explanation": "Absolute local replace paths contain measured versus reproduced output roots.",
+    "resolution": "Verified each original hash against its file, then replaced only its own output root with <OUTPUT>; all module text matched. No source changes or repeated profiling.",
+    "normalizedGoModSha256": {
+      "archive/before/go.mod": "e48e423659f833523f0cebbac11fc4ea73c6c7300c990543b9b7f1b510f87a7b",
+      "archive/candidate/go.mod": "39d81a69b8c51ec559f4683d616793a35f4133c89de1ca67ba813e9d1011edbe",
+      "archive/harness/go.mod": "eb35210508418dcbaf1a697bdd7dd8914a63da4253db75373b862db150dceb2f"
+    }
+  }
+]

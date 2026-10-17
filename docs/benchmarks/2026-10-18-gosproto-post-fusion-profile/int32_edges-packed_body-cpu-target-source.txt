@@ -1,0 +1,13 @@
+Total: 2.32s
+ROUTINE ======================== github.com/cnooljaw/gosproto.encodeInt64Slice in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-post-fusion-profile/measured/archive/candidate/encode.go
+     260ms      620ms (flat, cum) 26.72% of Total
+         .          .    268:func encodeInt64Slice(values []int64, width int, output []byte) int {
+         .          .    269:	output[0] = byte(width)
+         .          .    270:	if width == 4 {
+     190ms      190ms    271:		for index, number := range values {
+      70ms      430ms    272:			writeUint32(output[1+index*4:], uint32(number))
+         .          .    273:		}
+         .          .    274:	} else {
+         .          .    275:		for index, number := range values {
+         .          .    276:			writeUint64(output[1+index*8:], uint64(number))
+         .          .    277:		}

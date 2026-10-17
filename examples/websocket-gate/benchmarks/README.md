@@ -44,7 +44,9 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 
 [通知单缓冲](../../../docs/benchmarks/2026-10-18-gosproto-notification-workspace/RESULTS.md) 只融合有Request、无Response的通知，通用encoder及有响应请求流程不变。沿用19项探针，9项通知两轮均更快、少一次分配，大型约快6.5%～7.3%、整数数组约快11.7%～13.5%、ASCII4KiB约快43%～45%；10项非目标及约14～20 ns请求代价、A/A失败完整保留。库/官方/固定差分/GoTS通过，该切片已本地提交为 gosproto 0988af0 / GSR 9876a5b，未推送；正式依赖、Decode及原PB/TS矩阵未变。
 
-[有响应请求单缓冲](../../../docs/benchmarks/2026-10-18-gosproto-request-workspace/RESULTS.md) 在锁外完成预检/编码，登记后Pack，重复session仍返回限长限容raw body。五项请求两轮均少一次分配，大型约快5.8%～6.2%、整数数组约快9.5%～11.6%、ASCII4KiB约快41%～42%；共用writer的小幅计时代价、失败workspace内存成本、全部A/A失败及原值一并保留。库/官方/race/checkptr/固定差分/fuzz/GoTS验收通过，新修改待审查；正式依赖、Decode及原PB/TS矩阵不变。
+[有响应请求单缓冲](../../../docs/benchmarks/2026-10-18-gosproto-request-workspace/RESULTS.md) 在锁外完成预检/编码，登记后Pack，重复session仍返回限长限容raw body。五项请求两轮均少一次分配，大型约快5.8%～6.2%、整数数组约快9.5%～11.6%、ASCII4KiB约快41%～42%；共用writer的小幅计时代价、失败workspace内存成本、全部A/A失败及原值一并保留。库/官方/race/checkptr/固定差分/fuzz/GoTS验收通过，该切片已本地提交为 gosproto 6d854d1 / GSR f715e6b，未推送；正式依赖、Decode及原PB/TS矩阵不变。
+
+[融合后热点诊断](../../../docs/benchmarks/2026-10-18-gosproto-post-fusion-profile/RESULTS.md) 从6d854d1归档采四种输入×body/RPC八条路径，CPU与逐次内存采样分开。定位大型记录预检/写出、整数数组Pack/写出及512 B布局外溢；4 KiB ASCII的kevent干扰和全部原值保留，不把profile耗时当配对基线。源码未改，独立harness检查/归档核对通过，诊断待审查；不是新的A/B或PB/TS排名。
 
 ## 比较口径
 

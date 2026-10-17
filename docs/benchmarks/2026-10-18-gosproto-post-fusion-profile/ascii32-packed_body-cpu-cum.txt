@@ -1,0 +1,48 @@
+File: encoding.test
+Type: cpu
+Time: 2026-10-18 00:56:18 CST
+Duration: 2.54s, Total samples = 2.36s (92.88%)
+Showing nodes accounting for 1.78s, 75.42% of 2.36s total
+Dropped 44 nodes (cum <= 0.01s)
+Showing top 40 nodes out of 78
+      flat  flat%   sum%        cum   cum%
+     0.02s  0.85%  0.85%      2.11s 89.41%  codecpairstool.BenchmarkCurrentEncoding.func1.1
+         0     0%  0.85%      2.11s 89.41%  testing.(*B).run1.func1
+         0     0%  0.85%      2.11s 89.41%  testing.(*B).runN
+     0.03s  1.27%  2.12%      2.06s 87.29%  github.com/cnooljaw/gosproto.EncodePacked
+     0.01s  0.42%  2.54%      2.03s 86.02%  github.com/cnooljaw/gosproto.encodeWithLimits
+     0.10s  4.24%  6.78%      1.78s 75.42%  github.com/cnooljaw/gosproto.encodeBufferWithLimits
+     0.14s  5.93% 12.71%      0.46s 19.49%  github.com/cnooljaw/gosproto.encodeMessageInto
+     0.15s  6.36% 19.07%      0.37s 15.68%  github.com/cnooljaw/gosproto.encodedSize
+         0     0% 19.07%      0.34s 14.41%  runtime.systemstack
+     0.05s  2.12% 21.19%      0.27s 11.44%  runtime.makeslice
+     0.01s  0.42% 21.61%      0.24s 10.17%  github.com/cnooljaw/gosproto.GetSprotoType
+     0.13s  5.51% 27.12%      0.24s 10.17%  github.com/cnooljaw/gosproto.packInto
+     0.04s  1.69% 28.81%      0.22s  9.32%  runtime.mallocgc
+     0.19s  8.05% 36.86%      0.19s  8.05%  runtime.kevent
+     0.02s  0.85% 37.71%      0.19s  8.05%  runtime.mapaccess2
+         0     0% 37.71%      0.19s  8.05%  runtime.netpoll
+         0     0% 37.71%      0.19s  8.05%  runtime.startTheWorldWithSema
+     0.07s  2.97% 40.68%      0.18s  7.63%  github.com/cnooljaw/gosproto.encodeScalarInto
+     0.05s  2.12% 42.80%      0.18s  7.63%  github.com/cnooljaw/gosproto.getbase
+     0.16s  6.78% 49.58%      0.16s  6.78%  reflect.Value.Elem
+     0.03s  1.27% 50.85%      0.16s  6.78%  runtime.mallocgcSmallNoscan
+         0     0% 50.85%      0.12s  5.08%  runtime.gcStart.func4
+     0.06s  2.54% 53.39%      0.10s  4.24%  github.com/cnooljaw/gosproto.fieldSize
+     0.02s  0.85% 54.24%      0.09s  3.81%  internal/runtime/maps.(*Map).getWithKeySmall
+     0.01s  0.42% 54.66%      0.09s  3.81%  reflect.(*rtype).Elem
+     0.08s  3.39% 58.05%      0.09s  3.81%  reflect.Value.IsNil (inline)
+     0.05s  2.12% 60.17%      0.07s  2.97%  reflect.Value.Field
+         0     0% 60.17%      0.07s  2.97%  runtime.(*mheap).alloc.func1
+         0     0% 60.17%      0.07s  2.97%  runtime.(*mheap).allocSpan
+         0     0% 60.17%      0.07s  2.97%  runtime.gcMarkTermination.func3
+     0.02s  0.85% 61.02%      0.07s  2.97%  runtime.interhash
+     0.07s  2.97% 63.98%      0.07s  2.97%  runtime.memmove
+     0.06s  2.54% 66.53%      0.06s  2.54%  github.com/cnooljaw/gosproto.ffRunBytes
+     0.06s  2.54% 69.07%      0.06s  2.54%  github.com/cnooljaw/gosproto.normalizeLimits (inline)
+     0.03s  1.27% 70.34%      0.06s  2.54%  runtime.interequal
+     0.02s  0.85% 71.19%      0.05s  2.12%  github.com/cnooljaw/gosproto.writeFF (inline)
+     0.05s  2.12% 73.31%      0.05s  2.12%  reflect.toType (inline)
+         0     0% 73.31%      0.05s  2.12%  runtime.(*mcache).nextFree
+         0     0% 73.31%      0.05s  2.12%  runtime.(*mcache).refill
+     0.05s  2.12% 75.42%      0.05s  2.12%  runtime.duffzero
