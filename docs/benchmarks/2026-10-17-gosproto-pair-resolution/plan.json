@@ -1,0 +1,22 @@
+{
+  "blockMs": 40,
+  "modes": [
+    "self",
+    "clone"
+  ],
+  "cases": [
+    "addressbook/sproto_pack",
+    "game_small/sproto_encode",
+    "game_small/sproto_pack",
+    "echo_ascii4k/sproto_encode",
+    "echo_ascii4k/sproto_pack",
+    "echo_ascii4k/sproto_pencode",
+    "ascii32/frame",
+    "utf8_1k/frame",
+    "ascii4k/frame",
+    "zeros4k/frame",
+    "game_large/sproto_pack",
+    "int32_edges/sproto_pack"
+  ],
+  "policy": "One focused calibration at 40 ms; unchanged 2% median/3 pp IQR/5-of-6 rounds and exact allocation gate. Do not merge prior passing cases into a new full-matrix claim. Record every GC-bearing block, do not discard. No candidate comparison or production adoption."
+}

@@ -174,4 +174,6 @@ Decode 性能阶段已按用户决定冻结于独立库 `a09fb00`（Decode 生�
 
 后续稀疏 word 写出候选未通过组合路径门槛，未采用；额外 A/A 发现同源码计时差值可大于候选收益，下一步先校准测量方法。750 个配对样本、四项 CPU 摘要和汇编核对见 [诊断记录](benchmarks/2026-10-17-gosproto-pack-sparse/RESULTS.md)。独立库保持 `bba3326` 且工作树干净，正式依赖与 Decode 阶段基线不变；该轮未重复接线验收，诊断已本地提交为 GSR `8f0003f`。
 
-后续新增同函数/同源码 A/A 与 ABBA/BAAB 配对工具，9/19 项同时通过两类控制。原候选复测仍未达保留门槛，正式库保持 `bba3326`；新工具和记录待审查，未重复接线验收，见 [校准记录](benchmarks/2026-10-17-gosproto-pair-calibration/RESULTS.md)。该工具只服务局部优化，不替代完整 Go/TS 对照或发布验收。
+后续新增同函数/同源码 A/A 与 ABBA/BAAB 配对工具，9/19 项同时通过两类控制。原候选复测仍未达保留门槛，正式库保持 `bba3326`；该轮工具和记录已提交为 GSR `f064584`，未重复接线验收，见 [校准记录](benchmarks/2026-10-17-gosproto-pair-calibration/RESULTS.md)。该工具只服务局部优化，不替代完整 Go/TS 对照或发布验收。
+
+后续仅扩展工具的筛选和 GC 观测：隔离探针解释了 16 B 的 tiny 块窗口差值，40 ms 聚焦实验未使控制整体稳定，默认与总门槛不变。原始数据与验证见 [GC 边界诊断](benchmarks/2026-10-17-gosproto-pair-resolution/RESULTS.md)。没有比较或采用生产候选；独立库、正式依赖和 Decode 阶段基线保持不变，新工具改动与记录待审查。

@@ -26,7 +26,9 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 
 小幅优化先用 [Go 配对工具](tools/go-pairs/README.md) 校准同函数和同源码 A/A，再解释候选差值。工具在独立归档中交错采样并保留全部轮次，不修改正式依赖；控制未通过的项目标记为无法判定。它不代替上面的四实现完整 Benchmark。
 
-首轮 [校准与原候选复测](../../../docs/benchmarks/2026-10-17-gosproto-pair-calibration/RESULTS.md) 中，9/19 项同时通过两类控制；原候选仍未达到保留门槛，正式库未改。新工具和记录待审查。
+首轮 [校准与原候选复测](../../../docs/benchmarks/2026-10-17-gosproto-pair-calibration/RESULTS.md) 中，9/19 项同时通过两类控制；原候选仍未达到保留门槛，正式库未改；该轮工具与记录已本地提交为 GSR `f064584`。
+
+后续 [GC 边界与聚焦校准](../../../docs/benchmarks/2026-10-17-gosproto-pair-resolution/RESULTS.md) 解释了 16 B 的 tiny 分配窗口差值，但单纯拉长到 40 ms 未稳定控制。工具默认和严格总门槛不变，新增筛选和 GC 观测仅用于诊断，新改动待审查。
 
 ## 比较口径
 

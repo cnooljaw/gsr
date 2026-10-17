@@ -1,0 +1,369 @@
+package benchmarks
+
+import (
+	"bytes"
+	"crypto/sha256"
+	"encoding/json"
+	"fmt"
+	"math"
+	"os"
+	"reflect"
+	"runtime"
+	"strings"
+	"testing"
+	"time"
+
+	before "github.com/cnooljaw/gosproto-before"
+)
+
+const (
+	pairRounds   = 6
+	pairQuartets = 4
+	blockTarget  = 10 * time.Millisecond
+)
+
+type pairOperation struct {
+	name        string
+	left, right func() error
+}
+
+type pairBlock struct {
+	Arm         string `json:"arm"`
+	Calls       int    `json:"calls"`
+	Nanoseconds int64  `json:"nanoseconds"`
+}
+
+type pairQuartet struct {
+	Round  int         `json:"round"`
+	Index  int         `json:"index"`
+	Blocks []pairBlock `json:"blocks"`
+	Ratio  float64     `json:"rightOverLeft"`
+}
+
+type pairAllocation struct {
+	Arm     string `json:"arm"`
+	Calls   int    `json:"calls"`
+	Bytes   uint64 `json:"bytes"`
+	Mallocs uint64 `json:"mallocs"`
+}
+
+type pairResult struct {
+	Name          string           `json:"name"`
+	SameFunction  bool             `json:"sameFunction"`
+	CallsPerBlock int              `json:"callsPerBlock"`
+	Quartets      []pairQuartet    `json:"quartets"`
+	RoundRatios   []float64        `json:"roundRatios"`
+	LeftNS        float64          `json:"leftNsPerOp"`
+	RightNS       float64          `json:"rightNsPerOp"`
+	Allocations   []pairAllocation `json:"allocations"`
+}
+
+// quartetRatio 按各块实际调用数归一化，以对数均值配对，不混用两边独立中位数。
+func quartetRatio(blocks []pairBlock) (float64, error) {
+	if len(blocks) != 4 {
+		return 0, fmt.Errorf("quartet requires four blocks")
+	}
+	order := blocks[0].Arm + blocks[1].Arm + blocks[2].Arm + blocks[3].Arm
+	if order != "ABBA" && order != "BAAB" {
+		return 0, fmt.Errorf("unbalanced quartet: %s", order)
+	}
+	var difference float64
+	for _, block := range blocks {
+		if block.Calls < 1 || block.Nanoseconds < 1 {
+			return 0, fmt.Errorf("invalid measured block")
+		}
+		value := math.Log(float64(block.Nanoseconds) / float64(block.Calls))
+		if block.Arm == "A" {
+			difference -= value
+		} else {
+			difference += value
+		}
+	}
+	return math.Exp(difference / 2), nil
+}
+
+func quartetOrder(round, index int) string {
+	if (round+index)%2 == 0 {
+		return "ABBA"
+	}
+	return "BAAB"
+}
+
+func sampleBlock(run func() error, calls int) (pairBlock, error) {
+	start := time.Now()
+	for range calls {
+		if err := run(); err != nil {
+			return pairBlock{}, err
+		}
+	}
+	return pairBlock{Calls: calls, Nanoseconds: time.Since(start).Nanoseconds()}, nil
+}
+
+func blockCalls(run func() error) (int, error) {
+	calls := 256
+	for range 8 {
+		block, err := sampleBlock(run, calls)
+		if err != nil {
+			return 0, err
+		}
+		if block.Nanoseconds >= int64(2*time.Millisecond) {
+			return max(1, min(10000000, int(float64(calls)*float64(blockTarget)/float64(block.Nanoseconds)))), nil
+		}
+		calls = min(calls*4, 10000000)
+	}
+	return 0, fmt.Errorf("cannot calibrate block within bounded pilot")
+}
+
+func pairOperations(t *testing.T, mode string) []pairOperation {
+	t.Helper()
+	var pairs []pairOperation
+	for _, sample := range representativeCases(t) {
+		operations, wires := representativeOperations(t, sample)
+		checkRepresentativeWire(t, sample, wires)
+		_, factory := representativeMessages(sample.Type)
+		message := factory()
+		if err := json.Unmarshal(sample.Data, message); err != nil {
+			t.Fatal(err)
+		}
+		wire, err := before.Encode(message)
+		if err != nil || !bytes.Equal(wire, wires["sproto_encode"]) || !bytes.Equal(before.Pack(wire), wires["sproto_pack"]) {
+			t.Fatalf("%s baseline wire: %v", sample.Name, err)
+		}
+		old := map[string]func() error{
+			"sproto_encode": func() error {
+				var err error
+				encodedSink, err = before.Encode(message)
+				return err
+			},
+			"sproto_pack": func() error {
+				encodedSink = before.Pack(wire)
+				return nil
+			},
+			"sproto_pencode": func() error {
+				var err error
+				encodedSink, err = before.EncodePacked(message)
+				return err
+			},
+		}
+		for _, operation := range operations {
+			left, ok := old[operation.name]
+			if !ok {
+				continue
+			}
+			if mode == "self" {
+				left = operation.run
+			}
+			pairs = append(pairs, pairOperation{sample.Name + "/" + operation.name, left, operation.run})
+		}
+	}
+	contents, err := os.ReadFile("cases.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var echoCases []benchmarkCase
+	if err := json.Unmarshal(contents, &echoCases); err != nil {
+		t.Fatal(err)
+	}
+	for _, sample := range echoCases {
+		text := strings.Repeat(sample.Pattern, sample.Repeat)
+		left := beforeEchoCodecs(text)["sproto_frame"].encode
+		right := echoCodecs(text)["sproto_frame"].encode
+		old, err := left()
+		if err != nil {
+			t.Fatal(err)
+		}
+		now, err := right()
+		if err != nil || !bytes.Equal(old, now) || len(now) != sample.Wire["sproto_frame"].Bytes || fmt.Sprintf("%x", sha256.Sum256(now)) != sample.Wire["sproto_frame"].SHA256 {
+			t.Fatalf("%s Echo wire: %v", sample.Name, err)
+		}
+		runRight := func() error {
+			var err error
+			encodedSink, err = right()
+			return err
+		}
+		runLeft := func() error {
+			var err error
+			encodedSink, err = left()
+			return err
+		}
+		if mode == "self" {
+			runLeft = runRight
+		}
+		pairs = append(pairs, pairOperation{sample.Name + "/frame", runLeft, runRight})
+	}
+	return pairs
+}
+
+// TestPairStatistics 保护归一化、收益方向、ABBA/BAAB 对线性对数漂移的抵消，以及坏样本拒绝。
+func TestPairStatistics(t *testing.T) {
+	for _, order := range []string{"ABBA", "BAAB"} {
+		var blocks []pairBlock
+		for i, arm := range order {
+			calls := 1000
+			value := 100.0
+			if arm == 'B' {
+				calls, value = 2000, 120
+			}
+			blocks = append(blocks, pairBlock{string(arm), calls, int64(float64(calls) * value * math.Pow(1.01, float64(i)))})
+		}
+		ratio, err := quartetRatio(blocks)
+		if err != nil || math.Abs(ratio-1.2) > 0.0001 {
+			t.Fatalf("%s ratio=%v err=%v", order, ratio, err)
+		}
+		blocks[0].Calls = 0
+		if _, err := quartetRatio(blocks); err == nil {
+			t.Fatal("invalid count accepted")
+		}
+	}
+	if _, err := quartetRatio([]pairBlock{{"A", 1, 1}, {"A", 1, 1}, {"B", 1, 1}, {"B", 1, 1}}); err == nil {
+		t.Fatal("unbalanced order accepted")
+	}
+	for round := range pairRounds {
+		var firstA int
+		for index := range pairQuartets {
+			if quartetOrder(round, index)[0] == 'A' {
+				firstA++
+			}
+		}
+		if firstA != pairQuartets/2 {
+			t.Fatal("first arm is not balanced")
+		}
+	}
+}
+
+// TestPairSampling 是显式工具入口，完整保存所有计时块；不作为默认正确性或发布验收。
+func TestPairSampling(t *testing.T) {
+	output := os.Getenv("GSR_PAIR_OUTPUT")
+	if output == "" {
+		t.Skip("explicit sampling tool: set GSR_PAIR_OUTPUT")
+	}
+	mode := os.Getenv("GSR_PAIR_MODE")
+	if mode != "self" && mode != "clone" && mode != "compare" {
+		t.Fatal("GSR_PAIR_MODE must be self, clone or compare")
+	}
+	if runtime.GOMAXPROCS(0) != 1 {
+		t.Fatal("sampling requires GOMAXPROCS=1")
+	}
+	results := []pairResult{}
+	operations := pairOperations(t, mode)
+	for _, operation := range operations {
+		result := pairResult{Name: operation.name, SameFunction: reflect.ValueOf(operation.left).Pointer() == reflect.ValueOf(operation.right).Pointer()}
+		if mode == "self" && !result.SameFunction {
+			t.Fatal("self control does not share its call target")
+		}
+		runtime.GC()
+		// 每项先连续交错预热，再校准；计时块之间不强制 GC，也不关闭 GC。
+		warm := time.Now()
+		for time.Since(warm) < 50*time.Millisecond {
+			for range 64 {
+				if err := operation.left(); err != nil {
+					t.Fatal(err)
+				}
+				if err := operation.right(); err != nil {
+					t.Fatal(err)
+				}
+			}
+		}
+		leftCalls, err := blockCalls(operation.left)
+		if err != nil {
+			t.Fatal(err)
+		}
+		rightCalls, err := blockCalls(operation.right)
+		if err != nil {
+			t.Fatal(err)
+		}
+		result.CallsPerBlock = max(leftCalls, rightCalls)
+		var leftNanos, rightNanos int64
+		for round := range pairRounds {
+			var logarithms float64
+			for index := range pairQuartets {
+				quartet := pairQuartet{Round: round, Index: index}
+				for _, arm := range quartetOrder(round, index) {
+					run := operation.left
+					if arm == 'B' {
+						run = operation.right
+					}
+					block, err := sampleBlock(run, result.CallsPerBlock)
+					if err != nil {
+						t.Fatal(err)
+					}
+					block.Arm = string(arm)
+					quartet.Blocks = append(quartet.Blocks, block)
+					if arm == 'A' {
+						leftNanos += block.Nanoseconds
+					} else {
+						rightNanos += block.Nanoseconds
+					}
+				}
+				ratio, err := quartetRatio(quartet.Blocks)
+				if err != nil {
+					t.Fatal(err)
+				}
+				quartet.Ratio = ratio
+				logarithms += math.Log(ratio)
+				result.Quartets = append(result.Quartets, quartet)
+			}
+			result.RoundRatios = append(result.RoundRatios, math.Exp(logarithms/pairQuartets))
+		}
+		result.LeftNS = float64(leftNanos) / float64(result.CallsPerBlock*pairRounds*pairQuartets*2)
+		result.RightNS = float64(rightNanos) / float64(result.CallsPerBlock*pairRounds*pairQuartets*2)
+		for repeat := range 3 {
+			for _, arm := range quartetOrder(repeat, 0)[:2] {
+				run := operation.left
+				if arm == 'B' {
+					run = operation.right
+				}
+				var start, end runtime.MemStats
+				runtime.ReadMemStats(&start)
+				for range 128 {
+					if err := run(); err != nil {
+						t.Fatal(err)
+					}
+				}
+				runtime.ReadMemStats(&end)
+				result.Allocations = append(result.Allocations, pairAllocation{string(arm), 128, end.TotalAlloc - start.TotalAlloc, end.Mallocs - start.Mallocs})
+			}
+		}
+		results = append(results, result)
+		contents, err := json.MarshalIndent(struct {
+			Mode     string       `json:"mode"`
+			Rounds   int          `json:"rounds"`
+			Quartets int          `json:"quartetsPerRound"`
+			TargetNS int64        `json:"targetBlockNs"`
+			Results  []pairResult `json:"results"`
+		}{mode, pairRounds, pairQuartets, int64(blockTarget), results}, "", "  ")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(output, append(contents, '\n'), 0644); err != nil {
+			t.Fatal(err)
+		}
+		t.Logf("%s %s: completed %d/%d", mode, operation.name, len(results), len(operations))
+	}
+}
+
+// TestPairSelection 保护精确筛选、原矩阵顺序和未知/重复名称拒绝，避免误采整套或空集。
+func TestPairSelection(t *testing.T) {
+	operations := []pairOperation{{name: "first/pack"}, {name: "second/pack"}}
+	selected, err := selectPairs(operations, []string{"second/pack"})
+	if err != nil || len(selected) != 1 || selected[0].name != "second/pack" {
+		t.Fatalf("selection=%v err=%v", selected, err)
+	}
+	selected, err = selectPairs(operations, []string{"second/pack", "first/pack"})
+	if err != nil || len(selected) != 2 || selected[0].name != "first/pack" {
+		t.Fatalf("order=%v err=%v", selected, err)
+	}
+	for _, names := range [][]string{{"missing"}, {"first/pack", "first/pack"}} {
+		if _, err := selectPairs(operations, names); err == nil {
+			t.Fatalf("invalid selection accepted: %v", names)
+		}
+	}
+	selected, err = selectPairs(operations, nil)
+	if err != nil || len(selected) != 2 {
+		t.Fatal("default selection changed")
+	}
+}
+
+func selectPairs(operations []pairOperation, names []string) ([]pairOperation, error) {
+	return operations, nil
+}

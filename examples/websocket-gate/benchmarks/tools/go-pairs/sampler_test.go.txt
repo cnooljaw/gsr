@@ -9,6 +9,7 @@ import (
 	"os"
 	"reflect"
 	"runtime"
+	"runtime/metrics"
 	"strings"
 	"testing"
 	"time"
@@ -17,9 +18,9 @@ import (
 )
 
 const (
-	pairRounds   = 6
-	pairQuartets = 4
-	blockTarget  = 10 * time.Millisecond
+	pairRounds         = 6
+	pairQuartets       = 4
+	defaultBlockTarget = 10 * time.Millisecond
 )
 
 type pairOperation struct {
@@ -28,9 +29,10 @@ type pairOperation struct {
 }
 
 type pairBlock struct {
-	Arm         string `json:"arm"`
-	Calls       int    `json:"calls"`
-	Nanoseconds int64  `json:"nanoseconds"`
+	Arm          string `json:"arm"`
+	Calls        int    `json:"calls"`
+	Nanoseconds  int64  `json:"nanoseconds"`
+	CompletedGCs uint64 `json:"completedGcCycles"`
 }
 
 type pairQuartet struct {
@@ -41,10 +43,11 @@ type pairQuartet struct {
 }
 
 type pairAllocation struct {
-	Arm     string `json:"arm"`
-	Calls   int    `json:"calls"`
-	Bytes   uint64 `json:"bytes"`
-	Mallocs uint64 `json:"mallocs"`
+	Arm          string `json:"arm"`
+	Calls        int    `json:"calls"`
+	Bytes        uint64 `json:"bytes"`
+	Mallocs      uint64 `json:"mallocs"`
+	CompletedGCs uint32 `json:"completedGcCycles"`
 }
 
 type pairResult struct {
@@ -89,25 +92,30 @@ func quartetOrder(round, index int) string {
 	return "BAAB"
 }
 
-func sampleBlock(run func() error, calls int) (pairBlock, error) {
+// sampleBlock 在计时区间外读取完成 GC 周期；不丢弃含 GC 的块。
+func sampleBlock(run func() error, calls int, counter []metrics.Sample) (pairBlock, error) {
+	metrics.Read(counter)
+	beforeGC := counter[0].Value.Uint64()
 	start := time.Now()
 	for range calls {
 		if err := run(); err != nil {
 			return pairBlock{}, err
 		}
 	}
-	return pairBlock{Calls: calls, Nanoseconds: time.Since(start).Nanoseconds()}, nil
+	elapsed := time.Since(start).Nanoseconds()
+	metrics.Read(counter)
+	return pairBlock{Calls: calls, Nanoseconds: elapsed, CompletedGCs: counter[0].Value.Uint64() - beforeGC}, nil
 }
 
-func blockCalls(run func() error) (int, error) {
+func blockCalls(run func() error, target time.Duration, counter []metrics.Sample) (int, error) {
 	calls := 256
 	for range 8 {
-		block, err := sampleBlock(run, calls)
+		block, err := sampleBlock(run, calls, counter)
 		if err != nil {
 			return 0, err
 		}
 		if block.Nanoseconds >= int64(2*time.Millisecond) {
-			return max(1, min(10000000, int(float64(calls)*float64(blockTarget)/float64(block.Nanoseconds)))), nil
+			return max(1, min(10000000, int(float64(calls)*float64(target)/float64(block.Nanoseconds)))), nil
 		}
 		calls = min(calls*4, 10000000)
 	}
@@ -204,7 +212,7 @@ func TestPairStatistics(t *testing.T) {
 			if arm == 'B' {
 				calls, value = 2000, 120
 			}
-			blocks = append(blocks, pairBlock{string(arm), calls, int64(float64(calls) * value * math.Pow(1.01, float64(i)))})
+			blocks = append(blocks, pairBlock{Arm: string(arm), Calls: calls, Nanoseconds: int64(float64(calls) * value * math.Pow(1.01, float64(i)))})
 		}
 		ratio, err := quartetRatio(blocks)
 		if err != nil || math.Abs(ratio-1.2) > 0.0001 {
@@ -215,7 +223,7 @@ func TestPairStatistics(t *testing.T) {
 			t.Fatal("invalid count accepted")
 		}
 	}
-	if _, err := quartetRatio([]pairBlock{{"A", 1, 1}, {"A", 1, 1}, {"B", 1, 1}, {"B", 1, 1}}); err == nil {
+	if _, err := quartetRatio([]pairBlock{{Arm: "A", Calls: 1, Nanoseconds: 1}, {Arm: "A", Calls: 1, Nanoseconds: 1}, {Arm: "B", Calls: 1, Nanoseconds: 1}, {Arm: "B", Calls: 1, Nanoseconds: 1}}); err == nil {
 		t.Fatal("unbalanced order accepted")
 	}
 	for round := range pairRounds {
@@ -245,7 +253,28 @@ func TestPairSampling(t *testing.T) {
 		t.Fatal("sampling requires GOMAXPROCS=1")
 	}
 	results := []pairResult{}
-	operations := pairOperations(t, mode)
+	blockTarget := defaultBlockTarget
+	if text := os.Getenv("GSR_PAIR_BLOCK_TARGET"); text != "" {
+		var err error
+		blockTarget, err = time.ParseDuration(text)
+		if err != nil || (blockTarget != 10*time.Millisecond && blockTarget != 40*time.Millisecond) {
+			t.Fatal("block target must be 10ms or 40ms")
+		}
+	}
+	counter := []metrics.Sample{{Name: "/gc/cycles/total:gc-cycles"}, {Name: "/gc/gogc:percent"}}
+	metrics.Read(counter)
+	gcPercent := counter[1].Value.Uint64()
+	if gcPercent == ^uint64(0) {
+		t.Fatal("sampling requires enabled GC")
+	}
+	var selectedNames []string
+	if names := os.Getenv("GSR_PAIR_CASES"); names != "" {
+		selectedNames = strings.Split(names, ",")
+	}
+	operations, err := selectPairs(pairOperations(t, mode), selectedNames)
+	if err != nil {
+		t.Fatal(err)
+	}
 	for _, operation := range operations {
 		result := pairResult{Name: operation.name, SameFunction: reflect.ValueOf(operation.left).Pointer() == reflect.ValueOf(operation.right).Pointer()}
 		if mode == "self" && !result.SameFunction {
@@ -264,11 +293,11 @@ func TestPairSampling(t *testing.T) {
 				}
 			}
 		}
-		leftCalls, err := blockCalls(operation.left)
+		leftCalls, err := blockCalls(operation.left, blockTarget, counter)
 		if err != nil {
 			t.Fatal(err)
 		}
-		rightCalls, err := blockCalls(operation.right)
+		rightCalls, err := blockCalls(operation.right, blockTarget, counter)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -283,7 +312,7 @@ func TestPairSampling(t *testing.T) {
 					if arm == 'B' {
 						run = operation.right
 					}
-					block, err := sampleBlock(run, result.CallsPerBlock)
+					block, err := sampleBlock(run, result.CallsPerBlock, counter)
 					if err != nil {
 						t.Fatal(err)
 					}
@@ -321,17 +350,18 @@ func TestPairSampling(t *testing.T) {
 					}
 				}
 				runtime.ReadMemStats(&end)
-				result.Allocations = append(result.Allocations, pairAllocation{string(arm), 128, end.TotalAlloc - start.TotalAlloc, end.Mallocs - start.Mallocs})
+				result.Allocations = append(result.Allocations, pairAllocation{Arm: string(arm), Calls: 128, Bytes: end.TotalAlloc - start.TotalAlloc, Mallocs: end.Mallocs - start.Mallocs, CompletedGCs: end.NumGC - start.NumGC})
 			}
 		}
 		results = append(results, result)
 		contents, err := json.MarshalIndent(struct {
-			Mode     string       `json:"mode"`
-			Rounds   int          `json:"rounds"`
-			Quartets int          `json:"quartetsPerRound"`
-			TargetNS int64        `json:"targetBlockNs"`
-			Results  []pairResult `json:"results"`
-		}{mode, pairRounds, pairQuartets, int64(blockTarget), results}, "", "  ")
+			Mode        string       `json:"mode"`
+			Rounds      int          `json:"rounds"`
+			Quartets    int          `json:"quartetsPerRound"`
+			TargetNS    int64        `json:"targetBlockNs"`
+			GOGCPercent uint64       `json:"gogcPercent"`
+			Results     []pairResult `json:"results"`
+		}{mode, pairRounds, pairQuartets, int64(blockTarget), gcPercent, results}, "", "  ")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -339,5 +369,65 @@ func TestPairSampling(t *testing.T) {
 			t.Fatal(err)
 		}
 		t.Logf("%s %s: completed %d/%d", mode, operation.name, len(results), len(operations))
+	}
+}
+
+// TestPairSelection 保护精确筛选、原矩阵顺序和未知/重复名称拒绝，避免误采整套或空集。
+func TestPairSelection(t *testing.T) {
+	operations := []pairOperation{{name: "first/pack"}, {name: "second/pack"}}
+	selected, err := selectPairs(operations, []string{"second/pack"})
+	if err != nil || len(selected) != 1 || selected[0].name != "second/pack" {
+		t.Fatalf("selection=%v err=%v", selected, err)
+	}
+	selected, err = selectPairs(operations, []string{"second/pack", "first/pack"})
+	if err != nil || len(selected) != 2 || selected[0].name != "first/pack" {
+		t.Fatalf("order=%v err=%v", selected, err)
+	}
+	for _, names := range [][]string{{"missing"}, {"first/pack", "first/pack"}} {
+		if _, err := selectPairs(operations, names); err == nil {
+			t.Fatalf("invalid selection accepted: %v", names)
+		}
+	}
+	selected, err = selectPairs(operations, nil)
+	if err != nil || len(selected) != 2 {
+		t.Fatal("default selection changed")
+	}
+}
+
+func selectPairs(operations []pairOperation, names []string) ([]pairOperation, error) {
+	if len(names) == 0 {
+		return operations, nil
+	}
+	wanted := make(map[string]bool, len(names))
+	for _, name := range names {
+		if _, exists := wanted[name]; exists {
+			return nil, fmt.Errorf("duplicate case: %s", name)
+		}
+		wanted[name] = false
+	}
+	var selected []pairOperation
+	for _, operation := range operations {
+		if _, exists := wanted[operation.name]; exists {
+			wanted[operation.name] = true
+			selected = append(selected, operation)
+		}
+	}
+	for name, found := range wanted {
+		if !found {
+			return nil, fmt.Errorf("unknown case: %s", name)
+		}
+	}
+	return selected, nil
+}
+
+// TestPairGCCounter 保护计时块对显式完成 GC 的观测，不改变或过滤耗时样本。
+func TestPairGCCounter(t *testing.T) {
+	counter := []metrics.Sample{{Name: "/gc/cycles/total:gc-cycles"}}
+	block, err := sampleBlock(func() error {
+		runtime.GC()
+		return nil
+	}, 1, counter)
+	if err != nil || block.CompletedGCs < 1 || block.Calls != 1 || block.Nanoseconds <= 0 {
+		t.Fatalf("block=%+v err=%v", block, err)
 	}
 }

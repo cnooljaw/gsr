@@ -35,12 +35,12 @@ def summarize(raw):
                 for key in ["bytes", "mallocs"]
             }
         same_allocation = allocation["A"] == allocation["B"]
-        accepted = (
+        timing_accepted = (
             abs(median - 1) <= 0.02
             and quartiles[2] - quartiles[0] <= 0.03
             and within >= 5
-            and same_allocation
         )
+        accepted = timing_accepted and same_allocation
         summary.append({
             "name": result["name"],
             "medianRatio": median,
@@ -48,6 +48,7 @@ def summarize(raw):
             "roundsWithin5Pct": within,
             "allocationMedian": allocation,
             "sameAllocation": same_allocation,
+            "timingAccepted": timing_accepted if raw["mode"] != "compare" else None,
             "controlAccepted": accepted if raw["mode"] != "compare" else None,
             "roundRatios": ratios,
         })
@@ -62,9 +63,15 @@ def main():
     parser.add_argument("--mode", choices=["self", "clone", "compare"], default="self")
     parser.add_argument("--candidate-patch", type=Path)
     parser.add_argument("--prepare-only", action="store_true")
+    parser.add_argument("--block-ms", type=int, choices=[10, 40], default=10)
+    parser.add_argument("--case", action="append", dest="cases", default=[])
     options = parser.parse_args()
     if (options.mode == "compare") != bool(options.candidate_patch):
         parser.error("compare requires --candidate-patch; self/clone must use unchanged archives")
+    if os.environ.get("GOGC", "").strip().lower() in {"off", "-1"}:
+        parser.error("sampling requires enabled GC")
+    if len(set(options.cases)) != len(options.cases):
+        parser.error("duplicate --case")
     library = options.library.resolve()
     output = options.output.resolve()
     if output.exists():
@@ -139,13 +146,21 @@ import (
     manifest = {
         "baselineCommit": baseline, "mode": options.mode,
         "goVersion": run(["go", "version"], root).strip(),
+        "gsrHead": run(["git", "rev-parse", "HEAD"], root).strip(),
+        "environment": {key: os.environ.get(key) for key in ["GOGC", "GOMEMLIMIT", "GOFLAGS", "GOTOOLCHAIN"]},
+        "generatedGoInputs": {
+            str(path.relative_to(root)): digest(path)
+            for directory in ["examples/websocket-gate/gen", "examples/websocket-gate/benchmarks/gen", "protocol/gen"]
+            for path in sorted((root / directory).rglob("*.go"))
+        },
         "beforeGoSource": sources(before), "candidateGoSource": sources(candidate),
         "harnessGoSource": sources(harness),
         "fixtures": {name: digest(harness / name) for name in ["representative.json", "cases.json", "correctness.json"]},
         "tools": {name: digest(tool / name) for name in ["run.py", "sampler_test.go.txt"]},
         "candidatePatchSha256": digest(options.candidate_patch) if options.candidate_patch else None,
         "controlGate": "abs(median ratio - 1) <= 2%; round ratio IQR <= 3 percentage points; at least 5/6 rounds within 5%; allocation medians equal",
-        "parameters": {"rounds": 6, "quartetsPerRound": 4, "targetBlockMs": 10, "warmupMs": 50, "gcEnabled": True},
+        "parameters": {"rounds": 6, "quartetsPerRound": 4, "targetBlockMs": options.block_ms, "warmupMs": 50, "gcEnabled": True},
+        "selectedCases": options.cases or "all_19",
         "scope": "Controls calibrate this case/run only; compare has no automatic adoption decision. Median/IQR are descriptive, not a confidence interval.",
     }
     if options.mode != "compare" and manifest["beforeGoSource"] != manifest["candidateGoSource"]:
@@ -153,7 +168,7 @@ import (
     (output / "inputs.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
     if options.prepare_only:
         return
-    run(["go", "test", "-mod=mod", "-run", "^(TestPairStatistics|TestRepresentativeFixtures)$", ".", "-timeout=1m"], harness)
+    run(["go", "test", "-mod=mod", "-run", "^(TestPairStatistics|TestPairSelection|TestPairGCCounter|TestRepresentativeFixtures)$", ".", "-timeout=1m"], harness)
     binary = output / "pairs.test"
     run(["go", "test", "-mod=mod", "-c", "-o", str(binary), "."], harness)
     manifest["binarySha256"] = digest(binary)
@@ -161,13 +176,25 @@ import (
     run([str(binary), "-test.run=^TestPairSampling$", "-test.v", "-test.timeout=90s"], harness, {
         "GOMAXPROCS": "1", "GSR_PAIR_MODE": options.mode,
         "GSR_PAIR_OUTPUT": str(output / "raw.json"),
+        "GSR_PAIR_BLOCK_TARGET": str(options.block_ms) + "ms",
+        "GSR_PAIR_CASES": ",".join(options.cases),
     }, timeout=95)
     for directory, key in [(before, "beforeGoSource"), (candidate, "candidateGoSource"), (harness, "harnessGoSource")]:
         if sources(directory) != manifest[key]:
             raise RuntimeError("source changed during sampling")
     raw = json.loads((output / "raw.json").read_text())
-    if len(raw["results"]) != 19:
+    if (raw["rounds"], raw["quartetsPerRound"], raw["targetBlockNs"]) != (6, 4, options.block_ms * 1000000):
+        raise RuntimeError("sampling parameters differ")
+    if len(raw["results"]) != (len(options.cases) if options.cases else 19):
         raise RuntimeError("sampling incomplete")
+    if options.cases and {result["name"] for result in raw["results"]} != set(options.cases):
+        raise RuntimeError("sampled cases differ")
+    for path, expected in manifest["generatedGoInputs"].items():
+        if digest(root / path) != expected:
+            raise RuntimeError("generated input changed during sampling")
+    for name, expected in manifest["tools"].items():
+        if digest(tool / name) != expected:
+            raise RuntimeError("tool changed during sampling")
     for result in raw["results"]:
         if len(result["quartets"]) != 24 or len(result["roundRatios"]) != 6:
             raise RuntimeError("sampling incomplete")
