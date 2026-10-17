@@ -1,0 +1,110 @@
+--- a/decode.go
++++ b/decode.go
+@@ -258,6 +258,9 @@
+ 	if err != nil {
+ 		return err
+ 	}
++	if count > 0 && field.st.int64Record && field.st.decodeIntegerFields() {
++		return decodeIntegerRecordSlice(data, count, field, value, budget)
++	}
+ 	result := reflect.MakeSlice(value.Type(), count, count)
+ 	for index := 0; index < count; index++ {
+ 		used, content, err := readChunk(data)
+--- /dev/null
++++ b/decode_integer_record.go
+@@ -0,0 +1,95 @@
++package sproto
++
++import "reflect"
++
++// decodeIntegerFields 检查所有可由原 tag 表命中的字段，公开 Fields 替换时回落通用路径。
++func (schema *SprotoType) decodeIntegerFields() bool {
++	for _, index := range schema.tagMap {
++		if !schema.Fields[index].nativeInteger(schema) {
++			return false
++		}
++	}
++	return true
++}
++
++// decodeIntegerRecordSlice 只用于入口已核对的整数叶子结构；每个字段/元素仍各自独占。
++func decodeIntegerRecordSlice(data []byte, count int, field *SprotoField, value reflect.Value, budget *decodeBudget) error {
++	if budget.depth >= budget.limits.MaxDepth {
++		return ErrLimit
++	}
++	budget.depth++
++	defer func() { budget.depth-- }()
++	result := reflect.MakeSlice(value.Type(), count, count)
++	for index := 0; index < count; index++ {
++		used, content, err := readChunk(data)
++		if err != nil {
++			return err
++		}
++		current := reflect.New(field.st.typ)
++		consumed, err := decodeIntegerRecord(content, field.st, current, budget)
++		if err != nil {
++			return err
++		}
++		if consumed != len(content) {
++			return ErrDecode
++		}
++		result.Index(index).Set(current)
++		data = data[used:]
++	}
++	value.Set(result)
++	return nil
++}
++
++// decodeIntegerRecord 复用数组层已建立的深度，保留逐条 header/字节边界和元素预算。
++func decodeIntegerRecord(chunk []byte, schema *SprotoType, value reflect.Value, budget *decodeBudget) (int, error) {
++	if len(chunk) < 2 {
++		return 0, ErrDecode
++	}
++	count := int(readUint16(chunk))
++	total := 2 + count*2
++	if total > len(chunk) {
++		return 0, ErrDecode
++	}
++	if err := budget.add(count); err != nil {
++		return 0, err
++	}
++	record := value.Elem()
++	tag := 0
++	for index := 0; index < count; index++ {
++		entry := int(readUint16(chunk[2+index*2:]))
++		if entry%2 == 1 {
++			tag += (entry + 1) / 2
++			continue
++		}
++		if tag > 65535 {
++			return 0, ErrDecode
++		}
++		hasInline := entry != 0
++		var content []byte
++		if !hasInline {
++			used, data, err := readChunk(chunk[total:])
++			if err != nil {
++				return 0, err
++			}
++			total += used
++			content = data
++		}
++		field := schema.FieldByTag(tag)
++		tag++
++		if field == nil {
++			continue
++		}
++		bits := uint64(uint16(entry/2 - 1))
++		if !hasInline {
++			var err error
++			bits, err = scalarBits(0, false, content)
++			if err != nil {
++				return 0, err
++			}
++		}
++		result := new(int64)
++		*result = int64(bits)
++		record.Field(field.index[0]).Set(reflect.ValueOf(result))
++	}
++	return total, nil
++}

@@ -34,6 +34,8 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 
 ## 报告
 
+[Decode 记录候选与受控写入原型](../../../docs/benchmarks/2026-10-17-gosproto-decode-writes/RESULTS.md) 保存被撤回的整数叶子 parser，以及完整通用流程中的类型化整数写入隔离原型。后者五轮大型 Decode/PDecode 约 -11.2%/-9.2%，分配不变；字符串与未改 Unpack 控制的代价保留。正式库生产源码仍为 `70d985c`，受控写入仅形成 Proposed 提案。
+
 [Decode 同分配诊断与安全 inline 验收](../../../docs/benchmarks/2026-10-17-gosproto-decode-analysis/RESULTS.md) 区分固定流程、反射赋值与构造成本；保留通用/固定探针各自数据。安全 inline 最终 129 项五轮中，大型 Decode/PDecode 约 -5.3%/-4.1%，分配不变；原三轮波动、完整矩阵极小项代价及 A/A 控制分别公开。固定 Item 探针不作为生产结果，正式依赖仍为 v0.4.0。
 
 [普通 Unpack 候选筛选](../../../docs/benchmarks/2026-10-16-gosproto-unpack-candidates/RESULTS.md) 记录五个未采用候选、1935 个三轮样本和可复现补丁。位置/计数表、游标及稀疏直接恢复均未通过业务收益与形态代价检查；生产代码仍为已提交的零段优化，只新增独立字节回归。额外保存大型 Decode 的对象构造/分配 profile，不作为新排名。

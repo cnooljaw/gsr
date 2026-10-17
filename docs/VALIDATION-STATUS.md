@@ -4,13 +4,21 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## Decode 记录候选与类型化写入原型（2026-10-17）
+
+上一轮已本地提交为 gosproto `70d985c`、GSR `d0328fd`，未推送。整数叶子记录 parser 只带来约 -3.1% Decode/-1.3% PDecode，已撤回。正式库仅新增精确稀疏 header 解码预算、失败原数组与 Fields 替换语义回归，生产 Go 源码全部保持 `70d985c`。
+
+类型化写入只在隔离副本验证：129 项五轮中，大型 Decode/PDecode 约 -11.2%/-9.2%，分配不变。字符串/未改 Unpack 控制的代价与原值一并保留。原型完整库官方对照/race/严格 checkptr/vet、131068 组差分与 GC/padding 检查、Decode/Codec 有限 fuzz，以及临时覆盖 GSR 三包和 Go/TS Plain/MAC 7/7、零跳过通过。没有跨架构运行或新的极小项 A/A 复核。
+
+原型不等于正式依赖已升级或写入边界已采用；[实验记录](benchmarks/2026-10-17-gosproto-decode-writes/RESULTS.md) 与 [Proposed 提案](RFC-GOSPROTO-DECODER-WRITES.md) 记录范围、代价和后续门槛。新增正式库测试、诊断和文档未提交。
+
 ## Decode 同分配诊断与安全 inline（2026-10-17）
 
 前轮已本地提交为 gosproto `d66644a`、GSR `acfb070`，GSR 补丁格式属性修正为 `ae2e1bc`，均未推送。先做同分配的固定 Item 构造/赋值诊断，再仅为已确认的 inline 原生 *int64 省去重复分派；仍用安全反射赋值，未新增 unsafe、API、池或缓存。
 
 129 项五轮中，大型 Decode/PDecode 约 -5.3%/-4.1%，小型约 -4.6%/-3.1%，分配不变。原三轮明显波动、完整矩阵极小零段约 +13% 与 A/A 复核分别保留，未改 Unpack 的耗时差异不称为算法收益。固定 Item 类型化探针不冒充通用 decoder。
 
-131068 组旧新差分覆盖全部合法 inline 值、低预算、迟到坏帧及 packed 路径；扩展既有指针独占回归覆盖 0/1/32766/32767/MaxInt64。完整库 race/严格 checkptr（固定官方 C/Lua oracle）、vet、Decode/Codec 各约十秒 fuzz、GSR 临时覆盖三包与 Go/TS Plain/MAC 集成 7/7、零跳过通过。未重复 GSR 全仓/race、TS 性能或跨平台运行。数据和具体范围见 [Decode 验收](benchmarks/2026-10-17-gosproto-decode-analysis/RESULTS.md)，新增实现、测试和文档未提交。
+131068 组旧新差分覆盖全部合法 inline 值、低预算、迟到坏帧及 packed 路径；扩展既有指针独占回归覆盖 0/1/32766/32767/MaxInt64。完整库 race/严格 checkptr（固定官方 C/Lua oracle）、vet、Decode/Codec 各约十秒 fuzz、GSR 临时覆盖三包与 Go/TS Plain/MAC 集成 7/7、零跳过通过。未重复 GSR 全仓/race、TS 性能或跨平台运行。数据和具体范围见 [Decode 验收](benchmarks/2026-10-17-gosproto-decode-analysis/RESULTS.md)，该切片已本地提交为 gosproto `70d985c`、GSR `d0328fd`，未发布。
 
 ## 普通 Unpack 候选筛选（2026-10-16）
 

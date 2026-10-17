@@ -1,0 +1,13 @@
+{
+  "command": [
+    "go",
+    "tool",
+    "objdump",
+    "-s",
+    "^github.com/cnooljaw/gosproto.decodeMessage$",
+    "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-decode/typed-store.test"
+  ],
+  "architecture": "darwin/arm64",
+  "excerpt": "  decode.go:346\t\t0x100209efc\t\t370001e5\t\tTBNZ $0, R5, 15(PC)\t\t\t\t\t\n  decode.go:348\t\t0x100209f00\t\tf9404884\t\tMOVD 144(R4), R4\t\t\t\t\t\n  decode.go:348\t\t0x100209f04\t\tf000181b\t\tADRP 3158016(PC), R27\t\t\t\t\t\n  decode.go:348\t\t0x100209f08\t\tb948d365\t\tMOVWU 2256(R27), R5\t\t\t\t\t\n  decode.go:348\t\t0x100209f0c\t\t340000a5\t\tCBZW R5, 5(PC)\t\t\t\t\t\t\n  decode.go:348\t\t0x100209f10\t\t97f9b8e0\t\tCALL runtime.gcWriteBarrier2(SB)\t\t\t\n  decode.go:348\t\t0x100209f14\t\tf9000320\t\tMOVD R0, (R25)\t\t\t\t\t\t\n  decode.go:348\t\t0x100209f18\t\tf8646825\t\tMOVD (R1)(R4), R5\t\t\t\t\t\n  decode.go:348\t\t0x100209f1c\t\tf9000725\t\tMOVD R5, 8(R25)\t\t\t\t\t\t\n  decode.go:348\t\t0x100209f20\t\tf8246820\t\tMOVD R0, (R1)(R4)\t\t\t\t\t\n  decode.go:348\t\t0x100209f24\t\t14000027\t\tJMP 39(PC)\t\t\t\t\t\t",
+  "observation": "Typed pointer store emits runtime.writeBarrier check and gcWriteBarrier2 on this compiler; not a cross-platform runtime proof"
+}

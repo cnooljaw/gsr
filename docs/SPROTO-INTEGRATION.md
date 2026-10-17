@@ -100,7 +100,9 @@ Go 第三轮已重建基线并筛选候选：仅保留布局记录内存收窄�
 
 普通 Unpack 后续验证五个位置/计数表及游标候选，各做 129 项三轮配对，全部因稀疏回退或真实组合收益不足撤回。该切片只保留 2048 组独立 mask 字节回归与 [筛选记录](benchmarks/2026-10-16-gosproto-unpack-candidates/RESULTS.md)，已提交为 gosproto `d66644a`、GSR `acfb070`（格式属性修正 `ae2e1bc`），正式依赖仍为 v0.4.0。
 
-2026-10-17，同分配探针确认大型 Decode 仍有反射执行成本；落地已确认 inline 原生整数的安全快捷处理。大型 Decode/PDecode 约 -5.3%/-4.1%，分配、wire、预算及独占不变，未新增 unsafe。完整库/官方对照、差分、有限 fuzz 与 GSR/GoTS 集成通过，控制中的波动和代价分别保留，见 [Decode 诊断与验收](benchmarks/2026-10-17-gosproto-decode-analysis/RESULTS.md)。新增改动未提交/发布，正式依赖仍为 v0.4.0。
+2026-10-17，同分配探针确认大型 Decode 仍有反射执行成本；落地已确认 inline 原生整数的安全快捷处理。大型 Decode/PDecode 约 -5.3%/-4.1%，分配、wire、预算及独占不变，未新增 unsafe。完整库/官方对照、差分、有限 fuzz 与 GSR/GoTS 集成通过，控制中的波动和代价分别保留，见 [Decode 诊断与验收](benchmarks/2026-10-17-gosproto-decode-analysis/RESULTS.md)。已本地提交为 gosproto `70d985c`、GSR `d0328fd`，未发布，正式依赖仍为 v0.4.0。
+
+后续整数记录专用 parser 已因组合收益不足撤回。原生整数指针类型化写入在隔离副本的五轮数据中带来大型 Decode/PDecode 约 -11.2%/-9.2%，并通过官方/GC/差分及 GoTS 集成；正式生产代码仍为 `70d985c`。数据与局限见 [实验记录](benchmarks/2026-10-17-gosproto-decode-writes/RESULTS.md)，正式化范围见 [Proposed 提案](RFC-GOSPROTO-DECODER-WRITES.md)。新增测试与文档未提交，正式依赖仍为 v0.4.0。
 
 ## 独立修复库与官方对照（2026-10-15）
 

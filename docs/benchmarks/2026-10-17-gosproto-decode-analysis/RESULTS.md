@@ -83,7 +83,7 @@ fixed_typed 的大型纯 Decode 低于同场 PB，但其 PDecode 20.492 µs 仍�
 
 [131068 组差分](inline/differential.go.txt) 枚举全部 0…32766 inline 值，分别验证成功、低元素预算拒绝、后续坏帧及 packed 解码，比较稳定错误类、消费长度、完整输出、失败时原指针和成功字段独占。完整独立库 race/严格 checkptr（启用固定官方 C/Lua oracle）、vet、两项各约十秒 fuzz，以及 GSR 临时 modfile 三包和 Go/TS Plain/MAC 集成 7/7、零跳过通过。
 
-命令、执行数量与未验证范围见 [validation.json](validation.json)。没有重跑 GSR 全仓/race、TS 性能或跨平台运行。新增生产改动、测试与文档尚未提交/发布，GSR 正式依赖仍为 v0.4.0。
+命令、执行数量与未验证范围见 [validation.json](validation.json)。没有重跑 GSR 全仓/race、TS 性能或跨平台运行。该切片已本地提交为 gosproto `70d985c`、GSR `d0328fd`，未发布，GSR 正式依赖仍为 v0.4.0。后续见 [记录候选与受控写入原型](../2026-10-17-gosproto-decode-writes/RESULTS.md)。
 
 inline 实现可用独立副本复现：
 
