@@ -1,0 +1,201 @@
+{
+  "decision": "retain reply-bearing request shared workspace; uncommitted",
+  "libraryHead": "0988af05baa2665b7c43399e949a1b6ea1439c89",
+  "gsrHead": "9876a5b2a692d4734b210c415ddd6f1db06eec28",
+  "finalGoSource": {
+    "decode.go": "b3cbbe248d17fe770add10ba93e5942fe5c54c13eba1c416135d83cff890e65e",
+    "decode_pointer.go": "5cf91e619c80895785046b396dbf1861a61281cb0b6c3d954cd07d99b8bfd961",
+    "encode.go": "73fe791f2e3d5d9011bc2011b9413c94457baea06c887426992f4a665fe0784a",
+    "encode_integer_record.go": "1ec4e5d0531c1de565aaa6b60c8ea8e185b9c36a95ffc9e49b848e5ed267fdcb",
+    "encode_pointer.go": "e7a239568a0fc8788404de6f5bc0d5e2ac092fa559f0a6bfd4561fdc155f81c1",
+    "encode_test.go": "d28095ae5b5b820eb0d5aed634397bb86159361b5876c3126100d59e37d41099",
+    "fuzz_test.go": "10eb7cb2d2fcd8afe47b6880cd61f64121f17b0a3355a6073b41ceb87e8d435c",
+    "limits.go": "0b7f61892c851cfd3de87128e22f0b74b201af718036a5c0ddafbaa2b87007a4",
+    "limits_test.go": "133e730777dc7ed132e5fd6c683cac8597870e908a3363f9b4ee37f1c19728d0",
+    "meta.go": "6badd4a5ac60d8a15caaa1f35634268101c436b275cf4a0fe120b91db417d217",
+    "official_compat_test.go": "fa413db0126e78205f7ee2d56f8f5d521bc29d82b723953385b79b0407412b60",
+    "pack.go": "d77720c37dcf73412bdf614b4ceb292d4a94aa259622f370c04cf6ae7b68d686",
+    "pack_test.go": "70e79e8fa5273d4a9f31fb6afc885efbb1f2f86ca9d68b1bba4c1c97e8deed56",
+    "rpc.go": "6a5d29737047ecdcc2286b68a35df3330affa9dd8948ffbd5fde09104eed7899",
+    "rpc_limits_test.go": "6c0361cbda2870b3d4abf578b7313acc44728ed78de0ea92336c8c1170ee39b1",
+    "rpc_test.go": "4db20f87186685ef4bd78bc0e021940a8afe718a28ae8bddd6b66bede3017468",
+    "sproto.go": "2d35ffddf1ec0492fe6425f3d1dd7ede5d4edb3794773f6971fc4f36ceb80f4d",
+    "sproto_test.go": "20a255950d0628f27a00cf5923448d524c729b05f16ed18df3a095d2c6449d9e"
+  },
+  "changedGoFiles": [
+    "limits.go",
+    "rpc.go",
+    "rpc_limits_test.go",
+    "rpc_test.go"
+  ],
+  "finalMatchesMeasuredCandidate": true,
+  "archiveReproduction": {
+    "self": [
+      "baselineCommit",
+      "mode",
+      "beforeGoSource",
+      "candidateGoSource",
+      "harnessGoSource",
+      "generatedGoInputs",
+      "fixtures",
+      "tools",
+      "candidatePatchSha256",
+      "probeSha256",
+      "parameters",
+      "selectedCases"
+    ],
+    "clone": [
+      "baselineCommit",
+      "mode",
+      "beforeGoSource",
+      "candidateGoSource",
+      "harnessGoSource",
+      "generatedGoInputs",
+      "fixtures",
+      "tools",
+      "candidatePatchSha256",
+      "probeSha256",
+      "parameters",
+      "selectedCases"
+    ],
+    "pass1": [
+      "baselineCommit",
+      "mode",
+      "beforeGoSource",
+      "candidateGoSource",
+      "harnessGoSource",
+      "generatedGoInputs",
+      "fixtures",
+      "tools",
+      "candidatePatchSha256",
+      "probeSha256",
+      "parameters",
+      "selectedCases"
+    ],
+    "pass2": [
+      "baselineCommit",
+      "mode",
+      "beforeGoSource",
+      "candidateGoSource",
+      "harnessGoSource",
+      "generatedGoInputs",
+      "fixtures",
+      "tools",
+      "candidatePatchSha256",
+      "probeSha256",
+      "parameters",
+      "selectedCases"
+    ]
+  },
+  "officialOracle": {
+    "root": "/private/tmp/gsr-official-sproto-review",
+    "commit": "e93fd5a0653b2bcab38d3b830958bf2e3a901b5f",
+    "sha256": {
+      "sproto.c": "c47a13a15ae15d35550ed584b9102644374032ff13f1170bffadf81a2604f7bc",
+      "lsproto.c": "26bd8f0e1ec9d5ee387b79bdd29171fb292dd47e486463459319aa7db9060820",
+      "sproto.h": "7339fd0923c22e081d69d7256e60453625f1c08eaa8b5974a9b31cadffdae9d9",
+      "sproto.lua": "ca8027fa957f07c3e8b0b5cb18f2f75911bbf12783b9224b02975359ac59d234",
+      "sproto/core.so": "ab4ff727b6f91f43712efd6161fc2f3ddc4bb24738d70fd2c098afcbc39df05f"
+    },
+    "fingerprintsMatch": true,
+    "enabledForFinalRaceCheckptr": true
+  },
+  "measurement": {
+    "blocks": 9120,
+    "quartets": 2280,
+    "pairedRounds": 570
+  },
+  "controlsAccepted": {
+    "self": 17,
+    "clone": 15
+  },
+  "correctness": {
+    "rpcSuccessScenarios": 1008,
+    "rpcSuccessOutputs": 2016,
+    "newDuplicateChecks": 504,
+    "officialHeaderVectors": 39,
+    "fixedRpcSeeds": 3078,
+    "framesCompared": 12312,
+    "allocationFailsBaseline": true,
+    "normalAndRaceAllocationPass": true,
+    "goTsPass": 7,
+    "goTsSkip": 0
+  },
+  "fuzz": {
+    "^FuzzPackRoundTrip$": 3946,
+    "^FuzzCodecRoundTrip$": 464565
+  },
+  "errorDiagnostic": {
+    "windows": 72,
+    "callsPerWindow": 64,
+    "noTimingClaim": true,
+    "fmtPoolBoundaryNoiseRetained": true
+  },
+  "unchanged": {
+    "bodyPreflightSource": true,
+    "responseEncodeMethod": true,
+    "sessionAdmissionBlock": true,
+    "decodeFrozen": true,
+    "packUnpackAlgorithms": true,
+    "formalGsrDependency": "v0.4.0"
+  },
+  "limitations": [
+    "self17/19,clone15/19; no retries",
+    "14 non-target RPC allocations unchanged but small CPU costs disclosed",
+    "one secondary19 body/Pack/manual-frame control; ASCII Encode+2.94 percent21ns",
+    "failed admission stages full workspace; duplicate clipped body retains backing header/slack",
+    "no GSR full/race, cross-platform or fresh PB/TS ranking"
+  ],
+  "artifactsSha256": {
+    ".gitattributes": "fb25a78a6381f5646d71aacea4486f6aeeeb03c4d71740227011024be0d20a8f",
+    "RESULTS.md": "120a449a25fc92548ed2242e436aec1650cde9a3f1016bf5533f4136cea76269",
+    "acceptance.json": "47d9d48daee2067c975c42c2b7237b95b9000c971432bbd3b93c06d647b76c6b",
+    "analyze.py": "dc51122b57e98cf90e437f2c41be0dc382b9f09c457b49e1195d30bc0036ca43",
+    "business/commands.json": "750f911ccfd1de91fbd132e449a7fc8115bf89732b968f8f5cd3b00af7972d1b",
+    "business/inputs.json": "636bd9c5f23ba7b64296a944b69708f376fe4adc146eea26f6147093e1960fe9",
+    "business/raw.json": "9c5e0b13a92f416fc68bf43c8d23981edde67288e4b7787f7a9352eeb26ba8e1",
+    "business/summary.json": "718996dac63735f571b6eb19c37a9135f7da4d14e4a5d8052592979be91854a3",
+    "candidate.patch": "672eae6e35dc0a177b54862184c65bcbab2460cbbfc5722cf3cd9cb12226c615",
+    "checks.json": "ec10c9a4bbd9b6648faffb2245d05414046bad1b534096915a74318dc1d936d2",
+    "clone/commands.json": "a7aa9dabf1c3efd05fb9395b7840a6a4bf52ba7c1a0c9a22587795a0a97c584f",
+    "clone/inputs.json": "7d0fb9ed519972e9ae7a3b093f58b645f4d6fbfd5f23c1a72b46762f6b7220ca",
+    "clone/raw.json": "99412430784ebd57803e4e32e18c39ed16addb5c262453d3ad2673dbb6a84994",
+    "clone/summary.json": "b410c316247bff5579d2c237b3322ccaba3e515f0f7e9634f7d21505d340c3c5",
+    "commands.json": "f5e076f8c694e920ea9e078710e4eea89ec6f447a2cd9d1826cd99b66c25ea12",
+    "driver-inputs.json": "7079d0123a50fac7ad82865fcd1f308ceb61c4e1ad3bcc7f5da34b7300a0200c",
+    "error-allocation.json": "d56ce0486ae8cd71f490eb6224149a2542ce2f13b5a454d026cfe3d97346d083",
+    "error-probe.go.txt": "25d22521cb94d5019438e3a93a243a3c6e095b479dbc172304e8201a95243e47",
+    "joined.json": "877294eec34771c6bef85a50434ec50d5d56b738be022a25f552a03f4bfeacf5",
+    "pass1/commands.json": "80135db2d7884f4008a39cccbee2f46f46db43f92c14c6db173744ebd85e30aa",
+    "pass1/inputs.json": "95b86114c7eb8ea92b8c9992456d52ab9193d06e33d7c590566932343f4cb28f",
+    "pass1/raw.json": "e5582560f7127ed1fb5947331fa00028bed1d3a5ac7b92070f2e029767da759b",
+    "pass1/summary.json": "d1d78085dcfdbd1c2f495802efd6867242c3d0cc4307a5eda0d25ec7a35d42fa",
+    "pass2/commands.json": "3389f4b78cd6a2955cd63b7ef251ee21e8c866eb839363767354209237fc20a6",
+    "pass2/inputs.json": "2f801e389cfb53dfcf7af286c96689760ad7e27d965277a21785704b6efb7e22",
+    "pass2/raw.json": "707cf677979fec52f581f8a05f18311f0f0cbd8dd47289cc5b8c1ee1d4563c80",
+    "pass2/summary.json": "125efa1779c4f927e8c41fa69367054757869c6571aa6a3f02025df6d44fee5f",
+    "plan.json": "bdd02b28605b49b6c7db0ba0efac493f7c36a78c93b693bec3ae1bfad72cc92d",
+    "reproduce.py": "8278121d82bbb5adf653f12097cf44e7ba55ea2173f2273a915c6b3ad04bcff1",
+    "rpc-fuzz.go.txt": "12475909ea0beb9d84fe0ca4bc002896d0f4cbaa4e26dda56e3a0397374c7746",
+    "rpc-probe.go.txt": "b6ee38d532743d10faff2621e7d84faf2db8f5446f8eaf7b6615f19696130eff",
+    "self/commands.json": "90883b7dd0150ef8703ed626170701f3d95450c2cd47541dfbc50365ee2fea3c",
+    "self/inputs.json": "7e18a98fdaf3f3aa636a09eb64901dea002735172784634e7a473eb8cbae51fc",
+    "self/raw.json": "c6c4c4b7315d4d107f742dea11c432af55e200c133bb52e760dcb7fe9efbdec8",
+    "self/summary.json": "3c7c072fab9b32d36c131fa5209b0efdc2a3f297b6f19bb454f654eaf7f7964c"
+  },
+  "differential": {
+    "fixedSeeds": 3078,
+    "comparedFrames": 12312,
+    "probeSha256": "12475909ea0beb9d84fe0ca4bc002896d0f4cbaa4e26dda56e3a0397374c7746",
+    "errorProbeSourceSha256": "25d22521cb94d5019438e3a93a243a3c6e095b479dbc172304e8201a95243e47",
+    "harnessGoSourceAfterErrorProbe": {
+      "before_echo_test.go": "b09f65d09fae355c160381e58675d69e3166cc9d1e4a47acaf504f9d6476b367",
+      "error_allocation_test.go": "25d22521cb94d5019438e3a93a243a3c6e095b479dbc172304e8201a95243e47",
+      "protocol_benchmark_test.go": "5da22792f620ff303e002c5c38fbc88f2c0205369f5f92914f134546c5d2f8e7",
+      "representative_benchmark_test.go": "773830c5a7a2d06d35d371368a2596b5bd28e8f08a61e87b7ce634a2a8ad74c4",
+      "rpc_fuzz_test.go": "12475909ea0beb9d84fe0ca4bc002896d0f4cbaa4e26dda56e3a0397374c7746",
+      "sampler_test.go": "9b0220b6227d699b7d15a3f59ba524e52da91f28b013d3b13affd7e70e651568"
+    },
+    "candidateMatchesFinal": true
+  }
+}

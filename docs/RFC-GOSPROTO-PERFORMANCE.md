@@ -6,7 +6,7 @@
 
 前两轮以已发布的 gosproto v0.4.0 为版本基线；下一轮从已提交的 `6012b06` 做增量，不从 v0.4.0 重复实施。实现改动应在独立 gosproto 仓库进行，GSR 提供真实接线和跨语言 Benchmark；不修改 Go module cache，也不将库源码复制到 GSR。
 
-当前切片（2026-10-18）：响应单缓冲已本地提交为 gosproto b626637 / GSR b2825cf，见第 31 节，未推送。后续只将有 Request、无 Response 的通知复用到同一工作区；有响应请求保持独立 body、session 登记、锁和重复错误返回。测量与验收见第 32 节，新修改未提交。正式 GSR 依赖仍为 v0.4.0，Decode 阶段性冻结。
+当前切片（2026-10-18）：通知单缓冲已本地提交为 gosproto 0988af0 / GSR 9876a5b，见第 32 节，未推送。后续融合有响应请求，在锁外完成预检/写出、登记后Pack，重复session仍返回限长限容raw body。成功收益、失败工作区成本及共用writer代价见第 33 节，新修改未提交。正式 GSR 依赖仍为 v0.4.0，Decode 阶段性冻结。
 
 ## 1. 目标与证据
 
@@ -426,4 +426,14 @@ RequestEncode改用局部header值，避免字段指针赋值使session副本保
 
 固定四次19项真实RPC配对共7296块独立复算一致。9项通知两轮均改善且少一次分配：大型−6.53%/−7.34%（7424→3968 B，3→2次），整数数组−13.46%/−11.71%（8192→4096 B，2→1次），ASCII4KiB约−43%～−45%，32 B−11.91%/−16.91%。非目标10项分配不变；整数数组请求+0.43%/+0.32%（20.1/14.4 ns）及ASCII响应第二轮+1.07%（8.9 ns）代价保留，不将其他控制加速当算法收益。self13/19、clone7/19及全部失败保留，不重试到通过，不设最低收益百分比。
 
-扩展既有RPC测试保护忽略session、不登记pending、typed nil与8 MiB通知预算，旧实现先通过；分配断言旧2对1按预期失败，新普通/race通过。库全测/官方C-Lua/race/checkptr/vet、3078固定RPC差分/12312帧、GSR三包及Go/TS 7/7、零跳过通过；源码与采样/重建归档一致。通用codec/Pack未改，不重复随机fuzz、PB/TS矩阵或GSR全仓/race。新代码/记录未提交，见 [通知工作区报告](benchmarks/2026-10-18-gosproto-notification-workspace/RESULTS.md)。正式依赖仍v0.4.0，Decode继续冻结。
+扩展既有RPC测试保护忽略session、不登记pending、typed nil与8 MiB通知预算，旧实现先通过；分配断言旧2对1按预期失败，新普通/race通过。库全测/官方C-Lua/race/checkptr/vet、3078固定RPC差分/12312帧、GSR三包及Go/TS 7/7、零跳过通过；源码与采样/重建归档一致。通用codec/Pack未改，不重复随机fuzz、PB/TS矩阵或GSR全仓/race。该切片已本地提交为 gosproto 0988af0 / GSR 9876a5b，未推送，见 [通知工作区报告](benchmarks/2026-10-18-gosproto-notification-workspace/RESULTS.md)。正式依赖仍v0.4.0，Decode继续冻结。
+
+## 33. 有响应请求的 body 工作区融合
+
+提取私有encodeBufferWithLimits，将原预检/写出结果保留为同一独占workspace和未压缩frame。有Request且有Response时，先在锁外编码header/body，继续原session校验、锁/重复检查、1024上限及登记，再持锁Pack；body预检、错误优先级、wire/cap及独占不变。重复session返回限长限容raw body，无效session/满载仍nil错误；无Request流程、ResponseEncode方法、Decode/Dispatch、Pack/Unpack算法均未改。
+
+四次19项RPC加一次原19项body/Pack/手工帧，共9120块独立复算一致。五项请求两轮改善并少一次分配：大型−5.80%/−6.17%（7424→3968 B，3→2次），整数数组−9.49%/−11.58%（8192→4096 B，2→1次），ASCII4KiB−41.04%/−41.91%。14项非目标分配不变；AddressBook响应约+7.7/+2.4 ns、ASCII通知约+6.7/+12.4 ns代价保留。普通19项约−2.04%～+2.94%，ASCII纯Encode约+21 ns、整数数组PEncode约+59 ns；self17/19、clone15/19与全部失败披露，不重试或设最低收益线。
+
+失败路径现在先分配完整workspace，重复返回body仍保留底层header/slack；独立72窗口分配诊断显示32 B输入invalid/full为48→64 B，MaxInt32重复缓冲尺寸级别48→80 B，fmt池/GC尾差不归为确定新增对象。接受并披露失败成本，不以cap相同声称底层字节完全不变。
+
+既有1008组成功用例扩展504组重复raw body/cap/独占，补typed nil请求优先于session错误；语义在旧实现先通过，分配旧2对1失败、新普通/race通过。库全测/官方C-Lua/race/checkptr/vet、3078固定RPC差分/12312帧、Pack/Codec各10秒有限fuzz（3946/464565次）、GSR三包和Go/TS 7/7通过，源码/归档一致。Pack后段计数不增长如实保留，未凑随机次数。新代码/记录未提交，见 [请求工作区报告](benchmarks/2026-10-18-gosproto-request-workspace/RESULTS.md)。后续先重采当前profile再选热点，正式依赖仍v0.4.0，Decode继续冻结。

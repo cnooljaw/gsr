@@ -1,0 +1,378 @@
+[
+  {
+    "args": [
+      "python3",
+      "-B",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/examples/websocket-gate/benchmarks/tools/go-pairs/run.py",
+      "--library",
+      "/private/tmp/gsr-gosproto-fork",
+      "--baseline",
+      "0988af0",
+      "--mode",
+      "self",
+      "--output",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-request-workspace/measured/self",
+      "--block-ms",
+      "10",
+      "--prepare-only"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.233,
+    "output": ""
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "sampler_test.go",
+      "rpc_probe_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-request-workspace/measured/self/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.005,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-run",
+      "^(TestPairStatistics|TestPairSelection|TestPairGCCounter|TestRepresentativeFixtures)$",
+      ".",
+      "-timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-request-workspace/measured/self/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 1.603,
+    "output": "ok  \tcodecpairstool\t0.592s\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-c",
+      "-o",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-request-workspace/measured/self/rpc.test",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-request-workspace/measured/self/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.501,
+    "output": ""
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-request-workspace/measured/self/rpc.test",
+      "-test.run=^TestPairSampling$",
+      "-test.v",
+      "-test.timeout=90s"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-request-workspace/measured/self/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GSR_PAIR_MODE": "self",
+      "GSR_PAIR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-request-workspace/measured/self/raw.json",
+      "GSR_PAIR_BLOCK_TARGET": "10ms",
+      "GSR_PAIR_CASES": ""
+    },
+    "exitCode": 0,
+    "elapsedSeconds": 20.921,
+    "output": "=== RUN   TestPairSampling\n    sampler_test.go:371: self addressbook/notification: completed 1/19\n    sampler_test.go:371: self addressbook/request_cancel: completed 2/19\n    sampler_test.go:371: self addressbook/response: completed 3/19\n    sampler_test.go:371: self game_small/notification: completed 4/19\n    sampler_test.go:371: self game_small/request_cancel: completed 5/19\n    sampler_test.go:371: self game_small/response: completed 6/19\n    sampler_test.go:371: self game_large/notification: completed 7/19\n    sampler_test.go:371: self game_large/request_cancel: completed 8/19\n    sampler_test.go:371: self game_large/response: completed 9/19\n    sampler_test.go:371: self int32_edges/notification: completed 10/19\n    sampler_test.go:371: self int32_edges/request_cancel: completed 11/19\n    sampler_test.go:371: self int32_edges/response: completed 12/19\n    sampler_test.go:371: self echo_ascii4k/notification: completed 13/19\n    sampler_test.go:371: self echo_ascii4k/request_cancel: completed 14/19\n    sampler_test.go:371: self echo_ascii4k/response: completed 15/19\n    sampler_test.go:371: self ascii32/notification: completed 16/19\n    sampler_test.go:371: self utf8_1k/notification: completed 17/19\n    sampler_test.go:371: self ascii4k/notification: completed 18/19\n    sampler_test.go:371: self zeros4k/notification: completed 19/19\n--- PASS: TestPairSampling (20.59s)\nPASS\n"
+  },
+  {
+    "args": [
+      "python3",
+      "-B",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/examples/websocket-gate/benchmarks/tools/go-pairs/run.py",
+      "--library",
+      "/private/tmp/gsr-gosproto-fork",
+      "--baseline",
+      "0988af0",
+      "--mode",
+      "clone",
+      "--output",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-request-workspace/measured/clone",
+      "--block-ms",
+      "10",
+      "--prepare-only"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.266,
+    "output": ""
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "sampler_test.go",
+      "rpc_probe_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-request-workspace/measured/clone/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.005,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-run",
+      "^(TestPairStatistics|TestPairSelection|TestPairGCCounter|TestRepresentativeFixtures)$",
+      ".",
+      "-timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-request-workspace/measured/clone/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 1.409,
+    "output": "ok  \tcodecpairstool\t0.344s\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-c",
+      "-o",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-request-workspace/measured/clone/rpc.test",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-request-workspace/measured/clone/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.357,
+    "output": ""
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-request-workspace/measured/clone/rpc.test",
+      "-test.run=^TestPairSampling$",
+      "-test.v",
+      "-test.timeout=90s"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-request-workspace/measured/clone/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GSR_PAIR_MODE": "clone",
+      "GSR_PAIR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-request-workspace/measured/clone/raw.json",
+      "GSR_PAIR_BLOCK_TARGET": "10ms",
+      "GSR_PAIR_CASES": ""
+    },
+    "exitCode": 0,
+    "elapsedSeconds": 20.11,
+    "output": "=== RUN   TestPairSampling\n    sampler_test.go:371: clone addressbook/notification: completed 1/19\n    sampler_test.go:371: clone addressbook/request_cancel: completed 2/19\n    sampler_test.go:371: clone addressbook/response: completed 3/19\n    sampler_test.go:371: clone game_small/notification: completed 4/19\n    sampler_test.go:371: clone game_small/request_cancel: completed 5/19\n    sampler_test.go:371: clone game_small/response: completed 6/19\n    sampler_test.go:371: clone game_large/notification: completed 7/19\n    sampler_test.go:371: clone game_large/request_cancel: completed 8/19\n    sampler_test.go:371: clone game_large/response: completed 9/19\n    sampler_test.go:371: clone int32_edges/notification: completed 10/19\n    sampler_test.go:371: clone int32_edges/request_cancel: completed 11/19\n    sampler_test.go:371: clone int32_edges/response: completed 12/19\n    sampler_test.go:371: clone echo_ascii4k/notification: completed 13/19\n    sampler_test.go:371: clone echo_ascii4k/request_cancel: completed 14/19\n    sampler_test.go:371: clone echo_ascii4k/response: completed 15/19\n    sampler_test.go:371: clone ascii32/notification: completed 16/19\n    sampler_test.go:371: clone utf8_1k/notification: completed 17/19\n    sampler_test.go:371: clone ascii4k/notification: completed 18/19\n    sampler_test.go:371: clone zeros4k/notification: completed 19/19\n--- PASS: TestPairSampling (19.77s)\nPASS\n"
+  },
+  {
+    "args": [
+      "python3",
+      "-B",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/examples/websocket-gate/benchmarks/tools/go-pairs/run.py",
+      "--library",
+      "/private/tmp/gsr-gosproto-fork",
+      "--baseline",
+      "0988af0",
+      "--mode",
+      "compare",
+      "--output",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-request-workspace/measured/pass1",
+      "--block-ms",
+      "10",
+      "--prepare-only",
+      "--candidate-patch",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-18-gosproto-request-workspace/candidate.patch"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.415,
+    "output": ""
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "sampler_test.go",
+      "rpc_probe_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-request-workspace/measured/pass1/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.005,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-run",
+      "^(TestPairStatistics|TestPairSelection|TestPairGCCounter|TestRepresentativeFixtures)$",
+      ".",
+      "-timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-request-workspace/measured/pass1/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 1.52,
+    "output": "ok  \tcodecpairstool\t0.344s\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-c",
+      "-o",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-request-workspace/measured/pass1/rpc.test",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-request-workspace/measured/pass1/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.422,
+    "output": ""
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-request-workspace/measured/pass1/rpc.test",
+      "-test.run=^TestPairSampling$",
+      "-test.v",
+      "-test.timeout=90s"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-request-workspace/measured/pass1/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GSR_PAIR_MODE": "compare",
+      "GSR_PAIR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-request-workspace/measured/pass1/raw.json",
+      "GSR_PAIR_BLOCK_TARGET": "10ms",
+      "GSR_PAIR_CASES": ""
+    },
+    "exitCode": 0,
+    "elapsedSeconds": 20.735,
+    "output": "=== RUN   TestPairSampling\n    sampler_test.go:371: compare addressbook/notification: completed 1/19\n    sampler_test.go:371: compare addressbook/request_cancel: completed 2/19\n    sampler_test.go:371: compare addressbook/response: completed 3/19\n    sampler_test.go:371: compare game_small/notification: completed 4/19\n    sampler_test.go:371: compare game_small/request_cancel: completed 5/19\n    sampler_test.go:371: compare game_small/response: completed 6/19\n    sampler_test.go:371: compare game_large/notification: completed 7/19\n    sampler_test.go:371: compare game_large/request_cancel: completed 8/19\n    sampler_test.go:371: compare game_large/response: completed 9/19\n    sampler_test.go:371: compare int32_edges/notification: completed 10/19\n    sampler_test.go:371: compare int32_edges/request_cancel: completed 11/19\n    sampler_test.go:371: compare int32_edges/response: completed 12/19\n    sampler_test.go:371: compare echo_ascii4k/notification: completed 13/19\n    sampler_test.go:371: compare echo_ascii4k/request_cancel: completed 14/19\n    sampler_test.go:371: compare echo_ascii4k/response: completed 15/19\n    sampler_test.go:371: compare ascii32/notification: completed 16/19\n    sampler_test.go:371: compare utf8_1k/notification: completed 17/19\n    sampler_test.go:371: compare ascii4k/notification: completed 18/19\n    sampler_test.go:371: compare zeros4k/notification: completed 19/19\n--- PASS: TestPairSampling (20.40s)\nPASS\n"
+  },
+  {
+    "args": [
+      "python3",
+      "-B",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/examples/websocket-gate/benchmarks/tools/go-pairs/run.py",
+      "--library",
+      "/private/tmp/gsr-gosproto-fork",
+      "--baseline",
+      "0988af0",
+      "--mode",
+      "compare",
+      "--output",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-request-workspace/measured/pass2",
+      "--block-ms",
+      "10",
+      "--prepare-only",
+      "--candidate-patch",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-18-gosproto-request-workspace/candidate.patch"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.235,
+    "output": ""
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "sampler_test.go",
+      "rpc_probe_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-request-workspace/measured/pass2/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.004,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-run",
+      "^(TestPairStatistics|TestPairSelection|TestPairGCCounter|TestRepresentativeFixtures)$",
+      ".",
+      "-timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-request-workspace/measured/pass2/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 1.442,
+    "output": "ok  \tcodecpairstool\t0.335s\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-c",
+      "-o",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-request-workspace/measured/pass2/rpc.test",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-request-workspace/measured/pass2/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.448,
+    "output": ""
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-request-workspace/measured/pass2/rpc.test",
+      "-test.run=^TestPairSampling$",
+      "-test.v",
+      "-test.timeout=90s"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-request-workspace/measured/pass2/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GSR_PAIR_MODE": "compare",
+      "GSR_PAIR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-request-workspace/measured/pass2/raw.json",
+      "GSR_PAIR_BLOCK_TARGET": "10ms",
+      "GSR_PAIR_CASES": ""
+    },
+    "exitCode": 0,
+    "elapsedSeconds": 20.407,
+    "output": "=== RUN   TestPairSampling\n    sampler_test.go:371: compare addressbook/notification: completed 1/19\n    sampler_test.go:371: compare addressbook/request_cancel: completed 2/19\n    sampler_test.go:371: compare addressbook/response: completed 3/19\n    sampler_test.go:371: compare game_small/notification: completed 4/19\n    sampler_test.go:371: compare game_small/request_cancel: completed 5/19\n    sampler_test.go:371: compare game_small/response: completed 6/19\n    sampler_test.go:371: compare game_large/notification: completed 7/19\n    sampler_test.go:371: compare game_large/request_cancel: completed 8/19\n    sampler_test.go:371: compare game_large/response: completed 9/19\n    sampler_test.go:371: compare int32_edges/notification: completed 10/19\n    sampler_test.go:371: compare int32_edges/request_cancel: completed 11/19\n    sampler_test.go:371: compare int32_edges/response: completed 12/19\n    sampler_test.go:371: compare echo_ascii4k/notification: completed 13/19\n    sampler_test.go:371: compare echo_ascii4k/request_cancel: completed 14/19\n    sampler_test.go:371: compare echo_ascii4k/response: completed 15/19\n    sampler_test.go:371: compare ascii32/notification: completed 16/19\n    sampler_test.go:371: compare utf8_1k/notification: completed 17/19\n    sampler_test.go:371: compare ascii4k/notification: completed 18/19\n    sampler_test.go:371: compare zeros4k/notification: completed 19/19\n--- PASS: TestPairSampling (20.07s)\nPASS\n"
+  },
+  {
+    "args": [
+      "python3",
+      "-B",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/examples/websocket-gate/benchmarks/tools/go-pairs/run.py",
+      "--library",
+      "/private/tmp/gsr-gosproto-fork",
+      "--baseline",
+      "0988af0",
+      "--mode",
+      "compare",
+      "--output",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-request-workspace/measured/business",
+      "--block-ms",
+      "10",
+      "--candidate-patch",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-18-gosproto-request-workspace/candidate.patch"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 22.039,
+    "output": "addressbook/sproto_encode: +0.38%; IQR 1.41pp; control=None\naddressbook/sproto_pack: -0.84%; IQR 2.58pp; control=None\naddressbook/sproto_pencode: -0.05%; IQR 0.47pp; control=None\ngame_small/sproto_encode: +1.03%; IQR 8.34pp; control=None\ngame_small/sproto_pack: -0.86%; IQR 1.71pp; control=None\ngame_small/sproto_pencode: +0.79%; IQR 1.14pp; control=None\ngame_large/sproto_encode: -0.52%; IQR 0.94pp; control=None\ngame_large/sproto_pack: +0.62%; IQR 0.56pp; control=None\ngame_large/sproto_pencode: -0.91%; IQR 1.59pp; control=None\nint32_edges/sproto_encode: +0.13%; IQR 0.69pp; control=None\nint32_edges/sproto_pack: +0.13%; IQR 1.31pp; control=None\nint32_edges/sproto_pencode: +1.39%; IQR 1.26pp; control=None\necho_ascii4k/sproto_encode: +2.94%; IQR 2.21pp; control=None\necho_ascii4k/sproto_pack: -2.04%; IQR 1.63pp; control=None\necho_ascii4k/sproto_pencode: +0.80%; IQR 0.81pp; control=None\nascii32/frame: -0.34%; IQR 3.81pp; control=None\nutf8_1k/frame: -1.10%; IQR 2.72pp; control=None\nascii4k/frame: +1.71%; IQR 0.51pp; control=None\nzeros4k/frame: -0.45%; IQR 2.23pp; control=None\n"
+  }
+]

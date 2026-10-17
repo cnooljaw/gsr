@@ -1,0 +1,106 @@
+package benchmarks
+
+import (
+	"bytes"
+	"encoding/json"
+	"os"
+	"reflect"
+	"runtime"
+	"testing"
+
+	sproto "github.com/cnooljaw/gosproto"
+	before "github.com/cnooljaw/gosproto-before"
+)
+
+type rpcErrorPayload struct {
+	Binary []byte `sproto:"string,0"`
+}
+
+var rpcErrorOutput []byte
+
+// 失败路径的固定分配诊断同时检查 raw body 的字节、容量及 nil 结果，不用于计时排名。
+func TestRequestFailureAllocation(t *testing.T) {
+	type row struct {
+		Size       int     `json:"payloadBytes"`
+		Mode       string  `json:"failure"`
+		Round      int     `json:"round"`
+		Arm        string  `json:"arm"`
+		BytesPerOp float64 `json:"bytesPerOp"`
+		Allocs     float64 `json:"allocsPerOp"`
+	}
+	var rows []row
+	for _, size := range []int{32, 256, 4096, 65536} {
+		input := &rpcErrorPayload{Binary: bytes.Repeat([]byte{0x91}, size)}
+		typ := reflect.TypeOf(input)
+		want, err := before.Encode(input)
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, mode := range []string{"invalid-session", "duplicate-session", "pending-full"} {
+			old, err := before.NewRpc([]*before.Protocol{{Type: 2147483647, Name: "frame", Request: typ, Response: typ}})
+			if err != nil {
+				t.Fatal(err)
+			}
+			current, err := sproto.NewRpc([]*sproto.Protocol{{Type: 2147483647, Name: "frame", Request: typ, Response: typ}})
+			if err != nil {
+				t.Fatal(err)
+			}
+			session := int32(0)
+			switch mode {
+			case "duplicate-session":
+				session = 2147483647
+				if _, err := old.RequestEncode("frame", session, input); err != nil {
+					t.Fatal(err)
+				}
+				if _, err := current.RequestEncode("frame", session, input); err != nil {
+					t.Fatal(err)
+				}
+			case "pending-full":
+				for pending := int32(1); pending <= 1024; pending++ {
+					if _, err := old.RequestEncode("frame", pending, &rpcErrorPayload{}); err != nil {
+						t.Fatal(err)
+					}
+					if _, err := current.RequestEncode("frame", pending, &rpcErrorPayload{}); err != nil {
+						t.Fatal(err)
+					}
+				}
+				session = 1025
+			}
+			calls := []func() ([]byte, error){
+				func() ([]byte, error) { return old.RequestEncode("frame", session, input) },
+				func() ([]byte, error) { return current.RequestEncode("frame", session, input) },
+			}
+			for round := 0; round < 3; round++ {
+				for position := 0; position < 2; position++ {
+					arm := (position + round) % 2
+					runtime.GC()
+					var start, end runtime.MemStats
+					runtime.ReadMemStats(&start)
+					for count := 0; count < 64; count++ {
+						output, err := calls[arm]()
+						if err == nil {
+							t.Fatal("expected admission error")
+						}
+						if mode == "duplicate-session" {
+							if !bytes.Equal(output, want) || cap(output) != len(want) {
+								t.Fatal("duplicate raw body/cap changed")
+							}
+						} else if output != nil {
+							t.Fatal("partial frame returned on failure")
+						}
+						rpcErrorOutput = output
+					}
+					runtime.ReadMemStats(&end)
+					rows = append(rows, row{size, mode, round, []string{"before", "candidate"}[arm], float64(end.TotalAlloc-start.TotalAlloc) / 64, float64(end.Mallocs-start.Mallocs) / 64})
+				}
+			}
+		}
+	}
+	encoded, err := json.MarshalIndent(rows, "", "  ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(os.Getenv("GSR_ERROR_ALLOCATION_OUTPUT"), append(encoded, '\n'), 0644); err != nil {
+		t.Fatal(err)
+	}
+}

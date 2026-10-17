@@ -4,9 +4,13 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## RPC 有响应请求单缓冲（2026-10-18）
+
+上一切片已提交为 gosproto 0988af0 / GSR 9876a5b，提交后两库干净、未推送。后续融合声明Request且有Response的请求：锁外完成body预检和写出，原session接纳后Pack，重复session仍返回限长限容raw body。五项请求两轮均少一次分配，大型约快5.8%～6.2%、整数数组约快9.5%～11.6%、ASCII4KiB约快41%～42%。共用writer成本（ASCII纯Encode约+21 ns）、失败workspace分配（32 B invalid/full多16 B，MaxInt32重复缓冲级别多32 B）及self17/19、clone15/19控制失败全部披露。扩展504组重复body/cap/独占回归，库/官方/race/checkptr/vet、固定RPC差分、有限fuzz、GSR三包和Go/TS 7/7通过，源码/归档一致，见 [请求工作区报告](benchmarks/2026-10-18-gosproto-request-workspace/RESULTS.md)。新修改未提交，正式依赖与Decode/Pack/Unpack/TS不变；后续先重采profile再决定热点，不新增PB/TS排名。
+
 ## RPC 通知单缓冲（2026-10-18）
 
-上一切片已提交为 gosproto b626637 / GSR b2825cf，提交后两库干净、未推送。后续仅融合有Request、无Response的通知，复用上一轮私有前缀写出，省一次body分配和复制；有响应请求的校验、锁、session登记和重复错误raw body返回保持。9项通知两轮均改善：大型约快6.5%～7.3%、整数数组约快11.7%～13.5%、ASCII4KiB约快43%～45%；10项非目标分配不变，整数数组请求约14～20 ns代价与self13/19、clone7/19控制失败完整披露。库/官方/race/checkptr/vet、3078固定RPC差分、GSR三包和Go/TS 7/7、零跳过通过，源码/归档一致，见 [通知工作区报告](benchmarks/2026-10-18-gosproto-notification-workspace/RESULTS.md)。新修改未提交，正式依赖/Decode/Pack/Unpack/TS不变，未重新测PB/TS排名。
+上一切片已提交为 gosproto b626637 / GSR b2825cf，提交后两库干净、未推送。后续仅融合有Request、无Response的通知，复用上一轮私有前缀写出，省一次body分配和复制；有响应请求的校验、锁、session登记和重复错误raw body返回保持。9项通知两轮均改善：大型约快6.5%～7.3%、整数数组约快11.7%～13.5%、ASCII4KiB约快43%～45%；10项非目标分配不变，整数数组请求约14～20 ns代价与self13/19、clone7/19控制失败完整披露。库/官方/race/checkptr/vet、3078固定RPC差分、GSR三包和Go/TS 7/7、零跳过通过，源码/归档一致，见 [通知工作区报告](benchmarks/2026-10-18-gosproto-notification-workspace/RESULTS.md)。该切片已本地提交为 gosproto 0988af0 / GSR 9876a5b，未推送；正式依赖/Decode/Pack/Unpack/TS不变，未重新测PB/TS排名。
 
 ## RPC 响应单缓冲（2026-10-18）
 
