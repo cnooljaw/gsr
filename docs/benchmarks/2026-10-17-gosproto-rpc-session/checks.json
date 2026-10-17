@@ -1,0 +1,30 @@
+[
+  {
+    "stage": "test before implementation",
+    "args": [
+      "go",
+      "test",
+      "-run",
+      "^TestRpcFrameAllocation$",
+      "-v",
+      ".",
+      "-timeout=1m"
+    ],
+    "exitCode": 1,
+    "output": "=== RUN   TestRpcFrameAllocation\n    rpc_test.go:249: notification=4 request=4, want no session allocation for notification\n--- FAIL: TestRpcFrameAllocation (0.00s)\nFAIL\nFAIL\tgithub.com/cnooljaw/gosproto\t0.565s\nFAIL\n"
+  },
+  {
+    "stage": "targeted after implementation",
+    "args": [
+      "go",
+      "test",
+      "-run",
+      "^TestRpc",
+      "-v",
+      ".",
+      "-timeout=1m"
+    ],
+    "exitCode": 0,
+    "output": "=== RUN   TestRpcPendingAdmissionAndCleanup\n--- PASS: TestRpcPendingAdmissionAndCleanup (0.00s)\n=== RUN   TestRpcInvalidDefinitionsAndMessages\n--- PASS: TestRpcInvalidDefinitionsAndMessages (0.00s)\n=== RUN   TestRpcSessionIsolationAndLateResponses\n--- PASS: TestRpcSessionIsolationAndLateResponses (0.00s)\n=== RUN   TestRpcRequest\n--- PASS: TestRpcRequest (0.00s)\n=== RUN   TestRpcResponse\n--- PASS: TestRpcResponse (0.00s)\n=== RUN   TestRpcFrameAssembly\n--- PASS: TestRpcFrameAssembly (0.01s)\n=== RUN   TestRpcFrameBodyBudget\n--- PASS: TestRpcFrameBodyBudget (0.01s)\n=== RUN   TestRpcFrameAllocation\n--- PASS: TestRpcFrameAllocation (0.00s)\nPASS\nok  \tgithub.com/cnooljaw/gosproto\t0.353s\n"
+  }
+]

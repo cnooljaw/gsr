@@ -6,7 +6,7 @@
 
 前两轮以已发布的 gosproto v0.4.0 为版本基线；下一轮从已提交的 `6012b06` 做增量，不从 v0.4.0 重复实施。实现改动应在独立 gosproto 仓库进行，GSR 提供真实接线和跨语言 Benchmark；不修改 Go module cache，也不将库源码复制到 GSR。
 
-当前切片（2026-10-17）：EncodePacked 私有共享工作区已提交为 gosproto 56f5c21 / GSR 0f0f779，见第 27 节，未推送。后续真实 RPC RequestEncode/ResponseEncode 复用 Pack 工作区，少两次分配；19 项两轮均更快并完成验收，见第 28 节，新实现与记录未提交。正式 GSR 依赖仍为 v0.4.0，Decode 阶段性冻结。
+当前切片（2026-10-17）：RPC 共享工作区已本地提交为 gosproto dc4948d / GSR c4622bf，见第 28 节，未推送。后续仅将 RequestEncode 的 session 存储移入有响应分支，通知少一次逻辑分配及约 4 B/op；两轮测量与完整局部验收见第 29 节，新实现与记录未提交。正式 GSR 依赖仍为 v0.4.0，Decode 阶段性冻结。
 
 ## 1. 目标与证据
 
@@ -392,4 +392,12 @@ self 11/19、clone 14/19 通过，9/19 同时通过；两类控制的全部配�
 
 新增真实 RPC 探针：五种代表消息各测通知、请求编码加 CancelSession、响应编码，四种 Echo 测通知，共 19 项。固定 self/clone/两次比较与原 19 项未改路径对照，共 9120 块独立复算一致。两轮大型消息约快 7.9%～10.3%、整数数组约快 17.7%～20.2%、ASCII 4 KiB 约快 37.3%～39.1%，所有项少两次分配。self/clone 总控制 13/19、14/19，失败与逐轮波动原样保留；原未改路径中位差约在 ±2% 内，不据此宣称新算法收益或网络/PB 排名。
 
-864 组 header/角色/长度场景、1728 输出保护 wire/cap/独占，另保护预算、错误优先级和分配；旧实现分配测试按预期失败。普通库、race/checkptr、官方 C/Lua、vet、有限 fuzz、GSR 三包及 Go/TS 7/7 通过；最终与采样源码逐字节一致。保留到独立库工作树，尚未提交，见 [RPC 工作区报告](benchmarks/2026-10-17-gosproto-rpc-workspace/RESULTS.md)。body 缓冲与复制仍在，后续若融合须另行验证错误顺序及锁语义；Decode/Unpack/TS 和正式依赖不变。
+864 组 header/角色/长度场景、1728 输出保护 wire/cap/独占，另保护预算、错误优先级和分配；旧实现分配测试按预期失败。普通库、race/checkptr、官方 C/Lua、vet、有限 fuzz、GSR 三包及 Go/TS 7/7 通过；最终与采样源码逐字节一致。已本地提交为 gosproto dc4948d / GSR c4622bf，未推送，见 [RPC 工作区报告](benchmarks/2026-10-17-gosproto-rpc-workspace/RESULTS.md)。body 缓冲与复制仍在，后续若融合须另行验证错误顺序及锁语义；Decode/Unpack/TS 和正式依赖不变。
+
+## 29. 通知路径避免 session 参数逃逸
+
+RPC RequestEncode 原先在有响应分支取 &session，导致参数的堆存储在通知路径也分配。仅在该分支声明 requestSession 副本再取地址，保持原锁范围、body 校验、session 登记及错误顺序；不用另一套 header codec 或公共接口。编译器逃逸报告和同构建分配回归确认问题：旧实现通知/有响应请求均4次，新通知3次，请求仍4次；大型通知因布局记录为5→4次。
+
+固定 self/clone/两次19项真实RPC配对，共7296块独立复算一致。9种通知全部少一次逻辑分配、约4 B/op；32 B通知两轮约快2.71%/3.38%，AddressBook约快1.92%/2.13%。大型通知约慢0.73%/0.51%（68/48 ns），ASCII请求约慢1.06%/1.20%（18/20 ns），代价原样保留。self/clone原控制14/19、10/19，相同源码clone大型通知也有-2.51%偏差；不把大消息细微CPU差解释成已确认算法收益或回退。Go tiny allocator合并小值，少一次allocs/op不等同于每次少一个独立GC对象。
+
+按确定的分配减少、小包收益和极低维护成本保留，不设统一最低CPU收益线。库全测/官方C-Lua/race/checkptr/vet、GSR三包及Go/TS 7/7通过，源码与归档重建一致；新修改未提交。完整数据、控制失败及复现见 [session逃逸报告](benchmarks/2026-10-17-gosproto-rpc-session/RESULTS.md)。Decode、Pack/Unpack、body编解码、TS和正式依赖均不变，本轮未重复相关fuzz或PB/TS性能矩阵。

@@ -34,7 +34,9 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 
 上一切片已提交为 gosproto d1ab622 / GSR d3b3ef4。后续 [EncodePacked 工作区](../../../docs/benchmarks/2026-10-17-gosproto-packed-workspace/RESULTS.md) 在 API 不变的前提下省一次分配；两轮原 19 项同时检查公共 Encode/Pack 和手工帧。body PEncode 改善不等同于 RPC/完整帧改善，32 B 帧的小幅代价单列披露；该切片已本地提交为 gosproto 56f5c21 / GSR 0f0f779，未推送。
 
-后续 [真实 RPC 工作区](../../../docs/benchmarks/2026-10-17-gosproto-rpc-workspace/RESULTS.md) 专门测 RequestEncode/ResponseEncode：五种代表消息的通知、请求加 CancelSession、响应，以及四种 Echo 通知，共 19 项。两轮均更快、少两次分配，大型约快 8%～10%、整数数组约快 18%～20%；控制失败与完整块、原未改路径对照一并保留。它包含真实 RPC 编码/session 成本，区别于下文原 frame 的手工组帧，不包含网络或 Dispatch，也不替换原四实现矩阵。新实现与记录待审查。
+后续 [真实 RPC 工作区](../../../docs/benchmarks/2026-10-17-gosproto-rpc-workspace/RESULTS.md) 专门测 RequestEncode/ResponseEncode：五种代表消息的通知、请求加 CancelSession、响应，以及四种 Echo 通知，共 19 项。两轮均更快、少两次分配，大型约快 8%～10%、整数数组约快 18%～20%；控制失败与完整块、原未改路径对照一并保留。它包含真实 RPC 编码/session 成本，区别于下文原 frame 的手工组帧，不包含网络或 Dispatch，也不替换原四实现矩阵。该切片已本地提交为 gosproto dc4948d / GSR c4622bf，未推送。
+
+[通知 session 逃逸](../../../docs/benchmarks/2026-10-17-gosproto-rpc-session/RESULTS.md) 复用同一19项真实RPC探针，仅把session存储放入有响应分支；9种通知两轮全部少一次逻辑分配、约4 B/op，小包有约2%～3%的CPU改善。大型通知及ASCII请求的小幅计时代价、self/clone失败及原始数据完整保留；不设最低收益比例，不概括为全面加速。库与Go/TS验收通过，新改动待审查。
 
 ## 比较口径
 
