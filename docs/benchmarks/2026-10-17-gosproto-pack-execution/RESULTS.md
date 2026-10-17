@@ -1,6 +1,6 @@
 # Pack 普通 word 执行路径收敛
 
-2026-10-17。Decode 阶段性冻结记录已本地提交为 GSR `0db5ed0`，独立库基线为 `a09fb00`，其 Decode 生产源码与 `fc3246a` 相同；当前 Pack 生产改动与本报告尚未提交/发布，正式 GSR 依赖仍为 v0.4.0。Decode 保持阶段性冻结，后续仍可回头优化。
+2026-10-17。Decode 阶段性冻结记录已本地提交为 GSR `0db5ed0`，独立库基线为 `a09fb00`，其 Decode 生产源码与 `fc3246a` 相同；该轮 Pack 实现已本地提交为 gosproto `faa6a21`，本报告为 GSR `3626b3d`，未推送/发布，正式 GSR 依赖仍为 v0.4.0。Decode 保持阶段性冻结，后续仍可回头优化。
 
 ## 问题与实施范围
 
@@ -75,4 +75,4 @@ python3 docs/benchmarks/2026-10-17-gosproto-pack-execution/reproduce-pairs.py \
 
 默认重跑 final 的 137 项 × 五轮；--candidate inline 重跑筛选三轮；--prepare-only 只建归档/补丁副本并核对输入。不会修改传入独立库。原始源码、模块覆盖与官方指纹见 [inputs.json](inputs.json)，候选补丁见 [patches](patches/)。本轮共保留 1096 个配对样本，不保证复现相同 ns/op。
 
-目前保留的是无额外分配的数值 Pack 中等幅度改进；完整数值路径仍有差距，后续以这份组合测量为基线。Decode 当前阶段维持冻结。实现与记录留在工作树供审查，未提交/推送/发布，GSR 依赖仍为 v0.4.0。
+目前保留的是无额外分配的数值 Pack 中等幅度改进；完整数值路径仍有差距，后续以这份组合测量为基线。Decode 当前阶段维持冻结。实现与记录已本地提交为 gosproto `faa6a21` / GSR `3626b3d`，未推送/发布，GSR 依赖仍为 v0.4.0。

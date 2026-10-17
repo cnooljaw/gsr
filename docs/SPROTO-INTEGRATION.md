@@ -168,4 +168,6 @@ davyxu 的 `float32/float64` 是生成器扩展：生成整数字段，用精度
 
 Decode 性能阶段已按用户决定冻结于独立库 `a09fb00`（Decode 生产源码同 `fc3246a`）。最后的独立入口实验微基准约 -38.3%，完整大型 Decode/PDecode 仅 -2.25%/-1.28%，未达预设门槛，候选未采用；详见 [冻结报告](benchmarks/2026-10-17-gosproto-decode-freeze/RESULTS.md)。正式依赖仍为 v0.4.0，实验与阶段性冻结文档已提交为 GSR `0db5ed0`，未发布。
 
-后续只调整 Pack 普通 word 的执行路径，Decode 保持当前阶段基线。五轮大型/整数数组 PEncode 约 -6.0%/-5.7%，分配不变，完整库/官方/差分/fuzz 与 GoTS 7/7 验收通过，见 [Pack 执行路径验收](benchmarks/2026-10-17-gosproto-pack-execution/RESULTS.md)。新实现和记录未提交，正式依赖仍为 v0.4.0。
+后续只调整 Pack 普通 word 的执行路径，Decode 保持当前阶段基线。五轮大型/整数数组 PEncode 约 -6.0%/-5.7%，分配不变，完整库/官方/差分/fuzz 与 GoTS 7/7 验收通过，见 [Pack 执行路径验收](benchmarks/2026-10-17-gosproto-pack-execution/RESULTS.md)。该轮已本地提交为 gosproto `faa6a21` / GSR `3626b3d`，未推送/发布，正式依赖仍为 v0.4.0。
+
+后续连续零 word Pack 的三个候选虽改善零块，但因 ASCII、数值组合或短包代价全部未采用，正式生产代码保持 `faa6a21`。仅新增精确零段/FF/尾块回归和 1719 个筛选样本，未重复集成验收，见 [筛选记录](benchmarks/2026-10-17-gosproto-zero-pack/RESULTS.md)。新回归/记录未提交，Decode 阶段基线与正式依赖保持不变。

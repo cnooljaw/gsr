@@ -1,0 +1,59 @@
+diff --git a/pack_test.go b/pack_test.go
+index 255ba4e..9f0de18 100644
+--- a/pack_test.go
++++ b/pack_test.go
+@@ -241,3 +241,54 @@ func TestPackPartialRunAtBlockLimit(t *testing.T) {
+ 		})
+ 	}
+ }
++
++// 连续零 word 的 mask 数量、FF 前缀和不足八字节的尾部必须保持精确，且不能访问额外容量。
++func TestPackZeroRuns(t *testing.T) {
++	type prefix struct {
++		raw  []byte
++		wire []byte
++	}
++	prefixes := []prefix{
++		{},
++		{[]byte{0x91, 0, 0, 0, 0, 0, 0, 0}, []byte{1, 0x91}},
++		{[]byte{1, 2, 3, 4, 5, 0, 0, 0}, []byte{0x1f, 1, 2, 3, 4, 5}},
++		{[]byte{0, 0, 0, 1, 2, 3, 4, 0xff}, []byte{0xf8, 1, 2, 3, 4, 0xff}},
++	}
++	for _, words := range []int{1, 255, 256, 257} {
++		current := prefix{raw: bytes.Repeat([]byte{0xa5}, words*8)}
++		for remaining := words; remaining > 0; {
++			count := min(256, remaining)
++			current.wire = append(current.wire, 0xff, byte(count-1))
++			current.wire = append(current.wire, bytes.Repeat([]byte{0xa5}, count*8)...)
++			remaining -= count
++		}
++		prefixes = append(prefixes, current)
++	}
++	for _, before := range prefixes {
++		for _, words := range []int{1, 2, 3, 7, 8, 9, 15, 16, 17, 31, 32, 33, 255, 256, 257} {
++			for tail := 0; tail <= 8; tail++ {
++				for _, nonzeroTail := range []bool{false, true} {
++					raw := append(bytes.Clone(before.raw), make([]byte, words*8+tail)...)
++					want := append(bytes.Clone(before.wire), make([]byte, words)...)
++					if tail > 0 {
++						if nonzeroTail {
++							raw[len(raw)-1] = 0xe7
++							want = append(want, byte(1<<(tail-1)), 0xe7)
++						} else {
++							want = append(want, 0)
++						}
++					}
++					for offset := 0; offset < 8; offset++ {
++						storage := bytes.Repeat([]byte{0xcc}, offset+len(raw)+8)
++						copy(storage[offset:], raw)
++						snapshot := bytes.Clone(storage)
++						input := storage[offset : offset+len(raw)]
++						if got := Pack(input); !bytes.Equal(got, want) || !bytes.Equal(storage, snapshot) {
++							t.Fatalf("prefix=%d zeros=%d tail=%d nonzero=%t offset=%d wire=%x want=%x", len(before.raw), words, tail, nonzeroTail, offset, got, want)
++						}
++					}
++				}
++			}
++		}
++	}
++}

@@ -171,4 +171,6 @@ SPROTO_ORACLE_DIR=/path/to/pinned/sproto \
 
 [入口最终实验与 Decode 冻结](../../../docs/benchmarks/2026-10-17-gosproto-decode-freeze/RESULTS.md) 保存 90 个微基准与 645 个完整对照样本。入口约 -38.3%，大型 Decode/PDecode 仅 -2.25%/-1.28%，未达预定门槛，候选未采用。Decode 冻结于 `a09fb00`，正式依赖未变；阶段性冻结记录已本地提交为 GSR `0db5ed0`，后续仍可回头优化。
 
-[Pack 普通 word 执行路径](../../../docs/benchmarks/2026-10-17-gosproto-pack-execution/RESULTS.md) 保存当前 137 项五轮对照及三轮筛选。大型/整数数组 PEncode 约 -6.0%/-5.7%，分配不变，Decode 等控制不变；所有代价与验证范围一并保留，新实现/记录待审查。
+[Pack 普通 word 执行路径](../../../docs/benchmarks/2026-10-17-gosproto-pack-execution/RESULTS.md) 保存当前 137 项五轮对照及三轮筛选。大型/整数数组 PEncode 约 -6.0%/-5.7%，分配不变，Decode 等控制不变；所有代价与验证范围一并保留；该轮已本地提交为 gosproto `faa6a21` / GSR `3626b3d`，未推送/发布。
+
+[连续零 word Pack 筛选](../../../docs/benchmarks/2026-10-17-gosproto-zero-pack/RESULTS.md) 保存三个候选各 191 项三轮的全部原值，共 1719 样本。零块有收益，但其他路径代价不合适，全部撤回；只保留精确字节回归和记录，尚未提交。新增 27 种零段/尾块 benchmark 控制及完整复现脚本，不作为新的协议总体性能基线。

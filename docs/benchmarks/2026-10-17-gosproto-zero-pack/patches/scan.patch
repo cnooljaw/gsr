@@ -1,0 +1,48 @@
+--- a/pack.go
++++ b/pack.go
+@@ -74,6 +74,14 @@
+ 		var used int
+ 		if len(src) >= 8 {
+ 			word := binary.LittleEndian.Uint64(src)
++			// FF 段外的连续完整零 word 各产生一个零 mask，部分尾块仍走原路径。
++			if word == 0 && ffN == 0 && len(src) >= 16 && binary.LittleEndian.Uint64(src[8:]) == 0 {
++				words := 2 + zeroBytePrefix(src[16:])/8
++				clear(packed[offset : offset+words])
++				offset += words
++				src = src[words*8:]
++				continue
++			}
+ 			if ffN > 0 && (word-0x0101010101010101)&^word&0x8080808080808080 == 0 {
+ 				used = 8
+ 			} else {
+@@ -168,9 +176,9 @@
+ 	return packed[:offset]
+ }
+ 
+-// zeroHeaderPrefix 按有效切片长度统计连续零 mask，遇到首个非零字节立即停止。
+-// 调用方只在已确认的零段后使用；预检传入的范围另受剩余输出预算限制。
+-func zeroHeaderPrefix(src []byte) int {
++// zeroBytePrefix 按有效切片长度统计连续零字节，遇到首个非零字节立即停止。
++// 调用方只在已确认的零段后使用；Unpack 预检的范围另受剩余输出预算限制。
++func zeroBytePrefix(src []byte) int {
+ 	index := 0
+ 	for len(src)-index >= 8 {
+ 		word := binary.LittleEndian.Uint64(src[index:])
+@@ -208,7 +216,7 @@
+ 				}
+ 				// 多检查一个零 mask 即可判定超额，不为小预算扫描整段大输入。
+ 				end := min(len(remaining), words+1)
+-				run := 2 + zeroHeaderPrefix(remaining[2:end])
++				run := 2 + zeroBytePrefix(remaining[2:end])
+ 				if run > words {
+ 					return nil, ErrLimit
+ 				}
+@@ -239,7 +247,7 @@
+ 		if header == 0 {
+ 			run := 1
+ 			if len(src) >= 2 && src[1] == 0 {
+-				run = 2 + zeroHeaderPrefix(src[2:])
++				run = 2 + zeroBytePrefix(src[2:])
+ 			}
+ 			// 输出由本次 make 清零，已预检的零段只需推进游标。
+ 			offset += run * 8

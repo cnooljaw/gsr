@@ -4,13 +4,19 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## 连续零 word Pack 候选筛选（2026-10-17）
+
+上一轮已本地提交为 gosproto `faa6a21` / GSR `3626b3d`，未推送。后续三个零段候选各 191 项三轮，共 1719 个样本，零字节帧约 -34%～-40%，但 ASCII、数值组合或短包出现代价，全部撤回；未进入五轮验收，没有新的 PB/SP 排名。正式生产 Go 文件保持 `faa6a21`，Decode 继续阶段性冻结。
+
+只保留 TestPackZeroRuns 的独立精确字节回归，先在基线通过；三个候选最终快照的 Pack/Unpack 相关测试、三个归档补丁副本的完整源码/harness/夹具指纹核对通过。没有采用生产改动，未重复完整库/race/checkptr/官方/fuzz、GSR/GoTS 或 TS 性能验收。原值、控制波动及复现见 [筛选记录](benchmarks/2026-10-17-gosproto-zero-pack/RESULTS.md)。新增回归与记录未提交，正式依赖仍为 v0.4.0。
+
 ## Pack 普通 word 执行路径收敛（2026-10-17）
 
 Decode 阶段性冻结记录已提交为 GSR `0db5ed0`，后续仍可回头优化。当前仅改独立库 pack.go 的完整 word 执行位置，减少逐 word 调用，原 FF、尾块、mask、预留和独占规则保留；Decode/Encode/Unpack/meta/RPC/TS 源码不变。
 
 137 项五轮共 685 样本，大型 Pack/PEncode 约 -13.6%/-6.0%，整数数组约 -19.6%/-5.7%，分配不变；另保留三轮 411 个筛选样本。最终无 SP 中位数回退 >5%，但冻结 payload 控制和 FF 尾块代价原样保留，不宣称完整路径全面胜 PB。
 
-复用原独立字节回归，17984 差分、完整库 race/checkptr/固定官方 C/Lua 对照、vet、Pack/Codec 各约十秒 fuzz、GSR 三包及 TS 构建/GoTS Plain/MAC 7/7、零跳过通过。Linux amd64/arm64/386 构建通过，未跨平台运行或重测 TS 性能。profile 的 kevent 干扰明确保留，不把采样份额当提速比例。具体输入、补丁、指纹、复现与范围见 [验收记录](benchmarks/2026-10-17-gosproto-pack-execution/RESULTS.md)。新代码和记录未提交，正式依赖仍为 v0.4.0。
+复用原独立字节回归，17984 差分、完整库 race/checkptr/固定官方 C/Lua 对照、vet、Pack/Codec 各约十秒 fuzz、GSR 三包及 TS 构建/GoTS Plain/MAC 7/7、零跳过通过。Linux amd64/arm64/386 构建通过，未跨平台运行或重测 TS 性能。profile 的 kevent 干扰明确保留，不把采样份额当提速比例。具体输入、补丁、指纹、复现与范围见 [验收记录](benchmarks/2026-10-17-gosproto-pack-execution/RESULTS.md)。该轮已本地提交为 gosproto `faa6a21` / GSR `3626b3d`，未推送/发布，正式依赖仍为 v0.4.0。
 
 ## Decode 性能阶段冻结（2026-10-17）
 
