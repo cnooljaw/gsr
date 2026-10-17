@@ -6,7 +6,7 @@
 
 前两轮以已发布的 gosproto v0.4.0 为版本基线；下一轮从已提交的 `6012b06` 做增量，不从 v0.4.0 重复实施。实现改动应在独立 gosproto 仓库进行，GSR 提供真实接线和跨语言 Benchmark；不修改 Go module cache，也不将库源码复制到 GSR。
 
-当前切片（2026-10-17）：Pack 组合复评已提交为 gosproto d1ab622 / GSR d3b3ef4，见第 26 节。后续 EncodePacked 私有共享工作区省去一次中间编码分配，两轮业务与完整验收通过，见第 27 节；新实现与记录未提交。正式 GSR 依赖仍为 v0.4.0，Decode 阶段性冻结。
+当前切片（2026-10-17）：EncodePacked 私有共享工作区已提交为 gosproto 56f5c21 / GSR 0f0f779，见第 27 节，未推送。后续真实 RPC RequestEncode/ResponseEncode 复用 Pack 工作区，少两次分配；19 项两轮均更快并完成验收，见第 28 节，新实现与记录未提交。正式 GSR 依赖仍为 v0.4.0，Decode 阶段性冻结。
 
 ## 1. 目标与证据
 
@@ -384,4 +384,12 @@ self 11/19、clone 14/19 通过，9/19 同时通过；两类控制的全部配�
 
 固定四次原 19 项配对，7296 块：大型 PEncode 两轮 −4.82%/−5.52%，7424→3968 B、3→2 次；整数数组 −9.46%/−9.70%，8192→4096 B、2→1 次；ASCII 4 KiB −40.03%/−40.71%。原手工/RPC 完整帧未改用组合入口，32 B 帧有约 7～9 ns（2%～3%）代价，其他完整帧基本持平，不将 body PEncode 降幅推广为网络收益。按实际收益与代价保留，不使用最低百分比淘汰线。
 
-证据、重叠边界依据及测试修正见 [工作区报告](benchmarks/2026-10-17-gosproto-packed-workspace/RESULTS.md)。独立库工作树修改未提交，正式依赖不变，Decode/Unpack/RPC/TS 保持原实现。
+证据、重叠边界依据及测试修正见 [工作区报告](benchmarks/2026-10-17-gosproto-packed-workspace/RESULTS.md)。该切片已本地提交为 gosproto 56f5c21 / GSR 0f0f779，未推送；当时 Decode/Unpack/RPC/TS 保持原实现，正式依赖不变。
+
+## 28. RPC 编码组帧工作区
+
+保留 body 编码先于 session 检查的顺序、等待登记及锁范围，只将 header 直接编码到独占 Pack 工作区，复制已编码 body 后从前部压缩，省去 header 字节缓冲与 Append 拼接缓冲。复用现有 schema 预检/写出，不手写另一套 header codec；header/body 默认预算各自计算，重复 session 返回已编码 body 的既有行为也不变。
+
+新增真实 RPC 探针：五种代表消息各测通知、请求编码加 CancelSession、响应编码，四种 Echo 测通知，共 19 项。固定 self/clone/两次比较与原 19 项未改路径对照，共 9120 块独立复算一致。两轮大型消息约快 7.9%～10.3%、整数数组约快 17.7%～20.2%、ASCII 4 KiB 约快 37.3%～39.1%，所有项少两次分配。self/clone 总控制 13/19、14/19，失败与逐轮波动原样保留；原未改路径中位差约在 ±2% 内，不据此宣称新算法收益或网络/PB 排名。
+
+864 组 header/角色/长度场景、1728 输出保护 wire/cap/独占，另保护预算、错误优先级和分配；旧实现分配测试按预期失败。普通库、race/checkptr、官方 C/Lua、vet、有限 fuzz、GSR 三包及 Go/TS 7/7 通过；最终与采样源码逐字节一致。保留到独立库工作树，尚未提交，见 [RPC 工作区报告](benchmarks/2026-10-17-gosproto-rpc-workspace/RESULTS.md)。body 缓冲与复制仍在，后续若融合须另行验证错误顺序及锁语义；Decode/Unpack/TS 和正式依赖不变。

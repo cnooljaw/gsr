@@ -4,11 +4,17 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## RPC 编码组帧工作区（2026-10-17）
+
+上一切片已本地提交为 gosproto 56f5c21 / GSR 0f0f779，提交后两库干净、未推送。后续 RPC 编码保持 body 校验和 session 登记/锁范围，省去 header 字节与 Append 拼接缓冲。864 组 header/角色/长度、1728 输出的精确 wire/cap/独占，以及独立预算、错误优先级、重复 session 输出与相对分配回归通过；分配用例在旧实现按预期失败。
+
+真实 RPC 19 项两轮全部更快、少两次分配，大型消息约快 8%～10%、整数数组约快 18%～20%、4 KiB ASCII 约快 38%。self/clone 13/19、14/19 总控制通过，失败与波动完整保存；加原未改路径对照共 9120 块，独立复算一致。最终库全测、race/checkptr、固定官方 C/Lua、vet、Pack/Codec 有限 fuzz（143169/230271 次）、GSR 三包及 Go/TS Plain/MAC 7/7、零跳过通过，归档重建/最终源码一致，见 [RPC 工作区报告](benchmarks/2026-10-17-gosproto-rpc-workspace/RESULTS.md)。新代码/记录未提交，正式依赖、Decode/Unpack/TS 不变；未跑 GSR 全仓/race 或新 PB/TS 性能矩阵。
+
 ## EncodePacked 私有共享工作区（2026-10-17）
 
 上一切片已提交为 gosproto d1ab622 / GSR d3b3ef4，提交后干净、未推送。后续私有单缓冲实现保留到工作树；新增组合 wire/cap/独占/错误及长 FF 边界，移除间隔的负向检查在 65535 B 失败，减少一次分配的相对用例在旧实现仍失败。首次插桩下的绝对分配断言失败已记录，修正为同构建相对检查后验收通过，没有生产代码修改掩盖测试失败。
 
-固定四次原 19 项配对共 7296 块，独立复算一致；大型 PEncode 约快 4.8%～5.5%、整数数组约快 9.5%～9.7%、ASCII 4 KiB 约快 40%，均少一次字节分配。32 B 手工帧约慢 7～9 ns，完整帧不能套用 body 组合降幅。最终普通库、race/checkptr、固定官方 C/Lua、vet、Pack/Codec 有限 fuzz（44243/228585 次）、GSR 三包及 Go/TS Plain/MAC 7/7、零跳过通过，见 [工作区记录](benchmarks/2026-10-17-gosproto-packed-workspace/RESULTS.md)。新代码/记录未提交，正式依赖、Decode/Unpack/RPC/TS 不变；无 GSR 全仓/race、跨平台运行或新 TS/PB 性能结论。
+固定四次原 19 项配对共 7296 块，独立复算一致；大型 PEncode 约快 4.8%～5.5%、整数数组约快 9.5%～9.7%、ASCII 4 KiB 约快 40%，均少一次字节分配。32 B 手工帧约慢 7～9 ns，完整帧不能套用 body 组合降幅。最终普通库、race/checkptr、固定官方 C/Lua、vet、Pack/Codec 有限 fuzz（44243/228585 次）、GSR 三包及 Go/TS Plain/MAC 7/7、零跳过通过，见 [工作区记录](benchmarks/2026-10-17-gosproto-packed-workspace/RESULTS.md)。该切片已提交为 gosproto 56f5c21 / GSR 0f0f779，未推送；当时正式依赖、Decode/Unpack/RPC/TS 不变；无 GSR 全仓/race、跨平台运行或新 TS/PB 性能结论。
 
 ## Pack 小幅收益复评与组合保留（2026-10-17）
 

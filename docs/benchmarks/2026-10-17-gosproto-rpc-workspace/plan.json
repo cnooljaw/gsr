@@ -1,0 +1,18 @@
+{
+  "baselineCommit": "56f5c21",
+  "scope": "RPC encode frame only; preserve body Encode before session validation and original session lock/admission order. Do not change Dispatch/Decode, public APIs, budgets, wire/cap/ownership or duplicate-error body result.",
+  "candidate": "Encode rpcHeader into private shared Pack workspace, copy already-encoded body, pack forward; no header byte slice or Append buffer.",
+  "correctness": "Existing session/admission/error tests plus frame wire/cap/ownership across header scalar boundaries, FF/tails and no-body roles. Body budget remains independent of header budget.",
+  "measurement": {
+    "blockMs": 10,
+    "modes": [
+      "self",
+      "clone",
+      "pass1",
+      "pass2"
+    ],
+    "matrix": "5 existing representative messages x notification_encode/request_encode_cancel/response_encode + 4 Echo RPC notification frames = 19 actual RPC API operations. Same cleanup cost per arm. Original wire fixtures remain setup validation.",
+    "secondary": "Original 19 body/Pack/manual-frame operations as unchanged controls, one compare run."
+  },
+  "assessment": "No minimum percent. Evaluate actual RPC paths, allocation reduction, independent passes, control noise, small/large cost and ownership. No retries to pass or new protocol abstraction."
+}

@@ -1,0 +1,152 @@
+[
+  {
+    "args": [
+      "go",
+      "test",
+      "-run",
+      "^TestRpcFrameAllocation$",
+      "-v",
+      ".",
+      "-timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-workspace/negative",
+    "env": {},
+    "exitCode": 1,
+    "expectedExitCode": 1,
+    "elapsedSeconds": 1.488,
+    "output": "=== RUN   TestRpcFrameAllocation\n    rpc_test.go:234: RPC=6 separate=5, want fewer allocations\n--- FAIL: TestRpcFrameAllocation (0.00s)\nFAIL\nFAIL\tgithub.com/cnooljaw/gosproto\t0.498s\nFAIL\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-run",
+      "^(TestRpcFrameAssembly|TestRpcFrameBodyBudget|TestRpcInvalidDefinitionsAndMessages)$",
+      "-v",
+      ".",
+      "-timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-rpc-workspace/negative",
+    "env": {},
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "elapsedSeconds": 0.576,
+    "output": "=== RUN   TestRpcInvalidDefinitionsAndMessages\n--- PASS: TestRpcInvalidDefinitionsAndMessages (0.00s)\n=== RUN   TestRpcFrameAssembly\n--- PASS: TestRpcFrameAssembly (0.01s)\n=== RUN   TestRpcFrameBodyBudget\n--- PASS: TestRpcFrameBodyBudget (0.01s)\nPASS\nok  \tgithub.com/cnooljaw/gosproto\t0.250s\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "./...",
+      "-timeout=2m"
+    ],
+    "cwd": "/private/tmp/gsr-gosproto-fork",
+    "env": {
+      "SPROTO_ORACLE_DIR": "/private/tmp/gsr-official-sproto-review"
+    },
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "elapsedSeconds": 1.49,
+    "output": "ok  \tgithub.com/cnooljaw/gosproto\t1.087s\n?   \tgithub.com/cnooljaw/gosproto/examples/echo\t[no test files]\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-gcflags=all=-d=checkptr=2",
+      "./...",
+      "-timeout=2m"
+    ],
+    "cwd": "/private/tmp/gsr-gosproto-fork",
+    "env": {
+      "SPROTO_ORACLE_DIR": "/private/tmp/gsr-official-sproto-review",
+      "GOMAXPROCS": "2"
+    },
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "elapsedSeconds": 3.209,
+    "output": "ok  \tgithub.com/cnooljaw/gosproto\t2.119s\n?   \tgithub.com/cnooljaw/gosproto/examples/echo\t[no test files]\n"
+  },
+  {
+    "args": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "cwd": "/private/tmp/gsr-gosproto-fork",
+    "env": {},
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "elapsedSeconds": 0.159,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-run=^$",
+      "-fuzz=^FuzzPackRoundTrip$",
+      "-fuzztime=10s",
+      "-parallel=1",
+      "-timeout=30s"
+    ],
+    "cwd": "/private/tmp/gsr-gosproto-fork",
+    "env": {},
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "elapsedSeconds": 12.202,
+    "output": "fuzz: elapsed: 0s, gathering baseline coverage: 0/48 completed\nfuzz: elapsed: 0s, gathering baseline coverage: 48/48 completed, now fuzzing with 1 workers\nfuzz: elapsed: 3s, execs: 93796 (31244/sec), new interesting: 4 (total: 52)\nfuzz: elapsed: 6s, execs: 143169 (16458/sec), new interesting: 6 (total: 54)\nfuzz: elapsed: 9s, execs: 143169 (0/sec), new interesting: 6 (total: 54)\nfuzz: elapsed: 11s, execs: 143169 (0/sec), new interesting: 6 (total: 54)\nPASS\nok  \tgithub.com/cnooljaw/gosproto\t11.387s\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-run=^$",
+      "-fuzz=^FuzzCodecRoundTrip$",
+      "-fuzztime=10s",
+      "-parallel=1",
+      "-timeout=30s"
+    ],
+    "cwd": "/private/tmp/gsr-gosproto-fork",
+    "env": {},
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "elapsedSeconds": 10.596,
+    "output": "fuzz: elapsed: 0s, gathering baseline coverage: 0/35 completed\nfuzz: elapsed: 0s, gathering baseline coverage: 35/35 completed, now fuzzing with 1 workers\nfuzz: elapsed: 3s, execs: 66646 (22207/sec), new interesting: 0 (total: 35)\nfuzz: elapsed: 6s, execs: 137886 (23755/sec), new interesting: 0 (total: 35)\nfuzz: elapsed: 9s, execs: 206091 (22720/sec), new interesting: 2 (total: 37)\nfuzz: elapsed: 10s, execs: 230271 (23224/sec), new interesting: 2 (total: 37)\nPASS\nok  \tgithub.com/cnooljaw/gosproto\t10.249s\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-modfile=/private/tmp/gsr-next-codec.mod",
+      "./protocol/sproto",
+      "./examples/websocket-gate/cmd/debugserver",
+      "./examples/websocket-gate/benchmarks",
+      "-timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {},
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "elapsedSeconds": 1.72,
+    "output": "ok  \tgithub.com/cnooljaw/gsr/protocol/sproto\t0.326s\nok  \tgithub.com/cnooljaw/gsr/examples/websocket-gate/cmd/debugserver\t0.748s\nok  \tgithub.com/cnooljaw/gsr/examples/websocket-gate/benchmarks\t0.420s\n"
+  },
+  {
+    "args": [
+      "npm",
+      "--prefix",
+      "examples/websocket-gate",
+      "run",
+      "test:sproto:integration"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {
+      "GOFLAGS": "-modfile=/private/tmp/gsr-next-codec.mod"
+    },
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "elapsedSeconds": 3.23,
+    "output": "\n> test:sproto:integration\n> npm run build && go build -o ../../tmp/sproto-echo ./cmd/debugserver && GSR_SPROTO_SERVER_BIN=../../tmp/sproto-echo node --test client/dist/sproto_client.test.js\n\n\n> build\n> tsc --project tsconfig.json\n\n✔ official Sproto vectors and safe integer boundary (1.990584ms)\n✔ official Sproto boolean and mixed signed int64 arrays (129.804083ms)\n✔ Sproto decoded results and unpacked buffers stay independent (4.187167ms)\n✔ Sproto sessions stay independent and close clears pending (1.985208ms)\n✔ Sproto pending and packet limits (73.580459ms)\n✔ Go/TS Sproto Echo Plain (428.794791ms)\n✔ Go/TS Sproto Echo MAC (34.4605ms)\nℹ tests 7\nℹ suites 0\nℹ pass 7\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 735.007834\n"
+  }
+]

@@ -184,4 +184,7 @@ Decode 性能阶段已按用户决定冻结于独立库 `a09fb00`（Decode 生�
 
 用户随后修正统一收益淘汰线，稀疏展开与 FF 段分离重新进行两轮独立业务复测、前后控制及固定形态检查，组合保留到 gosproto 工作树。大型/整数数组 PEncode 两轮分别约快 3.72%～4.24% / 2.83%～3.04%，零字节完整帧约快 20%；合成四非零字节形态的约 3.33% 代价单列披露。最终库官方对照、race/checkptr/vet/fuzz、临时 modfile 三包及 Go/TS Plain/MAC 7/7 通过，见 [复评记录](benchmarks/2026-10-17-gosproto-pack-reassessment/RESULTS.md)。实现与记录未提交，正式依赖仍为 v0.4.0，Decode 冻结。
 
-上述切片已本地提交为 gosproto d1ab622 / GSR d3b3ef4，未推送。后续仅优化 EncodePacked 私有工作区，省去中间字节分配；两轮 body PEncode 改善及 32 B 手工帧约 7～9 ns 代价分别披露，不将组合入口收益当成 RPC 帧收益。最终库官方对照、普通/race/checkptr/vet/fuzz、GSR 三包与 Go/TS 7/7 通过，见 [工作区报告](benchmarks/2026-10-17-gosproto-packed-workspace/RESULTS.md)。新实现待审查，正式依赖和 Decode 基线不变。
+上述切片已本地提交为 gosproto d1ab622 / GSR d3b3ef4，未推送。后续仅优化 EncodePacked 私有工作区，省去中间字节分配；两轮 body PEncode 改善及 32 B 手工帧约 7～9 ns 代价分别披露，不将组合入口收益当成 RPC 帧收益。最终库官方对照、普通/race/checkptr/vet/fuzz、GSR 三包与 Go/TS 7/7 通过，见 [工作区报告](benchmarks/2026-10-17-gosproto-packed-workspace/RESULTS.md)。该切片已提交为 gosproto 56f5c21 / GSR 0f0f779，未推送，正式依赖和 Decode 基线不变。
+
+
+后续 RPC 编码切片只将 header 编码与拼接复用到 Pack 工作区，保留 body 校验、session 登记及锁范围。真实通知/请求加取消/响应共 19 项，两轮全部更快且少两次分配；大型消息约快 8%～10%，整数数组约快 18%～20%。默认预算、错误顺序、wire/cap/独占的增量回归及库普通/race/checkptr/官方 C-Lua/vet/fuzz、GSR 三包、Go/TS 7/7 通过；新代码与记录未提交，见 [RPC 工作区报告](benchmarks/2026-10-17-gosproto-rpc-workspace/RESULTS.md)。这次是实际 RPC API 的测量，区别于原手工帧与 body PEncode；没有新增网络或 PB/TS 排名结论，正式依赖不变。
