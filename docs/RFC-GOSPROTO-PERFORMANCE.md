@@ -6,7 +6,7 @@
 
 前两轮以已发布的 gosproto v0.4.0 为版本基线；下一轮从已提交的 `6012b06` 做增量，不从 v0.4.0 重复实施。实现改动应在独立 gosproto 仓库进行，GSR 提供真实接线和跨语言 Benchmark；不修改 Go module cache，也不将库源码复制到 GSR。
 
-当前切片（2026-10-18）：固定私有RPC header优化已本地提交为 gosproto f9de3d2 / GSR dbb681f，见第 30 节，未推送。后续仅将声明body的ResponseEncode融合到单缓冲工作区；五项响应两轮均改善并少一次分配，共用body/请求路径成本及完整验收见第 31 节，新实现与记录未提交。正式 GSR 依赖仍为 v0.4.0，Decode 阶段性冻结。
+当前切片（2026-10-18）：响应单缓冲已本地提交为 gosproto b626637 / GSR b2825cf，见第 31 节，未推送。后续只将有 Request、无 Response 的通知复用到同一工作区；有响应请求保持独立 body、session 登记、锁和重复错误返回。测量与验收见第 32 节，新修改未提交。正式 GSR 依赖仍为 v0.4.0，Decode 阶段性冻结。
 
 ## 1. 目标与证据
 
@@ -418,4 +418,12 @@ RequestEncode改用局部header值，避免字段指针赋值使session副本保
 
 固定四次19项真实RPC配对加一次原19项body/Pack/手工帧，共9120块独立复算一致。五项响应两轮均更快且少一次分配：大型−7.58%/−6.04%（7424→3968 B，3→2次），整数数组−14.79%/−12.54%（8192→4096 B，2→1次），ASCII4KiB−43.90%/−43.04%（9728→4864 B，2→1次）。请求/通知分配不变；AddressBook通知约+1.30%/+0.98%（9/7 ns）代价保留。nil-prefix普通19项约−2.86%～+1.33%，不把未针对路径的波动归因于算法。self/clone17/19、16/19控制及全部失败保留；按真实响应收益、低复杂度及透明代价保留，无最低CPU比例门槛。
 
-复用1008组RPC边界与39官方头对照，新增3个typed nil响应必须ErrNil/nil输出，旧实现也通过；初版空结构测试预期不符合getbase契约，仅纠正测试，未改生产行为。相对分配回归旧2对1失败，新普通/race/checkptr通过。最终库全测/官方/race/checkptr/vet、Pack/Codec各10秒fuzz（136238/220094次）、3078固定RPC差分/12312帧、GSR三包及Go/TS 7/7通过，源码与归档一致。新修改未提交，见 [响应工作区报告](benchmarks/2026-10-18-gosproto-response-workspace/RESULTS.md)。正式依赖、Decode及新的PB/TS排名不变。
+复用1008组RPC边界与39官方头对照，新增3个typed nil响应必须ErrNil/nil输出，旧实现也通过；初版空结构测试预期不符合getbase契约，仅纠正测试，未改生产行为。相对分配回归旧2对1失败，新普通/race/checkptr通过。最终库全测/官方/race/checkptr/vet、Pack/Codec各10秒fuzz（136238/220094次）、3078固定RPC差分/12312帧、GSR三包及Go/TS 7/7通过，源码与归档一致。该切片已本地提交为 gosproto b626637 / GSR b2825cf，未推送，见 [响应工作区报告](benchmarks/2026-10-18-gosproto-response-workspace/RESULTS.md)。正式依赖、Decode及新的PB/TS排名不变。
+
+## 32. 仅融合无响应通知的 body 缓冲
+
+仅在Request存在且HasResponse为false的分支，将私有type-only header作为既有encodeWithLimits前缀，直接写入最终Pack工作区，省掉中间body分配及复制；生产仅rpc.go增加八行。通知仍忽略session且不登记等待，typed nil/预算失败返回nil；header/body预算、wire/cap、输入/旧输出独占不变。有响应请求的body校验顺序、session锁/登记及重复session返回raw body保持，ResponseEncode/通用encoder/Decode/Dispatch/Pack/Unpack/TS均未改。
+
+固定四次19项真实RPC配对共7296块独立复算一致。9项通知两轮均改善且少一次分配：大型−6.53%/−7.34%（7424→3968 B，3→2次），整数数组−13.46%/−11.71%（8192→4096 B，2→1次），ASCII4KiB约−43%～−45%，32 B−11.91%/−16.91%。非目标10项分配不变；整数数组请求+0.43%/+0.32%（20.1/14.4 ns）及ASCII响应第二轮+1.07%（8.9 ns）代价保留，不将其他控制加速当算法收益。self13/19、clone7/19及全部失败保留，不重试到通过，不设最低收益百分比。
+
+扩展既有RPC测试保护忽略session、不登记pending、typed nil与8 MiB通知预算，旧实现先通过；分配断言旧2对1按预期失败，新普通/race通过。库全测/官方C-Lua/race/checkptr/vet、3078固定RPC差分/12312帧、GSR三包及Go/TS 7/7、零跳过通过；源码与采样/重建归档一致。通用codec/Pack未改，不重复随机fuzz、PB/TS矩阵或GSR全仓/race。新代码/记录未提交，见 [通知工作区报告](benchmarks/2026-10-18-gosproto-notification-workspace/RESULTS.md)。正式依赖仍v0.4.0，Decode继续冻结。

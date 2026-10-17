@@ -4,11 +4,15 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## RPC 通知单缓冲（2026-10-18）
+
+上一切片已提交为 gosproto b626637 / GSR b2825cf，提交后两库干净、未推送。后续仅融合有Request、无Response的通知，复用上一轮私有前缀写出，省一次body分配和复制；有响应请求的校验、锁、session登记和重复错误raw body返回保持。9项通知两轮均改善：大型约快6.5%～7.3%、整数数组约快11.7%～13.5%、ASCII4KiB约快43%～45%；10项非目标分配不变，整数数组请求约14～20 ns代价与self13/19、clone7/19控制失败完整披露。库/官方/race/checkptr/vet、3078固定RPC差分、GSR三包和Go/TS 7/7、零跳过通过，源码/归档一致，见 [通知工作区报告](benchmarks/2026-10-18-gosproto-notification-workspace/RESULTS.md)。新修改未提交，正式依赖/Decode/Pack/Unpack/TS不变，未重新测PB/TS排名。
+
 ## RPC 响应单缓冲（2026-10-18）
 
 上一切片已提交为 gosproto f9de3d2 / GSR dbb681f，提交后两库干净、未推送。后续仅将声明body的ResponseEncode写入同一Pack工作区，省一次中间body分配/复制；普通调用传nil前缀，请求方法/登记/锁/重复错误body返回不变。相对分配回归旧2对1失败，新普通及插桩构建通过；补3个typed nil响应ErrNil/nil输出，旧实现也通过，错误的空结构测试预期与修正保留。
 
-四次19项RPC加一次原19项body/Pack/手工帧，共9120块独立复算一致；五项响应两轮均改善，大型约快6%～8%、整数数组约快13%～15%、ASCII4KiB约快43%～44%，各少一次分配。请求/通知分配不变，AddressBook通知+1.30%/+0.98%（9/7 ns）代价、nil-prefix普通项−2.86%～+1.33%波动与控制17/19、16/19全部公开。最终库全测/固定官方/race/checkptr/vet、Pack/Codec有限fuzz（136238/220094次）、3078固定RPC差分/12312帧、GSR三包和Go/TS Plain/MAC 7/7、零跳过通过，源码与归档一致，见 [响应工作区报告](benchmarks/2026-10-18-gosproto-response-workspace/RESULTS.md)。新修改未提交，正式依赖/Decode/Pack/Unpack/TS不变；未运行GSR全仓/race、跨平台或新PB/TS性能矩阵。
+四次19项RPC加一次原19项body/Pack/手工帧，共9120块独立复算一致；五项响应两轮均改善，大型约快6%～8%、整数数组约快13%～15%、ASCII4KiB约快43%～44%，各少一次分配。请求/通知分配不变，AddressBook通知+1.30%/+0.98%（9/7 ns）代价、nil-prefix普通项−2.86%～+1.33%波动与控制17/19、16/19全部公开。最终库全测/固定官方/race/checkptr/vet、Pack/Codec有限fuzz（136238/220094次）、3078固定RPC差分/12312帧、GSR三包和Go/TS Plain/MAC 7/7、零跳过通过，源码与归档一致，见 [响应工作区报告](benchmarks/2026-10-18-gosproto-response-workspace/RESULTS.md)。该切片已本地提交为 gosproto b626637 / GSR b2825cf，未推送；正式依赖/Decode/Pack/Unpack/TS不变；未运行GSR全仓/race、跨平台或新PB/TS性能矩阵。
 
 ## RPC 固定私有 header（2026-10-17）
 
