@@ -166,4 +166,6 @@ davyxu 的 `float32/float64` 是生成器扩展：生成整数字段，用精度
 
 后续三个 Decode 入口写法与固定八字节普通 Unpack 恢复均因收益不足/回退未采用，全部生产代码保持 `fc3246a`。基线新 profile、mask 分布、918 个筛选样本和新增 FF 后继回归见 [局部候选筛选](benchmarks/2026-10-17-gosproto-decode-binding/RESULTS.md)。该轮未重复集成验收，回归与记录已本地提交为 gosproto `a09fb00`、GSR `d1beb28`。
 
-Decode 性能阶段已按用户决定冻结于独立库 `a09fb00`（Decode 生产源码同 `fc3246a`）。最后的独立入口实验微基准约 -38.3%，完整大型 Decode/PDecode 仅 -2.25%/-1.28%，未达预设门槛，候选未采用；详见 [冻结报告](benchmarks/2026-10-17-gosproto-decode-freeze/RESULTS.md)。正式依赖仍为 v0.4.0，新实验与冻结文档未提交/发布。
+Decode 性能阶段已按用户决定冻结于独立库 `a09fb00`（Decode 生产源码同 `fc3246a`）。最后的独立入口实验微基准约 -38.3%，完整大型 Decode/PDecode 仅 -2.25%/-1.28%，未达预设门槛，候选未采用；详见 [冻结报告](benchmarks/2026-10-17-gosproto-decode-freeze/RESULTS.md)。正式依赖仍为 v0.4.0，实验与阶段性冻结文档已提交为 GSR `0db5ed0`，未发布。
+
+后续只调整 Pack 普通 word 的执行路径，Decode 保持当前阶段基线。五轮大型/整数数组 PEncode 约 -6.0%/-5.7%，分配不变，完整库/官方/差分/fuzz 与 GoTS 7/7 验收通过，见 [Pack 执行路径验收](benchmarks/2026-10-17-gosproto-pack-execution/RESULTS.md)。新实现和记录未提交，正式依赖仍为 v0.4.0。

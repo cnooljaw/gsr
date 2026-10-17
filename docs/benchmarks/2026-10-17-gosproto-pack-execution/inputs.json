@@ -1,0 +1,44 @@
+{
+  "libraryHead": "a09fb004c3f3b63f9d93a6377f63d76080cfa027",
+  "gsrHead": "0db5ed0a60725f89ee9ae9ec36ad11cb5c34d434",
+  "harnessSha256": {
+    "protocol_benchmark_test.go": "5da22792f620ff303e002c5c38fbc88f2c0205369f5f92914f134546c5d2f8e7",
+    "paired_test.go": "89a9cb0b4ecbe4a23a5c398f8220dc5d5ef3c31cf008939e0c624d48bf224947",
+    "packing_test.go": "185454f2b6395568173d360e71de93c77d31361c9741afdb09403b7accec79a7",
+    "unpack_benchmark_test.go": "8107ee55a84d638bd240a74696e0c1ae8c1b4ea90ad6598db630e5b8df0c1fa5",
+    "unpacking_test.go": "a9e22f40d25fabaa7fad820e2f7e205f8d90640a70ec62880b4041e2133b4290",
+    "before_echo_test.go": "b09f65d09fae355c160381e58675d69e3166cc9d1e4a47acaf504f9d6476b367",
+    "representative_benchmark_test.go": "773830c5a7a2d06d35d371368a2596b5bd28e8f08a61e87b7ce634a2a8ad74c4"
+  },
+  "fixtures": {
+    "representative.json": "5d4ead8bcf974f35e9ca9b7c4b41e946790ea5d68534fdf231813f6f7ff9ea33",
+    "cases.json": "aa77345f5b8560ae6a10beeb3b492bd5b2d722230da3df667d776eaa9b580d70",
+    "correctness.json": "77cffe32896d2ebfc9a69f9973aea9ffccf57a891ab42ccecde0faf805330adb"
+  },
+  "tsProduction": {
+    "examples/websocket-gate/client/src/sproto_client.ts": "4c68cbf32775ffd874f1d0a3b42b6eb23ee9bc4b803f52879c22aff0839ebb7b",
+    "examples/websocket-gate/client/src/representative_benchmark.ts": "b97f5962e6cbc7c8a84255f16a2c0e35c7a7ac1dd6dc3dfb7b9d9f98c7dea2b2",
+    "examples/websocket-gate/client/src/secure_auth.test.ts": "f6bb2dbb1a774910420a80ad4348dac451317d9e6b8e32e3d375b80008ae71b3",
+    "examples/websocket-gate/client/src/secure_auth.ts": "1f8f25ee1b04cb4d44bb033be6dcdd59c2e6881bd5ba80dc07cb6d18114d2691",
+    "examples/websocket-gate/client/src/auth_vectors.test.ts": "da268f61031814da04efaf7096fd690fdd4858c03a4af69462830b2e6c201d79",
+    "examples/websocket-gate/client/src/sproto_client.test.ts": "dd55bbf567978faf91a379d62a88452c7f7a3b04a47a16923875f805e4a0e5e3",
+    "examples/websocket-gate/client/src/index.ts": "9968668953b2241310612e4ca8346ba1142d24c5551d93fb5d816f389d20a81f",
+    "examples/websocket-gate/client/src/protocol_benchmark.ts": "4a8b3e0d762efa4868a1685c0ad8c94cb3e9157c83a1b7393f48862688957bef",
+    "examples/websocket-gate/client/src/vendor/sproto.ts": "1b1258d8258e15d3b6df18e98da9667139a0788c277c2d6f21c549cbb05617c8",
+    "examples/websocket-gate/client/src/gen/benchmark/representative_pb.ts": "9028dd612649717de706e5212c14fa371eb464308036cf7472d956f83fcb52dd",
+    "examples/websocket-gate/client/src/gen/gsr/example/echo/v1/echo_pb.ts": "abc29249f2f5c5a9e622bd9b4a0f4254e2d7e9cac7f130162210bf36efa7f2ec",
+    "examples/websocket-gate/client/src/gen/gsr/protocol/v1/options_pb.ts": "ff7bb76433996a21484ce6539ca9fc161e1db43ec5faa1a95aa0e254e62e5348",
+    "examples/websocket-gate/client/src/gen/gsr/common/v1/common_pb.ts": "d6e423d3f1fb17794b89a72b4d6ac1cbbd4fa5a23a1ad87d796468592871596d"
+  },
+  "goMod": "module encoderbench\n\ngo 1.24.0\n\nrequire (\n github.com/cnooljaw/gsr v0.0.0\n github.com/cnooljaw/gosproto v0.4.0\n github.com/cnooljaw/gosproto-before v0.0.0\n google.golang.org/protobuf v1.36.1\n)\nreplace github.com/cnooljaw/gsr => /Users/lijiawang/Documents/cocos/laya/gsr\nreplace github.com/cnooljaw/gosproto => /private/tmp/gsr-gosproto-fork\nreplace github.com/cnooljaw/gosproto-before => /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-execution/before\n",
+  "temporaryModfile": "module github.com/cnooljaw/gsr\n\ngo 1.24.0\n\nrequire google.golang.org/protobuf v1.36.1\n\nrequire (\n\tgithub.com/DATA-DOG/go-sqlmock v1.5.2\n\tgithub.com/cnooljaw/gosproto v0.4.0\n\tgithub.com/go-sql-driver/mysql v1.10.1\n\tgithub.com/gorilla/websocket v1.5.3\n\tgithub.com/redis/go-redis/v9 v9.18.0\n)\n\nrequire (\n\tfilippo.io/edwards25519 v1.2.0 // indirect\n\tgithub.com/cespare/xxhash/v2 v2.3.0 // indirect\n\tgithub.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect\n\tgo.uber.org/atomic v1.11.0 // indirect\n)\n\nreplace github.com/cnooljaw/gosproto => /private/tmp/gsr-gosproto-fork\n",
+  "scope": "Only pack.go production changes. Decode frozen; Encode/Unpack/meta/RPC/TS and fixtures unchanged. Screening and five-round final snapshots separate.",
+  "oracleCommit": "e93fd5a0653b2bcab38d3b830958bf2e3a901b5f",
+  "oracleSourceSha256": {
+    "sproto.c": "c47a13a15ae15d35550ed584b9102644374032ff13f1170bffadf81a2604f7bc",
+    "lsproto.c": "26bd8f0e1ec9d5ee387b79bdd29171fb292dd47e486463459319aa7db9060820",
+    "sproto.h": "7339fd0923c22e081d69d7256e60453625f1c08eaa8b5974a9b31cadffdae9d9",
+    "sproto.lua": "ca8027fa957f07c3e8b0b5cb18f2f75911bbf12783b9224b02975359ac59d234",
+    "sproto/core.so": "ab4ff727b6f91f43712efd6161fc2f3ddc4bb24738d70fd2c098afcbc39df05f"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "baseline": [
+    "/private/tmp/gsr-gosproto-fork/pack.go:48:6: cannot inline packWord: function too complex: cost 270 exceeds budget 80"
+  ],
+  "inline": [
+    "../inline/pack.go:48:6: can inline packFFMergeable with cost 23 as: func(byte) bool { zero := ^header; remaining := zero & (zero - byte(1)); return remaining & (remaining - byte(1)) == byte(0) }",
+    "../inline/pack.go:87:36: inlining call to packFFMergeable"
+  ],
+  "final": [
+    "/private/tmp/gsr-gosproto-fork/pack.go:48:6: can inline packFFMergeable with cost 23 as: func(byte) bool { zero := ^header; remaining := zero & (zero - byte(1)); return remaining & (remaining - byte(1)) == byte(0) }",
+    "/private/tmp/gsr-gosproto-fork/pack.go:88:36: inlining call to packFFMergeable"
+  ]
+}

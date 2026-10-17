@@ -169,4 +169,6 @@ SPROTO_ORACLE_DIR=/path/to/pinned/sproto \
 
 [Decode 入口与普通 mask 候选筛选](../../../docs/benchmarks/2026-10-17-gosproto-decode-binding/RESULTS.md) 保存三个入口写法与固定八字节恢复的 918 个筛选样本。四个候选全部未采用；新增基线 profile、mask 分布和独立 FF 后继回归，未改生产代码或正式依赖；该轮已本地提交为 gosproto `a09fb00`、GSR `d1beb28`。
 
-[入口最终实验与 Decode 冻结](../../../docs/benchmarks/2026-10-17-gosproto-decode-freeze/RESULTS.md) 保存 90 个微基准与 645 个完整对照样本。入口约 -38.3%，大型 Decode/PDecode 仅 -2.25%/-1.28%，未达预定门槛，候选未采用。Decode 冻结于 `a09fb00`，正式依赖未变；冻结记录待审查。
+[入口最终实验与 Decode 冻结](../../../docs/benchmarks/2026-10-17-gosproto-decode-freeze/RESULTS.md) 保存 90 个微基准与 645 个完整对照样本。入口约 -38.3%，大型 Decode/PDecode 仅 -2.25%/-1.28%，未达预定门槛，候选未采用。Decode 冻结于 `a09fb00`，正式依赖未变；阶段性冻结记录已本地提交为 GSR `0db5ed0`，后续仍可回头优化。
+
+[Pack 普通 word 执行路径](../../../docs/benchmarks/2026-10-17-gosproto-pack-execution/RESULTS.md) 保存当前 137 项五轮对照及三轮筛选。大型/整数数组 PEncode 约 -6.0%/-5.7%，分配不变，Decode 等控制不变；所有代价与验证范围一并保留，新实现/记录待审查。

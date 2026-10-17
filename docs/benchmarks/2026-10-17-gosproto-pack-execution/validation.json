@@ -1,0 +1,182 @@
+{
+  "baseCommit": "5be3b26",
+  "commands": [
+    {
+      "cwd": "/private/tmp/gsr-gosproto-fork",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "-gcflags=all=-d=checkptr=2",
+        "./...",
+        "-timeout=2m"
+      ],
+      "env": {
+        "SPROTO_ORACLE_DIR": "/private/tmp/gsr-official-sproto-review",
+        "GOMAXPROCS": "2"
+      },
+      "exitCode": 0,
+      "elapsedSeconds": 3.446,
+      "output": "ok  \tgithub.com/cnooljaw/gosproto\t2.253s\n?   \tgithub.com/cnooljaw/gosproto/examples/echo\t[no test files]\n"
+    },
+    {
+      "cwd": "/private/tmp/gsr-gosproto-fork",
+      "args": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "env": {},
+      "exitCode": 0,
+      "elapsedSeconds": 0.221,
+      "output": ""
+    },
+    {
+      "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-execution/differential",
+      "args": [
+        "go",
+        "test",
+        "-mod=mod",
+        "-race",
+        "-gcflags=all=-d=checkptr=2",
+        "-v",
+        ".",
+        "-timeout=1m"
+      ],
+      "env": {},
+      "exitCode": 0,
+      "elapsedSeconds": 1.965,
+      "output": "=== RUN   TestPackDifferential\n    pack_differential_test.go:71: 17984 differential inputs\n--- PASS: TestPackDifferential (0.27s)\nPASS\nok  \tpackdiff\t1.641s\n"
+    },
+    {
+      "cwd": "/private/tmp/gsr-gosproto-fork",
+      "args": [
+        "go",
+        "test",
+        "-run=^$",
+        "-fuzz=^FuzzPackRoundTrip$",
+        "-fuzztime=10s",
+        "-parallel=2",
+        "-timeout=45s"
+      ],
+      "env": {},
+      "exitCode": 0,
+      "elapsedSeconds": 12.059,
+      "output": "fuzz: elapsed: 0s, gathering baseline coverage: 0/45 completed\nfuzz: elapsed: 0s, gathering baseline coverage: 45/45 completed, now fuzzing with 2 workers\nfuzz: elapsed: 3s, execs: 41581 (13851/sec), new interesting: 1 (total: 46)\nfuzz: elapsed: 6s, execs: 41581 (0/sec), new interesting: 1 (total: 46)\nfuzz: elapsed: 9s, execs: 41581 (0/sec), new interesting: 1 (total: 46)\nfuzz: elapsed: 11s, execs: 41581 (0/sec), new interesting: 1 (total: 46)\nPASS\nok  \tgithub.com/cnooljaw/gosproto\t11.342s\n"
+    },
+    {
+      "cwd": "/private/tmp/gsr-gosproto-fork",
+      "args": [
+        "go",
+        "test",
+        "-run=^$",
+        "-fuzz=^FuzzCodecRoundTrip$",
+        "-fuzztime=10s",
+        "-parallel=2",
+        "-timeout=45s"
+      ],
+      "env": {},
+      "exitCode": 0,
+      "elapsedSeconds": 10.402,
+      "output": "fuzz: elapsed: 0s, gathering baseline coverage: 0/5 completed\nfuzz: elapsed: 0s, gathering baseline coverage: 5/5 completed, now fuzzing with 2 workers\nfuzz: elapsed: 3s, execs: 171439 (57139/sec), new interesting: 0 (total: 5)\nfuzz: elapsed: 6s, execs: 348227 (58898/sec), new interesting: 0 (total: 5)\nfuzz: elapsed: 9s, execs: 526477 (59416/sec), new interesting: 0 (total: 5)\nfuzz: elapsed: 10s, execs: 585361 (56265/sec), new interesting: 0 (total: 5)\nPASS\nok  \tgithub.com/cnooljaw/gosproto\t10.241s\n"
+    },
+    {
+      "cwd": "/private/tmp/gsr-gosproto-fork",
+      "args": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "env": {
+        "GOOS": "linux",
+        "GOARCH": "amd64",
+        "CGO_ENABLED": "0"
+      },
+      "exitCode": 0,
+      "elapsedSeconds": 0.366,
+      "output": ""
+    },
+    {
+      "cwd": "/private/tmp/gsr-gosproto-fork",
+      "args": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "env": {
+        "GOOS": "linux",
+        "GOARCH": "arm64",
+        "CGO_ENABLED": "0"
+      },
+      "exitCode": 0,
+      "elapsedSeconds": 0.348,
+      "output": ""
+    },
+    {
+      "cwd": "/private/tmp/gsr-gosproto-fork",
+      "args": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "env": {
+        "GOOS": "linux",
+        "GOARCH": "386",
+        "CGO_ENABLED": "0"
+      },
+      "exitCode": 0,
+      "elapsedSeconds": 0.32,
+      "output": ""
+    },
+    {
+      "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+      "args": [
+        "go",
+        "test",
+        "-modfile=/private/tmp/gsr-next-codec.mod",
+        "./protocol/sproto",
+        "./examples/websocket-gate/cmd/debugserver",
+        "./examples/websocket-gate/benchmarks",
+        "-timeout=2m"
+      ],
+      "env": {},
+      "exitCode": 0,
+      "elapsedSeconds": 1.458,
+      "output": "ok  \tgithub.com/cnooljaw/gsr/protocol/sproto\t0.313s\nok  \tgithub.com/cnooljaw/gsr/examples/websocket-gate/cmd/debugserver\t0.764s\nok  \tgithub.com/cnooljaw/gsr/examples/websocket-gate/benchmarks\t0.445s\n"
+    },
+    {
+      "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+      "args": [
+        "npm",
+        "--prefix",
+        "examples/websocket-gate",
+        "run",
+        "test:sproto:integration"
+      ],
+      "env": {
+        "GOFLAGS": "-modfile=/private/tmp/gsr-next-codec.mod"
+      },
+      "exitCode": 0,
+      "elapsedSeconds": 2.436,
+      "output": "\n> test:sproto:integration\n> npm run build && go build -o ../../tmp/sproto-echo ./cmd/debugserver && GSR_SPROTO_SERVER_BIN=../../tmp/sproto-echo node --test client/dist/sproto_client.test.js\n\n\n> build\n> tsc --project tsconfig.json\n\n✔ official Sproto vectors and safe integer boundary (1.850667ms)\n✔ official Sproto boolean and mixed signed int64 arrays (125.546458ms)\n✔ Sproto decoded results and unpacked buffers stay independent (3.951ms)\n✔ Sproto sessions stay independent and close clears pending (1.430917ms)\n✔ Sproto pending and packet limits (66.268916ms)\n✔ Go/TS Sproto Echo Plain (382.776459ms)\n✔ Go/TS Sproto Echo MAC (25.129084ms)\nℹ tests 7\nℹ suites 0\nℹ pass 7\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 659.42375\n"
+    }
+  ],
+  "newTests": "No new formal tests: existing TestPack covers all masks/distinct byte order, FF merge/exit/long search/tails; existing budget and ownership cases plus retained 17984-input differential exercise this execution-only move.",
+  "differentialCases": 17984,
+  "officialOracleEnabled": true,
+  "oracleFingerprintsVerified": true,
+  "integration": {
+    "pass": 7,
+    "fail": 0,
+    "skipped": 0
+  },
+  "scope": "Pack only. No new API, wire, allocation policy, resource model or ownership. Decode/Unpack/Encode/meta/RPC/TS unchanged.",
+  "reproduction": "Screen and final archived/patched copies exactly reproduce complete Go sources, seven harnesses, three fixtures.",
+  "notRun": [
+    "GSR whole repository tests/race",
+    "New TS performance matrix",
+    "Cross-platform runtime (Linux amd64/arm64/386 build only)"
+  ],
+  "profileLimitation": "CPU samples heavily dominated by runtime.kevent, especially final profiles (80-89%); retained without interpreting percentage changes as speedup.",
+  "fuzzNote": "Pack fuzz passed 41581 executions; after first 3s no further executions reported through normal PASS shutdown at 11s. No timeout extension or retry."
+}

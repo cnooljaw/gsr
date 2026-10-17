@@ -4,13 +4,21 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## Pack 普通 word 执行路径收敛（2026-10-17）
+
+Decode 阶段性冻结记录已提交为 GSR `0db5ed0`，后续仍可回头优化。当前仅改独立库 pack.go 的完整 word 执行位置，减少逐 word 调用，原 FF、尾块、mask、预留和独占规则保留；Decode/Encode/Unpack/meta/RPC/TS 源码不变。
+
+137 项五轮共 685 样本，大型 Pack/PEncode 约 -13.6%/-6.0%，整数数组约 -19.6%/-5.7%，分配不变；另保留三轮 411 个筛选样本。最终无 SP 中位数回退 >5%，但冻结 payload 控制和 FF 尾块代价原样保留，不宣称完整路径全面胜 PB。
+
+复用原独立字节回归，17984 差分、完整库 race/checkptr/固定官方 C/Lua 对照、vet、Pack/Codec 各约十秒 fuzz、GSR 三包及 TS 构建/GoTS Plain/MAC 7/7、零跳过通过。Linux amd64/arm64/386 构建通过，未跨平台运行或重测 TS 性能。profile 的 kevent 干扰明确保留，不把采样份额当提速比例。具体输入、补丁、指纹、复现与范围见 [验收记录](benchmarks/2026-10-17-gosproto-pack-execution/RESULTS.md)。新代码和记录未提交，正式依赖仍为 v0.4.0。
+
 ## Decode 性能阶段冻结（2026-10-17）
 
 上一轮回归/记录已本地提交为 gosproto `a09fb00`、GSR `d1beb28`，未推送。按用户决定单独验证 messageDecodePointer 入口：18 项五轮微基准与三种能力状态测试，选择一个候选进入 129 项五轮完整对照，共 735 个样本。
 
 入口微基准约 -38.3%，但大型 Decode/PDecode 只有 -2.25%/-1.28%；虽两项五轮方向一致、分配不变，仍未达预定 3%/2% 门槛，未采用。Decode 冻结于 `a09fb00`（生产源码同 `fc3246a`），不再扩展局部性能候选。独立库工作树干净，正式 GSR 依赖仍为 v0.4.0。
 
-实验与正式库分离，微基准、完整对照每轮分别运行能力/夹具用例，两份 prepare-only 副本核对完整源码与输入指纹通过。没有采用生产改动，因此未重复完整库/race/checkptr/官方对照/fuzz、GSR/GoTS 或 TS 性能；不把旧验收当成本轮重跑。预定门槛、逐轮原值、冻结范围和复现见 [冻结报告](benchmarks/2026-10-17-gosproto-decode-freeze/RESULTS.md)。新记录未提交。
+实验与正式库分离，微基准、完整对照每轮分别运行能力/夹具用例，两份 prepare-only 副本核对完整源码与输入指纹通过。没有采用生产改动，因此未重复完整库/race/checkptr/官方对照/fuzz、GSR/GoTS 或 TS 性能；不把旧验收当成本轮重跑。预定门槛、逐轮原值、冻结范围和复现见 [冻结报告](benchmarks/2026-10-17-gosproto-decode-freeze/RESULTS.md)。该记录已提交为 GSR `0db5ed0`。
 
 ## Decode 入口与固定 word 恢复筛选（2026-10-17）
 
