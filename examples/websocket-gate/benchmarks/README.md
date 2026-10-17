@@ -38,7 +38,9 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 
 [通知 session 逃逸](../../../docs/benchmarks/2026-10-17-gosproto-rpc-session/RESULTS.md) 复用同一19项真实RPC探针，仅把session存储放入有响应分支；9种通知两轮全部少一次逻辑分配、约4 B/op，小包有约2%～3%的CPU改善。大型通知及ASCII请求的小幅计时代价、self/clone失败及原始数据完整保留；不设最低收益比例，不概括为全面加速。库与Go/TS验收通过，该切片已提交为 gosproto 69cae73 / GSR 9ecc811，未推送。
 
-[RPC profile与固定私有头](../../../docs/benchmarks/2026-10-17-gosproto-rpc-profile/RESULTS.md) 保留分离CPU/内存采样及失败诊断。候选仅以有界栈头复用现有整数/tag写出，19项真实RPC两轮全部更快，32 B约快37%/38%，大型约快2%～4%；通知少一个、请求/响应少两个对象。1008组API边界、39官方头向量、3078固定差分及库/GoTS验收通过；控制失败与仅58次有限随机fuzz均公开。新实现待审查，正式依赖与原PB/TS矩阵未变。
+[RPC profile与固定私有头](../../../docs/benchmarks/2026-10-17-gosproto-rpc-profile/RESULTS.md) 保留分离CPU/内存采样及失败诊断。候选仅以有界栈头复用现有整数/tag写出，19项真实RPC两轮全部更快，32 B约快37%/38%，大型约快2%～4%；通知少一个、请求/响应少两个对象。1008组API边界、39官方头向量、3078固定差分及库/GoTS验收通过；控制失败与仅58次有限随机fuzz均公开。该切片已提交为 gosproto f9de3d2 / GSR dbb681f，未推送；正式依赖与原PB/TS矩阵未变。
+
+[响应单缓冲](../../../docs/benchmarks/2026-10-18-gosproto-response-workspace/RESULTS.md) 仅融合声明body的ResponseEncode；五项响应两轮均更快、少一次分配，大型约快6%～8%、整数数组约快13%～15%、ASCII4KiB约快43%～44%。共用写出增加私有字节前缀，普通调用传nil；请求/通知及原body/Pack/手工帧单独测量，约9/7 ns通知代价和控制失败完整披露。库/官方/差分/GoTS验收通过，新修改待审查；不是RequestEncode、网络或PB/TS新排名。
 
 ## 比较口径
 

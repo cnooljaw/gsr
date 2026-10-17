@@ -1,0 +1,189 @@
+diff --git a/limits.go b/limits.go
+index 66f97b0..5c7df86 100644
+--- a/limits.go
++++ b/limits.go
+@@ -55,10 +55,12 @@ func (budget *decodeBudget) add(count int) error {
+ 
+ // EncodeWithLimits 在任何递归编码和大块分配前验证值、深度与预计输出大小。
+ func EncodeWithLimits(message interface{}, limits Limits) ([]byte, error) {
+-	return encodeWithLimits(message, limits, false)
++	return encodeWithLimits(message, limits, false, nil)
+ }
+ 
+-func encodeWithLimits(message interface{}, limits Limits, packResult bool) ([]byte, error) {
++// prefix 只由内部组合路径传入；body 仍先完成独立预算预检，再与前缀写入同一独占缓冲。
++// prefix 只借用至本次调用返回，结果不与它共享存储；普通调用传 nil。
++func encodeWithLimits(message interface{}, limits Limits, packResult bool, prefix []byte) ([]byte, error) {
+ 	limits, err := normalizeLimits(limits)
+ 	if err != nil {
+ 		return nil, err
+@@ -79,15 +81,19 @@ func encodeWithLimits(message interface{}, limits Limits, packResult bool) ([]by
+ 	if err != nil {
+ 		return nil, err
+ 	}
+-	capacity, start := size, 0
++	totalSize := len(prefix) + size
++	capacity, start := totalSize, 0
+ 	if packResult {
+-		capacity = packedBufferSize(size)
++		capacity = packedBufferSize(totalSize)
+ 		// FF 头的最坏增长和八字节余量隔开读写游标，避免覆盖尚未消费的编码字节。
+-		start = capacity - size
++		start = capacity - totalSize
+ 	}
+ 	output := make([]byte, capacity)
+-	encoded := output[start : start+size]
+-	encodeMessageInto(schema, value, encoded, &layout, binding)
++	encoded := output[start : start+totalSize]
++	if len(prefix) > 0 {
++		copy(encoded, prefix)
++	}
++	encodeMessageInto(schema, value, encoded[len(prefix):], &layout, binding)
+ 	runtime.KeepAlive(message)
+ 	if packResult {
+ 		return packInto(output, encoded), nil
+diff --git a/rpc.go b/rpc.go
+index 79105e9..b5cd4d0 100644
+--- a/rpc.go
++++ b/rpc.go
+@@ -118,16 +118,15 @@ func (rpc *Rpc) Dispatch(packed []byte) (mode RpcMode, name string, session int3
+ 	return
+ }
+ 
+-// packRpcFrame 编码库内固定的两个 int32 字段，再与已编码 body 拼成独占帧。
++// encodeRpcHeader 编码库内固定的两个 int32 字段，返回实际写出长度。
+ // tag 0/1 最多占六字节头部和两个八字节非 inline 段，总长不超过 22 字节。
+ // 栈内小缓冲只属于本次调用；整数与 tag 跳跃仍复用普通编码器的 wire 函数。
+-func packRpcFrame(header *rpcHeader, body []byte) ([]byte, error) {
++func encodeRpcHeader(header *rpcHeader, encodedHeader *[22]byte) (int, error) {
+ 	limits, err := normalizeLimits(Limits{})
+ 	if err != nil {
+-		return nil, err
++		return 0, err
+ 	}
+ 	budget := &decodeBudget{limits: limits}
+-	var encodedHeader [22]byte
+ 	count := 0
+ 	if header.Type != nil {
+ 		count = 1
+@@ -142,7 +141,7 @@ func packRpcFrame(header *rpcHeader, body []byte) ([]byte, error) {
+ 			continue
+ 		}
+ 		if err := budget.add(1); err != nil {
+-			return nil, err
++			return 0, err
+ 		}
+ 		if skip := skipTag(previous, tag); skip > 0 {
+ 			writeUint16(encodedHeader[headerOffset:], skip)
+@@ -160,13 +159,23 @@ func packRpcFrame(header *rpcHeader, body []byte) ([]byte, error) {
+ 	// 私有 header 无嵌套，深度固定为一；normalizeLimits 已保证 MaxDepth 至少为一。
+ 	// header 与 body 各自使用默认预算，不将二者改为共享额度。
+ 	if bodyOffset > limits.MaxBytes {
+-		return nil, ErrLimit
++		return 0, ErrLimit
+ 	}
+-	size := bodyOffset + len(body)
++	return bodyOffset, nil
++}
++
++// packRpcFrame 将固定头与已编码 body 拼成独占帧，请求仍保留独立 body 的错误返回契约。
++func packRpcFrame(header *rpcHeader, body []byte) ([]byte, error) {
++	var encodedHeader [22]byte
++	headerSize, err := encodeRpcHeader(header, &encodedHeader)
++	if err != nil {
++		return nil, err
++	}
++	size := headerSize + len(body)
+ 	output := make([]byte, packedBufferSize(size))
+ 	start := len(output) - size
+-	copy(output[start:], encodedHeader[:bodyOffset])
+-	copy(output[start+bodyOffset:], body)
++	copy(output[start:], encodedHeader[:headerSize])
++	copy(output[start+headerSize:], body)
+ 	return packInto(output, output[start:]), nil
+ }
+ 
+@@ -186,12 +195,15 @@ func (rpc *Rpc) ResponseEncode(name string, session int32, response interface{})
+ 		if reflect.TypeOf(response) != protocol.Response {
+ 			return nil, ErrEncode
+ 		}
+-		if data, err = Encode(response); err != nil {
+-			return
++		var encodedHeader [22]byte
++		headerSize, err := encodeRpcHeader(&rpcHeader{Session: &session}, &encodedHeader)
++		if err != nil {
++			return nil, err
+ 		}
++		return encodeWithLimits(response, Limits{}, true, encodedHeader[:headerSize])
+ 	}
+ 
+-	return packRpcFrame(&rpcHeader{Session: &session}, data)
++	return packRpcFrame(&rpcHeader{Session: &session}, nil)
+ }
+ 
+ // RequestEncode 编码独占 RPC 请求帧；有响应的协议要求正 session，并登记有界等待。
+diff --git a/rpc_limits_test.go b/rpc_limits_test.go
+index 4c464fe..a5a4d09 100644
+--- a/rpc_limits_test.go
++++ b/rpc_limits_test.go
+@@ -87,6 +87,14 @@ func TestRpcInvalidDefinitionsAndMessages(t *testing.T) {
+ 	if _, err := rpc.ResponseEncode("test.foobar", 1, &FooResponse{}); !errors.Is(err, ErrEncode) {
+ 		t.Fatalf("invalid response payload: %v", err)
+ 	}
++	// 已声明 body 的 typed nil 是 ErrNil，不能因为头已准备就返回成功或部分帧。
++	var empty *FoobarResponse
++	for _, session := range []int32{1, 32767, MaxInt32} {
++		output, err := rpc.ResponseEncode("test.foobar", session, empty)
++		if !errors.Is(err, ErrNil) || output != nil {
++			t.Fatalf("typed nil response session=%d output=%d err=%v", session, len(output), err)
++		}
++	}
+ 	if _, err := rpc.ResponseEncode("missing", 1, &FoobarResponse{}); !errors.Is(err, ErrUnknownProtocol) {
+ 		t.Fatalf("unknown response: %v", err)
+ 	}
+diff --git a/rpc_test.go b/rpc_test.go
+index f65822b..ab5e36c 100644
+--- a/rpc_test.go
++++ b/rpc_test.go
+@@ -203,7 +203,7 @@ func TestRpcFrameBodyBudget(t *testing.T) {
+ 	}
+ }
+ 
+-// RPC 组帧只承担 body/Pack 缓冲，不为私有 header 或 session 新增堆对象。
++// 请求组帧不新增 header/session 对象，响应组合路径与 EncodePacked 一样省去 body 缓冲。
+ func TestRpcFrameAllocation(t *testing.T) {
+ 	input := &packedBufferMessage{Payload: bytes.Repeat([]byte{0x91}, 256)}
+ 	code := int32(1)
+@@ -259,7 +259,17 @@ func TestRpcFrameAllocation(t *testing.T) {
+ 		}
+ 		output = Pack(body)
+ 	})
+-	if assembled > buffers || withSession > buffers || response > buffers {
+-		t.Fatalf("notification=%v request=%v response=%v buffers=%v, want no header/session heap objects", assembled, withSession, response, buffers)
++	if assembled > buffers || withSession > buffers {
++		t.Fatalf("notification=%v request=%v buffers=%v, want no header/session heap objects", assembled, withSession, buffers)
++	}
++	packedBody := testing.AllocsPerRun(100, func() {
++		var err error
++		output, err = EncodePacked(input)
++		if err != nil {
++			t.Fatal(err)
++		}
++	})
++	if response > packedBody {
++		t.Fatalf("response=%v packed body=%v, want no intermediate body buffer", response, packedBody)
+ 	}
+ }
+diff --git a/sproto.go b/sproto.go
+index 9622fb9..a0e6bed 100644
+--- a/sproto.go
++++ b/sproto.go
+@@ -75,7 +75,7 @@ func Uint(v uint) *uint {
+ 
+ // EncodePacked 使用默认有限预算编码并压缩，返回独占字节，不保留输入引用。
+ func EncodePacked(sp interface{}) ([]byte, error) {
+-	return encodeWithLimits(sp, Limits{}, true)
++	return encodeWithLimits(sp, Limits{}, true, nil)
+ }
+ 
+ // unpack && decode

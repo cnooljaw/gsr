@@ -193,4 +193,7 @@ Decode 性能阶段已按用户决定冻结于独立库 `a09fb00`（Decode 生�
 后续只调整 RequestEncode 的局部 session 存储：通知不再因另一分支取参数地址而多分配。两轮9种通知都少一次逻辑分配、约4 B/op；32 B/AddressBook小包有小幅CPU改善，大型通知约48～68 ns及ASCII请求约18～20 ns的代价与控制波动一并披露。库普通/官方C-Lua/race/checkptr/vet、GSR三包及Go/TS 7/7通过，见 [session逃逸报告](benchmarks/2026-10-17-gosproto-rpc-session/RESULTS.md)。该切片已提交为 gosproto 69cae73 / GSR 9ecc811，未推送；wire、session/锁语义、Decode和正式依赖不变。
 
 
-后续按RPC profile仅优化库私有的type/session头：复用已有整数与tag写出、保留预算检查，用22 B调用内栈缓冲消除反射遍历和header/session堆对象。真实RPC19项两轮均更快，32 B通知约快37%/38%，大型消息约快2%～4%；通知少一次、请求/响应少两次分配。1008组API边界、39个官方C/Lua头向量、3078组固定旧新差分及库/race/checkptr/官方/vet、GSR三包、Go/TS 7/7通过。首次采样干扰、首版分配失败、仅58次有限随机fuzz和控制未全过的事实均保留，见 [RPC profile与header报告](benchmarks/2026-10-17-gosproto-rpc-profile/RESULTS.md)。新改动未提交，Decode、普通body codec、Pack/Unpack、TS及正式依赖不变。
+后续按RPC profile仅优化库私有的type/session头：复用已有整数与tag写出、保留预算检查，用22 B调用内栈缓冲消除反射遍历和header/session堆对象。真实RPC19项两轮均更快，32 B通知约快37%/38%，大型消息约快2%～4%；通知少一次、请求/响应少两次分配。1008组API边界、39个官方C/Lua头向量、3078组固定旧新差分及库/race/checkptr/官方/vet、GSR三包、Go/TS 7/7通过。首次采样干扰、首版分配失败、仅58次有限随机fuzz和控制未全过的事实均保留，见 [RPC profile与header报告](benchmarks/2026-10-17-gosproto-rpc-profile/RESULTS.md)。该切片已提交为 gosproto f9de3d2 / GSR dbb681f，未推送；当时Decode、普通body codec、Pack/Unpack、TS及正式依赖不变。
+
+
+后续仅融合声明body的ResponseEncode：以私有header字节前缀复用现有预检/写出，省一次body分配及复制，不新增公共前缀API或协议模型。五项响应两轮均改善，大型约快6%～8%、整数数组约快13%～15%、ASCII4KiB约快43%～44%，容量/独占/预算保持；请求方法与session/错误返回未改，共用nil前缀写出成本与通知约9/7 ns代价独立披露。库/官方/race/checkptr/vet、有限fuzz、3078固定RPC差分、GSR三包和Go/TS 7/7通过，见 [响应工作区报告](benchmarks/2026-10-18-gosproto-response-workspace/RESULTS.md)。新代码/记录未提交，正式依赖、Decode、Pack/Unpack和TS不变。
