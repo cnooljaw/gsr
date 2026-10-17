@@ -1,0 +1,35 @@
+--- a/pack_test.go
++++ b/pack_test.go
+@@ -100,6 +100,32 @@
+ 			}
+ 		}
+ 	}
++	// 每个有效位使用不同高位字节，直接构造 wire，保护恢复位置与消费长度。
++	for mask := 0; mask < 256; mask++ {
++		wire := []byte{byte(mask)}
++		if mask == 255 {
++			wire = append(wire, 0)
++		}
++		expected := make([]byte, 16)
++		for bit := 0; bit < 8; bit++ {
++			if mask&(1<<bit) != 0 {
++				value := byte(0x80 + bit*13)
++				wire = append(wire, value)
++				expected[bit] = value
++			}
++		}
++		// 后接独立 word，使多消费或少消费一字节也能被观察到。
++		wire = append(wire, 0x81, 0x7f, 0xfe)
++		expected[8], expected[15] = 0x7f, 0xfe
++		for offset := 0; offset < 8; offset++ {
++			backing := bytes.Repeat([]byte{0xee}, offset+len(wire)+8)
++			copy(backing[offset:], wire)
++			output, err := UnpackWithLimit(backing[offset:offset+len(wire)], len(expected))
++			if err != nil || !bytes.Equal(output, expected) {
++				t.Fatalf("distinct mask=%02x offset=%d output=%x error=%v", mask, offset, output, err)
++			}
++		}
++	}
+ }
+ 
+ func TestUnpack(t *testing.T) {

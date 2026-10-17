@@ -34,6 +34,8 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 
 ## 报告
 
+[普通 Unpack 候选筛选](../../../docs/benchmarks/2026-10-16-gosproto-unpack-candidates/RESULTS.md) 记录五个未采用候选、1935 个三轮样本和可复现补丁。位置/计数表、游标及稀疏直接恢复均未通过业务收益与形态代价检查；生产代码仍为已提交的零段优化，只新增独立字节回归。额外保存大型 Decode 的对象构造/分配 profile，不作为新排名。
+
 [连续零 mask 有界解包](../../../docs/benchmarks/2026-10-16-gosproto-zero-unpack/RESULTS.md) 是最新 Unpack 专项：129 项五轮配对，4 KiB/64 KiB 零块约 -64.0%/-68.3%，4 KiB 零字节帧约 -51.2%。AddressBook Unpack 约 +10%、PDecode +1.6% 和普通形态代价原样保留；35 种形态、45824 组输入/预算差分、失败候选与 profile 一并记录。完整预检、分配和 wire 不变，正式依赖仍为 v0.4.0。
 
 [长 FF 段有界搜索](../../../docs/benchmarks/2026-10-16-gosproto-ffscan/RESULTS.md) 是上一轮 Pack 专项：137 项五轮配对，4 KiB ASCII Pack/PEncode 约 -71.8%/-57.4%，完整帧约 -43.1%，UTF-8 帧约 -34.2%。保留小包约 5% 的 Pack 代价、39 种合成形态、失败候选与 17984 组差分。预算、wire、输出容量不变，正式依赖仍为 v0.4.0。

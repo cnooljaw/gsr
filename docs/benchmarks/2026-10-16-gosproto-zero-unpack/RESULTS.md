@@ -1,6 +1,6 @@
 # gosproto 连续零 mask 的有界解包
 
-2026-10-16，上一轮已本地提交为 gosproto `07350a9`、GSR `3a78dbd`，提交后两个工作树干净，未推送。本轮只改 Unpack 与相关回归，Pack、Encoder、Decoder、RPC、元信息和 TS 生产源码冻结。新增改动未提交/发布，正式 Go 依赖仍为 v0.4.0，接线使用临时 modfile。
+2026-10-16，上一轮已本地提交为 gosproto `07350a9`、GSR `3a78dbd`，提交后两个工作树干净，未推送。本轮只改 Unpack 与相关回归，Pack、Encoder、Decoder、RPC、元信息和 TS 生产源码冻结。该切片随后已本地提交为 gosproto `22e287e`、GSR `1af93f4`，未发布，正式 Go 依赖仍为 v0.4.0，接线使用临时 modfile。
 
 ## 诊断与实现
 
@@ -76,4 +76,4 @@ python3 docs/benchmarks/2026-10-16-gosproto-zero-unpack/reproduce-pairs.py \
 
 需要 Go 1.24、git、gofmt 与含 `07350a9` 的独立库。输出目录必须不存在；可加 --prepare-only。已核对七份 Go harness、三份 JSON 与实测输入逐字节一致；其中上一轮 packing 探针保留在构建输入中，本轮不执行其 Benchmark。候选取指定库工作树，必须核对实际 replace 和源码指纹，不把 require 行的 v0.4.0 当作未发布源码。
 
-来源与冻结代码见 [inputs.json](inputs.json)，原始值见 [raw](raw)；二进制和 pprof 留在忽略的 tmp/gosproto-zero-unpack/。本轮新增实现及文档未提交，留供审查，正式依赖与发布分开处理。
+来源与冻结代码见 [inputs.json](inputs.json)，原始值见 [raw](raw)；二进制和 pprof 留在忽略的 tmp/gosproto-zero-unpack/。该切片已本地提交为 gosproto `22e287e`、GSR `1af93f4`，未发布。后续见 [普通 Unpack 候选筛选](../2026-10-16-gosproto-unpack-candidates/RESULTS.md)，正式依赖与发布分开处理。

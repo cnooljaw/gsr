@@ -1,6 +1,6 @@
 # gosproto 后续性能优化方案
 
-状态：2026-10-16，GSR 正式依赖仍为 v0.4.0，后续独立库优化尚未发布。TS 长块和 Go 安全路径见 [首轮结果](benchmarks/2026-10-15-sproto-next/RESULTS.md)，数值 packing、字段查询及类型化构造见 [第二轮结果](benchmarks/2026-10-15-sproto-round2/RESULTS.md)。TS 优化阶段已在 GSR `9801808` 收尾，可迁移经验见 [TS → Go 优化经验](SPROTO-OPTIMIZATION-LESSONS.md)。编码执行层改进见第 9 节，大型 Encode 约 6.54 µs，同场 PB 7.59 µs。混合 word Pack 已本地提交为独立库 `7dc6713`、GSR `e9e1f74`，未推送；长 FF 有界搜索已本地提交为独立库 `07350a9`、GSR `3a78dbd`，见第 11 节。当前连续零 mask 解包新增改动未提交，见第 12 节。公开 API、generator 与预算/所有权契约不变。
+状态：2026-10-16，GSR 正式依赖仍为 v0.4.0，后续独立库优化尚未发布。TS 长块和 Go 安全路径见 [首轮结果](benchmarks/2026-10-15-sproto-next/RESULTS.md)，数值 packing、字段查询及类型化构造见 [第二轮结果](benchmarks/2026-10-15-sproto-round2/RESULTS.md)。TS 优化阶段已在 GSR `9801808` 收尾，可迁移经验见 [TS → Go 优化经验](SPROTO-OPTIMIZATION-LESSONS.md)。编码执行层改进见第 9 节，大型 Encode 约 6.54 µs，同场 PB 7.59 µs。混合 word Pack 已本地提交为独立库 `7dc6713`、GSR `e9e1f74`，未推送；长 FF 有界搜索已本地提交为独立库 `07350a9`、GSR `3a78dbd`，见第 11 节。连续零 mask 解包已本地提交为独立库 `22e287e`、GSR `1af93f4`，见第 12 节。普通 Unpack 五个候选已撤回，仅新增回归与筛选记录，见第 13 节。公开 API、generator 与预算/所有权契约不变。
 
 第三轮已完成当前基线与候选筛选，只保留调用内布局记录的内存收窄，独立库已本地提交为 `a579920`，GSR 记录提交为 `fdbc736`，均未推送/发布；未取得新的明显 CPU 加速。实测和取舍见 [第三轮结果](benchmarks/2026-10-16-gosproto-round3/RESULTS.md) 及第 8 节。
 
@@ -251,4 +251,10 @@ TS 经验提取已在 GSR `f45a8c6` 提交。Go 从 `6012b06` 重建两套主基
 
 最终同进程 129 项、五轮 645 样本：4 KiB 零块 Unpack 1.620 → 0.5839 µs，64 KiB 23.940 → 7.593 µs；4 KiB 零字节 Echo 完整帧 2.891 → 1.411 µs，同场 PB 1.595 µs。数值业务组合基本持平，AddressBook Unpack 增加约 16 ns（约 10%）、PDecode 增加约 19 ns（1.6%）；普通稀疏/ASCII 形态的约 5% 代价与失败候选分别保留，不宣称全面无回退。
 
-45824 组输入/预算差分、完整独立库 race/严格 checkptr/官方对照、vet、相关有限 fuzz，以及 GSR 三包和 Go/TS Plain/MAC 集成通过。Pack、Encoder、Decoder、RPC、元信息与 TS 生产源码冻结，分配次数和字节数不变。源码指纹、原始样本、profile、复现及未验证范围见 [解包结果](benchmarks/2026-10-16-gosproto-zero-unpack/RESULTS.md)。本轮新增改动未提交/发布，正式依赖仍为 v0.4.0。
+45824 组输入/预算差分、完整独立库 race/严格 checkptr/官方对照、vet、相关有限 fuzz，以及 GSR 三包和 Go/TS Plain/MAC 集成通过。Pack、Encoder、Decoder、RPC、元信息与 TS 生产源码冻结，分配次数和字节数不变。源码指纹、原始样本、profile、复现及未验证范围见 [解包结果](benchmarks/2026-10-16-gosproto-zero-unpack/RESULTS.md)。该切片已本地提交为独立库 `22e287e`、GSR `1af93f4`，未发布，正式依赖仍为 v0.4.0。
+
+## 13. 普通 Unpack 候选筛选
+
+从 `22e287e` 验证位置/计数表、仅计数表、源游标与固定输出区间、仅输出区间、单字节直接恢复五个候选。各 129 项、三轮，共 1935 样本；全部因稀疏回退或真实组合收益不足撤回，生产源码恢复为 `22e287e`。例如源游标使大型/整数数组纯 Unpack 约 -5.8%/-5.6%，但单字节形态 +12%；增加直接恢复后双字节 +14.1%，大型 PDecode 基本持平。没有进入五轮正式验收。
+
+保留 TestPack 的 2048 组独立 mask 字节、后继 word 与切片偏移回归，已在未改生产代码时验证。额外 CPU/alloc profile 显示大型纯 Decode 仍为 532 次分配，主要对象归于原生整数指针和结构体构造；CPU 中的 kevent 不当作业务耗时。下一步以隔离探针拆分构造、reflect.Set 与 wire 遍历，保留真实输出所有权和失败原子性。未新增 unsafe、API、池或缓存。原始值、五个候选补丁及复现见 [筛选记录](benchmarks/2026-10-16-gosproto-unpack-candidates/RESULTS.md)；本轮新增测试和文档未提交。

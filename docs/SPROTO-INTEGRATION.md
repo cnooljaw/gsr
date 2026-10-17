@@ -96,7 +96,9 @@ Go 第三轮已重建基线并筛选候选：仅保留布局记录内存收窄�
 
 长 FF 搜索切片：只跳过有界范围内确认全非零的完整 word，保留原合并/尾块规则，主循环直接判断源长度。4 KiB ASCII Pack/PEncode 约少 71.8%/57.4%，完整帧约少 43.1%；数值消息没有同等收益，部分小包 Pack 有约 5% 代价。已本地提交为 gosproto `07350a9`、GSR `3a78dbd`，未发布，正式依赖仍为 v0.4.0；见 [FF 搜索验收](benchmarks/2026-10-16-gosproto-ffscan/RESULTS.md)。
 
-当前新增连续零 mask 的有界解包，保留完整预检、错误优先级和独占输出。4 KiB 零字节帧解码约 -51.2%，同场比 PB 低约 11.5%；数值业务组合基本持平，AddressBook Unpack 约 +10%、PDecode +1.6% 的代价保留。45824 组差分、官方对照与库 race/checkptr/vet/fuzz、GSR 三包和 Go/TS 集成通过，见 [解包验收](benchmarks/2026-10-16-gosproto-zero-unpack/RESULTS.md)。新增改动未提交/发布，正式依赖仍为 v0.4.0。
+当前新增连续零 mask 的有界解包，保留完整预检、错误优先级和独占输出。4 KiB 零字节帧解码约 -51.2%，同场比 PB 低约 11.5%；数值业务组合基本持平，AddressBook Unpack 约 +10%、PDecode +1.6% 的代价保留。45824 组差分、官方对照与库 race/checkptr/vet/fuzz、GSR 三包和 Go/TS 集成通过，见 [解包验收](benchmarks/2026-10-16-gosproto-zero-unpack/RESULTS.md)。已本地提交为 gosproto `22e287e`、GSR `1af93f4`，未发布，正式依赖仍为 v0.4.0。
+
+普通 Unpack 后续验证五个位置/计数表及游标候选，各做 129 项三轮配对，全部因稀疏回退或真实组合收益不足撤回。当前生产代码仍为 `22e287e`，只新增 2048 组独立 mask 字节回归与未提交的 [筛选记录](benchmarks/2026-10-16-gosproto-unpack-candidates/RESULTS.md)。下一步以大型 Decode 的对象构造与反射赋值探针确定切片，正式依赖仍为 v0.4.0。
 
 ## 独立修复库与官方对照（2026-10-15）
 

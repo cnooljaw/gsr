@@ -1,0 +1,36 @@
+{
+  "platform": "Go 1.24.13 darwin/arm64 Apple M2",
+  "retainedProduction": "all production Go source identical to 22e287e; only TestPack extended",
+  "commands": [
+    {
+      "cwd": "/private/tmp/gsr-gosproto-fork",
+      "command": "go test -run '^TestPack$' . -timeout=1m",
+      "exitCode": 0,
+      "elapsedSeconds": 0.579,
+      "stage": "before production candidates; exact retained source and test"
+    },
+    {
+      "cwd": "/private/tmp/gsr-gosproto-fork",
+      "command": "go test -run '^(TestPack|TestUnpackOutputBudget)$' . -timeout=1m",
+      "exitCode": 0,
+      "elapsedSeconds": 0.333,
+      "stage": "table candidate only, later withdrawn"
+    },
+    {
+      "cwd": "gsr",
+      "command": "python3 docs/benchmarks/2026-10-16-gosproto-unpack-candidates/reproduce-pairs.py --library /private/tmp/gsr-gosproto-fork --candidate table --output tmp/gosproto-mask-unpack/reproduce-check --prepare-only",
+      "exitCode": 0,
+      "byteComparison": "all candidate Go files, seven Go harness files and three JSON fixtures match measured input hashes"
+    }
+  ],
+  "newCoverage": "Existing TestPack adds 256 independently constructed masks with distinct high-bit bytes, a following independent word, and eight slice offsets; 2048 added cases. No production change retained.",
+  "notRun": [
+    "Five-round acceptance: all candidates rejected during three-round screening",
+    "New full library tests/race/checkptr/vet/fuzz after rollback",
+    "GSR integration or whole repository tests",
+    "TS performance or cross-platform runs"
+  ],
+  "reason": "Production is byte-for-byte baseline after rollback; retained independent test was already run against that source; no runtime/API changes retained.",
+  "profiles": "Three separate baseline CPU/alloc profiles collected after candidate timings; production source equals current baseline. runtime.kevent samples retained, not assigned to codec cost.",
+  "reproductionAudit": "All five archived-and-patched candidates match every measured Go source hash, seven Go harness files and three JSON fixtures. Retained source and frozen TS fingerprints match. JSON, Python syntax and document links valid."
+}

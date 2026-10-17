@@ -4,13 +4,19 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## 普通 Unpack 候选筛选（2026-10-16）
+
+上一轮已本地提交为 gosproto `22e287e`、GSR `1af93f4`，未推送。五个位置/计数表与游标候选各做 129 项三轮配对，共 1935 样本，均因稀疏回退或真实组合收益不足撤回；所有 Go 生产源码恢复为 `22e287e`，没有新的性能验收结论。
+
+只保留 TestPack 新增的 2048 组独立预期字节与偏移回归，已在未改生产代码时通过。复现副本的全部 Go 源码、七份 harness 和三份 JSON 指纹与实测一致。生产代码恢复后未重复全仓/race/vet/fuzz、GSR 集成或 TS 性能；额外采集三项基线 CPU/分配 profile，kevent 样本保留且不归于业务成本。数据、候选补丁与范围见 [筛选记录](benchmarks/2026-10-16-gosproto-unpack-candidates/RESULTS.md)。新增测试和文档未提交，正式依赖仍为 v0.4.0。
+
 ## 连续零 mask 有界解包（2026-10-16）
 
 上一轮已本地提交为 gosproto `07350a9`、GSR `3a78dbd`，未推送。当前仅改 Unpack 的连续零 mask 扫描及分类，保留完整预检、有限输出预算、错误优先级和独占输出；Pack、Encoder、Decoder、RPC、元信息与 TS 生产源码冻结。
 
 最终 129 项五轮配对中，4 KiB/64 KiB 零块 Unpack 耗时约 -64.0%/-68.3%；4 KiB 零字节 Echo 完整帧约 -51.2%，比同场 PB 约低 11.5%。AddressBook Unpack 约 +10%、PDecode +1.6%，部分普通形态约 +5% 的代价和全部失败候选原样保留，分配不变。
 
-45824 组输入/预算差分、完整独立库 race/严格 checkptr（启用固定官方 C/Lua 对照）、vet、FuzzDecode 与 FuzzPackRoundTrip 各约十秒通过。GSR 临时覆盖三包、TS 构建和 Go/TS Plain/MAC 集成 7/7、零跳过通过。未重复 GSR 全仓/race、TS 性能或跨平台执行，详见 [解包结果](benchmarks/2026-10-16-gosproto-zero-unpack/RESULTS.md)。新增改动未提交/发布，正式依赖仍为 v0.4.0。
+45824 组输入/预算差分、完整独立库 race/严格 checkptr（启用固定官方 C/Lua 对照）、vet、FuzzDecode 与 FuzzPackRoundTrip 各约十秒通过。GSR 临时覆盖三包、TS 构建和 Go/TS Plain/MAC 集成 7/7、零跳过通过。未重复 GSR 全仓/race、TS 性能或跨平台执行，详见 [解包结果](benchmarks/2026-10-16-gosproto-zero-unpack/RESULTS.md)。该切片已本地提交为 gosproto `22e287e`、GSR `1af93f4`，未发布，正式依赖仍为 v0.4.0。
 
 ## 长 FF 段有界搜索（2026-10-16）
 
