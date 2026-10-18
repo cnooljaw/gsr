@@ -48,7 +48,9 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 
 [融合后热点诊断](../../../docs/benchmarks/2026-10-18-gosproto-post-fusion-profile/RESULTS.md) 从6d854d1归档采四种输入×body/RPC八条路径，CPU与逐次内存采样分开。定位大型记录预检/写出、整数数组Pack/写出及512 B布局外溢；4 KiB ASCII的kevent干扰和全部原值保留，不把profile耗时当配对基线。源码未改，独立harness检查/归档核对通过，诊断已本地提交为GSR d2be5d8，未推送；不是新的A/B或PB/TS排名。
 
-[整数数组连续游标](../../../docs/benchmarks/2026-10-18-gosproto-array-cursor/RESULTS.md) 只改4/8字节输出游标，编译器可消除重复切片检查。43项包含原body/RPC及混合64位新诊断；两轮32/64位纯Encode约快25%/23%、PEncode约快14%/8%，大型约快3%，对象数中位数不变。小包代价、两个字节计数尾差、未改Pack第二轮+9.45%及各臂符号汇编一致的未解释观察完整保留；库/官方/race/checkptr/fuzz/GoTS验收通过，新修改待审查，不更新正式依赖或PB/TS排名。
+[整数数组连续游标](../../../docs/benchmarks/2026-10-18-gosproto-array-cursor/RESULTS.md) 只改4/8字节输出游标，编译器可消除重复切片检查。43项包含原body/RPC及混合64位新诊断；两轮32/64位纯Encode约快25%/23%、PEncode约快14%/8%，大型约快3%，对象数中位数不变。小包代价、两个字节计数尾差、未改Pack第二轮+9.45%及各臂符号汇编一致的未解释观察完整保留；库/官方/race/checkptr/fuzz/GoTS验收通过，该切片已本地提交为gosproto 0c1f6cf / GSR 22eb772，未推送；不更新正式依赖或PB/TS排名。
+
+[整数记录Fields局部复用](../../../docs/benchmarks/2026-10-18-gosproto-record-fields/RESULTS.md) 固定43项、两轮，原值和编译证据完整保留。大型纯Encode小幅下降与控制同阶，PEncode无改善、RPC方向混合，未采用生产候选；只保留Go字段乱序/忽略字段回归和记录待审查。负向新旧夹具对照证实覆盖增量；生产仍0c1f6cf，本轮未重复生产全验收，不以新基线Pack控制覆盖上轮未解释差值。
 
 ## 比较口径
 

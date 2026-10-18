@@ -1,0 +1,358 @@
+[
+  {
+    "args": [
+      "python3",
+      "-B",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/examples/websocket-gate/benchmarks/tools/go-pairs/run.py",
+      "--library",
+      "/private/tmp/gsr-gosproto-fork",
+      "--baseline",
+      "0c1f6cf",
+      "--mode",
+      "self",
+      "--output",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-fields/measured/self",
+      "--block-ms",
+      "10",
+      "--prepare-only"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.254,
+    "output": ""
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "sampler_test.go",
+      "rpc_probe_test.go",
+      "joint_probe_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-fields/measured/self/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.005,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-run",
+      "^(TestPairStatistics|TestPairSelection|TestPairGCCounter|TestRepresentativeFixtures)$",
+      ".",
+      "-timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-fields/measured/self/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 1.78,
+    "output": "ok  \tcodecpairstool\t0.625s\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-c",
+      "-o",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-fields/measured/self/rpc.test",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-fields/measured/self/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.504,
+    "output": ""
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-fields/measured/self/rpc.test",
+      "-test.run=^TestPairSampling$",
+      "-test.v",
+      "-test.timeout=90s"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-fields/measured/self/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GSR_PAIR_MODE": "self",
+      "GSR_PAIR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-fields/measured/self/raw.json",
+      "GSR_PAIR_BLOCK_TARGET": "10ms",
+      "GSR_PAIR_CASES": ""
+    },
+    "exitCode": 0,
+    "elapsedSeconds": 46.825,
+    "output": "=== RUN   TestPairSampling\n    sampler_test.go:371: self body/addressbook/sproto_encode: completed 1/43\n    sampler_test.go:371: self body/addressbook/sproto_pack: completed 2/43\n    sampler_test.go:371: self body/addressbook/sproto_pencode: completed 3/43\n    sampler_test.go:371: self body/game_small/sproto_encode: completed 4/43\n    sampler_test.go:371: self body/game_small/sproto_pack: completed 5/43\n    sampler_test.go:371: self body/game_small/sproto_pencode: completed 6/43\n    sampler_test.go:371: self body/game_large/sproto_encode: completed 7/43\n    sampler_test.go:371: self body/game_large/sproto_pack: completed 8/43\n    sampler_test.go:371: self body/game_large/sproto_pencode: completed 9/43\n    sampler_test.go:371: self body/int32_edges/sproto_encode: completed 10/43\n    sampler_test.go:371: self body/int32_edges/sproto_pack: completed 11/43\n    sampler_test.go:371: self body/int32_edges/sproto_pencode: completed 12/43\n    sampler_test.go:371: self body/echo_ascii4k/sproto_encode: completed 13/43\n    sampler_test.go:371: self body/echo_ascii4k/sproto_pack: completed 14/43\n    sampler_test.go:371: self body/echo_ascii4k/sproto_pencode: completed 15/43\n    sampler_test.go:371: self body/ascii32/frame: completed 16/43\n    sampler_test.go:371: self body/utf8_1k/frame: completed 17/43\n    sampler_test.go:371: self body/ascii4k/frame: completed 18/43\n    sampler_test.go:371: self body/zeros4k/frame: completed 19/43\n    sampler_test.go:371: self rpc/addressbook/notification: completed 20/43\n    sampler_test.go:371: self rpc/addressbook/request_cancel: completed 21/43\n    sampler_test.go:371: self rpc/addressbook/response: completed 22/43\n    sampler_test.go:371: self rpc/game_small/notification: completed 23/43\n    sampler_test.go:371: self rpc/game_small/request_cancel: completed 24/43\n    sampler_test.go:371: self rpc/game_small/response: completed 25/43\n    sampler_test.go:371: self rpc/game_large/notification: completed 26/43\n    sampler_test.go:371: self rpc/game_large/request_cancel: completed 27/43\n    sampler_test.go:371: self rpc/game_large/response: completed 28/43\n    sampler_test.go:371: self rpc/int32_edges/notification: completed 29/43\n    sampler_test.go:371: self rpc/int32_edges/request_cancel: completed 30/43\n    sampler_test.go:371: self rpc/int32_edges/response: completed 31/43\n    sampler_test.go:371: self rpc/echo_ascii4k/notification: completed 32/43\n    sampler_test.go:371: self rpc/echo_ascii4k/request_cancel: completed 33/43\n    sampler_test.go:371: self rpc/echo_ascii4k/response: completed 34/43\n    sampler_test.go:371: self rpc/ascii32/notification: completed 35/43\n    sampler_test.go:371: self rpc/utf8_1k/notification: completed 36/43\n    sampler_test.go:371: self rpc/ascii4k/notification: completed 37/43\n    sampler_test.go:371: self rpc/zeros4k/notification: completed 38/43\n    sampler_test.go:371: self body/wide64/sproto_encode: completed 39/43\n    sampler_test.go:371: self body/wide64/sproto_pencode: completed 40/43\n    sampler_test.go:371: self rpc/wide64/notification: completed 41/43\n    sampler_test.go:371: self rpc/wide64/request_cancel: completed 42/43\n    sampler_test.go:371: self rpc/wide64/response: completed 43/43\n--- PASS: TestPairSampling (46.49s)\nPASS\n"
+  },
+  {
+    "args": [
+      "python3",
+      "-B",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/examples/websocket-gate/benchmarks/tools/go-pairs/run.py",
+      "--library",
+      "/private/tmp/gsr-gosproto-fork",
+      "--baseline",
+      "0c1f6cf",
+      "--mode",
+      "clone",
+      "--output",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-fields/measured/clone",
+      "--block-ms",
+      "10",
+      "--prepare-only"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.292,
+    "output": ""
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "sampler_test.go",
+      "rpc_probe_test.go",
+      "joint_probe_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-fields/measured/clone/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.072,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-run",
+      "^(TestPairStatistics|TestPairSelection|TestPairGCCounter|TestRepresentativeFixtures)$",
+      ".",
+      "-timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-fields/measured/clone/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 1.778,
+    "output": "ok  \tcodecpairstool\t0.583s\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-c",
+      "-o",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-fields/measured/clone/rpc.test",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-fields/measured/clone/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.464,
+    "output": ""
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-fields/measured/clone/rpc.test",
+      "-test.run=^TestPairSampling$",
+      "-test.v",
+      "-test.timeout=90s"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-fields/measured/clone/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GSR_PAIR_MODE": "clone",
+      "GSR_PAIR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-fields/measured/clone/raw.json",
+      "GSR_PAIR_BLOCK_TARGET": "10ms",
+      "GSR_PAIR_CASES": ""
+    },
+    "exitCode": 0,
+    "elapsedSeconds": 47.485,
+    "output": "=== RUN   TestPairSampling\n    sampler_test.go:371: clone body/addressbook/sproto_encode: completed 1/43\n    sampler_test.go:371: clone body/addressbook/sproto_pack: completed 2/43\n    sampler_test.go:371: clone body/addressbook/sproto_pencode: completed 3/43\n    sampler_test.go:371: clone body/game_small/sproto_encode: completed 4/43\n    sampler_test.go:371: clone body/game_small/sproto_pack: completed 5/43\n    sampler_test.go:371: clone body/game_small/sproto_pencode: completed 6/43\n    sampler_test.go:371: clone body/game_large/sproto_encode: completed 7/43\n    sampler_test.go:371: clone body/game_large/sproto_pack: completed 8/43\n    sampler_test.go:371: clone body/game_large/sproto_pencode: completed 9/43\n    sampler_test.go:371: clone body/int32_edges/sproto_encode: completed 10/43\n    sampler_test.go:371: clone body/int32_edges/sproto_pack: completed 11/43\n    sampler_test.go:371: clone body/int32_edges/sproto_pencode: completed 12/43\n    sampler_test.go:371: clone body/echo_ascii4k/sproto_encode: completed 13/43\n    sampler_test.go:371: clone body/echo_ascii4k/sproto_pack: completed 14/43\n    sampler_test.go:371: clone body/echo_ascii4k/sproto_pencode: completed 15/43\n    sampler_test.go:371: clone body/ascii32/frame: completed 16/43\n    sampler_test.go:371: clone body/utf8_1k/frame: completed 17/43\n    sampler_test.go:371: clone body/ascii4k/frame: completed 18/43\n    sampler_test.go:371: clone body/zeros4k/frame: completed 19/43\n    sampler_test.go:371: clone rpc/addressbook/notification: completed 20/43\n    sampler_test.go:371: clone rpc/addressbook/request_cancel: completed 21/43\n    sampler_test.go:371: clone rpc/addressbook/response: completed 22/43\n    sampler_test.go:371: clone rpc/game_small/notification: completed 23/43\n    sampler_test.go:371: clone rpc/game_small/request_cancel: completed 24/43\n    sampler_test.go:371: clone rpc/game_small/response: completed 25/43\n    sampler_test.go:371: clone rpc/game_large/notification: completed 26/43\n    sampler_test.go:371: clone rpc/game_large/request_cancel: completed 27/43\n    sampler_test.go:371: clone rpc/game_large/response: completed 28/43\n    sampler_test.go:371: clone rpc/int32_edges/notification: completed 29/43\n    sampler_test.go:371: clone rpc/int32_edges/request_cancel: completed 30/43\n    sampler_test.go:371: clone rpc/int32_edges/response: completed 31/43\n    sampler_test.go:371: clone rpc/echo_ascii4k/notification: completed 32/43\n    sampler_test.go:371: clone rpc/echo_ascii4k/request_cancel: completed 33/43\n    sampler_test.go:371: clone rpc/echo_ascii4k/response: completed 34/43\n    sampler_test.go:371: clone rpc/ascii32/notification: completed 35/43\n    sampler_test.go:371: clone rpc/utf8_1k/notification: completed 36/43\n    sampler_test.go:371: clone rpc/ascii4k/notification: completed 37/43\n    sampler_test.go:371: clone rpc/zeros4k/notification: completed 38/43\n    sampler_test.go:371: clone body/wide64/sproto_encode: completed 39/43\n    sampler_test.go:371: clone body/wide64/sproto_pencode: completed 40/43\n    sampler_test.go:371: clone rpc/wide64/notification: completed 41/43\n    sampler_test.go:371: clone rpc/wide64/request_cancel: completed 42/43\n    sampler_test.go:371: clone rpc/wide64/response: completed 43/43\n--- PASS: TestPairSampling (47.15s)\nPASS\n"
+  },
+  {
+    "args": [
+      "python3",
+      "-B",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/examples/websocket-gate/benchmarks/tools/go-pairs/run.py",
+      "--library",
+      "/private/tmp/gsr-gosproto-fork",
+      "--baseline",
+      "0c1f6cf",
+      "--mode",
+      "compare",
+      "--output",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-fields/measured/pass1",
+      "--block-ms",
+      "10",
+      "--prepare-only",
+      "--candidate-patch",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-18-gosproto-record-fields/candidate.patch"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.452,
+    "output": ""
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "sampler_test.go",
+      "rpc_probe_test.go",
+      "joint_probe_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-fields/measured/pass1/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.005,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-run",
+      "^(TestPairStatistics|TestPairSelection|TestPairGCCounter|TestRepresentativeFixtures)$",
+      ".",
+      "-timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-fields/measured/pass1/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 1.586,
+    "output": "ok  \tcodecpairstool\t0.587s\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-c",
+      "-o",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-fields/measured/pass1/rpc.test",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-fields/measured/pass1/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.592,
+    "output": ""
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-fields/measured/pass1/rpc.test",
+      "-test.run=^TestPairSampling$",
+      "-test.v",
+      "-test.timeout=90s"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-fields/measured/pass1/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GSR_PAIR_MODE": "compare",
+      "GSR_PAIR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-fields/measured/pass1/raw.json",
+      "GSR_PAIR_BLOCK_TARGET": "10ms",
+      "GSR_PAIR_CASES": ""
+    },
+    "exitCode": 0,
+    "elapsedSeconds": 45.615,
+    "output": "=== RUN   TestPairSampling\n    sampler_test.go:371: compare body/addressbook/sproto_encode: completed 1/43\n    sampler_test.go:371: compare body/addressbook/sproto_pack: completed 2/43\n    sampler_test.go:371: compare body/addressbook/sproto_pencode: completed 3/43\n    sampler_test.go:371: compare body/game_small/sproto_encode: completed 4/43\n    sampler_test.go:371: compare body/game_small/sproto_pack: completed 5/43\n    sampler_test.go:371: compare body/game_small/sproto_pencode: completed 6/43\n    sampler_test.go:371: compare body/game_large/sproto_encode: completed 7/43\n    sampler_test.go:371: compare body/game_large/sproto_pack: completed 8/43\n    sampler_test.go:371: compare body/game_large/sproto_pencode: completed 9/43\n    sampler_test.go:371: compare body/int32_edges/sproto_encode: completed 10/43\n    sampler_test.go:371: compare body/int32_edges/sproto_pack: completed 11/43\n    sampler_test.go:371: compare body/int32_edges/sproto_pencode: completed 12/43\n    sampler_test.go:371: compare body/echo_ascii4k/sproto_encode: completed 13/43\n    sampler_test.go:371: compare body/echo_ascii4k/sproto_pack: completed 14/43\n    sampler_test.go:371: compare body/echo_ascii4k/sproto_pencode: completed 15/43\n    sampler_test.go:371: compare body/ascii32/frame: completed 16/43\n    sampler_test.go:371: compare body/utf8_1k/frame: completed 17/43\n    sampler_test.go:371: compare body/ascii4k/frame: completed 18/43\n    sampler_test.go:371: compare body/zeros4k/frame: completed 19/43\n    sampler_test.go:371: compare rpc/addressbook/notification: completed 20/43\n    sampler_test.go:371: compare rpc/addressbook/request_cancel: completed 21/43\n    sampler_test.go:371: compare rpc/addressbook/response: completed 22/43\n    sampler_test.go:371: compare rpc/game_small/notification: completed 23/43\n    sampler_test.go:371: compare rpc/game_small/request_cancel: completed 24/43\n    sampler_test.go:371: compare rpc/game_small/response: completed 25/43\n    sampler_test.go:371: compare rpc/game_large/notification: completed 26/43\n    sampler_test.go:371: compare rpc/game_large/request_cancel: completed 27/43\n    sampler_test.go:371: compare rpc/game_large/response: completed 28/43\n    sampler_test.go:371: compare rpc/int32_edges/notification: completed 29/43\n    sampler_test.go:371: compare rpc/int32_edges/request_cancel: completed 30/43\n    sampler_test.go:371: compare rpc/int32_edges/response: completed 31/43\n    sampler_test.go:371: compare rpc/echo_ascii4k/notification: completed 32/43\n    sampler_test.go:371: compare rpc/echo_ascii4k/request_cancel: completed 33/43\n    sampler_test.go:371: compare rpc/echo_ascii4k/response: completed 34/43\n    sampler_test.go:371: compare rpc/ascii32/notification: completed 35/43\n    sampler_test.go:371: compare rpc/utf8_1k/notification: completed 36/43\n    sampler_test.go:371: compare rpc/ascii4k/notification: completed 37/43\n    sampler_test.go:371: compare rpc/zeros4k/notification: completed 38/43\n    sampler_test.go:371: compare body/wide64/sproto_encode: completed 39/43\n    sampler_test.go:371: compare body/wide64/sproto_pencode: completed 40/43\n    sampler_test.go:371: compare rpc/wide64/notification: completed 41/43\n    sampler_test.go:371: compare rpc/wide64/request_cancel: completed 42/43\n    sampler_test.go:371: compare rpc/wide64/response: completed 43/43\n--- PASS: TestPairSampling (45.26s)\nPASS\n"
+  },
+  {
+    "args": [
+      "python3",
+      "-B",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/examples/websocket-gate/benchmarks/tools/go-pairs/run.py",
+      "--library",
+      "/private/tmp/gsr-gosproto-fork",
+      "--baseline",
+      "0c1f6cf",
+      "--mode",
+      "compare",
+      "--output",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-fields/measured/pass2",
+      "--block-ms",
+      "10",
+      "--prepare-only",
+      "--candidate-patch",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-18-gosproto-record-fields/candidate.patch"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.342,
+    "output": ""
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "sampler_test.go",
+      "rpc_probe_test.go",
+      "joint_probe_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-fields/measured/pass2/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.005,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-run",
+      "^(TestPairStatistics|TestPairSelection|TestPairGCCounter|TestRepresentativeFixtures)$",
+      ".",
+      "-timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-fields/measured/pass2/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 1.716,
+    "output": "ok  \tcodecpairstool\t0.607s\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-c",
+      "-o",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-fields/measured/pass2/rpc.test",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-fields/measured/pass2/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.571,
+    "output": ""
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-fields/measured/pass2/rpc.test",
+      "-test.run=^TestPairSampling$",
+      "-test.v",
+      "-test.timeout=90s"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-fields/measured/pass2/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GSR_PAIR_MODE": "compare",
+      "GSR_PAIR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-fields/measured/pass2/raw.json",
+      "GSR_PAIR_BLOCK_TARGET": "10ms",
+      "GSR_PAIR_CASES": ""
+    },
+    "exitCode": 0,
+    "elapsedSeconds": 46.412,
+    "output": "=== RUN   TestPairSampling\n    sampler_test.go:371: compare body/addressbook/sproto_encode: completed 1/43\n    sampler_test.go:371: compare body/addressbook/sproto_pack: completed 2/43\n    sampler_test.go:371: compare body/addressbook/sproto_pencode: completed 3/43\n    sampler_test.go:371: compare body/game_small/sproto_encode: completed 4/43\n    sampler_test.go:371: compare body/game_small/sproto_pack: completed 5/43\n    sampler_test.go:371: compare body/game_small/sproto_pencode: completed 6/43\n    sampler_test.go:371: compare body/game_large/sproto_encode: completed 7/43\n    sampler_test.go:371: compare body/game_large/sproto_pack: completed 8/43\n    sampler_test.go:371: compare body/game_large/sproto_pencode: completed 9/43\n    sampler_test.go:371: compare body/int32_edges/sproto_encode: completed 10/43\n    sampler_test.go:371: compare body/int32_edges/sproto_pack: completed 11/43\n    sampler_test.go:371: compare body/int32_edges/sproto_pencode: completed 12/43\n    sampler_test.go:371: compare body/echo_ascii4k/sproto_encode: completed 13/43\n    sampler_test.go:371: compare body/echo_ascii4k/sproto_pack: completed 14/43\n    sampler_test.go:371: compare body/echo_ascii4k/sproto_pencode: completed 15/43\n    sampler_test.go:371: compare body/ascii32/frame: completed 16/43\n    sampler_test.go:371: compare body/utf8_1k/frame: completed 17/43\n    sampler_test.go:371: compare body/ascii4k/frame: completed 18/43\n    sampler_test.go:371: compare body/zeros4k/frame: completed 19/43\n    sampler_test.go:371: compare rpc/addressbook/notification: completed 20/43\n    sampler_test.go:371: compare rpc/addressbook/request_cancel: completed 21/43\n    sampler_test.go:371: compare rpc/addressbook/response: completed 22/43\n    sampler_test.go:371: compare rpc/game_small/notification: completed 23/43\n    sampler_test.go:371: compare rpc/game_small/request_cancel: completed 24/43\n    sampler_test.go:371: compare rpc/game_small/response: completed 25/43\n    sampler_test.go:371: compare rpc/game_large/notification: completed 26/43\n    sampler_test.go:371: compare rpc/game_large/request_cancel: completed 27/43\n    sampler_test.go:371: compare rpc/game_large/response: completed 28/43\n    sampler_test.go:371: compare rpc/int32_edges/notification: completed 29/43\n    sampler_test.go:371: compare rpc/int32_edges/request_cancel: completed 30/43\n    sampler_test.go:371: compare rpc/int32_edges/response: completed 31/43\n    sampler_test.go:371: compare rpc/echo_ascii4k/notification: completed 32/43\n    sampler_test.go:371: compare rpc/echo_ascii4k/request_cancel: completed 33/43\n    sampler_test.go:371: compare rpc/echo_ascii4k/response: completed 34/43\n    sampler_test.go:371: compare rpc/ascii32/notification: completed 35/43\n    sampler_test.go:371: compare rpc/utf8_1k/notification: completed 36/43\n    sampler_test.go:371: compare rpc/ascii4k/notification: completed 37/43\n    sampler_test.go:371: compare rpc/zeros4k/notification: completed 38/43\n    sampler_test.go:371: compare body/wide64/sproto_encode: completed 39/43\n    sampler_test.go:371: compare body/wide64/sproto_pencode: completed 40/43\n    sampler_test.go:371: compare rpc/wide64/notification: completed 41/43\n    sampler_test.go:371: compare rpc/wide64/request_cancel: completed 42/43\n    sampler_test.go:371: compare rpc/wide64/response: completed 43/43\n--- PASS: TestPairSampling (46.07s)\nPASS\n"
+  }
+]
