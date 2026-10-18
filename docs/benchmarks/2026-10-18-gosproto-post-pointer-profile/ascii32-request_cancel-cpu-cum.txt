@@ -1,0 +1,48 @@
+File: encoding.test
+Type: cpu
+Time: 2026-10-18 13:18:05 CST
+Duration: 2.57s, Total samples = 2.25s (87.51%)
+Showing nodes accounting for 1.27s, 56.44% of 2.25s total
+Dropped 53 nodes (cum <= 0.01s)
+Showing top 40 nodes out of 94
+      flat  flat%   sum%        cum   cum%
+         0     0%     0%      1.89s 84.00%  codecpairstool.BenchmarkCurrentEncoding.func1.3
+         0     0%     0%      1.89s 84.00%  testing.(*B).run1.func1
+         0     0%     0%      1.89s 84.00%  testing.(*B).runN
+     0.05s  2.22%  2.22%      1.65s 73.33%  github.com/cnooljaw/gosproto.(*Rpc).RequestEncode
+     0.03s  1.33%  3.56%      0.99s 44.00%  github.com/cnooljaw/gosproto.encodeBufferWithLimits
+         0     0%  3.56%      0.49s 21.78%  runtime.systemstack
+     0.04s  1.78%  5.33%      0.26s 11.56%  github.com/cnooljaw/gosproto.encodedSize
+     0.18s  8.00% 13.33%      0.26s 11.56%  github.com/cnooljaw/gosproto.packInto
+     0.26s 11.56% 24.89%      0.26s 11.56%  runtime.kevent
+     0.03s  1.33% 26.22%      0.26s 11.56%  runtime.makeslice
+         0     0% 26.22%      0.26s 11.56%  runtime.netpoll
+         0     0% 26.22%      0.26s 11.56%  runtime.startTheWorldWithSema
+     0.01s  0.44% 26.67%      0.23s 10.22%  runtime.mallocgc
+         0     0% 26.67%      0.20s  8.89%  github.com/cnooljaw/gosproto.(*Rpc).CancelSession
+     0.03s  1.33% 28.00%      0.18s  8.00%  runtime.mapdelete_fast32
+     0.05s  2.22% 30.22%      0.17s  7.56%  github.com/cnooljaw/gosproto.encodeMessageInto
+     0.02s  0.89% 31.11%      0.15s  6.67%  internal/runtime/maps.(*Map).Delete
+         0     0% 31.11%      0.15s  6.67%  runtime.gcStart.func4
+     0.11s  4.89% 36.00%      0.14s  6.22%  runtime.mapassign_fast32
+     0.01s  0.44% 36.44%      0.13s  5.78%  github.com/cnooljaw/gosproto.GetSprotoType
+     0.01s  0.44% 36.89%      0.12s  5.33%  runtime.mallocgcSmallNoscan
+         0     0% 36.89%      0.11s  4.89%  runtime.gcMarkTermination.func3
+         0     0% 36.89%      0.11s  4.89%  runtime.mapaccess2
+     0.08s  3.56% 40.44%      0.10s  4.44%  github.com/cnooljaw/gosproto.encodeRpcHeader
+         0     0% 40.44%      0.10s  4.44%  runtime.deductAssistCredit
+         0     0% 40.44%      0.10s  4.44%  runtime.gcAssistAlloc
+         0     0% 40.44%      0.10s  4.44%  runtime.gcAssistAlloc.func2
+         0     0% 40.44%      0.10s  4.44%  runtime.gcAssistAlloc1
+         0     0% 40.44%      0.10s  4.44%  runtime.gcDrainN
+     0.02s  0.89% 41.33%      0.09s  4.00%  internal/runtime/maps.(*Map).deleteSmall
+     0.02s  0.89% 42.22%      0.08s  3.56%  github.com/cnooljaw/gosproto.encodeScalarInto
+     0.08s  3.56% 45.78%      0.08s  3.56%  reflect.Value.Elem
+     0.05s  2.22% 48.00%      0.07s  3.11%  github.com/cnooljaw/gosproto.fieldSize
+     0.04s  1.78% 49.78%      0.07s  3.11%  internal/runtime/maps.(*Map).getWithKeySmall
+     0.05s  2.22% 52.00%      0.06s  2.67%  github.com/cnooljaw/gosproto.ffRunBytes
+     0.01s  0.44% 52.44%      0.06s  2.67%  github.com/cnooljaw/gosproto.getbase
+         0     0% 52.44%      0.06s  2.67%  runtime.(*mheap).alloc.func1
+         0     0% 52.44%      0.06s  2.67%  runtime.(*mheap).allocSpan
+     0.04s  1.78% 54.22%      0.05s  2.22%  reflect.Value.IsNil (inline)
+     0.05s  2.22% 56.44%      0.05s  2.22%  runtime.madvise

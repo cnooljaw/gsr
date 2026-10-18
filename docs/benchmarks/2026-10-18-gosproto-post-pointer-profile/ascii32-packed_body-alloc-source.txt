@@ -1,0 +1,37 @@
+Total: 1.34MB
+ROUTINE ======================== github.com/cnooljaw/gosproto.encodeBufferWithLimits in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-post-pointer-profile/archive/candidate/limits.go
+    1.22MB     1.22MB (flat, cum) 90.90% of Total
+         .          .     76:func encodeBufferWithLimits(message interface{}, limits Limits, reservePack bool, prefix []byte) ([]byte, []byte, error) {
+         .          .     77:	limits, err := normalizeLimits(limits)
+         .          .     78:	if err != nil {
+         .          .     79:		return nil, nil, err
+         .          .     80:	}
+         .          .     81:	typ, value, err := getbase(message)
+         .          .     82:	if err != nil {
+         .          .     83:		return nil, nil, err
+         .          .     84:	}
+         .       792B     85:	schema, err := GetSprotoType(typ.Elem())
+         .          .     86:	if err != nil {
+         .          .     87:		return nil, nil, err
+         .          .     88:	}
+         .          .     89:	budget := &decodeBudget{limits: limits}
+         .          .     90:	var layout encodeLayout
+         .          .     91:	binding := knownEncodeType(schema)
+         .          .     92:	size, err := encodedSize(schema, value, budget, 1, &layout, binding)
+         .          .     93:	runtime.KeepAlive(message)
+         .          .     94:	if err != nil {
+         .          .     95:		return nil, nil, err
+         .          .     96:	}
+         .          .     97:	totalSize := len(prefix) + size
+         .          .     98:	capacity, start := totalSize, 0
+         .          .     99:	if reservePack {
+         .          .    100:		capacity = packedBufferSize(totalSize)
+         .          .    101:		// FF 头的最坏增长和八字节余量隔开读写游标，避免覆盖尚未消费的编码字节。
+         .          .    102:		start = capacity - totalSize
+         .          .    103:	}
+    1.22MB     1.22MB    104:	output := make([]byte, capacity)
+         .          .    105:	encoded := output[start : start+totalSize]
+         .          .    106:	if len(prefix) > 0 {
+         .          .    107:		copy(encoded, prefix)
+         .          .    108:	}
+         .          .    109:	encodeMessageInto(schema, value, encoded[len(prefix):], &layout, binding)

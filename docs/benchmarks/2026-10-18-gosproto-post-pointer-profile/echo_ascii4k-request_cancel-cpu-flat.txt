@@ -1,0 +1,48 @@
+File: encoding.test
+Type: cpu
+Time: 2026-10-18 13:18:31 CST
+Duration: 2.69s, Total samples = 2.13s (79.22%)
+Showing nodes accounting for 1.95s, 91.55% of 2.13s total
+Dropped 37 nodes (cum <= 0.01s)
+Showing top 40 nodes out of 52
+      flat  flat%   sum%        cum   cum%
+     1.47s 69.01% 69.01%      1.47s 69.01%  runtime.kevent
+     0.08s  3.76% 72.77%      0.08s  3.76%  runtime.memmove
+     0.07s  3.29% 76.06%      0.10s  4.69%  runtime.typePointers.next
+     0.06s  2.82% 78.87%      0.21s  9.86%  runtime.scanobject
+     0.04s  1.88% 80.75%      0.04s  1.88%  runtime.scanblock
+     0.03s  1.41% 82.16%      0.03s  1.41%  indexbytebody
+     0.02s  0.94% 83.10%      0.10s  4.69%  github.com/cnooljaw/gosproto.encodeScalarInto
+     0.02s  0.94% 84.04%      0.06s  2.82%  github.com/cnooljaw/gosproto.packInto
+     0.02s  0.94% 84.98%      0.02s  0.94%  runtime.findObject
+     0.02s  0.94% 85.92%      0.02s  0.94%  runtime.getGCMask (inline)
+     0.02s  0.94% 86.85%      0.02s  0.94%  runtime.greyobject
+     0.01s  0.47% 87.32%      0.11s  5.16%  github.com/cnooljaw/gosproto.encodeMessageInto
+     0.01s  0.47% 87.79%      0.02s  0.94%  github.com/cnooljaw/gosproto.getbase
+     0.01s  0.47% 88.26%      0.02s  0.94%  internal/runtime/maps.(*Map).getWithKeySmall
+     0.01s  0.47% 88.73%      0.02s  0.94%  internal/runtime/maps.(*Map).putSlotSmallFast32
+     0.01s  0.47% 89.20%      0.02s  0.94%  reflect.(*rtype).Elem
+     0.01s  0.47% 89.67%      0.03s  1.41%  runtime.(*mheap).allocSpan
+     0.01s  0.47% 90.14%      0.29s 13.62%  runtime.gcDrainN
+     0.01s  0.47% 90.61%      0.06s  2.82%  runtime.mallocgcSmallNoscan
+     0.01s  0.47% 91.08%      0.03s  1.41%  runtime.mapassign_fast32
+     0.01s  0.47% 91.55%      0.03s  1.41%  runtime.markroot.func1
+         0     0% 91.55%      0.03s  1.41%  bytes.IndexByte (inline)
+         0     0% 91.55%      0.65s 30.52%  codecpairstool.BenchmarkCurrentEncoding.func1.3
+         0     0% 91.55%      0.63s 29.58%  github.com/cnooljaw/gosproto.(*Rpc).RequestEncode
+         0     0% 91.55%      0.03s  1.41%  github.com/cnooljaw/gosproto.GetSprotoType
+         0     0% 91.55%      0.54s 25.35%  github.com/cnooljaw/gosproto.encodeBufferWithLimits
+         0     0% 91.55%      0.02s  0.94%  github.com/cnooljaw/gosproto.encodedSize
+         0     0% 91.55%      0.03s  1.41%  github.com/cnooljaw/gosproto.ffRunBytes
+         0     0% 91.55%      0.03s  1.41%  github.com/cnooljaw/gosproto.followingFFWords
+         0     0% 91.55%      0.03s  1.41%  runtime.(*mcache).nextFree
+         0     0% 91.55%      0.03s  1.41%  runtime.(*mcache).refill
+         0     0% 91.55%      0.03s  1.41%  runtime.(*mcentral).cacheSpan
+         0     0% 91.55%      0.02s  0.94%  runtime.(*mcentral).grow
+         0     0% 91.55%      0.02s  0.94%  runtime.(*mheap).alloc
+         0     0% 91.55%      0.03s  1.41%  runtime.(*mheap).alloc.func1
+         0     0% 91.55%      0.29s 13.62%  runtime.deductAssistCredit
+         0     0% 91.55%      0.29s 13.62%  runtime.gcAssistAlloc
+         0     0% 91.55%      0.29s 13.62%  runtime.gcAssistAlloc.func2
+         0     0% 91.55%      0.29s 13.62%  runtime.gcAssistAlloc1
+         0     0% 91.55%      0.83s 38.97%  runtime.gcMarkTermination.func3

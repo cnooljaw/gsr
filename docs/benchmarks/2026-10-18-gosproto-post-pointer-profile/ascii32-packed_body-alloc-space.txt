@@ -1,0 +1,37 @@
+File: encoding.test
+Type: alloc_space
+Time: 2026-10-18 13:18:05 CST
+Showing nodes accounting for 1344.45kB, 97.71% of 1376.02kB total
+Dropped 107 nodes (cum <= 6.88kB)
+Showing top 30 nodes out of 31
+      flat  flat%   sum%        cum   cum%
+ 1250.06kB 90.85% 90.85%  1250.84kB 90.90%  github.com/cnooljaw/gosproto.encodeBufferWithLimits
+   36.91kB  2.68% 93.53%    36.91kB  2.68%  regexp/syntax.(*compiler).inst (inline)
+   27.23kB  1.98% 95.51%    27.23kB  1.98%  regexp.onePassCopy
+    9.78kB  0.71% 96.22%    20.86kB  1.52%  regexp.makeOnePass
+    9.08kB  0.66% 96.88%     9.08kB  0.66%  regexp/syntax.(*parser).newRegexp (inline)
+    3.61kB  0.26% 97.14%   106.99kB  7.78%  regexp.compile
+    3.61kB  0.26% 97.40%    89.08kB  6.47%  testing.(*B).Run
+    2.62kB  0.19% 97.59%    16.46kB  1.20%  regexp/syntax.parse
+    0.77kB 0.056% 97.65%    26.52kB  1.93%  testing.runBenchmarks
+    0.40kB 0.029% 97.68%    17.77kB  1.29%  testing.newMatcher
+    0.12kB 0.0091% 97.69%  1344.48kB 97.71%  testing.(*B).runN
+    0.09kB 0.0068% 97.69%    39.10kB  2.84%  codecpairstool.BenchmarkCurrentEncoding
+    0.09kB 0.0068% 97.70%    48.83kB  3.55%  codecpairstool.BenchmarkCurrentEncoding.func1
+    0.07kB 0.0051% 97.71%    30.43kB  2.21%  testing.(*M).Run
+         0     0% 97.71%  1250.84kB 90.90%  codecpairstool.BenchmarkCurrentEncoding.func1.2
+         0     0% 97.71%  1250.84kB 90.90%  github.com/cnooljaw/gosproto.EncodePacked
+         0     0% 97.71%  1250.84kB 90.90%  github.com/cnooljaw/gosproto.encodeWithLimits
+         0     0% 97.71%    30.43kB  2.21%  main.main
+         0     0% 97.71%   106.99kB  7.78%  regexp.Compile (inline)
+         0     0% 97.71%    48.09kB  3.50%  regexp.compileOnePass
+         0     0% 97.71%    35.92kB  2.61%  regexp/syntax.(*compiler).compile
+         0     0% 97.71%    34.12kB  2.48%  regexp/syntax.(*compiler).rune
+         0     0% 97.71%    10.19kB  0.74%  regexp/syntax.(*parser).literal
+         0     0% 97.71%    37.89kB  2.75%  regexp/syntax.Compile
+         0     0% 97.71%    16.46kB  1.20%  regexp/syntax.Parse (inline)
+         0     0% 97.71%    32.18kB  2.34%  runtime.main
+         0     0% 97.71%  1341.93kB 97.52%  testing.(*B).run1.func1
+         0     0% 97.71%    91.95kB  6.68%  testing.(*matcher).fullName
+         0     0% 97.71%    90.79kB  6.60%  testing.simpleMatch.matches
+         0     0% 97.71%    17.18kB  1.25%  testing.simpleMatch.verify

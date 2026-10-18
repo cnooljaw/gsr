@@ -1,0 +1,37 @@
+File: encoding.test
+Type: alloc_objects
+Time: 2026-10-18 13:18:17 CST
+Showing nodes accounting for 40885, 97.52% of 41924 total
+Dropped 161 nodes (cum <= 209)
+Showing top 30 nodes out of 34
+      flat  flat%   sum%        cum   cum%
+     20001 47.71% 47.71%      20001 47.71%  github.com/cnooljaw/gosproto.(*encodeLayout).add (inline)
+     20001 47.71% 95.42%      40002 95.42%  github.com/cnooljaw/gosproto.encodeBufferWithLimits
+       358  0.85% 96.27%        358  0.85%  regexp.makeOnePass.func1
+       344  0.82% 97.09%        344  0.82%  reflect.New
+        41 0.098% 97.19%       1036  2.47%  regexp.compile
+        41 0.098% 97.29%        483  1.15%  regexp.makeOnePass
+        27 0.064% 97.35%        223  0.53%  encoding/json.(*decodeState).literalStore
+        21  0.05% 97.40%        633  1.51%  encoding/json.(*decodeState).object
+        21  0.05% 97.45%        275  0.66%  regexp/syntax.parse
+         9 0.021% 97.47%        882  2.10%  testing.(*B).Run
+         4 0.0095% 97.48%        384  0.92%  codecpairstool.BenchmarkCurrentEncoding
+         4 0.0095% 97.49%        247  0.59%  testing.runBenchmarks
+         3 0.0072% 97.50%       1152  2.75%  codecpairstool.BenchmarkCurrentEncoding.func1
+         3 0.0072% 97.51%        306  0.73%  testing.(*M).Run
+         2 0.0048% 97.51%      40058 95.55%  codecpairstool.BenchmarkCurrentEncoding.func1.3
+         2 0.0048% 97.51%        645  1.54%  encoding/json.Unmarshal
+         2 0.0048% 97.52%      41627 99.29%  testing.(*B).runN
+         1 0.0024% 97.52%      40003 95.42%  github.com/cnooljaw/gosproto.(*Rpc).RequestEncode
+         0     0% 97.52%        507  1.21%  encoding/json.(*decodeState).array
+         0     0% 97.52%        637  1.52%  encoding/json.(*decodeState).unmarshal
+         0     0% 97.52%        637  1.52%  encoding/json.(*decodeState).value
+         0     0% 97.52%        324  0.77%  encoding/json.indirect
+         0     0% 97.52%      20001 47.71%  github.com/cnooljaw/gosproto.encodedIntegerRecordSize
+         0     0% 97.52%      20001 47.71%  github.com/cnooljaw/gosproto.encodedSize
+         0     0% 97.52%      20001 47.71%  github.com/cnooljaw/gosproto.fieldSize
+         0     0% 97.52%        306  0.73%  main.main
+         0     0% 97.52%       1036  2.47%  regexp.Compile (inline)
+         0     0% 97.52%        525  1.25%  regexp.compileOnePass
+         0     0% 97.52%        275  0.66%  regexp/syntax.Parse (inline)
+         0     0% 97.52%        306  0.73%  runtime.main
