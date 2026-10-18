@@ -1,0 +1,162 @@
+{
+  "scope": "4-byte store/cursor/load/check loop in ordinary inspect binary;does not establish whole path or timing equivalence",
+  "identicalSymbolicAndMachineInstructions": true,
+  "instructionsPerArm": 15,
+  "arms": {
+    "gosproto-before": [
+      {
+        "address": "0x10015207c",
+        "opcode": "b9000088",
+        "instruction": "MOVW R8, (R4)"
+      },
+      {
+        "address": "0x100152080",
+        "opcode": "d1001063",
+        "instruction": "SUB $4, R3, R3"
+      },
+      {
+        "address": "0x100152084",
+        "opcode": "cb0303e8",
+        "instruction": "NEG R3, R8"
+      },
+      {
+        "address": "0x100152088",
+        "opcode": "937ffd08",
+        "instruction": "ASR $63, R8, R8"
+      },
+      {
+        "address": "0x10015208c",
+        "opcode": "927e0108",
+        "instruction": "AND $4, R8, R8"
+      },
+      {
+        "address": "0x100152090",
+        "opcode": "91000400",
+        "instruction": "ADD $1, R0, R0"
+      },
+      {
+        "address": "0x100152094",
+        "opcode": "8b080084",
+        "instruction": "ADD R8, R4, R4"
+      },
+      {
+        "address": "0x100152098",
+        "opcode": "d1001042",
+        "instruction": "SUB $4, R2, R2"
+      },
+      {
+        "address": "0x10015209c",
+        "opcode": "eb05001f",
+        "instruction": "CMP R5, R0"
+      },
+      {
+        "address": "0x1001520a0",
+        "opcode": "54fffdea",
+        "instruction": "BGE -17(PC)"
+      },
+      {
+        "address": "0x1001520a4",
+        "opcode": "f86078c8",
+        "instruction": "MOVD (R6)(R0<<3), R8"
+      },
+      {
+        "address": "0x1001520a8",
+        "opcode": "d503201f",
+        "instruction": "NOOP"
+      },
+      {
+        "address": "0x1001520ac",
+        "opcode": "d503201f",
+        "instruction": "NOOP"
+      },
+      {
+        "address": "0x1001520b0",
+        "opcode": "f1000c5f",
+        "instruction": "CMP $3, R2"
+      },
+      {
+        "address": "0x1001520b4",
+        "opcode": "54fffe48",
+        "instruction": "BHI -14(PC)"
+      }
+    ],
+    "gosproto": [
+      {
+        "address": "0x10020d4cc",
+        "opcode": "b9000088",
+        "instruction": "MOVW R8, (R4)"
+      },
+      {
+        "address": "0x10020d4d0",
+        "opcode": "d1001063",
+        "instruction": "SUB $4, R3, R3"
+      },
+      {
+        "address": "0x10020d4d4",
+        "opcode": "cb0303e8",
+        "instruction": "NEG R3, R8"
+      },
+      {
+        "address": "0x10020d4d8",
+        "opcode": "937ffd08",
+        "instruction": "ASR $63, R8, R8"
+      },
+      {
+        "address": "0x10020d4dc",
+        "opcode": "927e0108",
+        "instruction": "AND $4, R8, R8"
+      },
+      {
+        "address": "0x10020d4e0",
+        "opcode": "91000400",
+        "instruction": "ADD $1, R0, R0"
+      },
+      {
+        "address": "0x10020d4e4",
+        "opcode": "8b080084",
+        "instruction": "ADD R8, R4, R4"
+      },
+      {
+        "address": "0x10020d4e8",
+        "opcode": "d1001042",
+        "instruction": "SUB $4, R2, R2"
+      },
+      {
+        "address": "0x10020d4ec",
+        "opcode": "eb05001f",
+        "instruction": "CMP R5, R0"
+      },
+      {
+        "address": "0x10020d4f0",
+        "opcode": "54fffdea",
+        "instruction": "BGE -17(PC)"
+      },
+      {
+        "address": "0x10020d4f4",
+        "opcode": "f86078c8",
+        "instruction": "MOVD (R6)(R0<<3), R8"
+      },
+      {
+        "address": "0x10020d4f8",
+        "opcode": "d503201f",
+        "instruction": "NOOP"
+      },
+      {
+        "address": "0x10020d4fc",
+        "opcode": "d503201f",
+        "instruction": "NOOP"
+      },
+      {
+        "address": "0x10020d500",
+        "opcode": "f1000c5f",
+        "instruction": "CMP $3, R2"
+      },
+      {
+        "address": "0x10020d504",
+        "opcode": "54fffe48",
+        "instruction": "BHI -14(PC)"
+      }
+    ]
+  },
+  "interpretation": "No additional per-element work in this extracted loop. Candidate changes surrounding function code and location. int32 timing regression remains unexplained;no automatic noise or alignment attribution."
+}

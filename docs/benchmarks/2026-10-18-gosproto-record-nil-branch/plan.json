@@ -1,0 +1,19 @@
+{
+  "baselineCommit": "a3b3830",
+  "scope": "Only native integer-record array entry in fieldSize and encodeFieldInto. Helpers,field loops,binding,type/owner/shape guards,layout,budgets,wire,ownership,Pack/RPC/Decode remain unchanged.",
+  "candidate": "Obtain existing reflect.Value item once;zero-initialize encodePointer;only for !item.IsNil() borrow pointer using unchanged messageEncodePointer(item,childBinding). Still call original helper for nil,so layout/budgets are not bypassed. No new unsafe API/cache or value lifetime.",
+  "correctness": "Existing shuffled integer-record,nil/empty,sparse tags,byte/depth/element budget,current-value,offset,metadata-replacement tests. No duplicate fixture needed.",
+  "measurement": {
+    "modes": [
+      "self",
+      "clone",
+      "pass1",
+      "pass2"
+    ],
+    "blockMs": 10,
+    "cases": 43,
+    "matrix": "Unchanged original19 body+19 actualRPC+5 wide64. Target10 game_small/game_large Encode/PEncode/3RPCroles;other33 controls. Separate unchanged8-case nil supplement fixed before any timing.",
+    "sameControlsForAllCases": true
+  },
+  "assessment": "No minimum percent threshold. Compare both passes,absolute ns,all control flags,allocation counts and cumulative ratios. Include nil cost/gain and any nonnil regression together. No retries/tuning after timing. Prior pointer experiment non-target int32 request_cancel+4.74percent and historical cursor Pack+9.45percent remain unresolved;new baseline cannot erase them."
+}

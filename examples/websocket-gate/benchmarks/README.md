@@ -52,7 +52,9 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 
 [整数记录Fields局部复用](../../../docs/benchmarks/2026-10-18-gosproto-record-fields/RESULTS.md) 固定43项、两轮，原值和编译证据完整保留。大型纯Encode小幅下降与控制同阶，PEncode无改善、RPC方向混合，未采用生产候选；只保留Go字段乱序/忽略字段回归和记录，已本地提交为gosproto bd1976a / GSR 4bf1b32、未推送。负向新旧夹具对照证实覆盖增量；该轮最终生产为0c1f6cf，当轮未重复生产全验收，不以新基线Pack控制覆盖上轮未解释差值。
 
-[整数记录指针入口](../../../docs/benchmarks/2026-10-18-gosproto-record-pointer/RESULTS.md) 保留已验证数组入口的现有指针借用，减少helper反射值/重复nil分支。43项两轮大型Encode约快8%、PEncode/RPC约快5%～7%，分配次数不变；独立nil矩阵确认全nil256记录约慢0.2μs，混合记录仍改善。全部控制失败、累计与配对方向不同、未改请求+4.74%和旧Pack未解释差值保留；官方/race/checkptr/fuzz/GSR/GoTS通过。新改动待审查，不改变正式依赖或PB/TS排名。
+[整数记录指针入口](../../../docs/benchmarks/2026-10-18-gosproto-record-pointer/RESULTS.md) 保留已验证数组入口的现有指针借用，减少helper反射值/重复nil分支。43项两轮大型Encode约快8%、PEncode/RPC约快5%～7%，分配次数不变；独立nil矩阵确认全nil256记录约慢0.2μs，混合记录仍改善。全部控制失败、累计与配对方向不同、未改请求+4.74%和旧Pack未解释差值保留；官方/race/checkptr/fuzz/GSR/GoTS通过。该切片已本地提交为gosproto a3b3830 / GSR f37fef0，未推送；不改变正式依赖或PB/TS排名。
+
+[nil调用分支实验](../../../docs/benchmarks/2026-10-18-gosproto-record-nil-branch/RESULTS.md) 原43项+原nil8项、固定两轮。全nil256项约快0.32～0.43μs，但正常大型Encode慢约9%、组合入口及混合数组也回退，撤回候选，库保持a3b3830干净。int32纯Encode的约13%非目标回退、完整控制/累计/尾差和核心指令核对保留，未重复未变生产的全验收。新记录待审查，后续先刷新当前profile；Decode与依赖不变。
 
 ## 比较口径
 
