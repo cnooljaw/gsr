@@ -6,7 +6,7 @@
 
 前两轮以已发布的 gosproto v0.4.0 为版本基线；下一轮从已提交的 `6012b06` 做增量，不从 v0.4.0 重复实施。实现改动应在独立 gosproto 仓库进行，GSR 提供真实接线和跨语言 Benchmark；不修改 Go module cache，也不将库源码复制到 GSR。
 
-当前切片（2026-10-18）：nil分支实验记录已本地提交为GSR a391e42，库保持a3b3830，未推送，见第38节。本轮刷新四输入×三个入口的CPU/分配热点，见第39节；库干净，新诊断/文档未提交。正式依赖仍v0.4.0，Decode冻结。
+当前切片（2026-10-18）：优化后profile已本地提交为GSR 17996e0，库保持a3b3830，未推送，见第39节。后续Pack剩余目标游标未形成主要组合路径稳定收益且密集形态回退，候选撤回，见第40节；库干净，新GSR记录未提交。正式依赖仍v0.4.0，Decode冻结。
 
 ## 1. 目标与证据
 
@@ -480,4 +480,10 @@ RequestEncode改用局部header值，避免字段指针赋值使session副本保
 
 ## 39. 指针入口优化后的热点刷新
 
-从已提交a3b3830归档刷新四种输入的纯Encode/EncodePacked/RequestEncode+CancelSession，CPU各2秒、逐次分配另起进程各20000次，共24份profile；不作为A/B或PB/TS排名。整数数组Pack约34%/39%，大型记录预检/写出与Pack仍各自可见；父子累计不相加。大型三个入口3968B/2次，其中512B布局外溢，其余输入一次结果分配。4KiB ASCII及整数数组纯Encode的kevent/GC栈占比保留，不归因协议或据此排名。harness检查/vet/构建、选择/指纹及归档复现通过，库保持a3b3830干净，未重复生产全验收。见 [优化后热点报告](benchmarks/2026-10-18-gosproto-post-pointer-profile/RESULTS.md)，新诊断/文档未提交；下一轮先检查普通word Pack游标/BCE，再做单一候选，Decode和正式依赖不变。
+从已提交a3b3830归档刷新四种输入的纯Encode/EncodePacked/RequestEncode+CancelSession，CPU各2秒、逐次分配另起进程各20000次，共24份profile；不作为A/B或PB/TS排名。整数数组Pack约34%/39%，大型记录预检/写出与Pack仍各自可见；父子累计不相加。大型三个入口3968B/2次，其中512B布局外溢，其余输入一次结果分配。4KiB ASCII及整数数组纯Encode的kevent/GC栈占比保留，不归因协议或据此排名。harness检查/vet/构建、选择/指纹及归档复现通过，库保持a3b3830干净，未重复生产全验收。见 [优化后热点报告](benchmarks/2026-10-18-gosproto-post-pointer-profile/RESULTS.md)，该诊断已本地提交为GSR 17996e0，未推送；下一轮先检查普通word Pack游标/BCE，再做单一候选，Decode和正式依赖不变。
+
+## 40. Pack 剩余目标游标未采用
+
+只改packInto目标游标：推进剩余dst并从原packed起点返回，保留cap及FF/尾部/重叠规则。BCE总检查点未减少，ARM64汇编301→309行、栈帧112B不变；既有相关回归及17984组wire/cap/独占差分通过。固定原43项+原19形态，23808块独立复算一致。大型纯Pack+1.33%/+1.68%，大型和整数PEncode方向翻转，四/六非零长word约慢0.1μs；部分RPC/零场景改善与控制限制完整保留，综合撤回候选，不设最小收益比例。self49/62、clone38/62、累计方向不同/离群/字节尾差保留；最终全部Go源码与a3b3830相同、库干净，未重复未变生产的全验收。见 [Pack游标实验](benchmarks/2026-10-18-gosproto-pack-cursor/RESULTS.md)，新GSR记录未提交，Decode及正式依赖不变。
+
+下一轮先核对密集word写出串行位置计算、mask生成及历史前缀候选，不同时改FF/body或扩大unsafe。

@@ -1,0 +1,56 @@
+diff --git a/pack.go b/pack.go
+index dedd097..41bd853 100644
+--- a/pack.go
++++ b/pack.go
+@@ -107,19 +107,19 @@ func Pack(src []byte) []byte {
+ // packInto 只接收本次调用独占且按 packedBufferSize 预留的输出。
+ // EncodePacked 允许 src 位于同一缓冲后部，必须保留完整增长额度和八字节写出余量。
+ func packInto(packed, src []byte) []byte {
+-	offset := 0
++	// dst 只推进写入位置，结果仍从 packed 起点切出并保留原有容量。
++	dst := packed
+ 	for len(src) >= 8 {
+ 		word := binary.LittleEndian.Uint64(src)
+ 		nonzero := (((word & 0x7f7f7f7f7f7f7f7f) + 0x7f7f7f7f7f7f7f7f) | word) & 0x8080808080808080
+ 		header := uint8(((nonzero >> 7) * 0x0102040810204080) >> 56)
+ 		if header == 0xff {
+ 			consumed := ffRunBytes(src)
+-			writeFF(packed[offset:], src, consumed)
+-			offset += 2 + ((consumed + 7) &^ 7)
++			writeFF(dst, src, consumed)
++			dst = dst[2+((consumed+7)&^7):]
+ 			src = src[consumed:]
+ 			continue
+ 		}
+-		dst := packed[offset:]
+ 		// 去掉至多两个置位后是否为零，比普通路径完整计数更直接。
+ 		remaining := header & (header - 1)
+ 		if remaining&(remaining-1) == 0 {
+@@ -137,7 +137,7 @@ func packInto(packed, src []byte) []byte {
+ 					index = 3
+ 				}
+ 			}
+-			offset += index
++			dst = dst[index:]
+ 		} else {
+ 			// Pack 预留八字节尾空间，零字节暂写的位置会被下一个有效字节覆盖，不进入返回切片。
+ 			_ = dst[8]
+@@ -159,14 +159,15 @@ func packInto(packed, src []byte) []byte {
+ 			dst[index] = byte(word >> 56)
+ 			index += int((header >> 7) & 1)
+ 			dst[0] = header
+-			offset += index
++			dst = dst[index:]
+ 		}
+ 		src = src[8:]
+ 	}
+ 	if len(src) > 0 {
+-		offset += packSegment(packed[offset:], src, 0)
++		length := packSegment(dst, src, 0)
++		dst = dst[length:]
+ 	}
+-	return packed[:offset]
++	return packed[:len(packed)-len(dst)]
+ }
+ 
+ // zeroHeaderPrefix 按有效切片长度统计连续零 mask，遇到首个非零字节立即停止。

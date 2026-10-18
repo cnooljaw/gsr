@@ -1,0 +1,33 @@
+{
+  "sourceManifest": "docs/benchmarks/2026-10-18-gosproto-post-pointer-profile/inputs.json",
+  "sourceManifestSha256": "3566d7a21a273ebe0e680e549a221f5e79716948b2b3d5079fafca21ded3eab8",
+  "binary": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-post-pointer-profile/encoding.test",
+  "binarySha256": "0d27c764a927a957cad2625e7c792644713a9e9f7856b3cae84ec94056cc6704",
+  "libraryCommit": "a3b3830d5e3fc1abcedc1cdbc2d84533082d28f6",
+  "commands": [
+    {
+      "args": [
+        "go",
+        "tool",
+        "objdump",
+        "-s",
+        "github.com/cnooljaw/gosproto\\.packInto$",
+        "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-post-pointer-profile/encoding.test"
+      ],
+      "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+      "exitCode": 0,
+      "elapsedSeconds": 0.09035616740584373
+    },
+    {
+      "args": [
+        "go",
+        "build",
+        "-gcflags=-d=ssa/check_bce/debug=1",
+        "."
+      ],
+      "cwd": "/private/tmp/gsr-gosproto-fork",
+      "exitCode": 0,
+      "elapsedSeconds": 0.34903345815837383
+    }
+  ]
+}

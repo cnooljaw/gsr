@@ -1,0 +1,116 @@
+package benchmarks
+
+import (
+	"bytes"
+	"fmt"
+	"math/bits"
+	"os"
+	"strings"
+	"testing"
+
+	sproto "github.com/cnooljaw/gosproto"
+	before "github.com/cnooljaw/gosproto-before"
+)
+
+type packPattern struct {
+	name string
+	raw  []byte
+}
+
+func packPatterns() []packPattern {
+	var cases []packPattern
+	for _, size := range []int{32, 4096} {
+		for count := 0; count <= 8; count++ {
+			raw := make([]byte, size)
+			for word := 0; word < size/8; word++ {
+				mask := bits.RotateLeft8(uint8((1<<count)-1), word%8)
+				for bit := 0; bit < 8; bit++ {
+					if mask&(1<<bit) != 0 {
+						raw[word*8+bit] = byte(1 + (word*13+bit*7)%255)
+					}
+				}
+			}
+			cases = append(cases, packPattern{fmt.Sprintf("n%d_%d", count, size), raw})
+		}
+	}
+	random := make([]byte, 4096)
+	state := uint32(0x12345678)
+	for i := range random {
+		state ^= state << 13
+		state ^= state >> 17
+		state ^= state << 5
+		random[i] = byte(state)
+	}
+	cases = append(cases, packPattern{"random4096", random})
+	for _, count := range []int{6, 7} {
+		raw := bytes.Repeat([]byte{1}, 8)
+		for i := 0; i < 511; i++ {
+			word := make([]byte, 8)
+			for j := 0; j < count; j++ {
+				word[(j+i)%8] = byte(j + 1)
+			}
+			raw = append(raw, word...)
+		}
+		cases = append(cases, packPattern{fmt.Sprintf("ff_n%d_4096", count), raw})
+	}
+	for _, size := range []int{63, 64, 65, 127, 128, 129, 255, 256, 257, 2046, 2047, 2048, 2049, 4094, 4095, 4096} {
+		cases = append(cases, packPattern{fmt.Sprintf("ff_tail%d", size), bytes.Repeat([]byte{0xee}, size)})
+	}
+	for _, size := range []int{256, 4096} {
+		raw := bytes.Repeat([]byte{1}, size)
+		raw[8] = 0
+		cases = append(cases, packPattern{fmt.Sprintf("ff_earlyzero%d", size), raw})
+	}
+	for _, size := range []int{8, 15, 16, 17, 23, 24, 31, 32, 33, 63, 64, 65, 127, 128, 129, 255, 256, 257, 4095, 4096, 4097} {
+		cases = append(cases, packPattern{fmt.Sprintf("zero_tail%d", size), make([]byte, size)})
+	}
+	for _, words := range []int{1, 2, 3, 7, 8, 9} {
+		raw := bytes.Repeat([]byte{0x91}, 8)
+		for i := 0; i < 64; i++ {
+			raw = append(raw, make([]byte, words*8)...)
+			raw = append(raw, 1, 0, 2, 0, 3, 0, 4, 0)
+		}
+		cases = append(cases, packPattern{fmt.Sprintf("zero_run%dx64", words), raw})
+	}
+	return cases
+}
+
+// pairOperations 只选择预先记录的回退形态，计时前检查精确 wire 和容量。
+func pairOperations(t *testing.T, mode string) []pairOperation {
+	t.Helper()
+	wanted := strings.Split(os.Getenv("GSR_PATTERN_NAMES"), ",")
+	selected := make(map[string]bool, len(wanted))
+	for _, name := range wanted {
+		selected[name] = false
+	}
+	var operations []pairOperation
+	for _, sample := range packPatterns() {
+		if _, ok := selected[sample.name]; !ok {
+			continue
+		}
+		selected[sample.name] = true
+		raw := sample.raw
+		left, right := before.Pack(raw), sproto.Pack(raw)
+		if !bytes.Equal(left, right) || cap(left) != cap(right) {
+			t.Fatalf("pattern wire/cap %s", sample.name)
+		}
+		runRight := func() error {
+			encodedSink = sproto.Pack(raw)
+			return nil
+		}
+		runLeft := func() error {
+			encodedSink = before.Pack(raw)
+			return nil
+		}
+		if mode == "self" {
+			runLeft = runRight
+		}
+		operations = append(operations, pairOperation{sample.name, runLeft, runRight})
+	}
+	for name, found := range selected {
+		if !found {
+			t.Fatalf("unknown pattern %s", name)
+		}
+	}
+	return operations
+}

@@ -56,7 +56,9 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 
 [nil调用分支实验](../../../docs/benchmarks/2026-10-18-gosproto-record-nil-branch/RESULTS.md) 原43项+原nil8项、固定两轮。全nil256项约快0.32～0.43μs，但正常大型Encode慢约9%、组合入口及混合数组也回退，撤回候选，库保持a3b3830干净。int32纯Encode的约13%非目标回退、完整控制/累计/尾差和核心指令核对保留，未重复未变生产的全验收。该记录已本地提交为GSR a391e42，未推送；后续先刷新当前profile，Decode与依赖不变。
 
-[优化后热点诊断](../../../docs/benchmarks/2026-10-18-gosproto-post-pointer-profile/RESULTS.md) 基于a3b3830，四种输入各纯Encode/EncodePacked/实际RPC，CPU与逐次内存分开采24份profile。整数数组Pack约34%/39%，大型仍有512B布局外溢；runtime/GC栈、初始化对象、插桩耗时与全部原值保留，不推导新排名。独立harness检查/vet/归档核对通过，生产未改、库干净，新诊断待审查。下一轮先核对普通word Pack游标/BCE，不同时改记录或扩大unsafe。
+[优化后热点诊断](../../../docs/benchmarks/2026-10-18-gosproto-post-pointer-profile/RESULTS.md) 基于a3b3830，四种输入各纯Encode/EncodePacked/实际RPC，CPU与逐次内存分开采24份profile。整数数组Pack约34%/39%，大型仍有512B布局外溢；runtime/GC栈、初始化对象、插桩耗时与全部原值保留，不推导新排名。独立harness检查/vet/归档核对通过，生产未改、库干净；该诊断已本地提交为GSR 17996e0，未推送。下一轮先核对普通word Pack游标/BCE，不同时改记录或扩大unsafe。
+
+[Pack剩余目标游标](../../../docs/benchmarks/2026-10-18-gosproto-pack-cursor/RESULTS.md) 固定62项两轮，原43项业务加19种形态，相关回归与17984差分通过。检查点未减少、汇编略增加；主要PEncode方向翻转、密集长word约慢0.1μs，部分RPC/零场景收益保留，综合撤回候选。全部控制/原值/累计和恢复指纹保留，库保持a3b3830干净，新记录待审查；Decode与正式依赖不变。
 
 ## 比较口径
 

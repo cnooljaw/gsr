@@ -4,9 +4,13 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## Pack 剩余目标游标实验（2026-10-18）
+
+上一轮诊断已提交为GSR 17996e0，提交后两库干净，未推送。只改packInto目标游标：推进剩余dst并从原packed起点返回，保留cap及FF/尾部/重叠规则。BCE总检查点未减少，ARM64汇编301→309行、栈帧112B不变；既有相关回归及17984组wire/cap/独占差分通过。固定原43项+原19形态，23808块独立复算一致。大型纯Pack+1.33%/+1.68%，大型和整数PEncode方向翻转，四/六非零长word约慢0.1μs；部分RPC/零场景改善与控制限制完整保留，综合撤回候选，不设最小收益比例。self49/62、clone38/62、累计方向不同/离群/字节尾差保留；最终全部Go源码与a3b3830相同、库干净，未重复未变生产的全验收。见 [Pack游标实验](benchmarks/2026-10-18-gosproto-pack-cursor/RESULTS.md)，新GSR记录未提交，Decode及正式依赖不变。
+
 ## 指针入口优化后的热点诊断（2026-10-18）
 
-上一轮记录已本地提交为GSR a391e42，提交后两库干净，未推送。从已提交a3b3830归档刷新四种输入的纯Encode/EncodePacked/RequestEncode+CancelSession，CPU各2秒、逐次分配另起进程各20000次，共24份profile；不作为A/B或PB/TS排名。整数数组Pack约34%/39%，大型记录预检/写出与Pack仍各自可见；父子累计不相加。大型三个入口3968B/2次，其中512B布局外溢，其余输入一次结果分配。4KiB ASCII及整数数组纯Encode的kevent/GC栈占比保留，不归因协议或据此排名。harness检查/vet/构建、选择/指纹及归档复现通过，库保持a3b3830干净，未重复生产全验收。见 [优化后热点报告](benchmarks/2026-10-18-gosproto-post-pointer-profile/RESULTS.md)，新诊断/文档未提交；下一轮先检查普通word Pack游标/BCE，再做单一候选，Decode和正式依赖不变。
+上一轮记录已本地提交为GSR a391e42，提交后两库干净，未推送。从已提交a3b3830归档刷新四种输入的纯Encode/EncodePacked/RequestEncode+CancelSession，CPU各2秒、逐次分配另起进程各20000次，共24份profile；不作为A/B或PB/TS排名。整数数组Pack约34%/39%，大型记录预检/写出与Pack仍各自可见；父子累计不相加。大型三个入口3968B/2次，其中512B布局外溢，其余输入一次结果分配。4KiB ASCII及整数数组纯Encode的kevent/GC栈占比保留，不归因协议或据此排名。harness检查/vet/构建、选择/指纹及归档复现通过，库保持a3b3830干净，未重复生产全验收。见 [优化后热点报告](benchmarks/2026-10-18-gosproto-post-pointer-profile/RESULTS.md)，该诊断已本地提交为GSR 17996e0，未推送；下一轮先检查普通word Pack游标/BCE，再做单一候选，Decode和正式依赖不变。
 
 ## nil 调用分支前移实验（2026-10-18）
 
