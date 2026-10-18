@@ -1,0 +1,9 @@
+{
+  "initialFinalAudit": {
+    "command": "git rev-parse HEAD in official source export",
+    "exitCode": 128,
+    "output": "fatal: not a git repository (or any of the parent directories): .git",
+    "diagnosis": "Official reference directory is an exported source tree without .git;not a checkout. No tests or measurements failed."
+  },
+  "resolution": "Verify all recorded C/Lua/header/shared-object SHA256 values directly. Commit e93fd5a is retained as recorded archive provenance,not a newly observed git HEAD."
+}

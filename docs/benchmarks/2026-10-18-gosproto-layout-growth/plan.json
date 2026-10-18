@@ -1,0 +1,30 @@
+{
+  "baselineCommit": "a161158",
+  "gsrCommit": "c201237",
+  "scope": "Only per-call encodeLayout overflow storage growth;local32,initial128,logical records,preflight/write order and API/wire/cap/ownership/error budgets unchanged. No new unsafe/cache/pool. Decode frozen.",
+  "candidate": "When overflow slice is full allocate max(128,2*oldCapacity),copy only existing entries,then append the new validated-in-progress record. Keep allocation lazy at original add call sites;never reserve from array length or MaxElements.",
+  "correctness": "Extend existing TestEncodeTracksCurrentValues over multiple growths;baseline/candidate related regressions;109-shape old/new raw/packed/RPC wire/cap/ownership and budget errors in isolated harness.",
+  "measurement": {
+    "modes": [
+      "self",
+      "clone",
+      "pass1",
+      "pass2"
+    ],
+    "blockMs": 10,
+    "cases": 70,
+    "growthCases": [
+      "flat/full/256",
+      "flat/full/512",
+      "flat/full/1024",
+      "flat/full/4096",
+      "flat/nil/4096",
+      "flat/half/4096",
+      "nested/32x32",
+      "nested/32x128",
+      "array_record/4096"
+    ],
+    "matrix": "Original43 body/manualframe/actualRPC/wide64 plus9 growth shapes x3 Encode/PEncode/request_cancel entries. All70 get same self/clone and two fixed compare passes. Controls include no-overflow small cases and unmodified pure Pack. Intermediate memory costs1057/4129 retained."
+  },
+  "assessment": "No minimum gain threshold. Weigh paired and cumulative real API ns,all raw/control flags,allocations,intermediate memory/CPU costs and simplicity. Fixed source/plan/probes before sampling;no retry/tuning/deleting outliers. Model alone is not speedup. If rejected verify fingerprint then restore only production encode.go,retain meaningful expanded existing test and report."
+}

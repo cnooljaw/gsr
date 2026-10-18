@@ -1,0 +1,15 @@
+{
+  "command": "go test -run '^(TestEncodeTracksCurrentValues|TestIntegerRecordArrayBudgetsAndTags|TestCodecBudgetBoundaries|TestLimitsBeforeAllocation|TestEncodePackedWorkspace|TestEncodePackedErrors|TestEncodePackedAllocation)$' -v . -timeout=1m",
+  "cwd": "/private/tmp/gsr-gosproto-fork",
+  "baseline": {
+    "production": "a161158",
+    "expandedExistingTest": true,
+    "exitCode": 0,
+    "packageSeconds": 0.821
+  },
+  "candidate": {
+    "exitCode": 0,
+    "packageSeconds": 0.36
+  },
+  "increment": "Extend existing current-value/old-output test to 96/1024/1056/4096 added child slots with three integer-array width/presence cases;no new Test function or implementation-specific capacity assertion."
+}
