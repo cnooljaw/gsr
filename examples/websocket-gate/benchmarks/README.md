@@ -58,7 +58,9 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 
 [优化后热点诊断](../../../docs/benchmarks/2026-10-18-gosproto-post-pointer-profile/RESULTS.md) 基于a3b3830，四种输入各纯Encode/EncodePacked/实际RPC，CPU与逐次内存分开采24份profile。整数数组Pack约34%/39%，大型仍有512B布局外溢；runtime/GC栈、初始化对象、插桩耗时与全部原值保留，不推导新排名。独立harness检查/vet/归档核对通过，生产未改、库干净；该诊断已本地提交为GSR 17996e0，未推送。下一轮先核对普通word Pack游标/BCE，不同时改记录或扩大unsafe。
 
-[Pack剩余目标游标](../../../docs/benchmarks/2026-10-18-gosproto-pack-cursor/RESULTS.md) 固定62项两轮，原43项业务加19种形态，相关回归与17984差分通过。检查点未减少、汇编略增加；主要PEncode方向翻转、密集长word约慢0.1μs，部分RPC/零场景收益保留，综合撤回候选。全部控制/原值/累计和恢复指纹保留，库保持a3b3830干净，新记录待审查；Decode与正式依赖不变。
+[Pack剩余目标游标](../../../docs/benchmarks/2026-10-18-gosproto-pack-cursor/RESULTS.md) 固定62项两轮，原43项业务加19种形态，相关回归与17984差分通过。检查点未减少、汇编略增加；主要PEncode方向翻转、密集长word约慢0.1μs，部分RPC/零场景收益保留，综合撤回候选。全部控制/原值/累计和恢复指纹保留，库保持a3b3830干净；该记录已本地提交为GSR 13d4609，未推送，Decode与正式依赖不变。
+
+[主循环密集前缀写出](../../../docs/benchmarks/2026-10-18-gosproto-pack-prefix-main/RESULTS.md) 核对旧helper候选后只重评当前主循环的目标位置计算，62项固定两轮。大型/整数Pack约快7%～10%，PEncode与真实RPC同向改善；小型稀疏约1～4ns代价和全部控制/累计/尾差保留。对象数中位数不变，相关回归/17984差分/官方/race/checkptr/vet/有限fuzz/GSR/GoTS验收通过，保留新代码待审查；不更新正式依赖或PB/TS排名。
 
 ## 比较口径
 

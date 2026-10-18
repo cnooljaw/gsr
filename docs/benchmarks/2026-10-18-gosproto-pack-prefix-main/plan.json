@@ -1,0 +1,41 @@
+{
+  "baselineCommit": "a3b3830",
+  "scope": "Only dense ordinary-word destination positions inside current packInto. Output offset/input cursor,mask extraction,sparse<=2 byte path,FF/tail,budgets,reserved overlap gap,wire/cap/ownership unchanged. No new unsafe/table/pool/cache/API.",
+  "candidate": "Replace serial destination index accumulation by byte-lane prefix sum ranks=(nonzero>>7)*0x0101010101010101. Eight stores retain same order and exact destination positions;advance offset by1+high-byte total. Reevaluate historical arithmetic in current inlined Pack loop/RPC workspace context,not old helper or timing baseline.",
+  "proof": "Flags are0/1 in byte lanes;all prefix sums<=8 so multiplication has no cross-lane carry. FullFF handled first,ordinary mask count<=7. Position before byte i equals1+sum(flags before i),matching old serial index. Same scratch writes/reservation and checked slices retained.",
+  "correctness": "Existing all-mask/high-byte/FF256/tail/zero golden Pack and EncodePacked overlap/wire/cap/ownership/errors/allocation;baseline then candidate. Reuse17984 old/new Pack differential. No implementation-mirroring test added.",
+  "measurement": {
+    "modes": [
+      "self",
+      "clone",
+      "pass1",
+      "pass2"
+    ],
+    "blockMs": 10,
+    "cases": 62,
+    "patterns": [
+      "n0_32",
+      "n1_32",
+      "n2_32",
+      "n4_32",
+      "n6_32",
+      "n8_32",
+      "n0_4096",
+      "n1_4096",
+      "n2_4096",
+      "n4_4096",
+      "n6_4096",
+      "n8_4096",
+      "ff_n6_4096",
+      "ff_n7_4096",
+      "ff_tail2047",
+      "ff_tail2048",
+      "ff_tail2049",
+      "ff_earlyzero4096",
+      "zero_run1x64"
+    ],
+    "matrix": "Original43 body/manualframe/actualRPC/wide64 unchanged,append19 existing regression patterns. Same self/clone controls for all62;6 pureEncode controls,56 Pack-affected cases. Original19 pattern contents unchanged apart from multiline Go formatting.",
+    "sameControlsForAllCases": true
+  },
+  "assessment": "No minimum percent threshold. Two fixed current-baseline passes,absolute ns,all control flags,allocations,realAPI and small/pattern costs. Original43+19 matrix unchanged. Preserve all outliers,cumulative ratios and historical failures. No tuning/retry after sampling. Old prefix experiment is contextual evidence only,not pooled timing or a valid current control."
+}

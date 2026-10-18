@@ -1,0 +1,34 @@
+[
+  {
+    "args": [
+      "go",
+      "test",
+      "-modfile=/private/tmp/gsr-next-codec.mod",
+      "./protocol/sproto",
+      "./examples/websocket-gate/cmd/debugserver",
+      "./examples/websocket-gate/benchmarks",
+      "-timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 2.1312584597617388,
+    "output": "ok  \tgithub.com/cnooljaw/gsr/protocol/sproto\t0.351s\nok  \tgithub.com/cnooljaw/gsr/examples/websocket-gate/cmd/debugserver\t0.481s\nok  \tgithub.com/cnooljaw/gsr/examples/websocket-gate/benchmarks\t0.798s\n"
+  },
+  {
+    "args": [
+      "npm",
+      "--prefix",
+      "examples/websocket-gate",
+      "run",
+      "test:sproto:integration"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {
+      "GOFLAGS": "-modfile=/private/tmp/gsr-next-codec.mod"
+    },
+    "exitCode": 0,
+    "elapsedSeconds": 2.7944503761827946,
+    "output": "\n> test:sproto:integration\n> npm run build && go build -o ../../tmp/sproto-echo ./cmd/debugserver && GSR_SPROTO_SERVER_BIN=../../tmp/sproto-echo node --test client/dist/sproto_client.test.js\n\n\n> build\n> tsc --project tsconfig.json\n\n\u2714 official Sproto vectors and safe integer boundary (1.770042ms)\n\u2714 official Sproto boolean and mixed signed int64 arrays (122.586792ms)\n\u2714 Sproto decoded results and unpacked buffers stay independent (3.941708ms)\n\u2714 Sproto sessions stay independent and close clears pending (1.199583ms)\n\u2714 Sproto pending and packet limits (66.442583ms)\n\u2714 Go/TS Sproto Echo Plain (441.583709ms)\n\u2714 Go/TS Sproto Echo MAC (32.453208ms)\n\u2139 tests 7\n\u2139 suites 0\n\u2139 pass 7\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 721.04625\n"
+  }
+]
