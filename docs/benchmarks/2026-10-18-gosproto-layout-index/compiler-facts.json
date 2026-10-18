@@ -1,0 +1,101 @@
+{
+  "pass1-before": {
+    "encodedIntegerRecordSize": {
+      "instructions": 276,
+      "stackFrameBytes": 144,
+      "growsliceCallSites": 1,
+      "makesliceCallSites": 1,
+      "panicCalls": 4
+    },
+    "encodedSize": {
+      "instructions": 552,
+      "stackFrameBytes": 272,
+      "growsliceCallSites": 1,
+      "makesliceCallSites": 1,
+      "panicCalls": 5
+    },
+    "packInto": {
+      "instructions": 296,
+      "stackFrameBytes": 112,
+      "growsliceCallSites": 0,
+      "makesliceCallSites": 0,
+      "panicCalls": 13
+    }
+  },
+  "pass1-candidate": {
+    "encodedIntegerRecordSize": {
+      "instructions": 256,
+      "stackFrameBytes": 112,
+      "growsliceCallSites": 0,
+      "makesliceCallSites": 1,
+      "panicCalls": 6
+    },
+    "encodedSize": {
+      "instructions": 532,
+      "stackFrameBytes": 272,
+      "growsliceCallSites": 0,
+      "makesliceCallSites": 1,
+      "panicCalls": 7
+    },
+    "packInto": {
+      "instructions": 296,
+      "stackFrameBytes": 112,
+      "growsliceCallSites": 0,
+      "makesliceCallSites": 0,
+      "panicCalls": 13
+    }
+  },
+  "pass2-before": {
+    "encodedIntegerRecordSize": {
+      "instructions": 276,
+      "stackFrameBytes": 144,
+      "growsliceCallSites": 1,
+      "makesliceCallSites": 1,
+      "panicCalls": 4
+    },
+    "encodedSize": {
+      "instructions": 552,
+      "stackFrameBytes": 272,
+      "growsliceCallSites": 1,
+      "makesliceCallSites": 1,
+      "panicCalls": 5
+    },
+    "packInto": {
+      "instructions": 296,
+      "stackFrameBytes": 112,
+      "growsliceCallSites": 0,
+      "makesliceCallSites": 0,
+      "panicCalls": 13
+    }
+  },
+  "pass2-candidate": {
+    "encodedIntegerRecordSize": {
+      "instructions": 256,
+      "stackFrameBytes": 112,
+      "growsliceCallSites": 0,
+      "makesliceCallSites": 1,
+      "panicCalls": 6
+    },
+    "encodedSize": {
+      "instructions": 532,
+      "stackFrameBytes": 272,
+      "growsliceCallSites": 0,
+      "makesliceCallSites": 1,
+      "panicCalls": 7
+    },
+    "packInto": {
+      "instructions": 296,
+      "stackFrameBytes": 112,
+      "growsliceCallSites": 0,
+      "makesliceCallSites": 0,
+      "panicCalls": 13
+    }
+  },
+  "packIntoIdenticalAcrossArmsAndPasses": true,
+  "compilerInlineCost": {
+    "baseline": 72,
+    "unmeasuredDraft": 81,
+    "fixedCandidate": 76
+  },
+  "preTimingDraft": "Direct-index draft cost81 exceeded80;equivalent max rule selected before measurements.No CPU sampling of draft."
+}

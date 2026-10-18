@@ -64,7 +64,9 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 
 [布局项数与增长诊断](../../../docs/benchmarks/2026-10-18-gosproto-layout-audit/RESULTS.md) 覆盖109形态/317入口，独立未插桩分配与48项数增长模型。大型99项外溢512B一次容纳，减小初始容量会增配；长数组增长值得实验，但中间长度代价、预算早期失败均保留。未测CPU、不改生产代码；诊断/vet/fixture/独立复算/归档核对通过，库保持a161158；该诊断已本地提交为GSR c201237，未推送。
 
-[布局按需倍增](../../../docs/benchmarks/2026-10-18-gosproto-layout-growth/RESULTS.md) 固定70项/四组，长数组真实入口与分配改善，4096个含整数数组记录的请求快约8.5%～8.9%、少75648B/4次分配。中间长度增配、常规追加/预检帧成本与所有控制失败/波动完整保留；既有扩展/525差分/官方/race/checkptr/vet/有限fuzz/GSR/GoTS通过，保留候选待审查，未提交，不改正式依赖或Decode。
+[布局按需倍增](../../../docs/benchmarks/2026-10-18-gosproto-layout-growth/RESULTS.md) 固定70项/四组，长数组真实入口与分配改善，4096个含整数数组记录的请求快约8.5%～8.9%、少75648B/4次分配。中间长度增配、常规追加/预检帧成本与所有控制失败/波动完整保留；既有扩展/525差分/官方/race/checkptr/vet/有限fuzz/GSR/GoTS通过，已本地提交为库bdfe1d0、GSR bf828b0，未推送，不改正式依赖或Decode。
+
+[布局连续索引写入](../../../docs/benchmarks/2026-10-18-gosproto-layout-index/RESULTS.md) 复用count保持容量序列，固定原70项四组。大型Encode/PEncode/真实请求约快2.5%～4.7%，全部分配中位数不变，整数记录预检帧144→112B；int32/手工帧代价、未改纯Pack波动及所有控制/累计原值保留。既有回归/525差分/官方/race/checkptr/vet/有限fuzz/GSR/GoTS7/7通过，保留候选待审查，未提交，正式依赖和Decode不变。
 
 ## 比较口径
 

@@ -1,0 +1,118 @@
+package benchmarks
+
+import (
+	"bytes"
+	"encoding/json"
+	"os"
+	"reflect"
+	"strings"
+	"testing"
+
+	sproto "github.com/cnooljaw/gosproto"
+	before "github.com/cnooljaw/gosproto-before"
+	"github.com/cnooljaw/gsr/examples/websocket-gate/gen/sproto/c2s"
+)
+
+type rpcProbePair struct {
+	name        string
+	left, right func() ([]byte, error)
+}
+
+func rpcProbePairs(t *testing.T, name string, message any, echoOnly bool) []rpcProbePair {
+	t.Helper()
+	typ := reflect.TypeOf(message)
+	oldNotify, err := before.NewRpc([]*before.Protocol{{Type: 1, Name: "frame", Request: typ}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	notify, err := sproto.NewRpc([]*sproto.Protocol{{Type: 1, Name: "frame", Request: typ}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	pairs := []rpcProbePair{{name + "/notification", func() ([]byte, error) {
+		return oldNotify.RequestEncode("frame", 0, message)
+	}, func() ([]byte, error) {
+		return notify.RequestEncode("frame", 0, message)
+	}}}
+	if echoOnly {
+		return pairs
+	}
+	oldCall, err := before.NewRpc([]*before.Protocol{{Type: 1, Name: "frame", Request: typ, Response: typ}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	call, err := sproto.NewRpc([]*sproto.Protocol{{Type: 1, Name: "frame", Request: typ, Response: typ}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	return append(pairs,
+		rpcProbePair{name + "/request_cancel", func() ([]byte, error) {
+			packet, err := oldCall.RequestEncode("frame", 1, message)
+			oldCall.CancelSession(1)
+			return packet, err
+		}, func() ([]byte, error) {
+			packet, err := call.RequestEncode("frame", 1, message)
+			call.CancelSession(1)
+			return packet, err
+		}},
+		rpcProbePair{name + "/response", func() ([]byte, error) {
+			return oldCall.ResponseEncode("frame", 1, message)
+		}, func() ([]byte, error) {
+			return call.ResponseEncode("frame", 1, message)
+		}},
+	)
+}
+
+// pairOperations 使用真实 RPC 编码 API；有响应请求的两边都计入 CancelSession，保持等待有界。
+func pairOperations(t *testing.T, mode string) []pairOperation {
+	t.Helper()
+	var rpcPairs []rpcProbePair
+	for _, sample := range representativeCases(t) {
+		_, wires := representativeOperations(t, sample)
+		checkRepresentativeWire(t, sample, wires)
+		_, factory := representativeMessages(sample.Type)
+		message := factory()
+		if err := json.Unmarshal(sample.Data, message); err != nil {
+			t.Fatal(err)
+		}
+		rpcPairs = append(rpcPairs, rpcProbePairs(t, sample.Name, message, false)...)
+	}
+	contents, err := os.ReadFile("cases.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var echoCases []benchmarkCase
+	if err := json.Unmarshal(contents, &echoCases); err != nil {
+		t.Fatal(err)
+	}
+	for _, sample := range echoCases {
+		text := strings.Repeat(sample.Pattern, sample.Repeat)
+		rpcPairs = append(rpcPairs, rpcProbePairs(t, sample.Name, &c2s.EchoRequest{Text: &text}, true)...)
+	}
+	var operations []pairOperation
+	for _, pair := range rpcPairs {
+		left, err := pair.left()
+		if err != nil {
+			t.Fatal(err)
+		}
+		right, err := pair.right()
+		if err != nil || !bytes.Equal(left, right) || cap(left) != cap(right) {
+			t.Fatalf("RPC wire/cap %s err=%v", pair.name, err)
+		}
+		runRight := func() error {
+			var err error
+			encodedSink, err = pair.right()
+			return err
+		}
+		runLeft := func() error {
+			var err error
+			encodedSink, err = pair.left()
+			return err
+		}
+		if mode == "self" {
+			runLeft = runRight
+		}
+		operations = append(operations, pairOperation{pair.name, runLeft, runRight})
+	}
+	return operations
+}
