@@ -1,0 +1,19 @@
+{
+  "baselineCommit": "bd1976a",
+  "scope": "Only integer-record helper entry and its two validated array callers; reuse existing encodePointer. No changes to field loops,metadata guards,budgets,Pack,RPC or Decode.",
+  "candidate": "Move messageEncodePointer(value.Index(i),childBinding) to validated integers branches; helper accepts encodePointer and checks pointer.value==nil instead of reflect.Value.IsNil. No new unsafe primitive,cache or lifetime.",
+  "correctness": "Existing shuffled declaration/ignored field record fixture,nil/empty records,sparse tags,exact byte/depth/element budgets,current values,native offset GC and metadata substitution tests; no duplicate fixture added.",
+  "measurement": {
+    "blockMs": 10,
+    "modes": [
+      "self",
+      "clone",
+      "pass1",
+      "pass2"
+    ],
+    "cases": 43,
+    "matrix": "Exactly previous19 body/manual-frame +19 actualRPC +5 wide64 diagnostic cases,unchanged probes. Target10 cases:game_small/game_large bodyEncode/PEncode and3RPCroles;other33 controls.",
+    "sameControlsForAllCases": true
+  },
+  "assessment": "No minimum gain threshold. Assess both fixed passes,absolute ns,allA/Aflags,small/non-target costs and2-line production delta. Retain prior Pack+9.45percent as unresolved historical observation;currentcontrol is new baseline0c1f6cf versus new candidate,not a rerun to erase it. No tuning/retries after sampling."
+}

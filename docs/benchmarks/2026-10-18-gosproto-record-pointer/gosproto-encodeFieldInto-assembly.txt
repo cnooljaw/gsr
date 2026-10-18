@@ -1,0 +1,865 @@
+TEXT github.com/cnooljaw/gosproto.encodeFieldInto(SB) /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-pointer/inspect/pass1/candidate/encode.go
+  encode.go:169		0x10020d2f0		f9400b90		MOVD 16(R28), R16						
+  encode.go:169		0x10020d2f4		d10143f1		SUB $80, RSP, R17						
+  encode.go:169		0x10020d2f8		eb10023f		CMP R16, R17							
+  encode.go:169		0x10020d2fc		540069c9		BLS 846(PC)							
+  encode.go:169		0x10020d300		f8130ffe		MOVD.W R30, -208(RSP)						
+  encode.go:169		0x10020d304		f81f83fd		MOVD R29, -8(RSP)						
+  encode.go:169		0x10020d308		d10023fd		SUB $8, RSP, R29						
+  encode.go:169		0x10020d30c		f90073e1		MOVD R1, 224(RSP)						
+  encode.go:169		0x10020d310		f90077e2		MOVD R2, 232(RSP)						
+  encode.go:170		0x10020d314		f9006fe0		MOVD R0, 216(RSP)						
+  encode.go:170		0x10020d318		f9008be7		MOVD R7, 272(RSP)						
+  encode.go:170		0x10020d31c		f90087e6		MOVD R6, 264(RSP)						
+  encode.go:170		0x10020d320		f90083e5		MOVD R5, 256(RSP)						
+  encode.go:170		0x10020d324		f9007fe4		MOVD R4, 248(RSP)						
+  encode.go:170		0x10020d328		f90057e3		MOVD R3, 168(RSP)						
+  encode.go:170		0x10020d32c		f90063e2		MOVD R2, 192(RSP)						
+  encode.go:170		0x10020d330		f9005fe1		MOVD R1, 184(RSP)						
+  encode.go:170		0x10020d334		3940e00a		MOVBU 56(R0), R10						
+  encode.go:170		0x10020d338		3600170a		TBZ $0, R10, 184(PC)						
+  value.go:86		0x10020d33c		92401069		AND $31, R3, R9							
+  value.go:86		0x10020d340		f90053e9		MOVD R9, 160(RSP)						
+  value.go:1758		0x10020d344		f1005d3f		CMP $23, R9							
+  value.go:1758		0x10020d348		54000061		BNE 3(PC)							
+  value.go:1759		0x10020d34c		f940044a		MOVD 8(R2), R10							
+  encode.go:171		0x10020d350		14000011		JMP 17(PC)							
+  encode.go:170		0x10020d354		390463e8		MOVB R8, 280(RSP)						
+  value.go:1761		0x10020d358		aa0103e0		MOVD R1, R0							
+  value.go:1761		0x10020d35c		aa0203e1		MOVD R2, R1							
+  value.go:1761		0x10020d360		aa0303e2		MOVD R3, R2							
+  value.go:1761		0x10020d364		97fae4df		CALL reflect.Value.lenNonSlice(SB)				
+  encode_pointer.go:31	0x10020d368		f9405fe1		MOVD 184(RSP), R1						
+  value.go:1759		0x10020d36c		f94063e2		MOVD 192(RSP), R2						
+  encode_pointer.go:31	0x10020d370		f94057e3		MOVD 168(RSP), R3						
+  encode.go:192		0x10020d374		f9407fe4		MOVD 248(RSP), R4						
+  encode.go:192		0x10020d378		f94083e5		MOVD 256(RSP), R5						
+  encode.go:195		0x10020d37c		f94087e6		MOVD 264(RSP), R6						
+  encode.go:49		0x10020d380		f9408be7		MOVD 272(RSP), R7						
+  encode_pointer.go:28	0x10020d384		394463e8		MOVBU 280(RSP), R8						
+  value.go:1758		0x10020d388		f94053e9		MOVD 160(RSP), R9						
+  encode.go:171		0x10020d38c		aa0003ea		MOVD R0, R10							
+  encode.go:175		0x10020d390		f9406fe0		MOVD 216(RSP), R0						
+  encode.go:171		0x10020d394		b40013aa		CBZ R10, 157(PC)						
+  encode.go:175		0x10020d398		f940140a		MOVD 40(R0), R10						
+  encode.go:175		0x10020d39c		f940100b		MOVD 32(R0), R11						
+  encode.go:191		0x10020d3a0		f100195f		CMP $6, R10							
+  encode.go:191		0x10020d3a4		54000881		BNE 68(PC)							
+  encode.go:191		0x10020d3a8		b940016a		MOVWU (R11), R10						
+  encode.go:191		0x10020d3ac		d28dec8c		MOVD $28516, R12						
+  encode.go:191		0x10020d3b0		f2ac4eac		MOVK $(25205<<16), R12						
+  encode.go:191		0x10020d3b4		6b0c015f		CMPW R12, R10							
+  encode.go:191		0x10020d3b8		540001a1		BNE 13(PC)							
+  encode.go:191		0x10020d3bc		7940096c		MOVHU 4(R11), R12						
+  encode.go:191		0x10020d3c0		d28cad8d		MOVD $25964, R13						
+  encode.go:191		0x10020d3c4		6b0d019f		CMPW R13, R12							
+  encode.go:191		0x10020d3c8		54000121		BNE 9(PC)							
+  encode.go:192		0x10020d3cc		f10000bf		CMP $0, R5							
+  encode.go:192		0x10020d3d0		540062a9		BLS 789(PC)							
+  encode.go:192		0x10020d3d4		b27d03e7		ORR $8, ZR, R7							
+  encode.go:192		0x10020d3d8		39000087		MOVB R7, (R4)							
+  value.go:1758		0x10020d3dc		f1005d3f		CMP $23, R9							
+  value.go:1758		0x10020d3e0		aa1f03e0		MOVD ZR, R0							
+  value.go:1758		0x10020d3e4		b24003e7		ORR $1, ZR, R7							
+  encode.go:194		0x10020d3e8		140002c6		JMP 710(PC)							
+  encode.go:207		0x10020d3ec		d28e8e6c		MOVD $29811, R12						
+  encode.go:207		0x10020d3f0		f2ad2e4c		MOVK $(26994<<16), R12						
+  encode.go:207		0x10020d3f4		6b0c015f		CMPW R12, R10							
+  encode.go:207		0x10020d3f8		54000121		BNE 9(PC)							
+  encode.go:207		0x10020d3fc		7940096c		MOVHU 4(R11), R12						
+  encode.go:207		0x10020d400		d28cedcd		MOVD $26478, R13						
+  encode.go:207		0x10020d404		6b0d019f		CMPW R13, R12							
+  encode.go:207		0x10020d408		540000a1		BNE 5(PC)							
+  value.go:1758		0x10020d40c		f1005d3f		CMP $23, R9							
+  value.go:1758		0x10020d410		aa1f03e0		MOVD ZR, R0							
+  value.go:1758		0x10020d414		aa1f03e7		MOVD ZR, R7							
+  encode.go:207		0x10020d418		14000256		JMP 598(PC)							
+  encode.go:213		0x10020d41c		d28e8e6c		MOVD $29811, R12						
+  encode.go:213		0x10020d420		f2aeae4c		MOVK $(30066<<16), R12						
+  encode.go:213		0x10020d424		6b0c015f		CMPW R12, R10							
+  encode.go:213		0x10020d428		54000ec1		BNE 118(PC)							
+  encode.go:213		0x10020d42c		7940096a		MOVHU 4(R11), R10						
+  encode.go:213		0x10020d430		d28e8c6b		MOVD $29795, R11						
+  encode.go:213		0x10020d434		6b0b015f		CMPW R11, R10							
+  encode.go:213		0x10020d438		54000e41		BNE 114(PC)							
+  value.go:1758		0x10020d43c		f1005d3f		CMP $23, R9							
+  encode_pointer.go:28	0x10020d440		360000a8		TBZ $0, R8, 5(PC)						
+  encode_pointer.go:29	0x10020d444		f9402008		MOVD 64(R0), R8							
+  encode_pointer.go:23	0x10020d448		3941c108		MOVBU 112(R8), R8						
+  encode_pointer.go:23	0x10020d44c		b24003ea		ORR $1, ZR, R10							
+  encode.go:214		0x10020d450		1400000f		JMP 15(PC)							
+  encode_pointer.go:31	0x10020d454		94000613		CALL github.com/cnooljaw/gosproto.checkEncodeChild(SB)		
+  value.go:1758		0x10020d458		f94053e4		MOVD 160(RSP), R4						
+  value.go:1758		0x10020d45c		f1005c9f		CMP $23, R4							
+  value.go:1759		0x10020d460		f94063e2		MOVD 192(RSP), R2						
+  encode.go:219		0x10020d464		f94057e3		MOVD 168(RSP), R3						
+  encode.go:222		0x10020d468		f9407fe4		MOVD 248(RSP), R4						
+  encode.go:222		0x10020d46c		f94083e5		MOVD 256(RSP), R5						
+  encode.go:222		0x10020d470		f94087e6		MOVD 264(RSP), R6						
+  encode.go:222		0x10020d474		f9408be7		MOVD 272(RSP), R7						
+  value.go:1758		0x10020d478		f94053e9		MOVD 160(RSP), R9						
+  encode.go:214		0x10020d47c		aa0103e8		MOVD R1, R8							
+  encode.go:214		0x10020d480		aa0003ea		MOVD R0, R10							
+  encode.go:215		0x10020d484		f9406fe0		MOVD 216(RSP), R0						
+  encode.go:219		0x10020d488		f9405fe1		MOVD 184(RSP), R1						
+  encode.go:215		0x10020d48c		36000108		TBZ $0, R8, 8(PC)						
+  encode.go:215		0x10020d490		f940200b		MOVD 64(R0), R11						
+  encode.go:215		0x10020d494		3941c56c		MOVBU 113(R11), R12						
+  encode.go:215		0x10020d498		360000ac		TBZ $0, R12, 5(PC)						
+  encode_pointer.go:48	0x10020d49c		f940256c		MOVD 72(R11), R12						
+  encode_pointer.go:48	0x10020d4a0		f940216d		MOVD 64(R11), R13						
+  encode_pointer.go:48	0x10020d4a4		aa1f03ee		MOVD ZR, R14							
+  encode_pointer.go:48	0x10020d4a8		140001f2		JMP 498(PC)							
+  encode_pointer.go:48	0x10020d4ac		aa1f03eb		MOVD ZR, R11							
+  encode.go:215		0x10020d4b0		14000165		JMP 357(PC)							
+  encode.go:198		0x10020d4b4		f1001d5f		CMP $7, R10							
+  encode.go:198		0x10020d4b8		54000a41		BNE 82(PC)							
+  encode.go:198		0x10020d4bc		b9400168		MOVWU (R11), R8							
+  encode.go:198		0x10020d4c0		d28dec4a		MOVD $28514, R10						
+  encode.go:198		0x10020d4c4		f2ad8dea		MOVK $(27759<<16), R10						
+  encode.go:198		0x10020d4c8		6b0a011f		CMPW R10, R8							
+  encode.go:198		0x10020d4cc		54000161		BNE 11(PC)							
+  encode.go:198		0x10020d4d0		7940096a		MOVHU 4(R11), R10						
+  encode.go:198		0x10020d4d4		d28c2cac		MOVD $24933, R12						
+  encode.go:198		0x10020d4d8		6b0c015f		CMPW R12, R10							
+  encode.go:198		0x10020d4dc		540000e1		BNE 7(PC)							
+  encode.go:198		0x10020d4e0		3940196a		MOVBU 6(R11), R10						
+  encode.go:198		0x10020d4e4		7101b95f		CMPW $110, R10							
+  encode.go:198		0x10020d4e8		54000081		BNE 4(PC)							
+  value.go:1758		0x10020d4ec		f1005d3f		CMP $23, R9							
+  value.go:1758		0x10020d4f0		aa1f03e0		MOVD ZR, R0							
+  encode.go:198		0x10020d4f4		14000111		JMP 273(PC)							
+  encode.go:176		0x10020d4f8		d28dcd2a		MOVD $28265, R10						
+  encode.go:176		0x10020d4fc		f2acae8a		MOVK $(25972<<16), R10						
+  encode.go:176		0x10020d500		6b0a011f		CMPW R10, R8							
+  encode.go:176		0x10020d504		540007e1		BNE 63(PC)							
+  encode.go:176		0x10020d508		79400968		MOVHU 4(R11), R8						
+  encode.go:176		0x10020d50c		d28cacea		MOVD $25959, R10						
+  encode.go:176		0x10020d510		6b0a011f		CMPW R10, R8							
+  encode.go:176		0x10020d514		54000761		BNE 59(PC)							
+  encode.go:176		0x10020d518		39401968		MOVBU 6(R11), R8						
+  encode.go:176		0x10020d51c		7101c91f		CMPW $114, R8							
+  encode.go:176		0x10020d520		54000701		BNE 56(PC)							
+  encode.go:49		0x10020d524		f94050e8		MOVD 160(R7), R8						
+  encode.go:50		0x10020d528		9100050a		ADD $1, R8, R10							
+  encode.go:50		0x10020d52c		f90050ea		MOVD R10, 160(R7)						
+  encode.go:51		0x10020d530		f100811f		CMP $32, R8							
+  encode.go:51		0x10020d534		5400008a		BGE 4(PC)							
+  encode.go:52		0x10020d538		54001ea2		BCS 245(PC)							
+  encode.go:52		0x10020d53c		b86878e7		MOVWU (R7)(R8<<2), R7						
+  encode.go:177		0x10020d540		14000008		JMP 8(PC)							
+  encode.go:54		0x10020d544		f94044ea		MOVD 136(R7), R10						
+  encode.go:54		0x10020d548		d1008108		SUB $32, R8, R8							
+  encode.go:54		0x10020d54c		eb08015f		CMP R8, R10							
+  encode.go:54		0x10020d550		54001d89		BLS 236(PC)							
+  encode.go:54		0x10020d554		f94040ea		MOVD 128(R7), R10						
+  encode.go:54		0x10020d558		b8687948		MOVWU (R10)(R8<<2), R8						
+  encode.go:54		0x10020d55c		aa0803e7		MOVD R8, R7							
+  encode.go:177		0x10020d560		f90033e7		MOVD R7, 96(RSP)						
+  encode.go:178		0x10020d564		39420008		MOVBU 128(R0), R8						
+  encode.go:178		0x10020d568		370000e8		TBNZ $0, R8, 7(PC)						
+  encode.go:181		0x10020d56c		f10000bf		CMP $0, R5							
+  encode.go:181		0x10020d570		54001c29		BLS 225(PC)							
+  encode.go:181		0x10020d574		39000087		MOVB R7, (R4)							
+  value.go:1758		0x10020d578		f1005d3f		CMP $23, R9							
+  value.go:1758		0x10020d57c		aa1f03e8		MOVD ZR, R8							
+  encode.go:182		0x10020d580		1400007c		JMP 124(PC)							
+  encode.go:179		0x10020d584		aa0103e0		MOVD R1, R0							
+  encode.go:179		0x10020d588		aa0203e1		MOVD R2, R1							
+  encode.go:179		0x10020d58c		aa0303e2		MOVD R3, R2							
+  encode.go:179		0x10020d590		97fad478		CALL reflect.Value.Addr(SB)					
+  value.go:1484		0x10020d594		b24003e3		ORR $1, ZR, R3							
+  value.go:1484		0x10020d598		97fb0052		CALL reflect.valueInterface(SB)					
+  encode.go:179		0x10020d59c		d0000563		ADRP 712704(PC), R3						
+  encode.go:179		0x10020d5a0		91060063		ADD $384, R3, R3						
+  encode.go:179		0x10020d5a4		eb03001f		CMP R3, R0							
+  encode.go:179		0x10020d5a8		54000c41		BNE 98(PC)							
+  encode.go:270		0x10020d5ac		f94083e2		MOVD 256(RSP), R2						
+  encode.go:270		0x10020d5b0		f100005f		CMP $0, R2							
+  encode.go:270		0x10020d5b4		54000b89		BLS 92(PC)							
+  encode.go:271		0x10020d5b8		f94087e3		MOVD 264(RSP), R3						
+  encode.go:271		0x10020d5bc		d1000463		SUB $1, R3, R3							
+  encode.go:271		0x10020d5c0		cb0303e4		NEG R3, R4							
+  encode.go:271		0x10020d5c4		937ffc84		ASR $63, R4, R4							
+  encode.go:271		0x10020d5c8		92400084		AND $1, R4, R4							
+  encode.go:179		0x10020d5cc		f9400425		MOVD 8(R1), R5							
+  encode.go:179		0x10020d5d0		f9400026		MOVD (R1), R6							
+  encode.go:270		0x10020d5d4		f94033e7		MOVD 96(RSP), R7						
+  encode.go:270		0x10020d5d8		f9407fe8		MOVD 248(RSP), R8						
+  encode.go:270		0x10020d5dc		39000107		MOVB R7, (R8)							
+  encode.go:271		0x10020d5e0		8b040104		ADD R4, R8, R4							
+  encode.go:271		0x10020d5e4		d1000442		SUB $1, R2, R2							
+  encode.go:272		0x10020d5e8		f10010ff		CMP $4, R7							
+  encode.go:272		0x10020d5ec		54000061		BNE 3(PC)							
+  encode.go:272		0x10020d5f0		aa1f03e0		MOVD ZR, R0							
+  encode.go:273		0x10020d5f4		14000042		JMP 66(PC)							
+  encode.go:273		0x10020d5f8		aa1f03e0		MOVD ZR, R0							
+  encode.go:278		0x10020d5fc		14000028		JMP 40(PC)							
+  encode.go:278		0x10020d600		aa1f03e0		MOVD ZR, R0							
+  encode.go:175		0x10020d604		1400001b		JMP 27(PC)							
+  encode.go:172		0x10020d608		aa1f03e0		MOVD ZR, R0							
+  encode.go:172		0x10020d60c		f85f83fd		MOVD -8(RSP), R29						
+  encode.go:172		0x10020d610		f84d07fe		MOVD.P 208(RSP), R30						
+  encode.go:172		0x10020d614		d65f03c0		RET								
+  encode_pointer.go:28	0x10020d618		360000a8		TBZ $0, R8, 5(PC)						
+  encode_pointer.go:29	0x10020d61c		f940200a		MOVD 64(R0), R10						
+  encode_pointer.go:23	0x10020d620		3941c14a		MOVBU 112(R10), R10						
+  encode_pointer.go:23	0x10020d624		b24003e8		ORR $1, ZR, R8							
+  encode.go:230		0x10020d628		1400000c		JMP 12(PC)							
+  encode_pointer.go:31	0x10020d62c		9400059d		CALL github.com/cnooljaw/gosproto.checkEncodeChild(SB)		
+  encode.go:230		0x10020d630		f94063e2		MOVD 192(RSP), R2						
+  encode.go:230		0x10020d634		f94057e3		MOVD 168(RSP), R3						
+  encode.go:230		0x10020d638		f9407fe4		MOVD 248(RSP), R4						
+  encode.go:230		0x10020d63c		f94083e5		MOVD 256(RSP), R5						
+  encode.go:230		0x10020d640		f94087e6		MOVD 264(RSP), R6						
+  encode.go:230		0x10020d644		f9408be7		MOVD 272(RSP), R7						
+  encode.go:230		0x10020d648		aa0103ea		MOVD R1, R10							
+  encode.go:230		0x10020d64c		aa0003e8		MOVD R0, R8							
+  encode.go:230		0x10020d650		f9406fe0		MOVD 216(RSP), R0						
+  encode.go:230		0x10020d654		f9405fe1		MOVD 184(RSP), R1						
+  encode.go:230		0x10020d658		f9402000		MOVD 64(R0), R0							
+  encode.go:230		0x10020d65c		aa0a03e9		MOVD R10, R9							
+  encode.go:230		0x10020d660		97fffd04		CALL github.com/cnooljaw/gosproto.encodeMessageInto(SB)		
+  encode.go:230		0x10020d664		f85f83fd		MOVD -8(RSP), R29						
+  encode.go:230		0x10020d668		f84d07fe		MOVD.P 208(RSP), R30						
+  encode.go:230		0x10020d66c		d65f03c0		RET								
+  encode.go:228		0x10020d670		f85f83fd		MOVD -8(RSP), R29						
+  encode.go:228		0x10020d674		f84d07fe		MOVD.P 208(RSP), R30						
+  encode.go:228		0x10020d678		d65f03c0		RET								
+  binary.go:124		0x10020d67c		f9000088		MOVD R8, (R4)							
+  encode.go:280		0x10020d680		d1002063		SUB $8, R3, R3							
+  encode.go:280		0x10020d684		cb0303e8		NEG R3, R8							
+  encode.go:280		0x10020d688		937ffd08		ASR $63, R8, R8							
+  encode.go:280		0x10020d68c		927d0108		AND $8, R8, R8							
+  encode.go:278		0x10020d690		91000400		ADD $1, R0, R0							
+  encode.go:280		0x10020d694		8b040104		ADD R4, R8, R4							
+  encode.go:280		0x10020d698		d1002042		SUB $8, R2, R2							
+  encode.go:278		0x10020d69c		eb05001f		CMP R5, R0							
+  encode.go:278		0x10020d6a0		540000ea		BGE 7(PC)							
+  encode.go:278		0x10020d6a4		f86078c8		MOVD (R6)(R0<<3), R8						
+  encode.go:279		0x10020d6a8		d503201f		NOOP								
+  encode.go:66		0x10020d6ac		d503201f		NOOP								
+  binary.go:123		0x10020d6b0		f1001c5f		CMP $7, R2							
+  binary.go:123		0x10020d6b4		54fffe48		BHI -14(PC)							
+  binary.go:123		0x10020d6b8		14000006		JMP 6(PC)							
+  encode.go:283		0x10020d6bc		9b057ce1		MUL R5, R7, R1							
+  encode.go:283		0x10020d6c0		91000420		ADD $1, R1, R0							
+  encode.go:179		0x10020d6c4		f85f83fd		MOVD -8(RSP), R29						
+  encode.go:179		0x10020d6c8		f84d07fe		MOVD.P 208(RSP), R30						
+  encode.go:179		0x10020d6cc		d65f03c0		RET								
+  binary.go:123		0x10020d6d0		b2400be0		ORR $7, ZR, R0							
+  binary.go:123		0x10020d6d4		aa0203e1		MOVD R2, R1							
+  binary.go:123		0x10020d6d8		97f9ada2		CALL runtime.panicIndex(SB)					
+  binary.go:98		0x10020d6dc		b9000088		MOVW R8, (R4)							
+  encode.go:275		0x10020d6e0		d1001063		SUB $4, R3, R3							
+  encode.go:275		0x10020d6e4		cb0303e8		NEG R3, R8							
+  encode.go:275		0x10020d6e8		937ffd08		ASR $63, R8, R8							
+  encode.go:275		0x10020d6ec		927e0108		AND $4, R8, R8							
+  encode.go:273		0x10020d6f0		91000400		ADD $1, R0, R0							
+  encode.go:275		0x10020d6f4		8b080084		ADD R8, R4, R4							
+  encode.go:275		0x10020d6f8		d1001042		SUB $4, R2, R2							
+  encode.go:273		0x10020d6fc		eb05001f		CMP R5, R0							
+  encode.go:273		0x10020d700		54fffdea		BGE -17(PC)							
+  encode.go:273		0x10020d704		f86078c8		MOVD (R6)(R0<<3), R8						
+  encode.go:274		0x10020d708		d503201f		NOOP								
+  encode.go:62		0x10020d70c		d503201f		NOOP								
+  binary.go:97		0x10020d710		f1000c5f		CMP $3, R2							
+  binary.go:97		0x10020d714		54fffe48		BHI -14(PC)							
+  binary.go:97		0x10020d718		b24007e0		ORR $3, ZR, R0							
+  binary.go:97		0x10020d71c		aa0203e1		MOVD R2, R1							
+  binary.go:97		0x10020d720		97f9ad90		CALL runtime.panicIndex(SB)					
+  encode.go:270		0x10020d724		aa1f03e0		MOVD ZR, R0							
+  encode.go:270		0x10020d728		aa0003e1		MOVD R0, R1							
+  encode.go:270		0x10020d72c		97f9ad8d		CALL runtime.panicIndex(SB)					
+  encode.go:179		0x10020d730		aa0303e1		MOVD R3, R1							
+  encode.go:179		0x10020d734		90000602		ADRP 786432(PC), R2						
+  encode.go:179		0x10020d738		91258042		ADD $2400, R2, R2						
+  encode.go:179		0x10020d73c		97f80a65		CALL runtime.panicdottypeE(SB)					
+  encode.go:182		0x10020d740		910004aa		ADD $1, R5, R10							
+  encode.go:182		0x10020d744		f94057e3		MOVD 168(RSP), R3						
+  encode.go:182		0x10020d748		f9405fe0		MOVD 184(RSP), R0						
+  encode.go:182		0x10020d74c		f94063e2		MOVD 192(RSP), R2						
+  encode.go:183		0x10020d750		f9406fe0		MOVD 216(RSP), R0						
+  encode.go:183		0x10020d754		f9405fe1		MOVD 184(RSP), R1						
+  binary.go:98		0x10020d758		aa0803e4		MOVD R8, R4							
+  encode.go:185		0x10020d75c		f94083e5		MOVD 256(RSP), R5						
+  encode.go:185		0x10020d760		aa0703e6		MOVD R7, R6							
+  encode.go:190		0x10020d764		f94033e7		MOVD 96(RSP), R7						
+  value.go:1758		0x10020d768		f94053e9		MOVD 160(RSP), R9						
+  encode.go:182		0x10020d76c		aa0a03e8		MOVD R10, R8							
+  encode.go:182		0x10020d770		f9004be8		MOVD R8, 144(RSP)						
+  value.go:1758		0x10020d774		54000061		BNE 3(PC)							
+  value.go:1759		0x10020d778		f940044a		MOVD 8(R2), R10							
+  encode.go:182		0x10020d77c		14000010		JMP 16(PC)							
+  value.go:1761		0x10020d780		aa0103e0		MOVD R1, R0							
+  value.go:1761		0x10020d784		aa0203e1		MOVD R2, R1							
+  value.go:1761		0x10020d788		aa0303e2		MOVD R3, R2							
+  value.go:1761		0x10020d78c		97fae3d5		CALL reflect.Value.lenNonSlice(SB)				
+  encode.go:183		0x10020d790		f9405fe1		MOVD 184(RSP), R1						
+  encode.go:183		0x10020d794		f94063e2		MOVD 192(RSP), R2						
+  encode.go:183		0x10020d798		f94057e3		MOVD 168(RSP), R3						
+  binary.go:98		0x10020d79c		f9407fe4		MOVD 248(RSP), R4						
+  encode.go:185		0x10020d7a0		f94083e5		MOVD 256(RSP), R5						
+  encode.go:185		0x10020d7a4		f94087e6		MOVD 264(RSP), R6						
+  encode.go:190		0x10020d7a8		f94033e7		MOVD 96(RSP), R7						
+  encode.go:182		0x10020d7ac		f9404be8		MOVD 144(RSP), R8						
+  value.go:1758		0x10020d7b0		f94053e9		MOVD 160(RSP), R9						
+  encode.go:182		0x10020d7b4		aa0003ea		MOVD R0, R10							
+  encode.go:183		0x10020d7b8		f9406fe0		MOVD 216(RSP), R0						
+  encode.go:182		0x10020d7bc		eb0a011f		CMP R10, R8							
+  encode.go:182		0x10020d7c0		540006ca		BGE 54(PC)							
+  encode.go:183		0x10020d7c4		aa0103e0		MOVD R1, R0							
+  encode.go:183		0x10020d7c8		aa0203e1		MOVD R2, R1							
+  encode.go:183		0x10020d7cc		aa0303e2		MOVD R3, R2							
+  encode.go:183		0x10020d7d0		aa0803e3		MOVD R8, R3							
+  encode.go:183		0x10020d7d4		97fae047		CALL reflect.Value.Index(SB)					
+  encode.go:183		0x10020d7d8		aa0203e3		MOVD R2, R3							
+  encode.go:183		0x10020d7dc		aa0103e2		MOVD R1, R2							
+  encode.go:183		0x10020d7e0		aa0003e1		MOVD R0, R1							
+  encode.go:183		0x10020d7e4		f9406fe0		MOVD 216(RSP), R0						
+  encode.go:183		0x10020d7e8		97fffc32		CALL github.com/cnooljaw/gosproto.integerBits(SB)		
+  encode.go:184		0x10020d7ec		f94033e4		MOVD 96(RSP), R4						
+  encode.go:184		0x10020d7f0		f100109f		CMP $4, R4							
+  encode.go:184		0x10020d7f4		540002a1		BNE 21(PC)							
+  encode.go:185		0x10020d7f8		f9404be5		MOVD 144(RSP), R5						
+  encode.go:185		0x10020d7fc		d37ef4a6		LSL $2, R5, R6							
+  encode.go:185		0x10020d800		910004c6		ADD $1, R6, R6							
+  encode.go:185		0x10020d804		f94083e1		MOVD 256(RSP), R1						
+  encode.go:185		0x10020d808		eb06003f		CMP R6, R1							
+  encode.go:185		0x10020d80c		54000703		BCC 56(PC)							
+  encode.go:185		0x10020d810		f94087e7		MOVD 264(RSP), R7						
+  encode.go:185		0x10020d814		cb0508e8		SUB R5<<2, R7, R8						
+  encode.go:185		0x10020d818		cb050829		SUB R5<<2, R1, R9						
+  encode.go:185		0x10020d81c		d1000529		SUB $1, R9, R9							
+  encode.go:185		0x10020d820		d1000508		SUB $1, R8, R8							
+  encode.go:185		0x10020d824		cb0803e8		NEG R8, R8							
+  encode.go:185		0x10020d828		8a88fcc6		AND R8->63, R6, R6						
+  binary.go:97		0x10020d82c		f1000d3f		CMP $3, R9							
+  binary.go:97		0x10020d830		54000589		BLS 44(PC)							
+  binary.go:98		0x10020d834		f9407fe8		MOVD 248(RSP), R8						
+  binary.go:98		0x10020d838		b8266900		MOVW R0, (R8)(R6)						
+  value.go:1758		0x10020d83c		f94053e6		MOVD 160(RSP), R6						
+  value.go:1758		0x10020d840		f1005cdf		CMP $23, R6							
+  encode.go:62		0x10020d844		17ffffbf		JMP -65(PC)							
+  encode.go:187		0x10020d848		f9404be5		MOVD 144(RSP), R5						
+  encode.go:187		0x10020d84c		d37df0a6		LSL $3, R5, R6							
+  encode.go:187		0x10020d850		910004c6		ADD $1, R6, R6							
+  encode.go:187		0x10020d854		f94083e1		MOVD 256(RSP), R1						
+  encode.go:187		0x10020d858		eb06003f		CMP R6, R1							
+  encode.go:187		0x10020d85c		540003e3		BCC 31(PC)							
+  encode.go:187		0x10020d860		f94087e7		MOVD 264(RSP), R7						
+  encode.go:187		0x10020d864		cb050ce8		SUB R5<<3, R7, R8						
+  encode.go:187		0x10020d868		cb050c29		SUB R5<<3, R1, R9						
+  encode.go:187		0x10020d86c		d1000529		SUB $1, R9, R9							
+  encode.go:187		0x10020d870		d1000508		SUB $1, R8, R8							
+  encode.go:187		0x10020d874		cb0803e8		NEG R8, R8							
+  encode.go:187		0x10020d878		8a88fcc6		AND R8->63, R6, R6						
+  binary.go:123		0x10020d87c		f1001d3f		CMP $7, R9							
+  binary.go:123		0x10020d880		54000269		BLS 19(PC)							
+  binary.go:124		0x10020d884		f9407fe8		MOVD 248(RSP), R8						
+  binary.go:124		0x10020d888		f8266900		MOVD R0, (R8)(R6)						
+  value.go:1758		0x10020d88c		f94053e6		MOVD 160(RSP), R6						
+  value.go:1758		0x10020d890		f1005cdf		CMP $23, R6							
+  encode.go:66		0x10020d894		17ffffab		JMP -85(PC)							
+  value.go:1758		0x10020d898		f1005d3f		CMP $23, R9							
+  value.go:1758		0x10020d89c		54000061		BNE 3(PC)							
+  value.go:1759		0x10020d8a0		f9400441		MOVD 8(R2), R1							
+  encode.go:190		0x10020d8a4		14000007		JMP 7(PC)							
+  value.go:1761		0x10020d8a8		aa0103e0		MOVD R1, R0							
+  value.go:1761		0x10020d8ac		aa0203e1		MOVD R2, R1							
+  value.go:1761		0x10020d8b0		aa0303e2		MOVD R3, R2							
+  value.go:1761		0x10020d8b4		97fae38b		CALL reflect.Value.lenNonSlice(SB)				
+  encode.go:190		0x10020d8b8		f94033e7		MOVD 96(RSP), R7						
+  encode.go:190		0x10020d8bc		aa0003e1		MOVD R0, R1							
+  encode.go:190		0x10020d8c0		9b077c21		MUL R7, R1, R1							
+  encode.go:190		0x10020d8c4		91000420		ADD $1, R1, R0							
+  encode.go:190		0x10020d8c8		17ffff6a		JMP -150(PC)							
+  binary.go:123		0x10020d8cc		b2400be0		ORR $7, ZR, R0							
+  binary.go:123		0x10020d8d0		aa0903e1		MOVD R9, R1							
+  binary.go:123		0x10020d8d4		97f9ad23		CALL runtime.panicIndex(SB)					
+  encode.go:187		0x10020d8d8		aa0603e0		MOVD R6, R0							
+  encode.go:187		0x10020d8dc		97f9ad39		CALL runtime.panicSliceB(SB)					
+  binary.go:97		0x10020d8e0		b24007e0		ORR $3, ZR, R0							
+  binary.go:97		0x10020d8e4		aa0903e1		MOVD R9, R1							
+  binary.go:97		0x10020d8e8		97f9ad1e		CALL runtime.panicIndex(SB)					
+  encode.go:185		0x10020d8ec		aa0603e0		MOVD R6, R0							
+  encode.go:185		0x10020d8f0		97f9ad34		CALL runtime.panicSliceB(SB)					
+  encode.go:181		0x10020d8f4		aa1f03e0		MOVD ZR, R0							
+  encode.go:181		0x10020d8f8		aa0003e1		MOVD R0, R1							
+  encode.go:181		0x10020d8fc		97f9ad19		CALL runtime.panicIndex(SB)					
+  encode.go:54		0x10020d900		aa0803e0		MOVD R8, R0							
+  encode.go:54		0x10020d904		aa0a03e1		MOVD R10, R1							
+  encode.go:54		0x10020d908		97f9ad16		CALL runtime.panicIndex(SB)					
+  encode.go:52		0x10020d90c		aa0803e0		MOVD R8, R0							
+  encode.go:52		0x10020d910		b27b03e1		ORR $32, ZR, R1							
+  encode.go:52		0x10020d914		97f9ad13		CALL runtime.panicIndex(SB)					
+  encode.go:199		0x10020d918		91000400		ADD $1, R0, R0							
+  encode.go:199		0x10020d91c		f94057e3		MOVD 168(RSP), R3						
+  encode.go:199		0x10020d920		f9405fe7		MOVD 184(RSP), R7						
+  encode.go:199		0x10020d924		f94063e2		MOVD 192(RSP), R2						
+  encode.go:200		0x10020d928		aa0703e1		MOVD R7, R1							
+  encode.go:201		0x10020d92c		aa0503e4		MOVD R5, R4							
+  encode.go:201		0x10020d930		f94083e5		MOVD 256(RSP), R5						
+  value.go:1758		0x10020d934		aa0603e9		MOVD R6, R9							
+  encode.go:199		0x10020d938		f90043e0		MOVD R0, 128(RSP)						
+  value.go:1758		0x10020d93c		54000061		BNE 3(PC)							
+  value.go:1759		0x10020d940		f9400446		MOVD 8(R2), R6							
+  encode.go:199		0x10020d944		1400000d		JMP 13(PC)							
+  value.go:1761		0x10020d948		aa0103e0		MOVD R1, R0							
+  value.go:1761		0x10020d94c		aa0203e1		MOVD R2, R1							
+  value.go:1761		0x10020d950		aa0303e2		MOVD R3, R2							
+  value.go:1761		0x10020d954		97fae363		CALL reflect.Value.lenNonSlice(SB)				
+  encode.go:200		0x10020d958		f9405fe1		MOVD 184(RSP), R1						
+  encode.go:200		0x10020d95c		f94063e2		MOVD 192(RSP), R2						
+  encode.go:200		0x10020d960		f94057e3		MOVD 168(RSP), R3						
+  encode.go:201		0x10020d964		f9407fe4		MOVD 248(RSP), R4						
+  encode.go:201		0x10020d968		f94083e5		MOVD 256(RSP), R5						
+  value.go:1758		0x10020d96c		f94053e9		MOVD 160(RSP), R9						
+  encode.go:199		0x10020d970		aa0003e6		MOVD R0, R6							
+  encode.go:199		0x10020d974		f94043e0		MOVD 128(RSP), R0						
+  encode.go:199		0x10020d978		eb06001f		CMP R6, R0							
+  encode.go:199		0x10020d97c		540004aa		BGE 37(PC)							
+  encode.go:199		0x10020d980		aa0003e4		MOVD R0, R4							
+  encode.go:200		0x10020d984		aa0103e0		MOVD R1, R0							
+  encode.go:200		0x10020d988		aa0203e1		MOVD R2, R1							
+  encode.go:200		0x10020d98c		aa0303e2		MOVD R3, R2							
+  encode.go:200		0x10020d990		aa0403e3		MOVD R4, R3							
+  encode.go:200		0x10020d994		97fadfd7		CALL reflect.Value.Index(SB)					
+  value.go:86		0x10020d998		92401044		AND $31, R2, R4							
+  value.go:283		0x10020d99c		f100049f		CMP $1, R4							
+  value.go:283		0x10020d9a0		54000080		BEQ 4(PC)							
+  encode.go:200		0x10020d9a4		f9005be1		MOVD R1, 176(RSP)						
+  value.go:284		0x10020d9a8		97fad396		CALL reflect.Value.panicNotBool(SB)				
+  value.go:286		0x10020d9ac		f9405be1		MOVD 176(RSP), R1						
+  value.go:286		0x10020d9b0		39400024		MOVBU (R1), R4							
+  encode.go:200		0x10020d9b4		36000164		TBZ $0, R4, 11(PC)						
+  encode.go:201		0x10020d9b8		f94083e1		MOVD 256(RSP), R1						
+  encode.go:201		0x10020d9bc		f94043e0		MOVD 128(RSP), R0						
+  encode.go:201		0x10020d9c0		eb00003f		CMP R0, R1							
+  encode.go:201		0x10020d9c4		540003e9		BLS 31(PC)							
+  encode.go:201		0x10020d9c8		b24003e4		ORR $1, ZR, R4							
+  encode.go:201		0x10020d9cc		f9407fe5		MOVD 248(RSP), R5						
+  encode.go:201		0x10020d9d0		382068a4		MOVB R4, (R5)(R0)						
+  value.go:1758		0x10020d9d4		f94053e6		MOVD 160(RSP), R6						
+  value.go:1758		0x10020d9d8		f1005cdf		CMP $23, R6							
+  encode.go:201		0x10020d9dc		17ffffcf		JMP -49(PC)							
+  encode.go:203		0x10020d9e0		f94083e1		MOVD 256(RSP), R1						
+  encode.go:203		0x10020d9e4		f94043e0		MOVD 128(RSP), R0						
+  encode.go:203		0x10020d9e8		eb00003f		CMP R0, R1							
+  encode.go:203		0x10020d9ec		54000289		BLS 20(PC)							
+  encode.go:203		0x10020d9f0		f9407fe4		MOVD 248(RSP), R4						
+  encode.go:203		0x10020d9f4		3820689f		MOVB ZR, (R4)(R0)						
+  value.go:1758		0x10020d9f8		f94053e5		MOVD 160(RSP), R5						
+  value.go:1758		0x10020d9fc		f1005cbf		CMP $23, R5							
+  value.go:1758		0x10020da00		b24003e4		ORR $1, ZR, R4							
+  encode.go:201		0x10020da04		f9407fe5		MOVD 248(RSP), R5						
+  value.go:1758		0x10020da08		f94053e6		MOVD 160(RSP), R6						
+  encode.go:203		0x10020da0c		17ffffc3		JMP -61(PC)							
+  value.go:1758		0x10020da10		f1005d3f		CMP $23, R9							
+  value.go:1758		0x10020da14		54000061		BNE 3(PC)							
+  value.go:1759		0x10020da18		f9400441		MOVD 8(R2), R1							
+  encode.go:206		0x10020da1c		14000006		JMP 6(PC)							
+  value.go:1761		0x10020da20		aa0103e0		MOVD R1, R0							
+  value.go:1761		0x10020da24		aa0203e1		MOVD R2, R1							
+  value.go:1761		0x10020da28		aa0303e2		MOVD R3, R2							
+  value.go:1761		0x10020da2c		97fae32d		CALL reflect.Value.lenNonSlice(SB)				
+  encode.go:206		0x10020da30		aa0003e1		MOVD R0, R1							
+  encode.go:228		0x10020da34		aa0103e0		MOVD R1, R0							
+  encode.go:206		0x10020da38		17ffff0e		JMP -242(PC)							
+  encode.go:203		0x10020da3c		97f9acc9		CALL runtime.panicIndex(SB)					
+  encode.go:201		0x10020da40		97f9acc8		CALL runtime.panicIndex(SB)					
+  encode.go:215		0x10020da44		39017feb		MOVB R11, 95(RSP)						
+  encode.go:214		0x10020da48		390177e8		MOVB R8, 93(RSP)						
+  encode.go:214		0x10020da4c		39017bea		MOVB R10, 94(RSP)						
+  encode.go:214		0x10020da50		aa1f03ec		MOVD ZR, R12							
+  encode.go:214		0x10020da54		aa1f03ed		MOVD ZR, R13							
+  encode.go:216		0x10020da58		14000014		JMP 20(PC)							
+  binary.go:98		0x10020da5c		f9407fee		MOVD 248(RSP), R14						
+  binary.go:98		0x10020da60		b82769c0		MOVW R0, (R14)(R7)						
+  encode.go:225		0x10020da64		8b04000f		ADD R4, R0, R15							
+  encode.go:216		0x10020da68		f9403bf0		MOVD 112(RSP), R16						
+  encode.go:216		0x10020da6c		9100060c		ADD $1, R16, R12						
+  encode.go:225		0x10020da70		910011ed		ADD $4, R15, R13						
+  value.go:1758		0x10020da74		f94053e9		MOVD 160(RSP), R9						
+  value.go:1758		0x10020da78		f1005d3f		CMP $23, R9							
+  encode.go:216		0x10020da7c		39417feb		MOVBU 95(RSP), R11						
+  encode.go:216		0x10020da80		f9405fe0		MOVD 184(RSP), R0						
+  encode.go:216		0x10020da84		f94063e2		MOVD 192(RSP), R2						
+  encode.go:216		0x10020da88		f94057e3		MOVD 168(RSP), R3						
+  encode.go:222		0x10020da8c		f9406fe0		MOVD 216(RSP), R0						
+  encode.go:219		0x10020da90		f9405fe1		MOVD 184(RSP), R1						
+  encode.go:222		0x10020da94		aa0e03e4		MOVD R14, R4							
+  encode.go:222		0x10020da98		f94083e5		MOVD 256(RSP), R5						
+  encode.go:222		0x10020da9c		f9408be7		MOVD 272(RSP), R7						
+  encode_pointer.go:58	0x10020daa0		394177e8		MOVBU 93(RSP), R8						
+  encode.go:222		0x10020daa4		39417bea		MOVBU 94(RSP), R10						
+  encode.go:220		0x10020daa8		f90037ed		MOVD R13, 104(RSP)						
+  encode.go:216		0x10020daac		f9003bec		MOVD R12, 112(RSP)						
+  value.go:1758		0x10020dab0		54000061		BNE 3(PC)							
+  value.go:1759		0x10020dab4		f940044e		MOVD 8(R2), R14							
+  encode.go:216		0x10020dab8		14000014		JMP 20(PC)							
+  value.go:1761		0x10020dabc		aa0103e0		MOVD R1, R0							
+  value.go:1761		0x10020dac0		aa0203e1		MOVD R2, R1							
+  value.go:1761		0x10020dac4		aa0303e2		MOVD R3, R2							
+  value.go:1761		0x10020dac8		97fae306		CALL reflect.Value.lenNonSlice(SB)				
+  encode.go:219		0x10020dacc		f9405fe1		MOVD 184(RSP), R1						
+  encode.go:219		0x10020dad0		f94063e2		MOVD 192(RSP), R2						
+  encode.go:219		0x10020dad4		f94057e3		MOVD 168(RSP), R3						
+  encode.go:222		0x10020dad8		f9407fe4		MOVD 248(RSP), R4						
+  encode.go:222		0x10020dadc		f94083e5		MOVD 256(RSP), R5						
+  encode.go:222		0x10020dae0		f94087e6		MOVD 264(RSP), R6						
+  encode.go:222		0x10020dae4		f9408be7		MOVD 272(RSP), R7						
+  encode_pointer.go:58	0x10020dae8		394177e8		MOVBU 93(RSP), R8						
+  value.go:1758		0x10020daec		f94053e9		MOVD 160(RSP), R9						
+  encode.go:222		0x10020daf0		39417bea		MOVBU 94(RSP), R10						
+  encode.go:218		0x10020daf4		39417feb		MOVBU 95(RSP), R11						
+  encode.go:216		0x10020daf8		f9403bec		MOVD 112(RSP), R12						
+  encode.go:228		0x10020dafc		f94037ed		MOVD 104(RSP), R13						
+  encode.go:216		0x10020db00		aa0003ee		MOVD R0, R14							
+  encode.go:222		0x10020db04		f9406fe0		MOVD 216(RSP), R0						
+  encode.go:216		0x10020db08		eb0e019f		CMP R14, R12							
+  encode.go:216		0x10020db0c		5400098a		BGE 76(PC)							
+  encode.go:218		0x10020db10		3600042b		TBZ $0, R11, 33(PC)						
+  encode.go:219		0x10020db14		aa0103e0		MOVD R1, R0							
+  encode.go:219		0x10020db18		aa0203e1		MOVD R2, R1							
+  encode.go:219		0x10020db1c		aa0303e2		MOVD R3, R2							
+  encode.go:219		0x10020db20		aa0c03e3		MOVD R12, R3							
+  encode.go:219		0x10020db24		97fadf73		CALL reflect.Value.Index(SB)					
+  encode_pointer.go:58	0x10020db28		394177e3		MOVBU 93(RSP), R3						
+  encode_pointer.go:58	0x10020db2c		37000063		TBNZ $0, R3, 3(PC)						
+  encode_pointer.go:58	0x10020db30		aa1f03e0		MOVD ZR, R0							
+  encode.go:219		0x10020db34		14000003		JMP 3(PC)							
+  encode_pointer.go:61	0x10020db38		97fae9c2		CALL reflect.Value.UnsafePointer(SB)				
+  encode_pointer.go:58	0x10020db3c		394177e3		MOVBU 93(RSP), R3						
+  encode.go:220		0x10020db40		f94037e6		MOVD 104(RSP), R6						
+  encode.go:220		0x10020db44		910010c7		ADD $4, R6, R7							
+  encode.go:220		0x10020db48		f94083e1		MOVD 256(RSP), R1						
+  encode.go:220		0x10020db4c		eb07003f		CMP R7, R1							
+  encode.go:220		0x10020db50		540008a3		BCC 69(PC)							
+  encode.go:220		0x10020db54		f9406fe8		MOVD 216(RSP), R8						
+  encode.go:220		0x10020db58		f9402108		MOVD 64(R8), R8							
+  encode.go:220		0x10020db5c		f94087e9		MOVD 264(RSP), R9						
+  encode.go:220		0x10020db60		cb060129		SUB R6, R9, R9							
+  encode.go:220		0x10020db64		cb060026		SUB R6, R1, R6							
+  encode.go:220		0x10020db68		d1001124		SUB $4, R9, R4							
+  encode.go:220		0x10020db6c		cb0403e9		NEG R4, R9							
+  encode.go:220		0x10020db70		8a89fce7		AND R9->63, R7, R7						
+  encode.go:220		0x10020db74		f9407fe9		MOVD 248(RSP), R9						
+  encode.go:220		0x10020db78		8b070122		ADD R7, R9, R2							
+  encode.go:220		0x10020db7c		d10010c3		SUB $4, R6, R3							
+  encode.go:220		0x10020db80		aa0003e1		MOVD R0, R1							
+  encode.go:220		0x10020db84		f9408be5		MOVD 272(RSP), R5						
+  encode.go:220		0x10020db88		aa0803e0		MOVD R8, R0							
+  encode.go:220		0x10020db8c		9400036d		CALL github.com/cnooljaw/gosproto.encodeIntegerRecordInto(SB)	
+  encode.go:220		0x10020db90		1400001e		JMP 30(PC)							
+  encode.go:222		0x10020db94		aa0103e0		MOVD R1, R0							
+  encode.go:222		0x10020db98		aa0203e1		MOVD R2, R1							
+  encode.go:222		0x10020db9c		aa0303e2		MOVD R3, R2							
+  encode.go:222		0x10020dba0		aa0c03e3		MOVD R12, R3							
+  encode.go:222		0x10020dba4		97fadf53		CALL reflect.Value.Index(SB)					
+  encode.go:222		0x10020dba8		f94037e4		MOVD 104(RSP), R4						
+  encode.go:222		0x10020dbac		91001085		ADD $4, R4, R5							
+  encode.go:222		0x10020dbb0		f94083e6		MOVD 256(RSP), R6						
+  encode.go:222		0x10020dbb4		eb0500df		CMP R5, R6							
+  encode.go:222		0x10020dbb8		54000503		BCC 40(PC)							
+  encode.go:222		0x10020dbbc		f9406fea		MOVD 216(RSP), R10						
+  encode.go:222		0x10020dbc0		f940214a		MOVD 64(R10), R10						
+  encode.go:222		0x10020dbc4		f94087eb		MOVD 264(RSP), R11						
+  encode.go:222		0x10020dbc8		cb04016b		SUB R4, R11, R11						
+  encode.go:222		0x10020dbcc		cb0400cc		SUB R4, R6, R12							
+  encode.go:222		0x10020dbd0		d1001166		SUB $4, R11, R6							
+  encode.go:222		0x10020dbd4		cb0603eb		NEG R6, R11							
+  encode.go:222		0x10020dbd8		8a8bfcab		AND R11->63, R5, R11						
+  encode.go:222		0x10020dbdc		f9407fed		MOVD 248(RSP), R13						
+  encode.go:222		0x10020dbe0		8b0b01a4		ADD R11, R13, R4						
+  encode.go:222		0x10020dbe4		d1001185		SUB $4, R12, R5							
+  encode.go:222		0x10020dbe8		aa0203e3		MOVD R2, R3							
+  encode.go:222		0x10020dbec		f9408be7		MOVD 272(RSP), R7						
+  encode.go:222		0x10020dbf0		39417be8		MOVBU 94(RSP), R8						
+  encode.go:222		0x10020dbf4		394177e9		MOVBU 93(RSP), R9						
+  encode.go:222		0x10020dbf8		aa0103e2		MOVD R1, R2							
+  encode.go:222		0x10020dbfc		aa0003e1		MOVD R0, R1							
+  encode.go:222		0x10020dc00		aa0a03e0		MOVD R10, R0							
+  encode.go:222		0x10020dc04		97fffb9b		CALL github.com/cnooljaw/gosproto.encodeMessageInto(SB)		
+  encode.go:224		0x10020dc08		f94083e1		MOVD 256(RSP), R1						
+  encode.go:224		0x10020dc0c		f94037e4		MOVD 104(RSP), R4						
+  encode.go:224		0x10020dc10		eb04003f		CMP R4, R1							
+  encode.go:224		0x10020dc14		540001e3		BCC 15(PC)							
+  encode.go:224		0x10020dc18		cb040025		SUB R4, R1, R5							
+  encode.go:224		0x10020dc1c		f94087e6		MOVD 264(RSP), R6						
+  encode.go:224		0x10020dc20		cb0400c7		SUB R4, R6, R7							
+  encode.go:224		0x10020dc24		cb0703e7		NEG R7, R7							
+  encode.go:224		0x10020dc28		8a87fc87		AND R7->63, R4, R7						
+  encode.go:62		0x10020dc2c		d503201f		NOOP								
+  binary.go:97		0x10020dc30		f1000cbf		CMP $3, R5							
+  binary.go:97		0x10020dc34		54fff148		BHI -118(PC)							
+  binary.go:97		0x10020dc38		14000003		JMP 3(PC)							
+  encode.go:228		0x10020dc3c		aa0d03e0		MOVD R13, R0							
+  encode.go:216		0x10020dc40		17fffe8c		JMP -372(PC)							
+  binary.go:97		0x10020dc44		b24007e0		ORR $3, ZR, R0							
+  binary.go:97		0x10020dc48		aa0503e1		MOVD R5, R1							
+  binary.go:97		0x10020dc4c		97f9ac45		CALL runtime.panicIndex(SB)					
+  encode.go:224		0x10020dc50		aa0403e0		MOVD R4, R0							
+  encode.go:224		0x10020dc54		97f9ac5b		CALL runtime.panicSliceB(SB)					
+  encode.go:222		0x10020dc58		aa0503e0		MOVD R5, R0							
+  encode.go:222		0x10020dc5c		aa0603e1		MOVD R6, R1							
+  encode.go:222		0x10020dc60		97f9ac58		CALL runtime.panicSliceB(SB)					
+  encode.go:220		0x10020dc64		aa0703e0		MOVD R7, R0							
+  encode.go:220		0x10020dc68		97f9ac56		CALL runtime.panicSliceB(SB)					
+  encode_pointer.go:48	0x10020dc6c		910005ce		ADD $1, R14, R14						
+  encode_pointer.go:48	0x10020dc70		eb0c01df		CMP R12, R14							
+  encode_pointer.go:48	0x10020dc74		5400058a		BGE 44(PC)							
+  encode_pointer.go:48	0x10020dc78		f86e79af		MOVD (R13)(R14<<3), R15						
+  encode_pointer.go:49	0x10020dc7c		f9401570		MOVD 40(R11), R16						
+  encode_pointer.go:49	0x10020dc80		eb1001ff		CMP R16, R15							
+  encode_pointer.go:49	0x10020dc84		54000562		BCS 43(PC)							
+  encode_pointer.go:49	0x10020dc88		f9401170		MOVD 32(R11), R16						
+  encode_pointer.go:49	0x10020dc8c		f86f7a0f		MOVD (R16)(R15<<3), R15						
+  encode_pointer.go:50	0x10020dc90		f94019f0		MOVD 48(R15), R16						
+  encode_pointer.go:48	0x10020dc94		eb0c01df		CMP R12, R14							
+  encode_pointer.go:50	0x10020dc98		b7fffeb0		TBNZ $63, R16, -11(PC)						
+  encode_pointer.go:66	0x10020dc9c		394261f0		MOVBU 152(R15), R16						
+  encode_pointer.go:66	0x10020dca0		36000430		TBZ $0, R16, 33(PC)						
+  encode_pointer.go:66	0x10020dca4		f94045f0		MOVD 136(R15), R16						
+  encode_pointer.go:66	0x10020dca8		eb0b021f		CMP R11, R16							
+  encode_pointer.go:66	0x10020dcac		540003a1		BNE 29(PC)							
+  encode_pointer.go:67	0x10020dcb0		f94015f0		MOVD 40(R15), R16						
+  encode_pointer.go:67	0x10020dcb4		f1001e1f		CMP $7, R16							
+  encode_pointer.go:67	0x10020dcb8		54000301		BNE 24(PC)							
+  encode_pointer.go:67	0x10020dcbc		f94011f0		MOVD 32(R15), R16						
+  encode_pointer.go:67	0x10020dcc0		b9400211		MOVWU (R16), R17						
+  encode_pointer.go:67	0x10020dcc4		d28dcd33		MOVD $28265, R19						
+  encode_pointer.go:67	0x10020dcc8		f2acae93		MOVK $(25972<<16), R19						
+  encode_pointer.go:67	0x10020dccc		6b13023f		CMPW R19, R17							
+  encode_pointer.go:67	0x10020dcd0		54000201		BNE 16(PC)							
+  encode_pointer.go:67	0x10020dcd4		79400a11		MOVHU 4(R16), R17						
+  encode_pointer.go:67	0x10020dcd8		d28cacf3		MOVD $25959, R19						
+  encode_pointer.go:67	0x10020dcdc		6b13023f		CMPW R19, R17							
+  encode_pointer.go:67	0x10020dce0		54000141		BNE 10(PC)							
+  encode_pointer.go:67	0x10020dce4		39401a10		MOVBU 6(R16), R16						
+  encode_pointer.go:67	0x10020dce8		7101ca1f		CMPW $114, R16							
+  encode_pointer.go:67	0x10020dcec		540000a1		BNE 5(PC)							
+  encode_pointer.go:67	0x10020dcf0		3940e1ef		MOVBU 56(R15), R15						
+  encode_pointer.go:48	0x10020dcf4		eb0c01df		CMP R12, R14							
+  encode_pointer.go:50	0x10020dcf8		3607fbaf		TBZ $0, R15, -35(PC)						
+  encode_pointer.go:50	0x10020dcfc		1400000a		JMP 10(PC)							
+  encode_pointer.go:48	0x10020dd00		eb0c01df		CMP R12, R14							
+  encode_pointer.go:67	0x10020dd04		14000008		JMP 8(PC)							
+  encode_pointer.go:48	0x10020dd08		eb0c01df		CMP R12, R14							
+  encode_pointer.go:67	0x10020dd0c		14000006		JMP 6(PC)							
+  encode_pointer.go:48	0x10020dd10		eb0c01df		CMP R12, R14							
+  encode_pointer.go:67	0x10020dd14		14000004		JMP 4(PC)							
+  encode_pointer.go:48	0x10020dd18		eb0c01df		CMP R12, R14							
+  encode_pointer.go:67	0x10020dd1c		14000002		JMP 2(PC)							
+  encode_pointer.go:48	0x10020dd20		eb0c01df		CMP R12, R14							
+  encode.go:215		0x10020dd24		9a9fb7eb		CSET GE, R11							
+  value.go:1758		0x10020dd28		f1005d3f		CMP $23, R9							
+  encode.go:215		0x10020dd2c		17ffff46		JMP -186(PC)							
+  encode_pointer.go:49	0x10020dd30		aa0f03e0		MOVD R15, R0							
+  encode_pointer.go:49	0x10020dd34		aa1003e1		MOVD R16, R1							
+  encode_pointer.go:49	0x10020dd38		97f9ac0a		CALL runtime.panicIndex(SB)					
+  encode.go:211		0x10020dd3c		8b000048		ADD R0, R2, R8							
+  encode.go:208		0x10020dd40		f9403feb		MOVD 120(RSP), R11						
+  encode.go:208		0x10020dd44		91000560		ADD $1, R11, R0							
+  encode.go:211		0x10020dd48		91001108		ADD $4, R8, R8							
+  encode.go:208		0x10020dd4c		f94063e2		MOVD 192(RSP), R2						
+  encode.go:208		0x10020dd50		f94057e3		MOVD 168(RSP), R3						
+  encode.go:208		0x10020dd54		f9405feb		MOVD 184(RSP), R11						
+  encode.go:209		0x10020dd58		aa0b03e1		MOVD R11, R1							
+  binary.go:98		0x10020dd5c		aa0a03e4		MOVD R10, R4							
+  encode.go:210		0x10020dd60		f94083e5		MOVD 256(RSP), R5						
+  encode.go:210		0x10020dd64		aa0703e6		MOVD R7, R6							
+  value.go:1758		0x10020dd68		f94053e9		MOVD 160(RSP), R9						
+  encode.go:210		0x10020dd6c		aa0803e7		MOVD R8, R7							
+  encode.go:210		0x10020dd70		f90037e7		MOVD R7, 104(RSP)						
+  encode.go:208		0x10020dd74		f9003fe0		MOVD R0, 120(RSP)						
+  value.go:1758		0x10020dd78		54000061		BNE 3(PC)							
+  value.go:1759		0x10020dd7c		f9400448		MOVD 8(R2), R8							
+  encode.go:208		0x10020dd80		1400000f		JMP 15(PC)							
+  value.go:1761		0x10020dd84		aa0103e0		MOVD R1, R0							
+  value.go:1761		0x10020dd88		aa0203e1		MOVD R2, R1							
+  value.go:1761		0x10020dd8c		aa0303e2		MOVD R3, R2							
+  value.go:1761		0x10020dd90		97fae254		CALL reflect.Value.lenNonSlice(SB)				
+  encode.go:209		0x10020dd94		f9405fe1		MOVD 184(RSP), R1						
+  encode.go:209		0x10020dd98		f94063e2		MOVD 192(RSP), R2						
+  encode.go:209		0x10020dd9c		f94057e3		MOVD 168(RSP), R3						
+  binary.go:98		0x10020dda0		f9407fe4		MOVD 248(RSP), R4						
+  encode.go:210		0x10020dda4		f94083e5		MOVD 256(RSP), R5						
+  encode.go:210		0x10020dda8		f94087e6		MOVD 264(RSP), R6						
+  encode.go:228		0x10020ddac		f94037e7		MOVD 104(RSP), R7						
+  value.go:1758		0x10020ddb0		f94053e9		MOVD 160(RSP), R9						
+  encode.go:208		0x10020ddb4		aa0003e8		MOVD R0, R8							
+  encode.go:208		0x10020ddb8		f9403fe0		MOVD 120(RSP), R0						
+  encode.go:208		0x10020ddbc		eb08001f		CMP R8, R0							
+  encode.go:208		0x10020ddc0		5400074a		BGE 58(PC)							
+  encode.go:208		0x10020ddc4		aa0003e4		MOVD R0, R4							
+  encode.go:209		0x10020ddc8		aa0103e0		MOVD R1, R0							
+  encode.go:209		0x10020ddcc		aa0203e1		MOVD R2, R1							
+  encode.go:209		0x10020ddd0		aa0303e2		MOVD R3, R2							
+  encode.go:209		0x10020ddd4		aa0403e3		MOVD R4, R3							
+  encode.go:209		0x10020ddd8		97fadec6		CALL reflect.Value.Index(SB)					
+  value.go:86		0x10020dddc		92401044		AND $31, R2, R4							
+  value.go:2342		0x10020dde0		f100609f		CMP $24, R4							
+  value.go:2342		0x10020dde4		54000081		BNE 4(PC)							
+  value.go:2343		0x10020dde8		f9400024		MOVD (R1), R4							
+  value.go:2343		0x10020ddec		f9400425		MOVD 8(R1), R5							
+  encode.go:209		0x10020ddf0		14000004		JMP 4(PC)							
+  value.go:2345		0x10020ddf4		97fae87f		CALL reflect.Value.stringNonString(SB)				
+  encode.go:209		0x10020ddf8		aa0103e5		MOVD R1, R5							
+  encode.go:209		0x10020ddfc		aa0003e4		MOVD R0, R4							
+  encode.go:210		0x10020de00		f94083e1		MOVD 256(RSP), R1						
+  encode.go:210		0x10020de04		f94037e0		MOVD 104(RSP), R0						
+  encode.go:210		0x10020de08		eb00003f		CMP R0, R1							
+  encode.go:210		0x10020de0c		540005c3		BCC 46(PC)							
+  encode.go:210		0x10020de10		cb000026		SUB R0, R1, R6							
+  encode.go:210		0x10020de14		f94087e7		MOVD 264(RSP), R7						
+  encode.go:210		0x10020de18		cb0000e8		SUB R0, R7, R8							
+  encode.go:210		0x10020de1c		cb0803e9		NEG R8, R9							
+  encode.go:210		0x10020de20		8a89fc09		AND R9->63, R0, R9						
+  encode.go:62		0x10020de24		d503201f		NOOP								
+  binary.go:97		0x10020de28		f1000cdf		CMP $3, R6							
+  binary.go:97		0x10020de2c		54000469		BLS 35(PC)							
+  binary.go:98		0x10020de30		f9407fea		MOVD 248(RSP), R10						
+  binary.go:98		0x10020de34		b8296945		MOVW R5, (R10)(R9)						
+  encode.go:211		0x10020de38		91001009		ADD $4, R0, R9							
+  encode.go:211		0x10020de3c		eb09003f		CMP R9, R1							
+  encode.go:211		0x10020de40		54000383		BCC 28(PC)							
+  encode.go:211		0x10020de44		d10010c6		SUB $4, R6, R6							
+  encode.go:211		0x10020de48		d1001108		SUB $4, R8, R8							
+  encode.go:211		0x10020de4c		cb0803e8		NEG R8, R8							
+  encode.go:211		0x10020de50		8a88fd28		AND R8->63, R9, R8						
+  encode.go:211		0x10020de54		8b080148		ADD R8, R10, R8							
+  encode.go:211		0x10020de58		eb0600bf		CMP R6, R5							
+  encode.go:211		0x10020de5c		9a86b0a2		CSEL LT, R5, R6, R2						
+  encode.go:211		0x10020de60		eb08009f		CMP R8, R4							
+  encode.go:211		0x10020de64		54000081		BNE 4(PC)							
+  value.go:1758		0x10020de68		f94053e4		MOVD 160(RSP), R4						
+  value.go:1758		0x10020de6c		f1005c9f		CMP $23, R4							
+  encode.go:211		0x10020de70		17ffffb3		JMP -77(PC)							
+  encode.go:211		0x10020de74		f9004fe2		MOVD R2, 152(RSP)						
+  encode.go:211		0x10020de78		aa0803e0		MOVD R8, R0							
+  encode.go:211		0x10020de7c		aa0403e1		MOVD R4, R1							
+  encode.go:211		0x10020de80		97f9ad24		CALL runtime.memmove(SB)					
+  value.go:1758		0x10020de84		f94053e3		MOVD 160(RSP), R3						
+  value.go:1758		0x10020de88		f1005c7f		CMP $23, R3							
+  encode.go:211		0x10020de8c		f94037e0		MOVD 104(RSP), R0						
+  encode.go:210		0x10020de90		f94083e1		MOVD 256(RSP), R1						
+  encode.go:211		0x10020de94		f9404fe2		MOVD 152(RSP), R2						
+  value.go:1758		0x10020de98		aa0303e4		MOVD R3, R4							
+  encode.go:210		0x10020de9c		f94087e7		MOVD 264(RSP), R7						
+  binary.go:98		0x10020dea0		f9407fea		MOVD 248(RSP), R10						
+  encode.go:211		0x10020dea4		17ffffa6		JMP -90(PC)							
+  encode.go:228		0x10020dea8		aa0703e0		MOVD R7, R0							
+  encode.go:208		0x10020deac		17fffdf1		JMP -527(PC)							
+  encode.go:211		0x10020deb0		aa0903e0		MOVD R9, R0							
+  encode.go:211		0x10020deb4		97f9abc3		CALL runtime.panicSliceB(SB)					
+  binary.go:97		0x10020deb8		b24007e0		ORR $3, ZR, R0							
+  binary.go:97		0x10020debc		aa0603e1		MOVD R6, R1							
+  binary.go:97		0x10020dec0		97f9aba8		CALL runtime.panicIndex(SB)					
+  encode.go:210		0x10020dec4		97f9abbf		CALL runtime.panicSliceB(SB)					
+  unsafe.go:35		0x10020dec8		9e66000a		FMOVD F0, R10							
+  binary.go:124		0x10020decc		f9407feb		MOVD 248(RSP), R11						
+  binary.go:124		0x10020ded0		f826696a		MOVD R10, (R11)(R6)						
+  encode.go:194		0x10020ded4		f94047ea		MOVD 136(RSP), R10						
+  encode.go:194		0x10020ded8		91000540		ADD $1, R10, R0							
+  encode.go:196		0x10020dedc		910020a7		ADD $8, R5, R7							
+  value.go:1758		0x10020dee0		f94053e9		MOVD 160(RSP), R9						
+  value.go:1758		0x10020dee4		f1005d3f		CMP $23, R9							
+  encode.go:194		0x10020dee8		f94057e3		MOVD 168(RSP), R3						
+  encode.go:194		0x10020deec		f94063e2		MOVD 192(RSP), R2						
+  encode.go:194		0x10020def0		f9405fe1		MOVD 184(RSP), R1						
+  binary.go:124		0x10020def4		aa0b03e4		MOVD R11, R4							
+  encode.go:195		0x10020def8		aa0803e5		MOVD R8, R5							
+  encode.go:195		0x10020defc		f94087e6		MOVD 264(RSP), R6						
+  encode.go:194		0x10020df00		f90047e0		MOVD R0, 136(RSP)						
+  encode.go:195		0x10020df04		f90037e7		MOVD R7, 104(RSP)						
+  value.go:1758		0x10020df08		54000061		BNE 3(PC)							
+  value.go:1759		0x10020df0c		f9400448		MOVD 8(R2), R8							
+  encode.go:194		0x10020df10		1400000f		JMP 15(PC)							
+  value.go:1761		0x10020df14		aa0103e0		MOVD R1, R0							
+  value.go:1761		0x10020df18		aa0203e1		MOVD R2, R1							
+  value.go:1761		0x10020df1c		aa0303e2		MOVD R3, R2							
+  value.go:1761		0x10020df20		97fae1f0		CALL reflect.Value.lenNonSlice(SB)				
+  encode.go:195		0x10020df24		f9405fe1		MOVD 184(RSP), R1						
+  encode.go:195		0x10020df28		f94063e2		MOVD 192(RSP), R2						
+  encode.go:195		0x10020df2c		f94057e3		MOVD 168(RSP), R3						
+  binary.go:124		0x10020df30		f9407fe4		MOVD 248(RSP), R4						
+  encode.go:195		0x10020df34		f94083e5		MOVD 256(RSP), R5						
+  encode.go:195		0x10020df38		f94087e6		MOVD 264(RSP), R6						
+  encode.go:195		0x10020df3c		f94037e7		MOVD 104(RSP), R7						
+  value.go:1758		0x10020df40		f94053e9		MOVD 160(RSP), R9						
+  encode.go:194		0x10020df44		aa0003e8		MOVD R0, R8							
+  encode.go:194		0x10020df48		f94047e0		MOVD 136(RSP), R0						
+  encode.go:194		0x10020df4c		eb08001f		CMP R8, R0							
+  encode.go:194		0x10020df50		540003ca		BGE 30(PC)							
+  encode.go:195		0x10020df54		eb0700bf		CMP R7, R5							
+  encode.go:195		0x10020df58		54000603		BCC 48(PC)							
+  encode.go:194		0x10020df5c		aa0003e4		MOVD R0, R4							
+  encode.go:195		0x10020df60		aa0103e0		MOVD R1, R0							
+  encode.go:195		0x10020df64		aa0203e1		MOVD R2, R1							
+  encode.go:195		0x10020df68		aa0303e2		MOVD R3, R2							
+  encode.go:195		0x10020df6c		aa0403e3		MOVD R4, R3							
+  encode.go:195		0x10020df70		97fade60		CALL reflect.Value.Index(SB)					
+  encode.go:195		0x10020df74		f94087e4		MOVD 264(RSP), R4						
+  encode.go:195		0x10020df78		f94037e5		MOVD 104(RSP), R5						
+  encode.go:195		0x10020df7c		cb050086		SUB R5, R4, R6							
+  encode.go:195		0x10020df80		cb0603e6		NEG R6, R6							
+  value.go:86		0x10020df84		92401047		AND $31, R2, R7							
+  encode.go:195		0x10020df88		f94083e8		MOVD 256(RSP), R8						
+  encode.go:195		0x10020df8c		cb050109		SUB R5, R8, R9							
+  encode.go:195		0x10020df90		8a86fca6		AND R6->63, R5, R6						
+  value.go:1380		0x10020df94		d503201f		NOOP								
+  value.go:1382		0x10020df98		f10034ff		CMP $13, R7							
+  value.go:1382		0x10020df9c		54000081		BNE 4(PC)							
+  value.go:1383		0x10020dfa0		bd400020		FMOVS (R1), F0							
+  value.go:1383		0x10020dfa4		1e22c000		FCVTSD F0, F0							
+  encode.go:195		0x10020dfa8		14000004		JMP 4(PC)							
+  value.go:1384		0x10020dfac		f10038ff		CMP $14, R7							
+  value.go:1384		0x10020dfb0		54000161		BNE 11(PC)							
+  value.go:1385		0x10020dfb4		fd400020		FMOVD (R1), F0							
+  encode.go:66		0x10020dfb8		d503201f		NOOP								
+  binary.go:123		0x10020dfbc		f1001d3f		CMP $7, R9							
+  binary.go:123		0x10020dfc0		54fff848		BHI -62(PC)							
+  binary.go:123		0x10020dfc4		14000003		JMP 3(PC)							
+  encode.go:228		0x10020dfc8		aa0703e0		MOVD R7, R0							
+  encode.go:194		0x10020dfcc		17fffda9		JMP -599(PC)							
+  binary.go:123		0x10020dfd0		b2400be0		ORR $7, ZR, R0							
+  binary.go:123		0x10020dfd4		aa0903e1		MOVD R9, R1							
+  binary.go:123		0x10020dfd8		97f9ab62		CALL runtime.panicIndex(SB)					
+  value.go:86		0x10020dfdc		f90057e7		MOVD R7, 168(RSP)						
+  value.go:1387		0x10020dfe0		f00006e0		ADRP 913408(PC), R0						
+  value.go:1387		0x10020dfe4		91048000		ADD $288, R0, R0						
+  value.go:1387		0x10020dfe8		97f81746		CALL runtime.newobject(SB)					
+  value.go:1387		0x10020dfec		d2800261		MOVD $19, R1							
+  value.go:1387		0x10020dff0		f9000401		MOVD R1, 8(R0)							
+  value.go:1387		0x10020dff4		90000181		ADRP 196608(PC), R1						
+  value.go:1387		0x10020dff8		910e0c21		ADD $899, R1, R1						
+  value.go:1387		0x10020dffc		f9000001		MOVD R1, (R0)							
+  value.go:1387		0x10020e000		f94057e1		MOVD 168(RSP), R1						
+  value.go:1387		0x10020e004		f9000801		MOVD R1, 16(R0)							
+  value.go:1387		0x10020e008		aa0003e1		MOVD R0, R1							
+  value.go:1387		0x10020e00c		b0000600		ADRP 790528(PC), R0						
+  value.go:1387		0x10020e010		91290000		ADD $2624, R0, R0						
+  value.go:1387		0x10020e014		97f98acf		CALL runtime.gopanic(SB)					
+  encode.go:195		0x10020e018		aa0703e0		MOVD R7, R0							
+  encode.go:195		0x10020e01c		aa0503e1		MOVD R5, R1							
+  encode.go:195		0x10020e020		97f9ab68		CALL runtime.panicSliceB(SB)					
+  encode.go:192		0x10020e024		aa1f03e0		MOVD ZR, R0							
+  encode.go:192		0x10020e028		aa0003e1		MOVD R0, R1							
+  encode.go:192		0x10020e02c		97f9ab4d		CALL runtime.panicIndex(SB)					
+  encode.go:192		0x10020e030		d503201f		NOOP								
+  encode.go:169		0x10020e034		a90087e0		STP (R0, R1), 8(RSP)						
+  encode.go:169		0x10020e038		a9018fe2		STP (R2, R3), 24(RSP)						
+  encode.go:169		0x10020e03c		a90297e4		STP (R4, R5), 40(RSP)						
+  encode.go:169		0x10020e040		a9039fe6		STP (R6, R7), 56(RSP)						
+  encode.go:169		0x10020e044		390123e8		MOVB R8, 72(RSP)						
+  encode.go:169		0x10020e048		aa1e03e3		MOVD R30, R3							
+  encode.go:169		0x10020e04c		97f9a1ed		CALL runtime.morestack_noctxt.abi0(SB)				
+  encode.go:169		0x10020e050		a94087e0		LDP 8(RSP), (R0, R1)						
+  encode.go:169		0x10020e054		a9418fe2		LDP 24(RSP), (R2, R3)						
+  encode.go:169		0x10020e058		a94297e4		LDP 40(RSP), (R4, R5)						
+  encode.go:169		0x10020e05c		a9439fe6		LDP 56(RSP), (R6, R7)						
+  encode.go:169		0x10020e060		394123e8		MOVBU 72(RSP), R8						
+  encode.go:169		0x10020e064		17fffca3		JMP github.com/cnooljaw/gosproto.encodeFieldInto(SB)		
+  encode.go:169		0x10020e068		00000000		?								
+  encode.go:169		0x10020e06c		00000000		?								

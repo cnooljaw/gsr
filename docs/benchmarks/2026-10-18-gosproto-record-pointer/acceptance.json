@@ -1,0 +1,68 @@
+[
+  {
+    "args": [
+      "go",
+      "test",
+      "./...",
+      "-timeout=2m"
+    ],
+    "cwd": "/private/tmp/gsr-gosproto-fork",
+    "env": {
+      "SPROTO_ORACLE_DIR": "/private/tmp/gsr-official-sproto-review"
+    },
+    "exitCode": 0,
+    "elapsedSeconds": 2.2454359997063875,
+    "output": "ok  \tgithub.com/cnooljaw/gosproto\t1.437s\n?   \tgithub.com/cnooljaw/gosproto/examples/echo\t[no test files]\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-gcflags=all=-d=checkptr=2",
+      "./...",
+      "-timeout=2m"
+    ],
+    "cwd": "/private/tmp/gsr-gosproto-fork",
+    "env": {
+      "SPROTO_ORACLE_DIR": "/private/tmp/gsr-official-sproto-review",
+      "GOMAXPROCS": "2"
+    },
+    "exitCode": 0,
+    "elapsedSeconds": 3.5050677098333836,
+    "output": "ok  \tgithub.com/cnooljaw/gosproto\t2.287s\n?   \tgithub.com/cnooljaw/gosproto/examples/echo\t[no test files]\n"
+  },
+  {
+    "args": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "cwd": "/private/tmp/gsr-gosproto-fork",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.22119170799851418,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-run",
+      "^$",
+      "-fuzz",
+      "^FuzzCodecRoundTrip$",
+      "-fuzztime=10s",
+      "-parallel=2",
+      ".",
+      "-timeout=1m"
+    ],
+    "cwd": "/private/tmp/gsr-gosproto-fork",
+    "env": {
+      "GOMAXPROCS": "2"
+    },
+    "exitCode": 0,
+    "elapsedSeconds": 11.445654625073075,
+    "output": "fuzz: elapsed: 0s, gathering baseline coverage: 0/39 completed\nfuzz: elapsed: 0s, gathering baseline coverage: 39/39 completed, now fuzzing with 2 workers\nfuzz: elapsed: 3s, execs: 135533 (45162/sec), new interesting: 0 (total: 39)\nfuzz: elapsed: 6s, execs: 276235 (46909/sec), new interesting: 0 (total: 39)\nfuzz: elapsed: 9s, execs: 394155 (39299/sec), new interesting: 0 (total: 39)\nfuzz: elapsed: 10s, execs: 441809 (45796/sec), new interesting: 0 (total: 39)\nPASS\nok  \tgithub.com/cnooljaw/gosproto\t10.377s\n"
+  }
+]

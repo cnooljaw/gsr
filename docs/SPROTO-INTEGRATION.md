@@ -211,4 +211,7 @@ Decode 性能阶段已按用户决定冻结于独立库 `a09fb00`（Decode 生�
 后续只调整原生[]int64的4/8字节输出游标，保留预检/宽度/预算/wire/cap/独占。编译器可消除每元素重复切片检查；43项两轮中，32/64位纯Encode约快25%/23%，PEncode约快14%/8%，大型约快3%，实际RPC也改善。对象数中位数不变，两个手工帧±0.125 B/op尾差、小包约5～8 ns及未改纯Pack第二轮+9.45%（245 ns）均披露；Pack各臂两轮符号指令一致，原因仍未确定。库/官方/race/checkptr/vet、474047次有限Codec fuzz、GSR三包和Go/TS 7/7通过；40组精确wire及故意错步长负向回归保护游标。见 [连续游标报告](benchmarks/2026-10-18-gosproto-array-cursor/RESULTS.md)，该切片已本地提交为gosproto 0c1f6cf / GSR 22eb772，未推送；正式依赖与Decode不变，不新增PB/TS排名。
 
 
-后续完成Fields局部复用实验：两个记录helper各捕获一次切片头，编译器确实把两次每字段描述加载移出循环。固定43项两轮中，大型纯Encode约快0.75%/1.17%，与控制偏差同阶；PEncode持平、RPC方向混合，未确认业务组合收益，生产候选撤回。保留乱序Go声明/忽略字段的预算tag回归；错误使用声明顺序时，新夹具失败、旧夹具仍通过，覆盖增量明确。最终生产代码与0c1f6cf一致，相关基线/候选测试、固定采样及归档核对通过，未重复生产全验收，见 [Fields实验](benchmarks/2026-10-18-gosproto-record-fields/RESULTS.md)。测试与记录未提交；下一步单独检查记录入口反射值/指针借用成本，不扩大unsafe范围，Decode和正式依赖不变。
+后续完成Fields局部复用实验：两个记录helper各捕获一次切片头，编译器确实把两次每字段描述加载移出循环。固定43项两轮中，大型纯Encode约快0.75%/1.17%，与控制偏差同阶；PEncode持平、RPC方向混合，未确认业务组合收益，生产候选撤回。保留乱序Go声明/忽略字段的预算tag回归；错误使用声明顺序时，新夹具失败、旧夹具仍通过，覆盖增量明确。最终生产代码与0c1f6cf一致，相关基线/候选测试、固定采样及归档核对通过，未重复生产全验收，见 [Fields实验](benchmarks/2026-10-18-gosproto-record-fields/RESULTS.md)。测试与记录已本地提交为gosproto bd1976a / GSR 4bf1b32，未推送；下一步单独检查记录入口反射值/指针借用成本，不扩大unsafe范围，Decode和正式依赖不变。
+
+
+整数记录指针入口改用已验证数组分支借用现有encodePointer，helper避免三字反射值与重复nil类型分支，生产净减3行，不扩大unsafe或改变预算/wire/所有权。固定43项两轮中，大型Encode约快7.9%～8.3%、PEncode快5.6%～7.3%、三种RPC快5.2%～7.2%，小型也改善，目标分配中位数相同。补充8项nil矩阵确认全nil256记录约慢193～217ns（4%～5%），混合数组更快；明确接受该局部代价，保留候选。主self35/43、clone34/43及全部失败/累计方向相反/离群块保留，第二轮未改int32请求+4.74%未解释；旧Pack+9.45%仍不覆盖。库/官方/race/checkptr/vet、441809次有限Codec fuzz、GSR三包及Go/TS7/7通过。见 [指针入口报告](benchmarks/2026-10-18-gosproto-record-pointer/RESULTS.md)，新改动未提交，Decode和正式依赖继续冻结。
