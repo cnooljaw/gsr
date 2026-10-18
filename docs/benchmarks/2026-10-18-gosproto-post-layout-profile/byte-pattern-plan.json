@@ -1,0 +1,7 @@
+{
+  "stage": "Supplemental deterministic morphology audit selected after current CPU profiles;not a timing rerun or production candidate",
+  "inputs": "all5 representative fixtures plus32B ASCII",
+  "entries": ["raw body", "RPC notification", "RPC request_cancel", "RPC response"],
+  "method": "Encode actual messages;RPC via existing probes then public Unpack to recover padded input;count nonzero byte masks per8-byte block. Body final partial word zero-padded for counting only.",
+  "limits": "Raw input morphology is not execution frequency:FF scanner may absorb6/7-nonzero words;do not equate histogram with branch counts. RPC padding up to7 bytes remains in the recovered final block. No perf/algorithm conclusion from masks alone."
+}

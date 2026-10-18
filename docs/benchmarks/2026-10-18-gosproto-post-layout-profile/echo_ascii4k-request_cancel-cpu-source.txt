@@ -1,0 +1,105 @@
+Total: 2.22s
+ROUTINE ======================== github.com/cnooljaw/gosproto.encodeMessageInto in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-post-layout-profile/run/archive/candidate/encode.go
+      20ms      110ms (flat, cum)  4.95% of Total
+         .          .    123:func encodeMessageInto(schema *SprotoType, value reflect.Value, output []byte, layout *encodeLayout, binding encodeBinding) int {
+         .          .    124:	count := layout.next()
+         .          .    125:	writeUint16(output, uint16(count))
+         .          .    126:	if value.IsNil() {
+         .          .    127:		return 2
+         .          .    128:	}
+         .          .    129:	record := value.Elem()
+         .          .    130:	pointer := messageEncodePointer(value, binding)
+         .          .    131:	headerOffset, bodyOffset, previous := 2, 2+count*2, -1
+         .          .    132:	for _, index := range schema.order {
+         .          .    133:		field := schema.Fields[index]
+         .          .    134:		if field.Tag < 0 {
+         .          .    135:			continue
+         .          .    136:		}
+         .          .    137:		native := binding.native && field.nativeInteger(schema)
+         .          .    138:		var current reflect.Value
+         .          .    139:		var bits uint64
+         .          .    140:		if native {
+         .          .    141:			var present bool
+         .          .    142:			bits, present = pointer.integer(field.encOffset)
+         .          .    143:			if !present {
+         .          .    144:				continue
+         .          .    145:			}
+         .          .    146:		} else {
+         .          .    147:			current = record.Field(field.index[0])
+         .          .    148:			if omittedField(field, current) {
+         .          .    149:				continue
+         .          .    150:			}
+         .          .    151:		}
+         .          .    152:		if skip := skipTag(previous, field.Tag); skip > 0 {
+         .          .    153:			writeUint16(output[headerOffset:], skip)
+         .          .    154:			headerOffset += 2
+         .          .    155:		}
+         .          .    156:		var header uint16
+         .          .    157:		var length int
+         .          .    158:		if native {
+         .          .    159:			header, length = encodeIntegerInto(bits, output[bodyOffset:])
+      10ms       10ms    160:		} else if field.Array || field.Wire == WireStructName {
+         .          .    161:			length = encodeFieldInto(field, current, output[bodyOffset+4:], layout, binding.exact && field.encOwner == schema && field.Array != field.pointer)
+         .          .    162:		} else {
+         .       90ms    163:			header, length = encodeScalarInto(field, current, output[bodyOffset:])
+         .          .    164:		}
+      10ms       10ms    165:		writeUint16(output[headerOffset:], header)
+         .          .    166:		headerOffset += 2
+         .          .    167:		previous = field.Tag
+         .          .    168:		if header == 0 {
+         .          .    169:			writeUint32(output[bodyOffset:], uint32(length))
+         .          .    170:			bodyOffset += 4 + length
+ROUTINE ======================== github.com/cnooljaw/gosproto.encodedSize in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-post-layout-profile/run/archive/candidate/limits.go
+         0       10ms (flat, cum)  0.45% of Total
+         .          .    114:func encodedSize(schema *SprotoType, value reflect.Value, budget *decodeBudget, depth int, layout *encodeLayout, binding encodeBinding) (int, error) {
+         .          .    115:	if depth > budget.limits.MaxDepth {
+         .          .    116:		return 0, ErrLimit
+         .          .    117:	}
+         .          .    118:	size, lastTag := 2, -1
+         .          .    119:	if size > budget.limits.MaxBytes {
+         .          .    120:		return 0, ErrLimit
+         .          .    121:	}
+         .          .    122:	layoutIndex := layout.add(0)
+         .          .    123:	if value.IsNil() {
+         .          .    124:		return size, nil
+         .          .    125:	}
+         .          .    126:	record := value.Elem()
+         .          .    127:	pointer := messageEncodePointer(value, binding)
+         .          .    128:	headerCount := 0
+         .          .    129:	for _, index := range schema.order {
+         .          .    130:		field := schema.Fields[index]
+         .          .    131:		if field.Tag < 0 {
+         .          .    132:			continue
+         .          .    133:		}
+         .          .    134:		native := binding.native && field.nativeInteger(schema)
+         .          .    135:		var current reflect.Value
+         .          .    136:		var bits uint64
+         .          .    137:		if native {
+         .          .    138:			var present bool
+         .          .    139:			bits, present = pointer.integer(field.encOffset)
+         .          .    140:			if !present {
+         .          .    141:				continue
+         .          .    142:			}
+         .          .    143:		} else {
+         .       10ms    144:			current = record.Field(field.index[0])
+         .          .    145:			if omittedField(field, current) {
+         .          .    146:				continue
+         .          .    147:			}
+         .          .    148:		}
+         .          .    149:		if err := budget.add(1); err != nil {
+ROUTINE ======================== github.com/cnooljaw/gosproto.packInto in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-post-layout-profile/run/archive/candidate/pack.go
+         0      110ms (flat, cum)  4.95% of Total
+         .          .    109:func packInto(packed, src []byte) []byte {
+         .          .    110:	offset := 0
+         .          .    111:	for len(src) >= 8 {
+         .          .    112:		word := binary.LittleEndian.Uint64(src)
+         .          .    113:		nonzero := (((word & 0x7f7f7f7f7f7f7f7f) + 0x7f7f7f7f7f7f7f7f) | word) & 0x8080808080808080
+         .          .    114:		header := uint8(((nonzero >> 7) * 0x0102040810204080) >> 56)
+         .          .    115:		if header == 0xff {
+         .       50ms    116:			consumed := ffRunBytes(src)
+         .       60ms    117:			writeFF(packed[offset:], src, consumed)
+         .          .    118:			offset += 2 + ((consumed + 7) &^ 7)
+         .          .    119:			src = src[consumed:]
+         .          .    120:			continue
+         .          .    121:		}
+         .          .    122:		dst := packed[offset:]

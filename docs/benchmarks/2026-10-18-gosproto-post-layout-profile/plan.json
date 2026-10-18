@@ -1,0 +1,58 @@
+{
+  "baselineCommit": "7397804",
+  "gsrCommit": "25b0b0d",
+  "scope": "Read-only current Encode/EncodePacked/actualRPC CPU and allocation profile plus same-binary/same-function A/A GC context diagnosis.No production candidate,no new PB/TS ranking,do not replace historical comparisons or retry controls.",
+  "cases": [
+    "ascii32",
+    "game_large",
+    "int32_edges",
+    "echo_ascii4k"
+  ],
+  "entries": [
+    "raw_body",
+    "packed_body",
+    "request_cancel"
+  ],
+  "cpu": {
+    "benchtime": "2s",
+    "runsPerEntry": 1,
+    "memorySampling": "default"
+  },
+  "allocation": {
+    "benchtime": "20000x",
+    "memProfileRate": 1,
+    "runsPerEntry": 1
+  },
+  "growthCases": [
+    "flat/full/256",
+    "flat/full/512",
+    "flat/full/1024",
+    "flat/full/4096",
+    "flat/nil/4096",
+    "flat/half/4096",
+    "nested/32x32",
+    "nested/32x128",
+    "array_record/4096"
+  ],
+  "context": {
+    "cases": [
+      "body/echo_ascii4k/sproto_pack",
+      "body/zeros4k/frame"
+    ],
+    "contexts": [
+      "full",
+      "isolated"
+    ],
+    "callsPerBlock": 16384,
+    "rounds": 6,
+    "quartetsPerRound": 4,
+    "warmup": "50ms interleaved",
+    "AandB": "exact same function pointer;not two implementations",
+    "metrics": "outside timed loop:heap objects/goal/scan,alloc bytes,GC cycles,GC/assist/user CPU estimates",
+    "full": "KeepAlive all70 operations including their fixtures until end",
+    "isolated": "construct same70,retain only selected operation,drop rest before explicit GC",
+    "profileCase": "body/echo_ascii4k/sproto_pack",
+    "cpuBenchtime": "2s"
+  },
+  "assessment": "One fixed profile per entry and one A/A run per context/case. No causal proof from correlation,GC CPU counters update coarsely. Instrumented A/A is a diagnostic,not old sampler timing or speedup/control replacement.Heap contexts/profiling are different workloads;preserve all raw counters,flags,outliers and setup overhead. No GOGC off,alloc reuse or production modifications."
+}

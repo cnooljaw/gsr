@@ -4,9 +4,13 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## 当前编码profile与4KiB GC上下文（2026-10-18）
+
+前一切片已提交为库7397804、GSR 25b0b0d，未推送。只读采26份profile；固定4个同函数A/A条件共384块/96quartet/24轮复算至1e−12一致，24个byte-pattern计数和2×97个limiter点核对。full Pack的A/A−3.35%/IQR11.76pp、隔离−0.72%/1.04pp；后者仍有−24.5%单轮，zero frame隔离未通过，原值/尾差/失败全保留。原full堆峰637MB；另起无计时事件诊断确认limiter full0→1279、isolated0，独立峰值459/13MB，不回填旧数据。harness统计/选择/fixture/vet、补充诊断/vet、源/二进制/26profile SHA与fresh归档通过；库所有Go源码等于7397804、工作树干净，无生产改动，不重复官方/race/checkptr/fuzz/GSR/GoTS。见 [诊断报告](benchmarks/2026-10-18-gosproto-post-layout-profile/RESULTS.md)，新文档未提交，正式依赖/Decode不变。 2026-10-19收尾发现临时库HEAD/config缺失，先备份再恢复最小元数据；完整fsck/源码SHA/status通过，全refs bundle已保存于稳定工作区忽略目录，未推送，详见报告恢复记录。
+
 ## 编码布局连续索引写入（2026-10-18）
 
-前一增长切片已提交为库bdfe1d0、GSR bf828b0，未推送。只在add复用连续逻辑索引满载判断和安全写入，容量序列不变。固定原70项/四组26880块独立复算通过；大型Encode快2.94%～4.67%、PEncode2.52%～3.19%、实际请求3.13%～3.48%，70项分配中位数相同，保留候选。草稿内联81、固定max规则76的计时前记录保留；整数记录预检帧144→112B，通用帧272B不变，安全检查未删。self40/70、clone38/70，int32/手工帧成本、未改纯Pack波动、累计方向不同及大块全保留。既有回归、109形态525项wire/cap/独占/错误差分、harness/vet/fresh归档、官方SHA、库/race/checkptr/vet、有限Pack9053/Codec475186次fuzz、GSR三包/GoTS7/7零跳过通过。Pack计数3s后停止、覆盖有限。见 [连续索引报告](benchmarks/2026-10-18-gosproto-layout-index/RESULTS.md)；新代码/文档未提交，Decode与正式依赖不变。
+前一增长切片已提交为库bdfe1d0、GSR bf828b0，未推送。只在add复用连续逻辑索引满载判断和安全写入，容量序列不变。固定原70项/四组26880块独立复算通过；大型Encode快2.94%～4.67%、PEncode2.52%～3.19%、实际请求3.13%～3.48%，70项分配中位数相同，保留候选。草稿内联81、固定max规则76的计时前记录保留；整数记录预检帧144→112B，通用帧272B不变，安全检查未删。self40/70、clone38/70，int32/手工帧成本、未改纯Pack波动、累计方向不同及大块全保留。既有回归、109形态525项wire/cap/独占/错误差分、harness/vet/fresh归档、官方SHA、库/race/checkptr/vet、有限Pack9053/Codec475186次fuzz、GSR三包/GoTS7/7零跳过通过。Pack计数3s后停止、覆盖有限。见 [连续索引报告](benchmarks/2026-10-18-gosproto-layout-index/RESULTS.md)；该轮已本地提交为库7397804、GSR 25b0b0d，未推送，Decode与正式依赖不变。
 
 ## 编码布局按需倍增（2026-10-18）
 

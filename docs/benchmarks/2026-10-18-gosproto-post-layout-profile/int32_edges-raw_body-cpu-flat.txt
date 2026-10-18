@@ -1,0 +1,48 @@
+File: encoding.test
+Type: cpu
+Time: 2026-10-18 23:40:13 CST
+Duration: 2.60s, Total samples = 2.24s (86.00%)
+Showing nodes accounting for 2.08s, 92.86% of 2.24s total
+Dropped 42 nodes (cum <= 0.01s)
+Showing top 40 nodes out of 58
+      flat  flat%   sum%        cum   cum%
+     1.13s 50.45% 50.45%      1.13s 50.45%  runtime.kevent
+     0.35s 15.62% 66.07%      0.42s 18.75%  github.com/cnooljaw/gosproto.encodeInt64Slice (inline)
+     0.26s 11.61% 77.68%      0.28s 12.50%  github.com/cnooljaw/gosproto.fieldSize
+     0.05s  2.23% 79.91%      0.08s  3.57%  runtime.typePointers.next
+     0.04s  1.79% 81.70%      0.04s  1.79%  encoding/binary.littleEndian.PutUint32 (inline)
+     0.04s  1.79% 83.48%      0.15s  6.70%  runtime.scanobject
+     0.03s  1.34% 84.82%      0.07s  3.12%  github.com/cnooljaw/gosproto.writeUint32 (inline)
+     0.03s  1.34% 86.16%      0.03s  1.34%  runtime.resolveTypeOff
+     0.02s  0.89% 87.05%      0.30s 13.39%  github.com/cnooljaw/gosproto.encodedSize
+     0.02s  0.89% 87.95%      0.02s  0.89%  runtime.getGCMask (inline)
+     0.02s  0.89% 88.84%      0.14s  6.25%  runtime.mallocgcSmallNoscan
+     0.02s  0.89% 89.73%      0.02s  0.89%  runtime.memclrNoHeapPointers
+     0.02s  0.89% 90.62%      0.02s  0.89%  runtime.typePointers.nextFast (inline)
+     0.01s  0.45% 91.07%      0.46s 20.54%  github.com/cnooljaw/gosproto.encodeFieldInto
+     0.01s  0.45% 91.52%      0.02s  0.89%  reflect.valueInterface
+     0.01s  0.45% 91.96%      0.08s  3.57%  runtime.(*mcentral).cacheSpan
+     0.01s  0.45% 92.41%      0.03s  1.34%  runtime.(*mheap).freeSpanLocked
+     0.01s  0.45% 92.86%      0.05s  2.23%  runtime.(*sweepLocked).sweep
+         0     0% 92.86%      1.10s 49.11%  codecpairstool.BenchmarkCurrentEncoding.func1.1
+         0     0% 92.86%      1.10s 49.11%  github.com/cnooljaw/gosproto.Encode
+         0     0% 92.86%      1.10s 49.11%  github.com/cnooljaw/gosproto.EncodeWithLimits (inline)
+         0     0% 92.86%      1.10s 49.11%  github.com/cnooljaw/gosproto.encodeBufferWithLimits
+         0     0% 92.86%      0.46s 20.54%  github.com/cnooljaw/gosproto.encodeMessageInto
+         0     0% 92.86%      1.10s 49.11%  github.com/cnooljaw/gosproto.encodeWithLimits
+         0     0% 92.86%      0.03s  1.34%  reflect.(*rtype).ptrTo
+         0     0% 92.86%      0.03s  1.34%  reflect.(*rtype).typeOff (inline)
+         0     0% 92.86%      0.03s  1.34%  reflect.Value.Addr
+         0     0% 92.86%      0.02s  0.89%  reflect.Value.Interface (inline)
+         0     0% 92.86%      0.03s  1.34%  reflect.ptrTo (inline)
+         0     0% 92.86%      0.03s  1.34%  reflect.resolveTypeOff
+         0     0% 92.86%      0.08s  3.57%  runtime.(*mcache).nextFree
+         0     0% 92.86%      0.08s  3.57%  runtime.(*mcache).refill
+         0     0% 92.86%      0.02s  0.89%  runtime.(*mcentral).grow
+         0     0% 92.86%      0.02s  0.89%  runtime.(*mheap).alloc
+         0     0% 92.86%      0.03s  1.34%  runtime.(*mheap).alloc.func1
+         0     0% 92.86%      0.03s  1.34%  runtime.(*mheap).allocSpan
+         0     0% 92.86%      0.04s  1.79%  runtime.(*mheap).freeSpan (inline)
+         0     0% 92.86%      0.02s  0.89%  runtime.(*mheap).initSpan
+         0     0% 92.86%      0.04s  1.79%  runtime.(*sweepLocked).sweep.(*mheap).freeSpan.func2
+         0     0% 92.86%      0.18s  8.04%  runtime.deductAssistCredit

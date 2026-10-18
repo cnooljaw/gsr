@@ -1,0 +1,60 @@
+Total: 2.04s
+ROUTINE ======================== github.com/cnooljaw/gosproto.packInto in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-post-layout-profile/run/archive/candidate/pack.go
+      30ms      350ms (flat, cum) 17.16% of Total
+         .          .    109:func packInto(packed, src []byte) []byte {
+         .          .    110:	offset := 0
+         .          .    111:	for len(src) >= 8 {
+         .       20ms    112:		word := binary.LittleEndian.Uint64(src)
+         .          .    113:		nonzero := (((word & 0x7f7f7f7f7f7f7f7f) + 0x7f7f7f7f7f7f7f7f) | word) & 0x8080808080808080
+         .          .    114:		header := uint8(((nonzero >> 7) * 0x0102040810204080) >> 56)
+         .          .    115:		if header == 0xff {
+         .      150ms    116:			consumed := ffRunBytes(src)
+         .      150ms    117:			writeFF(packed[offset:], src, consumed)
+         .          .    118:			offset += 2 + ((consumed + 7) &^ 7)
+         .          .    119:			src = src[consumed:]
+         .          .    120:			continue
+         .          .    121:		}
+         .          .    122:		dst := packed[offset:]
+         .          .    123:		// 去掉至多两个置位后是否为零，比普通路径完整计数更直接。
+         .          .    124:		remaining := header & (header - 1)
+         .          .    125:		if remaining&(remaining-1) == 0 {
+         .          .    126:			// 已确认至多两个非零字节，直接写固定位置，避免通用循环和可变目标索引。
+         .          .    127:			_ = dst[2]
+      20ms       20ms    128:			dst[0] = header
+         .          .    129:			index := 1
+         .          .    130:			if header != 0 {
+         .          .    131:				shift := bits.TrailingZeros8(header) * 8
+         .          .    132:				dst[1] = byte(word >> shift)
+         .          .    133:				index = 2
+         .          .    134:				if remaining != 0 {
+         .          .    135:					shift = bits.TrailingZeros8(remaining) * 8
+         .          .    136:					dst[2] = byte(word >> shift)
+         .          .    137:					index = 3
+         .          .    138:				}
+         .          .    139:			}
+         .          .    140:			offset += index
+         .          .    141:		} else {
+         .          .    142:			// Pack 预留八字节尾空间，零字节暂写的位置会被下一个有效字节覆盖，不进入返回切片。
+         .          .    143:			_ = dst[8]
+         .          .    144:			// 0/1 字节标志相乘得到前缀和，每个和至多为 8，不跨字节进位。
+         .          .    145:			// FF 已在前面处理；各目标位置只依赖对应前缀，不串行累加 index。
+         .          .    146:			ranks := (nonzero >> 7) * 0x0101010101010101
+         .          .    147:			dst[1] = byte(word)
+         .          .    148:			dst[1+int(ranks&7)] = byte(word >> 8)
+         .          .    149:			dst[1+int((ranks>>8)&7)] = byte(word >> 16)
+         .          .    150:			dst[1+int((ranks>>16)&7)] = byte(word >> 24)
+         .          .    151:			dst[1+int((ranks>>24)&7)] = byte(word >> 32)
+         .          .    152:			dst[1+int((ranks>>32)&7)] = byte(word >> 40)
+         .          .    153:			dst[1+int((ranks>>40)&7)] = byte(word >> 48)
+         .          .    154:			dst[1+int((ranks>>48)&7)] = byte(word >> 56)
+         .          .    155:			dst[0] = header
+         .          .    156:			offset += 1 + int(ranks>>56)
+         .          .    157:		}
+         .          .    158:		src = src[8:]
+         .          .    159:	}
+      10ms       10ms    160:	if len(src) > 0 {
+         .          .    161:		offset += packSegment(packed[offset:], src, 0)
+         .          .    162:	}
+         .          .    163:	return packed[:offset]
+         .          .    164:}
+         .          .    165:

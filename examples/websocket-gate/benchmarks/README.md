@@ -66,7 +66,9 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 
 [布局按需倍增](../../../docs/benchmarks/2026-10-18-gosproto-layout-growth/RESULTS.md) 固定70项/四组，长数组真实入口与分配改善，4096个含整数数组记录的请求快约8.5%～8.9%、少75648B/4次分配。中间长度增配、常规追加/预检帧成本与所有控制失败/波动完整保留；既有扩展/525差分/官方/race/checkptr/vet/有限fuzz/GSR/GoTS通过，已本地提交为库bdfe1d0、GSR bf828b0，未推送，不改正式依赖或Decode。
 
-[布局连续索引写入](../../../docs/benchmarks/2026-10-18-gosproto-layout-index/RESULTS.md) 复用count保持容量序列，固定原70项四组。大型Encode/PEncode/真实请求约快2.5%～4.7%，全部分配中位数不变，整数记录预检帧144→112B；int32/手工帧代价、未改纯Pack波动及所有控制/累计原值保留。既有回归/525差分/官方/race/checkptr/vet/有限fuzz/GSR/GoTS7/7通过，保留候选待审查，未提交，正式依赖和Decode不变。
+[布局连续索引写入](../../../docs/benchmarks/2026-10-18-gosproto-layout-index/RESULTS.md) 复用count保持容量序列，固定原70项四组。大型Encode/PEncode/真实请求约快2.5%～4.7%，全部分配中位数不变，整数记录预检帧144→112B；int32/手工帧代价、未改纯Pack波动及所有控制/累计原值保留。既有回归/525差分/官方/race/checkptr/vet/有限fuzz/GSR/GoTS7/7通过，已本地提交为库7397804、GSR 25b0b0d，未推送，正式依赖和Decode不变。
+
+[当前热点与GC上下文](../../../docs/benchmarks/2026-10-18-gosproto-post-layout-profile/RESULTS.md) 26份profile、同函数384块与补充limiter事件显示：混合夹具存活可触发GC CPU limiter并放大波动，隔离并不保证全部控制通过；完整原值保留，不用新诊断替代旧比较。整数数组组合Pack仍占37%～41%，先补单项独立进程采样再选候选。只读诊断/vet/独立复算/指纹通过，库干净，新文档待审查。
 
 ## 比较口径
 

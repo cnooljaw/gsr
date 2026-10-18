@@ -1,0 +1,82 @@
+package benchmarks
+
+import (
+	"encoding/json"
+	"fmt"
+	"math/bits"
+	"os"
+	"strings"
+	"testing"
+
+	sproto "github.com/cnooljaw/gosproto"
+	"github.com/cnooljaw/gsr/examples/websocket-gate/gen/sproto/c2s"
+)
+
+type bytePattern struct {
+	Name    string
+	Bytes   int
+	Blocks  int
+	Masks   map[string]int
+	Nonzero [9]int
+}
+
+// TestPackBytePatterns 记录实际body及RPC恢复字节的word形态，不将原始mask当作Pack分支执行计数。
+func TestPackBytePatterns(t *testing.T) {
+	var results []bytePattern
+	observe := func(name string, wire []byte) {
+		r := bytePattern{Name: name, Bytes: len(wire), Masks: make(map[string]int)}
+		for start := 0; start < len(wire); start += 8 {
+			var mask byte
+			for index, value := range wire[start:min(start+8, len(wire))] {
+				if value != 0 {
+					mask |= 1 << index
+				}
+			}
+			r.Masks[fmt.Sprintf("%02x", mask)]++
+			r.Nonzero[bits.OnesCount8(mask)]++
+			r.Blocks++
+		}
+		results = append(results, r)
+	}
+	messages := map[string]any{}
+	for _, sample := range representativeCases(t) {
+		_, factory := representativeMessages(sample.Type)
+		message := factory()
+		if err := json.Unmarshal(sample.Data, message); err != nil {
+			t.Fatal(err)
+		}
+		messages[sample.Name] = message
+	}
+	text := strings.Repeat("A", 32)
+	messages["ascii32"] = &c2s.EchoRequest{Text: &text}
+	for _, name := range []string{"ascii32", "addressbook", "game_small", "game_large", "int32_edges", "echo_ascii4k"} {
+		message := messages[name]
+		wire, err := sproto.Encode(message)
+		if err != nil {
+			t.Fatal(err)
+		}
+		observe(name+"/body", wire)
+		for _, probe := range rpcProbePairs(t, name, message, false) {
+			packet, err := probe.right()
+			if err != nil {
+				t.Fatal(err)
+			}
+			unpacked, err := sproto.Unpack(packet)
+			if err != nil {
+				t.Fatal(err)
+			}
+			observe(probe.name, unpacked)
+		}
+	}
+	if len(results) != 24 {
+		t.Fatal("incomplete pattern matrix")
+	}
+	encoded, err := json.MarshalIndent(results, "", "  ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(os.Getenv("GSR_PATTERN_OUTPUT"), append(encoded, '\n'), 0644); err != nil {
+		t.Fatal(err)
+	}
+	t.Log("24 deterministic morphology observations;no timing")
+}

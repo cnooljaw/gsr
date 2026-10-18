@@ -1,0 +1,350 @@
+Total: 2.34s
+ROUTINE ======================== github.com/cnooljaw/gosproto.encodeFieldInto in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-post-layout-profile/run/archive/candidate/encode.go
+     110ms      860ms (flat, cum) 36.75% of Total
+         .          .    176:func encodeFieldInto(field *SprotoField, value reflect.Value, output []byte, layout *encodeLayout, trusted bool) int {
+         .          .    177:	if field.Array {
+         .          .    178:		if value.Len() == 0 {
+         .          .    179:			return 0
+         .          .    180:		}
+         .          .    181:		offset := 0
+         .          .    182:		switch field.Wire {
+         .          .    183:		case WireVarintName:
+         .          .    184:			width := layout.next()
+         .          .    185:			if field.int64Slice {
+         .       90ms    186:				return encodeInt64Slice(*value.Addr().Interface().(*[]int64), width, output)
+         .          .    187:			}
+         .          .    188:			output[0] = byte(width)
+         .          .    189:			for index := 0; index < value.Len(); index++ {
+         .          .    190:				number := integerBits(field, value.Index(index))
+         .          .    191:				if width == 4 {
+         .          .    192:					writeUint32(output[1+index*4:], uint32(number))
+         .          .    193:				} else {
+         .          .    194:					writeUint64(output[1+index*8:], number)
+         .          .    195:				}
+         .          .    196:			}
+         .          .    197:			offset = 1 + width*value.Len()
+         .          .    198:		case WireDoubleName:
+         .          .    199:			output[0] = 8
+         .          .    200:			offset = 1
+         .          .    201:			for index := 0; index < value.Len(); index++ {
+         .          .    202:				writeUint64(output[offset:], math.Float64bits(value.Index(index).Float()))
+         .          .    203:				offset += 8
+         .          .    204:			}
+         .          .    205:		case WireBooleanName:
+         .          .    206:			for index := 0; index < value.Len(); index++ {
+         .          .    207:				if value.Index(index).Bool() {
+         .          .    208:					output[index] = 1
+         .          .    209:				} else {
+         .          .    210:					output[index] = 0
+         .          .    211:				}
+         .          .    212:			}
+         .          .    213:			offset = value.Len()
+         .          .    214:		case WireBytesName:
+         .          .    215:			for index := 0; index < value.Len(); index++ {
+         .          .    216:				text := value.Index(index).String()
+      10ms       10ms    217:				writeUint32(output[offset:], uint32(len(text)))
+         .          .    218:				offset += 4 + copy(output[offset+4:], text)
+         .          .    219:			}
+         .          .    220:		case WireStructName:
+         .          .    221:			childBinding := bindEncodeChild(field, value, trusted)
+         .          .    222:			integers := childBinding.native && field.st.int64Record && field.st.nativeIntegerFields()
+      30ms       30ms    223:			for index := 0; index < value.Len(); index++ {
+         .          .    224:				var length int
+         .          .    225:				if integers {
+         .      190ms    226:					pointer := messageEncodePointer(value.Index(index), childBinding)
+      20ms      490ms    227:					length = encodeIntegerRecordInto(field.st, pointer, output[offset+4:], layout)
+         .          .    228:				} else {
+      10ms       10ms    229:					length = encodeMessageInto(field.st, value.Index(index), output[offset+4:], layout, childBinding)
+         .          .    230:				}
+      40ms       40ms    231:				writeUint32(output[offset:], uint32(length))
+         .          .    232:				offset += 4 + length
+         .          .    233:			}
+         .          .    234:		}
+         .          .    235:		return offset
+         .          .    236:	}
+ROUTINE ======================== github.com/cnooljaw/gosproto.encodeInt64Slice in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-post-layout-profile/run/archive/candidate/encode.go
+      70ms       80ms (flat, cum)  3.42% of Total
+         .          .    276:func encodeInt64Slice(values []int64, width int, output []byte) int {
+         .          .    277:	output[0] = byte(width)
+         .          .    278:	remaining := output[1:]
+         .          .    279:	if width == 4 {
+      30ms       30ms    280:		for _, number := range values {
+         .       10ms    281:			writeUint32(remaining, uint32(number))
+      40ms       40ms    282:			remaining = remaining[4:]
+         .          .    283:		}
+         .          .    284:	} else {
+         .          .    285:		for _, number := range values {
+         .          .    286:			writeUint64(remaining, uint64(number))
+         .          .    287:			remaining = remaining[8:]
+ROUTINE ======================== github.com/cnooljaw/gosproto.encodeIntegerRecordInto in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-post-layout-profile/run/archive/candidate/encode_integer_record.go
+     360ms      470ms (flat, cum) 20.09% of Total
+      20ms       20ms     51:func encodeIntegerRecordInto(schema *SprotoType, pointer encodePointer, output []byte, layout *encodeLayout) int {
+         .       20ms     52:	count := layout.next()
+      10ms       10ms     53:	writeUint16(output, uint16(count))
+         .          .     54:	if pointer.value == nil {
+         .          .     55:		return 2
+         .          .     56:	}
+         .          .     57:	headerOffset, bodyOffset, previous := 2, 2+count*2, -1
+      80ms       80ms     58:	for _, index := range schema.order {
+      10ms       10ms     59:		field := schema.Fields[index]
+      20ms       20ms     60:		if field.Tag < 0 {
+         .          .     61:			continue
+         .          .     62:		}
+      10ms       10ms     63:		bits, present := pointer.integer(field.encOffset)
+      40ms       40ms     64:		if !present {
+         .          .     65:			continue
+         .          .     66:		}
+      20ms       20ms     67:		if skip := skipTag(previous, field.Tag); skip > 0 {
+         .          .     68:			writeUint16(output[headerOffset:], skip)
+         .          .     69:			headerOffset += 2
+         .          .     70:		}
+         .       90ms     71:		header, length := encodeIntegerInto(bits, output[bodyOffset:])
+      80ms       80ms     72:		writeUint16(output[headerOffset:], header)
+      10ms       10ms     73:		headerOffset += 2
+      20ms       20ms     74:		previous = field.Tag
+         .          .     75:		if header == 0 {
+         .          .     76:			writeUint32(output[bodyOffset:], uint32(length))
+         .          .     77:			bodyOffset += 4 + length
+         .          .     78:		}
+         .          .     79:	}
+      40ms       40ms     80:	return bodyOffset
+         .          .     81:}
+ROUTINE ======================== github.com/cnooljaw/gosproto.encodeMessageInto in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-post-layout-profile/run/archive/candidate/encode.go
+         0      880ms (flat, cum) 37.61% of Total
+         .          .    123:func encodeMessageInto(schema *SprotoType, value reflect.Value, output []byte, layout *encodeLayout, binding encodeBinding) int {
+         .          .    124:	count := layout.next()
+         .          .    125:	writeUint16(output, uint16(count))
+         .          .    126:	if value.IsNil() {
+         .          .    127:		return 2
+         .          .    128:	}
+         .          .    129:	record := value.Elem()
+         .          .    130:	pointer := messageEncodePointer(value, binding)
+         .          .    131:	headerOffset, bodyOffset, previous := 2, 2+count*2, -1
+         .          .    132:	for _, index := range schema.order {
+         .          .    133:		field := schema.Fields[index]
+         .          .    134:		if field.Tag < 0 {
+         .          .    135:			continue
+         .          .    136:		}
+         .          .    137:		native := binding.native && field.nativeInteger(schema)
+         .          .    138:		var current reflect.Value
+         .          .    139:		var bits uint64
+         .          .    140:		if native {
+         .          .    141:			var present bool
+         .          .    142:			bits, present = pointer.integer(field.encOffset)
+         .          .    143:			if !present {
+         .          .    144:				continue
+         .          .    145:			}
+         .          .    146:		} else {
+         .       10ms    147:			current = record.Field(field.index[0])
+         .          .    148:			if omittedField(field, current) {
+         .          .    149:				continue
+         .          .    150:			}
+         .          .    151:		}
+         .          .    152:		if skip := skipTag(previous, field.Tag); skip > 0 {
+         .          .    153:			writeUint16(output[headerOffset:], skip)
+         .          .    154:			headerOffset += 2
+         .          .    155:		}
+         .          .    156:		var header uint16
+         .          .    157:		var length int
+         .          .    158:		if native {
+         .          .    159:			header, length = encodeIntegerInto(bits, output[bodyOffset:])
+         .          .    160:		} else if field.Array || field.Wire == WireStructName {
+         .      860ms    161:			length = encodeFieldInto(field, current, output[bodyOffset+4:], layout, binding.exact && field.encOwner == schema && field.Array != field.pointer)
+         .          .    162:		} else {
+         .          .    163:			header, length = encodeScalarInto(field, current, output[bodyOffset:])
+         .          .    164:		}
+         .          .    165:		writeUint16(output[headerOffset:], header)
+         .          .    166:		headerOffset += 2
+         .          .    167:		previous = field.Tag
+         .          .    168:		if header == 0 {
+         .       10ms    169:			writeUint32(output[bodyOffset:], uint32(length))
+         .          .    170:			bodyOffset += 4 + length
+         .          .    171:		}
+         .          .    172:	}
+         .          .    173:	return bodyOffset
+         .          .    174:}
+ROUTINE ======================== github.com/cnooljaw/gosproto.encodedIntegerRecordSize in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-post-layout-profile/run/archive/candidate/encode_integer_record.go
+     220ms      340ms (flat, cum) 14.53% of Total
+      10ms       10ms      7:func encodedIntegerRecordSize(schema *SprotoType, pointer encodePointer, budget *decodeBudget, depth int, layout *encodeLayout) (int, error) {
+         .          .      8:	if depth > budget.limits.MaxDepth || budget.limits.MaxBytes < 2 {
+         .          .      9:		return 0, ErrLimit
+         .          .     10:	}
+         .       50ms     11:	layoutIndex := layout.add(0)
+         .          .     12:	if pointer.value == nil {
+         .          .     13:		return 2, nil
+         .          .     14:	}
+         .          .     15:	size, headers, lastTag := 2, 0, -1
+      40ms       40ms     16:	for _, index := range schema.order {
+      30ms       30ms     17:		field := schema.Fields[index]
+         .          .     18:		if field.Tag < 0 {
+         .          .     19:			continue
+         .          .     20:		}
+         .       30ms     21:		bits, present := pointer.integer(field.encOffset)
+      20ms       20ms     22:		if !present {
+         .          .     23:			continue
+         .          .     24:		}
+         .       20ms     25:		if err := budget.add(1); err != nil {
+         .          .     26:			return 0, err
+         .          .     27:		}
+      20ms       20ms     28:		gap := field.Tag - lastTag - 1
+         .          .     29:		if gap > 32768 {
+         .          .     30:			return 0, fmt.Errorf("%w: tag gap", ErrEncode)
+         .          .     31:		}
+         .          .     32:		if gap > 0 {
+         .          .     33:			size += 2
+         .          .     34:			headers++
+         .          .     35:		}
+         .          .     36:		size += 2
+         .          .     37:		headers++
+         .          .     38:		lastTag = field.Tag
+      50ms       50ms     39:		if bits > MaxEmbeddedInt {
+         .          .     40:			size += 4 + integerWidth(bits)
+         .          .     41:		}
+      10ms       10ms     42:		if size > budget.limits.MaxBytes {
+         .          .     43:			return 0, ErrLimit
+         .          .     44:		}
+         .          .     45:	}
+      10ms       30ms     46:	layout.set(layoutIndex, headers)
+      30ms       30ms     47:	return size, nil
+         .          .     48:}
+         .          .     49:
+         .          .     50:// encodeIntegerRecordInto 复用同一次预检的布局，字段值仍逐个读取并写入独占输出。
+         .          .     51:func encodeIntegerRecordInto(schema *SprotoType, pointer encodePointer, output []byte, layout *encodeLayout) int {
+         .          .     52:	count := layout.next()
+ROUTINE ======================== github.com/cnooljaw/gosproto.encodedSize in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-post-layout-profile/run/archive/candidate/limits.go
+         0      680ms (flat, cum) 29.06% of Total
+         .          .    114:func encodedSize(schema *SprotoType, value reflect.Value, budget *decodeBudget, depth int, layout *encodeLayout, binding encodeBinding) (int, error) {
+         .          .    115:	if depth > budget.limits.MaxDepth {
+         .          .    116:		return 0, ErrLimit
+         .          .    117:	}
+         .          .    118:	size, lastTag := 2, -1
+         .          .    119:	if size > budget.limits.MaxBytes {
+         .          .    120:		return 0, ErrLimit
+         .          .    121:	}
+         .          .    122:	layoutIndex := layout.add(0)
+         .          .    123:	if value.IsNil() {
+         .          .    124:		return size, nil
+         .          .    125:	}
+         .          .    126:	record := value.Elem()
+         .          .    127:	pointer := messageEncodePointer(value, binding)
+         .          .    128:	headerCount := 0
+         .          .    129:	for _, index := range schema.order {
+         .          .    130:		field := schema.Fields[index]
+         .          .    131:		if field.Tag < 0 {
+         .          .    132:			continue
+         .          .    133:		}
+         .          .    134:		native := binding.native && field.nativeInteger(schema)
+         .          .    135:		var current reflect.Value
+         .          .    136:		var bits uint64
+         .          .    137:		if native {
+         .          .    138:			var present bool
+         .          .    139:			bits, present = pointer.integer(field.encOffset)
+         .          .    140:			if !present {
+         .          .    141:				continue
+         .          .    142:			}
+         .          .    143:		} else {
+         .          .    144:			current = record.Field(field.index[0])
+         .          .    145:			if omittedField(field, current) {
+         .          .    146:				continue
+         .          .    147:			}
+         .          .    148:		}
+         .       10ms    149:		if err := budget.add(1); err != nil {
+         .          .    150:			return 0, err
+         .          .    151:		}
+         .          .    152:		gap := field.Tag - lastTag - 1
+         .          .    153:		if gap > 32768 {
+         .          .    154:			return 0, fmt.Errorf("%w: tag gap", ErrEncode)
+         .          .    155:		}
+         .          .    156:		if gap > 0 {
+         .          .    157:			size += 2
+         .          .    158:			headerCount++
+         .          .    159:		}
+         .          .    160:		size += 2
+         .          .    161:		headerCount++
+         .          .    162:		lastTag = field.Tag
+         .          .    163:		var part int
+         .          .    164:		var inline bool
+         .          .    165:		var err error
+         .          .    166:		if native {
+         .          .    167:			part, inline = signedSize(bits)
+         .          .    168:		} else {
+         .      670ms    169:			part, inline, err = fieldSize(field, current, budget, depth, layout, binding.exact && field.encOwner == schema && field.Array != field.pointer)
+         .          .    170:		}
+         .          .    171:		if err != nil {
+         .          .    172:			return 0, err
+         .          .    173:		}
+         .          .    174:		if !inline {
+ROUTINE ======================== github.com/cnooljaw/gosproto.fieldSize in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-post-layout-profile/run/archive/candidate/limits.go
+     180ms      670ms (flat, cum) 28.63% of Total
+         .          .    185:func fieldSize(field *SprotoField, value reflect.Value, budget *decodeBudget, depth int, layout *encodeLayout, trusted bool) (int, bool, error) {
+      10ms       10ms    186:	if field.Array {
+         .          .    187:		if err := budget.add(value.Len()); err != nil {
+         .          .    188:			return 0, false, err
+         .          .    189:		}
+         .          .    190:		size := 0
+         .          .    191:		switch field.Wire {
+         .          .    192:		case WireVarintName:
+         .          .    193:			if field.int64Slice {
+         .          .    194:				values := *value.Addr().Interface().(*[]int64)
+         .          .    195:				width := 4
+      10ms       10ms    196:				for _, number := range values {
+         .          .    197:					if number < MinInt32 || number > MaxInt32 {
+         .          .    198:						width = 8
+         .          .    199:						break
+         .          .    200:					}
+         .          .    201:				}
+         .          .    202:				if len(values) > 0 {
+         .          .    203:					size = 1 + width*len(values)
+         .          .    204:					layout.add(width)
+         .          .    205:				}
+         .          .    206:				break
+         .          .    207:			}
+         .          .    208:			width := 4
+         .          .    209:			for i := 0; i < value.Len(); i++ {
+         .          .    210:				bits := integerBits(field, value.Index(i))
+         .          .    211:				if field.unsigned && bits > math.MaxInt64 {
+         .          .    212:					return 0, false, fmt.Errorf("%w: integer exceeds signed 64-bit range", ErrEncode)
+         .          .    213:				}
+         .          .    214:				if integerWidth(bits) > width {
+         .          .    215:					width = 8
+         .          .    216:				}
+         .          .    217:			}
+         .          .    218:			if value.Len() > 0 {
+         .          .    219:				size = 1 + width*value.Len()
+         .          .    220:				layout.add(width)
+         .          .    221:			}
+         .          .    222:		case WireDoubleName:
+         .          .    223:			if value.Len() > 0 {
+         .          .    224:				size = 1 + 8*value.Len()
+         .          .    225:			}
+         .          .    226:		case WireBooleanName:
+         .          .    227:			size = value.Len()
+         .          .    228:		case WireBytesName:
+         .          .    229:			for i := 0; i < value.Len(); i++ {
+         .       10ms    230:				size += 4 + value.Index(i).Len()
+         .          .    231:				if size > budget.limits.MaxBytes {
+         .          .    232:					return 0, false, ErrLimit
+         .          .    233:				}
+         .          .    234:			}
+         .          .    235:		case WireStructName:
+         .          .    236:			var childBinding encodeBinding
+         .          .    237:			if value.Len() > 0 {
+         .          .    238:				childBinding = bindEncodeChild(field, value, trusted)
+         .          .    239:
+         .          .    240:			}
+         .          .    241:			integers := childBinding.native && field.st.int64Record && field.st.nativeIntegerFields()
+      80ms       80ms    242:			for i := 0; i < value.Len(); i++ {
+         .          .    243:				var part int
+         .          .    244:				var err error
+      50ms       50ms    245:				if integers {
+         .      140ms    246:					pointer := messageEncodePointer(value.Index(i), childBinding)
+      10ms      350ms    247:					part, err = encodedIntegerRecordSize(field.st, pointer, budget, depth+1, layout)
+         .          .    248:				} else {
+         .          .    249:					part, err = encodedSize(field.st, value.Index(i), budget, depth+1, layout, childBinding)
+         .          .    250:				}
+      20ms       20ms    251:				if err != nil {
+         .          .    252:					return 0, false, err
+         .          .    253:				}
+         .          .    254:				size += 4 + part
+         .          .    255:				if size > budget.limits.MaxBytes {
+         .          .    256:					return 0, false, ErrLimit

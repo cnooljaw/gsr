@@ -1,0 +1,157 @@
+package benchmarks
+
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"os"
+	"strings"
+	"testing"
+
+	sproto "github.com/cnooljaw/gosproto"
+	before "github.com/cnooljaw/gosproto-before"
+)
+
+func growthFixtureSamples(t *testing.T) []layoutSample {
+	t.Helper()
+	contents, err := os.ReadFile(os.Getenv("GSR_GROWTH_FIXTURE_PLAN"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var plan layoutPlan
+	if err := json.Unmarshal(contents, &plan); err != nil {
+		t.Fatal(err)
+	}
+	return layoutSamples(t, plan)
+}
+
+func growthPairOperations(t *testing.T, mode string) []pairOperation {
+	t.Helper()
+	selected := strings.Split(os.Getenv("GSR_GROWTH_CASES"), ",")
+	all := growthFixtureSamples(t)
+	var operations []pairOperation
+	for _, name := range selected {
+		var message any
+		for _, sample := range all {
+			if sample.Name == name {
+				message = sample.Message
+				break
+			}
+		}
+		if message == nil {
+			t.Fatal("missing growth case: " + name)
+		}
+		for _, packed := range []bool{false, true} {
+			entry := "encode"
+			if packed {
+				entry = "pencode"
+			}
+			left := func() error {
+				var err error
+				if packed {
+					encodedSink, err = before.EncodePacked(message)
+				} else {
+					encodedSink, err = before.Encode(message)
+				}
+				return err
+			}
+			right := func() error {
+				var err error
+				if packed {
+					encodedSink, err = sproto.EncodePacked(message)
+				} else {
+					encodedSink, err = sproto.Encode(message)
+				}
+				return err
+			}
+			if err := left(); err != nil {
+				t.Fatal(err)
+			}
+			want, capacity := bytes.Clone(encodedSink), cap(encodedSink)
+			if err := right(); err != nil || !bytes.Equal(want, encodedSink) || capacity != cap(encodedSink) {
+				t.Fatal("growth wire/cap changed: " + name + "/" + entry)
+			}
+			if mode == "self" {
+				left = right
+			}
+			operations = append(operations, pairOperation{name + "/" + entry, left, right})
+		}
+		for _, probe := range rpcProbePairs(t, name, message, false) {
+			if !strings.HasSuffix(probe.name, "/request_cancel") {
+				continue
+			}
+			left := func() error {
+				var err error
+				encodedSink, err = probe.left()
+				return err
+			}
+			right := func() error {
+				var err error
+				encodedSink, err = probe.right()
+				return err
+			}
+			if mode == "self" {
+				left = right
+			}
+			operations = append(operations, pairOperation{probe.name, left, right})
+		}
+	}
+	if len(operations) != 27 {
+		t.Fatal("incomplete growth matrix")
+	}
+	return operations
+}
+
+// TestGrowthDifferential 保护多级布局增长后的完整 wire/cap、预算错误及后续编码不覆盖旧结果。
+func TestGrowthDifferential(t *testing.T) {
+	samples := growthFixtureSamples(t)
+	if len(samples) != 109 {
+		t.Fatal("incomplete fixture matrix")
+	}
+	checks := 0
+	compare := func(name string, left, right func() ([]byte, error)) {
+		t.Helper()
+		old, err := left()
+		if err != nil {
+			t.Fatalf("%s old encode: %v", name, err)
+		}
+		current, err := right()
+		if err != nil || !bytes.Equal(old, current) || cap(old) != cap(current) {
+			t.Fatalf("%s wire/cap: %v", name, err)
+		}
+		oldSnapshot, snapshot := bytes.Clone(old), bytes.Clone(current)
+		if _, err := left(); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := right(); err != nil || !bytes.Equal(old, oldSnapshot) || !bytes.Equal(current, snapshot) {
+			t.Fatalf("%s output ownership: %v", name, err)
+		}
+		checks++
+	}
+	for _, sample := range samples {
+		left := func() ([]byte, error) { return before.EncodeWithLimits(sample.Message, sample.Limits) }
+		right := func() ([]byte, error) { return sproto.EncodeWithLimits(sample.Message, sproto.Limits(sample.Limits)) }
+		if sample.ExpectedCount < 0 {
+			old, oldErr := left()
+			current, err := right()
+			if !errors.Is(oldErr, before.ErrLimit) || !errors.Is(err, sproto.ErrLimit) || old != nil || current != nil || oldErr.Error() != err.Error() {
+				t.Fatalf("%s budget contract: %v / %v", sample.Name, oldErr, err)
+			}
+			checks++
+			continue
+		}
+		compare(sample.Name+"/raw", left, right)
+		compare(sample.Name+"/packed", func() ([]byte, error) {
+			return before.EncodePacked(sample.Message)
+		}, func() ([]byte, error) {
+			return sproto.EncodePacked(sample.Message)
+		})
+		for _, probe := range rpcProbePairs(t, sample.Name, sample.Message, false) {
+			compare(probe.name, probe.left, probe.right)
+		}
+	}
+	if checks != 525 {
+		t.Fatal("incomplete differential checks", checks)
+	}
+	t.Logf("%d shapes, %d body/packed/RPC/budget wire-cap-ownership checks", len(samples), checks)
+}

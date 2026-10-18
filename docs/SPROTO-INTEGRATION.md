@@ -235,4 +235,7 @@ Pack前缀已提交为库a161158、GSR d6c672c，均未推送。后续只读布�
 仅在布局外溢满载时倍增，固定原43项+27个长数组入口。4096个含整数数组记录的真实请求快8.54%/8.89%，分配230784B/12次→155136B/8次；full/nil/half长数组同向改善。中间嵌套多3456B、常规追加成本、预检帧各增16B及非目标大幅翻转均保留，按综合收益保留候选，不设最低比例。既有扩展/525差分/官方/race/checkptr/vet/有限fuzz/GSR/GoTS验收通过，Pack fuzz计数停增限制如实披露。见 [布局按需增长报告](benchmarks/2026-10-18-gosproto-layout-growth/RESULTS.md)，该轮已本地提交为库bdfe1d0、GSR bf828b0，未推送，Decode与正式依赖不变。
 
 
-布局追加仅复用连续索引写入，保持容量与预算；固定原70项两轮，大型纯Encode/PEncode和三种RPC同向改善，实际请求快3.13%/3.48%，所有分配中位数相同。整数记录预检帧144→112B，通用帧不变；int32/手工帧成本、未改纯Pack波动及全部失败控制/累计原值保留。既有回归/525差分、官方/race/checkptr/vet/有限fuzz/GSR/GoTS7/7通过；Pack9053次且3s后停增的限制披露。见 [连续索引报告](benchmarks/2026-10-18-gosproto-layout-index/RESULTS.md)，候选保留待审查、未提交，不改Decode或正式依赖。
+布局追加仅复用连续索引写入，保持容量与预算；固定原70项两轮，大型纯Encode/PEncode和三种RPC同向改善，实际请求快3.13%/3.48%，所有分配中位数相同。整数记录预检帧144→112B，通用帧不变；int32/手工帧成本、未改纯Pack波动及全部失败控制/累计原值保留。既有回归/525差分、官方/race/checkptr/vet/有限fuzz/GSR/GoTS7/7通过；Pack9053次且3s后停增的限制披露。见 [连续索引报告](benchmarks/2026-10-18-gosproto-layout-index/RESULTS.md)，该轮已本地提交为库7397804、GSR 25b0b0d，未推送，不改Decode或正式依赖。
+
+
+7397804后只读刷新26份profile及4KiB同函数上下文，发现混合夹具环境会大幅改变堆/GC；另起无计时诊断确认GC CPU limiter在full启用（0→1279）、isolated未启用（0）。这是已测到的机制，不回填历史比较或把隔离数字当协议加速。整数数组组合Pack仍占37%～41%，24项形态统计支持后续普通word研究；先补单项独立进程采样。诊断/vet、384块/24形态/194事件点和源/归档/profile核对通过，库干净，生产/正式依赖/Decode不变；新GSR文档未提交。见 [当前热点与GC上下文](benchmarks/2026-10-18-gosproto-post-layout-profile/RESULTS.md)。

@@ -1,0 +1,48 @@
+File: encoding.test
+Type: cpu
+Time: 2026-10-18 23:40:01 CST
+Duration: 2.62s, Total samples = 2.32s (88.72%)
+Showing nodes accounting for 1.97s, 84.91% of 2.32s total
+Dropped 44 nodes (cum <= 0.01s)
+Showing top 40 nodes out of 77
+      flat  flat%   sum%        cum   cum%
+     0.34s 14.66% 14.66%      0.34s 14.66%  runtime.kevent
+     0.17s  7.33% 21.98%      0.29s 12.50%  github.com/cnooljaw/gosproto.packInto
+     0.10s  4.31% 26.29%      0.10s  4.31%  reflect.Value.Elem
+     0.09s  3.88% 30.17%      1.61s 69.40%  github.com/cnooljaw/gosproto.(*Rpc).RequestEncode
+     0.09s  3.88% 34.05%      0.25s 10.78%  github.com/cnooljaw/gosproto.encodedSize
+     0.07s  3.02% 37.07%      0.07s  3.02%  reflect.flag.kind (inline)
+     0.07s  3.02% 40.09%      0.27s 11.64%  runtime.mallocgc
+     0.06s  2.59% 42.67%      0.06s  2.59%  runtime.memhash32
+     0.05s  2.16% 44.83%      0.07s  3.02%  github.com/cnooljaw/gosproto.encodeRpcHeader
+     0.05s  2.16% 46.98%      0.06s  2.59%  github.com/cnooljaw/gosproto.ffRunBytes
+     0.05s  2.16% 49.14%      0.05s  2.16%  internal/chacha8rand.block
+     0.05s  2.16% 51.29%      0.18s  7.76%  internal/runtime/maps.(*Map).Delete
+     0.05s  2.16% 53.45%      0.11s  4.74%  reflect.Value.IsNil (inline)
+     0.04s  1.72% 55.17%      0.26s 11.21%  github.com/cnooljaw/gosproto.(*Rpc).CancelSession
+     0.04s  1.72% 56.90%      0.09s  3.88%  github.com/cnooljaw/gosproto.fieldSize
+     0.04s  1.72% 58.62%      0.06s  2.59%  github.com/cnooljaw/gosproto.writeFF (inline)
+     0.04s  1.72% 60.34%      0.07s  3.02%  internal/runtime/maps.(*Map).deleteSmall
+     0.04s  1.72% 62.07%      0.04s  1.72%  internal/sync.(*Mutex).Lock (inline)
+     0.04s  1.72% 63.79%      0.04s  1.72%  runtime.madvise
+     0.04s  1.72% 65.52%      0.18s  7.76%  runtime.mallocgcSmallNoscan
+     0.04s  1.72% 67.24%      0.04s  1.72%  runtime.memclrNoHeapPointers
+     0.03s  1.29% 68.53%      0.96s 41.38%  github.com/cnooljaw/gosproto.encodeBufferWithLimits
+     0.03s  1.29% 69.83%      0.03s  1.29%  internal/chacha8rand.(*State).Next (inline)
+     0.03s  1.29% 71.12%      0.05s  2.16%  internal/runtime/maps.(*Map).putSlotSmallFast32
+     0.03s  1.29% 72.41%      0.03s  1.29%  internal/sync.(*Mutex).Unlock (inline)
+     0.03s  1.29% 73.71%      0.03s  1.29%  runtime.ifaceeq
+     0.03s  1.29% 75.00%      0.05s  2.16%  runtime.interequal
+     0.02s  0.86% 75.86%      0.02s  0.86%  github.com/cnooljaw/gosproto.(*decodeBudget).add (inline)
+     0.02s  0.86% 76.72%      0.05s  2.16%  github.com/cnooljaw/gosproto.encodeScalarInto
+     0.02s  0.86% 77.59%      0.02s  0.86%  internal/abi.(*SwissMapType).IndirectKey (inline)
+     0.02s  0.86% 78.45%      0.04s  1.72%  internal/runtime/maps.(*Map).getWithoutKeySmallFastStr
+     0.02s  0.86% 79.31%      0.02s  0.86%  reflect.(*rtype).Kind
+     0.02s  0.86% 80.17%      0.02s  0.86%  reflect.Value.lenNonSlice
+     0.02s  0.86% 81.03%      0.02s  0.86%  runtime.acquirem (inline)
+     0.02s  0.86% 81.90%      0.06s  2.59%  runtime.mapaccess2_faststr
+     0.02s  0.86% 82.76%      0.02s  0.86%  runtime.memmove
+     0.02s  0.86% 83.62%      0.03s  1.29%  runtime.nextFreeFast (inline)
+     0.01s  0.43% 84.05%      0.15s  6.47%  github.com/cnooljaw/gosproto.encodeMessageInto
+     0.01s  0.43% 84.48%      0.10s  4.31%  github.com/cnooljaw/gosproto.getbase
+     0.01s  0.43% 84.91%      0.02s  0.86%  reflect.Value.Field

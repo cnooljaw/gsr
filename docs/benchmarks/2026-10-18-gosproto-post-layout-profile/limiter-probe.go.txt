@@ -1,0 +1,56 @@
+package benchmarks
+
+import (
+	"encoding/json"
+	"os"
+	"runtime"
+	"runtime/metrics"
+	"testing"
+)
+
+type limiterPoint struct {
+	Calls       int
+	Snapshot    contextSnapshot
+	LastEnabled uint64
+}
+
+// TestPackLimiterEvents 只记录固定调用期间的GC limiter事件与堆变化，不采集耗时或重试A/A控制。
+func TestPackLimiterEvents(t *testing.T) {
+	all, operation := contextOperation(t)
+	if runtime.GOMAXPROCS(0) != 1 {
+		t.Fatal("GOMAXPROCS=1 required")
+	}
+	counters := contextCounters()
+	limiter := []metrics.Sample{{Name: "/gc/limiter/last-enabled:gc-cycle"}}
+	points := make([]limiterPoint, 0, 97)
+	read := func(calls int) {
+		metrics.Read(limiter)
+		if limiter[0].Value.Kind() != metrics.KindUint64 {
+			t.Fatal("limiter metric unavailable")
+		}
+		points = append(points, limiterPoint{calls, contextRead(counters), limiter[0].Value.Uint64()})
+	}
+	read(0)
+	for index := 0; index < 96; index++ {
+		for range 16384 {
+			if err := operation.right(); err != nil {
+				t.Fatal(err)
+			}
+		}
+		read((index + 1) * 16384)
+	}
+	runtime.KeepAlive(all)
+	result := struct {
+		Case    string
+		Context string
+		Points  []limiterPoint
+	}{operation.name, os.Getenv("GSR_CONTEXT_LIVE"), points}
+	encoded, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(os.Getenv("GSR_LIMITER_OUTPUT"), append(encoded, '\n'), 0644); err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("%s:1572864 calls,97 limiter snapshots;no timing", result.Context)
+}

@@ -1,0 +1,10 @@
+{
+  "stage": "After context snapshots showed full-heap peak637MB and zero-GC blocks,record official Go CPU-limiter activation;not a timing retry",
+  "case": "body/echo_ascii4k/sproto_pack",
+  "contexts": ["full", "isolated"],
+  "callsPerContext": 1572864,
+  "readEveryCalls": 16384,
+  "metric": "/gc/limiter/last-enabled:gc-cycle",
+  "timing": "none;do not record ns or AA ratios;single fixed diagnostic per context",
+  "interpretation": "lastEnabled greater than pre-loop GC cycle locates an activation during this diagnostic;does not reconstruct historical run events;no GC-off or pool/cap changes"
+}
