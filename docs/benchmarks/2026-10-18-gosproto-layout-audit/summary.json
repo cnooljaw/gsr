@@ -1,0 +1,70 @@
+{
+  "cases": 109,
+  "allocationEntries": 317,
+  "callsPerEntry": 128,
+  "totalMeasuredCalls": 40576,
+  "growthCounts": 48,
+  "modelObservations": 192,
+  "totalModelCalls": 24576,
+  "failedAdmissionCases": [
+    "chain/65",
+    "failure/elements",
+    "failure/bytes_early",
+    "failure/depth",
+    "failure/bytes_after_spill"
+  ],
+  "fractionalAllocationObservations": [],
+  "doublingCostsInObservedCounts": [
+    {
+      "count": 1057,
+      "current": {
+        "Count": 1057,
+        "Policy": "current128",
+        "Calls": 128,
+        "FinalLength": 1025,
+        "FinalCapacity": 1344,
+        "Bytes": 1589248,
+        "Mallocs": 640,
+        "BytesPerCall": 12416,
+        "MallocsPerCall": 5
+      },
+      "doubling": {
+        "Count": 1057,
+        "Policy": "double128",
+        "Calls": 128,
+        "FinalLength": 1025,
+        "FinalCapacity": 2048,
+        "Bytes": 2031616,
+        "Mallocs": 640,
+        "BytesPerCall": 15872,
+        "MallocsPerCall": 5
+      }
+    },
+    {
+      "count": 4129,
+      "current": {
+        "Count": 4129,
+        "Policy": "current128",
+        "Calls": 128,
+        "FinalLength": 4097,
+        "FinalCapacity": 5440,
+        "Bytes": 9093120,
+        "Mallocs": 1152,
+        "BytesPerCall": 71040,
+        "MallocsPerCall": 9
+      },
+      "doubling": {
+        "Count": 4129,
+        "Policy": "double128",
+        "Calls": 128,
+        "FinalLength": 4097,
+        "FinalCapacity": 8192,
+        "Bytes": 8323072,
+        "Mallocs": 896,
+        "BytesPerCall": 65024,
+        "MallocsPerCall": 7
+      }
+    }
+  ],
+  "conclusion": "Current128 fits game_large in one spill; initial64 adds allocation. Longer arrays accumulate repeated growth. Doubling reduces some cumulative allocation, but has intermediate-length costs; no production adoption or CPU conclusion."
+}

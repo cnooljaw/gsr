@@ -1,0 +1,256 @@
+package benchmarks
+
+import (
+	"bytes"
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
+	"fmt"
+	"os"
+	"reflect"
+	"runtime"
+	"strings"
+	"testing"
+
+	before "github.com/cnooljaw/gosproto-before"
+	sproto "github.com/cnooljaw/gosproto"
+)
+
+type layoutRecord struct {
+	A *int64 `sproto:"integer,0"`
+	B *int64 `sproto:"integer,1"`
+	C *int64 `sproto:"integer,2"`
+}
+
+type layoutRows struct {
+	Rows []*layoutRecord `sproto:"struct,0,array"`
+}
+
+type layoutGroups struct {
+	Groups []*layoutRows `sproto:"struct,0,array"`
+}
+
+type layoutArrayRecord struct {
+	Values []int64 `sproto:"integer,0,array"`
+}
+
+type layoutArrayRows struct {
+	Rows []*layoutArrayRecord `sproto:"struct,0,array"`
+}
+
+type layoutChain struct {
+	Child *layoutChain `sproto:"struct,0"`
+}
+
+type layoutText struct {
+	Text *string `sproto:"string,0"`
+}
+
+type layoutSample struct {
+	Name string
+	Message any
+	Limits before.Limits
+	ExpectedCount int
+}
+
+type layoutPlan struct {
+	Lengths []int `json:"lengths"`
+	FlatModes []string `json:"flatModes"`
+	NestedGroups []int `json:"nestedGroups"`
+	NestedRows []int `json:"nestedRows"`
+	ChainDepths []int `json:"chainDepths"`
+	Initial []int `json:"initialCapacitiesToSimulate"`
+	Allocation struct { Calls int `json:"callsPerEntry"` } `json:"allocation"`
+}
+
+type layoutAllocation struct {
+	Entry string
+	Calls int
+	Bytes uint64
+	Mallocs uint64
+	BytesPerCall float64
+	MallocsPerCall float64
+	Length int
+	Capacity int
+	Error string
+}
+
+type layoutResult struct {
+	Name string
+	Limits before.Limits
+	Trace sproto.DiagnosticLayout
+	WireSHA256 string
+	InitialGrowth map[int][]sproto.DiagnosticGrowth
+	Allocations []layoutAllocation
+}
+
+func layoutRecords(length int, mode string) *layoutRows {
+	rows := &layoutRows{Rows: make([]*layoutRecord, length)}
+	for index := range rows.Rows {
+		if mode == "nil" || (mode == "half" && index%2 == 0) {
+			continue
+		}
+		a, b, c := int64(index), int64(-index-1), int64(1<<33)
+		rows.Rows[index] = &layoutRecord{A: &a, B: &b, C: &c}
+	}
+	return rows
+}
+
+func layoutSamples(t *testing.T, plan layoutPlan) []layoutSample {
+	t.Helper()
+	var samples []layoutSample
+	for _, sample := range representativeCases(t) {
+		_, factory := representativeMessages(sample.Type)
+		message := factory()
+		if err := json.Unmarshal(sample.Data, message); err != nil {
+			t.Fatal(err)
+		}
+		expected := map[string]int{"addressbook": 6, "game_small": 11, "game_large": 131, "int32_edges": 2, "echo_ascii4k": 1}[sample.Name]
+		samples = append(samples, layoutSample{Name: sample.Name, Message: message, ExpectedCount: expected})
+	}
+	text := strings.Repeat("A", 32)
+	samples = append(samples, layoutSample{Name: "ascii32", Message: &layoutText{Text: &text}, ExpectedCount: 1})
+	for _, length := range plan.Lengths {
+		for _, mode := range plan.FlatModes {
+			samples = append(samples, layoutSample{Name: fmt.Sprintf("flat/%s/%d", mode, length), Message: layoutRecords(length, mode), ExpectedCount: 1 + length})
+		}
+		rows := &layoutArrayRows{Rows: make([]*layoutArrayRecord, length)}
+		for index := range rows.Rows {
+			rows.Rows[index] = &layoutArrayRecord{Values: []int64{int64(index), -1}}
+		}
+		samples = append(samples, layoutSample{Name: fmt.Sprintf("array_record/%d", length), Message: rows, ExpectedCount: 1 + length*2})
+	}
+	for _, groups := range plan.NestedGroups {
+		for _, rows := range plan.NestedRows {
+			message := &layoutGroups{Groups: make([]*layoutRows, groups)}
+			for index := range message.Groups {
+				message.Groups[index] = layoutRecords(rows, "full")
+			}
+			samples = append(samples, layoutSample{Name: fmt.Sprintf("nested/%dx%d", groups, rows), Message: message, ExpectedCount: 1 + groups*(1+rows)})
+		}
+	}
+	for _, depth := range plan.ChainDepths {
+		message := &layoutChain{}
+		current := message
+		for index := 1; index < depth; index++ {
+			current.Child = &layoutChain{}
+			current = current.Child
+		}
+		expected := depth
+		if depth > 64 {
+			expected = -1
+		}
+		samples = append(samples, layoutSample{Name: fmt.Sprintf("chain/%d", depth), Message: message, ExpectedCount: expected})
+	}
+	for _, failure := range []struct { name string; limits before.Limits }{
+		{"elements", before.Limits{MaxElements: 1}},
+		{"bytes_early", before.Limits{MaxBytes: 2}},
+		{"depth", before.Limits{MaxDepth: 1}},
+		{"bytes_after_spill", before.Limits{MaxBytes: 2500}},
+	} {
+		samples = append(samples, layoutSample{Name: "failure/" + failure.name, Message: layoutRecords(4096, "full"), Limits: failure.limits, ExpectedCount: -1})
+	}
+	return samples
+}
+
+func allocationObservation(t *testing.T, entry string, calls int, run func() ([]byte, error)) layoutAllocation {
+	t.Helper()
+	wire, err := run()
+	result := layoutAllocation{Entry: entry, Calls: calls, Length: len(wire), Capacity: cap(wire)}
+	if err != nil {
+		result.Error = err.Error()
+	}
+	// 只测未插桩的 baseline；构造、schema 预热和显式 GC 均在计数范围外。
+	runtime.GC()
+	var start, finish runtime.MemStats
+	runtime.ReadMemStats(&start)
+	for index := 0; index < calls; index++ {
+		wire, err = run()
+		encodedSink = wire
+		if len(wire) != result.Length || cap(wire) != result.Capacity || (err == nil) != (result.Error == "") {
+			t.Fatal("unstable allocation entry result")
+		}
+	}
+	runtime.ReadMemStats(&finish)
+	result.Bytes = finish.TotalAlloc - start.TotalAlloc
+	result.Mallocs = finish.Mallocs - start.Mallocs
+	result.BytesPerCall = float64(result.Bytes) / float64(calls)
+	result.MallocsPerCall = float64(result.Mallocs) / float64(calls)
+	return result
+}
+
+// TestLayoutAudit 对实际消息与临界形态核对布局消费、增长点、失败路径及未插桩入口的分配。
+func TestLayoutAudit(t *testing.T) {
+	contents, err := os.ReadFile(os.Getenv("GSR_LAYOUT_PLAN"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var plan layoutPlan
+	if err := json.Unmarshal(contents, &plan); err != nil {
+		t.Fatal(err)
+	}
+	if runtime.GOMAXPROCS(0) != 1 || plan.Allocation.Calls != 128 {
+		t.Fatal("unexpected diagnostic settings")
+	}
+	samples := layoutSamples(t, plan)
+	expectedSamples := 6 + len(plan.Lengths)*(len(plan.FlatModes)+1) + len(plan.NestedGroups)*len(plan.NestedRows) + len(plan.ChainDepths) + 4
+	if len(samples) != expectedSamples {
+		t.Fatal("missing diagnostic cases")
+	}
+	results := make([]layoutResult, 0, len(samples))
+	for _, sample := range samples {
+		trace := sproto.DiagnosticEncodeLayout(sample.Message, sproto.Limits(sample.Limits))
+		wire, err := before.EncodeWithLimits(sample.Message, sample.Limits)
+		errorText := ""
+		if err != nil {
+			errorText = err.Error()
+		}
+		if errorText != trace.Error || (err != nil && wire != nil) {
+			t.Fatalf("%s error contract mismatch: %v / %s", sample.Name, err, trace.Error)
+		}
+		if err == nil && (!bytes.Equal(wire, trace.Wire) || trace.Count != trace.Consumed || trace.Count != sample.ExpectedCount) {
+			t.Fatalf("%s layout/wire mismatch: count=%d expected=%d consumed=%d", sample.Name, trace.Count, sample.ExpectedCount, trace.Consumed)
+		}
+		if (sample.ExpectedCount < 0) != (err != nil) {
+			t.Fatalf("%s unexpected admission", sample.Name)
+		}
+		if trace.Count != trace.Local+trace.ExtraLength || (len(trace.Growth) > 0 && trace.Growth[len(trace.Growth)-1].Capacity != trace.ExtraCapacity) {
+			t.Fatalf("%s replay mismatch", sample.Name)
+		}
+		signature := sha256.Sum256(wire)
+		result := layoutResult{Name: sample.Name, Limits: sample.Limits, Trace: trace, WireSHA256: hex.EncodeToString(signature[:]), InitialGrowth: make(map[int][]sproto.DiagnosticGrowth)}
+		for _, initial := range plan.Initial {
+			result.InitialGrowth[initial] = sproto.DiagnosticInitialCapacity(trace.Count, initial)
+		}
+		if !reflect.DeepEqual(result.InitialGrowth[128], trace.Growth) {
+			t.Fatalf("%s initial capacity replay mismatch", sample.Name)
+		}
+		result.Allocations = append(result.Allocations, allocationObservation(t, "raw_body", plan.Allocation.Calls, func() ([]byte, error) {
+			return before.EncodeWithLimits(sample.Message, sample.Limits)
+		}))
+		if err == nil {
+			result.Allocations = append(result.Allocations, allocationObservation(t, "packed_body", plan.Allocation.Calls, func() ([]byte, error) {
+				return before.EncodePacked(sample.Message)
+			}))
+			typ := reflect.TypeOf(sample.Message)
+			rpc, err := before.NewRpc([]*before.Protocol{{Type: 1, Name: "frame", Request: typ, Response: typ}})
+			if err != nil {
+				t.Fatal(err)
+			}
+			result.Allocations = append(result.Allocations, allocationObservation(t, "request_cancel", plan.Allocation.Calls, func() ([]byte, error) {
+				wire, err := rpc.RequestEncode("frame", 1, sample.Message)
+				rpc.CancelSession(1)
+				return wire, err
+			}))
+		}
+		results = append(results, result)
+	}
+	encoded, err := json.MarshalIndent(results, "", "  ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(os.Getenv("GSR_LAYOUT_OUTPUT"), append(encoded, '\n'), 0644); err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("%d layout cases verified; uninstrumented baseline allocation entries recorded", len(results))
+}

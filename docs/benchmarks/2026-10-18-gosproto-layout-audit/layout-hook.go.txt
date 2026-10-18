@@ -1,0 +1,100 @@
+package sproto
+
+import (
+	"runtime"
+)
+
+// 此文件只注入诊断归档；不进入库工作树、公共 API 或分配测量用的 baseline 归档。
+type DiagnosticGrowth struct {
+	Item int
+	Capacity int
+}
+
+type DiagnosticLayout struct {
+	Count int
+	Local int
+	ExtraLength int
+	ExtraCapacity int
+	Growth []DiagnosticGrowth
+	Histogram map[uint32]int
+	Size int
+	Consumed int
+	BudgetElements int
+	Error string
+	Wire []byte `json:"-"`
+}
+
+// DiagnosticEncodeLayout 复用原预检，随后回放原 add 方法记录真实增长点。
+func DiagnosticEncodeLayout(message any, limits Limits) DiagnosticLayout {
+	result := DiagnosticLayout{Histogram: make(map[uint32]int)}
+	limits, err := normalizeLimits(limits)
+	if err != nil {
+		result.Error = err.Error()
+		return result
+	}
+	typ, value, err := getbase(message)
+	if err != nil {
+		result.Error = err.Error()
+		return result
+	}
+	schema, err := GetSprotoType(typ.Elem())
+	if err != nil {
+		result.Error = err.Error()
+		return result
+	}
+	var layout encodeLayout
+	budget := &decodeBudget{limits: limits}
+	binding := knownEncodeType(schema)
+	result.Size, err = encodedSize(schema, value, budget, 1, &layout, binding)
+	runtime.KeepAlive(message)
+	result.Count = layout.count
+	result.Local = min(layout.count, len(layout.local))
+	result.ExtraLength = len(layout.extra)
+	result.ExtraCapacity = cap(layout.extra)
+	result.BudgetElements = budget.elements
+	var replay encodeLayout
+	for index := 0; index < layout.count; index++ {
+		entry := layout.local[0]
+		if index < len(layout.local) {
+			entry = layout.local[index]
+		} else {
+			entry = layout.extra[index-len(layout.local)]
+		}
+		result.Histogram[entry]++
+		previous := cap(replay.extra)
+		replay.add(int(entry))
+		if cap(replay.extra) != previous {
+			result.Growth = append(result.Growth, DiagnosticGrowth{Item: index + 1, Capacity: cap(replay.extra)})
+		}
+	}
+	if err != nil {
+		result.Error = err.Error()
+		return result
+	}
+	result.Wire = make([]byte, result.Size)
+	written := encodeMessageInto(schema, value, result.Wire, &layout, binding)
+	runtime.KeepAlive(message)
+	if written != result.Size {
+		panic("diagnostic encoded size mismatch")
+	}
+	result.Consumed = layout.cursor
+	return result
+}
+
+// DiagnosticInitialCapacity 只模拟增长分配；不更改生产策略，也不作为 CPU 结果。
+func DiagnosticInitialCapacity(count, initial int) []DiagnosticGrowth {
+	var extra []uint32
+	var growth []DiagnosticGrowth
+	for index := 32; index < count; index++ {
+		previous := cap(extra)
+		if extra == nil {
+			extra = make([]uint32, 0, initial)
+		}
+		extra = append(extra, 0)
+		if cap(extra) != previous {
+			growth = append(growth, DiagnosticGrowth{Item: index + 1, Capacity: cap(extra)})
+		}
+	}
+	return growth
+}
+

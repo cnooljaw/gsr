@@ -1,0 +1,9 @@
+{
+  "stage": "Supplemental allocation-only model chosen after cardinality audit; not a production candidate or timing rerun",
+  "counts": "all distinct Trace.Count values in first-stage raw.json",
+  "policies": ["current128:original append growth", "initial64:smaller initial reserve with original append growth", "double128:initial128 and explicit doubling only on exhaustion", "exact_lower_bound:clairvoyant final spill count; unattainable online baseline, not proposed implementation"],
+  "callsPerModel": 128,
+  "GOMAXPROCS": "1",
+  "GOGC": "enabled default",
+  "doNotInfer": ["No CPU speedup or full API allocation claims from model alone", "Doubling may overreserve at intermediate lengths; disclose cost", "Exact final size requires information not available at first spill", "No resource budget or error order changes authorized by model"]
+}

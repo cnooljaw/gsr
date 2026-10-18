@@ -60,7 +60,9 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 
 [Pack剩余目标游标](../../../docs/benchmarks/2026-10-18-gosproto-pack-cursor/RESULTS.md) 固定62项两轮，原43项业务加19种形态，相关回归与17984差分通过。检查点未减少、汇编略增加；主要PEncode方向翻转、密集长word约慢0.1μs，部分RPC/零场景收益保留，综合撤回候选。全部控制/原值/累计和恢复指纹保留，库保持a3b3830干净；该记录已本地提交为GSR 13d4609，未推送，Decode与正式依赖不变。
 
-[主循环密集前缀写出](../../../docs/benchmarks/2026-10-18-gosproto-pack-prefix-main/RESULTS.md) 核对旧helper候选后只重评当前主循环的目标位置计算，62项固定两轮。大型/整数Pack约快7%～10%，PEncode与真实RPC同向改善；小型稀疏约1～4ns代价和全部控制/累计/尾差保留。对象数中位数不变，相关回归/17984差分/官方/race/checkptr/vet/有限fuzz/GSR/GoTS验收通过，保留新代码待审查；不更新正式依赖或PB/TS排名。
+[主循环密集前缀写出](../../../docs/benchmarks/2026-10-18-gosproto-pack-prefix-main/RESULTS.md) 核对旧helper候选后只重评当前主循环的目标位置计算，62项固定两轮。大型/整数Pack约快7%～10%，PEncode与真实RPC同向改善；小型稀疏约1～4ns代价和全部控制/累计/尾差保留。对象数中位数不变，相关回归/17984差分/官方/race/checkptr/vet/有限fuzz/GSR/GoTS验收通过；已本地提交为库a161158、GSR d6c672c，未推送，不更新正式依赖或PB/TS排名。
+
+[布局项数与增长诊断](../../../docs/benchmarks/2026-10-18-gosproto-layout-audit/RESULTS.md) 覆盖109形态/317入口，独立未插桩分配与48项数增长模型。大型99项外溢512B一次容纳，减小初始容量会增配；长数组增长值得实验，但中间长度代价、预算早期失败均保留。未测CPU、不改生产代码；诊断/vet/fixture/独立复算/归档核对通过，库干净，新文档待审查。
 
 ## 比较口径
 

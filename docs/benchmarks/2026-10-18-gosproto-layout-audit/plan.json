@@ -1,0 +1,82 @@
+{
+  "baselineCommit": "a161158",
+  "scope": "Read-only layout cardinality/growth/allocation audit. No production candidate, CPU comparison, PB/TS ranking or Decode changes.",
+  "lengths": [
+    0,
+    1,
+    30,
+    31,
+    32,
+    33,
+    63,
+    64,
+    95,
+    96,
+    127,
+    128,
+    159,
+    160,
+    161,
+    256,
+    512,
+    1024,
+    4096
+  ],
+  "flatModes": [
+    "full",
+    "nil",
+    "half"
+  ],
+  "nestedGroups": [
+    1,
+    2,
+    8,
+    32
+  ],
+  "nestedRows": [
+    1,
+    8,
+    32,
+    128
+  ],
+  "chainDepths": [
+    1,
+    31,
+    32,
+    33,
+    63,
+    64,
+    65
+  ],
+  "initialCapacitiesToSimulate": [
+    32,
+    64,
+    128
+  ],
+  "allocation": {
+    "callsPerEntry": 128,
+    "entries": [
+      "EncodeWithLimits",
+      "EncodePacked (default limits, successful cases only)",
+      "RequestEncode+CancelSession (default limits, successful cases only)"
+    ],
+    "GOMAXPROCS": "1",
+    "GOGC": "enabled default",
+    "cpuTiming": false
+  },
+  "errorCases": [
+    "element budget before array traversal",
+    "byte budget early in large array",
+    "depth budget before child layout",
+    "byte budget after layout spill"
+  ],
+  "assertions": [
+    "hook source only in diagnostic archive; baseline Go source matches committed tree",
+    "diagnostic wire equals unmodified baseline, len/cap preserved in measured entry",
+    "layout cursor consumes all recorded entries on success",
+    "replayed growth equals original final capacity",
+    "error class/message and nil result agree with original",
+    "do not infer runtime allocator size classes from requested capacities alone",
+    "preserve all allocation observations, including non-integral tails"
+  ]
+}

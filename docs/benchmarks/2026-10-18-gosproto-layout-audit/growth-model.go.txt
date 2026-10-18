@@ -1,0 +1,113 @@
+// 此程序只比较布局存储策略的分配，不改变 gosproto，也不测 CPU。
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+	"runtime"
+	"sort"
+)
+
+type modelCase struct {
+	Count int
+	Trace struct {
+		Count int
+	} 
+}
+
+type modelResult struct {
+	Count int
+	Policy string
+	Calls int
+	FinalLength int
+	FinalCapacity int
+	Bytes uint64
+	Mallocs uint64
+	BytesPerCall float64
+	MallocsPerCall float64
+}
+
+var modelSink []uint32
+var byteSink []byte
+
+//go:noinline
+func modelLayout(count int, policy string) []uint32 {
+	if count <= 32 {
+		return nil
+	}
+	extra := count - 32
+	initial := 128
+	if policy == "initial64" {
+		initial = 64
+	}
+	if policy == "exact_lower_bound" {
+		initial = extra
+	}
+	storage := make([]uint32, 0, initial)
+	for index := 0; index < extra; index++ {
+		if policy == "double128" && len(storage) == cap(storage) {
+			grown := make([]uint32, len(storage), cap(storage)*2)
+			copy(grown, storage)
+			storage = grown
+		}
+		storage = append(storage, uint32(index))
+	}
+	return storage
+}
+
+func main() {
+	if len(os.Args) != 3 || runtime.GOMAXPROCS(0) != 1 {
+		panic("usage: growth-model raw.json model.json; GOMAXPROCS=1")
+	}
+	contents, err := os.ReadFile(os.Args[1])
+	if err != nil {
+		panic(err)
+	}
+	var samples []modelCase
+	if err := json.Unmarshal(contents, &samples); err != nil {
+		panic(err)
+	}
+	counts := make(map[int]bool)
+	for _, sample := range samples {
+		counts[sample.Trace.Count] = true
+	}
+	var ordered []int
+	for count := range counts {
+		ordered = append(ordered, count)
+	}
+	sort.Ints(ordered)
+	const calls = 128
+	var results []modelResult
+	for _, count := range ordered {
+		for _, policy := range []string{"current128", "initial64", "double128", "exact_lower_bound"} {
+			storage := modelLayout(count, policy)
+			for index, value := range storage {
+				if value != uint32(index) {
+					panic("model copy mismatch")
+				}
+			}
+			result := modelResult{Count: count, Policy: policy, Calls: calls, FinalLength: len(storage), FinalCapacity: cap(storage)}
+			runtime.GC()
+			var start, finish runtime.MemStats
+			runtime.ReadMemStats(&start)
+			for index := 0; index < calls; index++ {
+				modelSink = modelLayout(count, policy)
+			}
+			runtime.ReadMemStats(&finish)
+			result.Bytes = finish.TotalAlloc-start.TotalAlloc
+			result.Mallocs = finish.Mallocs-start.Mallocs
+			result.BytesPerCall = float64(result.Bytes)/calls
+			result.MallocsPerCall = float64(result.Mallocs)/calls
+			results = append(results, result)
+		}
+	}
+	encoded, err := json.MarshalIndent(results, "", "  ")
+	if err != nil {
+		panic(err)
+	}
+	if err := os.WriteFile(os.Args[2], append(encoded, '\n'), 0644); err != nil {
+		panic(err)
+	}
+	fmt.Printf("%d counts x 4 allocation models verified; no CPU timing\n",len(ordered))
+}
