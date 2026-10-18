@@ -1,0 +1,31 @@
+{
+  "reason": "unchanged int32_edges Pack pass2 +9.45percent versus pass1 -0.16percent; no resampling",
+  "normalization": "Remove source location,absolute PC and encoded instruction word only; retain symbolic instruction and operands without further relocation rewriting.",
+  "comparison": {
+    "gosproto-before": {
+      "instructionsPerPass": [
+        300,
+        300
+      ],
+      "symbolicInstructionsExactlyEqual": true,
+      "symbolicSha256": [
+        "d32e9237df30cf21c47725d87bad467fa81bfb23c87be126bb5a775bbf022716",
+        "d32e9237df30cf21c47725d87bad467fa81bfb23c87be126bb5a775bbf022716"
+      ],
+      "differences": []
+    },
+    "gosproto": {
+      "instructionsPerPass": [
+        300,
+        300
+      ],
+      "symbolicInstructionsExactlyEqual": true,
+      "symbolicSha256": [
+        "52d18b2f84b947b33ee990447923ce8c29ee0aa1acb80d5842d23bd3b009bf51",
+        "52d18b2f84b947b33ee990447923ce8c29ee0aa1acb80d5842d23bd3b009bf51"
+      ],
+      "differences": []
+    }
+  },
+  "caveat": "Equal symbolic instructions do not exclude absolute placement,GC,scheduling,input-address or other environment effects; cause is not established."
+}

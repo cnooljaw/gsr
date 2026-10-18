@@ -4,9 +4,13 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## 原生整数数组连续游标（2026-10-18）
+
+上一轮诊断已提交为GSR d2be5d8，提交后两库干净，未推送。后续只调整原生[]int64的4/8字节输出游标，保留预检/宽度/预算/wire/cap/独占。编译器可消除每元素重复切片检查；43项两轮中，32/64位纯Encode约快25%/23%，PEncode约快14%/8%，大型约快3%，实际RPC也改善。对象数中位数不变，两个手工帧±0.125 B/op尾差、小包约5～8 ns及未改纯Pack第二轮+9.45%（245 ns）均披露；Pack各臂两轮符号指令一致，原因仍未确定。库/官方/race/checkptr/vet、474047次有限Codec fuzz、GSR三包和Go/TS 7/7通过；40组精确wire及故意错步长负向回归保护游标。见 [连续游标报告](benchmarks/2026-10-18-gosproto-array-cursor/RESULTS.md)，新代码/记录未提交，正式依赖与Decode不变，不新增PB/TS排名。
+
 ## 融合后编码热点诊断（2026-10-18）
 
-有响应请求切片已本地提交为 gosproto 6d854d1 / GSR f715e6b，未推送。随后只刷新四种既有消息的body EncodePacked与真实RequestEncode+CancelSession八条profile，CPU与逐次内存采样分开；大型消息集中在整数记录预检/写出，整数数组集中在Pack和连续写出，大型仍有512 B布局外溢。4 KiB ASCII的kevent/GC归因明显，完整保留而不据此排名。独立harness夹具/统计/选择/vet、16次采样及归档/指纹核对通过；库源码干净，未重复生产验收，见 [融合后热点报告](benchmarks/2026-10-18-gosproto-post-fusion-profile/RESULTS.md)。下一轮先单独实验整数数组写出，预算/wire/cap/独占不变；新诊断未提交，正式依赖与Decode继续冻结。
+有响应请求切片已本地提交为 gosproto 6d854d1 / GSR f715e6b，未推送。随后只刷新四种既有消息的body EncodePacked与真实RequestEncode+CancelSession八条profile，CPU与逐次内存采样分开；大型消息集中在整数记录预检/写出，整数数组集中在Pack和连续写出，大型仍有512 B布局外溢。4 KiB ASCII的kevent/GC归因明显，完整保留而不据此排名。独立harness夹具/统计/选择/vet、16次采样及归档/指纹核对通过；库源码干净，未重复生产验收，见 [融合后热点报告](benchmarks/2026-10-18-gosproto-post-fusion-profile/RESULTS.md)。下一轮先单独实验整数数组写出，预算/wire/cap/独占不变；该诊断已本地提交为GSR d2be5d8，库保持6d854d1，未推送；正式依赖与Decode继续冻结。
 
 ## RPC 有响应请求单缓冲（2026-10-18）
 

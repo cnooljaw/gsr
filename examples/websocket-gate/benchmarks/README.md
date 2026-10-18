@@ -46,7 +46,9 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 
 [有响应请求单缓冲](../../../docs/benchmarks/2026-10-18-gosproto-request-workspace/RESULTS.md) 在锁外完成预检/编码，登记后Pack，重复session仍返回限长限容raw body。五项请求两轮均少一次分配，大型约快5.8%～6.2%、整数数组约快9.5%～11.6%、ASCII4KiB约快41%～42%；共用writer的小幅计时代价、失败workspace内存成本、全部A/A失败及原值一并保留。库/官方/race/checkptr/固定差分/fuzz/GoTS验收通过，该切片已本地提交为 gosproto 6d854d1 / GSR f715e6b，未推送；正式依赖、Decode及原PB/TS矩阵不变。
 
-[融合后热点诊断](../../../docs/benchmarks/2026-10-18-gosproto-post-fusion-profile/RESULTS.md) 从6d854d1归档采四种输入×body/RPC八条路径，CPU与逐次内存采样分开。定位大型记录预检/写出、整数数组Pack/写出及512 B布局外溢；4 KiB ASCII的kevent干扰和全部原值保留，不把profile耗时当配对基线。源码未改，独立harness检查/归档核对通过，诊断待审查；不是新的A/B或PB/TS排名。
+[融合后热点诊断](../../../docs/benchmarks/2026-10-18-gosproto-post-fusion-profile/RESULTS.md) 从6d854d1归档采四种输入×body/RPC八条路径，CPU与逐次内存采样分开。定位大型记录预检/写出、整数数组Pack/写出及512 B布局外溢；4 KiB ASCII的kevent干扰和全部原值保留，不把profile耗时当配对基线。源码未改，独立harness检查/归档核对通过，诊断已本地提交为GSR d2be5d8，未推送；不是新的A/B或PB/TS排名。
+
+[整数数组连续游标](../../../docs/benchmarks/2026-10-18-gosproto-array-cursor/RESULTS.md) 只改4/8字节输出游标，编译器可消除重复切片检查。43项包含原body/RPC及混合64位新诊断；两轮32/64位纯Encode约快25%/23%、PEncode约快14%/8%，大型约快3%，对象数中位数不变。小包代价、两个字节计数尾差、未改Pack第二轮+9.45%及各臂符号汇编一致的未解释观察完整保留；库/官方/race/checkptr/fuzz/GoTS验收通过，新修改待审查，不更新正式依赖或PB/TS排名。
 
 ## 比较口径
 

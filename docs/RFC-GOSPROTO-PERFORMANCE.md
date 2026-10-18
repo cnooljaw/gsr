@@ -6,7 +6,7 @@
 
 前两轮以已发布的 gosproto v0.4.0 为版本基线；下一轮从已提交的 `6012b06` 做增量，不从 v0.4.0 重复实施。实现改动应在独立 gosproto 仓库进行，GSR 提供真实接线和跨语言 Benchmark；不修改 Go module cache，也不将库源码复制到 GSR。
 
-当前切片（2026-10-18）：有响应请求融合已本地提交为 gosproto 6d854d1 / GSR f715e6b，见第 33 节，未推送。后续只刷新融合后的八条body/RPC编码profile，定位记录数组遍历、整数数组写出/Pack与512 B布局外溢，见第 34 节；生产代码未改，诊断记录未提交。正式 GSR 依赖仍为 v0.4.0，Decode阶段性冻结。
+当前切片（2026-10-18）：融合后热点诊断已本地提交为GSR d2be5d8，库保持6d854d1，见第 34 节，未推送。后续只优化原生整数数组的连续写出游标，32/64位纯Encode两轮约快25%/23%，组合及代价见第 35 节；新代码/记录未提交。正式GSR依赖仍v0.4.0，Decode阶段性冻结。
 
 ## 1. 目标与证据
 
@@ -444,4 +444,14 @@ RequestEncode改用局部header值，避免字段指针赋值使session副本保
 
 大型消息的整数记录预检/写出累计份额各约19%/22%～24%，其内已用受验证offset读*int64，不能简单归咎于逐字段反射；Pack约18%～20%。整数数组Pack约29%～34%、encodeInt64Slice约23%～27%，下一轮先单独核对连续游标/固定宽度写出的BCE与汇编，再配对实测；不同时改Pack或记录遍历。小包仍有schema查询/通用遍历成本，但不为此改pending语义或新建codec API。
 
-大型分配仍为3968 B/2次（3456 B输出尺寸级别+512 B布局外溢），其他三项各一次最终buffer，header/session及中间body已不是分配主因。4 KiB ASCII的kevent归因达56%～64%，沿GC阶段栈出现，成因未确定，不作为算法排名或收益上限。累计父子份额不相加，profile耗时不作为配对基线；全部原值保留，见 [融合后热点报告](benchmarks/2026-10-18-gosproto-post-fusion-profile/RESULTS.md)。本轮只新增诊断与文档，未提交；正式依赖、Decode及生产实现不变。
+大型分配仍为3968 B/2次（3456 B输出尺寸级别+512 B布局外溢），其他三项各一次最终buffer，header/session及中间body已不是分配主因。4 KiB ASCII的kevent归因达56%～64%，沿GC阶段栈出现，成因未确定，不作为算法排名或收益上限。累计父子份额不相加，profile耗时不作为配对基线；全部原值保留，见 [融合后热点报告](benchmarks/2026-10-18-gosproto-post-fusion-profile/RESULTS.md)。该诊断已本地提交为GSR d2be5d8，库保持6d854d1，未推送；正式依赖、Decode及生产实现不变。
+
+## 35. 原生整数数组连续游标写出
+
+仅将encodeInt64Slice的4/8字节输出改为remaining游标，生产净增三行。BCE确认旧每元素切片起点/store两处检查变成保留store一处，ARM64汇编减少重复偏移计算；不手工删检查，预检/宽度/signedness/预算、Pack/Unpack、RPC/Decode/TS和公开API均未改。
+
+固定43项（原19body/手工帧、19真实RPC、5条混合64位896数组诊断），self/clone/两次比较共16512块独立复算一致。32位纯Encode−24.98%/−24.89%、PEncode−13.89%/−14.05%；64位纯Encode−22.94%/−22.61%、PEncode−7.86%/−7.70%。大型Encode/PEncode约−3%，真实32位RPC约−12%～−14%、64位约−7%～−10%；小型request第二轮基本持平，不宣称全部更快。
+
+43项对象数中位数相同、20目标B/op相同，手工帧两个±0.125 B/op尾差保留。32 B手工frame约+5.2/+7.9 ns；未改int32纯Pack第一轮−0.16%、第二轮+9.45%（245 ns），后者六轮持续存在。只读取两轮原二进制核对：各臂300条Pack符号指令在两轮一致，但布局/GC/环境原因未定，不删样本或说已经解释为噪声。self/clone各40/43和全部失败披露；按真实组合收益、极低复杂度及公开代价保留，不设最低CPU比例。
+
+新增40组4/8字节、1～4096元素精确wire/cap、后继字段及独占回归，先在基线通过；独立8字节误前移7的负向归档在length2按预期失败。库全测/官方C-Lua/race/checkptr/vet、10秒Codec fuzz474047次、GSR三包及Go/TS 7/7通过，源码/编译器归档/复现一致；未重复不涉及该循环的Pack随机fuzz、byte-body RPC差分或PB/TS排名。新修改未提交，完整原值、编译器和未解决Pack差值见 [连续游标报告](benchmarks/2026-10-18-gosproto-array-cursor/RESULTS.md)。下一轮另行针对大型整数记录遍历，Decode及正式依赖继续冻结。

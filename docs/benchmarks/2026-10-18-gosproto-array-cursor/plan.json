@@ -1,0 +1,19 @@
+{
+  "baselineCommit": "6d854d1",
+  "scope": "Only encodeInt64Slice4/8-byte output loops use advancing byte cursor. Preflight,width selection,signedness,budgets,wire/cap/ownership,Pack/Decode/RPC unchanged.",
+  "candidate": "Write through remaining slice then advance4/8. Compiler can eliminate slice-start check after fixed-width store check; do not remove input validation or bounds checks manually.",
+  "correctness": "Add one independent40-case raw/packed wire test across4/8-byte signed boundaries,length1..4096,trailing byte field,input/old-output ownership. Existing native/named/unsigned/current-value/budget tests retained. New tests pass baseline before candidate.",
+  "measurement": {
+    "blockMs": 10,
+    "modes": [
+      "self",
+      "clone",
+      "pass1",
+      "pass2"
+    ],
+    "cases": 43,
+    "matrix": "Original19 bodyEncode/Pack/PEncode/manual-frame +19 actualRPC operations +wide64896values(Encode,PEncode,notification,request_cancel,response). Wide64 deterministic pattern min/max int64,just-beyond-int32,-1,0,1.",
+    "sameControlsForAllCases": true
+  },
+  "assessment": "No minimum CPU gain. Weigh two fixed passes, absolute deltas, all A/A flags,untargeted cases,allocations and tiny source cost. No retries or tuning after sampling."
+}
