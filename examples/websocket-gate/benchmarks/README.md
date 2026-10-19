@@ -22,6 +22,8 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 
 这里的 `-count=5` 用于性能采样；不改变日常测试保留缓存的规则。Node 基准在构建后运行 `node examples/websocket-gate/client/dist/protocol_benchmark.js`，标准输出为五轮原始数据及中位数 JSON。追加 `--case ascii32` 可单独复测 32 字节小包。
 
+本轮[原生整数数组读取视图](../../../docs/benchmarks/2026-10-19-gosproto-decode-array-view/RESULTS.md)在503a725上保留两处4/8字节读取收窄。52项两轮大数组Decode快26%～29%，4字节PDecode/真实Dispatch快7%～9%；短包代价、控制失败与8字节组合累计反向单列，不替代四实现排名。库/官方/race/checkptr/fuzz及GSR/GoTS验收通过。测试补丁归档偏差与修正复现入口亦有记录。前轮诊断已提交GSR `16d1491`，库实现与强化测试已本地提交为 `f7022ac`，本轮报告随当前GSR提交归档，依赖v0.4.0、Decode继续开放。
+
 ## Go 局部优化的配对校准
 
 小幅优化先用 [Go 配对工具](tools/go-pairs/README.md) 校准同函数和同源码 A/A，再解释候选差值。工具在独立归档中交错采样并保留全部轮次，不修改正式依赖；控制异常的项目需要解释或补证据，不能自动判为无价值优化。它不代替上面的四实现完整 Benchmark。
@@ -96,7 +98,7 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 
 后续[header字节偏移](../../../docs/benchmarks/2026-10-19-gosproto-decode-header-offset/RESULTS.md)用初始headerEnd与步进2替代index倍增，原字节/次数/预算/错误/独占/写屏障不变，parser660→656条/320B。40项两轮大型PDecode快0.81%/1.03%，但双控制失败且有累计翻转；整数数组PDecode+1.10%/+1.24%双控制通过、含数组记录PDecode+1.68%/+1.57%，整体取舍未采用，无最低收益比例。160进程/15,360块复算，self20/40、clone19/40，尾差/全部异常保留；目标测试/harness/vet/差分/fresh和指纹通过。主库从未应用候选，18份Go源码等于503a725且干净，未重复生产完整验收。该轮报告已本地提交为GSR `9699583`，未推送；库保持503a725，依赖v0.4.0、Decode继续开放。
 
-后续[当前Decode诊断](../../../docs/benchmarks/2026-10-19-gosproto-decode-current-profile/RESULTS.md)在503a725只读刷新四入口CPU/独立allocation，8进程/24快照，limiter零。大型Decode/PDecode为10416B/532、13872B/533次；整数数组为8288B/4、12384B/5次。CPU/分配范围分离，初始化/kevent/递归累计限制保留，耗时不作新排名。源码与机器码确认native数组逐元素开放尾切片仍有调整，下一候选为固定4/8字节视图并补8字节大数组观察，本轮未实施。harness/vet/40顺序/构建/profile文本/fresh及全部指纹通过，主库18份Go源码等于503a725且干净，未重复生产完整验收。新诊断未提交，依赖v0.4.0、Decode继续开放。
+后续[当前Decode诊断](../../../docs/benchmarks/2026-10-19-gosproto-decode-current-profile/RESULTS.md)在503a725只读刷新四入口CPU/独立allocation，8进程/24快照，limiter零。大型Decode/PDecode为10416B/532、13872B/533次；整数数组为8288B/4、12384B/5次。CPU/分配范围分离，初始化/kevent/递归累计限制保留，耗时不作新排名。源码与机器码确认native数组逐元素开放尾切片仍有调整，下一候选为固定4/8字节视图并补8字节大数组观察，本轮未实施。harness/vet/40顺序/构建/profile文本/fresh及全部指纹通过，主库18份Go源码等于503a725且干净，未重复生产完整验收。该诊断已本地提交为GSR `16d1491`，未推送；依赖v0.4.0、Decode继续开放。
 
 
 

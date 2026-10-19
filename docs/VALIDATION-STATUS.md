@@ -4,9 +4,15 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## 原生整数数组读取视图（2026-10-19，保留）
+
+[数组读取报告](benchmarks/2026-10-19-gosproto-decode-array-view/RESULTS.md)只收窄native []int64两处4/8字节元素视图，预检/预算/符号/分配/回退/独占不变。52项208进程/19,968块，4字节大数组Decode两轮快25.88%/26.84%、PDecode6.86%/8.44%、Dispatch8.77%/8.76%；8字节大Decode28.09%/28.50%。短8字节PDecode数ns代价、8字节组合首轮累计反向、大型游戏无稳定收益，以及self21/52、clone23/52等限制保留。无最低收益比例，全部对象数中位相同。
+
+扩展既有40组数组边界测试；冻结驱动git apply跳过测试补丁，生产补丁正确，后续指纹发现后独立强化基线与候选验收，不改计时归档。修正checked复现入口已prepare/SHA验证。8条收尾命令通过：强化基线、库全测并启用固定官方oracle、race/checkptr、vet、各10秒CodecRoundTrip/Decode fuzz、GSR三包、Go/TS7/7零skip；Decode fuzz三秒后无新增执行限制保留。库实现与强化测试已本地提交为 `f7022ac`，本轮报告随当前GSR提交归档，不推送；正式依赖v0.4.0，Decode继续开放。
+
 ## 当前Decode热点与分配诊断（2026-10-19）
 
-后续[当前Decode诊断](benchmarks/2026-10-19-gosproto-decode-current-profile/RESULTS.md)在503a725只读刷新四入口CPU/独立allocation，8进程/24快照，limiter零。大型Decode/PDecode为10416B/532、13872B/533次；整数数组为8288B/4、12384B/5次。CPU/分配范围分离，初始化/kevent/递归累计限制保留，耗时不作新排名。源码与机器码确认native数组逐元素开放尾切片仍有调整，下一候选为固定4/8字节视图并补8字节大数组观察，本轮未实施。harness/vet/40顺序/构建/profile文本/fresh及全部指纹通过，主库18份Go源码等于503a725且干净，未重复生产完整验收。新诊断未提交，依赖v0.4.0、Decode继续开放。
+后续[当前Decode诊断](benchmarks/2026-10-19-gosproto-decode-current-profile/RESULTS.md)在503a725只读刷新四入口CPU/独立allocation，8进程/24快照，limiter零。大型Decode/PDecode为10416B/532、13872B/533次；整数数组为8288B/4、12384B/5次。CPU/分配范围分离，初始化/kevent/递归累计限制保留，耗时不作新排名。源码与机器码确认native数组逐元素开放尾切片仍有调整，下一候选为固定4/8字节视图并补8字节大数组观察，本轮未实施。harness/vet/40顺序/构建/profile文本/fresh及全部指纹通过，主库18份Go源码等于503a725且干净，未重复生产完整验收。该诊断已本地提交为GSR `16d1491`，未推送；依赖v0.4.0、Decode继续开放。
 
 ## Header字节偏移遍历（2026-10-19，未采用）
 

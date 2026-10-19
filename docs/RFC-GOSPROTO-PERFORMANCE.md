@@ -6,7 +6,7 @@
 
 前两轮以已发布的 gosproto v0.4.0 为版本基线；下一轮从已提交的 `6012b06` 做增量，不从 v0.4.0 重复实施。实现改动应在独立 gosproto 仓库进行，GSR 提供真实接线和跨语言 Benchmark；不修改 Go module cache，也不将库源码复制到 GSR。
 
-当前切片（2026-10-19）：header字节偏移实验已本地提交为GSR `9699583`，未推送；库保持已验收的 `503a725`，见第58节。本轮只刷新大型/整数数组Decode/PDecode的CPU与分配诊断，8进程/24快照；整数数组逐元素尾切片计算仍可见，下一候选为固定4/8字节元素视图，尚未实现，见第59节。新诊断未提交，库干净，依赖v0.4.0，Decode继续开放。
+当前切片（2026-10-19）：Decode热点诊断已本地提交为GSR `16d1491`，未推送；本轮从库 `503a725` 保留原生整数数组固定4/8字节读取，两处改动。52项两轮大数组Decode快约26%～29%，4字节PDecode/Dispatch快约7%～9%；短8字节PDecode代价、控制失败和累计翻转完整披露，见第60节。库实现与强化测试已本地提交为 `f7022ac`，本轮报告随当前GSR提交归档，正式依赖v0.4.0，Decode继续开放。
 
 ## 1. 目标与证据
 
@@ -630,4 +630,12 @@ self27/40、clone30/40；对象数中位数均相同，25项字节尾差、22入
 
 大型CPU样本仍指向parser/子结构构造/独占整数；整数数组纯Decode的decodeIntSlice累计34.60%、readUint32累计8.44%，PDecode则Unpack30.90%而数组decoder12.88%，父子累计不相加。kevent各33.82%～60.76%原样保留，不归一化或推演加速上限，profile耗时不作A/B基线。实际4/8字节数组循环仍有开放尾切片len/cap/NEG/ASR/AND处理，下一轮单独验证固定元素视图，并补8字节大数组与短包/游戏/PDecode控制；当前仅定位，未实施候选。
 
-harness测试/vet/40项顺序与构造校验、构建、8采集/20pprof文本/机器码、fresh及全部source/binary/profileSHA核对通过，limiter零，最大堆快照3.86MiB。生产18份Go源码等于503a725且库干净，未重复生产完整验收/PBTS排名，不把旧差分次数当本轮新验证。见[当前Decode诊断](benchmarks/2026-10-19-gosproto-decode-current-profile/RESULTS.md)。新报告未提交，依赖v0.4.0，Decode继续开放。
+harness测试/vet/40项顺序与构造校验、构建、8采集/20pprof文本/机器码、fresh及全部source/binary/profileSHA核对通过，limiter零，最大堆快照3.86MiB。生产18份Go源码等于503a725且库干净，未重复生产完整验收/PBTS排名，不把旧差分次数当本轮新验证。见[当前Decode诊断](benchmarks/2026-10-19-gosproto-decode-current-profile/RESULTS.md)。该诊断已本地提交为GSR `16d1491`，未推送；库基线503a725，依赖v0.4.0，Decode继续开放。
+
+## 60. 原生整数数组固定4/8字节读取（保留）
+
+只收窄native []int64两处元素切片len/cap，保留宽度/整除/预算预检、符号扩展、精确分配、命名类型回退、失败原子性和独占；不加unsafe/池/parser/API，不改Pack/Unpack。实际ARM64数组decoder360→348条、160B帧，parser不变。扩展原NativeIntegerArrayWire的40宽度/长度组合，增加Decode/DecodePacked、消费长度与结果/wire独占。
+
+固定52项208进程/19,968块，两轮4字节896元素Decode−25.88%/−26.84%、PDecode−6.86%/−8.44%、真实Dispatch−8.77%/−8.76%；8字节Decode−28.09%/−28.50%。短8字节PDecode+1.95%/+0.81%仅数ns也披露；8字节大PDecode首轮累计+7157ns、次轮−1431ns，不能称组合稳定全面加速。大型游戏无稳定收益。self21/52、clone23/52，目标多项控制失败；全部对象数中位相同、29项字节尾差、19入口累计翻转、limiter零及离群保留。采用依据为两种宽度重复逐轮收益、真实4字节组合收益和两行局部改动，无最低比例门槛。
+
+归档git apply静默跳过测试补丁，生产补丁正确；指纹验收发现后保留原测量，独立强化基线测试+候选完整验收验证，未冒称双侧新测试在计时前运行。修正复现入口用patch并校验测试SHA，本轮只prepare验证。库全测/固定官方oracle/race/checkptr/vet、两项有限fuzz、GSR三包与Go/TS7/7零skip通过，源码/原fresh/checked-fresh/二进制/工具指纹已核对。Decode fuzz三秒后停滞限制保留，未重测PB/TS排名。见[数组读取报告](benchmarks/2026-10-19-gosproto-decode-array-view/RESULTS.md)。库实现与强化测试已本地提交为 `f7022ac`，本轮报告随当前GSR提交归档，依赖v0.4.0，Decode继续开放。

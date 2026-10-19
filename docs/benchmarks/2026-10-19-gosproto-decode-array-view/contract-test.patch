@@ -1,0 +1,37 @@
+diff --git a/limits_test.go b/limits_test.go
+index f7b400d..6f5a8ef 100644
+--- a/limits_test.go
++++ b/limits_test.go
+@@ -311,7 +311,7 @@ func TestSchemaAndMinimumByteBudget(t *testing.T) {
+ 	}
+ }
+ 
+-// 原生整数数组在4/8字节宽度和长短边界上保持精确wire，不能覆盖后继字段或借用源存储。
++// 原生整数数组在4/8字节宽度和长短边界上保持精确wire与解码结果，不能覆盖后继字段或借用源存储。
+ func TestNativeIntegerArrayWire(t *testing.T) {
+ 	type document struct {
+ 		Values []int64 `sproto:"integer,0,array"`
+@@ -351,6 +351,23 @@ func TestNativeIntegerArrayWire(t *testing.T) {
+ 				!reflect.DeepEqual(input.Values, original) || !bytes.Equal(input.Tail, []byte{0x51, 0xff, 0}) {
+ 				t.Fatalf("packed array/ownership width=%d length=%d err=%v", width, length, err)
+ 			}
++			// 解码覆盖同一组宽度/长度边界，并确认不同调用和wire各自独占。
++			var decoded, decodedAgain, unpacked document
++			for _, output := range []*document{&decoded, &decodedAgain} {
++				used, err := sproto.Decode(encoded, output)
++				if err != nil || used != len(encoded) || !reflect.DeepEqual(output, input) {
++					t.Fatalf("decode array width=%d length=%d used=%d err=%v", width, length, used, err)
++				}
++			}
++			if err := sproto.DecodePacked(packed, &unpacked); err != nil || !reflect.DeepEqual(&unpacked, input) {
++				t.Fatalf("decode packed array width=%d length=%d err=%v", width, length, err)
++			}
++			decoded.Values[0] ^= 0x33
++			decoded.Tail[0] ^= 0x22
++			if !reflect.DeepEqual(&decodedAgain, input) || !reflect.DeepEqual(&unpacked, input) ||
++				!bytes.Equal(encoded, want) || !bytes.Equal(packed, wantPacked) {
++				t.Fatalf("decode output aliases source or another result width=%d length=%d", width, length)
++			}
+ 			input.Values[0] ^= 0x55
+ 			input.Tail[0] ^= 0xff
+ 			if _, err := sproto.EncodePacked(input); err != nil || !bytes.Equal(encoded, want) || !bytes.Equal(packed, wantPacked) {
