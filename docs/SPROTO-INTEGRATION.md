@@ -253,4 +253,7 @@ Pack前缀已提交为库a161158、GSR d6c672c，均未推送。后续只读布�
 三索引固定输出视图已保留到工作树：临时len/cap为3/9、公开cap不变，无新分支/分配/unsafe。原70项两轮整数数组PEncode/真实通知/请求同向改善，低比例收益、ASCII请求和大记录成本、累计翻转与全部失败/尾差保留。两个未达预检目标的草稿不计时。既有契约/17,984差分、26,880块复算/fresh指纹、库/官方/race/checkptr/vet/有限fuzz/GSR三包/GoTS7/7通过，Pack计数停增限制如实记录。见[固定len/cap报告](benchmarks/2026-10-19-gosproto-pack-window/RESULTS.md)。该轮已本地提交为库 `d2f6027`、GSR `175028b`，未推送，Decode/正式依赖不变。
 
 
-后续只读[当前编码热点诊断](benchmarks/2026-10-19-gosproto-current-profile/RESULTS.md)已完成16入口/32份CPU与分配profile，原70项构造后逐项保活、默认GC、96快照limiter均零。大型记录预检/写出、整数Pack仍有可见成本；4KiB runtime.kevent占比与未确认成因完整披露，不产生新PB/TS排名。harness/vet、独立选择/次数/源/profile/fresh指纹通过，生产未改/库干净，不重复生产验收；新诊断未提交，下一轮先看记录写出切片定位/BCE。
+后续只读[当前编码热点诊断](benchmarks/2026-10-19-gosproto-current-profile/RESULTS.md)已完成16入口/32份CPU与分配profile，原70项构造后逐项保活、默认GC、96快照limiter均零。大型记录预检/写出、整数Pack仍有可见成本；4KiB runtime.kevent占比与未确认成因完整披露，不产生新PB/TS排名。harness/vet、独立选择/次数/源/profile/fresh指纹通过，生产未改/库干净，不重复生产验收；该轮已本地提交为GSR `7c91913`，未推送。
+
+
+后续[记录头部视图](benchmarks/2026-10-19-gosproto-record-header/RESULTS.md)只替换两处固定len/cap2切片，216→212条指令、帧/检查调用点不变。原70项两轮4096条full请求少5.42/2.68µs，half/嵌套及小收益保留，含数组记录请求成本与27项累计翻转不删。self63/70、clone62/70，目标分配不变；既有契约/525差分、26,880块复算/fresh、库/官方/race/checkptr/vet/有限Codec fuzz/GSR三包/GoTS7/7通过。新库两行实现和GSR报告未提交，正式依赖/Decode不变。

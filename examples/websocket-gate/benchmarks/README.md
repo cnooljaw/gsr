@@ -78,7 +78,10 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 
 [固定len/cap视图](../../../docs/benchmarks/2026-10-19-gosproto-pack-window/RESULTS.md) 两份草稿只预检，唯一三索引候选固定原70项/四组比较；整数数组PEncode快6.07%/3.73%，真实通知快5.68%/5.17%，精确候选保留。self46/70、clone51/70，ASCII请求/大记录成本、累计翻转/全部失败/尾差保留。既有契约/17,984差分、复算/fresh、库/官方/race/checkptr/vet/有限fuzz/GSR/GoTS7/7通过。该轮已本地提交为库 `d2f6027`、GSR `175028b`，未推送，Decode/正式依赖不变。
 
-[当前编码profile](../../../docs/benchmarks/2026-10-19-gosproto-current-profile/RESULTS.md) 从d2f6027只读采16入口/32份CPU与分配，原70构造后逐项保活、CPU在GC/预热后启动。96快照limiter零，源/二进制/profile/fresh及独立元数据核对通过；整数Pack/大型记录热点和4KiB runtime归因限制保留，不作新A/B或PB/TS排名。生产未改、库干净，新诊断报告未提交；下一步只检查记录写出切片定位/BCE。
+[当前编码profile](../../../docs/benchmarks/2026-10-19-gosproto-current-profile/RESULTS.md) 从d2f6027只读采16入口/32份CPU与分配，原70构造后逐项保活、CPU在GC/预热后启动。96快照limiter零，源/二进制/profile/fresh及独立元数据核对通过；整数Pack/大型记录热点和4KiB runtime归因限制保留，不作新A/B或PB/TS排名。生产未改；该轮已本地提交为GSR `7c91913`，未推送。
+
+[记录头部视图](../../../docs/benchmarks/2026-10-19-gosproto-record-header/RESULTS.md) 两处固定len/cap2使216→212条指令；原70项两轮4096条full请求快2.50%/1.19%，half/嵌套与低比例收益均保留，局部成本/27项累计翻转不删。self63/70、clone62/70，目标分配不变；既有契约/525差分/复算/fresh、库/官方/race/checkptr/vet/有限Codec fuzz/GSR/GoTS7/7通过。新实现与报告未提交，Decode/正式依赖不变。
+
 
 
 ## 比较口径

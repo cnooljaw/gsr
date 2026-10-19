@@ -4,9 +4,13 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## 整数记录固定头部视图（2026-10-19）
+
+库d2f6027/GSR7c91913上只改记录写出两处固定len/cap2视图，gofmt无变化且源码等于采样候选。216→212条指令、32B帧/14个panic调用点不变；原70项四组280进程/26,880块/6,720 quartet/1,680轮/1,120快照复算，fresh/全部指纹通过。self63/70、clone62/70，limiter均零，分配中位数70/69/68/69相同，尾差/27项累计翻转/全部离群保留。既有记录/tag/nil/元信息/预算/RPC与109形态525差分、harness/vet、库全测/官方C-Lua/race+checkptr/vet、10秒Codec fuzz436,240次、GSR三包/GoTS7/7零跳过通过。计时前一次before测试模块导入失败，独立modfile修正，零计时/失败命令完整记录；无计时重试。见[记录头部视图报告](benchmarks/2026-10-19-gosproto-record-header/RESULTS.md)。保留小幅收益并披露局部成本，新库/GSR报告未提交，Decode/正式依赖不变；未重测未改Pack的随机fuzz。
+
 ## 当前编码单项进程profile（2026-10-19）
 
-已提交库d2f6027/GSR175028b上只读诊断：16入口各CPU2秒和逐次分配20,000次，32进程/96快照；limiter均零，最大堆快照3.85MiB（非峰值）。构造原70项后只保活单项，CPU启动在GC/预热后；内存profile包含初始化/构造/预热，循环B/op为主。大型记录与整数Pack热点、4KiB kevent归因限制完整保留，不形成新A/B或PB/TS排名。harness统计/选择/GC/夹具/指标/70顺序、vet、构建、32采集、96摘要+2源码视图及fresh归档/源/二进制/profile独立核对通过。见[当前热点报告](benchmarks/2026-10-19-gosproto-current-profile/RESULTS.md)。生产未改/库干净，不重复生产全测/oracle/race/fuzz/GSR/GoTS；新GSR诊断未提交，Decode/正式依赖不变。
+已提交库d2f6027/GSR175028b上只读诊断：16入口各CPU2秒和逐次分配20,000次，32进程/96快照；limiter均零，最大堆快照3.85MiB（非峰值）。构造原70项后只保活单项，CPU启动在GC/预热后；内存profile包含初始化/构造/预热，循环B/op为主。大型记录与整数Pack热点、4KiB kevent归因限制完整保留，不形成新A/B或PB/TS排名。harness统计/选择/GC/夹具/指标/70顺序、vet、构建、32采集、96摘要+2源码视图及fresh归档/源/二进制/profile独立核对通过。见[当前热点报告](benchmarks/2026-10-19-gosproto-current-profile/RESULTS.md)。生产未改/库干净，不重复生产全测/oracle/race/fuzz/GSR/GoTS；该轮已本地提交为GSR `7c91913`，未推送，Decode/正式依赖不变。
 
 ## Pack固定len/cap视图（2026-10-19）
 

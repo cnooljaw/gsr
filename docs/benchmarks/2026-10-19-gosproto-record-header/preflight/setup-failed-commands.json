@@ -1,0 +1,433 @@
+[
+  {
+    "args": [
+      "python3",
+      "-B",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/examples/websocket-gate/benchmarks/tools/go-pairs/run.py",
+      "--library",
+      "/private/tmp/gsr-gosproto-fork",
+      "--baseline",
+      "d2f6027ca04566858e7e008d7321618995f34b33",
+      "--mode",
+      "self",
+      "--prepare-only",
+      "--output",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-header/self"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.20929104089736938,
+    "output": ""
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "protocol_benchmark_test.go",
+      "rpc_probe_test.go",
+      "layout_fixtures_test.go",
+      "joint_probe_test.go",
+      "sampler_test.go",
+      "telemetry_probe_test.go",
+      "before_echo_test.go",
+      "representative_benchmark_test.go",
+      "growth_probe_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-header/self/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.004661375656723976,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-run",
+      "^(TestPairStatistics|TestPairSelection|TestPairGCCounter|TestRepresentativeFixtures|TestIsolatedMetrics)$",
+      ".",
+      "-timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-header/self/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 1.743209708482027,
+    "output": "ok  \tcodecpairstool\t0.593s\n"
+  },
+  {
+    "args": [
+      "go",
+      "vet",
+      "-mod=mod",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-header/self/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.209607457742095,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-c",
+      "-o",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-header/self/pairs.test",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-header/self/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.38843616656959057,
+    "output": ""
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-header/self/pairs.test",
+      "-test.run=^TestIsolatedCaseList$",
+      "-test.timeout=20s"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-header/self/harness",
+    "env": {
+      "GSR_GROWTH_FIXTURE_PLAN": "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-18-gosproto-post-layout-profile/fixture-plan.json",
+      "GSR_GROWTH_CASES": "flat/full/256,flat/full/512,flat/full/1024,flat/full/4096,flat/nil/4096,flat/half/4096,nested/32x32,nested/32x128,array_record/4096",
+      "GOMAXPROCS": "1",
+      "GSR_ISOLATED_LIST": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-header/self/case-list.json"
+    },
+    "exitCode": 0,
+    "elapsedSeconds": 0.41987866535782814,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "python3",
+      "-B",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/examples/websocket-gate/benchmarks/tools/go-pairs/run.py",
+      "--library",
+      "/private/tmp/gsr-gosproto-fork",
+      "--baseline",
+      "d2f6027ca04566858e7e008d7321618995f34b33",
+      "--mode",
+      "clone",
+      "--prepare-only",
+      "--output",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-header/clone"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.11196304298937321,
+    "output": ""
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "protocol_benchmark_test.go",
+      "rpc_probe_test.go",
+      "layout_fixtures_test.go",
+      "joint_probe_test.go",
+      "sampler_test.go",
+      "telemetry_probe_test.go",
+      "before_echo_test.go",
+      "representative_benchmark_test.go",
+      "growth_probe_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-header/clone/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.004786750301718712,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-run",
+      "^(TestPairStatistics|TestPairSelection|TestPairGCCounter|TestRepresentativeFixtures|TestIsolatedMetrics)$",
+      ".",
+      "-timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-header/clone/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.9463432487100363,
+    "output": "ok  \tcodecpairstool\t0.336s\n"
+  },
+  {
+    "args": [
+      "go",
+      "vet",
+      "-mod=mod",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-header/clone/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.13645920902490616,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-c",
+      "-o",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-header/clone/pairs.test",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-header/clone/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.2833698336035013,
+    "output": ""
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-header/clone/pairs.test",
+      "-test.run=^TestIsolatedCaseList$",
+      "-test.timeout=20s"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-header/clone/harness",
+    "env": {
+      "GSR_GROWTH_FIXTURE_PLAN": "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-18-gosproto-post-layout-profile/fixture-plan.json",
+      "GSR_GROWTH_CASES": "flat/full/256,flat/full/512,flat/full/1024,flat/full/4096,flat/nil/4096,flat/half/4096,nested/32x32,nested/32x128,array_record/4096",
+      "GOMAXPROCS": "1",
+      "GSR_ISOLATED_LIST": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-header/clone/case-list.json"
+    },
+    "exitCode": 0,
+    "elapsedSeconds": 0.34245283156633377,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "python3",
+      "-B",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/examples/websocket-gate/benchmarks/tools/go-pairs/run.py",
+      "--library",
+      "/private/tmp/gsr-gosproto-fork",
+      "--baseline",
+      "d2f6027ca04566858e7e008d7321618995f34b33",
+      "--mode",
+      "compare",
+      "--prepare-only",
+      "--output",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-header/pass1",
+      "--candidate-patch",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-19-gosproto-record-header/candidate.patch"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.2850221246480942,
+    "output": ""
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "protocol_benchmark_test.go",
+      "rpc_probe_test.go",
+      "layout_fixtures_test.go",
+      "joint_probe_test.go",
+      "sampler_test.go",
+      "telemetry_probe_test.go",
+      "before_echo_test.go",
+      "representative_benchmark_test.go",
+      "growth_probe_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-header/pass1/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.008349999785423279,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-run",
+      "^(TestPairStatistics|TestPairSelection|TestPairGCCounter|TestRepresentativeFixtures|TestIsolatedMetrics)$",
+      ".",
+      "-timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-header/pass1/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.8414272908121347,
+    "output": "ok  \tcodecpairstool\t0.340s\n"
+  },
+  {
+    "args": [
+      "go",
+      "vet",
+      "-mod=mod",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-header/pass1/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.14853062480688095,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-c",
+      "-o",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-header/pass1/pairs.test",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-header/pass1/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.29910045862197876,
+    "output": ""
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-header/pass1/pairs.test",
+      "-test.run=^TestIsolatedCaseList$",
+      "-test.timeout=20s"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-header/pass1/harness",
+    "env": {
+      "GSR_GROWTH_FIXTURE_PLAN": "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-18-gosproto-post-layout-profile/fixture-plan.json",
+      "GSR_GROWTH_CASES": "flat/full/256,flat/full/512,flat/full/1024,flat/full/4096,flat/nil/4096,flat/half/4096,nested/32x32,nested/32x128,array_record/4096",
+      "GOMAXPROCS": "1",
+      "GSR_ISOLATED_LIST": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-header/pass1/case-list.json"
+    },
+    "exitCode": 0,
+    "elapsedSeconds": 0.3643832914531231,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "python3",
+      "-B",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/examples/websocket-gate/benchmarks/tools/go-pairs/run.py",
+      "--library",
+      "/private/tmp/gsr-gosproto-fork",
+      "--baseline",
+      "d2f6027ca04566858e7e008d7321618995f34b33",
+      "--mode",
+      "compare",
+      "--prepare-only",
+      "--output",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-header/pass2",
+      "--candidate-patch",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-19-gosproto-record-header/candidate.patch"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.18883595801889896,
+    "output": ""
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "protocol_benchmark_test.go",
+      "rpc_probe_test.go",
+      "layout_fixtures_test.go",
+      "joint_probe_test.go",
+      "sampler_test.go",
+      "telemetry_probe_test.go",
+      "before_echo_test.go",
+      "representative_benchmark_test.go",
+      "growth_probe_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-header/pass2/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.005816999822854996,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-run",
+      "^(TestPairStatistics|TestPairSelection|TestPairGCCounter|TestRepresentativeFixtures|TestIsolatedMetrics)$",
+      ".",
+      "-timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-header/pass2/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.9294601660221815,
+    "output": "ok  \tcodecpairstool\t0.335s\n"
+  },
+  {
+    "args": [
+      "go",
+      "vet",
+      "-mod=mod",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-header/pass2/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.1352413333952427,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-c",
+      "-o",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-header/pass2/pairs.test",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-header/pass2/harness",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.27782400138676167,
+    "output": ""
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-header/pass2/pairs.test",
+      "-test.run=^TestIsolatedCaseList$",
+      "-test.timeout=20s"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-header/pass2/harness",
+    "env": {
+      "GSR_GROWTH_FIXTURE_PLAN": "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-18-gosproto-post-layout-profile/fixture-plan.json",
+      "GSR_GROWTH_CASES": "flat/full/256,flat/full/512,flat/full/1024,flat/full/4096,flat/nil/4096,flat/half/4096,nested/32x32,nested/32x128,array_record/4096",
+      "GOMAXPROCS": "1",
+      "GSR_ISOLATED_LIST": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-header/pass2/case-list.json"
+    },
+    "exitCode": 0,
+    "elapsedSeconds": 0.34663637541234493,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-run",
+      "^(TestIntegerRecordArrayBudgetsAndTags|TestEncodeTracksCurrentValues|TestEncodeNativePointerOffsets|TestEncodeReplacedFieldMetadata|TestEncodeChangedFieldShape|TestEncodeReplacedNestedMetadata|TestLimitsBeforeAllocation|TestCodecBudgetBoundaries|TestRpcFrameAssembly|TestRpcFrameBodyBudget|TestRpcFrameAllocation)$",
+      ".",
+      "-timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-header/pass1/before",
+    "env": {},
+    "exitCode": 1,
+    "elapsedSeconds": 0.04349396005272865,
+    "output": "FAIL\tgithub.com/cnooljaw/gosproto-before [setup failed]\nFAIL\n# github.com/cnooljaw/gosproto-before\nfuzz_test.go:8:2: no required module provides package github.com/cnooljaw/gosproto; to add it:\n\tgo get github.com/cnooljaw/gosproto\n"
+  }
+]
