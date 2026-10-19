@@ -4,9 +4,13 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## Header字节偏移遍历（2026-10-19，未采用）
+
+后续[header字节偏移](benchmarks/2026-10-19-gosproto-decode-header-offset/RESULTS.md)用初始headerEnd与步进2替代index倍增，原字节/次数/预算/错误/独占/写屏障不变，parser660→656条/320B。40项两轮大型PDecode快0.81%/1.03%，但双控制失败且有累计翻转；整数数组PDecode+1.10%/+1.24%双控制通过、含数组记录PDecode+1.68%/+1.57%，整体取舍未采用，无最低收益比例。160进程/15,360块复算，self20/40、clone19/40，尾差/全部异常保留；目标测试/harness/vet/差分/fresh和指纹通过。主库从未应用候选，18份Go源码等于503a725且干净，未重复生产完整验收。新报告未提交，依赖v0.4.0、Decode继续开放。
+
 ## 固定两字节header读取视图（2026-10-19）
 
-后续[固定header视图](benchmarks/2026-10-19-gosproto-decode-header-view/RESULTS.md)只收窄readUint16的len/cap为2，原len/预算/错误/独占/全部字段guard不变。parser664→660条、320B不变；计时前两索引初稿证据另存，未计时。原40项两轮half4096 PDecode快2.41%/2.54%且双控制通过，大型PDecode快1.72%/1.89%；保留单行收益并接受短Echo/含数组记录等成本，self21/40、clone13/40及全部翻转/离群不删。160进程/15,360块复算、fresh/全部指纹、库全测/官方/race/checkptr/vet、有限Codec/Decode fuzz432,127/38,718次、GSR三包/GoTS7/7零跳过通过，Decode fuzz后段计数停止如实保留。新库实现与报告未提交，依赖v0.4.0、Decode继续开放。
+后续[固定header视图](benchmarks/2026-10-19-gosproto-decode-header-view/RESULTS.md)只收窄readUint16的len/cap为2，原len/预算/错误/独占/全部字段guard不变。parser664→660条、320B不变；计时前两索引初稿证据另存，未计时。原40项两轮half4096 PDecode快2.41%/2.54%且双控制通过，大型PDecode快1.72%/1.89%；保留单行收益并接受短Echo/含数组记录等成本，self21/40、clone13/40及全部翻转/离群不删。160进程/15,360块复算、fresh/全部指纹、库全测/官方/race/checkptr/vet、有限Codec/Decode fuzz432,127/38,718次、GSR三包/GoTS7/7零跳过通过，Decode fuzz后段计数停止如实保留。该轮已本地提交为库 `503a725`、GSR `2104eca`，未推送，依赖v0.4.0、Decode继续开放。
 
 ## 原生整数写入资格前移（2026-10-19，未采用）
 

@@ -6,7 +6,7 @@
 
 前两轮以已发布的 gosproto v0.4.0 为版本基线；下一轮从已提交的 `6012b06` 做增量，不从 v0.4.0 重复实施。实现改动应在独立 gosproto 仓库进行，GSR 提供真实接线和跨语言 Benchmark；不修改 Go module cache，也不将库源码复制到 GSR。
 
-当前切片（2026-10-19）：整数资格前移实验已本地提交为GSR `f7381dd`，库基线 `913c465`，未推送，见第56节。随后保留固定len/cap2的header读取视图：half4096 PDecode快2.41%/2.54%、大型PDecode快1.72%/1.89%，短Echo/含数组记录等成本和低控制通过率完整披露，见第57节。新库单行实现与GSR文档未提交，正式依赖v0.4.0，Decode继续开放。
+当前切片（2026-10-19）：固定header视图已本地提交为库 `503a725`、GSR `2104eca`，未推送，见第57节。随后验证字节偏移遍历：大型PDecode虽两轮快0.81%/1.03%，但控制失败/累计翻转，整数数组及含数组记录组合路径重复成本，未采用，见第58节。库保持503a725且干净，新实验文档未提交，依赖v0.4.0，Decode继续开放。
 
 ## 1. 目标与证据
 
@@ -614,4 +614,12 @@ self27/40、clone30/40；对象数中位数均相同，25项字节尾差、22入
 
 固定40项两轮half4096 PDecode快2.41%/2.54%（11,141.8/11,794.6ns），双控制通过、累计同向，保留单行收益；大型PDecode快1.72%/1.89%、嵌套PDecode快3.11%/3.94%，部分控制失败。接受4KiB Echo Dispatch+30.0/+52.9ns、小型PDecode+32.4/+14.4ns、含数组记录纯Decode+5.19%/+0.11%等成本，不宣称全路径改善；self21/40、clone13/40偏低、15入口累计翻转/全部异常原值保留，未改控制漂移不校正，无最低收益比例门槛。
 
-160进程/15,360块复算，源码/二进制/160raw/fresh、目标契约/40解码语义/525编码差分/harness/vet，库全测/官方/race/checkptr/vet、有限Codec/Decode fuzz432,127/38,718次、GSR三包/GoTS7/7零跳过通过；Decode fuzz后段计数停止如实记录。对象数中位数相同，字节尾差保留，limiter零。见[header视图报告](benchmarks/2026-10-19-gosproto-decode-header-view/RESULTS.md)。新库仅此单行实现及GSR报告未提交，正式依赖v0.4.0、Decode继续开放。
+160进程/15,360块复算，源码/二进制/160raw/fresh、目标契约/40解码语义/525编码差分/harness/vet，库全测/官方/race/checkptr/vet、有限Codec/Decode fuzz432,127/38,718次、GSR三包/GoTS7/7零跳过通过；Decode fuzz后段计数停止如实记录。对象数中位数相同，字节尾差保留，limiter零。见[header视图报告](benchmarks/2026-10-19-gosproto-decode-header-view/RESULTS.md)。该轮已本地提交为库 `503a725`、GSR `2104eca`，未推送；正式依赖v0.4.0、Decode继续开放。
+
+## 58. Header字节偏移遍历（未采用）
+
+只保存初始headerEnd := total，按offset从2起步进2读取固定len/cap2视图，避免每轮2+index*2。headerEnd不随payload消费增长，序列/次数/字节与旧循环相同，count0/32位范围和原边界/预算/错误/独占/全部guard保持。parser660→656条、320B帧不变，结构数组及真实写屏障保持；静态减少不直接作为采纳依据。
+
+固定40项两轮大型Decode/PDecode/通知有局部收益，但控制均失败，第二轮Decode/PDecode累计反向；小型通知快1.21%/1.16%也保留。整数数组PDecode+1.10%/+1.24%，两类控制通过且累计更慢，含数组记录PDecode+1.68%/+1.57%，部分控制失败。组合路径取舍未支持采用，不设收益比例门槛，未改控制漂移不校正。self20/40、clone19/40，22项字节尾差、16入口累计翻转和全部离群保留，limiter零。
+
+160进程/15,360块独立复算，目标契约/40入口wire语义/525编码控制、harness/vet、构建/汇编/顺序/源码/二进制/fresh核对通过。主库从未应用补丁，18份Go源码仍等于503a725且干净，未重复生产完整验收或PB/TS排名。见[字节偏移报告](benchmarks/2026-10-19-gosproto-decode-header-offset/RESULTS.md)。新报告未提交，依赖v0.4.0，Decode继续开放。
