@@ -1,0 +1,18 @@
+--- a/limits_test.go
++++ b/limits_test.go
+@@ -617,6 +617,15 @@
+ 			t.Fatalf("failed decode replaced caller array: %+v %v", limits, err)
+ 		}
+ 	}
++	// 记录数组须跨越 inline 和 4/8 字节边界；保留后继字段，检查游标与当前值。
++	for _, value := range []int64{0, 32766, 32767, -1, math.MinInt32, math.MinInt32 - 1, math.MaxInt32, math.MaxInt32 + 1, math.MinInt64, math.MaxInt64} {
++		first, namedFirst = value, number(value)
++		encoded, err := sproto.Encode(input)
++		want, referenceErr := sproto.Encode(reference)
++		if err != nil || referenceErr != nil || !bytes.Equal(encoded, want) || cap(encoded) != cap(want) {
++			t.Fatalf("integer record boundary %d: %x != %x, errors %v/%v", value, encoded, want, err, referenceErr)
++		}
++	}
+ 	input.Items[0].Bridge = nil
+ 	if encoded, err := sproto.Encode(input); !errors.Is(err, sproto.ErrEncode) || encoded != nil {
+ 		t.Fatalf("missing tag bridge: %x, %v", encoded, err)

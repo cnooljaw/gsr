@@ -1,0 +1,38 @@
+[
+  {
+    "variant": "extended",
+    "args": [
+      "go",
+      "test",
+      "-run",
+      "^TestIntegerRecordArrayBudgetsAndTags$",
+      ".",
+      "-timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-inline-preflight/negative",
+    "exitCode": 1,
+    "expectedExitCode": 1,
+    "elapsedSeconds": 1.7406099159270525,
+    "output": "--- FAIL: TestIntegerRecordArrayBudgetsAndTags (0.00s)\n    limits_test.go:626: integer record boundary 32767: 010000002c0000001c000000050000003d9c02003d9c00000000000008000000ffffffffffffff7f02000000000002000000000000000000 != 010000003000000020000000050000003d9c02003d9c000004000000ff7f000008000000ffffffffffffff7f020000000000020000000000, errors <nil>/<nil>\nFAIL\nFAIL\tgithub.com/cnooljaw/gosproto\t0.566s\nFAIL\n",
+    "testSha256": "999ac63bc1276d2b5dfb66624116d972e4528f649a9877d9b78fe79151d0f284",
+    "productionSha256": "7ce025a5cd41139157c36bc92542acd423986a47ea8fd9092740b800743abae8"
+  },
+  {
+    "variant": "old",
+    "args": [
+      "go",
+      "test",
+      "-run",
+      "^TestIntegerRecordArrayBudgetsAndTags$",
+      ".",
+      "-timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-record-inline-preflight/negative",
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "elapsedSeconds": 0.6549287922680378,
+    "output": "ok  \tgithub.com/cnooljaw/gosproto\t0.319s\n",
+    "testSha256": "0f261965aeb66f5752b53a461518668a0e9db68be312aeb9c0ff78786a9ddcad",
+    "productionSha256": "7ce025a5cd41139157c36bc92542acd423986a47ea8fd9092740b800743abae8"
+  }
+]
