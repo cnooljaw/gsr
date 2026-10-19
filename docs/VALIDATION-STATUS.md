@@ -4,9 +4,13 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## 非inline内容视图复用（2026-10-19）
+
+库2ea804e/GSRb004da7上只复用记录非inline内容切片，源码等于冻结候选；216条指令/32B帧不变，panic调用点15→14，inline新增两条清零指令。复用已提交记录边界等契约、109形态525差分，无新测试；原70项四组280进程/26,880块/6,720 quartet/1,680轮/1,120快照独立复算，fresh/全部指纹通过。self50/70、clone56/70，limiter零，分配中位数69/69/69/68相同；尾差/27项累计翻转/全部离群保留。harness/vet、库全测/官方C-Lua/race+checkptr/vet、10秒Codec fuzz512,102次（5个新增interesting，无失败）、GSR三包/GoTS7/7零跳过通过。见[内容视图报告](benchmarks/2026-10-19-gosproto-record-body-view/RESULTS.md)。保留小幅收益并接受full记录请求等成本，新库实现/GSR报告未提交，Decode/正式依赖不变；无失败准备/计时重试，不重复未改Pack随机fuzz。
+
 ## inline整数延后内容视图（2026-10-19）
 
-库9067933/GSRca02105上只改私有记录写出的inline分支，生产源码等于冻结候选；212→216条指令、32B帧、panic调用点14→15。既有数组用例补10个inline/宽度边界，基线通过；负向inline上限+1新用例在32767失败、旧用例通过。原70项四组280进程/26,880块/6,720 quartet/1,680轮/1,120快照独立复算，fresh/全部指纹通过。self60/70、clone64/70、limiter零、分配中位数68/69/70/69相同；16B尾差、28项累计翻转及离群完整保留。既有契约/109形态525差分、harness/vet、库全测/官方C-Lua/race+checkptr/vet、10秒Codec fuzz470,086次、GSR三包/GoTS7/7零跳过通过。见[inline内容视图报告](benchmarks/2026-10-19-gosproto-record-inline/RESULTS.md)。保留大型游戏路径收益并接受混合长记录等局部成本，新库实现/测试与GSR报告未提交，Decode/正式依赖不变；无计时重试，不重复未改Pack的随机fuzz。
+库9067933/GSRca02105上只改私有记录写出的inline分支，生产源码等于冻结候选；212→216条指令、32B帧、panic调用点14→15。既有数组用例补10个inline/宽度边界，基线通过；负向inline上限+1新用例在32767失败、旧用例通过。原70项四组280进程/26,880块/6,720 quartet/1,680轮/1,120快照独立复算，fresh/全部指纹通过。self60/70、clone64/70、limiter零、分配中位数68/69/70/69相同；16B尾差、28项累计翻转及离群完整保留。既有契约/109形态525差分、harness/vet、库全测/官方C-Lua/race+checkptr/vet、10秒Codec fuzz470,086次、GSR三包/GoTS7/7零跳过通过。见[inline内容视图报告](benchmarks/2026-10-19-gosproto-record-inline/RESULTS.md)。保留大型游戏路径收益并接受混合长记录等局部成本；该轮已本地提交为库 `2ea804e`、GSR `b004da7`，未推送，Decode/正式依赖不变；无计时重试，不重复未改Pack的随机fuzz。
 
 ## 整数记录固定头部视图（2026-10-19）
 

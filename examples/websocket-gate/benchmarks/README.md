@@ -82,7 +82,10 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 
 [记录头部视图](../../../docs/benchmarks/2026-10-19-gosproto-record-header/RESULTS.md) 两处固定len/cap2使216→212条指令；原70项两轮4096条full请求快2.50%/1.19%，half/嵌套与低比例收益均保留，局部成本/27项累计翻转不删。self63/70、clone62/70，目标分配不变；既有契约/525差分/复算/fresh、库/官方/race/checkptr/vet/有限Codec fuzz/GSR/GoTS7/7通过。该轮已本地提交为库 `9067933`、GSR `ca02105`，未推送，Decode/正式依赖不变。
 
-[inline内容视图](../../../docs/benchmarks/2026-10-19-gosproto-record-inline/RESULTS.md) 原70项两轮大型请求快3.18%/2.44%、响应快2.29%/2.44%，分配不变；接受混合长记录等成本、28项累计翻转全留。既有数组测试补10个边界、基线/负向覆盖证据通过；self60/70、clone64/70，复算/fresh、库/官方/race/checkptr/vet/有限Codec fuzz/GSR/GoTS7/7通过。新实现/测试与报告未提交，Decode/正式依赖不变。
+[inline内容视图](../../../docs/benchmarks/2026-10-19-gosproto-record-inline/RESULTS.md) 原70项两轮大型请求快3.18%/2.44%、响应快2.29%/2.44%，分配不变；接受混合长记录等成本、28项累计翻转全留。既有数组测试补10个边界、基线/负向覆盖证据通过；self60/70、clone64/70，复算/fresh、库/官方/race/checkptr/vet/有限Codec fuzz/GSR/GoTS7/7通过。该轮已本地提交为库 `2ea804e`、GSR `b004da7`，未推送，Decode/正式依赖不变。
+
+[非inline内容视图复用](../../../docs/benchmarks/2026-10-19-gosproto-record-body-view/RESULTS.md) 原70项两轮大型PEncode快0.51%/0.77%、half4096请求少1.39/0.98µs，分配不变，full请求等成本/27项累计翻转全留。self50/70、clone56/70，216条/32B帧不变、panic调用点15→14；既有契约/525差分/复算/fresh、库/官方/race/checkptr/vet/有限Codec fuzz/GSR/GoTS7/7通过。新实现与报告未提交，Decode/正式依赖不变。
+
 
 
 

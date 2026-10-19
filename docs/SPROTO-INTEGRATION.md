@@ -259,4 +259,7 @@ Pack前缀已提交为库a161158、GSR d6c672c，均未推送。后续只读布�
 后续[记录头部视图](benchmarks/2026-10-19-gosproto-record-header/RESULTS.md)只替换两处固定len/cap2切片，216→212条指令、帧/检查调用点不变。原70项两轮4096条full请求少5.42/2.68µs，half/嵌套及小收益保留，含数组记录请求成本与27项累计翻转不删。self63/70、clone62/70，目标分配不变；既有契约/525差分、26,880块复算/fresh、库/官方/race/checkptr/vet/有限Codec fuzz/GSR三包/GoTS7/7通过。该轮已本地提交为库 `9067933`、GSR `ca02105`，未推送，正式依赖/Decode不变。
 
 
-后续[inline内容视图](benchmarks/2026-10-19-gosproto-record-inline/RESULTS.md)只把记录写出的内容切片延到非inline分支；扩展既有数组测试10个边界并用上限+1负向归档证明新覆盖。原70项两轮大型真实请求快3.18%/2.44%、响应快2.29%/2.44%，混合长记录/未改整数数组成本与28项累计翻转全留。self60/70、clone64/70、目标分配不变；既有契约/525差分/复算/fresh、库/官方/race/checkptr/vet/有限Codec fuzz/GSR/GoTS7/7通过。新库实现/测试与GSR报告未提交，Decode/正式依赖不变。
+后续[inline内容视图](benchmarks/2026-10-19-gosproto-record-inline/RESULTS.md)只把记录写出的内容切片延到非inline分支；扩展既有数组测试10个边界并用上限+1负向归档证明新覆盖。原70项两轮大型真实请求快3.18%/2.44%、响应快2.29%/2.44%，混合长记录/未改整数数组成本与28项累计翻转全留。self60/70、clone64/70、目标分配不变；既有契约/525差分/复算/fresh、库/官方/race/checkptr/vet/有限Codec fuzz/GSR/GoTS7/7通过。该轮已本地提交为库 `2ea804e`、GSR `b004da7`，未推送，Decode/正式依赖不变。
+
+
+后续[非inline内容视图复用](benchmarks/2026-10-19-gosproto-record-body-view/RESULTS.md)只复用本次内容切片，216条/32B帧不变、panic调用点15→14；inline新增两条清零指令的代价一并测量。原70项两轮大型PEncode快0.51%/0.77%、half4096请求少1.39/0.98µs，分配不变；full4096请求与含数组记录成本、27项累计翻转全留，不宣称全面解决。self50/70、clone56/70，既有契约/525差分/复算/fresh、库/官方/race/checkptr/vet/有限Codec fuzz/GSR/GoTS7/7通过。新库实现/GSR报告未提交，Decode/正式依赖不变。
