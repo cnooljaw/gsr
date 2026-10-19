@@ -2,7 +2,7 @@
 
 本计划按 [ADR 0013](adr/0013-client-protocol-boundaries.md) 推进。当前工作树已实现 Protobuf 与独立 `protocol/sproto`，通过 Go/TypeScript Echo 验证。Go 编解码依赖独立维护的 `github.com/cnooljaw/gosproto v0.4.0`。新增 GSR API 尚未发布；已有 GSR 标签及原有协议保持不变。
 
-当前优化切片（2026-10-19）：前轮共享wire/分函数实验已提交 GSR `2ca8864`，未推送。新[分函数＋索引预检组合](benchmarks/2026-10-19-gosproto-unpack-split-indexed/RESULTS.md)完成固定70项：大型PDecode快3.12%/4.38%、4字节大数组快9.84%/9.23%，但普通word两轮慢约4%～33%、FF接稀疏慢约8.5%，组合未消除取舍，未采用。280进程/26,880块、目标契约及138500差分通过，控制/长尾/累计反向全部保留。主库仍af9169d且干净，新报告未提交；依赖v0.4.0，Decode继续开放。
+当前优化切片（2026-10-19）：前轮组合实验已提交GSR `885505c`，未推送。新[按word记录预检预算](benchmarks/2026-10-19-gosproto-unpack-word-budget/RESULTS.md)完成固定70项：单/双字节word约快5%～7%、零段小幅改善，但大型Unpack慢6.77%～7.93%、4字节大数组PDecode两轮慢4.02%、FF接稀疏慢约33%～34%，未采用。静态指令384→372但栈帧112→128B，不能据此预测动态收益。159275差分（新增MaxInt附近预算）、目标契约及来源核对通过；控制/尾差/长尾全部保留。主库仍af9169d且干净，新报告未提交，正式依赖v0.4.0、Decode继续开放。
 
 ## 边界与步骤
 

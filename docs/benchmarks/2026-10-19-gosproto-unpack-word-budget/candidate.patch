@@ -1,0 +1,55 @@
+--- a/pack.go
++++ b/pack.go
+@@ -195,13 +195,15 @@
+ 		return nil, ErrInvalidLimits
+ 	}
+ 	// 首次只扫描 tag/连续块长度，在分配前确认完整边界及有限的确切输出长度。
+-	size := 0
++	// 解包输出总是整 word；预算向下取整后，最后一次换算为字节。
++	maxWords := maxBytes / 8
++	wordsLeft := maxWords
+ 	for remaining := src; len(remaining) > 0; {
+ 		header := remaining[0]
+-		consumed, produced := 1, 8
++		consumed, produced := 1, 1
+ 		if header == 0 {
+ 			if len(remaining) >= 2 && remaining[1] == 0 {
+-				words := (maxBytes - size) / 8
++				words := wordsLeft
+ 				if words < 2 {
+ 					return nil, ErrLimit
+ 				}
+@@ -211,27 +213,27 @@
+ 				if run > words {
+ 					return nil, ErrLimit
+ 				}
+-				consumed, produced = run, run*8
++				consumed, produced = run, run
+ 			}
+ 		} else if header == 0xff {
+ 			if len(remaining) < 2 {
+ 				return nil, ErrUnpack
+ 			}
+-			produced = (int(remaining[1]) + 1) * 8
+-			consumed = 2 + produced
++			produced = int(remaining[1]) + 1
++			consumed = 2 + produced*8
+ 		} else {
+ 			consumed += bits.OnesCount8(header)
+ 		}
+ 		if consumed > len(remaining) {
+ 			return nil, ErrUnpack
+ 		}
+-		if produced > maxBytes-size {
++		if produced > wordsLeft {
+ 			return nil, ErrLimit
+ 		}
+-		size += produced
++		wordsLeft -= produced
+ 		remaining = remaining[consumed:]
+ 	}
+-	unpacked := make([]byte, size)
++	unpacked := make([]byte, (maxWords-wordsLeft)*8)
+ 	offset := 0
+ 	for len(src) > 0 {
+ 		header := src[0]

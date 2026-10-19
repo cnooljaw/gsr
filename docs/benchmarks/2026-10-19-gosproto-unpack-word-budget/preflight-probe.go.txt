@@ -1,0 +1,68 @@
+package benchmarks
+
+import (
+ "bytes"
+ "errors"
+ "testing"
+
+ sproto "github.com/cnooljaw/gosproto"
+ before "github.com/cnooljaw/gosproto-before"
+)
+
+func unpackErrorClass(t *testing.T, err, invalid, malformed, limit error) string {
+ t.Helper()
+ switch {
+ case err == nil:
+  return "ok"
+ case errors.Is(err, invalid):
+  return "invalid"
+ case errors.Is(err, malformed):
+  return "malformed"
+ case errors.Is(err, limit):
+  return "limit"
+ default:
+  t.Fatalf("unknown unpack error: %v", err)
+  return "unknown"
+ }
+}
+
+// TestUnpackPreflightDifferential 保护截断与预算竞争时的错误优先级、独占结果及输入不变。
+func TestUnpackPreflightDifferential(t *testing.T) {
+ checks:=0
+ compare:=func(wire []byte, budget int) {
+  original:=append([]byte(nil),wire...)
+  left,leftErr:=before.UnpackWithLimit(wire,budget)
+  right,rightErr:=sproto.UnpackWithLimit(wire,budget)
+  leftClass:=unpackErrorClass(t,leftErr,before.ErrInvalidLimits,before.ErrUnpack,before.ErrLimit)
+  rightClass:=unpackErrorClass(t,rightErr,sproto.ErrInvalidLimits,sproto.ErrUnpack,sproto.ErrLimit)
+  if leftClass!=rightClass || !bytes.Equal(left,right) || len(left)!=len(right) || cap(left)!=cap(right) || (left==nil)!=(right==nil) || !bytes.Equal(wire,original) {
+   t.Fatalf("budget=%d wire=%x errors=%s/%s outputlen=%d/%d cap=%d/%d",budget,wire,leftClass,rightClass,len(left),len(right),cap(left),cap(right))
+  }
+  if len(right)>0 {
+   leftFirst:=left[0]
+   right[0]^=0xff
+   if left[0]!=leftFirst {t.Fatal("unpacked results share storage")}
+   if !bytes.Equal(wire,original) { t.Fatal("unpacked output aliases input") }
+   right[0]^=0xff
+   if !bytes.Equal(left,right) { t.Fatal("unpacked results share storage") }
+  }
+  checks++
+ }
+ maxInt := int(^uint(0) >> 1)
+ budgets:=[]int{maxInt-7,maxInt-1,maxInt,-1,0,1,7,8,9,15,16,17,31,32,33,63,64,65,2047,2048,2049,2056,4096}
+ for header:=0;header<256;header++ {
+  wire:=[]byte{byte(header)}
+  if header==255 {wire=append(wire,0)}
+  for bit:=0;bit<8;bit++ {if header&(1<<bit)!=0 {wire=append(wire,byte(0x80+bit*13))}}
+  // 同时覆盖普通/FF后继头；前缀枚举让坏输入与预算不足竞争。
+  wire=append(wire,0x81,0x11,0xee,0xff,0,1,2,3,4,5,6,7,8)
+  for end:=0;end<=len(wire);end++ {for _,budget:=range budgets {compare(wire[:end],budget)}}
+ }
+ for _,count:=range []int{0,1,7,8,9,255,256,257,4096} {
+  wire:=make([]byte,count)
+  for _,budget:=range budgets {compare(wire,budget)}
+ }
+ ff:=append([]byte{0xff,255},bytes.Repeat([]byte{0xa5},2048)...)
+ for end:=0;end<=len(ff);end++ {for _,budget:=range budgets {compare(ff[:end],budget)}}
+ t.Logf("unpack preflight differential: %d wire/budget cases",checks)
+}

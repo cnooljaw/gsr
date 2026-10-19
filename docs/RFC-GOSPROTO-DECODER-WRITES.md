@@ -4,7 +4,7 @@
 
 当前状态（2026-10-19）：用户明确解除Decode阶段性冻结，允许按证据继续入口、解析和构造/写入优化；本页保留历史提案/验收，入口复核已本地提交为库 `913c465`、GSR `b708108`，见[Decode解冻报告](benchmarks/2026-10-19-gosproto-decode-resume/RESULTS.md)；后续[结构数组schema实验](benchmarks/2026-10-19-gosproto-decode-array-schema/RESULTS.md)未采用且报告已提交为GSR `26a5748`；当前[整数资格前移实验](benchmarks/2026-10-19-gosproto-decode-integer-proof/RESULTS.md)也未采用，报告已提交为GSR `f7381dd`；后续保留[固定header视图](benchmarks/2026-10-19-gosproto-decode-header-view/RESULTS.md)，已本地提交为库 `503a725`、GSR `2104eca`；后续[字节偏移实验](benchmarks/2026-10-19-gosproto-decode-header-offset/RESULTS.md)未采用且报告已提交为GSR `9699583`；[刷新Decode诊断](benchmarks/2026-10-19-gosproto-decode-current-profile/RESULTS.md)已本地提交为GSR `16d1491`；随后保留[原生整数数组读取视图](benchmarks/2026-10-19-gosproto-decode-array-view/RESULTS.md)，52项两轮大数组Decode快26%～29%、4字节组合快7%～9%，短包代价/控制失败/工具测试补丁偏差与纠正单列。该轮已本地提交为库 `f7022ac`、GSR `b3d4517`，完整兼容/接线验收通过，Decode继续开放。官方wire、预算、失败原子性、独占与写屏障约束不变。
 
-最新切片（2026-10-19）：前轮共享wire/分函数实验已提交 GSR `2ca8864`，未推送。新[分函数＋索引预检组合](benchmarks/2026-10-19-gosproto-unpack-split-indexed/RESULTS.md)完成固定70项：大型PDecode快3.12%/4.38%、4字节大数组快9.84%/9.23%，但普通word两轮慢约4%～33%、FF接稀疏慢约8.5%，组合未消除取舍，未采用。280进程/26,880块、目标契约及138500差分通过，控制/长尾/累计反向全部保留。主库仍af9169d且干净，新报告未提交；依赖v0.4.0，Decode继续开放。
+最新切片（2026-10-19）：前轮组合实验已提交GSR `885505c`，未推送。新[按word记录预检预算](benchmarks/2026-10-19-gosproto-unpack-word-budget/RESULTS.md)完成固定70项：单/双字节word约快5%～7%、零段小幅改善，但大型Unpack慢6.77%～7.93%、4字节大数组PDecode两轮慢4.02%、FF接稀疏慢约33%～34%，未采用。静态指令384→372但栈帧112→128B，不能据此预测动态收益。159275差分（新增MaxInt附近预算）、目标契约及来源核对通过；控制/尾差/长尾全部保留。主库仍af9169d且干净，新报告未提交，正式依赖v0.4.0、Decode继续开放。
 
 ## 问题与本轮证据
 
