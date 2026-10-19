@@ -6,7 +6,7 @@
 
 前两轮以已发布的 gosproto v0.4.0 为版本基线；下一轮从已提交的 `6012b06` 做增量，不从 v0.4.0 重复实施。实现改动应在独立 gosproto 仓库进行，GSR 提供真实接线和跨语言 Benchmark；不修改 Go module cache，也不将库源码复制到 GSR。
 
-当前切片（2026-10-19）：非inline内容视图已本地提交为库 `e50dfef`、GSR `29c954b`，未推送，见第53节。用户明确解除Decode阶段性冻结；重新验证并保留入口即时证明/地址借用分离，大型Decode两轮快2.37%/2.02%，组合路径代价完整披露，见第54节。新库实现与报告未提交，正式依赖仍v0.4.0。
+当前切片（2026-10-19）：Decode入口即时证明/地址借用分离已本地提交为库 `913c465`、GSR `b708108`，未推送，见第54节。随后只验证结构数组子schema局部复用；含数组记录Decode虽快约1%，大型与nil长数组重复观察到成本，未采用，见第55节。正式库干净且保持913c465，新GSR实验未提交，正式依赖v0.4.0，Decode继续开放。
 
 ## 1. 目标与证据
 
@@ -590,4 +590,12 @@ parser复用已有value.Elem()所得record的实际类型，调用点即时核�
 
 新40项×四模式160进程/15,360块独立复算：大型Decode快2.37%/2.02%（369.2/314.6ns），full4096 Decode快3.04%/2.83%，nil4096 Decode快6.19%/7.06%、PDecode快6.40%/6.94%，保留小幅和结构增长收益。大型RPC通知+0.63%/+0.03%、PDecode控制失败及第一轮累计+492.9ns、Echo小成本和未改Encode漂移同时披露，不宣称全路径获益。self27/40、clone35/40，所有对象数中位数相同，B/op尾差/7入口累计翻转/离群不删，limiter全零。
 
-四项当前基线CPU诊断先于计时，kevent占比原样保留，不用profile份额推演加速上限。fresh重建/源码/二进制/命令顺序/160单项SHA、库全测/官方/race/checkptr/vet、Codec/Decode有限fuzz497,350/1,217次、GSR三包与GoTS7/7零跳过通过；Decode fuzz后段计数停止如实记录，不盲目重跑。见[解冻与入口报告](benchmarks/2026-10-19-gosproto-decode-resume/RESULTS.md)。新库实现与GSR报告未提交，正式依赖v0.4.0，Decode继续开放，下一步先看重复字段定位与构造成本。
+四项当前基线CPU诊断先于计时，kevent占比原样保留，不用profile份额推演加速上限。fresh重建/源码/二进制/命令顺序/160单项SHA、库全测/官方/race/checkptr/vet、Codec/Decode有限fuzz497,350/1,217次、GSR三包与GoTS7/7零跳过通过；Decode fuzz后段计数停止如实记录，不盲目重跑。见[解冻与入口报告](benchmarks/2026-10-19-gosproto-decode-resume/RESULTS.md)。该轮已本地提交为库 `913c465`、GSR `b708108`，未推送；正式依赖v0.4.0，Decode继续开放，结构数组子schema实验见第55节。
+
+## 55. 结构数组子schema局部复用（未采用）
+
+只在decodeStructSlice的countChunks/MakeSlice之后保存私有schema链接，保留循环内schema.typ读取、每元素独占reflect.New与通用parser，未缓存公开Fields/值或新增unsafe。两次循环字段加载变为循环前一次，符号指令208不变、栈帧224→240B；据此进入同40项实测，不按静态条数决定收益。
+
+固定160进程/15,360块独立复算：含数组记录4096纯Decode快0.92%/1.05%（4,482.9/3,973.2ns），局部收益保留在报告；大型Decode+1.25%/+0.79%、通知Dispatch+0.48%/+0.65%，部分控制失败，nil4096 Decode+1.59%/+1.81%、PDecode+1.25%/+1.87%，nil两类控制均通过且累计同向。未改Encode/PEncode也漂移，不校正；基于主要目标成本和局部收益的整体取舍不采用，不设置最低收益比例或断言栈帧是唯一原因。
+
+self27/40、clone30/40；对象数中位数均相同，25项字节尾差、22入口累计翻转、1,858.944ms等离群原值保留，limiter零。目标契约/109形态525编码控制/40解码wire语义、harness/vet/四组构建与汇编/顺序/源码/二进制/fresh通过；预检查缓存权限失败在计时前解决，未清缓存或重试计时。候选从未应用主库，18份Go源码仍等于913c465，未重复生产全测/官方/race/fuzz/GSR/GoTS或PB/TS排名。见[数组schema报告](benchmarks/2026-10-19-gosproto-decode-array-schema/RESULTS.md)。新报告未提交，正式依赖v0.4.0，Decode继续开放。

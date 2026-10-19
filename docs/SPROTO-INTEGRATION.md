@@ -265,4 +265,7 @@ Pack前缀已提交为库a161158、GSR d6c672c，均未推送。后续只读布�
 后续[非inline内容视图复用](benchmarks/2026-10-19-gosproto-record-body-view/RESULTS.md)只复用本次内容切片，216条/32B帧不变、panic调用点15→14；inline新增两条清零指令的代价一并测量。原70项两轮大型PEncode快0.51%/0.77%、half4096请求少1.39/0.98µs，分配不变；full4096请求与含数组记录成本、27项累计翻转全留，不宣称全面解决。self50/70、clone56/70，既有契约/525差分/复算/fresh、库/官方/race/checkptr/vet/有限Codec fuzz/GSR/GoTS7/7通过。该轮已本地提交为库 `e50dfef`、GSR `29c954b`，未推送，正式依赖不变。
 
 
-用户于2026-10-19明确解除Decode阶段性冻结，入口、解析和构造/写入可继续按证据优化。当前[入口复核](benchmarks/2026-10-19-gosproto-decode-resume/RESULTS.md)保留即时类型证明与地址借用分离：大型Decode两轮快2.37%/2.02%、nil4096 Decode快6.19%/7.06%，大型通知Dispatch小成本/PDecode控制失败及累计翻转完整保留。新40项160进程/15,360块独立复算、fresh与来源核对，库全测/官方/race/checkptr/vet、有限Codec/Decode fuzz497,350/1,217次、GSR三包及GoTS7/7零跳过通过；Decode fuzz后段计数停止保留原输出，未重复PB/TS排名。新库实现与报告未提交，未推送，正式依赖仍v0.4.0，Decode继续开放。
+用户于2026-10-19明确解除Decode阶段性冻结，入口、解析和构造/写入可继续按证据优化。当前[入口复核](benchmarks/2026-10-19-gosproto-decode-resume/RESULTS.md)保留即时类型证明与地址借用分离：大型Decode两轮快2.37%/2.02%、nil4096 Decode快6.19%/7.06%，大型通知Dispatch小成本/PDecode控制失败及累计翻转完整保留。新40项160进程/15,360块独立复算、fresh与来源核对，库全测/官方/race/checkptr/vet、有限Codec/Decode fuzz497,350/1,217次、GSR三包及GoTS7/7零跳过通过；Decode fuzz后段计数停止保留原输出，未重复PB/TS排名。该轮已本地提交为库 `913c465`、GSR `b708108`，未推送，正式依赖仍v0.4.0，Decode继续开放。
+
+
+后续[结构数组schema局部复用](benchmarks/2026-10-19-gosproto-decode-array-schema/RESULTS.md)只保存同步调用内子schema链接，208条指令不变、栈帧224→240B。固定40项两轮中，含数组记录Decode快0.92%/1.05%，但大型Decode+1.25%/+0.79%、nil长数组Decode+1.59%/+1.81%，综合取舍未采用，不设最低收益比例。160进程/15,360块复算，self27/40、clone30/40；对象数不变，字节尾差/累计翻转/全部离群保留。目标契约/harness/vet/差分/fresh与指纹通过；主库从未应用补丁，源码等于913c465、工作树干净，未重复生产完整验收。新报告未提交，依赖v0.4.0、Decode继续开放。

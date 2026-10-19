@@ -1,0 +1,19 @@
+--- a/decode.go
++++ b/decode.go
+@@ -259,13 +259,14 @@
+ 		return err
+ 	}
+ 	result := reflect.MakeSlice(value.Type(), count, count)
++	schema := field.st
+ 	for index := 0; index < count; index++ {
+ 		used, content, err := readChunk(data)
+ 		if err != nil {
+ 			return err
+ 		}
+-		current := reflect.New(field.st.typ)
+-		consumed, err := decodeMessage(content, field.st, current, budget)
++		current := reflect.New(schema.typ)
++		consumed, err := decodeMessage(content, schema, current, budget)
+ 		if err != nil {
+ 			return err
+ 		}
