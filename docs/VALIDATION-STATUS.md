@@ -4,9 +4,13 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## 普通word连续段Pack实验（2026-10-19）
+
+前轮诊断已提交GSR4ff411f。只在归档实验连续段一次word写出；基线/候选既有Pack/尾块/FF/重叠/cap/独占/分配/错误测试及17,984差分通过。原70项四组280进程、26,880块/6,720 quartet/1,680轮/1,120快照独立复算；harness/vet、每项与合并JSON、fresh归档/源/二进制SHA一致。self13/70、clone42/70，均无limiter变化；self分配69/70一致（单项16B尾差保留），clone和两轮比较70/70一致。两轮目标Pack及主要RPC回退，候选不应用；nil4096小收益、全部失败/离群/累计差完整保存。见[连续段报告](benchmarks/2026-10-19-gosproto-pack-contiguous/RESULTS.md)。库干净且仍7397804，不跑未保留候选的发布级官方/race/checkptr/fuzz/GSR/GoTS；Decode/正式依赖不变，新GSR实验未提交。
+
 ## 原70项逐项独立进程控制（2026-10-19）
 
-以库7397804 / GSR a125ab4为只读基线，固定140个进程一次采样；self/clone均61/70控制通过，70/70分配中位数相同。全部13,440块、3,360 quartet、840轮、560状态快照独立复算，140逐项与合并JSON对齐；limiter无非零/变化，最大堆快照约4.20MB（非峰值）。旧混合控制40/70、38/70仅并列参考，17个不同入口至少一组失败与最大单轮+71.34%/+33.02%完整保留，无重跑/扣噪声。原计时块/校准源码相同，harness统计/选择/GC/fixture/指标检查与vet、fresh归档/源/二进制SHA通过。生产/正式依赖/Decode未改，不重复官方/race/checkptr/fuzz/GSR/GoTS。见[逐项进程报告](benchmarks/2026-10-19-gosproto-isolated-cases/RESULTS.md)，新GSR诊断未提交；库干净，后续只实验普通word Pack。
+以库7397804 / GSR a125ab4为只读基线，固定140个进程一次采样；self/clone均61/70控制通过，70/70分配中位数相同。全部13,440块、3,360 quartet、840轮、560状态快照独立复算，140逐项与合并JSON对齐；limiter无非零/变化，最大堆快照约4.20MB（非峰值）。旧混合控制40/70、38/70仅并列参考，17个不同入口至少一组失败与最大单轮+71.34%/+33.02%完整保留，无重跑/扣噪声。原计时块/校准源码相同，harness统计/选择/GC/fixture/指标检查与vet、fresh归档/源/二进制SHA通过。生产/正式依赖/Decode未改，不重复官方/race/checkptr/fuzz/GSR/GoTS。见[逐项进程报告](benchmarks/2026-10-19-gosproto-isolated-cases/RESULTS.md)，该轮已本地提交为 GSR `4ff411f`，未推送；库干净，后续只实验普通word Pack。
 
 ## 当前编码profile与4KiB GC上下文（2026-10-18）
 

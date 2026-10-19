@@ -1,0 +1,16 @@
+--- a/pack.go
++++ b/pack.go
+@@ -138,6 +138,13 @@
+ 				}
+ 			}
+ 			offset += index
++		} else if boundary := header + (header & -header); boundary&(boundary-1) == 0 {
++			// 连续置位段加最低位后只剩一个边界位；最高位段溢出为零也满足。
++			// 读出的 word 已独立于 src，最多写入原有八字节余量；返回长度只接纳非零段。
++			shift := bits.TrailingZeros8(header)
++			binary.LittleEndian.PutUint64(dst[1:], word>>uint(shift*8))
++			dst[0] = header
++			offset += 1 + bits.Len8(header) - shift
+ 		} else {
+ 			// Pack 预留八字节尾空间，零字节暂写的位置会被下一个有效字节覆盖，不进入返回切片。
+ 			_ = dst[8]

@@ -70,7 +70,9 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 
 [当前热点与GC上下文](../../../docs/benchmarks/2026-10-18-gosproto-post-layout-profile/RESULTS.md) 26份profile、同函数384块与补充limiter事件显示：混合夹具存活可触发GC CPU limiter并放大波动，隔离并不保证全部控制通过；完整原值保留，不用新诊断替代旧比较。整数数组组合Pack仍占37%～41%，先补单项独立进程采样再选候选。只读诊断/vet/独立复算/指纹通过，库干净；该轮已本地提交为 GSR `a125ab4`，未推送。
 
-[原70项逐项独立进程控制](../../../docs/benchmarks/2026-10-19-gosproto-isolated-cases/RESULTS.md) 固定140个进程，self/clone均61/70通过（旧混合40/70、38/70），分配中位数全部相同，limiter观测全零；最大堆快照约4.20MB，非峰值。仍有17个不同入口至少一组失败，离群/原值全保留；13,440块/560快照独立复算、harness/vet/fresh指纹通过。新诊断待审查，生产未改，不作新PB/TS排名；后续用逐项进程补充实现比较，保留混合历史。
+[原70项逐项独立进程控制](../../../docs/benchmarks/2026-10-19-gosproto-isolated-cases/RESULTS.md) 固定140个进程，self/clone均61/70通过（旧混合40/70、38/70），分配中位数全部相同，limiter观测全零；最大堆快照约4.20MB，非峰值。仍有17个不同入口至少一组失败，离群/原值全保留；13,440块/560快照独立复算、harness/vet/fresh指纹通过。该轮已本地提交为 GSR `4ff411f`，未推送；生产未改，不作新PB/TS排名，后续用逐项进程补充实现比较，保留混合历史。
+
+[普通word连续段实验](../../../docs/benchmarks/2026-10-19-gosproto-pack-contiguous/RESULTS.md) 固定原70项/四组280进程；批量写出使目标Pack和主要RPC两轮回退，增加32条符号指令，候选仅存归档未应用到库。既有契约/17,984差分、harness/vet、26,880块独立复算/fresh指纹通过。self/clone13/70、42/70且limiter均零，失败、小收益和离群全部保留；新报告待审查，生产/Decode/正式依赖不变。
 
 ## 比较口径
 

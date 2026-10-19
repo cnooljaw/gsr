@@ -241,4 +241,7 @@ Pack前缀已提交为库a161158、GSR d6c672c，均未推送。后续只读布�
 7397804后只读刷新26份profile及4KiB同函数上下文，发现混合夹具环境会大幅改变堆/GC；另起无计时诊断确认GC CPU limiter在full启用（0→1279）、isolated未启用（0）。这是已测到的机制，不回填历史比较或把隔离数字当协议加速。整数数组组合Pack仍占37%～41%，24项形态统计支持后续普通word研究；先补单项独立进程采样。诊断/vet、384块/24形态/194事件点和源/归档/profile核对通过，库干净，生产/正式依赖/Decode不变；该轮已本地提交为 GSR `a125ab4`，未推送。见 [当前热点与GC上下文](benchmarks/2026-10-18-gosproto-post-layout-profile/RESULTS.md)。
 
 
-原70项逐项独立进程控制已完成：self/clone 各61/70通过，分配中位数全部相同；140个进程 limiter 观测均为零，最大堆快照约4.20MB。13,440块与560快照独立复算、harness测试/vet及fresh指纹通过；仍有17个不同入口至少一组失败，离群全保留，不回填混合历史或宣称codec加速。见[逐项进程报告](benchmarks/2026-10-19-gosproto-isolated-cases/RESULTS.md)。新诊断未提交，生产源码/正式依赖/Decode不变；下一轮只实验普通word连续非零段批量写出。
+原70项逐项独立进程控制已完成：self/clone 各61/70通过，分配中位数全部相同；140个进程 limiter 观测均为零，最大堆快照约4.20MB。13,440块与560快照独立复算、harness测试/vet及fresh指纹通过；仍有17个不同入口至少一组失败，离群全保留，不回填混合历史或宣称codec加速。见[逐项进程报告](benchmarks/2026-10-19-gosproto-isolated-cases/RESULTS.md)。该轮已本地提交为 GSR `4ff411f`，未推送，生产源码/正式依赖/Decode不变；下一轮只实验普通word连续非零段批量写出。
+
+
+连续非零段批量写出已做固定原70项/四组280进程实验，目标整数数组Pack与大型Pack两轮回退，主要RPC也变慢；增加32条Pack符号指令、帧不变。候选仅留归档，未应用到库；小收益、所有控制失败/离群/累计原值保留，不按最低比例裁决。17,984差分、既有Pack/工作区契约、harness/vet、26,880块独立复算与fresh指纹通过。见[连续段实验](benchmarks/2026-10-19-gosproto-pack-contiguous/RESULTS.md)。self/clone13/70、42/70且limiter全零，测量仍有不确定性；库干净，Decode/正式依赖不变，新GSR报告未提交。

@@ -1,0 +1,171 @@
+{
+  "decision": "Reject this archived Pack candidate due repeated target and API cost;no fixed minimum-gain rule;new GSR experiment uncommitted",
+  "libraryHead": "7397804e37f4f190ea4d945f8f2e42b09e0a48ba",
+  "gsrHead": "4ff411faa4c5d2fa2fd25f58bb4d2f982d1c8b84",
+  "libraryWorkingTree": "clean;candidate never applied",
+  "finalLibraryGoSource": {
+    "decode.go": "b3cbbe248d17fe770add10ba93e5942fe5c54c13eba1c416135d83cff890e65e",
+    "decode_pointer.go": "5cf91e619c80895785046b396dbf1861a61281cb0b6c3d954cd07d99b8bfd961",
+    "encode.go": "ee0fb24ed0bbc8755052d8de4fd77c38307b3ac64656176a5299d4e1069cdf3f",
+    "encode_integer_record.go": "b1bfe815adcbfabd2de0463d4f28b41efa6b8f7d7df535efc00669e84d53d2d4",
+    "encode_pointer.go": "e7a239568a0fc8788404de6f5bc0d5e2ac092fa559f0a6bfd4561fdc155f81c1",
+    "encode_test.go": "d28095ae5b5b820eb0d5aed634397bb86159361b5876c3126100d59e37d41099",
+    "fuzz_test.go": "10eb7cb2d2fcd8afe47b6880cd61f64121f17b0a3355a6073b41ceb87e8d435c",
+    "limits.go": "223a9ec3a68c4fb4c5938332132692cec3658fee75aceea2e26076860fe94907",
+    "limits_test.go": "0f261965aeb66f5752b53a461518668a0e9db68be312aeb9c0ff78786a9ddcad",
+    "meta.go": "6badd4a5ac60d8a15caaa1f35634268101c436b275cf4a0fe120b91db417d217",
+    "official_compat_test.go": "fa413db0126e78205f7ee2d56f8f5d521bc29d82b723953385b79b0407412b60",
+    "pack.go": "e7aa06a522ad2d69697f1a46154bfbb7fa7908571046210683a20c72c6e8e071",
+    "pack_test.go": "70e79e8fa5273d4a9f31fb6afc885efbb1f2f86ca9d68b1bba4c1c97e8deed56",
+    "rpc.go": "6a5d29737047ecdcc2286b68a35df3330affa9dd8948ffbd5fde09104eed7899",
+    "rpc_limits_test.go": "6c0361cbda2870b3d4abf578b7313acc44728ed78de0ea92336c8c1170ee39b1",
+    "rpc_test.go": "4db20f87186685ef4bd78bc0e021940a8afe718a28ae8bddd6b66bede3017468",
+    "sproto.go": "2d35ffddf1ec0492fe6425f3d1dd7ede5d4edb3794773f6971fc4f36ceb80f4d",
+    "sproto_test.go": "20a255950d0628f27a00cf5923448d524c729b05f16ed18df3a095d2c6449d9e"
+  },
+  "formalDependency": "v0.4.0;go.mod/go.sum unchanged",
+  "decode": "frozen,unchanged",
+  "fixedPlan": "280 independent processes once,no timing retries or source/probe/plan changes",
+  "independentAnalysis": {
+    "processes": 280,
+    "blocks": 26880,
+    "quartets": 6720,
+    "rounds": 1680,
+    "snapshots": 1120
+  },
+  "freshComparedKeys": [
+    "baselineCommit",
+    "mode",
+    "goVersion",
+    "gsrHead",
+    "environment",
+    "generatedGoInputs",
+    "beforeGoSource",
+    "candidateGoSource",
+    "harnessGoSource",
+    "fixtures",
+    "tools",
+    "selectedCases",
+    "diagnosticPlan",
+    "driverInputs"
+  ],
+  "assembly": {
+    "self": {
+      "symbolicInstructions": 296,
+      "sha256": "f34a264f24896ed3aa44138c723d8269c9ba14c297e247dc34e5177aa03c5a98",
+      "frameBytes": 112,
+      "curatedSha256": "7d489f6583301ac99f2eff6a7b554b8bdaeaf7200ae19a08e637a4df802d6000"
+    },
+    "clone": {
+      "symbolicInstructions": 296,
+      "sha256": "2c1ecdab6b3e59c8006d84173dacdeb7c7854d5c71d77f83bac7e822c8c9ae11",
+      "frameBytes": 112,
+      "curatedSha256": "5a5578a3a4307fc2509ee6f33625dbea76f78a93aa50ad10452ca29d4f9ded5f"
+    },
+    "pass1": {
+      "symbolicInstructions": 328,
+      "sha256": "d72a2fc1c988e566c1daa3b5c3f6f8afaf1558d094f11f4e5c40354a23e10694",
+      "frameBytes": 112,
+      "curatedSha256": "92607b8a3425d2954bd5d67fe3cfeff9109fea8a57e2a25ca0368c6ffe7d2957"
+    },
+    "pass2": {
+      "symbolicInstructions": 328,
+      "sha256": "d169dc01af0f7f57aed93fc5a7012d5f2ec0c85792f34ac39c21f6d2b40c9e95",
+      "frameBytes": 112,
+      "curatedSha256": "da4a313e971a3ad2b189e0dc5df9e48c20894e4bdcf2e4941f17fd706e5be4c1"
+    }
+  },
+  "goModuleFileSha256": {
+    "self/candidate/go.mod": "39d81a69b8c51ec559f4683d616793a35f4133c89de1ca67ba813e9d1011edbe",
+    "self/harness/go.mod": "b975a6a28d2ebc93dd33fd70a3137d8ac3842ff042ef54944d7525feeaf0cc6a",
+    "self/before/go.mod": "e48e423659f833523f0cebbac11fc4ea73c6c7300c990543b9b7f1b510f87a7b",
+    "self/harness/go.sum": "2c3413439101b41d0f5f210b290a88513add402ba67058d79959d324e39f02b8",
+    "clone/candidate/go.mod": "39d81a69b8c51ec559f4683d616793a35f4133c89de1ca67ba813e9d1011edbe",
+    "clone/harness/go.mod": "fdbbb3c219f31d4df588710ac5db71c3eb6f13d27097087ecd88385a44424d33",
+    "clone/before/go.mod": "e48e423659f833523f0cebbac11fc4ea73c6c7300c990543b9b7f1b510f87a7b",
+    "clone/harness/go.sum": "2c3413439101b41d0f5f210b290a88513add402ba67058d79959d324e39f02b8",
+    "pass1/candidate/go.mod": "39d81a69b8c51ec559f4683d616793a35f4133c89de1ca67ba813e9d1011edbe",
+    "pass1/harness/go.mod": "99910c26e70a9176f35413c705f902edf18858ae0a60f3b899c18d2b533256f6",
+    "pass1/before/go.mod": "e48e423659f833523f0cebbac11fc4ea73c6c7300c990543b9b7f1b510f87a7b",
+    "pass1/harness/go.sum": "2c3413439101b41d0f5f210b290a88513add402ba67058d79959d324e39f02b8",
+    "pass2/candidate/go.mod": "39d81a69b8c51ec559f4683d616793a35f4133c89de1ca67ba813e9d1011edbe",
+    "pass2/harness/go.mod": "0a4f1359dc0717a930a67b9022062741bfe3f3795d7f0a4387a2c0d748fb9edb",
+    "pass2/before/go.mod": "e48e423659f833523f0cebbac11fc4ea73c6c7300c990543b9b7f1b510f87a7b",
+    "pass2/harness/go.sum": "2c3413439101b41d0f5f210b290a88513add402ba67058d79959d324e39f02b8"
+  },
+  "checks": [
+    "baseline/candidate existing Pack and EncodePacked contracts",
+    "17984 old/new differential inputs",
+    "four harness statistics/selection/GC/fixtures/default-metrics checks and vet",
+    "all70 names/order verified before timing in4 archives",
+    "unchanged sampleBlock and blockCalls source",
+    "280 raw records match merged JSON and hashes",
+    "all source/fixtures/generated/probe/driver/binary SHA reverified",
+    "fresh four-mode archive fingerprints equal",
+    "clean library;both diff checks;all new artifact whitespace"
+  ],
+  "notRun": [
+    "production candidate adoption",
+    "new PB/TS ranking",
+    "full library/official C-Lua/race/checkptr/fuzz for unretained candidate",
+    "GSR/GoTS integration",
+    "timing retries"
+  ],
+  "curationNotes": [
+    "Raw objdump text has trailing tabs;curated assembly strips trailing whitespace only;both original and curated SHA recorded. No raw samples,code,plan,probe,driver or timings changed.",
+    "Commit packaging: mark archived *.patch as -whitespace because unified-diff context begins with a required space before Go tabs;patch bytes and measurements unchanged."
+  ],
+  "limitations": [
+    "self13/70 clone42/70 controls;do not quantify exact causal slowdown",
+    "all limiter snapshots0 does not explain all other noise",
+    "sampled heaps are not peaks",
+    "small improvements and cumulative-direction differences retained",
+    "no CPU profiles this slice;instruction costs not added into timing estimates"
+  ],
+  "sourceReference": {
+    "path": "../skynet/lualib-src/sproto/sproto.c",
+    "sha256": "822eb2ea393f3f07b320edfdbc0165412978adbe0f2a1e648845c8a500b3d255",
+    "role": "read-only official-style mask/nonzero order and FF rules;this bulk-write optimization is not copied from its byte loop"
+  },
+  "commandTotalSeconds": 349.37163578905165,
+  "samplingProcessTotalSeconds": 338.5938002895564,
+  "artifactSha256": {
+    ".gitattributes": "706779a69328b68ebe4f35fb2d7c7a5bb96271f5f6db830d71e1903402ffc8bb",
+    "RESULTS.md": "d51782f896d9ce6c50723d0d9b1d10cb36f9ebcdbb076c98cafd4f18385182ce",
+    "analysis.json": "d4494597797760be121bf16d4fb1163d9d34401e69304ede6a8ca4972d1a6f09",
+    "analyze.py": "235d174f992512dff86964f92d005d9f57d102050b0156e854aedf447a8aa7a9",
+    "before-compiler.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "candidate-compiler.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "candidate.patch": "3388ee71973453403f2dc03354af50367c7733956d5222a72a4bde32d52e89d2",
+    "clone/case-list.json": "1d1b40403421c92074eeb4ed1b8028c95b14654c36c35b67991795b767977652",
+    "clone/inputs.json": "9fcd1d55c6a83d797f5208d976a047d6728075e61a0ad8aa685f2872c451fbf2",
+    "clone/raw.json": "bbb6f69b1764f93f01c2bfa6eb8319f6cfa933c2f4791f1a330b64d424b75b3a",
+    "clone/summary.json": "a8617228e685a03ef195f81b37e59e056facfe9bad4577c7382b0144624dee72",
+    "clone-pack-assembly.txt": "5a5578a3a4307fc2509ee6f33625dbea76f78a93aa50ad10452ca29d4f9ded5f",
+    "commands.json": "6794d5a4e70f051b1d84fdd49ca9055fe5e16febff1423fc7382dbf65c0031e8",
+    "correctness.json": "9dda5279a5289bb756b62937e21ec6b6a0c7c1c3460ac64a6d6a994420bca09d",
+    "pass1/case-list.json": "1d1b40403421c92074eeb4ed1b8028c95b14654c36c35b67991795b767977652",
+    "pass1/inputs.json": "2f03189f9b63d222fb0fb480d92b82eb4f6c352fdc565db5bf6b10eaaa5093dd",
+    "pass1/raw.json": "7ac6645d28d7d3cdf504d4d11d90ac8ff0d4cb21b5c1df6e55d2cdc66507b75c",
+    "pass1/summary.json": "a09e2e39f62ce659b2402cc4e090d2fa71e6f4c88583821affd7d5f9e31157b4",
+    "pass1-pack-assembly.txt": "92607b8a3425d2954bd5d67fe3cfeff9109fea8a57e2a25ca0368c6ffe7d2957",
+    "pass2/case-list.json": "1d1b40403421c92074eeb4ed1b8028c95b14654c36c35b67991795b767977652",
+    "pass2/inputs.json": "b85a7626bc6472d946c5be4b557be958bade9181b0298c2a7149978df88e98c7",
+    "pass2/raw.json": "7770a87347b9bd5a700a168b53408359a4f1df1bd1d00f2546fe70a84b1a886d",
+    "pass2/summary.json": "042bdc5e2062ec4475dc2d26d33625f1afa5d068e8a78b3064abfdfe898319fd",
+    "pass2-pack-assembly.txt": "da4a313e971a3ad2b189e0dc5df9e48c20894e4bdcf2e4941f17fd706e5be4c1",
+    "plan.json": "9b292d387ddfb6f55e555322b973f9ed6bccd5b41df6c0aad78e8ed3ec88b156",
+    "reproduce.py": "da936ccfaddd76576d0cdec3964b7f6eb11109b9696c99cb4c4f115ac8a2e9e7",
+    "self/case-list.json": "1d1b40403421c92074eeb4ed1b8028c95b14654c36c35b67991795b767977652",
+    "self/inputs.json": "fb5db5fb338e7ad56cef1928e3a462687250089c1947f27b29573bbf5bc07691",
+    "self/raw.json": "37c905668a2b760bcc36f5d49a1eec1ac08008c04ad242456a0e055fdbd56e34",
+    "self/summary.json": "38c653409d2d0aad3244741f1052eea1fd435d35b3a53bb6a6e8e7743f6c03ca",
+    "self-pack-assembly.txt": "7d489f6583301ac99f2eff6a7b554b8bdaeaf7200ae19a08e637a4df802d6000"
+  },
+  "centralDocumentSha256": {
+    "docs/RFC-GOSPROTO-PERFORMANCE.md": "34d564b73e3a1a2426f8616bd9fb3dbb37eca811d2a2152c5386572ddd291d4b",
+    "docs/SPROTO-INTEGRATION.md": "e6806dac37857d8b9ebe822b415e437f12a0d74538798e7e196860b319a07dc8",
+    "docs/VALIDATION-STATUS.md": "c83e8c70a2cdf54298fa39add9fedc2b676db1176200ed8f3cfdda4a71b09845",
+    "examples/websocket-gate/benchmarks/README.md": "855e4180e804051367018217985b36239872f9fdceaab9e684e608e7a0960529"
+  }
+}

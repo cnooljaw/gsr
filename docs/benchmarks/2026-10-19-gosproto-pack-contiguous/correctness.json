@@ -1,0 +1,50 @@
+[
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-run",
+      "^(TestPack|TestPackZeroRuns|TestPackPartialRunAtBlockLimit|TestEncodePackedWorkspace|TestEncodePackedAllocation|TestEncodePackedErrors)$",
+      "-v",
+      ".",
+      "-timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-contiguous/check/before",
+    "exitCode": 0,
+    "elapsedSeconds": 4.471257917582989,
+    "output": "=== RUN   TestPack\n--- PASS: TestPack (0.00s)\n=== RUN   TestPackPartialRunAtBlockLimit\n=== RUN   TestPackPartialRunAtBlockLimit/2046\n=== RUN   TestPackPartialRunAtBlockLimit/2047\n=== RUN   TestPackPartialRunAtBlockLimit/2048\n=== RUN   TestPackPartialRunAtBlockLimit/2049\n=== RUN   TestPackPartialRunAtBlockLimit/4094\n=== RUN   TestPackPartialRunAtBlockLimit/4095\n=== RUN   TestPackPartialRunAtBlockLimit/4096\n--- PASS: TestPackPartialRunAtBlockLimit (0.00s)\n    --- PASS: TestPackPartialRunAtBlockLimit/2046 (0.00s)\n    --- PASS: TestPackPartialRunAtBlockLimit/2047 (0.00s)\n    --- PASS: TestPackPartialRunAtBlockLimit/2048 (0.00s)\n    --- PASS: TestPackPartialRunAtBlockLimit/2049 (0.00s)\n    --- PASS: TestPackPartialRunAtBlockLimit/4094 (0.00s)\n    --- PASS: TestPackPartialRunAtBlockLimit/4095 (0.00s)\n    --- PASS: TestPackPartialRunAtBlockLimit/4096 (0.00s)\n=== RUN   TestPackZeroRuns\n--- PASS: TestPackZeroRuns (0.02s)\n=== RUN   TestEncodePackedWorkspace\n--- PASS: TestEncodePackedWorkspace (0.03s)\n=== RUN   TestEncodePackedAllocation\n--- PASS: TestEncodePackedAllocation (0.00s)\n=== RUN   TestEncodePackedErrors\n--- PASS: TestEncodePackedErrors (0.00s)\nPASS\nok  \tgithub.com/cnooljaw/gosproto-before\t0.627s\ngo: finding module for package github.com/cnooljaw/gosproto\ngo: found github.com/cnooljaw/gosproto in github.com/cnooljaw/gosproto v0.4.0\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-run",
+      "^(TestPack|TestPackZeroRuns|TestPackPartialRunAtBlockLimit|TestEncodePackedWorkspace|TestEncodePackedAllocation|TestEncodePackedErrors)$",
+      "-v",
+      ".",
+      "-timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-contiguous/check/candidate",
+    "exitCode": 0,
+    "elapsedSeconds": 0.9768660422414541,
+    "output": "=== RUN   TestPack\n--- PASS: TestPack (0.00s)\n=== RUN   TestPackPartialRunAtBlockLimit\n=== RUN   TestPackPartialRunAtBlockLimit/2046\n=== RUN   TestPackPartialRunAtBlockLimit/2047\n=== RUN   TestPackPartialRunAtBlockLimit/2048\n=== RUN   TestPackPartialRunAtBlockLimit/2049\n=== RUN   TestPackPartialRunAtBlockLimit/4094\n=== RUN   TestPackPartialRunAtBlockLimit/4095\n=== RUN   TestPackPartialRunAtBlockLimit/4096\n--- PASS: TestPackPartialRunAtBlockLimit (0.00s)\n    --- PASS: TestPackPartialRunAtBlockLimit/2046 (0.00s)\n    --- PASS: TestPackPartialRunAtBlockLimit/2047 (0.00s)\n    --- PASS: TestPackPartialRunAtBlockLimit/2048 (0.00s)\n    --- PASS: TestPackPartialRunAtBlockLimit/2049 (0.00s)\n    --- PASS: TestPackPartialRunAtBlockLimit/4094 (0.00s)\n    --- PASS: TestPackPartialRunAtBlockLimit/4095 (0.00s)\n    --- PASS: TestPackPartialRunAtBlockLimit/4096 (0.00s)\n=== RUN   TestPackZeroRuns\n--- PASS: TestPackZeroRuns (0.01s)\n=== RUN   TestEncodePackedWorkspace\n--- PASS: TestEncodePackedWorkspace (0.02s)\n=== RUN   TestEncodePackedAllocation\n--- PASS: TestEncodePackedAllocation (0.00s)\n=== RUN   TestEncodePackedErrors\n--- PASS: TestEncodePackedErrors (0.00s)\nPASS\nok  \tgithub.com/cnooljaw/gosproto\t0.370s\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-run",
+      "^(TestPackDifferential|TestRepresentativeFixtures)$",
+      "-v",
+      ".",
+      "-timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-contiguous/check/harness",
+    "exitCode": 0,
+    "elapsedSeconds": 0.888964207842946,
+    "output": "=== RUN   TestPackDifferential\n    pack_differential_test.go:71: 17984 differential inputs\n--- PASS: TestPackDifferential (0.04s)\n=== RUN   TestRepresentativeFixtures\n--- PASS: TestRepresentativeFixtures (0.00s)\nPASS\nok  \tcodecpairstool\t0.373s\n"
+  }
+]
