@@ -72,7 +72,9 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 
 [原70项逐项独立进程控制](../../../docs/benchmarks/2026-10-19-gosproto-isolated-cases/RESULTS.md) 固定140个进程，self/clone均61/70通过（旧混合40/70、38/70），分配中位数全部相同，limiter观测全零；最大堆快照约4.20MB，非峰值。仍有17个不同入口至少一组失败，离群/原值全保留；13,440块/560快照独立复算、harness/vet/fresh指纹通过。该轮已本地提交为 GSR `4ff411f`，未推送；生产未改，不作新PB/TS排名，后续用逐项进程补充实现比较，保留混合历史。
 
-[普通word连续段实验](../../../docs/benchmarks/2026-10-19-gosproto-pack-contiguous/RESULTS.md) 固定原70项/四组280进程；批量写出使目标Pack和主要RPC两轮回退，增加32条符号指令，候选仅存归档未应用到库。既有契约/17,984差分、harness/vet、26,880块独立复算/fresh指纹通过。self/clone13/70、42/70且limiter均零，失败、小收益和离群全部保留；新报告待审查，生产/Decode/正式依赖不变。
+[普通word连续段实验](../../../docs/benchmarks/2026-10-19-gosproto-pack-contiguous/RESULTS.md) 固定原70项/四组280进程；批量写出使目标Pack和主要RPC两轮回退，增加32条符号指令，候选仅存归档未应用到库。既有契约/17,984差分、harness/vet、26,880块独立复算/fresh指纹通过。self/clone13/70、42/70且limiter均零，失败、小收益和离群全部保留；该轮已本地提交为 GSR `d1dceaa`，未推送；生产/Decode/正式依赖不变。
+
+[固定payload视图](../../../docs/benchmarks/2026-10-19-gosproto-pack-payload/RESULTS.md) 只消除普通word重复索引+1，指令296→288，帧不变；原70项两轮大型Pack快8.87%/9.13%，整数数组PEncode快4.70%/4.19%，主要RPC与小收益保留。控制56/70、56/70，全部累计翻转/尾差/异常块/wide64成本披露。17,984差分、复算/fresh指纹、库/官方/race/checkptr/vet/有限fuzz/GSR/GoTS通过。新库代码和GSR报告未提交，Decode/正式依赖不变。
 
 ## 比较口径
 

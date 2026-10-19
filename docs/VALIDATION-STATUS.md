@@ -4,9 +4,13 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## Pack固定payload视图（2026-10-19）
+
+前轮实验已提交GSR d1dceaa。新候选仅普通word安全固定视图消除重复索引+1，296→288条符号指令、112B帧不变；原70项四组280进程/26,880块/6,720 quartet/1,680轮/1,120快照独立复算。self/clone56/70，所有limiter零；分配中位数69/69/69/70项相同，16B尾差披露。两轮目标Pack/PEncode/RPC改善，保留；累计方向翻转、233.678ms异常块、wide64成本与全部失败保留。既有工作区/全mask等契约、17,984差分、harness/vet、fresh归档/源/二进制SHA通过。库全测/官方C-Lua/race+checkptr/vet、有限fuzz（Pack36,026且3s后停增；Codec442,757）、GSR三包/GoTS7/7零跳过通过；oracle复用历史SHA一致的官方core/facade，parser来自只读Skynet并单列。见[固定payload报告](benchmarks/2026-10-19-gosproto-pack-payload/RESULTS.md)。库仅pack.go未提交，GSR新文档未提交，正式依赖/Decode不变。
+
 ## 普通word连续段Pack实验（2026-10-19）
 
-前轮诊断已提交GSR4ff411f。只在归档实验连续段一次word写出；基线/候选既有Pack/尾块/FF/重叠/cap/独占/分配/错误测试及17,984差分通过。原70项四组280进程、26,880块/6,720 quartet/1,680轮/1,120快照独立复算；harness/vet、每项与合并JSON、fresh归档/源/二进制SHA一致。self13/70、clone42/70，均无limiter变化；self分配69/70一致（单项16B尾差保留），clone和两轮比较70/70一致。两轮目标Pack及主要RPC回退，候选不应用；nil4096小收益、全部失败/离群/累计差完整保存。见[连续段报告](benchmarks/2026-10-19-gosproto-pack-contiguous/RESULTS.md)。库干净且仍7397804，不跑未保留候选的发布级官方/race/checkptr/fuzz/GSR/GoTS；Decode/正式依赖不变，新GSR实验未提交。
+前轮诊断已提交GSR4ff411f。只在归档实验连续段一次word写出；基线/候选既有Pack/尾块/FF/重叠/cap/独占/分配/错误测试及17,984差分通过。原70项四组280进程、26,880块/6,720 quartet/1,680轮/1,120快照独立复算；harness/vet、每项与合并JSON、fresh归档/源/二进制SHA一致。self13/70、clone42/70，均无limiter变化；self分配69/70一致（单项16B尾差保留），clone和两轮比较70/70一致。两轮目标Pack及主要RPC回退，候选不应用；nil4096小收益、全部失败/离群/累计差完整保存。见[连续段报告](benchmarks/2026-10-19-gosproto-pack-contiguous/RESULTS.md)。库干净且仍7397804，不跑未保留候选的发布级官方/race/checkptr/fuzz/GSR/GoTS；Decode/正式依赖不变；该轮已本地提交为 GSR `d1dceaa`，未推送。
 
 ## 原70项逐项独立进程控制（2026-10-19）
 

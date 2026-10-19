@@ -244,4 +244,7 @@ Pack前缀已提交为库a161158、GSR d6c672c，均未推送。后续只读布�
 原70项逐项独立进程控制已完成：self/clone 各61/70通过，分配中位数全部相同；140个进程 limiter 观测均为零，最大堆快照约4.20MB。13,440块与560快照独立复算、harness测试/vet及fresh指纹通过；仍有17个不同入口至少一组失败，离群全保留，不回填混合历史或宣称codec加速。见[逐项进程报告](benchmarks/2026-10-19-gosproto-isolated-cases/RESULTS.md)。该轮已本地提交为 GSR `4ff411f`，未推送，生产源码/正式依赖/Decode不变；下一轮只实验普通word连续非零段批量写出。
 
 
-连续非零段批量写出已做固定原70项/四组280进程实验，目标整数数组Pack与大型Pack两轮回退，主要RPC也变慢；增加32条Pack符号指令、帧不变。候选仅留归档，未应用到库；小收益、所有控制失败/离群/累计原值保留，不按最低比例裁决。17,984差分、既有Pack/工作区契约、harness/vet、26,880块独立复算与fresh指纹通过。见[连续段实验](benchmarks/2026-10-19-gosproto-pack-contiguous/RESULTS.md)。self/clone13/70、42/70且limiter全零，测量仍有不确定性；库干净，Decode/正式依赖不变，新GSR报告未提交。
+连续非零段批量写出已做固定原70项/四组280进程实验，目标整数数组Pack与大型Pack两轮回退，主要RPC也变慢；增加32条Pack符号指令、帧不变。候选仅留归档，未应用到库；小收益、所有控制失败/离群/累计原值保留，不按最低比例裁决。17,984差分、既有Pack/工作区契约、harness/vet、26,880块独立复算与fresh指纹通过。见[连续段实验](benchmarks/2026-10-19-gosproto-pack-contiguous/RESULTS.md)。self/clone13/70、42/70且limiter全零，测量仍有不确定性；库干净，Decode/正式依赖不变；该轮已本地提交为 GSR `d1dceaa`，未推送。
+
+
+普通Pack固定payload视图已保留：不增分支，写入地址/顺序不变，符号指令296→288、帧112B不变。原70项四组280进程两轮，大型Pack快约8.9%/9.1%，整数数组PEncode快4.7%/4.2%，主要RPC改善；低于2%的小收益照常计入。控制各56/70、所有累计翻转/异常块/尾差及wide64小成本保留。既有契约/17,984差分、独立复算/fresh指纹、库/官方/race/checkptr/vet/有限fuzz/GSR三包/GoTS7/7通过，Pack计数停增和oracle来源限制明确记录。见[固定payload报告](benchmarks/2026-10-19-gosproto-pack-payload/RESULTS.md)。新库pack.go和GSR文档未提交，不变更正式依赖或Decode。
