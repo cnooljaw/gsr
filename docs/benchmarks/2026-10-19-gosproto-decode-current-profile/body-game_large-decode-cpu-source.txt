@@ -1,0 +1,135 @@
+Total: 2.29s
+ROUTINE ======================== github.com/cnooljaw/gosproto.decodeIntSlice in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-decode-current-profile-measured/self/candidate/decode.go
+      10ms       80ms (flat, cum)  3.49% of Total
+         .          .    157:func decodeIntSlice(_ uint16, _ bool, data []byte, field *SprotoField, value reflect.Value, budget *decodeBudget) error {
+         .          .    158:	// 官方接受空内容或仅有宽度前缀的空数组；非空数组必须先校验宽度。
+         .          .    159:	if len(data) <= 1 {
+         .          .    160:		if field.int64Slice {
+         .          .    161:			*value.Addr().Interface().(*[]int64) = []int64{}
+         .          .    162:			return nil
+         .          .    163:		}
+         .          .    164:		value.Set(reflect.MakeSlice(value.Type(), 0, 0))
+         .          .    165:		return nil
+         .          .    166:	}
+         .          .    167:	width := int(data[0])
+         .          .    168:	data = data[1:]
+         .          .    169:	if (width != 4 && width != 8) || len(data)%width != 0 {
+         .          .    170:		return ErrDecode
+         .          .    171:	}
+         .          .    172:	count := len(data) / width
+         .          .    173:	if err := budget.add(count); err != nil {
+         .          .    174:		return err
+         .          .    175:	}
+         .          .    176:	if field.int64Slice {
+         .       70ms    177:		result := make([]int64, count)
+         .          .    178:		if width == 4 {
+         .          .    179:			for index := range result {
+      10ms       10ms    180:				result[index] = int64(int32(readUint32(data[index*4:])))
+         .          .    181:			}
+         .          .    182:		} else {
+         .          .    183:			for index := range result {
+         .          .    184:				result[index] = int64(readUint64(data[index*8:]))
+         .          .    185:			}
+ROUTINE ======================== github.com/cnooljaw/gosproto.decodeMessage in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-decode-current-profile-measured/self/candidate/decode.go
+     240ms      2.15s (flat, cum) 93.89% of Total
+      10ms       10ms    282:func decodeMessage(chunk []byte, schema *SprotoType, value reflect.Value, budget *decodeBudget) (int, error) {
+         .          .    283:	budget.depth++
+         .          .    284:	defer func() { budget.depth-- }()
+      10ms       10ms    285:	if budget.depth > budget.limits.MaxDepth {
+         .          .    286:		return 0, ErrLimit
+         .          .    287:	}
+         .          .    288:	if len(chunk) < 2 {
+         .          .    289:		return 0, ErrDecode
+         .          .    290:	}
+         .          .    291:	count := int(readUint16(chunk))
+         .          .    292:	total := 2 + count*2
+         .          .    293:	if total > len(chunk) {
+         .          .    294:		return 0, ErrDecode
+         .          .    295:	}
+         .          .    296:	if err := budget.add(count); err != nil {
+         .          .    297:		return 0, err
+         .          .    298:	}
+         .       10ms    299:	record := value.Elem()
+      10ms       40ms    300:	exactNative := schema.nativeInt64Pointer && record.Type() == schema.typ
+         .       10ms    301:	pointer := messageDecodePointer(value, exactNative)
+         .          .    302:	tag := 0
+      30ms       30ms    303:	for index := 0; index < count; index++ {
+      50ms       50ms    304:		entry := int(readUint16(chunk[2+index*2 : 4+index*2 : 4+index*2]))
+         .          .    305:		if entry%2 == 1 {
+         .          .    306:			tag += (entry + 1) / 2
+         .          .    307:			continue
+         .          .    308:		}
+         .          .    309:		if tag > 65535 {
+         .          .    310:			return 0, ErrDecode
+         .          .    311:		}
+         .          .    312:		hasInline := entry != 0
+         .          .    313:		inline := uint16(entry/2 - 1)
+         .          .    314:		var content []byte
+         .          .    315:		if !hasInline {
+      50ms       60ms    316:			used, data, err := readChunk(chunk[total:])
+      10ms       10ms    317:			if err != nil {
+         .          .    318:				return 0, err
+         .          .    319:			}
+         .          .    320:			total += used
+         .          .    321:			content = data
+         .          .    322:		}
+         .          .    323:		field := schema.FieldByTag(tag)
+         .          .    324:		tag++
+         .          .    325:		if field == nil {
+         .          .    326:			continue
+         .          .    327:		}
+      20ms       20ms    328:		if hasInline && (field.Array || field.Wire == WireBytesName || field.Wire == WireStructName) {
+         .          .    329:			return 0, ErrDecode
+         .          .    330:		}
+      10ms       10ms    331:		if field.nativeInt64Pointer {
+         .          .    332:			bits, err := scalarBits(inline, hasInline, content)
+      10ms       10ms    333:			if err != nil {
+         .          .    334:				return 0, err
+         .          .    335:			}
+         .      370ms    336:			result := new(int64)
+         .          .    337:			*result = int64(bits)
+      10ms      130ms    338:			if !pointer.setInteger(schema, field, result) {
+         .          .    339:				record.Field(field.index[0]).Set(reflect.ValueOf(result))
+         .          .    340:			}
+         .          .    341:			continue
+         .          .    342:		}
+      10ms      1.37s    343:		if err := field.dec(inline, hasInline, content, field, record.Field(field.index[0]), budget); err != nil {
+         .          .    344:			return 0, err
+         .          .    345:		}
+         .          .    346:	}
+      10ms       10ms    347:	return total, nil
+         .          .    348:}
+         .          .    349:
+         .          .    350:// Decode 解码一个结构体，使用默认有限预算，返回已消费的字节数。
+         .          .    351:func Decode(data []byte, message interface{}) (int, error) {
+         .          .    352:	return DecodeWithLimits(data, message, Limits{})
+ROUTINE ======================== github.com/cnooljaw/gosproto.decodeStructSlice in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-decode-current-profile-measured/self/candidate/decode.go
+      40ms      1.24s (flat, cum) 54.15% of Total
+         .          .    256:func decodeStructSlice(_ uint16, _ bool, data []byte, field *SprotoField, value reflect.Value, budget *decodeBudget) error {
+         .       40ms    257:	count, err := countChunks(data, budget)
+         .          .    258:	if err != nil {
+         .          .    259:		return err
+         .          .    260:	}
+         .       10ms    261:	result := reflect.MakeSlice(value.Type(), count, count)
+         .          .    262:	for index := 0; index < count; index++ {
+         .       30ms    263:		used, content, err := readChunk(data)
+      10ms       10ms    264:		if err != nil {
+         .          .    265:			return err
+         .          .    266:		}
+         .      240ms    267:		current := reflect.New(field.st.typ)
+         .      770ms    268:		consumed, err := decodeMessage(content, field.st, current, budget)
+      10ms       10ms    269:		if err != nil {
+         .          .    270:			return err
+         .          .    271:		}
+         .          .    272:		if consumed != len(content) {
+         .          .    273:			return ErrDecode
+         .          .    274:		}
+         .      110ms    275:		result.Index(index).Set(current)
+         .          .    276:		data = data[used:]
+         .          .    277:	}
+      20ms       20ms    278:	value.Set(result)
+         .          .    279:	return nil
+         .          .    280:}
+         .          .    281:
+         .          .    282:func decodeMessage(chunk []byte, schema *SprotoType, value reflect.Value, budget *decodeBudget) (int, error) {
+         .          .    283:	budget.depth++

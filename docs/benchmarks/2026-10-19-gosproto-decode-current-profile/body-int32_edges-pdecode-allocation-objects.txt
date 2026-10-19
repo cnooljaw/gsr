@@ -1,0 +1,42 @@
+File: pairs.test
+Type: alloc_objects
+Time: 2026-10-19 15:53:03 CST
+Showing nodes accounting for 460591, 98.40% of 468103 total
+Dropped 403 nodes (cum <= 2340)
+      flat  flat%   sum%        cum   cum%
+    149036 31.84% 31.84%     149036 31.84%  reflect.New
+     86087 18.39% 50.23%      86087 18.39%  codecpairstool.layoutRecords (inline)
+     47164 10.08% 60.30%     145057 30.99%  github.com/cnooljaw/gosproto.decodeMessage
+     46947 10.03% 70.33%     121724 26.00%  github.com/cnooljaw/gosproto-before.decodeMessage
+     35257  7.53% 77.87%      35257  7.53%  github.com/cnooljaw/gosproto.decodeIntSlice
+     23013  4.92% 82.78%     191095 40.82%  github.com/cnooljaw/gosproto.DecodeWithLimits
+     22977  4.91% 87.69%      22977  4.91%  github.com/cnooljaw/gosproto.UnpackWithLimit
+     22954  4.90% 92.59%      22954  4.90%  codecpairstool.representativeMessages.func6
+     14573  3.11% 95.71%     101310 21.64%  codecpairstool.layoutSamples
+     12308  2.63% 98.34%      12308  2.63%  github.com/cnooljaw/gosproto-before.decodeIntSlice
+        75 0.016% 98.35%     243729 52.07%  codecpairstool.decodeBodyOperations
+        64 0.014% 98.37%     121864 26.03%  github.com/cnooljaw/gosproto-before.DecodeWithLimits
+        55 0.012% 98.38%       5531  1.18%  codecpairstool.representativeOperations
+        48  0.01% 98.39%     353010 75.41%  codecpairstool.pairOperations
+        28 0.006% 98.39%     162032 34.61%  codecpairstool.appendDecodePair
+         2 0.00043% 98.39%     467917   100%  codecpairstool.BenchmarkCurrentOperation
+         2 0.00043% 98.40%     467961   100%  testing.(*B).runN
+         1 0.00021% 98.40%     101431 21.67%  codecpairstool.growthFixtureSamples
+         0     0% 98.40%     353013 75.41%  codecpairstool.currentProfileOperation
+         0     0% 98.40%      40461  8.64%  codecpairstool.decodeBodyOperations.func1
+         0     0% 98.40%      40463  8.64%  codecpairstool.decodeBodyOperations.func2
+         0     0% 98.40%      40471  8.65%  codecpairstool.decodeBodyOperations.func5
+         0     0% 98.40%     155191 33.15%  codecpairstool.decodeBodyOperations.func6
+         0     0% 98.40%     121864 26.03%  github.com/cnooljaw/gosproto-before.Decode (inline)
+         0     0% 98.40%      40461  8.64%  github.com/cnooljaw/gosproto-before.DecodePacked
+         0     0% 98.40%     121590 25.98%  github.com/cnooljaw/gosproto-before.decodeStructSlice
+         0     0% 98.40%     191095 40.82%  github.com/cnooljaw/gosproto.Decode (inline)
+         0     0% 98.40%     132237 28.25%  github.com/cnooljaw/gosproto.DecodePacked
+         0     0% 98.40%      22977  4.91%  github.com/cnooljaw/gosproto.Unpack (inline)
+         0     0% 98.40%     121958 26.05%  github.com/cnooljaw/gosproto.decodeStructSlice
+         0     0% 98.40%       3883  0.83%  google.golang.org/protobuf/encoding/protojson.Unmarshal (inline)
+         0     0% 98.40%       3883  0.83%  google.golang.org/protobuf/encoding/protojson.UnmarshalOptions.Unmarshal (inline)
+         0     0% 98.40%       3883  0.83%  google.golang.org/protobuf/encoding/protojson.UnmarshalOptions.unmarshal
+         0     0% 98.40%       3393  0.72%  google.golang.org/protobuf/encoding/protojson.decoder.unmarshalList
+         0     0% 98.40%       3878  0.83%  google.golang.org/protobuf/encoding/protojson.decoder.unmarshalMessage
+         0     0% 98.40%     467923   100%  testing.(*B).run1.func1

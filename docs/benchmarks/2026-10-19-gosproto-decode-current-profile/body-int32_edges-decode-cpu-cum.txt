@@ -1,0 +1,48 @@
+File: pairs.test
+Type: cpu
+Time: 2026-10-19 15:52:55 CST
+Duration: 2.59s, Total samples = 2.37s (91.34%)
+Showing nodes accounting for 2.09s, 88.19% of 2.37s total
+Dropped 25 nodes (cum <= 0.01s)
+Showing top 40 nodes out of 64
+      flat  flat%   sum%        cum   cum%
+         0     0%     0%      1.74s 73.42%  runtime.systemstack
+     1.44s 60.76% 60.76%      1.44s 60.76%  runtime.kevent
+         0     0% 60.76%      1.44s 60.76%  runtime.netpoll
+         0     0% 60.76%      1.44s 60.76%  runtime.startTheWorldWithSema
+         0     0% 60.76%      0.91s 38.40%  codecpairstool.BenchmarkCurrentOperation
+         0     0% 60.76%      0.91s 38.40%  codecpairstool.decodeBodyOperations.func2
+         0     0% 60.76%      0.91s 38.40%  testing.(*B).run1.func1
+         0     0% 60.76%      0.91s 38.40%  testing.(*B).runN
+         0     0% 60.76%      0.89s 37.55%  github.com/cnooljaw/gosproto.Decode (inline)
+         0     0% 60.76%      0.89s 37.55%  github.com/cnooljaw/gosproto.DecodeWithLimits
+     0.01s  0.42% 61.18%      0.84s 35.44%  github.com/cnooljaw/gosproto.decodeMessage
+     0.34s 14.35% 75.53%      0.82s 34.60%  github.com/cnooljaw/gosproto.decodeIntSlice
+         0     0% 75.53%      0.79s 33.33%  runtime.gcStart.func4
+         0     0% 75.53%      0.65s 27.43%  runtime.gcMarkTermination.func3
+         0     0% 75.53%      0.33s 13.92%  runtime.mallocgc
+         0     0% 75.53%      0.28s 11.81%  runtime.makeslice
+     0.16s  6.75% 82.28%      0.20s  8.44%  github.com/cnooljaw/gosproto.readUint32 (inline)
+         0     0% 82.28%      0.20s  8.44%  runtime.deductAssistCredit
+         0     0% 82.28%      0.20s  8.44%  runtime.gcAssistAlloc
+         0     0% 82.28%      0.20s  8.44%  runtime.gcAssistAlloc.func2
+         0     0% 82.28%      0.20s  8.44%  runtime.gcAssistAlloc1
+         0     0% 82.28%      0.20s  8.44%  runtime.gcDrainN
+     0.04s  1.69% 83.97%      0.16s  6.75%  runtime.scanobject
+         0     0% 83.97%      0.11s  4.64%  runtime.mallocgcSmallNoscan
+         0     0% 83.97%      0.07s  2.95%  runtime.(*mcache).nextFree
+         0     0% 83.97%      0.07s  2.95%  runtime.(*mcache).refill
+         0     0% 83.97%      0.07s  2.95%  runtime.(*mcentral).cacheSpan
+         0     0% 83.97%      0.05s  2.11%  runtime.(*mheap).alloc.func1
+         0     0% 83.97%      0.05s  2.11%  runtime.(*mheap).allocSpan
+     0.04s  1.69% 85.65%      0.05s  2.11%  runtime.greyobject
+     0.04s  1.69% 87.34%      0.04s  1.69%  encoding/binary.littleEndian.Uint32 (inline)
+         0     0% 87.34%      0.04s  1.69%  runtime.(*sweepLocked).sweep
+         0     0% 87.34%      0.03s  1.27%  reflect.New
+     0.01s  0.42% 87.76%      0.03s  1.27%  reflect.unsafe_New
+         0     0% 87.76%      0.03s  1.27%  runtime.(*mcentral).grow
+         0     0% 87.76%      0.03s  1.27%  runtime.(*mheap).alloc
+         0     0% 87.76%      0.03s  1.27%  runtime.(*mheap).freeSpan (inline)
+     0.01s  0.42% 88.19%      0.03s  1.27%  runtime.(*mheap).freeSpanLocked
+         0     0% 88.19%      0.03s  1.27%  runtime.(*sweepLocked).sweep.(*mheap).freeSpan.func2
+         0     0% 88.19%      0.03s  1.27%  runtime.deductSweepCredit

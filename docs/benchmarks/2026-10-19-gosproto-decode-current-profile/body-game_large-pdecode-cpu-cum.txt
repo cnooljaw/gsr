@@ -1,0 +1,48 @@
+File: pairs.test
+Type: cpu
+Time: 2026-10-19 15:52:33 CST
+Duration: 2.51s, Total samples = 2.07s (82.62%)
+Showing nodes accounting for 1.60s, 77.29% of 2.07s total
+Dropped 44 nodes (cum <= 0.01s)
+Showing top 40 nodes out of 73
+      flat  flat%   sum%        cum   cum%
+         0     0%     0%      1.31s 63.29%  codecpairstool.BenchmarkCurrentOperation
+         0     0%     0%      1.31s 63.29%  codecpairstool.decodeBodyOperations.func6
+         0     0%     0%      1.31s 63.29%  github.com/cnooljaw/gosproto.DecodePacked
+         0     0%     0%      1.31s 63.29%  testing.(*B).run1.func1
+         0     0%     0%      1.31s 63.29%  testing.(*B).runN
+         0     0%     0%      0.99s 47.83%  github.com/cnooljaw/gosproto.Decode (inline)
+     0.01s  0.48%  0.48%      0.99s 47.83%  github.com/cnooljaw/gosproto.DecodeWithLimits
+     0.16s  7.73%  8.21%      0.98s 47.34%  github.com/cnooljaw/gosproto.decodeMessage
+     0.04s  1.93% 10.14%      0.84s 40.58%  github.com/cnooljaw/gosproto.decodeStructSlice
+         0     0% 10.14%      0.84s 40.58%  runtime.systemstack
+     0.70s 33.82% 43.96%      0.70s 33.82%  runtime.kevent
+         0     0% 43.96%      0.70s 33.82%  runtime.netpoll
+         0     0% 43.96%      0.70s 33.82%  runtime.startTheWorldWithSema
+     0.09s  4.35% 48.31%      0.45s 21.74%  runtime.mallocgc
+         0     0% 48.31%      0.37s 17.87%  runtime.gcMarkTermination.func3
+         0     0% 48.31%      0.33s 15.94%  runtime.gcStart.func4
+         0     0% 48.31%      0.32s 15.46%  github.com/cnooljaw/gosproto.Unpack (inline)
+     0.27s 13.04% 61.35%      0.32s 15.46%  github.com/cnooljaw/gosproto.UnpackWithLimit
+     0.01s  0.48% 61.84%      0.25s 12.08%  runtime.newobject
+         0     0% 61.84%      0.15s  7.25%  reflect.New
+     0.01s  0.48% 62.32%      0.11s  5.31%  reflect.unsafe_New
+     0.03s  1.45% 63.77%      0.10s  4.83%  github.com/cnooljaw/gosproto.decodePointer.setInteger (inline)
+     0.02s  0.97% 64.73%      0.10s  4.83%  runtime.mallocgcSmallScanNoHeader
+     0.05s  2.42% 67.15%      0.10s  4.83%  runtime.mallocgcTiny
+     0.03s  1.45% 68.60%      0.09s  4.35%  runtime.deductAssistCredit
+         0     0% 68.60%      0.08s  3.86%  runtime.makeslice
+         0     0% 68.60%      0.07s  3.38%  runtime.gcAssistAlloc.func2
+         0     0% 68.60%      0.07s  3.38%  runtime.gcAssistAlloc1
+     0.01s  0.48% 69.08%      0.07s  3.38%  runtime.scanobject
+     0.06s  2.90% 71.98%      0.06s  2.90%  github.com/cnooljaw/gosproto.(*SprotoField).nativeInteger (inline)
+     0.01s  0.48% 72.46%      0.06s  2.90%  github.com/cnooljaw/gosproto.decodeIntSlice
+     0.05s  2.42% 74.88%      0.06s  2.90%  github.com/cnooljaw/gosproto.readChunk (inline)
+         0     0% 74.88%      0.06s  2.90%  runtime.gcAssistAlloc
+         0     0% 74.88%      0.06s  2.90%  runtime.gcDrainN
+     0.01s  0.48% 75.36%      0.05s  2.42%  github.com/cnooljaw/gosproto.countChunks
+         0     0% 75.36%      0.05s  2.42%  runtime.(*mcache).nextFree
+         0     0% 75.36%      0.05s  2.42%  runtime.(*mcache).refill
+         0     0% 75.36%      0.05s  2.42%  runtime.(*mcentral).cacheSpan
+     0.01s  0.48% 75.85%      0.05s  2.42%  runtime.mallocgcSmallNoscan
+     0.03s  1.45% 77.29%      0.04s  1.93%  reflect.(*rtype).ptrTo

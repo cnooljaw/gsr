@@ -1,0 +1,48 @@
+File: pairs.test
+Type: cpu
+Time: 2026-10-19 15:52:59 CST
+Duration: 2.53s, Total samples = 2.33s (92.25%)
+Showing nodes accounting for 2.20s, 94.42% of 2.33s total
+Dropped 31 nodes (cum <= 0.01s)
+Showing top 40 nodes out of 53
+      flat  flat%   sum%        cum   cum%
+     1.23s 52.79% 52.79%      1.23s 52.79%  runtime.kevent
+     0.58s 24.89% 77.68%      0.72s 30.90%  github.com/cnooljaw/gosproto.UnpackWithLimit
+     0.10s  4.29% 81.97%      0.30s 12.88%  github.com/cnooljaw/gosproto.decodeIntSlice
+     0.06s  2.58% 84.55%      0.07s  3.00%  github.com/cnooljaw/gosproto.readUint32 (inline)
+     0.03s  1.29% 85.84%      0.03s  1.29%  math/bits.OnesCount8 (inline)
+     0.03s  1.29% 87.12%      0.06s  2.58%  runtime.scanobject
+     0.02s  0.86% 87.98%      0.03s  1.29%  runtime.(*mheap).initSpan
+     0.02s  0.86% 88.84%      0.02s  0.86%  runtime.memclrNoHeapPointers
+     0.02s  0.86% 89.70%      0.02s  0.86%  runtime.mergeSummaries
+     0.02s  0.86% 90.56%      0.02s  0.86%  runtime.scanblock
+     0.01s  0.43% 90.99%      0.31s 13.30%  github.com/cnooljaw/gosproto.decodeMessage
+     0.01s  0.43% 91.42%      0.13s  5.58%  runtime.(*mcache).nextFree
+     0.01s  0.43% 91.85%      0.12s  5.15%  runtime.(*mcache).refill
+     0.01s  0.43% 92.27%      0.05s  2.15%  runtime.(*mheap).freeSpanLocked
+     0.01s  0.43% 92.70%      0.03s  1.29%  runtime.(*pageAlloc).update
+     0.01s  0.43% 93.13%      0.07s  3.00%  runtime.(*sweepLocked).sweep
+     0.01s  0.43% 93.56%      0.02s  0.86%  runtime.mallocgcSmallScanNoHeader
+     0.01s  0.43% 93.99%      0.04s  1.72%  runtime.newobject
+     0.01s  0.43% 94.42%      0.02s  0.86%  runtime.typePointers.next
+         0     0% 94.42%      1.09s 46.78%  codecpairstool.BenchmarkCurrentOperation
+         0     0% 94.42%      1.09s 46.78%  codecpairstool.decodeBodyOperations.func6
+         0     0% 94.42%      0.03s  1.29%  codecpairstool.representativeMessages.func6
+         0     0% 94.42%      0.34s 14.59%  github.com/cnooljaw/gosproto.Decode (inline)
+         0     0% 94.42%      1.06s 45.49%  github.com/cnooljaw/gosproto.DecodePacked
+         0     0% 94.42%      0.34s 14.59%  github.com/cnooljaw/gosproto.DecodeWithLimits
+         0     0% 94.42%      0.72s 30.90%  github.com/cnooljaw/gosproto.Unpack (inline)
+         0     0% 94.42%      0.11s  4.72%  runtime.(*mcentral).cacheSpan
+         0     0% 94.42%      0.03s  1.29%  runtime.(*mcentral).grow
+         0     0% 94.42%      0.03s  1.29%  runtime.(*mheap).alloc
+         0     0% 94.42%      0.03s  1.29%  runtime.(*mheap).alloc.func1
+         0     0% 94.42%      0.03s  1.29%  runtime.(*mheap).allocSpan
+         0     0% 94.42%      0.05s  2.15%  runtime.(*mheap).freeSpan (inline)
+         0     0% 94.42%      0.04s  1.72%  runtime.(*pageAlloc).free
+         0     0% 94.42%      0.05s  2.15%  runtime.(*sweepLocked).sweep.(*mheap).freeSpan.func2
+         0     0% 94.42%      0.09s  3.86%  runtime.deductAssistCredit
+         0     0% 94.42%      0.08s  3.43%  runtime.deductSweepCredit
+         0     0% 94.42%      0.09s  3.86%  runtime.gcAssistAlloc
+         0     0% 94.42%      0.08s  3.43%  runtime.gcAssistAlloc.func2
+         0     0% 94.42%      0.08s  3.43%  runtime.gcAssistAlloc1
+         0     0% 94.42%      0.08s  3.43%  runtime.gcDrainN

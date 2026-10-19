@@ -4,9 +4,13 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## 当前Decode热点与分配诊断（2026-10-19）
+
+后续[当前Decode诊断](benchmarks/2026-10-19-gosproto-decode-current-profile/RESULTS.md)在503a725只读刷新四入口CPU/独立allocation，8进程/24快照，limiter零。大型Decode/PDecode为10416B/532、13872B/533次；整数数组为8288B/4、12384B/5次。CPU/分配范围分离，初始化/kevent/递归累计限制保留，耗时不作新排名。源码与机器码确认native数组逐元素开放尾切片仍有调整，下一候选为固定4/8字节视图并补8字节大数组观察，本轮未实施。harness/vet/40顺序/构建/profile文本/fresh及全部指纹通过，主库18份Go源码等于503a725且干净，未重复生产完整验收。新诊断未提交，依赖v0.4.0、Decode继续开放。
+
 ## Header字节偏移遍历（2026-10-19，未采用）
 
-后续[header字节偏移](benchmarks/2026-10-19-gosproto-decode-header-offset/RESULTS.md)用初始headerEnd与步进2替代index倍增，原字节/次数/预算/错误/独占/写屏障不变，parser660→656条/320B。40项两轮大型PDecode快0.81%/1.03%，但双控制失败且有累计翻转；整数数组PDecode+1.10%/+1.24%双控制通过、含数组记录PDecode+1.68%/+1.57%，整体取舍未采用，无最低收益比例。160进程/15,360块复算，self20/40、clone19/40，尾差/全部异常保留；目标测试/harness/vet/差分/fresh和指纹通过。主库从未应用候选，18份Go源码等于503a725且干净，未重复生产完整验收。新报告未提交，依赖v0.4.0、Decode继续开放。
+后续[header字节偏移](benchmarks/2026-10-19-gosproto-decode-header-offset/RESULTS.md)用初始headerEnd与步进2替代index倍增，原字节/次数/预算/错误/独占/写屏障不变，parser660→656条/320B。40项两轮大型PDecode快0.81%/1.03%，但双控制失败且有累计翻转；整数数组PDecode+1.10%/+1.24%双控制通过、含数组记录PDecode+1.68%/+1.57%，整体取舍未采用，无最低收益比例。160进程/15,360块复算，self20/40、clone19/40，尾差/全部异常保留；目标测试/harness/vet/差分/fresh和指纹通过。主库从未应用候选，18份Go源码等于503a725且干净，未重复生产完整验收。该轮报告已本地提交为GSR `9699583`，未推送；库保持503a725，依赖v0.4.0、Decode继续开放。
 
 ## 固定两字节header读取视图（2026-10-19）
 
