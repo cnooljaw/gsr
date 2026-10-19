@@ -1,0 +1,48 @@
+File: pairs.test
+Type: cpu
+Time: 2026-10-19 16:51:53 CST
+Duration: 2.54s, Total samples = 2.23s (87.79%)
+Showing nodes accounting for 2.07s, 92.83% of 2.23s total
+Dropped 41 nodes (cum <= 0.01s)
+Showing top 40 nodes out of 41
+      flat  flat%   sum%        cum   cum%
+         0     0%     0%      1.81s 81.17%  runtime.systemstack
+     1.51s 67.71% 67.71%      1.51s 67.71%  runtime.kevent
+         0     0% 67.71%      1.51s 67.71%  runtime.netpoll
+         0     0% 67.71%      1.51s 67.71%  runtime.startTheWorldWithSema
+         0     0% 67.71%      0.78s 34.98%  runtime.gcStart.func4
+         0     0% 67.71%      0.73s 32.74%  runtime.gcMarkTermination.func3
+         0     0% 67.71%      0.70s 31.39%  codecpairstool.BenchmarkCurrentOperation
+         0     0% 67.71%      0.70s 31.39%  codecpairstool.pairOperations.func8
+         0     0% 67.71%      0.70s 31.39%  github.com/cnooljaw/gosproto.Unpack (inline)
+     0.27s 12.11% 79.82%      0.70s 31.39%  github.com/cnooljaw/gosproto.UnpackWithLimit
+         0     0% 79.82%      0.70s 31.39%  testing.(*B).run1.func1
+         0     0% 79.82%      0.70s 31.39%  testing.(*B).runN
+         0     0% 79.82%      0.35s 15.70%  runtime.makeslice
+         0     0% 79.82%      0.35s 15.70%  runtime.mallocgc
+         0     0% 79.82%      0.25s 11.21%  runtime.deductAssistCredit
+         0     0% 79.82%      0.25s 11.21%  runtime.gcAssistAlloc
+         0     0% 79.82%      0.25s 11.21%  runtime.gcAssistAlloc.func2
+         0     0% 79.82%      0.25s 11.21%  runtime.gcAssistAlloc1
+     0.01s  0.45% 80.27%      0.25s 11.21%  runtime.gcDrainN
+     0.06s  2.69% 82.96%      0.19s  8.52%  runtime.scanobject
+     0.01s  0.45% 83.41%      0.10s  4.48%  runtime.mallocgcSmallNoscan
+     0.07s  3.14% 86.55%      0.08s  3.59%  runtime.typePointers.next
+     0.03s  1.35% 87.89%      0.05s  2.24%  github.com/cnooljaw/gosproto.zeroHeaderPrefix (inline)
+         0     0% 87.89%      0.05s  2.24%  runtime.(*mcache).nextFree
+         0     0% 87.89%      0.05s  2.24%  runtime.(*mcache).refill
+         0     0% 87.89%      0.05s  2.24%  runtime.(*mcentral).cacheSpan
+         0     0% 87.89%      0.05s  2.24%  runtime.markroot
+         0     0% 87.89%      0.03s  1.35%  runtime.deductSweepCredit
+         0     0% 87.89%      0.03s  1.35%  runtime.markrootBlock
+     0.03s  1.35% 89.24%      0.03s  1.35%  runtime.memmove
+     0.03s  1.35% 90.58%      0.03s  1.35%  runtime.scanblock
+         0     0% 90.58%      0.03s  1.35%  runtime.sweepone
+     0.02s   0.9% 91.48%      0.02s   0.9%  encoding/binary.littleEndian.Uint64 (inline)
+         0     0% 91.48%      0.02s   0.9%  runtime.(*mcentral).grow
+         0     0% 91.48%      0.02s   0.9%  runtime.(*mheap).alloc
+         0     0% 91.48%      0.02s   0.9%  runtime.(*mheap).alloc.func1
+         0     0% 91.48%      0.02s   0.9%  runtime.(*mheap).allocSpan
+     0.01s  0.45% 91.93%      0.02s   0.9%  runtime.(*mheap).nextSpanForSweep
+     0.01s  0.45% 92.38%      0.02s   0.9%  runtime.(*mspan).typePointersOfUnchecked
+     0.01s  0.45% 92.83%      0.02s   0.9%  runtime.findObject

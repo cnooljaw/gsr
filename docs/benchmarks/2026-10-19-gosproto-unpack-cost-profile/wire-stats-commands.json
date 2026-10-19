@@ -1,0 +1,35 @@
+[
+  {
+    "scope": "post-timing wire diagnostic only",
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-run",
+      "^TestUnpackCostWireStats$",
+      "./...",
+      "-timeout=1m"
+    ],
+    "exitCode": 1,
+    "summary": "Wrong cwd scanned old ignored tmp sources. gosproto-before resolution and duplicate/invalid old experiment packages failed;other package no-tests-to-run lines are not validation. No dependency file changed. After all paired sampling,not a timing retry."
+  },
+  {
+    "scope": "corrected standalone wire diagnostic",
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-cost-wire-stats",
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-run",
+      "^TestUnpackCostWireStats$",
+      ".",
+      "-timeout=1m"
+    ],
+    "env": {
+      "GSR_WIRE_STATS": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-cost-wire-stats/wire-stats.json"
+    },
+    "exitCode": 0,
+    "output": "ok  \tcodecpairstool\t0.335s\n"
+  }
+]

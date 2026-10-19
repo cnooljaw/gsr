@@ -4,11 +4,17 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## Unpack代价诊断与预检输入游标（2026-10-19，未采用）
+
+[旧/当前代价诊断](benchmarks/2026-10-19-gosproto-unpack-cost-profile/RESULTS.md)8份CPU/24快照与来源/fresh指纹通过，未建立退化唯一原因。独立wire统计确认短零段没有普通word、FF接稀疏主要为固定0x11；探针首轮错误目录误扫tmp失败，更正后独立用例通过，正式依赖未变，不作全仓验证声明。
+
+[预检输入游标](benchmarks/2026-10-19-gosproto-unpack-preflight-cursor/RESULTS.md)只改变完整预检位置表示，138,500组截断/预算/error class/len-cap-nil/独占差分、两侧已有契约和70项语义检查通过。280进程/26,880块两轮4字节PDecode快11.85%/9.45%、8字节快8.72%/8.09%，真实8字节Dispatch快11.38%/10.88%；这些收益保留。但普通1..7有效字节word普遍慢4%～33%、FF接稀疏仍慢6%～10%，未采用。无最低比例门槛；self39/70、clone33/70、尾差/累计翻转/GC离群完整保留。主库从未应用候选、全部18份源码仍af9169d且干净，未重复完整生产验收。新诊断/报告未提交，不推送；依赖v0.4.0、Decode继续开放。
+
 ## 普通Unpack仅源游标（2026-10-19，保留）
 
 先在f7022ac做[四入口CPU诊断](benchmarks/2026-10-19-gosproto-unpack-current-profile/RESULTS.md)，4进程/12快照，来源/fresh/raw指纹核对。后续[源游标候选](benchmarks/2026-10-19-gosproto-unpack-source-cursor/RESULTS.md)只将普通mask的源切片推进移到word外，目标/预检/预算/错误/分配/零/FF不改。70项280进程/26,880块两轮大型PDecode快1.16%/1.42%、4字节数组快4.69%/3.34%、8字节数组快4.16%/4.00%；FF接稀疏约慢11%、短零段第二轮慢14%等代价保留，不设收益比例门槛或按fixture分支修补。
 
-self59/70、clone52/70，失败控制/27字节尾差/17入口累计翻转及全部异常保留，limiter零。8条收尾命令通过：库全测并启用固定官方oracle、race/checkptr、vet、Pack/Codec/Decode各10秒有限fuzz、GSR三包、Go/TS7/7零skip。Pack/Decode fuzz三秒后无新增执行限制保留；实际18份库源等于被测候选，正式依赖文件不变。库实现已本地提交为 `af9169d`，诊断与报告随当前GSR提交归档、不推送；依赖v0.4.0，Decode继续开放。
+self59/70、clone52/70，失败控制/27字节尾差/17入口累计翻转及全部异常保留，limiter零。8条收尾命令通过：库全测并启用固定官方oracle、race/checkptr、vet、Pack/Codec/Decode各10秒有限fuzz、GSR三包、Go/TS7/7零skip。Pack/Decode fuzz三秒后无新增执行限制保留；实际18份库源等于被测候选，正式依赖文件不变。该轮已本地提交为库 `af9169d`、GSR `6b47822`、不推送；依赖v0.4.0，Decode继续开放。
 
 ## 原生整数数组读取视图（2026-10-19，保留）
 

@@ -4,7 +4,7 @@
 
 当前状态（2026-10-19）：用户明确解除Decode阶段性冻结，允许按证据继续入口、解析和构造/写入优化；本页保留历史提案/验收，入口复核已本地提交为库 `913c465`、GSR `b708108`，见[Decode解冻报告](benchmarks/2026-10-19-gosproto-decode-resume/RESULTS.md)；后续[结构数组schema实验](benchmarks/2026-10-19-gosproto-decode-array-schema/RESULTS.md)未采用且报告已提交为GSR `26a5748`；当前[整数资格前移实验](benchmarks/2026-10-19-gosproto-decode-integer-proof/RESULTS.md)也未采用，报告已提交为GSR `f7381dd`；后续保留[固定header视图](benchmarks/2026-10-19-gosproto-decode-header-view/RESULTS.md)，已本地提交为库 `503a725`、GSR `2104eca`；后续[字节偏移实验](benchmarks/2026-10-19-gosproto-decode-header-offset/RESULTS.md)未采用且报告已提交为GSR `9699583`；[刷新Decode诊断](benchmarks/2026-10-19-gosproto-decode-current-profile/RESULTS.md)已本地提交为GSR `16d1491`；随后保留[原生整数数组读取视图](benchmarks/2026-10-19-gosproto-decode-array-view/RESULTS.md)，52项两轮大数组Decode快26%～29%、4字节组合快7%～9%，短包代价/控制失败/工具测试补丁偏差与纠正单列。该轮已本地提交为库 `f7022ac`、GSR `b3d4517`，完整兼容/接线验收通过，Decode继续开放。官方wire、预算、失败原子性、独占与写屏障约束不变。
 
-最新切片（2026-10-19）：[Unpack源游标](benchmarks/2026-10-19-gosproto-unpack-source-cursor/RESULTS.md)在f7022ac上仅把普通mask源切片推进移到word外。70项两轮大型PDecode快1.16%/1.42%、4/8字节大数组约快3.3%～4.7%；FF接稀疏约11%代价、短零段第二轮14%代价与控制失败完整保留，未新增形态分支。固定官方/库/race/checkptr/vet/有限fuzz及Go/TS验收通过。库实现已本地提交为 `af9169d`，诊断与报告随当前GSR提交归档，Decode继续开放。
+最新切片（2026-10-19）：源游标已提交库af9169d/GSR6b47822；随后[预检输入游标](benchmarks/2026-10-19-gosproto-unpack-preflight-cursor/RESULTS.md)保留真实业务4/8字节PDecode约8%～12%的收益证据，但普通word形态普遍4%～33%代价及FF接稀疏继续变慢，未采用通用替换。138,500组错误优先级/截断/预算/独占差分及70项固定比较通过，全部控制和异常保留。库18份源码仍af9169d且干净，新诊断和报告未提交，Decode继续开放。
 
 ## 问题与本轮证据
 
