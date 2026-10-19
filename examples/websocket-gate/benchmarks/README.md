@@ -30,6 +30,8 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 
 当前[共享wire40项诊断](../../../docs/benchmarks/2026-10-19-gosproto-unpack-shared-wire/RESULTS.md)控制源字节/对齐/cap后，业务与合成形态方向仍相反；恢复16条机器字相同，未证明唯一硬件原因。随后[原预检分函数70项实验](../../../docs/benchmarks/2026-10-19-gosproto-unpack-size-phase/RESULTS.md)未带来稳定组合收益，未采用。普通word收益、FF代价和所有失败控制均保留，不设收益比例门槛。主库仍af9169d且干净，前轮报告已提交GSR71d313d，新两个报告未提交，依赖v0.4.0、Decode继续开放。
 
+前轮共享wire/分函数实验已提交 GSR `2ca8864`，未推送。新[分函数＋索引预检组合](../../../docs/benchmarks/2026-10-19-gosproto-unpack-split-indexed/RESULTS.md)完成固定70项：大型PDecode快3.12%/4.38%、4字节大数组快9.84%/9.23%，但普通word两轮慢约4%～33%、FF接稀疏慢约8.5%，组合未消除取舍，未采用。280进程/26,880块、目标契约及138500差分通过，控制/长尾/累计反向全部保留。主库仍af9169d且干净，新报告未提交；依赖v0.4.0，Decode继续开放。
+
 ## Go 局部优化的配对校准
 
 小幅优化先用 [Go 配对工具](tools/go-pairs/README.md) 校准同函数和同源码 A/A，再解释候选差值。工具在独立归档中交错采样并保留全部轮次，不修改正式依赖；控制异常的项目需要解释或补证据，不能自动判为无价值优化。它不代替上面的四实现完整 Benchmark。

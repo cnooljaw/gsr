@@ -1,0 +1,101 @@
+--- a/pack.go
++++ b/pack.go
+@@ -191,45 +191,9 @@
+ 
+ // UnpackWithLimit 在扩容前限制解包后含填充的长度；packed 输入大小由调用方限制。
+ func UnpackWithLimit(src []byte, maxBytes int) ([]byte, error) {
+-	if maxBytes < 1 {
+-		return nil, ErrInvalidLimits
+-	}
+-	// 首次只扫描 tag/连续块长度，在分配前确认完整边界及有限的确切输出长度。
+-	size := 0
+-	for remaining := src; len(remaining) > 0; {
+-		header := remaining[0]
+-		consumed, produced := 1, 8
+-		if header == 0 {
+-			if len(remaining) >= 2 && remaining[1] == 0 {
+-				words := (maxBytes - size) / 8
+-				if words < 2 {
+-					return nil, ErrLimit
+-				}
+-				// 多检查一个零 mask 即可判定超额，不为小预算扫描整段大输入。
+-				end := min(len(remaining), words+1)
+-				run := 2 + zeroHeaderPrefix(remaining[2:end])
+-				if run > words {
+-					return nil, ErrLimit
+-				}
+-				consumed, produced = run, run*8
+-			}
+-		} else if header == 0xff {
+-			if len(remaining) < 2 {
+-				return nil, ErrUnpack
+-			}
+-			produced = (int(remaining[1]) + 1) * 8
+-			consumed = 2 + produced
+-		} else {
+-			consumed += bits.OnesCount8(header)
+-		}
+-		if consumed > len(remaining) {
+-			return nil, ErrUnpack
+-		}
+-		if produced > maxBytes-size {
+-			return nil, ErrLimit
+-		}
+-		size += produced
+-		remaining = remaining[consumed:]
++	size, err := unpackedSize(src, maxBytes)
++	if err != nil {
++		return nil, err
+ 	}
+ 	unpacked := make([]byte, size)
+ 	offset := 0
+@@ -269,3 +233,49 @@
+ 	}
+ 	return unpacked, nil
+ }
++
++// unpackedSize 在任何输出分配前校验完整输入和解包预算，返回含填充的确切长度。
++func unpackedSize(src []byte, maxBytes int) (int, error) {
++	if maxBytes < 1 {
++		return 0, ErrInvalidLimits
++	}
++	// 首次只扫描 tag/连续块长度，在分配前确认完整边界及有限的确切输出长度。
++	size := 0
++	for position := 0; position < len(src); {
++		available := len(src) - position
++		header := src[position]
++		consumed, produced := 1, 8
++		if header == 0 {
++			if available >= 2 && src[position+1] == 0 {
++				words := (maxBytes - size) / 8
++				if words < 2 {
++					return 0, ErrLimit
++				}
++				// 多检查一个零 mask 即可判定超额，不为小预算扫描整段大输入。
++				end := min(available, words+1)
++				run := 2 + zeroHeaderPrefix(src[position+2:position+end])
++				if run > words {
++					return 0, ErrLimit
++				}
++				consumed, produced = run, run*8
++			}
++		} else if header == 0xff {
++			if available < 2 {
++				return 0, ErrUnpack
++			}
++			produced = (int(src[position+1]) + 1) * 8
++			consumed = 2 + produced
++		} else {
++			consumed += bits.OnesCount8(header)
++		}
++		if consumed > available {
++			return 0, ErrUnpack
++		}
++		if produced > maxBytes-size {
++			return 0, ErrLimit
++		}
++		size += produced
++		position += consumed
++	}
++	return size, nil
++}
