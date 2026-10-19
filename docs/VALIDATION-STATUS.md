@@ -4,9 +4,13 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## 原70项逐项独立进程控制（2026-10-19）
+
+以库7397804 / GSR a125ab4为只读基线，固定140个进程一次采样；self/clone均61/70控制通过，70/70分配中位数相同。全部13,440块、3,360 quartet、840轮、560状态快照独立复算，140逐项与合并JSON对齐；limiter无非零/变化，最大堆快照约4.20MB（非峰值）。旧混合控制40/70、38/70仅并列参考，17个不同入口至少一组失败与最大单轮+71.34%/+33.02%完整保留，无重跑/扣噪声。原计时块/校准源码相同，harness统计/选择/GC/fixture/指标检查与vet、fresh归档/源/二进制SHA通过。生产/正式依赖/Decode未改，不重复官方/race/checkptr/fuzz/GSR/GoTS。见[逐项进程报告](benchmarks/2026-10-19-gosproto-isolated-cases/RESULTS.md)，新GSR诊断未提交；库干净，后续只实验普通word Pack。
+
 ## 当前编码profile与4KiB GC上下文（2026-10-18）
 
-前一切片已提交为库7397804、GSR 25b0b0d，未推送。只读采26份profile；固定4个同函数A/A条件共384块/96quartet/24轮复算至1e−12一致，24个byte-pattern计数和2×97个limiter点核对。full Pack的A/A−3.35%/IQR11.76pp、隔离−0.72%/1.04pp；后者仍有−24.5%单轮，zero frame隔离未通过，原值/尾差/失败全保留。原full堆峰637MB；另起无计时事件诊断确认limiter full0→1279、isolated0，独立峰值459/13MB，不回填旧数据。harness统计/选择/fixture/vet、补充诊断/vet、源/二进制/26profile SHA与fresh归档通过；库所有Go源码等于7397804、工作树干净，无生产改动，不重复官方/race/checkptr/fuzz/GSR/GoTS。见 [诊断报告](benchmarks/2026-10-18-gosproto-post-layout-profile/RESULTS.md)，新文档未提交，正式依赖/Decode不变。 2026-10-19收尾发现临时库HEAD/config缺失，先备份再恢复最小元数据；完整fsck/源码SHA/status通过，全refs bundle已保存于稳定工作区忽略目录，未推送，详见报告恢复记录。
+前一切片已提交为库7397804、GSR 25b0b0d，未推送。只读采26份profile；固定4个同函数A/A条件共384块/96quartet/24轮复算至1e−12一致，24个byte-pattern计数和2×97个limiter点核对。full Pack的A/A−3.35%/IQR11.76pp、隔离−0.72%/1.04pp；后者仍有−24.5%单轮，zero frame隔离未通过，原值/尾差/失败全保留。原full堆峰637MB；另起无计时事件诊断确认limiter full0→1279、isolated0，独立峰值459/13MB，不回填旧数据。harness统计/选择/fixture/vet、补充诊断/vet、源/二进制/26profile SHA与fresh归档通过；库所有Go源码等于7397804、工作树干净，无生产改动，不重复官方/race/checkptr/fuzz/GSR/GoTS。见 [诊断报告](benchmarks/2026-10-18-gosproto-post-layout-profile/RESULTS.md)，该轮已本地提交为 GSR `a125ab4`，未推送，正式依赖/Decode不变。 2026-10-19收尾发现临时库HEAD/config缺失，先备份再恢复最小元数据；完整fsck/源码SHA/status通过，全refs bundle已保存于稳定工作区忽略目录，未推送，详见报告恢复记录。
 
 ## 编码布局连续索引写入（2026-10-18）
 

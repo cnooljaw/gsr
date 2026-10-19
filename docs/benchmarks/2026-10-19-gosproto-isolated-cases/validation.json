@@ -1,0 +1,111 @@
+{
+  "decision": "Read-only isolated-process controls completed;new GSR diagnostics uncommitted;no production changes",
+  "libraryHead": "7397804e37f4f190ea4d945f8f2e42b09e0a48ba",
+  "gsrHead": "a125ab4a879206b7e7efe27569eaf1692516856b",
+  "libraryWorkingTree": "clean",
+  "finalGoSource": {
+    "decode.go": "b3cbbe248d17fe770add10ba93e5942fe5c54c13eba1c416135d83cff890e65e",
+    "decode_pointer.go": "5cf91e619c80895785046b396dbf1861a61281cb0b6c3d954cd07d99b8bfd961",
+    "encode.go": "ee0fb24ed0bbc8755052d8de4fd77c38307b3ac64656176a5299d4e1069cdf3f",
+    "encode_integer_record.go": "b1bfe815adcbfabd2de0463d4f28b41efa6b8f7d7df535efc00669e84d53d2d4",
+    "encode_pointer.go": "e7a239568a0fc8788404de6f5bc0d5e2ac092fa559f0a6bfd4561fdc155f81c1",
+    "encode_test.go": "d28095ae5b5b820eb0d5aed634397bb86159361b5876c3126100d59e37d41099",
+    "fuzz_test.go": "10eb7cb2d2fcd8afe47b6880cd61f64121f17b0a3355a6073b41ceb87e8d435c",
+    "limits.go": "223a9ec3a68c4fb4c5938332132692cec3658fee75aceea2e26076860fe94907",
+    "limits_test.go": "0f261965aeb66f5752b53a461518668a0e9db68be312aeb9c0ff78786a9ddcad",
+    "meta.go": "6badd4a5ac60d8a15caaa1f35634268101c436b275cf4a0fe120b91db417d217",
+    "official_compat_test.go": "fa413db0126e78205f7ee2d56f8f5d521bc29d82b723953385b79b0407412b60",
+    "pack.go": "e7aa06a522ad2d69697f1a46154bfbb7fa7908571046210683a20c72c6e8e071",
+    "pack_test.go": "70e79e8fa5273d4a9f31fb6afc885efbb1f2f86ca9d68b1bba4c1c97e8deed56",
+    "rpc.go": "6a5d29737047ecdcc2286b68a35df3330affa9dd8948ffbd5fde09104eed7899",
+    "rpc_limits_test.go": "6c0361cbda2870b3d4abf578b7313acc44728ed78de0ea92336c8c1170ee39b1",
+    "rpc_test.go": "4db20f87186685ef4bd78bc0e021940a8afe718a28ae8bddd6b66bede3017468",
+    "sproto.go": "2d35ffddf1ec0492fe6425f3d1dd7ede5d4edb3794773f6971fc4f36ceb80f4d",
+    "sproto_test.go": "20a255950d0628f27a00cf5923448d524c729b05f16ed18df3a095d2c6449d9e"
+  },
+  "formalDependency": "v0.4.0;go.mod/go.sum unchanged",
+  "decode": "frozen,unchanged",
+  "fixedPlan": "plan.json;140 processes once,no retries",
+  "independentAnalysis": {
+    "processes": 140,
+    "blocks": 13440,
+    "quartets": 3360,
+    "rounds": 840,
+    "snapshots": 560
+  },
+  "checks": [
+    "both harness statistics/selection/GC/fixtures/default-runtime metrics tests and vet",
+    "original70 case name/order exact before timing in both modes",
+    "sampleBlock and blockCalls source byte identical",
+    "140 per-case raw files match unfiltered aggregate and archived hashes",
+    "all driver/generated/fixture/library/harness/binary SHA reverified",
+    "fresh prepare-only manifest core equality",
+    "both Git diff checks;new artifact whitespace"
+  ],
+  "freshComparedKeys": [
+    "baselineCommit",
+    "mode",
+    "goVersion",
+    "gsrHead",
+    "environment",
+    "generatedGoInputs",
+    "beforeGoSource",
+    "candidateGoSource",
+    "harnessGoSource",
+    "fixtures",
+    "tools",
+    "selectedCases",
+    "diagnosticPlan",
+    "driverInputs"
+  ],
+  "goModuleFileSha256": {
+    "self/candidate/go.mod": "39d81a69b8c51ec559f4683d616793a35f4133c89de1ca67ba813e9d1011edbe",
+    "self/harness/go.mod": "80e872a34995a1e7ecf3c4298e65085af30f688d3b797c700b2f87c8dc712039",
+    "self/before/go.mod": "e48e423659f833523f0cebbac11fc4ea73c6c7300c990543b9b7f1b510f87a7b",
+    "self/harness/go.sum": "2c3413439101b41d0f5f210b290a88513add402ba67058d79959d324e39f02b8",
+    "clone/candidate/go.mod": "39d81a69b8c51ec559f4683d616793a35f4133c89de1ca67ba813e9d1011edbe",
+    "clone/harness/go.mod": "c620b8bd5cecf62eb2b2ac2a4723c2053e51c295de1687f2046619f9190451a0",
+    "clone/before/go.mod": "e48e423659f833523f0cebbac11fc4ea73c6c7300c990543b9b7f1b510f87a7b",
+    "clone/harness/go.sum": "2c3413439101b41d0f5f210b290a88513add402ba67058d79959d324e39f02b8"
+  },
+  "artifactSha256": {
+    ".gitattributes": "878d15ac1d4718d9990d357a919e43392518c95d1ada48f703674c18c97f00f9",
+    "RESULTS.md": "5dc641900af699c9d008a6d63a0daa444ba9fe1ee74cabdcb4598532f58ca06f",
+    "analysis.json": "6c608b1512e369d8d383759efb7fa9c776900e80f24106dacda2025b1c1f9fc0",
+    "analyze.py": "9e126c7b780d67849a677e192d1395ae57ded8b9d300c0d9fe5abf9930812087",
+    "clone/case-list.json": "1d1b40403421c92074eeb4ed1b8028c95b14654c36c35b67991795b767977652",
+    "clone/inputs.json": "8718e871156f1a15bbe8e0d78ce2a79c94e34932102940300be51da1ebae5b2f",
+    "clone/raw.json": "a8e9050d6fd43bb2a113d01846731c960929f36b8383735712f9a531c1c19b29",
+    "clone/summary.json": "0cd43cfd1ac0efeb412b10c8672f4f247df951ea42c63011db94c34d473009e1",
+    "commands.json": "e6a168c46ab7929e980f970b1a0e223d0d39494c07c8dd286e0a2c7566fbbc20",
+    "plan.json": "114752c84ae5a5ff3551c8e2219b64a755a84bb5c8ddb19660c8efff7431e251",
+    "reproduce.py": "ff381b332e46c8eafec157bfe9821b594abcaca7594a5d46a3ca59893fb7a60b",
+    "self/case-list.json": "1d1b40403421c92074eeb4ed1b8028c95b14654c36c35b67991795b767977652",
+    "self/inputs.json": "2998a20b8991c35916408fac42d16aae1b988d63d7f130007d238233128209d4",
+    "self/raw.json": "f0ee4b380fd01f91ac9f920faa1f0a4320abde8b8a38d8474e60b00d02552e67",
+    "self/summary.json": "5aa7aa6780b8e5dff174101dd576ca28642b597ceb050e578fd93b482979ea43",
+    "telemetry-probe.go.txt": "7a31325294c7aa6939acb0a3c9a5a7fba5af5dc250baf3935624f629afcc0d87"
+  },
+  "centralDocumentSha256": {
+    "docs/RFC-GOSPROTO-PERFORMANCE.md": "4257dccafccd1e9490e3aa470e6beabab4231b4c9a57dc179061dee4aa5db0c9",
+    "docs/SPROTO-INTEGRATION.md": "36b84686ef4aa6c713c7724025fd1de88d42930f39ec6d220e912345fd0c671d",
+    "docs/VALIDATION-STATUS.md": "5abbd2f1b1fbcaa25b1dc6ed2ca6da266906ded3f8e301dbcdf399b26c706583",
+    "examples/websocket-gate/benchmarks/README.md": "c428a1f461f0105c1b391e7e9487a5483fe9910b86bbfd6224be2aeeb3de9c9b"
+  },
+  "notRun": [
+    "new production candidate",
+    "library full suite/official oracle/race/checkptr/fuzz",
+    "GSR integration/GoTS",
+    "new PB/TS ranking",
+    "timing retries"
+  ],
+  "verificationNotes": [
+    "First final-check assertion expected70 caseRawSha256 entries;driver glob also includes case-list.json,so actual71=70 raw+1 name list.Corrected verifier only;all raw/plan/probe/driver/timing unchanged."
+  ],
+  "limitations": [
+    "sampled heaps are not peaks",
+    "4 snapshots cannot map limiter to individual blocks",
+    "17 cases fail at least one control;outliers retained",
+    "old mixed and new isolated conditions/binary layouts differ;no codec speedup claim"
+  ]
+}
