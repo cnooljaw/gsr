@@ -1,0 +1,37 @@
+File: current.test
+Type: alloc_space
+Time: 2026-10-19 11:42:45 CST
+Showing nodes accounting for 11037.45kB, 95.11% of 11605.38kB total
+Dropped 373 nodes (cum <= 58.03kB)
+Showing top 30 nodes out of 59
+      flat  flat%   sum%        cum   cum%
+ 4745.94kB 40.89% 40.89%  5262.90kB 45.35%  github.com/cnooljaw/gosproto.encodeBufferWithLimits
+ 1975.12kB 17.02% 57.91%  1975.12kB 17.02%  codecpairstool.layoutRecords (inline)
+ 1267.39kB 10.92% 68.83%  1783.85kB 15.37%  github.com/cnooljaw/gosproto-before.encodeBufferWithLimits
+  862.62kB  7.43% 76.27%   862.62kB  7.43%  bytes.Clone (inline)
+  501.50kB  4.32% 80.59%   501.50kB  4.32%  github.com/cnooljaw/gosproto.(*encodeLayout).add (inline)
+     501kB  4.32% 84.91%      501kB  4.32%  github.com/cnooljaw/gosproto-before.(*encodeLayout).add (inline)
+  358.23kB  3.09% 87.99%  2461.93kB 21.21%  codecpairstool.layoutSamples
+  202.26kB  1.74% 89.73%   202.26kB  1.74%  reflect.growslice
+  193.92kB  1.67% 91.41%   193.92kB  1.67%  reflect.deepValueEqual
+     127kB  1.09% 92.50%   128.22kB  1.10%  os.readFileContents
+  109.88kB  0.95% 93.45%   109.88kB  0.95%  encoding/json.(*RawMessage).UnmarshalJSON
+   83.18kB  0.72% 94.16%    83.18kB  0.72%  reflect.New
+   65.02kB  0.56% 94.72%   100.56kB  0.87%  reflect.Value.extendSlice
+   12.80kB  0.11% 94.83%  8082.49kB 69.64%  codecpairstool.pairOperations
+    8.52kB 0.073% 94.91%   769.27kB  6.63%  codecpairstool.representativeOperations
+    5.52kB 0.048% 94.96%   604.70kB  5.21%  codecpairstool.rpcPairOperations
+    4.36kB 0.038% 94.99%   388.27kB  3.35%  encoding/json.Unmarshal
+    4.35kB 0.037% 95.03%  6654.44kB 57.34%  codecpairstool.growthPairOperations
+    4.11kB 0.035% 95.07%   378.66kB  3.26%  encoding/json.(*decodeState).object
+    3.23kB 0.028% 95.09%   698.67kB  6.02%  codecpairstool.bodyPairOperations
+    0.84kB 0.0073% 95.10%  3519.64kB 30.33%  github.com/cnooljaw/gosproto.(*Rpc).RequestEncode
+    0.30kB 0.0026% 95.10% 11577.06kB 99.76%  codecpairstool.BenchmarkCurrentOperation
+    0.16kB 0.0013% 95.10%  2471.28kB 21.29%  codecpairstool.growthFixtureSamples
+    0.12kB 0.0011% 95.11% 11581.54kB 99.79%  testing.(*B).runN
+    0.07kB 0.00061% 95.11%   250.66kB  2.16%  codecpairstool.representativeCases
+         0     0% 95.11%  8082.71kB 69.65%  codecpairstool.currentProfileOperation
+         0     0% 95.11%  1651.33kB 14.23%  codecpairstool.growthPairOperations.func1
+         0     0% 95.11%  1651.33kB 14.23%  codecpairstool.growthPairOperations.func2 (inline)
+         0     0% 95.11%     3466kB 29.87%  codecpairstool.rpcPairOperations.func1
+         0     0% 95.11%  3497.67kB 30.14%  codecpairstool.rpcProbePairs.func2

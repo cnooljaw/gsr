@@ -1,0 +1,189 @@
+Total: 2.37s
+ROUTINE ======================== github.com/cnooljaw/gosproto.(*encodeLayout).add in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-current-profile/archive/candidate/encode.go
+      10ms       10ms (flat, cum)  0.42% of Total
+         .          .     26:func (layout *encodeLayout) add(value int) int {
+         .          .     27:	index := layout.count
+         .          .     28:	if index < len(layout.local) {
+         .          .     29:		layout.local[index] = uint32(value)
+         .          .     30:	} else {
+         .          .     31:		// add 连续写入，外溢长度始终等于总项数减去栈内项数。
+         .          .     32:		offset := index - len(layout.local)
+         .          .     33:		if offset == cap(layout.extra) {
+         .          .     34:			capacity := max(128, offset*2)
+         .          .     35:			// 只在新记录确实需要空间时增长，不按尚未验证的数组长度预分配。
+         .          .     36:			extra := make([]uint32, offset, capacity)
+         .          .     37:			copy(extra, layout.extra)
+         .          .     38:			layout.extra = extra
+         .          .     39:		}
+         .          .     40:		layout.extra = layout.extra[:offset+1]
+         .          .     41:		layout.extra[offset] = uint32(value)
+         .          .     42:	}
+      10ms       10ms     43:	layout.count++
+         .          .     44:	return index
+         .          .     45:}
+         .          .     46:
+         .          .     47:func (layout *encodeLayout) set(index, value int) {
+         .          .     48:	if index < len(layout.local) {
+ROUTINE ======================== github.com/cnooljaw/gosproto.encodeBufferWithLimits in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-current-profile/archive/candidate/limits.go
+         0      790ms (flat, cum) 33.33% of Total
+         .          .     76:func encodeBufferWithLimits(message interface{}, limits Limits, reservePack bool, prefix []byte) ([]byte, []byte, error) {
+         .          .     77:	limits, err := normalizeLimits(limits)
+         .          .     78:	if err != nil {
+         .          .     79:		return nil, nil, err
+         .          .     80:	}
+         .          .     81:	typ, value, err := getbase(message)
+         .          .     82:	if err != nil {
+         .          .     83:		return nil, nil, err
+         .          .     84:	}
+         .       10ms     85:	schema, err := GetSprotoType(typ.Elem())
+         .          .     86:	if err != nil {
+         .          .     87:		return nil, nil, err
+         .          .     88:	}
+         .          .     89:	budget := &decodeBudget{limits: limits}
+         .          .     90:	var layout encodeLayout
+         .          .     91:	binding := knownEncodeType(schema)
+         .      230ms     92:	size, err := encodedSize(schema, value, budget, 1, &layout, binding)
+         .          .     93:	runtime.KeepAlive(message)
+         .          .     94:	if err != nil {
+         .          .     95:		return nil, nil, err
+         .          .     96:	}
+         .          .     97:	totalSize := len(prefix) + size
+         .          .     98:	capacity, start := totalSize, 0
+         .          .     99:	if reservePack {
+         .          .    100:		capacity = packedBufferSize(totalSize)
+         .          .    101:		// FF 头的最坏增长和八字节余量隔开读写游标，避免覆盖尚未消费的编码字节。
+         .          .    102:		start = capacity - totalSize
+         .          .    103:	}
+         .      200ms    104:	output := make([]byte, capacity)
+         .          .    105:	encoded := output[start : start+totalSize]
+         .          .    106:	if len(prefix) > 0 {
+         .          .    107:		copy(encoded, prefix)
+         .          .    108:	}
+         .      350ms    109:	encodeMessageInto(schema, value, encoded[len(prefix):], &layout, binding)
+         .          .    110:	runtime.KeepAlive(message)
+         .          .    111:	return output, encoded, nil
+         .          .    112:}
+         .          .    113:
+         .          .    114:func encodedSize(schema *SprotoType, value reflect.Value, budget *decodeBudget, depth int, layout *encodeLayout, binding encodeBinding) (int, error) {
+ROUTINE ======================== github.com/cnooljaw/gosproto.encodeFieldInto in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-current-profile/archive/candidate/encode.go
+         0      340ms (flat, cum) 14.35% of Total
+         .          .    176:func encodeFieldInto(field *SprotoField, value reflect.Value, output []byte, layout *encodeLayout, trusted bool) int {
+         .          .    177:	if field.Array {
+         .          .    178:		if value.Len() == 0 {
+         .          .    179:			return 0
+         .          .    180:		}
+         .          .    181:		offset := 0
+         .          .    182:		switch field.Wire {
+         .          .    183:		case WireVarintName:
+         .          .    184:			width := layout.next()
+         .          .    185:			if field.int64Slice {
+         .      340ms    186:				return encodeInt64Slice(*value.Addr().Interface().(*[]int64), width, output)
+         .          .    187:			}
+         .          .    188:			output[0] = byte(width)
+         .          .    189:			for index := 0; index < value.Len(); index++ {
+         .          .    190:				number := integerBits(field, value.Index(index))
+         .          .    191:				if width == 4 {
+ROUTINE ======================== github.com/cnooljaw/gosproto.encodeMessageInto in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-current-profile/archive/candidate/encode.go
+      10ms      350ms (flat, cum) 14.77% of Total
+      10ms       10ms    123:func encodeMessageInto(schema *SprotoType, value reflect.Value, output []byte, layout *encodeLayout, binding encodeBinding) int {
+         .          .    124:	count := layout.next()
+         .          .    125:	writeUint16(output, uint16(count))
+         .          .    126:	if value.IsNil() {
+         .          .    127:		return 2
+         .          .    128:	}
+         .          .    129:	record := value.Elem()
+         .          .    130:	pointer := messageEncodePointer(value, binding)
+         .          .    131:	headerOffset, bodyOffset, previous := 2, 2+count*2, -1
+         .          .    132:	for _, index := range schema.order {
+         .          .    133:		field := schema.Fields[index]
+         .          .    134:		if field.Tag < 0 {
+         .          .    135:			continue
+         .          .    136:		}
+         .          .    137:		native := binding.native && field.nativeInteger(schema)
+         .          .    138:		var current reflect.Value
+         .          .    139:		var bits uint64
+         .          .    140:		if native {
+         .          .    141:			var present bool
+         .          .    142:			bits, present = pointer.integer(field.encOffset)
+         .          .    143:			if !present {
+         .          .    144:				continue
+         .          .    145:			}
+         .          .    146:		} else {
+         .          .    147:			current = record.Field(field.index[0])
+         .          .    148:			if omittedField(field, current) {
+         .          .    149:				continue
+         .          .    150:			}
+         .          .    151:		}
+         .          .    152:		if skip := skipTag(previous, field.Tag); skip > 0 {
+         .          .    153:			writeUint16(output[headerOffset:], skip)
+         .          .    154:			headerOffset += 2
+         .          .    155:		}
+         .          .    156:		var header uint16
+         .          .    157:		var length int
+         .          .    158:		if native {
+         .          .    159:			header, length = encodeIntegerInto(bits, output[bodyOffset:])
+         .          .    160:		} else if field.Array || field.Wire == WireStructName {
+         .      340ms    161:			length = encodeFieldInto(field, current, output[bodyOffset+4:], layout, binding.exact && field.encOwner == schema && field.Array != field.pointer)
+         .          .    162:		} else {
+         .          .    163:			header, length = encodeScalarInto(field, current, output[bodyOffset:])
+         .          .    164:		}
+         .          .    165:		writeUint16(output[headerOffset:], header)
+         .          .    166:		headerOffset += 2
+ROUTINE ======================== github.com/cnooljaw/gosproto.packInto in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-current-profile/archive/candidate/pack.go
+     630ms      630ms (flat, cum) 26.58% of Total
+         .          .    109:func packInto(packed, src []byte) []byte {
+         .          .    110:	offset := 0
+     260ms      260ms    111:	for len(src) >= 8 {
+     140ms      140ms    112:		word := binary.LittleEndian.Uint64(src)
+         .          .    113:		nonzero := (((word & 0x7f7f7f7f7f7f7f7f) + 0x7f7f7f7f7f7f7f7f) | word) & 0x8080808080808080
+      20ms       20ms    114:		header := uint8(((nonzero >> 7) * 0x0102040810204080) >> 56)
+      30ms       30ms    115:		if header == 0xff {
+         .          .    116:			consumed := ffRunBytes(src)
+         .          .    117:			writeFF(packed[offset:], src, consumed)
+         .          .    118:			offset += 2 + ((consumed + 7) &^ 7)
+         .          .    119:			src = src[consumed:]
+         .          .    120:			continue
+         .          .    121:		}
+         .          .    122:		// 去掉至多两个置位后是否为零，比普通路径完整计数更直接。
+      30ms       30ms    123:		remaining := header & (header - 1)
+      20ms       20ms    124:		if remaining&(remaining-1) == 0 {
+         .          .    125:			// 长度与容量均固定且非空，避免每个 word 重算动态切片的指针掩码。
+      30ms       30ms    126:			dst := packed[offset : offset+3 : offset+3]
+         .          .    127:			// 已确认至多两个非零字节，直接写固定位置，避免通用循环和可变目标索引。
+         .          .    128:			_ = dst[2]
+         .          .    129:			dst[0] = header
+         .          .    130:			index := 1
+         .          .    131:			if header != 0 {
+         .          .    132:				shift := bits.TrailingZeros8(header) * 8
+         .          .    133:				dst[1] = byte(word >> shift)
+         .          .    134:				index = 2
+         .          .    135:				if remaining != 0 {
+         .          .    136:					shift = bits.TrailingZeros8(remaining) * 8
+         .          .    137:					dst[2] = byte(word >> shift)
+         .          .    138:					index = 3
+         .          .    139:				}
+         .          .    140:			}
+         .          .    141:			offset += index
+         .          .    142:		} else {
+      30ms       30ms    143:			dst := packed[offset : offset+9 : offset+9]
+         .          .    144:			// Pack 预留八字节尾空间，零字节暂写的位置会被下一个有效字节覆盖，不进入返回切片。
+         .          .    145:			_ = dst[8]
+         .          .    146:			// 固定八字节视图越过 mask，非零字节位置直接使用 0～7 的前缀计数。
+         .          .    147:			payload := dst[1:9]
+         .          .    148:			// 0/1 字节标志相乘得到前缀和，每个和至多为 8，不跨字节进位。
+         .          .    149:			// FF 已在前面处理；各目标位置只依赖对应前缀，不串行累加 index。
+         .          .    150:			ranks := (nonzero >> 7) * 0x0101010101010101
+         .          .    151:			payload[0] = byte(word)
+         .          .    152:			payload[int(ranks&7)] = byte(word >> 8)
+         .          .    153:			payload[int((ranks>>8)&7)] = byte(word >> 16)
+         .          .    154:			payload[int((ranks>>16)&7)] = byte(word >> 24)
+         .          .    155:			payload[int((ranks>>24)&7)] = byte(word >> 32)
+      10ms       10ms    156:			payload[int((ranks>>32)&7)] = byte(word >> 40)
+      30ms       30ms    157:			payload[int((ranks>>40)&7)] = byte(word >> 48)
+      20ms       20ms    158:			payload[int((ranks>>48)&7)] = byte(word >> 56)
+      10ms       10ms    159:			dst[0] = header
+         .          .    160:			offset += 1 + int(ranks>>56)
+         .          .    161:		}
+         .          .    162:		src = src[8:]
+         .          .    163:	}
+         .          .    164:	if len(src) > 0 {

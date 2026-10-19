@@ -1,0 +1,106 @@
+Total: 2.22s
+ROUTINE ======================== github.com/cnooljaw/gosproto.encodeBufferWithLimits in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-current-profile/archive/candidate/limits.go
+         0      760ms (flat, cum) 34.23% of Total
+         .          .     76:func encodeBufferWithLimits(message interface{}, limits Limits, reservePack bool, prefix []byte) ([]byte, []byte, error) {
+         .          .     77:	limits, err := normalizeLimits(limits)
+         .          .     78:	if err != nil {
+         .          .     79:		return nil, nil, err
+         .          .     80:	}
+         .          .     81:	typ, value, err := getbase(message)
+         .          .     82:	if err != nil {
+         .          .     83:		return nil, nil, err
+         .          .     84:	}
+         .          .     85:	schema, err := GetSprotoType(typ.Elem())
+         .          .     86:	if err != nil {
+         .          .     87:		return nil, nil, err
+         .          .     88:	}
+         .          .     89:	budget := &decodeBudget{limits: limits}
+         .          .     90:	var layout encodeLayout
+         .          .     91:	binding := knownEncodeType(schema)
+         .      180ms     92:	size, err := encodedSize(schema, value, budget, 1, &layout, binding)
+         .          .     93:	runtime.KeepAlive(message)
+         .          .     94:	if err != nil {
+         .          .     95:		return nil, nil, err
+         .          .     96:	}
+         .          .     97:	totalSize := len(prefix) + size
+         .          .     98:	capacity, start := totalSize, 0
+         .          .     99:	if reservePack {
+         .          .    100:		capacity = packedBufferSize(totalSize)
+         .          .    101:		// FF 头的最坏增长和八字节余量隔开读写游标，避免覆盖尚未消费的编码字节。
+         .          .    102:		start = capacity - totalSize
+         .          .    103:	}
+         .      290ms    104:	output := make([]byte, capacity)
+         .          .    105:	encoded := output[start : start+totalSize]
+         .          .    106:	if len(prefix) > 0 {
+         .          .    107:		copy(encoded, prefix)
+         .          .    108:	}
+         .      290ms    109:	encodeMessageInto(schema, value, encoded[len(prefix):], &layout, binding)
+         .          .    110:	runtime.KeepAlive(message)
+         .          .    111:	return output, encoded, nil
+         .          .    112:}
+         .          .    113:
+         .          .    114:func encodedSize(schema *SprotoType, value reflect.Value, budget *decodeBudget, depth int, layout *encodeLayout, binding encodeBinding) (int, error) {
+ROUTINE ======================== github.com/cnooljaw/gosproto.encodeFieldInto in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-current-profile/archive/candidate/encode.go
+         0      270ms (flat, cum) 12.16% of Total
+         .          .    176:func encodeFieldInto(field *SprotoField, value reflect.Value, output []byte, layout *encodeLayout, trusted bool) int {
+         .          .    177:	if field.Array {
+         .          .    178:		if value.Len() == 0 {
+         .          .    179:			return 0
+         .          .    180:		}
+         .          .    181:		offset := 0
+         .          .    182:		switch field.Wire {
+         .          .    183:		case WireVarintName:
+         .          .    184:			width := layout.next()
+         .          .    185:			if field.int64Slice {
+         .      270ms    186:				return encodeInt64Slice(*value.Addr().Interface().(*[]int64), width, output)
+         .          .    187:			}
+         .          .    188:			output[0] = byte(width)
+         .          .    189:			for index := 0; index < value.Len(); index++ {
+         .          .    190:				number := integerBits(field, value.Index(index))
+         .          .    191:				if width == 4 {
+ROUTINE ======================== github.com/cnooljaw/gosproto.encodeMessageInto in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-current-profile/archive/candidate/encode.go
+      10ms      290ms (flat, cum) 13.06% of Total
+         .          .    123:func encodeMessageInto(schema *SprotoType, value reflect.Value, output []byte, layout *encodeLayout, binding encodeBinding) int {
+         .          .    124:	count := layout.next()
+         .          .    125:	writeUint16(output, uint16(count))
+         .          .    126:	if value.IsNil() {
+         .          .    127:		return 2
+         .          .    128:	}
+         .       10ms    129:	record := value.Elem()
+         .          .    130:	pointer := messageEncodePointer(value, binding)
+         .          .    131:	headerOffset, bodyOffset, previous := 2, 2+count*2, -1
+         .          .    132:	for _, index := range schema.order {
+         .          .    133:		field := schema.Fields[index]
+         .          .    134:		if field.Tag < 0 {
+         .          .    135:			continue
+         .          .    136:		}
+         .          .    137:		native := binding.native && field.nativeInteger(schema)
+         .          .    138:		var current reflect.Value
+         .          .    139:		var bits uint64
+         .          .    140:		if native {
+         .          .    141:			var present bool
+         .          .    142:			bits, present = pointer.integer(field.encOffset)
+         .          .    143:			if !present {
+         .          .    144:				continue
+         .          .    145:			}
+         .          .    146:		} else {
+         .          .    147:			current = record.Field(field.index[0])
+         .          .    148:			if omittedField(field, current) {
+         .          .    149:				continue
+         .          .    150:			}
+         .          .    151:		}
+         .          .    152:		if skip := skipTag(previous, field.Tag); skip > 0 {
+         .          .    153:			writeUint16(output[headerOffset:], skip)
+         .          .    154:			headerOffset += 2
+         .          .    155:		}
+         .          .    156:		var header uint16
+         .          .    157:		var length int
+         .          .    158:		if native {
+         .          .    159:			header, length = encodeIntegerInto(bits, output[bodyOffset:])
+         .          .    160:		} else if field.Array || field.Wire == WireStructName {
+      10ms      280ms    161:			length = encodeFieldInto(field, current, output[bodyOffset+4:], layout, binding.exact && field.encOwner == schema && field.Array != field.pointer)
+         .          .    162:		} else {
+         .          .    163:			header, length = encodeScalarInto(field, current, output[bodyOffset:])
+         .          .    164:		}
+         .          .    165:		writeUint16(output[headerOffset:], header)
+         .          .    166:		headerOffset += 2

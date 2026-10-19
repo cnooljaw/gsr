@@ -4,9 +4,13 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## 当前编码单项进程profile（2026-10-19）
+
+已提交库d2f6027/GSR175028b上只读诊断：16入口各CPU2秒和逐次分配20,000次，32进程/96快照；limiter均零，最大堆快照3.85MiB（非峰值）。构造原70项后只保活单项，CPU启动在GC/预热后；内存profile包含初始化/构造/预热，循环B/op为主。大型记录与整数Pack热点、4KiB kevent归因限制完整保留，不形成新A/B或PB/TS排名。harness统计/选择/GC/夹具/指标/70顺序、vet、构建、32采集、96摘要+2源码视图及fresh归档/源/二进制/profile独立核对通过。见[当前热点报告](benchmarks/2026-10-19-gosproto-current-profile/RESULTS.md)。生产未改/库干净，不重复生产全测/oracle/race/fuzz/GSR/GoTS；新GSR诊断未提交，Decode/正式依赖不变。
+
 ## Pack固定len/cap视图（2026-10-19）
 
-前轮已提交库0b38019/GSR31b3f99。两份未计时草稿和唯一实测三索引版本均通过既有契约/17,984差分；原70项四组280进程/26,880块/6,720 quartet/1,680轮/1,120快照复算。self46/70、clone51/70，limiter全零；分配中位数70/69/68/68项相同，16B尾差保留。整数数组PEncode/真实通知/请求两轮改善，保留；ASCII/大记录成本、累计方向翻转、44.994/206.939/227.795ms等异常块完整披露。harness/vet/fresh、源/工具/二进制指纹通过；库全测/官方C-Lua/race+checkptr/vet、有限fuzz（Pack5,487且3s后停增；Codec416,938）、GSR三包/GoTS7/7零跳过通过。见[固定len/cap报告](benchmarks/2026-10-19-gosproto-pack-window/RESULTS.md)。库仅pack.go和GSR新文档未提交，正式依赖/Decode不变。
+前轮已提交库0b38019/GSR31b3f99。两份未计时草稿和唯一实测三索引版本均通过既有契约/17,984差分；原70项四组280进程/26,880块/6,720 quartet/1,680轮/1,120快照复算。self46/70、clone51/70，limiter全零；分配中位数70/69/68/68项相同，16B尾差保留。整数数组PEncode/真实通知/请求两轮改善，保留；ASCII/大记录成本、累计方向翻转、44.994/206.939/227.795ms等异常块完整披露。harness/vet/fresh、源/工具/二进制指纹通过；库全测/官方C-Lua/race+checkptr/vet、有限fuzz（Pack5,487且3s后停增；Codec416,938）、GSR三包/GoTS7/7零跳过通过。见[固定len/cap报告](benchmarks/2026-10-19-gosproto-pack-window/RESULTS.md)。该轮已本地提交为库 `d2f6027`、GSR `175028b`，未推送，正式依赖/Decode不变。
 
 ## Pack固定payload视图（2026-10-19）
 

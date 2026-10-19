@@ -1,0 +1,55 @@
+Total: 101.30MB
+ROUTINE ======================== github.com/cnooljaw/gosproto.(*encodeLayout).add in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-current-profile/archive/candidate/encode.go
+   12.54MB    12.54MB (flat, cum) 12.38% of Total
+         .          .     26:func (layout *encodeLayout) add(value int) int {
+         .          .     27:	index := layout.count
+         .          .     28:	if index < len(layout.local) {
+         .          .     29:		layout.local[index] = uint32(value)
+         .          .     30:	} else {
+         .          .     31:		// add 连续写入，外溢长度始终等于总项数减去栈内项数。
+         .          .     32:		offset := index - len(layout.local)
+         .          .     33:		if offset == cap(layout.extra) {
+         .          .     34:			capacity := max(128, offset*2)
+         .          .     35:			// 只在新记录确实需要空间时增长，不按尚未验证的数组长度预分配。
+   12.54MB    12.54MB     36:			extra := make([]uint32, offset, capacity)
+         .          .     37:			copy(extra, layout.extra)
+         .          .     38:			layout.extra = extra
+         .          .     39:		}
+         .          .     40:		layout.extra = layout.extra[:offset+1]
+         .          .     41:		layout.extra[offset] = uint32(value)
+ROUTINE ======================== github.com/cnooljaw/gosproto.encodeBufferWithLimits in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-current-profile/archive/candidate/limits.go
+   82.57MB    95.12MB (flat, cum) 93.90% of Total
+         .          .     76:func encodeBufferWithLimits(message interface{}, limits Limits, reservePack bool, prefix []byte) ([]byte, []byte, error) {
+         .          .     77:	limits, err := normalizeLimits(limits)
+         .          .     78:	if err != nil {
+         .          .     79:		return nil, nil, err
+         .          .     80:	}
+         .          .     81:	typ, value, err := getbase(message)
+         .          .     82:	if err != nil {
+         .          .     83:		return nil, nil, err
+         .          .     84:	}
+         .    15.46kB     85:	schema, err := GetSprotoType(typ.Elem())
+         .          .     86:	if err != nil {
+         .          .     87:		return nil, nil, err
+         .          .     88:	}
+         .          .     89:	budget := &decodeBudget{limits: limits}
+         .          .     90:	var layout encodeLayout
+         .          .     91:	binding := knownEncodeType(schema)
+         .    12.54MB     92:	size, err := encodedSize(schema, value, budget, 1, &layout, binding)
+         .          .     93:	runtime.KeepAlive(message)
+         .          .     94:	if err != nil {
+         .          .     95:		return nil, nil, err
+         .          .     96:	}
+         .          .     97:	totalSize := len(prefix) + size
+         .          .     98:	capacity, start := totalSize, 0
+         .          .     99:	if reservePack {
+         .          .    100:		capacity = packedBufferSize(totalSize)
+         .          .    101:		// FF 头的最坏增长和八字节余量隔开读写游标，避免覆盖尚未消费的编码字节。
+         .          .    102:		start = capacity - totalSize
+         .          .    103:	}
+   82.57MB    82.57MB    104:	output := make([]byte, capacity)
+         .          .    105:	encoded := output[start : start+totalSize]
+         .          .    106:	if len(prefix) > 0 {
+         .          .    107:		copy(encoded, prefix)
+         .          .    108:	}
+         .          .    109:	encodeMessageInto(schema, value, encoded[len(prefix):], &layout, binding)

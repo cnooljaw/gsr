@@ -1,0 +1,37 @@
+File: current.test
+Type: alloc_space
+Time: 2026-10-19 11:42:08 CST
+Showing nodes accounting for 101636.66kB, 98.21% of 103484.38kB total
+Dropped 392 nodes (cum <= 517.42kB)
+Showing top 30 nodes out of 32
+      flat  flat%   sum%        cum   cum%
+84331.94kB 81.49% 81.49% 97152.90kB 93.88%  github.com/cnooljaw/gosproto.encodeBufferWithLimits
+12805.50kB 12.37% 93.87% 12805.50kB 12.37%  github.com/cnooljaw/gosproto.(*encodeLayout).add (inline)
+ 1975.12kB  1.91% 95.78%  1975.12kB  1.91%  codecpairstool.layoutRecords (inline)
+ 1267.39kB  1.22% 97.00%  1783.85kB  1.72%  github.com/cnooljaw/gosproto-before.encodeBufferWithLimits
+  862.62kB  0.83% 97.83%   862.62kB  0.83%  bytes.Clone (inline)
+  358.23kB  0.35% 98.18%  2461.93kB  2.38%  codecpairstool.layoutSamples
+   12.80kB 0.012% 98.19%  8081.96kB  7.81%  codecpairstool.pairOperations
+    8.52kB 0.0082% 98.20%   769.20kB  0.74%  codecpairstool.representativeOperations
+    5.52kB 0.0053% 98.21%   604.66kB  0.58%  codecpairstool.rpcPairOperations
+    4.35kB 0.0042% 98.21%  6653.97kB  6.43%  codecpairstool.growthPairOperations
+    3.23kB 0.0031% 98.21%   698.66kB  0.68%  codecpairstool.bodyPairOperations
+    0.84kB 0.00082% 98.21% 95409.64kB 92.20%  github.com/cnooljaw/gosproto.(*Rpc).RequestEncode
+    0.30kB 0.00029% 98.21% 103466.37kB   100%  codecpairstool.BenchmarkCurrentOperation
+    0.16kB 0.00015% 98.21%  2470.81kB  2.39%  codecpairstool.growthFixtureSamples
+    0.12kB 0.00012% 98.21% 103470.84kB   100%  testing.(*B).runN
+         0     0% 98.21%  8082.18kB  7.81%  codecpairstool.currentProfileOperation
+         0     0% 98.21%  1651.33kB  1.60%  codecpairstool.growthPairOperations.func1
+         0     0% 98.21%  1651.33kB  1.60%  codecpairstool.growthPairOperations.func2 (inline)
+         0     0% 98.21%    95356kB 92.15%  codecpairstool.rpcPairOperations.func1
+         0     0% 98.21% 95387.67kB 92.18%  codecpairstool.rpcProbePairs.func2
+         0     0% 98.21%   878.55kB  0.85%  github.com/cnooljaw/gosproto-before.Encode
+         0     0% 98.21%   831.38kB   0.8%  github.com/cnooljaw/gosproto-before.EncodePacked (inline)
+         0     0% 98.21%   878.55kB  0.85%  github.com/cnooljaw/gosproto-before.EncodeWithLimits (inline)
+         0     0% 98.21%  1762.73kB  1.70%  github.com/cnooljaw/gosproto-before.encodeWithLimits
+         0     0% 98.21%   891.60kB  0.86%  github.com/cnooljaw/gosproto.Encode
+         0     0% 98.21%   831.38kB   0.8%  github.com/cnooljaw/gosproto.EncodePacked (inline)
+         0     0% 98.21%   891.60kB  0.86%  github.com/cnooljaw/gosproto.EncodeWithLimits (inline)
+         0     0% 98.21% 97131.77kB 93.86%  github.com/cnooljaw/gosproto.encodeWithLimits
+         0     0% 98.21% 12678.50kB 12.25%  github.com/cnooljaw/gosproto.encodedIntegerRecordSize
+         0     0% 98.21% 12805.50kB 12.37%  github.com/cnooljaw/gosproto.encodedSize

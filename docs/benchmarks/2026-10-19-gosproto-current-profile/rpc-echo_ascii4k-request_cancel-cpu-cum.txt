@@ -1,0 +1,48 @@
+File: current.test
+Type: cpu
+Time: 2026-10-19 11:42:36 CST
+Duration: 2.53s, Total samples = 2.23s (88.00%)
+Showing nodes accounting for 1.99s, 89.24% of 2.23s total
+Dropped 38 nodes (cum <= 0.01s)
+Showing top 40 nodes out of 51
+      flat  flat%   sum%        cum   cum%
+     0.01s  0.45%  0.45%      1.84s 82.51%  runtime.systemstack
+     1.56s 69.96% 70.40%      1.56s 69.96%  runtime.kevent
+         0     0% 70.40%      1.56s 69.96%  runtime.netpoll
+         0     0% 70.40%      1.56s 69.96%  runtime.startTheWorldWithSema
+         0     0% 70.40%      1.01s 45.29%  runtime.gcStart.func4
+         0     0% 70.40%      0.62s 27.80%  codecpairstool.BenchmarkCurrentOperation
+         0     0% 70.40%      0.62s 27.80%  codecpairstool.rpcPairOperations.func1
+         0     0% 70.40%      0.62s 27.80%  codecpairstool.rpcProbePairs.func4
+         0     0% 70.40%      0.62s 27.80%  testing.(*B).run1.func1
+         0     0% 70.40%      0.62s 27.80%  testing.(*B).runN
+     0.02s   0.9% 71.30%      0.60s 26.91%  github.com/cnooljaw/gosproto.(*Rpc).RequestEncode
+         0     0% 71.30%      0.55s 24.66%  runtime.gcMarkTermination.func3
+         0     0% 71.30%      0.45s 20.18%  github.com/cnooljaw/gosproto.encodeBufferWithLimits
+         0     0% 71.30%      0.34s 15.25%  runtime.makeslice
+         0     0% 71.30%      0.34s 15.25%  runtime.mallocgc
+         0     0% 71.30%      0.22s  9.87%  runtime.gcAssistAlloc.func2
+         0     0% 71.30%      0.22s  9.87%  runtime.gcAssistAlloc1
+         0     0% 71.30%      0.21s  9.42%  runtime.deductAssistCredit
+         0     0% 71.30%      0.21s  9.42%  runtime.gcAssistAlloc
+         0     0% 71.30%      0.21s  9.42%  runtime.gcDrainN
+     0.05s  2.24% 73.54%      0.19s  8.52%  runtime.scanobject
+     0.01s  0.45% 73.99%      0.13s  5.83%  runtime.mallocgcSmallNoscan
+     0.01s  0.45% 74.44%      0.10s  4.48%  github.com/cnooljaw/gosproto.encodeMessageInto
+         0     0% 74.44%      0.10s  4.48%  github.com/cnooljaw/gosproto.packInto
+     0.10s  4.48% 78.92%      0.10s  4.48%  runtime.memmove
+     0.06s  2.69% 81.61%      0.09s  4.04%  runtime.typePointers.next
+         0     0% 81.61%      0.08s  3.59%  github.com/cnooljaw/gosproto.encodeScalarInto
+         0     0% 81.61%      0.07s  3.14%  bytes.IndexByte (inline)
+         0     0% 81.61%      0.07s  3.14%  github.com/cnooljaw/gosproto.ffRunBytes
+         0     0% 81.61%      0.07s  3.14%  github.com/cnooljaw/gosproto.followingFFWords
+     0.07s  3.14% 84.75%      0.07s  3.14%  indexbytebody
+         0     0% 84.75%      0.07s  3.14%  runtime.(*mcache).nextFree
+         0     0% 84.75%      0.07s  3.14%  runtime.(*mcache).refill
+         0     0% 84.75%      0.07s  3.14%  runtime.(*mcentral).cacheSpan
+     0.01s  0.45% 85.20%      0.05s  2.24%  runtime.(*sweepLocked).sweep
+         0     0% 85.20%      0.05s  2.24%  runtime.sweepone
+         0     0% 85.20%      0.04s  1.79%  runtime.deductSweepCredit
+     0.04s  1.79% 87.00%      0.04s  1.79%  runtime.greyobject
+     0.04s  1.79% 88.79%      0.04s  1.79%  runtime.memclrNoHeapPointers
+     0.01s  0.45% 89.24%      0.03s  1.35%  github.com/cnooljaw/gosproto.writeFF (inline)

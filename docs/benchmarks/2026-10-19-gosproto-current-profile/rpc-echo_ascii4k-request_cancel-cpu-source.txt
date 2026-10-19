@@ -1,0 +1,133 @@
+Total: 2.23s
+ROUTINE ======================== github.com/cnooljaw/gosproto.encodeBufferWithLimits in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-current-profile/archive/candidate/limits.go
+         0      450ms (flat, cum) 20.18% of Total
+         .          .     76:func encodeBufferWithLimits(message interface{}, limits Limits, reservePack bool, prefix []byte) ([]byte, []byte, error) {
+         .          .     77:	limits, err := normalizeLimits(limits)
+         .          .     78:	if err != nil {
+         .          .     79:		return nil, nil, err
+         .          .     80:	}
+         .          .     81:	typ, value, err := getbase(message)
+         .          .     82:	if err != nil {
+         .          .     83:		return nil, nil, err
+         .          .     84:	}
+         .       10ms     85:	schema, err := GetSprotoType(typ.Elem())
+         .          .     86:	if err != nil {
+         .          .     87:		return nil, nil, err
+         .          .     88:	}
+         .          .     89:	budget := &decodeBudget{limits: limits}
+         .          .     90:	var layout encodeLayout
+         .          .     91:	binding := knownEncodeType(schema)
+         .          .     92:	size, err := encodedSize(schema, value, budget, 1, &layout, binding)
+         .          .     93:	runtime.KeepAlive(message)
+         .          .     94:	if err != nil {
+         .          .     95:		return nil, nil, err
+         .          .     96:	}
+         .          .     97:	totalSize := len(prefix) + size
+         .          .     98:	capacity, start := totalSize, 0
+         .          .     99:	if reservePack {
+         .          .    100:		capacity = packedBufferSize(totalSize)
+         .          .    101:		// FF 头的最坏增长和八字节余量隔开读写游标，避免覆盖尚未消费的编码字节。
+         .          .    102:		start = capacity - totalSize
+         .          .    103:	}
+         .      340ms    104:	output := make([]byte, capacity)
+         .          .    105:	encoded := output[start : start+totalSize]
+         .          .    106:	if len(prefix) > 0 {
+         .          .    107:		copy(encoded, prefix)
+         .          .    108:	}
+         .      100ms    109:	encodeMessageInto(schema, value, encoded[len(prefix):], &layout, binding)
+         .          .    110:	runtime.KeepAlive(message)
+         .          .    111:	return output, encoded, nil
+         .          .    112:}
+         .          .    113:
+         .          .    114:func encodedSize(schema *SprotoType, value reflect.Value, budget *decodeBudget, depth int, layout *encodeLayout, binding encodeBinding) (int, error) {
+ROUTINE ======================== github.com/cnooljaw/gosproto.encodeMessageInto in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-current-profile/archive/candidate/encode.go
+      10ms      100ms (flat, cum)  4.48% of Total
+         .          .    123:func encodeMessageInto(schema *SprotoType, value reflect.Value, output []byte, layout *encodeLayout, binding encodeBinding) int {
+         .          .    124:	count := layout.next()
+         .          .    125:	writeUint16(output, uint16(count))
+         .          .    126:	if value.IsNil() {
+         .          .    127:		return 2
+         .          .    128:	}
+         .          .    129:	record := value.Elem()
+         .          .    130:	pointer := messageEncodePointer(value, binding)
+         .          .    131:	headerOffset, bodyOffset, previous := 2, 2+count*2, -1
+      10ms       10ms    132:	for _, index := range schema.order {
+         .          .    133:		field := schema.Fields[index]
+         .          .    134:		if field.Tag < 0 {
+         .          .    135:			continue
+         .          .    136:		}
+         .          .    137:		native := binding.native && field.nativeInteger(schema)
+         .          .    138:		var current reflect.Value
+         .          .    139:		var bits uint64
+         .          .    140:		if native {
+         .          .    141:			var present bool
+         .          .    142:			bits, present = pointer.integer(field.encOffset)
+         .          .    143:			if !present {
+         .          .    144:				continue
+         .          .    145:			}
+         .          .    146:		} else {
+         .       10ms    147:			current = record.Field(field.index[0])
+         .          .    148:			if omittedField(field, current) {
+         .          .    149:				continue
+         .          .    150:			}
+         .          .    151:		}
+         .          .    152:		if skip := skipTag(previous, field.Tag); skip > 0 {
+         .          .    153:			writeUint16(output[headerOffset:], skip)
+         .          .    154:			headerOffset += 2
+         .          .    155:		}
+         .          .    156:		var header uint16
+         .          .    157:		var length int
+         .          .    158:		if native {
+         .          .    159:			header, length = encodeIntegerInto(bits, output[bodyOffset:])
+         .          .    160:		} else if field.Array || field.Wire == WireStructName {
+         .          .    161:			length = encodeFieldInto(field, current, output[bodyOffset+4:], layout, binding.exact && field.encOwner == schema && field.Array != field.pointer)
+         .          .    162:		} else {
+         .       80ms    163:			header, length = encodeScalarInto(field, current, output[bodyOffset:])
+         .          .    164:		}
+         .          .    165:		writeUint16(output[headerOffset:], header)
+         .          .    166:		headerOffset += 2
+         .          .    167:		previous = field.Tag
+         .          .    168:		if header == 0 {
+ROUTINE ======================== github.com/cnooljaw/gosproto.ffRunBytes in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-current-profile/archive/candidate/pack.go
+         0       70ms (flat, cum)  3.14% of Total
+         .          .     66:func ffRunBytes(src []byte) int {
+         .          .     67:	limit := min(len(src), 2048)
+         .          .     68:	consumed := 8
+         .          .     69:	if len(src) >= 256 {
+         .       70ms     70:		consumed += followingFFWords(src[8:]) * 8
+         .          .     71:	}
+         .          .     72:	for consumed+8 <= limit {
+         .          .     73:		word := binary.LittleEndian.Uint64(src[consumed:])
+         .          .     74:		if (word-0x0101010101010101)&^word&0x8080808080808080 != 0 {
+         .          .     75:			nonzero := (((word & 0x7f7f7f7f7f7f7f7f) + 0x7f7f7f7f7f7f7f7f) | word) & 0x8080808080808080
+ROUTINE ======================== github.com/cnooljaw/gosproto.packInto in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-current-profile/archive/candidate/pack.go
+         0      100ms (flat, cum)  4.48% of Total
+         .          .    109:func packInto(packed, src []byte) []byte {
+         .          .    110:	offset := 0
+         .          .    111:	for len(src) >= 8 {
+         .          .    112:		word := binary.LittleEndian.Uint64(src)
+         .          .    113:		nonzero := (((word & 0x7f7f7f7f7f7f7f7f) + 0x7f7f7f7f7f7f7f7f) | word) & 0x8080808080808080
+         .          .    114:		header := uint8(((nonzero >> 7) * 0x0102040810204080) >> 56)
+         .          .    115:		if header == 0xff {
+         .       70ms    116:			consumed := ffRunBytes(src)
+         .       30ms    117:			writeFF(packed[offset:], src, consumed)
+         .          .    118:			offset += 2 + ((consumed + 7) &^ 7)
+         .          .    119:			src = src[consumed:]
+         .          .    120:			continue
+         .          .    121:		}
+         .          .    122:		// 去掉至多两个置位后是否为零，比普通路径完整计数更直接。
+ROUTINE ======================== github.com/cnooljaw/gosproto.writeFF in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-current-profile/archive/candidate/pack.go
+      10ms       30ms (flat, cum)  1.35% of Total
+         .          .     35:func writeFF(dst, src []byte, n int) {
+         .          .     36:	// 最后一个连续块可能不足八字节，不能读取切片长度之外的底层容量。
+         .          .     37:	n = min(n, len(src))
+         .          .     38:	align8 := (n + 7) & (^7)
+         .          .     39:	dst[0] = 0xff
+         .          .     40:	dst[1] = uint8(align8/8 - 1)
+         .       20ms     41:	copy(dst[2:], src[:n])
+      10ms       10ms     42:	for i := n; i < align8; i++ {
+         .          .     43:		dst[2+i] = 0
+         .          .     44:	}
+         .          .     45:}
+         .          .     46:
+         .          .     47:// packFFMergeable 判断当前 word 是否可按官方规则继续 FF 段。

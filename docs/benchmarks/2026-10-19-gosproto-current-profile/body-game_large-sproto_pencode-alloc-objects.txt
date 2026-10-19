@@ -1,0 +1,37 @@
+File: current.test
+Type: alloc_objects
+Time: 2026-10-19 11:42:04 CST
+Showing nodes accounting for 157788, 95.99% of 164384 total
+Dropped 379 nodes (cum <= 821)
+Showing top 30 nodes out of 39
+      flat  flat%   sum%        cum   cum%
+     86087 52.37% 52.37%      86087 52.37%  codecpairstool.layoutRecords (inline)
+     24769 15.07% 67.44%      24769 15.07%  github.com/cnooljaw/gosproto.(*encodeLayout).add (inline)
+     24729 15.04% 82.48%      49672 30.22%  github.com/cnooljaw/gosproto.encodeBufferWithLimits
+     14573  8.87% 91.35%     101310 61.63%  codecpairstool.layoutSamples
+      3063  1.86% 93.21%       3063  1.86%  reflect.New
+      2774  1.69% 94.90%       2878  1.75%  reflect.Value.extendSlice
+      1044  0.64% 95.53%       1459  0.89%  google.golang.org/protobuf/internal/impl.(*int32Converter).GoValueOf
+       165   0.1% 95.63%       3033  1.85%  encoding/json.(*decodeState).object
+       160 0.097% 95.73%       1265  0.77%  encoding/json.(*decodeState).literalStore
+       110 0.067% 95.80%      10051  6.11%  codecpairstool.representativeOperations
+        87 0.053% 95.85%     102245 62.20%  codecpairstool.growthPairOperations
+        81 0.049% 95.90%     114668 69.76%  codecpairstool.pairOperations
+        57 0.035% 95.93%       5607  3.41%  codecpairstool.rpcPairOperations
+        53 0.032% 95.97%       6676  4.06%  codecpairstool.bodyPairOperations
+        31 0.019% 95.98%       3151  1.92%  encoding/json.Unmarshal
+         2 0.0012% 95.99%     164199 99.89%  codecpairstool.BenchmarkCurrentOperation
+         2 0.0012% 95.99%     164243 99.91%  testing.(*B).runN
+         1 0.00061% 95.99%     101425 61.70%  codecpairstool.growthFixtureSamples
+         0     0% 95.99%     114671 69.76%  codecpairstool.currentProfileOperation
+         0     0% 95.99%      49344 30.02%  codecpairstool.representativeOperations.func7
+         0     0% 95.99%       2618  1.59%  encoding/json.(*decodeState).array
+         0     0% 95.99%       3051  1.86%  encoding/json.(*decodeState).unmarshal
+         0     0% 95.99%       3051  1.86%  encoding/json.(*decodeState).value
+         0     0% 95.99%       1808  1.10%  encoding/json.indirect
+         0     0% 95.99%      49400 30.05%  github.com/cnooljaw/gosproto.EncodePacked (inline)
+         0     0% 95.99%      49665 30.21%  github.com/cnooljaw/gosproto.encodeWithLimits
+         0     0% 95.99%      24755 15.06%  github.com/cnooljaw/gosproto.encodedIntegerRecordSize
+         0     0% 95.99%      24769 15.07%  github.com/cnooljaw/gosproto.encodedSize
+         0     0% 95.99%      24769 15.07%  github.com/cnooljaw/gosproto.fieldSize
+         0     0% 95.99%       7093  4.31%  google.golang.org/protobuf/encoding/protojson.Unmarshal (inline)

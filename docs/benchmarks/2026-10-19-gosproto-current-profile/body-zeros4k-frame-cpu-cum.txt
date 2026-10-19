@@ -1,0 +1,46 @@
+File: current.test
+Type: cpu
+Time: 2026-10-19 11:42:39 CST
+Duration: 2.65s, Total samples = 2.27s (85.64%)
+Showing nodes accounting for 2.11s, 92.95% of 2.27s total
+Dropped 40 nodes (cum <= 0.01s)
+      flat  flat%   sum%        cum   cum%
+         0     0%     0%      2.03s 89.43%  runtime.systemstack
+     1.71s 75.33% 75.33%      1.71s 75.33%  runtime.kevent
+         0     0% 75.33%      1.71s 75.33%  runtime.netpoll
+         0     0% 75.33%      1.71s 75.33%  runtime.startTheWorldWithSema
+         0     0% 75.33%      0.92s 40.53%  runtime.gcStart.func4
+         0     0% 75.33%      0.79s 34.80%  runtime.gcMarkTermination.func3
+         0     0% 75.33%      0.55s 24.23%  codecpairstool.BenchmarkCurrentOperation
+         0     0% 75.33%      0.55s 24.23%  codecpairstool.bodyPairOperations.func4
+         0     0% 75.33%      0.55s 24.23%  codecpairstool.echoCodecs.func7
+         0     0% 75.33%      0.55s 24.23%  testing.(*B).run1.func1
+         0     0% 75.33%      0.55s 24.23%  testing.(*B).runN
+         0     0% 75.33%      0.31s 13.66%  runtime.mallocgc
+         0     0% 75.33%      0.28s 12.33%  runtime.deductAssistCredit
+         0     0% 75.33%      0.28s 12.33%  runtime.gcAssistAlloc
+         0     0% 75.33%      0.28s 12.33%  runtime.gcAssistAlloc.func2
+         0     0% 75.33%      0.28s 12.33%  runtime.gcAssistAlloc1
+         0     0% 75.33%      0.28s 12.33%  runtime.gcDrainN
+     0.08s  3.52% 78.85%      0.27s 11.89%  runtime.scanobject
+         0     0% 78.85%      0.26s 11.45%  github.com/cnooljaw/gosproto.Pack (inline)
+         0     0% 78.85%      0.21s  9.25%  runtime.makeslice
+         0     0% 78.85%      0.17s  7.49%  github.com/cnooljaw/gosproto.Encode
+         0     0% 78.85%      0.17s  7.49%  github.com/cnooljaw/gosproto.EncodeWithLimits (inline)
+         0     0% 78.85%      0.17s  7.49%  github.com/cnooljaw/gosproto.encodeBufferWithLimits
+         0     0% 78.85%      0.17s  7.49%  github.com/cnooljaw/gosproto.encodeWithLimits
+         0     0% 78.85%      0.14s  6.17%  codecpairstool.echoCodecs.func3
+     0.13s  5.73% 84.58%      0.14s  6.17%  github.com/cnooljaw/gosproto.packInto
+         0     0% 84.58%      0.09s  3.96%  runtime.growslice
+     0.06s  2.64% 87.22%      0.08s  3.52%  runtime.findObject
+     0.04s  1.76% 88.99%      0.06s  2.64%  runtime.typePointers.next
+         0     0% 88.99%      0.04s  1.76%  github.com/cnooljaw/gosproto.encodeMessageInto
+         0     0% 88.99%      0.04s  1.76%  github.com/cnooljaw/gosproto.encodeScalarInto
+     0.03s  1.32% 90.31%      0.04s  1.76%  runtime.greyobject
+     0.04s  1.76% 92.07%      0.04s  1.76%  runtime.memmove
+         0     0% 92.07%      0.03s  1.32%  runtime.mallocgcSmallNoscan
+         0     0% 92.07%      0.02s  0.88%  github.com/cnooljaw/gosproto.encodedSize
+         0     0% 92.07%      0.02s  0.88%  runtime.(*mheap).alloc.func1
+         0     0% 92.07%      0.02s  0.88%  runtime.(*mheap).allocSpan
+         0     0% 92.07%      0.02s  0.88%  runtime.newobject
+     0.02s  0.88% 92.95%      0.02s  0.88%  runtime.spanOf (inline)

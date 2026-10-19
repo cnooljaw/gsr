@@ -1,0 +1,48 @@
+File: current.test
+Type: cpu
+Time: 2026-10-19 11:42:33 CST
+Duration: 2.38s, Total samples = 2.03s (85.22%)
+Showing nodes accounting for 1.93s, 95.07% of 2.03s total
+Dropped 23 nodes (cum <= 0.01s)
+Showing top 40 nodes out of 48
+      flat  flat%   sum%        cum   cum%
+     1.48s 72.91% 72.91%      1.48s 72.91%  runtime.kevent
+     0.09s  4.43% 77.34%      0.09s  4.43%  indexbytebody
+     0.08s  3.94% 81.28%      0.08s  3.94%  runtime.typePointers.next
+     0.05s  2.46% 83.74%      0.22s 10.84%  runtime.scanobject
+     0.03s  1.48% 85.22%      0.04s  1.97%  github.com/cnooljaw/gosproto.writeFF (inline)
+     0.03s  1.48% 86.70%      0.03s  1.48%  runtime.memclrNoHeapPointers
+     0.03s  1.48% 88.18%      0.03s  1.48%  runtime.typePointers.nextFast (inline)
+     0.02s  0.99% 89.16%      0.02s  0.99%  runtime.(*mspan).heapBitsSmallForAddr
+     0.02s  0.99% 90.15%      0.09s  4.43%  runtime.mallocgcSmallNoscan
+     0.02s  0.99% 91.13%      0.03s  1.48%  runtime.scanblock
+     0.01s  0.49% 91.63%      0.10s  4.93%  bytes.IndexByte (inline)
+     0.01s  0.49% 92.12%      0.15s  7.39%  github.com/cnooljaw/gosproto.packInto
+     0.01s  0.49% 92.61%      0.02s  0.99%  runtime.(*unwinder).next
+     0.01s  0.49% 93.10%      0.30s 14.78%  runtime.gcDrainN
+     0.01s  0.49% 93.60%      0.03s  1.48%  runtime.greyobject
+     0.01s  0.49% 94.09%      0.40s 19.70%  runtime.makeslice
+     0.01s  0.49% 94.58%      0.03s  1.48%  runtime.pcvalue
+     0.01s  0.49% 95.07%      0.02s  0.99%  runtime.step
+         0     0% 95.07%      0.55s 27.09%  codecpairstool.BenchmarkCurrentOperation
+         0     0% 95.07%      0.55s 27.09%  codecpairstool.representativeOperations.func5
+         0     0% 95.07%      0.55s 27.09%  github.com/cnooljaw/gosproto.Pack (inline)
+         0     0% 95.07%      0.10s  4.93%  github.com/cnooljaw/gosproto.ffRunBytes
+         0     0% 95.07%      0.10s  4.93%  github.com/cnooljaw/gosproto.followingFFWords
+         0     0% 95.07%      0.03s  1.48%  runtime.(*mcache).nextFree
+         0     0% 95.07%      0.03s  1.48%  runtime.(*mcache).refill
+         0     0% 95.07%      0.03s  1.48%  runtime.(*mcentral).cacheSpan
+         0     0% 95.07%      0.02s  0.99%  runtime.(*mspan).typePointersOfUnchecked
+         0     0% 95.07%      0.02s  0.99%  runtime.(*stkframe).getStackMap
+         0     0% 95.07%      0.30s 14.78%  runtime.deductAssistCredit
+         0     0% 95.07%      0.02s  0.99%  runtime.deductSweepCredit
+         0     0% 95.07%      0.30s 14.78%  runtime.gcAssistAlloc
+         0     0% 95.07%      0.30s 14.78%  runtime.gcAssistAlloc.func2
+         0     0% 95.07%      0.30s 14.78%  runtime.gcAssistAlloc1
+         0     0% 95.07%      0.88s 43.35%  runtime.gcMarkTermination.func3
+         0     0% 95.07%      0.60s 29.56%  runtime.gcStart.func4
+         0     0% 95.07%      0.39s 19.21%  runtime.mallocgc
+         0     0% 95.07%      0.07s  3.45%  runtime.markroot
+         0     0% 95.07%      0.04s  1.97%  runtime.markroot.func1
+         0     0% 95.07%      0.02s  0.99%  runtime.markrootBlock
+         0     0% 95.07%      1.48s 72.91%  runtime.netpoll

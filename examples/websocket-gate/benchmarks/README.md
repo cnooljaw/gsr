@@ -76,7 +76,10 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 
 [固定payload视图](../../../docs/benchmarks/2026-10-19-gosproto-pack-payload/RESULTS.md) 只消除普通word重复索引+1，指令296→288，帧不变；原70项两轮大型Pack快8.87%/9.13%，整数数组PEncode快4.70%/4.19%，主要RPC与小收益保留。控制56/70、56/70，全部累计翻转/尾差/异常块/wide64成本披露。17,984差分、复算/fresh指纹、库/官方/race/checkptr/vet/有限fuzz/GSR/GoTS通过。该轮已本地提交为库 `0b38019`、GSR `31b3f99`，未推送，Decode/正式依赖不变。
 
-[固定len/cap视图](../../../docs/benchmarks/2026-10-19-gosproto-pack-window/RESULTS.md) 两份草稿只预检，唯一三索引候选固定原70项/四组比较；整数数组PEncode快6.07%/3.73%，真实通知快5.68%/5.17%，精确候选保留。self46/70、clone51/70，ASCII请求/大记录成本、累计翻转/全部失败/尾差保留。既有契约/17,984差分、复算/fresh、库/官方/race/checkptr/vet/有限fuzz/GSR/GoTS7/7通过。新库代码和GSR报告未提交，Decode/正式依赖不变。
+[固定len/cap视图](../../../docs/benchmarks/2026-10-19-gosproto-pack-window/RESULTS.md) 两份草稿只预检，唯一三索引候选固定原70项/四组比较；整数数组PEncode快6.07%/3.73%，真实通知快5.68%/5.17%，精确候选保留。self46/70、clone51/70，ASCII请求/大记录成本、累计翻转/全部失败/尾差保留。既有契约/17,984差分、复算/fresh、库/官方/race/checkptr/vet/有限fuzz/GSR/GoTS7/7通过。该轮已本地提交为库 `d2f6027`、GSR `175028b`，未推送，Decode/正式依赖不变。
+
+[当前编码profile](../../../docs/benchmarks/2026-10-19-gosproto-current-profile/RESULTS.md) 从d2f6027只读采16入口/32份CPU与分配，原70构造后逐项保活、CPU在GC/预热后启动。96快照limiter零，源/二进制/profile/fresh及独立元数据核对通过；整数Pack/大型记录热点和4KiB runtime归因限制保留，不作新A/B或PB/TS排名。生产未改、库干净，新诊断报告未提交；下一步只检查记录写出切片定位/BCE。
+
 
 ## 比较口径
 
