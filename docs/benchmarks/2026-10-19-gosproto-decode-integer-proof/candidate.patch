@@ -1,0 +1,37 @@
+--- a/decode.go
++++ b/decode.go
+@@ -333,9 +333,8 @@
+ 			if err != nil {
+ 				return 0, err
+ 			}
+-			result := new(int64)
+-			*result = int64(bits)
+-			if !pointer.setInteger(schema, field, result) {
++			result, written := pointer.setInteger(schema, field, bits)
++			if !written {
+ 				record.Field(field.index[0]).Set(reflect.ValueOf(result))
+ 			}
+ 			continue
+--- a/decode_pointer.go
++++ b/decode_pointer.go
+@@ -19,12 +19,15 @@
+ 	return decodePointer{value: value.UnsafePointer()}
+ }
+ 
+-// 每次写入都核对公开字段描述；外来 owner 或变化的形状必须保留反射索引语义。
+-func (pointer decodePointer) setInteger(schema *SprotoType, field *SprotoField, value *int64) bool {
+-	if pointer.value == nil || !field.nativeInteger(schema) {
+-		return false
++// 每次分配前核对写入资格；仍构造一个独占值，供原生写入或原反射索引回退使用。
++func (pointer decodePointer) setInteger(schema *SprotoType, field *SprotoField, bits uint64) (*int64, bool) {
++	native := pointer.value != nil && field.nativeInteger(schema)
++	value := new(int64)
++	*value = int64(bits)
++	if !native {
++		return value, false
+ 	}
+ 	// 使用 Go 类型化指针赋值，写屏障由编译器生成，不能用字节复制替代。
+ 	*(**int64)(unsafe.Add(pointer.value, field.encOffset)) = value
+-	return true
++	return value, true
+ }
