@@ -4,9 +4,13 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## Pack固定len/cap视图（2026-10-19）
+
+前轮已提交库0b38019/GSR31b3f99。两份未计时草稿和唯一实测三索引版本均通过既有契约/17,984差分；原70项四组280进程/26,880块/6,720 quartet/1,680轮/1,120快照复算。self46/70、clone51/70，limiter全零；分配中位数70/69/68/68项相同，16B尾差保留。整数数组PEncode/真实通知/请求两轮改善，保留；ASCII/大记录成本、累计方向翻转、44.994/206.939/227.795ms等异常块完整披露。harness/vet/fresh、源/工具/二进制指纹通过；库全测/官方C-Lua/race+checkptr/vet、有限fuzz（Pack5,487且3s后停增；Codec416,938）、GSR三包/GoTS7/7零跳过通过。见[固定len/cap报告](benchmarks/2026-10-19-gosproto-pack-window/RESULTS.md)。库仅pack.go和GSR新文档未提交，正式依赖/Decode不变。
+
 ## Pack固定payload视图（2026-10-19）
 
-前轮实验已提交GSR d1dceaa。新候选仅普通word安全固定视图消除重复索引+1，296→288条符号指令、112B帧不变；原70项四组280进程/26,880块/6,720 quartet/1,680轮/1,120快照独立复算。self/clone56/70，所有limiter零；分配中位数69/69/69/70项相同，16B尾差披露。两轮目标Pack/PEncode/RPC改善，保留；累计方向翻转、233.678ms异常块、wide64成本与全部失败保留。既有工作区/全mask等契约、17,984差分、harness/vet、fresh归档/源/二进制SHA通过。库全测/官方C-Lua/race+checkptr/vet、有限fuzz（Pack36,026且3s后停增；Codec442,757）、GSR三包/GoTS7/7零跳过通过；oracle复用历史SHA一致的官方core/facade，parser来自只读Skynet并单列。见[固定payload报告](benchmarks/2026-10-19-gosproto-pack-payload/RESULTS.md)。库仅pack.go未提交，GSR新文档未提交，正式依赖/Decode不变。
+前轮实验已提交GSR d1dceaa。新候选仅普通word安全固定视图消除重复索引+1，296→288条符号指令、112B帧不变；原70项四组280进程/26,880块/6,720 quartet/1,680轮/1,120快照独立复算。self/clone56/70，所有limiter零；分配中位数69/69/69/70项相同，16B尾差披露。两轮目标Pack/PEncode/RPC改善，保留；累计方向翻转、233.678ms异常块、wide64成本与全部失败保留。既有工作区/全mask等契约、17,984差分、harness/vet、fresh归档/源/二进制SHA通过。库全测/官方C-Lua/race+checkptr/vet、有限fuzz（Pack36,026且3s后停增；Codec442,757）、GSR三包/GoTS7/7零跳过通过；oracle复用历史SHA一致的官方core/facade，parser来自只读Skynet并单列。见[固定payload报告](benchmarks/2026-10-19-gosproto-pack-payload/RESULTS.md)。该轮已本地提交为库 `0b38019`、GSR `31b3f99`，未推送，正式依赖/Decode不变。
 
 ## 普通word连续段Pack实验（2026-10-19）
 

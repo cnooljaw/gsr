@@ -1,0 +1,21 @@
+--- a/pack.go
++++ b/pack.go
+@@ -145,7 +145,8 @@
+ 			payload := dst[1:9]
+ 			// 0/1 字节标志相乘得到前缀和，每个和至多为 8，不跨字节进位。
+ 			// FF 已在前面处理；各目标位置只依赖对应前缀，不串行累加 index。
+-			ranks := (nonzero >> 7) * 0x0101010101010101
++			// 最高字节多计一个 mask；低七个前缀及写出位置不变，供编译器融合乘加。
++			ranks := (nonzero>>7)*0x0101010101010101 + 1<<56
+ 			payload[0] = byte(word)
+ 			payload[int(ranks&7)] = byte(word >> 8)
+ 			payload[int((ranks>>8)&7)] = byte(word >> 16)
+@@ -155,7 +156,7 @@
+ 			payload[int((ranks>>40)&7)] = byte(word >> 48)
+ 			payload[int((ranks>>48)&7)] = byte(word >> 56)
+ 			dst[0] = header
+-			offset += 1 + int(ranks>>56)
++			offset += int(ranks>>56)
+ 		}
+ 		src = src[8:]
+ 	}

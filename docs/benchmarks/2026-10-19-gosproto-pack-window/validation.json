@@ -1,0 +1,267 @@
+{
+  "decision": "Retain exact sampled fixed-len/cap view candidate;new library pack.go and GSR documents uncommitted;no fixed gain threshold",
+  "libraryHead": "0b38019c879b6b0eb0354fdf5dfb7673248b2f39",
+  "gsrHead": "31b3f99dc7dfff5f809da7b48b32c73f36333a11",
+  "libraryWorkingTree": "M pack.go only",
+  "finalLibraryGoSource": {
+    "decode.go": "b3cbbe248d17fe770add10ba93e5942fe5c54c13eba1c416135d83cff890e65e",
+    "decode_pointer.go": "5cf91e619c80895785046b396dbf1861a61281cb0b6c3d954cd07d99b8bfd961",
+    "encode.go": "ee0fb24ed0bbc8755052d8de4fd77c38307b3ac64656176a5299d4e1069cdf3f",
+    "encode_integer_record.go": "b1bfe815adcbfabd2de0463d4f28b41efa6b8f7d7df535efc00669e84d53d2d4",
+    "encode_pointer.go": "e7a239568a0fc8788404de6f5bc0d5e2ac092fa559f0a6bfd4561fdc155f81c1",
+    "encode_test.go": "d28095ae5b5b820eb0d5aed634397bb86159361b5876c3126100d59e37d41099",
+    "fuzz_test.go": "10eb7cb2d2fcd8afe47b6880cd61f64121f17b0a3355a6073b41ceb87e8d435c",
+    "limits.go": "223a9ec3a68c4fb4c5938332132692cec3658fee75aceea2e26076860fe94907",
+    "limits_test.go": "0f261965aeb66f5752b53a461518668a0e9db68be312aeb9c0ff78786a9ddcad",
+    "meta.go": "6badd4a5ac60d8a15caaa1f35634268101c436b275cf4a0fe120b91db417d217",
+    "official_compat_test.go": "fa413db0126e78205f7ee2d56f8f5d521bc29d82b723953385b79b0407412b60",
+    "pack.go": "99c642407cd0b44a2a5d09636c83ce6f2e185aead9937014e96fcc8a9757780a",
+    "pack_test.go": "70e79e8fa5273d4a9f31fb6afc885efbb1f2f86ca9d68b1bba4c1c97e8deed56",
+    "rpc.go": "6a5d29737047ecdcc2286b68a35df3330affa9dd8948ffbd5fde09104eed7899",
+    "rpc_limits_test.go": "6c0361cbda2870b3d4abf578b7313acc44728ed78de0ea92336c8c1170ee39b1",
+    "rpc_test.go": "4db20f87186685ef4bd78bc0e021940a8afe718a28ae8bddd6b66bede3017468",
+    "sproto.go": "2d35ffddf1ec0492fe6425f3d1dd7ede5d4edb3794773f6971fc4f36ceb80f4d",
+    "sproto_test.go": "20a255950d0628f27a00cf5923448d524c729b05f16ed18df3a095d2c6449d9e"
+  },
+  "baselineGoSource": {
+    "decode.go": "b3cbbe248d17fe770add10ba93e5942fe5c54c13eba1c416135d83cff890e65e",
+    "decode_pointer.go": "5cf91e619c80895785046b396dbf1861a61281cb0b6c3d954cd07d99b8bfd961",
+    "encode.go": "ee0fb24ed0bbc8755052d8de4fd77c38307b3ac64656176a5299d4e1069cdf3f",
+    "encode_integer_record.go": "b1bfe815adcbfabd2de0463d4f28b41efa6b8f7d7df535efc00669e84d53d2d4",
+    "encode_pointer.go": "e7a239568a0fc8788404de6f5bc0d5e2ac092fa559f0a6bfd4561fdc155f81c1",
+    "encode_test.go": "d28095ae5b5b820eb0d5aed634397bb86159361b5876c3126100d59e37d41099",
+    "fuzz_test.go": "10eb7cb2d2fcd8afe47b6880cd61f64121f17b0a3355a6073b41ceb87e8d435c",
+    "limits.go": "223a9ec3a68c4fb4c5938332132692cec3658fee75aceea2e26076860fe94907",
+    "limits_test.go": "0f261965aeb66f5752b53a461518668a0e9db68be312aeb9c0ff78786a9ddcad",
+    "meta.go": "6badd4a5ac60d8a15caaa1f35634268101c436b275cf4a0fe120b91db417d217",
+    "official_compat_test.go": "fa413db0126e78205f7ee2d56f8f5d521bc29d82b723953385b79b0407412b60",
+    "pack.go": "724bae9b4a9d18c3fe2028d9a5d73dcd43c3779ae3a3bf12cd4c8be56630b6b9",
+    "pack_test.go": "70e79e8fa5273d4a9f31fb6afc885efbb1f2f86ca9d68b1bba4c1c97e8deed56",
+    "rpc.go": "6a5d29737047ecdcc2286b68a35df3330affa9dd8948ffbd5fde09104eed7899",
+    "rpc_limits_test.go": "6c0361cbda2870b3d4abf578b7313acc44728ed78de0ea92336c8c1170ee39b1",
+    "rpc_test.go": "4db20f87186685ef4bd78bc0e021940a8afe718a28ae8bddd6b66bede3017468",
+    "sproto.go": "2d35ffddf1ec0492fe6425f3d1dd7ede5d4edb3794773f6971fc4f36ceb80f4d",
+    "sproto_test.go": "20a255950d0628f27a00cf5923448d524c729b05f16ed18df3a095d2c6449d9e"
+  },
+  "formalDependency": "v0.4.0;go.mod/go.sum unchanged",
+  "decode": "frozen,all source hashes unchanged",
+  "fixedPlan": "280 independent processes once;no timing retry/source/probe/plan tuning",
+  "independentAnalysis": {
+    "processes": 280,
+    "blocks": 26880,
+    "quartets": 6720,
+    "rounds": 1680,
+    "snapshots": 1120
+  },
+  "freshComparedKeys": [
+    "baselineCommit",
+    "mode",
+    "goVersion",
+    "gsrHead",
+    "environment",
+    "generatedGoInputs",
+    "beforeGoSource",
+    "candidateGoSource",
+    "harnessGoSource",
+    "fixtures",
+    "tools",
+    "selectedCases",
+    "diagnosticPlan",
+    "driverInputs"
+  ],
+  "assembly": {
+    "self": {
+      "symbolicInstructions": 288,
+      "frameBytes": 112,
+      "rawSha256": "d92707873bfb761fcfaddfeeb9369b2f0d2ceff525f69c9fc6b4ae96d14a64a3",
+      "curatedSha256": "1ae8e9f601c11ba7e0ccc602f55d213f7b8db32a9b34d1fe80dd71d7e9c79eb3"
+    },
+    "clone": {
+      "symbolicInstructions": 288,
+      "frameBytes": 112,
+      "rawSha256": "f464f31e9a20596b317708018d4ddb5eb694fb9a32c5d8f4f8a36dd4e029b8c4",
+      "curatedSha256": "f1d4b17392c3f3a50e8b705b8d7a6e47cd8e373d7c9c9525639a3b18d3db3cdc"
+    },
+    "pass1": {
+      "symbolicInstructions": 296,
+      "frameBytes": 112,
+      "rawSha256": "9fbfad064965b03933fad76d74a85bd93b9cc67e7f496f92f6049110dbff6963",
+      "curatedSha256": "09a04be1a7802e6328de6bfb42a154a85f5688aec256d41361af758255c56a94"
+    },
+    "pass2": {
+      "symbolicInstructions": 296,
+      "frameBytes": 112,
+      "rawSha256": "c24951b7e0eb45b126bde6607a9328ef721e2907f454b3169430ca71eb79429f",
+      "curatedSha256": "1be75a18ad600d172174ae690181fd48f09dd8c3cc6e3b0659a749c21597d5b9"
+    }
+  },
+  "goModuleFileSha256": {
+    "self/candidate/go.mod": "39d81a69b8c51ec559f4683d616793a35f4133c89de1ca67ba813e9d1011edbe",
+    "self/harness/go.mod": "cfe1adf6eb243d4e3eec186c6c9e1a23b7d0bf58847565e4ea42c3daf647dcc0",
+    "self/before/go.mod": "e48e423659f833523f0cebbac11fc4ea73c6c7300c990543b9b7f1b510f87a7b",
+    "self/harness/go.sum": "2c3413439101b41d0f5f210b290a88513add402ba67058d79959d324e39f02b8",
+    "clone/candidate/go.mod": "39d81a69b8c51ec559f4683d616793a35f4133c89de1ca67ba813e9d1011edbe",
+    "clone/harness/go.mod": "e8d1a90e527fa5c030801a9e860a2e85ce45cd87ecd66975a290bf58e59abe8c",
+    "clone/before/go.mod": "e48e423659f833523f0cebbac11fc4ea73c6c7300c990543b9b7f1b510f87a7b",
+    "clone/harness/go.sum": "2c3413439101b41d0f5f210b290a88513add402ba67058d79959d324e39f02b8",
+    "pass1/candidate/go.mod": "39d81a69b8c51ec559f4683d616793a35f4133c89de1ca67ba813e9d1011edbe",
+    "pass1/harness/go.mod": "3fb2b2c3ed92be3c03a1e3c762c527680dc6a159d6e8549e4eeedbdd5457841a",
+    "pass1/before/go.mod": "e48e423659f833523f0cebbac11fc4ea73c6c7300c990543b9b7f1b510f87a7b",
+    "pass1/harness/go.sum": "2c3413439101b41d0f5f210b290a88513add402ba67058d79959d324e39f02b8",
+    "pass2/candidate/go.mod": "39d81a69b8c51ec559f4683d616793a35f4133c89de1ca67ba813e9d1011edbe",
+    "pass2/harness/go.mod": "d7323fd75cbb6f677924d59954bb972946460a12389aed067ab5212465c1b0b2",
+    "pass2/before/go.mod": "e48e423659f833523f0cebbac11fc4ea73c6c7300c990543b9b7f1b510f87a7b",
+    "pass2/harness/go.sum": "2c3413439101b41d0f5f210b290a88513add402ba67058d79959d324e39f02b8"
+  },
+  "integrationBinarySha256": "3779319e3eb19774602cff4c2aa37150f4c0bc2e597168f459106090debe2885",
+  "integrationBuildInfoRawSha256": "79a42faf3e71c6d4eb64a3ac6785dba7dc5cf2f0e5eeee85db508e6ca298fa08",
+  "integrationModfileSha256": "8185a8af0fb38039dfc8e7abd9fc917feb0617ddb60fa93ea53a454efbba84cb",
+  "oracle": {
+    "officialCommit": "e93fd5a0653b2bcab38d3b830958bf2e3a901b5f",
+    "scope": "Preserved official C core and identical Lua facade match historical SHA;parser copied from read-only Skynet,not asserted to be pinned upstream revision.No source/binary rebuild or network fetch.",
+    "files": {
+      "sproto/core.so": {
+        "source": "/private/tmp/gsr-official-sproto-review/sproto/core.so",
+        "sha256": "ab4ff727b6f91f43712efd6161fc2f3ddc4bb24738d70fd2c098afcbc39df05f",
+        "matchesPreviouslyPinnedOfficial": true
+      },
+      "sproto.lua": {
+        "source": "/Users/lijiawang/Documents/cocos/laya/skynet/lualib/sproto.lua",
+        "sha256": "ca8027fa957f07c3e8b0b5cb18f2f75911bbf12783b9224b02975359ac59d234",
+        "matchesPreviouslyPinnedOfficial": true
+      },
+      "sprotoparser.lua": {
+        "source": "/Users/lijiawang/Documents/cocos/laya/skynet/lualib/sprotoparser.lua",
+        "sha256": "39e8637243055917d9dfb153cab18f5464339f4ae7cfce53ac13e1c7245bcde1",
+        "matchesPreviouslyPinnedOfficial": null
+      }
+    }
+  },
+  "acceptance": {
+    "commands": 7,
+    "exitCode": 0,
+    "goTsPass": 7,
+    "goTsSkipped": 0,
+    "fuzzPackExecutions": 5487,
+    "packFuzzNoProgressAfter3s": true,
+    "fuzzCodecExecutions": 416938,
+    "codecNewInteresting": 0
+  },
+  "preflight": {
+    "drafts": {
+      "branch-window": {
+        "sourceSha256": "b82f609abe3258604b1de5c087b04ad5be88037dd799641e866f1adc2dcaa413",
+        "binarySha256": "d58012ecb69df3caa0f950481889150f867d65b3065d97cba132b2b070dc42a6",
+        "rawAssemblySha256": "5042814b240ec5f5dfefc0c401ec413f606bd93c0395fddccb45fa83c103f608",
+        "symbolicInstructions": 304,
+        "frameBytes": 112,
+        "testCommandsSha256": "983654339d94dcb60c70241377ee42bd261fbd78af4303fd586b3934c555cbd1"
+      },
+      "count-bias": {
+        "sourceSha256": "d41a074bbb687b634119cd381b3c1c3376d3e9eb6c2f73e20ab221602f4a55a3",
+        "binarySha256": "02f2abc5d84fc3b89b4091daaec3f522cf8a5acf72884310aa6d5d19158b6396",
+        "rawAssemblySha256": "a0c0a19cc9dda4f7dba4442ebd1e7bb260e6de34d8b1673ca2c5b8b186dd344e",
+        "symbolicInstructions": 288,
+        "frameBytes": 112,
+        "testCommandsSha256": "f3e345c326b08cc53c94ce32a70b828fc056e2486642d28868c680d3c08b9cac"
+      },
+      "full-window": {
+        "sourceSha256": "99c642407cd0b44a2a5d09636c83ce6f2e185aead9937014e96fcc8a9757780a",
+        "binarySha256": "908231c54167a14ea6687271b9c89f1076f0599fb996b8f6a504ad46e914ed7b",
+        "rawAssemblySha256": "36708c0458712fe4a10df12c43a7d117e44127c1ab386ab6ad1c64e40e930c2f",
+        "symbolicInstructions": 296,
+        "frameBytes": 112,
+        "testCommandsSha256": "e5fef3f7e1d86d18d7b4d1c094e1ff54ad87b06b1f516d506e58565216f2fb6b"
+      }
+    },
+    "noTimingForFirstTwo": true,
+    "compilerRule": {
+      "path": "/Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/cmd/compile/internal/ssa/_gen/ARM64.rules",
+      "sha256": "79f9b5aac7a01b6841baa4107fa4ae49bbdeeeb30e1bfdd7b015e5e8894b0285",
+      "line1140": "(ADD a l:(MUL  x y)) && l.Uses==1 && clobber(l) => (MADD a x y)",
+      "note": "Rule requires multiply single use and clobber;actual draft has noMADD.Not attributing exact missing-fusion reason withoutSSA evidence."
+    }
+  },
+  "checks": [
+    "all3 draft existing Pack/EncodePacked contracts and17984 old/new differentials;first2 not timed",
+    "four harness statistics/selection/GC/fixtures/metrics/vet",
+    "70-case name/order exact in all four modes before timing",
+    "sampleBlock/blockCalls byte identical",
+    "280 per-case raw records match merged arrays and SHA",
+    "fresh archives and all source/generated/fixture/driver/probe/binary SHA",
+    "exact sampled candidate equals production Go sources;only pack.go differs from0b38019",
+    "library full/official C-Lua/race/checkptr/vet and finite fuzz",
+    "GSR three packages and GoTS7/7,module-info confirms local replacement",
+    "both diff checks;gofmt;new artifact whitespace"
+  ],
+  "curationNotes": [
+    "Assembly and module-info trailing whitespace removed only;raw/curated hashes recorded.Sampling inputs/raw untouched.",
+    "Oracle core.so and Lua facade match pinned historical official SHA;parser from read-only Skynet separately attributed.No C rebuild."
+  ],
+  "limitations": [
+    "self46/70 clone51/70;failed controls retained",
+    "cumulative direction differs for some APIs;227.795/206.939/44.994ms blocks and all outliers retained",
+    "allocation medians70/69/68/68 with16-byte observational tails",
+    "ASCII4KiB request and array-record request observed costs retained",
+    "heap snapshots are not peaks;limiter0 does not explain all timing noise",
+    "Pack fuzz only5487 executions and stalled after3s;finite coverage"
+  ],
+  "notRun": [
+    "new PB/TS ranking",
+    "push/release/tag/dependency upgrade",
+    "timing retries",
+    "additional production optimization after freezing the final candidate"
+  ],
+  "commandTotalSeconds": 341.1759924646467,
+  "samplingProcessTotalSeconds": 330.30007591843605,
+  "artifactSha256": {
+    ".gitattributes": "c4862ab8b1cf11dcff017de062647e83d44a030215e9956693bd6e9ba704037a",
+    "RESULTS.md": "bf9c14f3e34789de89b132cd20f03ea279214a7f7b538d9acc9219edee7e2100",
+    "acceptance.json": "cdf96c8e07c8fecffd04a27e3c5a6de1f08de001d26abbb94d6393b4d1539a86",
+    "analysis.json": "8696ddca7f4910cf998bcc39553070be87ee74152682646a6449fed08f7b5622",
+    "analyze.py": "235d174f992512dff86964f92d005d9f57d102050b0156e854aedf447a8aa7a9",
+    "before-compiler.txt": "7aa6c9b650c2c034a11bbd01d65ba33122d7171c85b77af3631a46e1a1510b0f",
+    "candidate-compiler.txt": "4ce7229302f820556677d297f459bb342ae39bb734b0d77e42f21816f2741c1c",
+    "candidate.patch": "c32293b006e30567bc0827b99d009523f4e33710b4139093a5319749e177b9f3",
+    "clone/case-list.json": "1d1b40403421c92074eeb4ed1b8028c95b14654c36c35b67991795b767977652",
+    "clone/inputs.json": "fe99ec7699f6567c85e19b4ab018749a95209e9263e312d030ea326d1f78bc48",
+    "clone/raw.json": "efeea1a7d0cbb1a2065d58c5a5d7846a30b64e586b37bec0e0109475cf36722f",
+    "clone/summary.json": "c0463a9629023298dab15f6df782d0ea9730e0e470f22606727272b0034ad6fa",
+    "clone-pack-assembly.txt": "f1d4b17392c3f3a50e8b705b8d7a6e47cd8e373d7c9c9525639a3b18d3db3cdc",
+    "commands.json": "af3f0ed0e5676e5e88dca6d5850b123ec73dae7408e1f6eddfabd45abacdf0c8",
+    "integration-build-info.txt": "27b5f9c3221bbee02d1778d19a99df4b1ec86acc3fa3a2dd07df7591d05a3e5e",
+    "oracle-provenance.json": "454b89c988dfb0dad357bcef351ea82f5d9141ecb8b61ca5e53d7ccd73b6294e",
+    "pass1/case-list.json": "1d1b40403421c92074eeb4ed1b8028c95b14654c36c35b67991795b767977652",
+    "pass1/inputs.json": "465fbb9a0ecd80e04ce7dd073fc98fd7655f5f2efcbb6f0aeae111914f61c760",
+    "pass1/raw.json": "6ade74cdca1b6f069d82bb4d9f7eec9561e8272351cee5ac6929fa7b576eb072",
+    "pass1/summary.json": "b877507c531568109180232668177449b483c210923828fcdd78b6f5b6d92f65",
+    "pass1-pack-assembly.txt": "09a04be1a7802e6328de6bfb42a154a85f5688aec256d41361af758255c56a94",
+    "pass2/case-list.json": "1d1b40403421c92074eeb4ed1b8028c95b14654c36c35b67991795b767977652",
+    "pass2/inputs.json": "759eefcd486fb9af12509c64f8a00cfb3333d54126d5721e8f3b6f19f6acdb21",
+    "pass2/raw.json": "5b1453c04eae076fea47131595aed75b5c1ece64188d94464f6704756c7b7b7f",
+    "pass2/summary.json": "a8105bd6036f840ded0867786edd87615de64f532a0a9065d29772ff4ba15c32",
+    "pass2-pack-assembly.txt": "1be75a18ad600d172174ae690181fd48f09dd8c3cc6e3b0659a749c21597d5b9",
+    "plan.json": "1febcf0f21adce21d0d361f023da10e98497569b82ecea4e30879dccb653cb00",
+    "preflight/branch-window-assembly.txt": "986d33af224e8fbd3d665664188e3bcbad68c1a99c55338caa46879447da358f",
+    "preflight/branch-window-commands.json": "983654339d94dcb60c70241377ee42bd261fbd78af4303fd586b3934c555cbd1",
+    "preflight/branch-window.patch": "cba5f3c4b09e343114066883e50e31917ec3023eb5da818592a1ce8191d35d27",
+    "preflight/count-bias-assembly.txt": "547725da2bf5fde3676cf730fb8ea4099e18cf7b6e235f39edb3db851b803b23",
+    "preflight/count-bias-commands.json": "f3e345c326b08cc53c94ce32a70b828fc056e2486642d28868c680d3c08b9cac",
+    "preflight/count-bias.patch": "0765b7080e20363ec055f8cb2765754254ab5da877cd1c1b207f0a87d2d76e1a",
+    "preflight/full-window-assembly.txt": "f099d002f7540625d0e3f37b789b923015b46bad0292c91b56dc77e688271695",
+    "preflight/full-window-commands.json": "e5fef3f7e1d86d18d7b4d1c094e1ff54ad87b06b1f516d506e58565216f2fb6b",
+    "preflight/summary.json": "395d2593c3871c30b0db0749812f6528762793860b9fb392f1eddaa3f33264a4",
+    "reproduce.py": "36204955e07420fe45aa07b2c478e29c2b3900d0718e9e9b71e99275b839810a",
+    "self/case-list.json": "1d1b40403421c92074eeb4ed1b8028c95b14654c36c35b67991795b767977652",
+    "self/inputs.json": "5149ccee612a69c637dceff16b426d58d7bc82078b1213b2dcb63aeea75c3315",
+    "self/raw.json": "24d512da357e2c449bc8df0e3bd94748ff7e78fb3e71c72cabf2a2c262267f21",
+    "self/summary.json": "9595a5b300b1b7df7e8c92348f490fc148c418e5ed12d2c5aa5f949a9aece7ad",
+    "self-pack-assembly.txt": "1ae8e9f601c11ba7e0ccc602f55d213f7b8db32a9b34d1fe80dd71d7e9c79eb3"
+  },
+  "centralDocumentSha256": {
+    "docs/RFC-GOSPROTO-PERFORMANCE.md": "74d427080e6c301c3a9c616ae1fed0dbc1d8d97e21772a33805311336eaa793e",
+    "docs/SPROTO-INTEGRATION.md": "e6025bb5e0e32f5a81c23437f74edb1444d1373b33505736319a7405e559da82",
+    "docs/VALIDATION-STATUS.md": "1e4518929032c02a101d281b4a5042a5c3bb1d10d5e16b76177e89d95eba9e1d",
+    "examples/websocket-gate/benchmarks/README.md": "2f3421b91fb3d225bf6d201101d91044623b728c9399cc9b732ea58fccbdf764"
+  }
+}

@@ -74,7 +74,9 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 
 [普通word连续段实验](../../../docs/benchmarks/2026-10-19-gosproto-pack-contiguous/RESULTS.md) 固定原70项/四组280进程；批量写出使目标Pack和主要RPC两轮回退，增加32条符号指令，候选仅存归档未应用到库。既有契约/17,984差分、harness/vet、26,880块独立复算/fresh指纹通过。self/clone13/70、42/70且limiter均零，失败、小收益和离群全部保留；该轮已本地提交为 GSR `d1dceaa`，未推送；生产/Decode/正式依赖不变。
 
-[固定payload视图](../../../docs/benchmarks/2026-10-19-gosproto-pack-payload/RESULTS.md) 只消除普通word重复索引+1，指令296→288，帧不变；原70项两轮大型Pack快8.87%/9.13%，整数数组PEncode快4.70%/4.19%，主要RPC与小收益保留。控制56/70、56/70，全部累计翻转/尾差/异常块/wide64成本披露。17,984差分、复算/fresh指纹、库/官方/race/checkptr/vet/有限fuzz/GSR/GoTS通过。新库代码和GSR报告未提交，Decode/正式依赖不变。
+[固定payload视图](../../../docs/benchmarks/2026-10-19-gosproto-pack-payload/RESULTS.md) 只消除普通word重复索引+1，指令296→288，帧不变；原70项两轮大型Pack快8.87%/9.13%，整数数组PEncode快4.70%/4.19%，主要RPC与小收益保留。控制56/70、56/70，全部累计翻转/尾差/异常块/wide64成本披露。17,984差分、复算/fresh指纹、库/官方/race/checkptr/vet/有限fuzz/GSR/GoTS通过。该轮已本地提交为库 `0b38019`、GSR `31b3f99`，未推送，Decode/正式依赖不变。
+
+[固定len/cap视图](../../../docs/benchmarks/2026-10-19-gosproto-pack-window/RESULTS.md) 两份草稿只预检，唯一三索引候选固定原70项/四组比较；整数数组PEncode快6.07%/3.73%，真实通知快5.68%/5.17%，精确候选保留。self46/70、clone51/70，ASCII请求/大记录成本、累计翻转/全部失败/尾差保留。既有契约/17,984差分、复算/fresh、库/官方/race/checkptr/vet/有限fuzz/GSR/GoTS7/7通过。新库代码和GSR报告未提交，Decode/正式依赖不变。
 
 ## 比较口径
 

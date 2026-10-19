@@ -1,0 +1,35 @@
+{
+  "drafts": {
+    "branch-window": {
+      "sourceSha256": "b82f609abe3258604b1de5c087b04ad5be88037dd799641e866f1adc2dcaa413",
+      "binarySha256": "d58012ecb69df3caa0f950481889150f867d65b3065d97cba132b2b070dc42a6",
+      "rawAssemblySha256": "5042814b240ec5f5dfefc0c401ec413f606bd93c0395fddccb45fa83c103f608",
+      "symbolicInstructions": 304,
+      "frameBytes": 112,
+      "testCommandsSha256": "983654339d94dcb60c70241377ee42bd261fbd78af4303fd586b3934c555cbd1"
+    },
+    "count-bias": {
+      "sourceSha256": "d41a074bbb687b634119cd381b3c1c3376d3e9eb6c2f73e20ab221602f4a55a3",
+      "binarySha256": "02f2abc5d84fc3b89b4091daaec3f522cf8a5acf72884310aa6d5d19158b6396",
+      "rawAssemblySha256": "a0c0a19cc9dda4f7dba4442ebd1e7bb260e6de34d8b1673ca2c5b8b186dd344e",
+      "symbolicInstructions": 288,
+      "frameBytes": 112,
+      "testCommandsSha256": "f3e345c326b08cc53c94ce32a70b828fc056e2486642d28868c680d3c08b9cac"
+    },
+    "full-window": {
+      "sourceSha256": "99c642407cd0b44a2a5d09636c83ce6f2e185aead9937014e96fcc8a9757780a",
+      "binarySha256": "908231c54167a14ea6687271b9c89f1076f0599fb996b8f6a504ad46e914ed7b",
+      "rawAssemblySha256": "36708c0458712fe4a10df12c43a7d117e44127c1ab386ab6ad1c64e40e930c2f",
+      "symbolicInstructions": 296,
+      "frameBytes": 112,
+      "testCommandsSha256": "e5fef3f7e1d86d18d7b4d1c094e1ff54ad87b06b1f516d506e58565216f2fb6b"
+    }
+  },
+  "noTimingForFirstTwo": true,
+  "compilerRule": {
+    "path": "/Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/cmd/compile/internal/ssa/_gen/ARM64.rules",
+    "sha256": "79f9b5aac7a01b6841baa4107fa4ae49bbdeeeb30e1bfdd7b015e5e8894b0285",
+    "line1140": "(ADD a l:(MUL  x y)) && l.Uses==1 && clobber(l) => (MADD a x y)",
+    "note": "Rule requires multiply single use and clobber;actual draft has noMADD.Not attributing exact missing-fusion reason withoutSSA evidence."
+  }
+}

@@ -247,4 +247,7 @@ Pack前缀已提交为库a161158、GSR d6c672c，均未推送。后续只读布�
 连续非零段批量写出已做固定原70项/四组280进程实验，目标整数数组Pack与大型Pack两轮回退，主要RPC也变慢；增加32条Pack符号指令、帧不变。候选仅留归档，未应用到库；小收益、所有控制失败/离群/累计原值保留，不按最低比例裁决。17,984差分、既有Pack/工作区契约、harness/vet、26,880块独立复算与fresh指纹通过。见[连续段实验](benchmarks/2026-10-19-gosproto-pack-contiguous/RESULTS.md)。self/clone13/70、42/70且limiter全零，测量仍有不确定性；库干净，Decode/正式依赖不变；该轮已本地提交为 GSR `d1dceaa`，未推送。
 
 
-普通Pack固定payload视图已保留：不增分支，写入地址/顺序不变，符号指令296→288、帧112B不变。原70项四组280进程两轮，大型Pack快约8.9%/9.1%，整数数组PEncode快4.7%/4.2%，主要RPC改善；低于2%的小收益照常计入。控制各56/70、所有累计翻转/异常块/尾差及wide64小成本保留。既有契约/17,984差分、独立复算/fresh指纹、库/官方/race/checkptr/vet/有限fuzz/GSR三包/GoTS7/7通过，Pack计数停增和oracle来源限制明确记录。见[固定payload报告](benchmarks/2026-10-19-gosproto-pack-payload/RESULTS.md)。新库pack.go和GSR文档未提交，不变更正式依赖或Decode。
+普通Pack固定payload视图已保留：不增分支，写入地址/顺序不变，符号指令296→288、帧112B不变。原70项四组280进程两轮，大型Pack快约8.9%/9.1%，整数数组PEncode快4.7%/4.2%，主要RPC改善；低于2%的小收益照常计入。控制各56/70、所有累计翻转/异常块/尾差及wide64小成本保留。既有契约/17,984差分、独立复算/fresh指纹、库/官方/race/checkptr/vet/有限fuzz/GSR三包/GoTS7/7通过，Pack计数停增和oracle来源限制明确记录。见[固定payload报告](benchmarks/2026-10-19-gosproto-pack-payload/RESULTS.md)。该轮已本地提交为库 `0b38019`、GSR `31b3f99`，未推送，不变更正式依赖或Decode。
+
+
+三索引固定输出视图已保留到工作树：临时len/cap为3/9、公开cap不变，无新分支/分配/unsafe。原70项两轮整数数组PEncode/真实通知/请求同向改善，低比例收益、ASCII请求和大记录成本、累计翻转与全部失败/尾差保留。两个未达预检目标的草稿不计时。既有契约/17,984差分、26,880块复算/fresh指纹、库/官方/race/checkptr/vet/有限fuzz/GSR三包/GoTS7/7通过，Pack计数停增限制如实记录。见[固定len/cap报告](benchmarks/2026-10-19-gosproto-pack-window/RESULTS.md)。新库pack.go和GSR报告未提交，Decode/正式依赖不变；后续先刷新当前组合profile。

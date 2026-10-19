@@ -6,7 +6,7 @@
 
 前两轮以已发布的 gosproto v0.4.0 为版本基线；下一轮从已提交的 `6012b06` 做增量，不从 v0.4.0 重复实施。实现改动应在独立 gosproto 仓库进行，GSR 提供真实接线和跨语言 Benchmark；不修改 Go module cache，也不将库源码复制到 GSR。
 
-当前切片（2026-10-19）：连续段实验已本地提交为 GSR `d1dceaa`，未推送。后续只改普通Pack写出的固定payload视图，296→288条符号指令、112B帧不变；两轮大型Pack快8.87%/9.13%、整数数组PEncode快4.70%/4.19%，主要RPC同向改善，保留精确候选。新库pack.go与GSR报告未提交，见第48节；控制失败、累计方向翻转、尾差和wide64小成本全部披露。正式依赖v0.4.0、Decode冻结。
+当前切片（2026-10-19）：固定payload视图已本地提交为库 `0b38019`、GSR `31b3f99`，未推送。后续仅保留三索引固定len/cap视图候选；两轮整数数组PEncode快6.07%/3.73%、真实通知快5.68%/5.17%，同时有ASCII请求/大记录请求成本与累计翻转，见第49节。新pack.go和GSR报告未提交，正式依赖v0.4.0、Decode冻结。
 
 ## 1. 目标与证据
 
@@ -537,4 +537,11 @@ self/clone仅13/70、42/70通过，limiter全零，故不宣称损失比例精�
 
 保留dst[8]检查，普通word使用dst[1:9]的固定8字节视图，七个1+prefix索引改为0～7的prefix；地址/字节/store顺序、最终计数、容量与所有权完全相同，无新分支或unsafe。预检及实际二进制296→288条符号指令、112B帧不变。固定原70项四组280进程：大型Pack快8.87%/9.13%，整数数组PEncode快4.70%/4.19%，大型请求配对少154.1/206.5ns；4096条含数组记录的请求只快1.13%/0.83%也计入收益。精确候选保留到库工作树，尚未提交。
 
-self/clone各56/70通过，limiter全零；全部控制/分配尾差/累计值保留。大型PEncode、4096条full记录请求等有累计方向翻转（后者pass2有233.678ms/43调用的B块），wide64 PEncode两轮多39.0/4.0ns，不能只报配对赢家。既有契约/17,984差分、26,880块复算、harness/vet/fresh指纹、库全测/官方C-Lua/race/checkptr/vet、有限fuzz（Pack36,026且3s后停增，Codec442,757）、GSR三包/GoTS7/7零跳过通过；oracle沿用相同SHA的官方core和Lua facade，parser来源单独披露。见[固定payload报告](benchmarks/2026-10-19-gosproto-pack-payload/RESULTS.md)。新库代码/GSR文档待审查未提交，正式依赖/Decode不变；下一轮再看剩余切片定位和计数数据流，不在本轮叠加。
+self/clone各56/70通过，limiter全零；全部控制/分配尾差/累计值保留。大型PEncode、4096条full记录请求等有累计方向翻转（后者pass2有233.678ms/43调用的B块），wide64 PEncode两轮多39.0/4.0ns，不能只报配对赢家。既有契约/17,984差分、26,880块复算、harness/vet/fresh指纹、库全测/官方C-Lua/race/checkptr/vet、有限fuzz（Pack36,026且3s后停增，Codec442,757）、GSR三包/GoTS7/7零跳过通过；oracle沿用相同SHA的官方core和Lua facade，parser来源单独披露。见[固定payload报告](benchmarks/2026-10-19-gosproto-pack-payload/RESULTS.md)。该轮已本地提交为库 `0b38019`、GSR `31b3f99`，未推送，正式依赖/Decode不变；下一轮再看剩余切片定位和计数数据流，不在本轮叠加。
+
+
+## 49. 分支内固定len/cap视图
+
+三份计时前草稿均通过既有契约/17,984差分：两索引固定len仍有指针掩码（304条），最高字节计数偏置未生成MADD（288条），不计时；只选三索引固定len/cap3/9（296条，基线288，均112B帧）测量，目标动态定位序列消失，未按总指令数自动否决。所有生产调用者输出len==cap，临时cap限制不影响公开结果cap或存储地址/顺序；计数/FF/尾块/预算不改。
+
+固定原70项四组280进程/26,880块独立复算：整数数组PEncode快6.07%/3.73%，真实通知快5.68%/5.17%、请求快3.92%/5.08%，这些入口控制均通过，保留精确候选。self46/70、clone51/70；ASCII4KiB请求多5.1/16.5ns、大记录请求多2,284.1/1,291.7ns、全部累计翻转/异常块/16B尾差均保留，不宣称全面提速。harness/vet/fresh/所有指纹、库全测/官方/race/checkptr/vet/有限fuzz（Pack5,487且3s后停增；Codec416,938）、GSR三包/GoTS7/7通过。见[固定len/cap报告](benchmarks/2026-10-19-gosproto-pack-window/RESULTS.md)。新库仅pack.go与GSR文档未提交，正式依赖/Decode不变；下一轮先刷新当前组合路径profile，再决定后续优化。
