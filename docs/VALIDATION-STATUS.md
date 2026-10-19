@@ -4,9 +4,13 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## Decode解冻与入口复核（2026-10-19）
+
+用户于2026-10-19明确解除Decode阶段性冻结，入口、解析和构造/写入可继续按证据优化。当前[入口复核](benchmarks/2026-10-19-gosproto-decode-resume/RESULTS.md)保留即时类型证明与地址借用分离：大型Decode两轮快2.37%/2.02%、nil4096 Decode快6.19%/7.06%，大型通知Dispatch小成本/PDecode控制失败及累计翻转完整保留。新40项160进程/15,360块独立复算、fresh与来源核对，库全测/官方/race/checkptr/vet、有限Codec/Decode fuzz497,350/1,217次、GSR三包及GoTS7/7零跳过通过；Decode fuzz后段计数停止保留原输出，未重复PB/TS排名。新库实现与报告未提交，未推送，正式依赖仍v0.4.0，Decode继续开放。
+
 ## 非inline内容视图复用（2026-10-19）
 
-库2ea804e/GSRb004da7上只复用记录非inline内容切片，源码等于冻结候选；216条指令/32B帧不变，panic调用点15→14，inline新增两条清零指令。复用已提交记录边界等契约、109形态525差分，无新测试；原70项四组280进程/26,880块/6,720 quartet/1,680轮/1,120快照独立复算，fresh/全部指纹通过。self50/70、clone56/70，limiter零，分配中位数69/69/69/68相同；尾差/27项累计翻转/全部离群保留。harness/vet、库全测/官方C-Lua/race+checkptr/vet、10秒Codec fuzz512,102次（5个新增interesting，无失败）、GSR三包/GoTS7/7零跳过通过。见[内容视图报告](benchmarks/2026-10-19-gosproto-record-body-view/RESULTS.md)。保留小幅收益并接受full记录请求等成本，新库实现/GSR报告未提交，Decode/正式依赖不变；无失败准备/计时重试，不重复未改Pack随机fuzz。
+库2ea804e/GSRb004da7上只复用记录非inline内容切片，源码等于冻结候选；216条指令/32B帧不变，panic调用点15→14，inline新增两条清零指令。复用已提交记录边界等契约、109形态525差分，无新测试；原70项四组280进程/26,880块/6,720 quartet/1,680轮/1,120快照独立复算，fresh/全部指纹通过。self50/70、clone56/70，limiter零，分配中位数69/69/69/68相同；尾差/27项累计翻转/全部离群保留。harness/vet、库全测/官方C-Lua/race+checkptr/vet、10秒Codec fuzz512,102次（5个新增interesting，无失败）、GSR三包/GoTS7/7零跳过通过。见[内容视图报告](benchmarks/2026-10-19-gosproto-record-body-view/RESULTS.md)。保留小幅收益并接受full记录请求等成本，该轮已本地提交为库 `e50dfef`、GSR `29c954b`，未推送，正式依赖不变；无失败准备/计时重试，不重复未改Pack随机fuzz。
 
 ## inline整数延后内容视图（2026-10-19）
 
@@ -178,7 +182,7 @@ Decode 阶段性冻结记录已提交为 GSR `0db5ed0`，后续仍可回头优�
 
 复用原独立字节回归，17984 差分、完整库 race/checkptr/固定官方 C/Lua 对照、vet、Pack/Codec 各约十秒 fuzz、GSR 三包及 TS 构建/GoTS Plain/MAC 7/7、零跳过通过。Linux amd64/arm64/386 构建通过，未跨平台运行或重测 TS 性能。profile 的 kevent 干扰明确保留，不把采样份额当提速比例。具体输入、补丁、指纹、复现与范围见 [验收记录](benchmarks/2026-10-17-gosproto-pack-execution/RESULTS.md)。该轮已本地提交为 gosproto `faa6a21` / GSR `3626b3d`，未推送/发布，正式依赖仍为 v0.4.0。
 
-## Decode 性能阶段冻结（2026-10-17）
+## Decode 性能阶段冻结（历史：2026-10-17，2026-10-19已解除）
 
 上一轮回归/记录已本地提交为 gosproto `a09fb00`、GSR `d1beb28`，未推送。按用户决定单独验证 messageDecodePointer 入口：18 项五轮微基准与三种能力状态测试，选择一个候选进入 129 项五轮完整对照，共 735 个样本。
 

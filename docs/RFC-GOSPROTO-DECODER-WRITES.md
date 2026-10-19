@@ -2,6 +2,8 @@
 
 状态：2026-10-17，范围已按用户“提交，继续”采纳并完成最小实现，已本地提交为 gosproto `fc3246a`、GSR `862fa8b`。此前安全 inline 与提案/回归已分别本地提交为 gosproto `70d985c` / `5be3b26`、GSR `d0328fd` / `2872d46`；均未推送/发布。Decode 性能阶段已按用户决定冻结于 `a09fb00`（生产源码同 `fc3246a`），最终入口候选未达保留门槛，见 [冻结报告](benchmarks/2026-10-17-gosproto-decode-freeze/RESULTS.md)。正式依赖仍为 v0.4.0。下文保留提案依据，封装后的新数据见 [实施验收](benchmarks/2026-10-17-gosproto-decode-store/RESULTS.md)。
 
+当前状态（2026-10-19）：用户明确解除Decode阶段性冻结，允许按证据继续入口、解析和构造/写入优化；本页保留历史提案/验收，当前入口复核见[Decode解冻报告](benchmarks/2026-10-19-gosproto-decode-resume/RESULTS.md)。官方wire、预算、失败原子性、独占与写屏障约束不变。
+
 ## 问题与本轮证据
 
 [前轮同分配诊断](benchmarks/2026-10-17-gosproto-decode-analysis/RESULTS.md) 显示，大型消息 SP/PB 分配次数相近，固定 Item 类型化赋值仍能减少执行成本。安全 inline 已有约 5% Decode 收益；本轮另建整数叶子数组专用 parser 只得到约 3.1% Decode、1.3% PDecode 收益，不值得维护重复解析器，已撤回。

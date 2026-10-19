@@ -1,0 +1,48 @@
+File: profile.test
+Type: cpu
+Time: 2026-10-19 12:39:05 CST
+Duration: 2.52s, Total samples = 2.23s (88.33%)
+Showing nodes accounting for 2.08s, 93.27% of 2.23s total
+Dropped 38 nodes (cum <= 0.01s)
+Showing top 40 nodes out of 46
+      flat  flat%   sum%        cum   cum%
+     1.62s 72.65% 72.65%      1.62s 72.65%  runtime.kevent
+     0.14s  6.28% 78.92%      0.20s  8.97%  github.com/cnooljaw/gosproto.UnpackWithLimit
+     0.06s  2.69% 81.61%      0.39s 17.49%  github.com/cnooljaw/gosproto.decodeMessage
+     0.03s  1.35% 82.96%      0.36s 16.14%  github.com/cnooljaw/gosproto.decodeStructSlice
+     0.03s  1.35% 84.30%      0.23s 10.31%  runtime.mallocgc
+     0.03s  1.35% 85.65%      0.05s  2.24%  runtime.scanobject
+     0.02s   0.9% 86.55%      0.03s  1.35%  gcWriteBarrier
+     0.02s   0.9% 87.44%      0.02s   0.9%  math/bits.OnesCount8 (inline)
+     0.02s   0.9% 88.34%      0.02s   0.9%  runtime.(*mspan).writeHeapBitsSmall
+     0.02s   0.9% 89.24%      0.02s   0.9%  runtime.madvise
+     0.02s   0.9% 90.13%      0.03s  1.35%  runtime.mallocgcSmallNoscan
+     0.02s   0.9% 91.03%      0.07s  3.14%  runtime.mallocgcSmallScanNoHeader
+     0.02s   0.9% 91.93%      0.02s   0.9%  runtime.markBits.setMarked (inline)
+     0.01s  0.45% 92.38%      0.02s   0.9%  reflect.Value.Set
+     0.01s  0.45% 92.83%      0.02s   0.9%  runtime.greyobject
+     0.01s  0.45% 93.27%      0.04s  1.79%  runtime.mallocgcTiny
+         0     0% 93.27%      0.59s 26.46%  codecpairstool.BenchmarkCurrentOperation
+         0     0% 93.27%      0.59s 26.46%  codecpairstool.decodeBodyOperations.func6
+         0     0% 93.27%      0.39s 17.49%  github.com/cnooljaw/gosproto.Decode (inline)
+         0     0% 93.27%      0.59s 26.46%  github.com/cnooljaw/gosproto.DecodePacked
+         0     0% 93.27%      0.39s 17.49%  github.com/cnooljaw/gosproto.DecodeWithLimits
+         0     0% 93.27%      0.20s  8.97%  github.com/cnooljaw/gosproto.Unpack (inline)
+         0     0% 93.27%      0.02s   0.9%  github.com/cnooljaw/gosproto.decodeIntSlice
+         0     0% 93.27%      0.04s  1.79%  github.com/cnooljaw/gosproto.decodePointer.setInteger (inline)
+         0     0% 93.27%      0.08s  3.59%  reflect.New
+         0     0% 93.27%      0.07s  3.14%  reflect.unsafe_New
+         0     0% 93.27%      0.03s  1.35%  runtime.(*mheap).alloc.func1
+         0     0% 93.27%      0.03s  1.35%  runtime.(*mheap).allocSpan
+         0     0% 93.27%      0.05s  2.24%  runtime.deductAssistCredit
+         0     0% 93.27%      0.05s  2.24%  runtime.gcAssistAlloc
+         0     0% 93.27%      0.05s  2.24%  runtime.gcAssistAlloc.func2
+         0     0% 93.27%      0.05s  2.24%  runtime.gcAssistAlloc1
+         0     0% 93.27%      0.05s  2.24%  runtime.gcDrainN
+         0     0% 93.27%      1.02s 45.74%  runtime.gcMarkTermination.func3
+         0     0% 93.27%      0.60s 26.91%  runtime.gcStart.func4
+         0     0% 93.27%      0.02s   0.9%  runtime.gcmarknewobject
+         0     0% 93.27%      0.02s   0.9%  runtime.heapSetTypeNoHeader (inline)
+         0     0% 93.27%      0.05s  2.24%  runtime.makeslice
+         0     0% 93.27%      1.62s 72.65%  runtime.netpoll
+         0     0% 93.27%      0.10s  4.48%  runtime.newobject

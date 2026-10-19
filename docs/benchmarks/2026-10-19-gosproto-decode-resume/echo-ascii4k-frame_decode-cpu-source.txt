@@ -1,0 +1,73 @@
+Total: 2.16s
+ROUTINE ======================== github.com/cnooljaw/gosproto.decodeMessage in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-decode-resume-v2/self/candidate/decode.go
+      10ms       80ms (flat, cum)  3.70% of Total
+         .          .    282:func decodeMessage(chunk []byte, schema *SprotoType, value reflect.Value, budget *decodeBudget) (int, error) {
+         .          .    283:	budget.depth++
+         .          .    284:	defer func() { budget.depth-- }()
+         .          .    285:	if budget.depth > budget.limits.MaxDepth {
+         .          .    286:		return 0, ErrLimit
+         .          .    287:	}
+         .          .    288:	if len(chunk) < 2 {
+         .          .    289:		return 0, ErrDecode
+         .          .    290:	}
+         .          .    291:	count := int(readUint16(chunk))
+         .          .    292:	total := 2 + count*2
+         .          .    293:	if total > len(chunk) {
+         .          .    294:		return 0, ErrDecode
+         .          .    295:	}
+         .          .    296:	if err := budget.add(count); err != nil {
+         .          .    297:		return 0, err
+         .          .    298:	}
+         .          .    299:	record := value.Elem()
+         .          .    300:	pointer := messageDecodePointer(schema, value)
+         .          .    301:	tag := 0
+         .          .    302:	for index := 0; index < count; index++ {
+         .          .    303:		entry := int(readUint16(chunk[2+index*2:]))
+         .          .    304:		if entry%2 == 1 {
+         .          .    305:			tag += (entry + 1) / 2
+         .          .    306:			continue
+         .          .    307:		}
+         .          .    308:		if tag > 65535 {
+         .          .    309:			return 0, ErrDecode
+         .          .    310:		}
+         .          .    311:		hasInline := entry != 0
+         .          .    312:		inline := uint16(entry/2 - 1)
+         .          .    313:		var content []byte
+         .          .    314:		if !hasInline {
+         .          .    315:			used, data, err := readChunk(chunk[total:])
+         .          .    316:			if err != nil {
+         .          .    317:				return 0, err
+         .          .    318:			}
+         .          .    319:			total += used
+         .          .    320:			content = data
+         .          .    321:		}
+         .          .    322:		field := schema.FieldByTag(tag)
+         .          .    323:		tag++
+         .          .    324:		if field == nil {
+         .          .    325:			continue
+         .          .    326:		}
+         .          .    327:		if hasInline && (field.Array || field.Wire == WireBytesName || field.Wire == WireStructName) {
+         .          .    328:			return 0, ErrDecode
+         .          .    329:		}
+         .          .    330:		if field.nativeInt64Pointer {
+         .          .    331:			bits, err := scalarBits(inline, hasInline, content)
+         .          .    332:			if err != nil {
+         .          .    333:				return 0, err
+         .          .    334:			}
+         .          .    335:			result := new(int64)
+         .          .    336:			*result = int64(bits)
+         .          .    337:			if !pointer.setInteger(schema, field, result) {
+         .          .    338:				record.Field(field.index[0]).Set(reflect.ValueOf(result))
+         .          .    339:			}
+         .          .    340:			continue
+         .          .    341:		}
+         .       70ms    342:		if err := field.dec(inline, hasInline, content, field, record.Field(field.index[0]), budget); err != nil {
+         .          .    343:			return 0, err
+         .          .    344:		}
+         .          .    345:	}
+      10ms       10ms    346:	return total, nil
+         .          .    347:}
+         .          .    348:
+         .          .    349:// Decode 解码一个结构体，使用默认有限预算，返回已消费的字节数。
+         .          .    350:func Decode(data []byte, message interface{}) (int, error) {
+         .          .    351:	return DecodeWithLimits(data, message, Limits{})

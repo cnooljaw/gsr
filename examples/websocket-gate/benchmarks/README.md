@@ -84,7 +84,9 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 
 [inline内容视图](../../../docs/benchmarks/2026-10-19-gosproto-record-inline/RESULTS.md) 原70项两轮大型请求快3.18%/2.44%、响应快2.29%/2.44%，分配不变；接受混合长记录等成本、28项累计翻转全留。既有数组测试补10个边界、基线/负向覆盖证据通过；self60/70、clone64/70，复算/fresh、库/官方/race/checkptr/vet/有限Codec fuzz/GSR/GoTS7/7通过。该轮已本地提交为库 `2ea804e`、GSR `b004da7`，未推送，Decode/正式依赖不变。
 
-[非inline内容视图复用](../../../docs/benchmarks/2026-10-19-gosproto-record-body-view/RESULTS.md) 原70项两轮大型PEncode快0.51%/0.77%、half4096请求少1.39/0.98µs，分配不变，full请求等成本/27项累计翻转全留。self50/70、clone56/70，216条/32B帧不变、panic调用点15→14；既有契约/525差分/复算/fresh、库/官方/race/checkptr/vet/有限Codec fuzz/GSR/GoTS7/7通过。新实现与报告未提交，Decode/正式依赖不变。
+[非inline内容视图复用](../../../docs/benchmarks/2026-10-19-gosproto-record-body-view/RESULTS.md) 原70项两轮大型PEncode快0.51%/0.77%、half4096请求少1.39/0.98µs，分配不变，full请求等成本/27项累计翻转全留。self50/70、clone56/70，216条/32B帧不变、panic调用点15→14；既有契约/525差分/复算/fresh、库/官方/race/checkptr/vet/有限Codec fuzz/GSR/GoTS7/7通过。该轮已本地提交为库 `e50dfef`、GSR `29c954b`，未推送，正式依赖不变。
+
+用户于2026-10-19明确解除Decode阶段性冻结，入口、解析和构造/写入可继续按证据优化。当前[入口复核](../../../docs/benchmarks/2026-10-19-gosproto-decode-resume/RESULTS.md)保留即时类型证明与地址借用分离：大型Decode两轮快2.37%/2.02%、nil4096 Decode快6.19%/7.06%，大型通知Dispatch小成本/PDecode控制失败及累计翻转完整保留。新40项160进程/15,360块独立复算、fresh与来源核对，库全测/官方/race/checkptr/vet、有限Codec/Decode fuzz497,350/1,217次、GSR三包及GoTS7/7零跳过通过；Decode fuzz后段计数停止保留原输出，未重复PB/TS排名。新库实现与报告未提交，未推送，正式依赖仍v0.4.0，Decode继续开放。
 
 
 
@@ -237,7 +239,7 @@ SPROTO_ORACLE_DIR=/path/to/pinned/sproto \
 
 [Decode 入口与普通 mask 候选筛选](../../../docs/benchmarks/2026-10-17-gosproto-decode-binding/RESULTS.md) 保存三个入口写法与固定八字节恢复的 918 个筛选样本。四个候选全部未采用；新增基线 profile、mask 分布和独立 FF 后继回归，未改生产代码或正式依赖；该轮已本地提交为 gosproto `a09fb00`、GSR `d1beb28`。
 
-[入口最终实验与 Decode 冻结](../../../docs/benchmarks/2026-10-17-gosproto-decode-freeze/RESULTS.md) 保存 90 个微基准与 645 个完整对照样本。入口约 -38.3%，大型 Decode/PDecode 仅 -2.25%/-1.28%，未达预定门槛，候选未采用。Decode 冻结于 `a09fb00`，正式依赖未变；阶段性冻结记录已本地提交为 GSR `0db5ed0`，后续仍可回头优化。
+[入口最终实验与 Decode 冻结](../../../docs/benchmarks/2026-10-17-gosproto-decode-freeze/RESULTS.md) 保存 90 个微基准与 645 个完整对照样本。入口约 -38.3%，大型 Decode/PDecode 仅 -2.25%/-1.28%，未达预定门槛，候选未采用。Decode当时冻结于 `a09fb00`，用户已于2026-10-19解除，见本页当前入口复核；正式依赖未变；阶段性冻结记录已本地提交为 GSR `0db5ed0`，后续仍可回头优化。
 
 [Pack 普通 word 执行路径](../../../docs/benchmarks/2026-10-17-gosproto-pack-execution/RESULTS.md) 保存当前 137 项五轮对照及三轮筛选。大型/整数数组 PEncode 约 -6.0%/-5.7%，分配不变，Decode 等控制不变；所有代价与验证范围一并保留；该轮已本地提交为 gosproto `faa6a21` / GSR `3626b3d`，未推送/发布。
 
