@@ -1,0 +1,171 @@
+package benchmarks
+
+import (
+ "bytes"
+ "crypto/sha256"
+ "encoding/hex"
+ "encoding/json"
+ "fmt"
+ "math/bits"
+ "reflect"
+ "testing"
+
+ sproto "github.com/cnooljaw/gosproto"
+ before "github.com/cnooljaw/gosproto-before"
+)
+
+type sharedWireMetadata struct {
+ Sample string
+ Variant string
+ PackedSHA256 string
+ RawSHA256 string
+ Length int
+ Capacity int
+ Alignment int
+ Spare int
+ OrdinaryWords int
+ ZeroMasks int
+ FFRuns int
+ SameBytesAcrossVariants bool
+ SameInputAcrossArms bool
+ SharedBetweenUnpackAndPDecode bool
+}
+
+var sharedWireRecords map[string]sharedWireMetadata
+
+type sharedWireSample struct {
+ name string
+ raw []byte
+ factory func() any
+}
+
+func sharedWireSamples(t testing.TB) []sharedWireSample {
+ t.Helper()
+ var samples []sharedWireSample
+ for _, sample:=range representativeCases(t) {
+  if sample.Name!="game_large" && sample.Name!="int32_edges" {continue}
+  _,factory:=representativeMessages(sample.Type)
+  message:=factory()
+  if err:=json.Unmarshal(sample.Data,message);err!=nil {t.Fatal(err)}
+  wire,err:=before.Encode(message)
+  current,currentErr:=sproto.Encode(message)
+  if err!=nil || currentErr!=nil || !bytes.Equal(wire,current) {t.Fatal("shared body wire differs",sample.Name,err,currentErr)}
+  samples=append(samples,sharedWireSample{sample.Name,wire,factory})
+ }
+ for _, sample:=range integerReadSamples() {
+  if sample.name!="width8_len896" {continue}
+  wire,err:=before.Encode(sample.message)
+  if err!=nil {t.Fatal(err)}
+  samples=append(samples,sharedWireSample{sample.name,wire,func() any {return &integerReadFixture{}}})
+ }
+ for _, shape:=range unpackShapes() {
+  if shape.name!="nonzero1x256" && shape.name!="nonzero2x256" && shape.name!="FF512-sparse4096" && shape.name!="zeroRun8x64" {continue}
+  samples=append(samples,sharedWireSample{shape.name,shape.raw,nil})
+ }
+ if len(samples)!=7 {t.Fatal("incomplete shared wire samples",len(samples))}
+ return samples
+}
+
+func sharedWireKinds(t testing.TB, wire []byte) (ordinary, zero, ff int) {
+ t.Helper()
+ for offset:=0;offset<len(wire); {
+  header:=wire[offset]
+  offset++
+  if header==255 {
+   if offset>=len(wire) {t.Fatal("truncated FF count")}
+   size:=(int(wire[offset])+1)*8
+   offset++
+   if size>len(wire)-offset {t.Fatal("truncated FF payload")}
+   offset+=size
+   ff++
+  } else {
+   size:=bits.OnesCount8(header)
+   if size>len(wire)-offset {t.Fatal("truncated mask payload")}
+   offset+=size
+   if header==0 {zero++} else {ordinary++}
+  }
+ }
+ return ordinary,zero,ff
+}
+
+func sharedWireOperations(t testing.TB, mode string, sample sharedWireSample) []pairOperation {
+ t.Helper()
+ packed:=before.Pack(sample.raw)
+ if !bytes.Equal(packed,sproto.Pack(sample.raw)) {t.Fatal("shared packed wire differs",sample.name)}
+ packedHash,rawHash:=sha256.Sum256(packed),sha256.Sum256(sample.raw)
+ ordinary,zero,ff:=sharedWireKinds(t,packed)
+ // 两段相同字节分别固定为64字节对齐与偏移1；每段的两种cap共享同一首地址。
+ stride:=(len(packed)+64+63)&^63
+ backing:=bytes.Repeat([]byte{0xa5},2*stride+128)
+ alignment:=int(reflect.ValueOf(backing).Pointer()&63)
+ start:=(64-alignment)&63
+ starts:=[]int{start,start+stride+1}
+ for _,index:=range starts {copy(backing[index:index+len(packed)],packed)}
+ var pairs []pairOperation
+ for offset,index:=range starts {
+  for _,spare:=range []int{0,64} {
+   wire:=backing[index:index+len(packed):index+len(packed)+spare]
+   observedAlignment:=int(reflect.ValueOf(wire).Pointer()&63)
+   if observedAlignment!=offset || !bytes.Equal(wire,packed) || cap(wire)!=len(wire)+spare {t.Fatal("wire placement differs")}
+   variant:=fmt.Sprintf("align%d_spare%d",offset,spare)
+   name:="shared/"+sample.name+"/"+variant
+   info:=sharedWireMetadata{sample.name,variant,hex.EncodeToString(packedHash[:]),hex.EncodeToString(rawHash[:]),len(wire),cap(wire),observedAlignment,spare,ordinary,zero,ff,true,true,sample.factory!=nil}
+   expected:=append([]byte(nil),sample.raw...)
+   expected=append(expected,make([]byte,(8-len(expected)%8)%8)...)
+   for _,decode:=range []func([]byte)([]byte,error){before.Unpack,sproto.Unpack} {
+    output,err:=decode(wire)
+    if err!=nil || !bytes.Equal(output,expected) {t.Fatal("shared unpack differs",name,err)}
+   }
+   appendDecodePair(t,&pairs,mode,name+"/unpack",func() error {
+    var err error
+    encodedSink,err=before.Unpack(wire)
+    return err
+   },func() error {
+    var err error
+    encodedSink,err=sproto.Unpack(wire)
+    return err
+   })
+   sharedWireRecords[name+"/unpack"]=info
+   if sample.factory!=nil {
+    left,right:=sample.factory(),sample.factory()
+    leftErr:=before.DecodePacked(wire,left)
+    rightErr:=sproto.DecodePacked(wire,right)
+    if leftErr!=nil || rightErr!=nil || !reflect.DeepEqual(left,right) {t.Fatal("shared packed decode differs",name,leftErr,rightErr)}
+    appendDecodePair(t,&pairs,mode,name+"/pdecode",func() error {
+     value:=sample.factory()
+     err:=before.DecodePacked(wire,value)
+     representativeSink=value
+     return err
+    },func() error {
+     value:=sample.factory()
+     err:=sproto.DecodePacked(wire,value)
+     representativeSink=value
+     return err
+    })
+    sharedWireRecords[name+"/pdecode"]=info
+   }
+   if !bytes.Equal(wire,packed) {t.Fatal("shared input mutated",name)}
+  }
+ }
+ return pairs
+}
+
+func pairOperations(t testing.TB, mode string) []pairOperation {
+ t.Helper()
+ // 延用70项的初始化/语义检查，随后只保活本轮40个操作中的所选闭包。
+ _=referencePairOperations(t,mode)
+ sharedWireRecords=make(map[string]sharedWireMetadata)
+ var pairs []pairOperation
+ for _,sample:=range sharedWireSamples(t) {pairs=append(pairs,sharedWireOperations(t,mode,sample)...)}
+ if len(pairs)!=40 || len(sharedWireRecords)!=40 {t.Fatal("incomplete shared matrix",len(pairs),len(sharedWireRecords))}
+ representativeSink,encodedSink,decodedSink=nil,nil,""
+ return pairs
+}
+
+// TestSharedWireMatrix 保护四种源对齐/容量使用相同字节和稳定解码结果。
+func TestSharedWireMatrix(t *testing.T) {
+ for _,pair:=range pairOperations(t,"clone") {
+  if err:=pair.left();err!=nil {t.Fatal(pair.name,err)}
+  if err:=pair.right();err!=nil {t.Fatal(pair.name,err)}
+ }
+}

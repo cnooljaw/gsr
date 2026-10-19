@@ -26,7 +26,9 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 
 前轮[普通Unpack仅源游标](../../../docs/benchmarks/2026-10-19-gosproto-unpack-source-cursor/RESULTS.md)在f7022ac上只改普通mask的源消费方式。70项两轮大型PDecode快1.16%/1.42%，4/8字节大数组快约3.3%～4.7%；FF接稀疏约慢11%、短零段第二轮慢14%的代价和失败控制完整保留，无收益比例门槛。库/官方/race/checkptr/vet/三项有限fuzz及GSR/GoTS通过；原数组读取轮已提交库f7022ac/GSRb3d4517，该轮已本地提交为库 `af9169d`、GSR `6b47822`，依赖v0.4.0、Decode继续开放。
 
-本轮[预检输入位置游标](../../../docs/benchmarks/2026-10-19-gosproto-unpack-preflight-cursor/RESULTS.md)完成138,500组错误/截断/预算差分及70项固定两轮：4/8字节大数组PDecode快约8%～12%，但普通word形态普遍慢4%～33%、FF接稀疏仍变慢，当前未采用通用替换。全部正面结果和代价保留，不设收益比例门槛；旧/当前CPU与实际wire诊断另列。主库仍已提交af9169d/GSR6b47822且干净，新报告未提交、依赖v0.4.0、Decode继续开放。
+前轮[预检输入位置游标](../../../docs/benchmarks/2026-10-19-gosproto-unpack-preflight-cursor/RESULTS.md)完成138,500组错误/截断/预算差分及70项固定两轮：4/8字节大数组PDecode快约8%～12%，但普通word形态普遍慢4%～33%、FF接稀疏仍变慢，当前未采用通用替换。全部正面结果和代价保留，不设收益比例门槛；旧/当前CPU与实际wire诊断另列。主库仍已提交af9169d/GSR6b47822且干净，新报告未提交、依赖v0.4.0、Decode继续开放。
+
+当前[共享wire40项诊断](../../../docs/benchmarks/2026-10-19-gosproto-unpack-shared-wire/RESULTS.md)控制源字节/对齐/cap后，业务与合成形态方向仍相反；恢复16条机器字相同，未证明唯一硬件原因。随后[原预检分函数70项实验](../../../docs/benchmarks/2026-10-19-gosproto-unpack-size-phase/RESULTS.md)未带来稳定组合收益，未采用。普通word收益、FF代价和所有失败控制均保留，不设收益比例门槛。主库仍af9169d且干净，前轮报告已提交GSR71d313d，新两个报告未提交，依赖v0.4.0、Decode继续开放。
 
 ## Go 局部优化的配对校准
 

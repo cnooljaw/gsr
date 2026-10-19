@@ -1,0 +1,65 @@
+[
+  {
+    "args": [
+      "git",
+      "rev-parse",
+      "--verify",
+      "af9169ddb70972e942fb14747dc4369947db617c^{commit}"
+    ],
+    "cwd": "/private/tmp/gsr-gosproto-fork",
+    "env": {},
+    "elapsedSeconds": 0.011,
+    "exitCode": 0,
+    "output": "af9169ddb70972e942fb14747dc4369947db617c\n"
+  },
+  {
+    "args": [
+      "patch",
+      "--batch",
+      "-p1",
+      "-i",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-19-gosproto-unpack-size-phase/candidate.patch"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-size-phase-measured/pass1/candidate",
+    "env": {},
+    "elapsedSeconds": 0.005,
+    "exitCode": 0,
+    "output": "patching file pack.go\n"
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "before_echo_test.go",
+      "sampler_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-size-phase-measured/pass1/harness",
+    "env": {},
+    "elapsedSeconds": 0.004,
+    "exitCode": 0,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "version"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {},
+    "elapsedSeconds": 0.014,
+    "exitCode": 0,
+    "output": "go version go1.24.13 darwin/arm64\n"
+  },
+  {
+    "args": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {},
+    "elapsedSeconds": 0.013,
+    "exitCode": 0,
+    "output": "71d313d01d6b43ce0dd6414b4e4c1c76c7306994\n"
+  }
+]
