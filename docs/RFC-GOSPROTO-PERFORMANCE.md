@@ -6,7 +6,7 @@
 
 前两轮以已发布的 gosproto v0.4.0 为版本基线；下一轮从已提交的 `6012b06` 做增量，不从 v0.4.0 重复实施。实现改动应在独立 gosproto 仓库进行，GSR 提供真实接线和跨语言 Benchmark；不修改 Go module cache，也不将库源码复制到 GSR。
 
-当前切片（2026-10-19）：Decode热点诊断已本地提交为GSR `16d1491`，未推送；本轮从库 `503a725` 保留原生整数数组固定4/8字节读取，两处改动。52项两轮大数组Decode快约26%～29%，4字节PDecode/Dispatch快约7%～9%；短8字节PDecode代价、控制失败和累计翻转完整披露，见第60节。库实现与强化测试已本地提交为 `f7022ac`，本轮报告随当前GSR提交归档，正式依赖v0.4.0，Decode继续开放。
+当前切片（2026-10-19）：整数数组读取视图已本地提交为库 `f7022ac`、GSR `b3d4517`，未推送。随后刷新4/8字节数组Unpack/PDecode CPU诊断，保留“普通mask仅改源游标”候选。固定70项两轮大型PDecode快1.16%/1.42%，4字节数组快4.69%/3.34%、8字节数组快4.16%/4.00%；FF接稀疏约慢11%、短零段第二轮慢14%的代价与失败控制均保留，见第61节。库实现已本地提交为 `af9169d`，诊断与报告随当前GSR提交归档，正式依赖v0.4.0，Decode继续开放。
 
 ## 1. 目标与证据
 
@@ -638,4 +638,14 @@ harness测试/vet/40项顺序与构造校验、构建、8采集/20pprof文本/�
 
 固定52项208进程/19,968块，两轮4字节896元素Decode−25.88%/−26.84%、PDecode−6.86%/−8.44%、真实Dispatch−8.77%/−8.76%；8字节Decode−28.09%/−28.50%。短8字节PDecode+1.95%/+0.81%仅数ns也披露；8字节大PDecode首轮累计+7157ns、次轮−1431ns，不能称组合稳定全面加速。大型游戏无稳定收益。self21/52、clone23/52，目标多项控制失败；全部对象数中位相同、29项字节尾差、19入口累计翻转、limiter零及离群保留。采用依据为两种宽度重复逐轮收益、真实4字节组合收益和两行局部改动，无最低比例门槛。
 
-归档git apply静默跳过测试补丁，生产补丁正确；指纹验收发现后保留原测量，独立强化基线测试+候选完整验收验证，未冒称双侧新测试在计时前运行。修正复现入口用patch并校验测试SHA，本轮只prepare验证。库全测/固定官方oracle/race/checkptr/vet、两项有限fuzz、GSR三包与Go/TS7/7零skip通过，源码/原fresh/checked-fresh/二进制/工具指纹已核对。Decode fuzz三秒后停滞限制保留，未重测PB/TS排名。见[数组读取报告](benchmarks/2026-10-19-gosproto-decode-array-view/RESULTS.md)。库实现与强化测试已本地提交为 `f7022ac`，本轮报告随当前GSR提交归档，依赖v0.4.0，Decode继续开放。
+归档git apply静默跳过测试补丁，生产补丁正确；指纹验收发现后保留原测量，独立强化基线测试+候选完整验收验证，未冒称双侧新测试在计时前运行。修正复现入口用patch并校验测试SHA，本轮只prepare验证。库全测/固定官方oracle/race/checkptr/vet、两项有限fuzz、GSR三包与Go/TS7/7零skip通过，源码/原fresh/checked-fresh/二进制/工具指纹已核对。Decode fuzz三秒后停滞限制保留，未重测PB/TS排名。见[数组读取报告](benchmarks/2026-10-19-gosproto-decode-array-view/RESULTS.md)。该轮已本地提交为库 `f7022ac`、GSR `b3d4517`，依赖v0.4.0，Decode继续开放。
+
+## 61. Unpack重新定位与仅源游标（保留）
+
+在f7022ac只读采4/8字节数组Unpack/PDecode四个CPU进程，12快照limiter零，全部18份源码/工具/二进制/fresh核对。8字节PDecode的Unpack累计43.23%、数组decoder7.42%；4字节为35.00%/13.75%。kevent和递归累计限制保留，profile耗时不作新基线。见[当前Unpack诊断](benchmarks/2026-10-19-gosproto-unpack-current-profile/RESULTS.md)。
+
+与旧cursor同时改变目标区间/&7不同，本轮保持目标地址不变，只将普通mask逐有效字节切源切片改为src[used]，word后一次推进；完整预检、源/目标边界检查、预算/错误/独占/分配、零/FF/Decode不变。实际循环回跳22→15条、整函数仍384条，帧128→112B。原52加全部18现有Unpack形态，共70项280进程/26,880块固定比较。
+
+两轮大型Unpack−6.33%/−6.15%、PDecode−1.16%/−1.42%、Dispatch−1.23%/−1.74%；4字节数组PDecode−4.69%/−3.34%、8字节−4.16%/−4.00%。约1%业务收益也保留，无最低比例门槛。FF接稀疏+11.47%/+10.55%且clone漂移不扣除，短零段第二轮+14.28%、短包与未改Decode代价均列出，不按fixture加分支。self59/70、clone52/70；全部对象数中位相同、27项字节尾差、17入口累计翻转和GC离群保留，limiter零。
+
+复用已提交全mask/偏移/后继/坏输入/预算/ownership测试，两侧归档测试相同。本轮8条验收通过：官方oracle/库全测、race/checkptr、vet、3项各10秒有限fuzz、GSR三包、Go/TS7/7零skip；Pack/Decode fuzz三秒后停滞限制保留。源码与冻结候选逐字节相同，正式依赖文件不改。见[源游标报告](benchmarks/2026-10-19-gosproto-unpack-source-cursor/RESULTS.md)。库实现已本地提交为 `af9169d`，诊断与报告随当前GSR提交归档、不推送；Decode继续开放，下一步先独立定位稀疏/短零段代价。

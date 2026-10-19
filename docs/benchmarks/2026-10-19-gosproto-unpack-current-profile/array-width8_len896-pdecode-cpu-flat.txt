@@ -1,0 +1,48 @@
+File: pairs.test
+Type: cpu
+Time: 2026-10-19 16:21:48 CST
+Duration: 2.94s, Total samples = 2.29s (77.93%)
+Showing nodes accounting for 2.15s, 93.89% of 2.29s total
+Dropped 33 nodes (cum <= 0.01s)
+Showing top 40 nodes out of 52
+      flat  flat%   sum%        cum   cum%
+     1.03s 44.98% 44.98%      1.03s 44.98%  runtime.kevent
+     0.84s 36.68% 81.66%      0.99s 43.23%  github.com/cnooljaw/gosproto.UnpackWithLimit
+     0.10s  4.37% 86.03%      0.17s  7.42%  github.com/cnooljaw/gosproto.decodeIntSlice
+     0.05s  2.18% 88.21%      0.11s  4.80%  runtime.scanobject
+     0.04s  1.75% 89.96%      0.04s  1.75%  runtime.typePointers.next
+     0.03s  1.31% 91.27%      0.03s  1.31%  runtime.madvise
+     0.02s  0.87% 92.14%      0.02s  0.87%  runtime.findObject
+     0.02s  0.87% 93.01%      0.03s  1.31%  runtime.pcvalue
+     0.01s  0.44% 93.45%      0.14s  6.11%  runtime.gcDrainN
+     0.01s  0.44% 93.89%      0.24s 10.48%  runtime.mallocgc
+         0     0% 93.89%      1.23s 53.71%  codecpairstool.BenchmarkCurrentOperation
+         0     0% 93.89%      1.23s 53.71%  codecpairstool.decodeBodyOperations.func6
+         0     0% 93.89%      0.24s 10.48%  github.com/cnooljaw/gosproto.Decode (inline)
+         0     0% 93.89%      1.23s 53.71%  github.com/cnooljaw/gosproto.DecodePacked
+         0     0% 93.89%      0.24s 10.48%  github.com/cnooljaw/gosproto.DecodeWithLimits
+         0     0% 93.89%      0.99s 43.23%  github.com/cnooljaw/gosproto.Unpack (inline)
+         0     0% 93.89%      0.03s  1.31%  github.com/cnooljaw/gosproto.decodeBytes
+         0     0% 93.89%      0.20s  8.73%  github.com/cnooljaw/gosproto.decodeMessage
+         0     0% 93.89%      0.03s  1.31%  reflect.New
+         0     0% 93.89%      0.03s  1.31%  reflect.unsafe_New
+         0     0% 93.89%      0.02s  0.87%  runtime.(*mcache).nextFree
+         0     0% 93.89%      0.02s  0.87%  runtime.(*mcache).refill
+         0     0% 93.89%      0.02s  0.87%  runtime.(*mcentral).cacheSpan
+         0     0% 93.89%      0.02s  0.87%  runtime.(*mcentral).grow
+         0     0% 93.89%      0.02s  0.87%  runtime.(*mheap).alloc
+         0     0% 93.89%      0.05s  2.18%  runtime.(*mheap).alloc.func1
+         0     0% 93.89%      0.05s  2.18%  runtime.(*mheap).allocSpan
+         0     0% 93.89%      0.02s  0.87%  runtime.(*unwinder).next
+         0     0% 93.89%      0.02s  0.87%  runtime.(*unwinder).resolveInternal
+         0     0% 93.89%      0.02s  0.87%  runtime.callers
+         0     0% 93.89%      0.02s  0.87%  runtime.callers.func1
+         0     0% 93.89%      0.15s  6.55%  runtime.deductAssistCredit
+         0     0% 93.89%      0.02s  0.87%  runtime.funcspdelta (inline)
+         0     0% 93.89%      0.15s  6.55%  runtime.gcAssistAlloc
+         0     0% 93.89%      0.14s  6.11%  runtime.gcAssistAlloc.func2
+         0     0% 93.89%      0.14s  6.11%  runtime.gcAssistAlloc1
+         0     0% 93.89%      0.39s 17.03%  runtime.gcMarkTermination.func3
+         0     0% 93.89%      0.64s 27.95%  runtime.gcStart.func4
+         0     0% 93.89%      0.03s  1.31%  runtime.growslice
+         0     0% 93.89%      0.02s  0.87%  runtime.mProf_Malloc

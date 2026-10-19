@@ -2,7 +2,7 @@
 
 本计划按 [ADR 0013](adr/0013-client-protocol-boundaries.md) 推进。当前工作树已实现 Protobuf 与独立 `protocol/sproto`，通过 Go/TypeScript Echo 验证。Go 编解码依赖独立维护的 `github.com/cnooljaw/gosproto v0.4.0`。新增 GSR API 尚未发布；已有 GSR 标签及原有协议保持不变。
 
-当前优化切片（2026-10-19）：Decode诊断已本地提交为GSR `16d1491`；后续[原生整数数组读取视图](benchmarks/2026-10-19-gosproto-decode-array-view/RESULTS.md)保留基于503a725的两处读取收窄。52项两轮大数组Decode快26%～29%，4字节PDecode/Dispatch快7%～9%；短包代价、控制失败、8字节组合累计翻转和测试补丁归档偏差均披露。固定官方/库/race/checkptr/vet/有限fuzz、GSR三包及Go/TS7/7通过。库实现与强化测试已本地提交为 `f7022ac`，本轮报告随当前GSR提交归档，正式require仍v0.4.0、未发布；Decode继续开放。
+当前优化切片（2026-10-19）：数组读取优化已本地提交为库 `f7022ac`、GSR `b3d4517`；随后[普通Unpack仅源游标](benchmarks/2026-10-19-gosproto-unpack-source-cursor/RESULTS.md)保留基于f7022ac的局部改动。70项两轮大型PDecode快1.16%/1.42%、4字节数组快4.69%/3.34%、8字节数组快4.16%/4.00%，FF接稀疏/短零段代价和失败控制单列。完整官方/库/race/checkptr/vet、有限fuzz、GSR及Go/TS7/7通过。库实现已本地提交为 `af9169d`，诊断与报告随当前GSR提交归档，require仍v0.4.0、未发布；Decode继续开放。
 
 ## 边界与步骤
 

@@ -22,7 +22,9 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 
 这里的 `-count=5` 用于性能采样；不改变日常测试保留缓存的规则。Node 基准在构建后运行 `node examples/websocket-gate/client/dist/protocol_benchmark.js`，标准输出为五轮原始数据及中位数 JSON。追加 `--case ascii32` 可单独复测 32 字节小包。
 
-本轮[原生整数数组读取视图](../../../docs/benchmarks/2026-10-19-gosproto-decode-array-view/RESULTS.md)在503a725上保留两处4/8字节读取收窄。52项两轮大数组Decode快26%～29%，4字节PDecode/真实Dispatch快7%～9%；短包代价、控制失败与8字节组合累计反向单列，不替代四实现排名。库/官方/race/checkptr/fuzz及GSR/GoTS验收通过。测试补丁归档偏差与修正复现入口亦有记录。前轮诊断已提交GSR `16d1491`，库实现与强化测试已本地提交为 `f7022ac`，本轮报告随当前GSR提交归档，依赖v0.4.0、Decode继续开放。
+前轮[原生整数数组读取视图](../../../docs/benchmarks/2026-10-19-gosproto-decode-array-view/RESULTS.md)在503a725上保留两处4/8字节读取收窄。52项两轮大数组Decode快26%～29%，4字节PDecode/真实Dispatch快7%～9%；短包代价、控制失败与8字节组合累计反向单列，不替代四实现排名。库/官方/race/checkptr/fuzz及GSR/GoTS验收通过。测试补丁归档偏差与修正复现入口亦有记录。前轮诊断已提交GSR `16d1491`，该轮已本地提交为库 `f7022ac`、GSR `b3d4517`，依赖v0.4.0、Decode继续开放。
+
+当前[普通Unpack仅源游标](../../../docs/benchmarks/2026-10-19-gosproto-unpack-source-cursor/RESULTS.md)在f7022ac上只改普通mask的源消费方式。70项两轮大型PDecode快1.16%/1.42%，4/8字节大数组快约3.3%～4.7%；FF接稀疏约慢11%、短零段第二轮慢14%的代价和失败控制完整保留，无收益比例门槛。库/官方/race/checkptr/vet/三项有限fuzz及GSR/GoTS通过；原数组读取轮已提交库f7022ac/GSRb3d4517，库实现已本地提交为 `af9169d`，诊断与报告随当前GSR提交归档，依赖v0.4.0、Decode继续开放。
 
 ## Go 局部优化的配对校准
 

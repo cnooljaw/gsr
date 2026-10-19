@@ -1,0 +1,303 @@
+{
+  "baselineCommit": "f7022ac03ac25d692a08b821543ea4b09f534940",
+  "previousCommits": {
+    "gosproto": "f7022ac",
+    "gsr": "b3d4517"
+  },
+  "counts": {
+    "processes": 280,
+    "blocks": 26880,
+    "quartets": 6720,
+    "rounds": 1680,
+    "snapshots": 1120
+  },
+  "controlAndTelemetrySummary": {
+    "self": {
+      "controlAccepted": 59,
+      "sameAllocation": 62,
+      "initialLimiterNonzero": 0,
+      "anyLimiterChange": 0,
+      "largestSampledHeap": 4114792,
+      "unequalAllocations": [
+        "body/game_large/pdecode",
+        "rpc/echo_ascii4k/dispatch",
+        "growth/flat/full/4096/decode",
+        "growth/flat/full/4096/pdecode",
+        "growth/flat/half/4096/decode",
+        "growth/flat/half/4096/pdecode",
+        "growth/nested/32x128/pdecode",
+        "array/width8_len896/decode"
+      ],
+      "failedControls": [
+        "body/addressbook/unpack",
+        "body/game_large/pdecode",
+        "rpc/echo_ascii4k/dispatch",
+        "echo/ascii4k/payload_decode",
+        "echo/ascii4k/frame_decode",
+        "growth/flat/full/4096/decode",
+        "growth/flat/full/4096/pdecode",
+        "growth/flat/half/4096/decode",
+        "growth/flat/half/4096/pdecode",
+        "growth/nested/32x128/pdecode",
+        "array/width8_len896/decode"
+      ]
+    },
+    "clone": {
+      "controlAccepted": 52,
+      "sameAllocation": 66,
+      "initialLimiterNonzero": 0,
+      "anyLimiterChange": 0,
+      "largestSampledHeap": 21678592,
+      "unequalAllocations": [
+        "body/game_large/pdecode",
+        "rpc/int32_edges/dispatch",
+        "growth/flat/half/4096/decode",
+        "growth/nested/32x128/decode"
+      ],
+      "failedControls": [
+        "body/game_small/decode",
+        "body/game_large/pdecode",
+        "rpc/int32_edges/dispatch",
+        "body/echo_ascii4k/decode",
+        "echo/ascii32/frame_decode",
+        "growth/flat/half/4096/decode",
+        "growth/nested/32x128/decode",
+        "array/width4_len3/unpack",
+        "array/width4_len3/pdecode",
+        "array/width8_len3/unpack",
+        "rpc/width8_len3/dispatch",
+        "shape/zero32/unpack",
+        "shape/nonzero1x256/unpack",
+        "shape/nonzero3x256/unpack",
+        "shape/nonzero4x256/unpack",
+        "shape/nonzero5x256/unpack",
+        "shape/nonzero6x256/unpack",
+        "shape/FF512-sparse4096/unpack"
+      ]
+    },
+    "pass1": {
+      "controlAccepted": null,
+      "sameAllocation": 62,
+      "initialLimiterNonzero": 0,
+      "anyLimiterChange": 0,
+      "largestSampledHeap": 4114728,
+      "unequalAllocations": [
+        "rpc/game_large/dispatch",
+        "rpc/int32_edges/dispatch",
+        "rpc/echo_ascii4k/dispatch",
+        "growth/flat/full/4096/decode",
+        "growth/flat/half/4096/decode",
+        "growth/flat/half/4096/pdecode",
+        "growth/nested/32x128/decode",
+        "array/width8_len896/pdecode"
+      ],
+      "failedControls": null
+    },
+    "pass2": {
+      "controlAccepted": null,
+      "sameAllocation": 63,
+      "initialLimiterNonzero": 0,
+      "anyLimiterChange": 0,
+      "largestSampledHeap": 4114568,
+      "unequalAllocations": [
+        "rpc/int32_edges/dispatch",
+        "growth/flat/full/4096/decode",
+        "growth/flat/full/4096/pdecode",
+        "growth/flat/half/4096/pdecode",
+        "growth/nested/32x128/decode",
+        "growth/nested/32x128/pdecode",
+        "array/width8_len896/pdecode"
+      ],
+      "failedControls": null
+    }
+  },
+  "archiveReproduction": [
+    "baselineCommit",
+    "mode",
+    "goVersion",
+    "gsrHead",
+    "environment",
+    "generatedGoInputs",
+    "beforeGoSource",
+    "candidateGoSource",
+    "harnessGoSource",
+    "fixtures",
+    "tools",
+    "candidatePatchSha256",
+    "controlGate",
+    "parameters",
+    "selectedCases",
+    "scope",
+    "diagnosticPlan",
+    "driverInputs"
+  ],
+  "baselineGoSource": {
+    "decode.go": "9b5206a43a017a69fb76e7f3cf901d8d5d568ad5825cb058c0b8b6b80b544868",
+    "decode_pointer.go": "4045dae3ebd404b13efea429fbcc1dd23f764bdfa51164464b92a3992826367f",
+    "encode.go": "ee0fb24ed0bbc8755052d8de4fd77c38307b3ac64656176a5299d4e1069cdf3f",
+    "encode_integer_record.go": "0aaa3de8cde3571f70b857b51532cc332d116c6eb6293f62bed6e349b563aa60",
+    "encode_pointer.go": "e7a239568a0fc8788404de6f5bc0d5e2ac092fa559f0a6bfd4561fdc155f81c1",
+    "encode_test.go": "d28095ae5b5b820eb0d5aed634397bb86159361b5876c3126100d59e37d41099",
+    "fuzz_test.go": "10eb7cb2d2fcd8afe47b6880cd61f64121f17b0a3355a6073b41ceb87e8d435c",
+    "limits.go": "223a9ec3a68c4fb4c5938332132692cec3658fee75aceea2e26076860fe94907",
+    "limits_test.go": "9612667b2dd51f286ee972d8303d1609a0c6bb274050f0056abe392447f29809",
+    "meta.go": "6badd4a5ac60d8a15caaa1f35634268101c436b275cf4a0fe120b91db417d217",
+    "official_compat_test.go": "fa413db0126e78205f7ee2d56f8f5d521bc29d82b723953385b79b0407412b60",
+    "pack.go": "99c642407cd0b44a2a5d09636c83ce6f2e185aead9937014e96fcc8a9757780a",
+    "pack_test.go": "70e79e8fa5273d4a9f31fb6afc885efbb1f2f86ca9d68b1bba4c1c97e8deed56",
+    "rpc.go": "6a5d29737047ecdcc2286b68a35df3330affa9dd8948ffbd5fde09104eed7899",
+    "rpc_limits_test.go": "6c0361cbda2870b3d4abf578b7313acc44728ed78de0ea92336c8c1170ee39b1",
+    "rpc_test.go": "4db20f87186685ef4bd78bc0e021940a8afe718a28ae8bddd6b66bede3017468",
+    "sproto.go": "2d35ffddf1ec0492fe6425f3d1dd7ede5d4edb3794773f6971fc4f36ceb80f4d",
+    "sproto_test.go": "20a255950d0628f27a00cf5923448d524c729b05f16ed18df3a095d2c6449d9e"
+  },
+  "candidateGoSource": {
+    "decode.go": "9b5206a43a017a69fb76e7f3cf901d8d5d568ad5825cb058c0b8b6b80b544868",
+    "decode_pointer.go": "4045dae3ebd404b13efea429fbcc1dd23f764bdfa51164464b92a3992826367f",
+    "encode.go": "ee0fb24ed0bbc8755052d8de4fd77c38307b3ac64656176a5299d4e1069cdf3f",
+    "encode_integer_record.go": "0aaa3de8cde3571f70b857b51532cc332d116c6eb6293f62bed6e349b563aa60",
+    "encode_pointer.go": "e7a239568a0fc8788404de6f5bc0d5e2ac092fa559f0a6bfd4561fdc155f81c1",
+    "encode_test.go": "d28095ae5b5b820eb0d5aed634397bb86159361b5876c3126100d59e37d41099",
+    "fuzz_test.go": "10eb7cb2d2fcd8afe47b6880cd61f64121f17b0a3355a6073b41ceb87e8d435c",
+    "limits.go": "223a9ec3a68c4fb4c5938332132692cec3658fee75aceea2e26076860fe94907",
+    "limits_test.go": "9612667b2dd51f286ee972d8303d1609a0c6bb274050f0056abe392447f29809",
+    "meta.go": "6badd4a5ac60d8a15caaa1f35634268101c436b275cf4a0fe120b91db417d217",
+    "official_compat_test.go": "fa413db0126e78205f7ee2d56f8f5d521bc29d82b723953385b79b0407412b60",
+    "pack.go": "54f2c365a99ae620f53bd02bf3ca4da84332c7f9102e871a88fb4ee05af00087",
+    "pack_test.go": "70e79e8fa5273d4a9f31fb6afc885efbb1f2f86ca9d68b1bba4c1c97e8deed56",
+    "rpc.go": "6a5d29737047ecdcc2286b68a35df3330affa9dd8948ffbd5fde09104eed7899",
+    "rpc_limits_test.go": "6c0361cbda2870b3d4abf578b7313acc44728ed78de0ea92336c8c1170ee39b1",
+    "rpc_test.go": "4db20f87186685ef4bd78bc0e021940a8afe718a28ae8bddd6b66bede3017468",
+    "sproto.go": "2d35ffddf1ec0492fe6425f3d1dd7ede5d4edb3794773f6971fc4f36ceb80f4d",
+    "sproto_test.go": "20a255950d0628f27a00cf5923448d524c729b05f16ed18df3a095d2c6449d9e"
+  },
+  "currentGoSource": {
+    "decode.go": "9b5206a43a017a69fb76e7f3cf901d8d5d568ad5825cb058c0b8b6b80b544868",
+    "decode_pointer.go": "4045dae3ebd404b13efea429fbcc1dd23f764bdfa51164464b92a3992826367f",
+    "encode.go": "ee0fb24ed0bbc8755052d8de4fd77c38307b3ac64656176a5299d4e1069cdf3f",
+    "encode_integer_record.go": "0aaa3de8cde3571f70b857b51532cc332d116c6eb6293f62bed6e349b563aa60",
+    "encode_pointer.go": "e7a239568a0fc8788404de6f5bc0d5e2ac092fa559f0a6bfd4561fdc155f81c1",
+    "encode_test.go": "d28095ae5b5b820eb0d5aed634397bb86159361b5876c3126100d59e37d41099",
+    "fuzz_test.go": "10eb7cb2d2fcd8afe47b6880cd61f64121f17b0a3355a6073b41ceb87e8d435c",
+    "limits.go": "223a9ec3a68c4fb4c5938332132692cec3658fee75aceea2e26076860fe94907",
+    "limits_test.go": "9612667b2dd51f286ee972d8303d1609a0c6bb274050f0056abe392447f29809",
+    "meta.go": "6badd4a5ac60d8a15caaa1f35634268101c436b275cf4a0fe120b91db417d217",
+    "official_compat_test.go": "fa413db0126e78205f7ee2d56f8f5d521bc29d82b723953385b79b0407412b60",
+    "pack.go": "54f2c365a99ae620f53bd02bf3ca4da84332c7f9102e871a88fb4ee05af00087",
+    "pack_test.go": "70e79e8fa5273d4a9f31fb6afc885efbb1f2f86ca9d68b1bba4c1c97e8deed56",
+    "rpc.go": "6a5d29737047ecdcc2286b68a35df3330affa9dd8948ffbd5fde09104eed7899",
+    "rpc_limits_test.go": "6c0361cbda2870b3d4abf578b7313acc44728ed78de0ea92336c8c1170ee39b1",
+    "rpc_test.go": "4db20f87186685ef4bd78bc0e021940a8afe718a28ae8bddd6b66bede3017468",
+    "sproto.go": "2d35ffddf1ec0492fe6425f3d1dd7ede5d4edb3794773f6971fc4f36ceb80f4d",
+    "sproto_test.go": "20a255950d0628f27a00cf5923448d524c729b05f16ed18df3a095d2c6449d9e"
+  },
+  "productionCandidateRetained": true,
+  "candidateChangedGoFiles": [
+    "pack.go"
+  ],
+  "timingProcessesOnceInFrozenOrder": true,
+  "samplingBlockFunctionsUnchanged": true,
+  "allObjectMediansEqual": true,
+  "assemblyCuration": {
+    "self": {
+      "rawSha256": "2f7d45e1fff0a7eb1fea0fc0ab1a0eb1ac94f8366847be2d6bdf4cad65a597c4",
+      "curatedSha256": "5346ef86b696e1a982a526c1df9a9df0638e1fd7787e0b85a401651f6f9a16c0"
+    },
+    "clone": {
+      "rawSha256": "676acc3c2b08bf8e68f1d9b917277c224799556077df95d714dd5d420bc8e3be",
+      "curatedSha256": "94b629de72f8b528bbcfd945ee0431093fd5c43980133d07e69f96b82a3445a9"
+    },
+    "pass1": {
+      "rawSha256": "589e38de897e3b258a3c6b1e7bdec88561c6a2e37911e2838b95f9fbdbd861cc",
+      "curatedSha256": "5f25f965f92a72115ee2f6521c29643432bfd3110a5ae5d4f390eef350e82564"
+    },
+    "pass2": {
+      "rawSha256": "140a9b043fe4f6d9ffb0cabae5ff0d9f35de3f5cb4af37947c9dd3f0d251fb11",
+      "curatedSha256": "e3e40f222d2415c150748084c9a084f524f1f6056df7986d50143d54a8186489"
+    }
+  },
+  "formalDependencyFilesUnchanged": true,
+  "decodeFrozen": false,
+  "pushed": false,
+  "allCurrentSourcesEqualMeasuredCandidate": true,
+  "acceptanceCommands": 8,
+  "allAcceptanceSucceeded": true,
+  "oracleEnabled": true,
+  "integrationTests": 7,
+  "integrationSkipped": 0,
+  "integrationBinarySha256": "a1d648c5e275b9d2fae9afb57532a719b29e6ff61351a8295bfd4f4d53448048",
+  "temporaryModSha256": "8185a8af0fb38039dfc8e7abd9fc917feb0617ddb60fa93ea53a454efbba84cb",
+  "temporarySumSha256": "2c3413439101b41d0f5f210b290a88513add402ba67058d79959d324e39f02b8",
+  "measurementCommandCount": 313,
+  "uncommitted": true,
+  "fuzz": {
+    "PackRoundTrip": {
+      "seconds": 10,
+      "execs": 3498,
+      "newInteresting": 0,
+      "stalledAfterThreeSeconds": true
+    },
+    "CodecRoundTrip": {
+      "seconds": 10,
+      "execs": 501185,
+      "newInteresting": 0
+    },
+    "Decode": {
+      "seconds": 10,
+      "execs": 15324,
+      "newInteresting": 0,
+      "stalledAfterThreeSeconds": true
+    }
+  },
+  "fuzzRetried": false,
+  "allLocalReportLinksExist": true,
+  "allJsonParsed": true,
+  "allCommandsSucceeded": true,
+  "artifactsSha256": {
+    ".gitattributes": "fb25a78a6381f5646d71aacea4486f6aeeeb03c4d71740227011024be0d20a8f",
+    "ALL-CASES.md": "2ec524d7492e861d49c4e32fa64044c2e4623431042decbb91b88943f457fe20",
+    "RESULTS.md": "6d71ea39bb42f0513399d398a428db5c8e6a6aeab3759e4184ee33c34017b536",
+    "accept.py": "7015952c6a1b53ed8ec594f46b7111bcf2981db9ee23a0f2e3f9089fbc0bb77f",
+    "acceptance.json": "e9db5d3b4b27d661a3d6bd2d97f455f8a1daf4a82e2bcda68444deaf2e029a84",
+    "allocation-tails.json": "e61e85892a49dcb05f867b7ce41322eb08d38d4d6c06ba4015a625b6156ebb6f",
+    "analysis.json": "aa984b8dfc9f1d2d75778d590adb6704ddf50999dc6364cce1402bfc7ca53009",
+    "analyze.py": "235d174f992512dff86964f92d005d9f57d102050b0156e854aedf447a8aa7a9",
+    "assembly-summary.json": "1f3af8c6f8cec774909033332ee86af22020ab10d23b752137818db5dc09b827",
+    "before-compiler.txt": "81d164dab64b305c81c9726dcdb93a64a216968f9d5fb967bc86016ac9af1bc2",
+    "candidate-compiler.txt": "2093142c82c48bdb1ec3c5280f464c013b13b7957bcec9e0f2c721030834f079",
+    "candidate.patch": "34977a4de9850c20c96fb8ab298968396eabee8db1cbd9775cbb885e09cf7c4c",
+    "clone/case-list.json": "6f50e59763500b95c497f37ccc4cc6b6a8617f18845cfa0c8751f57acd4faf73",
+    "clone/commands.json": "4a91638b07f6b69e734970f30effa832138db5baef69135f2af48866ead254aa",
+    "clone/inputs.json": "3584e341aa5233d0b93332fb8d82d29ba683f829896bf4531d8e11d3aa9c7972",
+    "clone/raw.json": "6243b70107f9ff90199015bd91ad7ba0892c524219b41ac67e3f3701e7c1eba6",
+    "clone/summary.json": "d58c48721cb34c40582264eb781ae4ec047ba87c6b1fe86bd65673b826dc434b",
+    "clone-unpack-assembly.txt": "94b629de72f8b528bbcfd945ee0431093fd5c43980133d07e69f96b82a3445a9",
+    "commands.json": "a8c007e20576b0631d53cc51a758375ccafab5d224772fa30395d5c5437776b2",
+    "cumulative-reversals.json": "a1931883a210fb8ba62f0db1e0ead30d7bfb929050bc12559a5d4c6cbdff3cdf",
+    "decode-probe.go.txt": "15dcf71d2cc3c2ad0a38ab391fd3fd8b143654c54f285a6f4080116c3f0d3359",
+    "integration-build-info.txt": "2115c707e8978acb2cacc0f9a73f53e44ddd5bebfe57d0934dcab38d826b9166",
+    "long-blocks.json": "0005fa2b2781f41356b6a67bae135eae48000c44f595ce2ab38ebfb278e55cf1",
+    "oracle-provenance.json": "454b89c988dfb0dad357bcef351ea82f5d9141ecb8b61ca5e53d7ccd73b6294e",
+    "pass1/case-list.json": "6f50e59763500b95c497f37ccc4cc6b6a8617f18845cfa0c8751f57acd4faf73",
+    "pass1/commands.json": "532951329c19ac19301ee568f5fb325e78a2da00ebfec1acbe771a4d93f54ff3",
+    "pass1/inputs.json": "a91d8a5cd94a998c44014e47e30d970b9f133518587160ef74c89ea36b424f5d",
+    "pass1/raw.json": "dec84f8eb32cc50bf40b472fed727fe4ff36bc9fea58ab4a0fdd87a427e9c295",
+    "pass1/summary.json": "755287f857cb92946a3feb36aaad2d518af4060b400223888c3337a352b5c111",
+    "pass1-unpack-assembly.txt": "5f25f965f92a72115ee2f6521c29643432bfd3110a5ae5d4f390eef350e82564",
+    "pass2/case-list.json": "6f50e59763500b95c497f37ccc4cc6b6a8617f18845cfa0c8751f57acd4faf73",
+    "pass2/commands.json": "2343895624ea919880d16672735dc139cfba40ea9802f7b536dc943eccb81d6a",
+    "pass2/inputs.json": "8fec077f6338d6fd44b81c4aa13621685ff53a4fab87cd56cd96e58d74171af6",
+    "pass2/raw.json": "527d0145bc63bcc504211566e7fba883527067ee03e9d694db9d56bb116d4933",
+    "pass2/summary.json": "65963db5a37a66df2c0fef4154b5e1012c5fcfe7efde1c50f956af90eb3f2ad8",
+    "pass2-unpack-assembly.txt": "e3e40f222d2415c150748084c9a084f524f1f6056df7986d50143d54a8186489",
+    "plan.json": "372418140174a8f3694f445774e90409d4493ba25647b815b5da88f59a07a832",
+    "reproduce.py": "b5973a536b5ad8024c5fba0c1612726c12724e0877ae9343f50eef65d8ebe209",
+    "self/case-list.json": "6f50e59763500b95c497f37ccc4cc6b6a8617f18845cfa0c8751f57acd4faf73",
+    "self/commands.json": "befb726a5eb852d0bdbd7e8fac33e3f8638244f053ec9ed8b49dea63ff2eefa4",
+    "self/inputs.json": "a78d44c1b0f0aee84c04991a847227064aeefeb125848760b7afb46e3c00101f",
+    "self/raw.json": "468f507c7f52436b35be114887a63bdc7505dad0b57ef875f3841123c9838a12",
+    "self/summary.json": "abc5f3e8ced6b1bb08642bd7fb0f919a59b5ffe7d68c185781ecdbf29618030e",
+    "self-unpack-assembly.txt": "5346ef86b696e1a982a526c1df9a9df0638e1fd7787e0b85a401651f6f9a16c0",
+    "worst-rounds.json": "574a0585b9e051de2f207ff1c678e0974dbeca261006d657292ada17e8cf7ad8"
+  }
+}
