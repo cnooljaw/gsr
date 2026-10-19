@@ -1,0 +1,1891 @@
+# github.com/cnooljaw/gosproto-before
+./decode.go:14:6: can inline readUint16 with cost 4 as: func([]byte) uint16 { return binary.littleEndian.Uint16(binary.LittleEndian, buffer) }
+./decode.go:18:6: can inline readUint32 with cost 4 as: func([]byte) uint32 { return binary.littleEndian.Uint32(binary.LittleEndian, buffer) }
+./decode.go:22:6: can inline readUint64 with cost 4 as: func([]byte) uint64 { return binary.littleEndian.Uint64(binary.LittleEndian, buffer) }
+./decode.go:26:6: can inline readChunk with cost 48 as: func([]byte) (int, []byte, error) { if len(chunk) < 4 { return 0, nil, ErrDecode }; size := uint64(readUint32(chunk)); if size > uint64(len(chunk) - 4) { return 0, nil, ErrDecode }; end := 4 + int(size); return end, chunk[4:end], nil }
+./decode.go:38:6: cannot inline targetValue: function too complex: cost 185 exceeds budget 80
+./decode.go:46:6: cannot inline setInteger: function too complex: cost 301 exceeds budget 80
+./decode.go:65:6: cannot inline decodeBool: function too complex: cost 129 exceeds budget 80
+./decode.go:74:6: can inline scalarBits with cost 38 as: func(uint16, bool, []byte) (uint64, error) { if hasInline { return uint64(inline), nil }; switch statement }
+./decode.go:88:6: cannot inline decodeInt: function too complex: cost 178 exceeds budget 80
+./decode.go:97:6: cannot inline decodeInt64: function too complex: cost 179 exceeds budget 80
+./decode.go:107:6: cannot inline decodeInt64Pointer: function too complex: cost 193 exceeds budget 80
+./decode.go:118:6: cannot inline decodeDouble: function too complex: cost 183 exceeds budget 80
+./decode.go:127:6: cannot inline decodeString: function too complex: cost 123 exceeds budget 80
+./decode.go:133:6: cannot inline decodeStringPointer: function too complex: cost 137 exceeds budget 80
+./decode.go:140:6: can inline decodeBytes with cost 65 as: func(uint16, bool, []byte, *SprotoField, reflect.Value, *decodeBudget) error { reflect.Value.SetBytes(value, append([]byte{}, data...)); return nil }
+./limits.go:48:6: can inline (*decodeBudget).add with cost 21 as: method(*decodeBudget) func(int) error { if count < 0 || count > budget.limits.MaxElements - budget.elements { return ErrLimit }; budget.elements += count; return nil }
+./decode.go:145:6: cannot inline decodeBoolSlice: function too complex: cost 373 exceeds budget 80
+./decode.go:157:6: cannot inline decodeIntSlice: function too complex: cost 1110 exceeds budget 80
+./decode.go:209:6: cannot inline countChunks: function too complex: cost 122 exceeds budget 80
+./decode.go:225:6: cannot inline decodeStringSlice: function too complex: cost 485 exceeds budget 80
+./decode_pointer.go:15:6: can inline messageDecodePointer with cost 67 as: func(reflect.Value, bool) decodePointer { if !exactNative { return decodePointer{} }; return decodePointer{...} }
+./meta.go:242:6: can inline (*SprotoType).FieldByTag with cost 51 as: method(*SprotoType) func(int) *SprotoField { if tag >= 0 && tag < len(st.dense) { if index != 0 { return st.Fields[index - 1] }; return nil }; if ok { return st.Fields[index] }; return nil }
+./encode_pointer.go:65:6: can inline (*SprotoField).nativeInteger with cost 17 as: method(*SprotoField) func(*SprotoType) bool { return field.nativeInt64Pointer && field.encOwner == schema && field.Wire == "integer" && !field.Array }
+./decode_pointer.go:23:6: can inline decodePointer.setInteger with cost 39 as: method(decodePointer) func(*SprotoType, *SprotoField, *int64) bool { if pointer.value == nil || !(*SprotoField).nativeInteger(field, schema) { return false }; *(**int64)(unsafe.Add(pointer.value, field.encOffset)) = value; return true }
+./decode.go:282:6: cannot inline decodeMessage: unhandled op DEFER
+./decode.go:284:8: can inline decodeMessage.func1 with cost 4 as: func() { budget.depth-- }
+./decode.go:243:6: cannot inline decodeStruct: function too complex: cost 211 exceeds budget 80
+./decode.go:256:6: cannot inline decodeStructSlice: function too complex: cost 632 exceeds budget 80
+./limits.go:27:6: can inline normalizeLimits with cost 53 as: func(Limits) (Limits, error) { if limits.MaxBytes == 0 { limits.MaxBytes = 8388608 }; if limits.MaxDepth == 0 { limits.MaxDepth = 64 }; if limits.MaxElements == 0 { limits.MaxElements = 100000 }; if limits.MaxBytes < 1 || limits.MaxDepth < 1 || limits.MaxDepth > 128 || limits.MaxElements < 1 { return Limits{}, ErrInvalidLimits }; return limits, nil }
+./meta.go:341:6: cannot inline getbase: function too complex: cost 388 exceeds budget 80
+/Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/reflect/type.go:2855:6: cannot inline reflect.TypeFor[go.shape.*uint8]: function too complex: cost 147 exceeds budget 80
+./meta.go:50:6: cannot inline (*SprotoField).parse: function too complex: cost 435 exceeds budget 80
+./meta.go:81:6: cannot inline (*SprotoField).assertWire: function too complex: cost 161 exceeds budget 80
+/Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/reflect/type.go:2855:6: cannot inline reflect.TypeFor[go.shape.[]int64]: function too complex: cost 147 exceeds budget 80
+./meta.go:276:6: cannot inline getSprotoTypeLocked: function too complex: cost 604 exceeds budget 80
+./meta.go:198:6: cannot inline (*SprotoField).init: function too complex: cost 381 exceeds budget 80
+./meta.go:95:6: cannot inline (*SprotoField).configureType: function too complex: cost 3479 exceeds budget 80
+./meta.go:255:6: cannot inline GetSprotoType: function too complex: cost 467 exceeds budget 80
+./decode.go:356:6: cannot inline DecodeWithLimits: function too complex: cost 663 exceeds budget 80
+./decode.go:351:6: can inline Decode with cost 72 as: func([]byte, interface {}) (int, error) { return int(.autotmp_4), .autotmp_5 }
+./decode.go:381:6: cannot inline MustDecode: function too complex: cost 92 exceeds budget 80
+./encode.go:26:6: can inline (*encodeLayout).add with cost 76 as: method(*encodeLayout) func(int) int { index := layout.count; if index < 32 { layout.local[index] = uint32(value) } else { offset := index - 32; if offset == cap(layout.extra) { capacity := max(128, offset * 2); extra := make([]uint32, offset, capacity); copy(extra, layout.extra); layout.extra = extra }; layout.extra = layout.extra[:offset + 1]; layout.extra[offset] = uint32(value) }; layout.count++; return index }
+./encode.go:47:6: can inline (*encodeLayout).set with cost 20 as: method(*encodeLayout) func(int, int) { if index < 32 { layout.local[index] = uint32(value) } else { layout.extra[index - 32] = uint32(value) } }
+./encode.go:55:6: can inline (*encodeLayout).next with cost 28 as: method(*encodeLayout) func() int { index := layout.cursor; layout.cursor++; if index < 32 { return int(layout.local[index]) }; return int(layout.extra[index - 32]) }
+./encode.go:64:6: can inline writeUint16 with cost 4 as: func([]byte, uint16) { binary.littleEndian.PutUint16(binary.LittleEndian, buffer, value) }
+./encode.go:68:6: can inline writeUint32 with cost 4 as: func([]byte, uint32) { binary.littleEndian.PutUint32(binary.LittleEndian, buffer, value) }
+./encode.go:72:6: can inline writeUint64 with cost 4 as: func([]byte, uint64) { binary.littleEndian.PutUint64(binary.LittleEndian, buffer, value) }
+./encode.go:76:6: cannot inline integerBits: function too complex: cost 137 exceeds budget 80
+./encode.go:83:6: can inline integerWidth with cost 18 as: func(uint64) int { number := int64(bits); if number >= int64(-2147483648) && number <= int64(2147483647) { return 4 }; return 8 }
+./encode.go:91:6: can inline signedSize with cost 30 as: func(uint64) (int, bool) { if bits <= uint64(32766) { return 0, true }; return integerWidth(bits), false }
+./encode.go:98:6: can inline encodeIntegerInto with cost 65 as: func(uint64, []byte) (uint16, int) { if bits <= uint64(32766) { return uint16((bits + uint64(1)) * uint64(2)), 0 }; width := integerWidth(bits); if width == 4 { writeUint32(output[4:], uint32(bits)) } else { writeUint64(output[4:], bits) }; return uint16(0), width }
+./encode.go:111:6: can inline omittedField with cost 78 as: func(*SprotoField, reflect.Value) bool { return field.nilable && reflect.Value.IsNil(value) }
+./encode.go:115:6: can inline skipTag with cost 19 as: func(int, int) uint16 { if nextTag > tag + 1 { return uint16((nextTag - tag - 2) * 2 + 1) }; return uint16(0) }
+./encode_pointer.go:57:6: can inline messageEncodePointer with cost 68 as: func(reflect.Value, encodeBinding) encodePointer { if !binding.native { return encodePointer{} }; return encodePointer{...} }
+./encode_pointer.go:70:6: can inline encodePointer.integer with cost 21 as: method(encodePointer) func(uintptr) (uint64, bool) { value := *(**int64)(unsafe.Add(pointer.value, offset)); if value == nil { return uint64(0), false }; return uint64(*value), true }
+./encode.go:276:6: can inline encodeInt64Slice with cost 64 as: func([]int64, int, []byte) int { output[0] = byte(width); remaining := output[1:]; if width == 4 { for loop } else { for loop }; return 1 + width * len(values) }
+./encode_pointer.go:22:6: can inline knownEncodeType with cost 7 as: func(*SprotoType) encodeBinding { return encodeBinding{...} }
+./encode_pointer.go:35:6: cannot inline checkEncodeChild: function too complex: cost 291 exceeds budget 80
+./encode_pointer.go:27:6: can inline bindEncodeChild with cost 76 as: func(*SprotoField, reflect.Value, bool) encodeBinding { if trusted { return knownEncodeType(field.st) }; return checkEncodeChild(field, value) }
+./encode_pointer.go:47:6: can inline (*SprotoType).nativeIntegerFields with cost 46 as: method(*SprotoType) func() bool { for loop; return true }
+./encode_integer_record.go:51:6: cannot inline encodeIntegerRecordInto: function too complex: cost 319 exceeds budget 80
+./encode.go:241:6: cannot inline encodeScalarInto: function too complex: cost 521 exceeds budget 80
+./encode.go:123:6: cannot inline encodeMessageInto: function too complex: cost 844 exceeds budget 80
+./encode.go:176:6: cannot inline encodeFieldInto: function too complex: cost 2173 exceeds budget 80
+./encode_integer_record.go:7:6: cannot inline encodedIntegerRecordSize: function too complex: cost 376 exceeds budget 80
+./limits.go:114:6: cannot inline encodedSize: function too complex: cost 892 exceeds budget 80
+./limits.go:185:6: cannot inline fieldSize: function too complex: cost 2601 exceeds budget 80
+./pack.go:97:6: can inline packedBufferSize with cost 12 as: func(int) int { return size + (size + 2047) / 2048 * 2 + 8 }
+./limits.go:76:6: cannot inline encodeBufferWithLimits: function too complex: cost 525 exceeds budget 80
+./pack.go:56:6: cannot inline followingFFWords: function too complex: cost 94 exceeds budget 80
+./pack.go:48:6: can inline packFFMergeable with cost 23 as: func(byte) bool { zero := ^header; remaining := zero & (zero - byte(1)); return remaining & (remaining - byte(1)) == byte(0) }
+./pack.go:66:6: cannot inline ffRunBytes: function too complex: cost 201 exceeds budget 80
+./pack.go:35:6: can inline writeFF with cost 56 as: func([]byte, []byte, int) { n = min(n, len(src)); align8 := (n + 7) & -8; dst[0] = byte(255); dst[1] = uint8(align8 / 8 - 1); copy(dst[2:], src[:n]); for loop }
+./pack.go:9:6: can inline packSegment with cost 61 as: func([]byte, []byte, int) int { header := uint8(0); notzero := 0; for loop; if ffN > 0 { if notzero >= 6 { return 8 } }; if notzero == 8 { return 10 }; dst[0] = header; return notzero + 1 }
+./pack.go:109:6: cannot inline packInto: function too complex: cost 509 exceeds budget 80
+./limits.go:63:6: cannot inline encodeWithLimits: function too complex: cost 148 exceeds budget 80
+./limits.go:57:6: can inline EncodeWithLimits with cost 73 as: func(interface {}, Limits) ([]byte, error) { return ([]byte)(.autotmp_4), .autotmp_5 }
+./encode.go:294:6: cannot inline Encode: function too complex: cost 87 exceeds budget 80
+./encode.go:299:6: can inline MustEncode with cost 76 as: func(interface {}) []byte { encoded, err := ([]byte)(.autotmp_4), .autotmp_5; if err != nil { panic(err) }; return encoded }
+./limits.go:290:6: can inline Limits.Validate with cost 63 as: method(Limits) func() error { _, err := Limits(.autotmp_3), .autotmp_4; return err }
+./meta.go:234:6: can inline (*SprotoType).Len with cost 4 as: method(*SprotoType) func() int { return len(st.order) }
+./meta.go:235:6: can inline (*SprotoType).Less with cost 18 as: method(*SprotoType) func(int, int) bool { return st.Fields[st.order[i]].Tag < st.Fields[st.order[j]].Tag }
+./meta.go:238:6: can inline (*SprotoType).Swap with cost 17 as: method(*SprotoType) func(int, int) { st.order[i], st.order[j] = st.order[j], st.order[i] }
+./pack.go:103:6: can inline Pack with cost 78 as: func([]byte) []byte { return packInto(make([]byte, packedBufferSize(len(src))), src) }
+./pack.go:172:6: can inline zeroHeaderPrefix with cost 52 as: func([]byte) int { index := 0; for loop; for loop; return index }
+./pack.go:193:6: cannot inline UnpackWithLimit: function too complex: cost 419 exceeds budget 80
+./pack.go:188:6: can inline Unpack with cost 71 as: func([]byte) ([]byte, error) { return ([]byte)(.autotmp_3), .autotmp_4 }
+./rpc.go:35:6: can inline (*Protocol).HasRequest with cost 5 as: method(*Protocol) func() bool { return p.Request != nil }
+./rpc.go:39:6: can inline (*Protocol).HasResponse with cost 5 as: method(*Protocol) func() bool { return p.Response != nil }
+./rpc.go:51:6: cannot inline getRpcSprotoType: function too complex: cost 202 exceeds budget 80
+./rpc.go:63:6: cannot inline (*Rpc).Dispatch: unhandled op DEFER
+./rpc.go:100:3: can inline (*Rpc).Dispatch.deferwrap1 with cost 76 as: func() { (*sync.Mutex).Unlock(.autotmp_21) }
+./rpc.go:124:6: cannot inline encodeRpcHeader: function too complex: cost 350 exceeds budget 80
+./rpc.go:168:6: cannot inline packRpcFrame: function too complex: cost 196 exceeds budget 80
+./rpc.go:183:6: cannot inline (*Rpc).ResponseEncode: function too complex: cost 313 exceeds budget 80
+./rpc.go:210:6: cannot inline (*Rpc).RequestEncode: unhandled op DEFER
+./rpc.go:254:3: can inline (*Rpc).RequestEncode.deferwrap1 with cost 76 as: func() { (*sync.Mutex).Unlock(.autotmp_30) }
+./rpc.go:276:6: can inline (*Rpc).GetProtocolByName with cost 20 as: method(*Rpc) func(string) *Protocol { if ok { return rpc.protocols[index] }; return nil }
+./rpc.go:283:6: cannot inline NewRpc: function too complex: cost 296 exceeds budget 80
+./rpc.go:315:6: cannot inline (*Rpc).CancelSession: unhandled op DEFER
+./rpc.go:317:2: can inline (*Rpc).CancelSession.deferwrap1 with cost 76 as: func() { (*sync.Mutex).Unlock(.autotmp_2) }
+./rpc.go:322:6: cannot inline (*Rpc).ResetSessions: unhandled op DEFER
+./rpc.go:324:2: can inline (*Rpc).ResetSessions.deferwrap1 with cost 76 as: func() { (*sync.Mutex).Unlock(.autotmp_1) }
+./sproto.go:15:6: can inline Append with cost 47 as: func([]byte, []byte) []byte { l := len(dst); if l + len(src) > cap(dst) { buf := make([]byte, (l + len(src)) * 2); copy(buf, dst); dst = buf }; dst = dst[0:l + len(src)]; copy(dst[l:], src); return dst }
+./sproto.go:28:6: can inline String with cost 3 as: func(string) *string { return &v }
+./sproto.go:32:6: can inline Bool with cost 3 as: func(bool) *bool { return &v }
+./sproto.go:36:6: can inline Int8 with cost 3 as: func(int8) *int8 { return &v }
+./sproto.go:40:6: can inline Uint8 with cost 3 as: func(uint8) *uint8 { return &v }
+./sproto.go:44:6: can inline Int16 with cost 3 as: func(int16) *int16 { return &v }
+./sproto.go:48:6: can inline Uint16 with cost 3 as: func(uint16) *uint16 { return &v }
+./sproto.go:52:6: can inline Int32 with cost 3 as: func(int32) *int32 { return &v }
+./sproto.go:56:6: can inline Uint32 with cost 3 as: func(uint32) *uint32 { return &v }
+./sproto.go:60:6: can inline Int64 with cost 3 as: func(int64) *int64 { return &v }
+./sproto.go:64:6: can inline Uint64 with cost 3 as: func(uint64) *uint64 { return &v }
+./sproto.go:68:6: can inline Int with cost 3 as: func(int) *int { return &v }
+./sproto.go:72:6: can inline Uint with cost 3 as: func(uint) *uint { return &v }
+./sproto.go:77:6: can inline EncodePacked with cost 73 as: func(interface {}) ([]byte, error) { return ([]byte)(.autotmp_3), .autotmp_4 }
+./sproto.go:82:6: cannot inline DecodePacked: function too complex: cost 168 exceeds budget 80
+/Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/reflect/type.go:2855:6: can inline reflect.TypeFor[*int64] with cost 62 as: func() reflect.Type { return reflect.TypeFor[go.shape.*uint8](&reflect..dict.TypeFor[*int64]) }
+/Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/reflect/type.go:2855:6: can inline reflect.TypeFor[[]int64] with cost 62 as: func() reflect.Type { return reflect.TypeFor[go.shape.[]int64](&reflect..dict.TypeFor[[]int64]) }
+/Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/reflect/type.go:2855:6: can inline reflect.TypeFor[*string] with cost 62 as: func() reflect.Type { return reflect.TypeFor[go.shape.*uint8](&reflect..dict.TypeFor[*string]) }
+./limits.go:20:23: inlining call to errors.New
+./limits.go:22:31: inlining call to errors.New
+./limits.go:24:24: inlining call to errors.New
+./rpc.go:11:33: inlining call to errors.New
+./rpc.go:12:33: inlining call to errors.New
+./rpc.go:13:33: inlining call to errors.New
+./sproto.go:8:27: inlining call to errors.New
+./sproto.go:9:27: inlining call to errors.New
+./sproto.go:10:27: inlining call to errors.New
+./sproto.go:11:27: inlining call to errors.New
+./sproto.go:12:27: inlining call to errors.New
+./decode.go:15:35: inlining call to binary.littleEndian.Uint16
+./decode.go:19:35: inlining call to binary.littleEndian.Uint32
+./decode.go:23:35: inlining call to binary.littleEndian.Uint64
+./decode.go:30:27: inlining call to readUint32
+./decode.go:30:27: inlining call to binary.littleEndian.Uint32
+./decode.go:47:19: inlining call to reflect.Value.Kind
+./decode.go:50:23: inlining call to reflect.Value.OverflowInt
+./decode.go:55:43: inlining call to reflect.Value.OverflowUint
+./decode.go:47:19: inlining call to reflect.flag.kind
+./decode.go:50:23: inlining call to reflect.flag.kind
+./decode.go:50:23: inlining call to reflect.Value.typ
+./decode.go:50:23: inlining call to abi.(*Type).Size
+./decode.go:50:23: inlining call to reflect.flag.kind
+./decode.go:55:43: inlining call to reflect.flag.kind
+./decode.go:55:43: inlining call to abi.(*Type).Size
+./decode.go:55:43: inlining call to reflect.flag.kind
+./decode.go:50:23: inlining call to abi.NoEscape
+./decode.go:80:39: inlining call to readUint32
+./decode.go:82:20: inlining call to readUint64
+./decode.go:80:39: inlining call to binary.littleEndian.Uint32
+./decode.go:82:20: inlining call to binary.littleEndian.Uint64
+./decode.go:89:25: inlining call to scalarBits
+./decode.go:89:25: inlining call to readUint32
+./decode.go:89:25: inlining call to readUint64
+./decode.go:89:25: inlining call to binary.littleEndian.Uint32
+./decode.go:89:25: inlining call to binary.littleEndian.Uint64
+./decode.go:98:25: inlining call to scalarBits
+./decode.go:98:25: inlining call to readUint32
+./decode.go:98:25: inlining call to readUint64
+./decode.go:98:25: inlining call to binary.littleEndian.Uint32
+./decode.go:98:25: inlining call to binary.littleEndian.Uint64
+./decode.go:108:25: inlining call to scalarBits
+./decode.go:114:27: inlining call to reflect.ValueOf
+./decode.go:108:25: inlining call to readUint32
+./decode.go:108:25: inlining call to readUint64
+./decode.go:114:27: inlining call to reflect.unpackEface
+./decode.go:108:25: inlining call to binary.littleEndian.Uint32
+./decode.go:108:25: inlining call to binary.littleEndian.Uint64
+./decode.go:114:27: inlining call to abi.(*Type).Kind
+./decode.go:114:27: inlining call to abi.(*Type).IfaceIndir
+./decode.go:119:25: inlining call to scalarBits
+./decode.go:123:57: inlining call to math.Float64frombits
+./decode.go:119:25: inlining call to readUint32
+./decode.go:119:25: inlining call to readUint64
+./decode.go:119:25: inlining call to binary.littleEndian.Uint32
+./decode.go:119:25: inlining call to binary.littleEndian.Uint64
+./decode.go:136:27: inlining call to reflect.ValueOf
+./decode.go:136:27: inlining call to reflect.unpackEface
+./decode.go:136:27: inlining call to abi.(*Type).Kind
+./decode.go:136:27: inlining call to abi.(*Type).IfaceIndir
+./decode.go:146:22: inlining call to (*decodeBudget).add
+./decode.go:149:40: inlining call to reflect.Value.Type
+./decode.go:149:40: inlining call to abi.NoEscape
+./decode.go:161:27: inlining call to reflect.Value.Interface
+./decode.go:164:41: inlining call to reflect.Value.Type
+./decode.go:173:22: inlining call to (*decodeBudget).add
+./decode.go:180:43: inlining call to readUint32
+./decode.go:184:37: inlining call to readUint64
+./decode.go:187:26: inlining call to reflect.Value.Interface
+./decode.go:190:40: inlining call to reflect.Value.Type
+./decode.go:194:40: inlining call to readUint32
+./decode.go:196:21: inlining call to readUint64
+./decode.go:199:49: inlining call to math.Float64frombits
+./decode.go:164:41: inlining call to abi.NoEscape
+./decode.go:180:43: inlining call to binary.littleEndian.Uint32
+./decode.go:184:37: inlining call to binary.littleEndian.Uint64
+./decode.go:190:40: inlining call to abi.NoEscape
+./decode.go:194:40: inlining call to binary.littleEndian.Uint32
+./decode.go:196:21: inlining call to binary.littleEndian.Uint64
+./decode.go:212:28: inlining call to readChunk
+./decode.go:216:23: inlining call to (*decodeBudget).add
+./decode.go:212:28: inlining call to readUint32
+./decode.go:212:28: inlining call to binary.littleEndian.Uint32
+./decode.go:230:40: inlining call to reflect.Value.Type
+./decode.go:232:34: inlining call to readChunk
+./decode.go:230:40: inlining call to abi.NoEscape
+./decode.go:232:34: inlining call to readUint32
+./decode.go:232:34: inlining call to binary.littleEndian.Uint32
+./decode_pointer.go:24:49: inlining call to (*SprotoField).nativeInteger
+./decode.go:291:25: inlining call to readUint16
+./decode.go:296:22: inlining call to (*decodeBudget).add
+./decode.go:300:57: inlining call to reflect.Value.Type
+./decode.go:301:33: inlining call to messageDecodePointer
+./decode.go:304:26: inlining call to readUint16
+./decode.go:316:32: inlining call to readChunk
+./decode.go:323:29: inlining call to (*SprotoType).FieldByTag
+./decode.go:332:27: inlining call to scalarBits
+./decode.go:338:26: inlining call to decodePointer.setInteger
+./decode.go:339:53: inlining call to reflect.ValueOf
+./decode.go:291:25: inlining call to binary.littleEndian.Uint16
+./decode.go:300:57: inlining call to abi.NoEscape
+./decode.go:304:26: inlining call to binary.littleEndian.Uint16
+./decode.go:316:32: inlining call to readUint32
+./decode.go:332:27: inlining call to readUint32
+./decode.go:332:27: inlining call to readUint64
+./decode.go:338:26: inlining call to (*SprotoField).nativeInteger
+./decode.go:339:53: inlining call to reflect.unpackEface
+./decode.go:316:32: inlining call to binary.littleEndian.Uint32
+./decode.go:332:27: inlining call to binary.littleEndian.Uint32
+./decode.go:332:27: inlining call to binary.littleEndian.Uint64
+./decode.go:339:53: inlining call to abi.(*Type).Kind
+./decode.go:339:53: inlining call to abi.(*Type).IfaceIndir
+./decode.go:261:40: inlining call to reflect.Value.Type
+./decode.go:263:34: inlining call to readChunk
+./decode.go:261:40: inlining call to abi.NoEscape
+./decode.go:263:34: inlining call to readUint32
+./decode.go:263:34: inlining call to binary.littleEndian.Uint32
+./meta.go:347:20: inlining call to reflect.TypeOf
+./meta.go:358:21: inlining call to reflect.ValueOf
+./meta.go:359:12: inlining call to reflect.Value.IsNil
+./meta.go:347:20: inlining call to abi.TypeOf
+./meta.go:347:20: inlining call to reflect.toType
+./meta.go:358:21: inlining call to reflect.unpackEface
+./meta.go:359:12: inlining call to reflect.flag.kind
+./meta.go:359:12: inlining call to reflect.flag.kind
+./meta.go:347:20: inlining call to abi.NoEscape
+./meta.go:347:20: inlining call to reflect.toRType
+./meta.go:358:21: inlining call to abi.(*Type).Kind
+./meta.go:358:21: inlining call to abi.(*Type).IfaceIndir
+/Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/reflect/type.go:2857:16: inlining call to reflect.TypeOf
+/Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/reflect/type.go:2860:15: inlining call to reflect.TypeOf
+/Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/reflect/type.go:2857:16: inlining call to abi.TypeOf
+/Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/reflect/type.go:2857:16: inlining call to reflect.toType
+/Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/reflect/type.go:2860:15: inlining call to abi.TypeOf
+/Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/reflect/type.go:2860:15: inlining call to reflect.toType
+/Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/reflect/type.go:2857:16: inlining call to abi.NoEscape
+/Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/reflect/type.go:2857:16: inlining call to reflect.toRType
+/Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/reflect/type.go:2860:15: inlining call to abi.NoEscape
+/Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/reflect/type.go:2860:15: inlining call to reflect.toRType
+./meta.go:52:25: inlining call to strings.Split
+./meta.go:74:25: inlining call to strings.HasPrefix
+./meta.go:74:25: inlining call to stringslite.HasPrefix
+/Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/reflect/type.go:2857:16: inlining call to reflect.TypeOf
+/Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/reflect/type.go:2860:15: inlining call to reflect.TypeOf
+/Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/reflect/type.go:2857:16: inlining call to abi.TypeOf
+/Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/reflect/type.go:2857:16: inlining call to reflect.toType
+/Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/reflect/type.go:2860:15: inlining call to abi.TypeOf
+/Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/reflect/type.go:2860:15: inlining call to reflect.toType
+/Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/reflect/type.go:2857:16: inlining call to abi.NoEscape
+/Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/reflect/type.go:2857:16: inlining call to reflect.toRType
+/Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/reflect/type.go:2860:15: inlining call to abi.NoEscape
+/Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/reflect/type.go:2860:15: inlining call to reflect.toRType
+./meta.go:202:24: inlining call to reflect.StructTag.Get
+./meta.go:177:97: inlining call to reflect.Kind.String
+./meta.go:177:117: inlining call to reflect.Kind.String
+./meta.go:177:137: inlining call to reflect.Kind.String
+./meta.go:180:90: inlining call to reflect.Kind.String
+./meta.go:180:110: inlining call to reflect.Kind.String
+./meta.go:183:83: inlining call to reflect.Kind.String
+./meta.go:177:97: inlining call to strconv.Itoa
+./meta.go:177:117: inlining call to strconv.Itoa
+./meta.go:177:137: inlining call to strconv.Itoa
+./meta.go:180:90: inlining call to strconv.Itoa
+./meta.go:180:110: inlining call to strconv.Itoa
+./meta.go:183:83: inlining call to strconv.Itoa
+./meta.go:259:12: inlining call to sync.(*Mutex).Lock
+./meta.go:261:15: inlining call to sync.(*Mutex).Unlock
+./meta.go:272:14: inlining call to sync.(*Mutex).Unlock
+./meta.go:259:12: inlining call to sync.(*Mutex).Lock
+./meta.go:261:15: inlining call to sync.(*Mutex).Unlock
+./meta.go:272:14: inlining call to sync.(*Mutex).Unlock
+./decode.go:357:32: inlining call to normalizeLimits
+./decode.go:382:21: inlining call to Decode
+./encode.go:65:31: inlining call to binary.littleEndian.PutUint16
+./encode.go:69:31: inlining call to binary.littleEndian.PutUint32
+./encode.go:73:31: inlining call to binary.littleEndian.PutUint64
+./encode.go:78:20: inlining call to reflect.Value.Uint
+./encode.go:80:25: inlining call to reflect.Value.Int
+./encode.go:78:20: inlining call to reflect.flag.kind
+./encode.go:78:20: inlining call to reflect.flag.kind
+./encode.go:80:25: inlining call to reflect.flag.kind
+./encode.go:80:25: inlining call to reflect.flag.kind
+./encode.go:95:21: inlining call to integerWidth
+./encode.go:102:23: inlining call to integerWidth
+./encode.go:104:14: inlining call to writeUint32
+./encode.go:106:14: inlining call to writeUint64
+./encode.go:104:14: inlining call to binary.littleEndian.PutUint32
+./encode.go:106:14: inlining call to binary.littleEndian.PutUint64
+./encode.go:112:37: inlining call to reflect.Value.IsNil
+./encode.go:112:37: inlining call to reflect.flag.kind
+./encode.go:112:37: inlining call to reflect.flag.kind
+./encode.go:281:15: inlining call to writeUint32
+./encode.go:286:15: inlining call to writeUint64
+./encode.go:281:15: inlining call to binary.littleEndian.PutUint32
+./encode.go:286:15: inlining call to binary.littleEndian.PutUint64
+./encode_pointer.go:36:19: inlining call to reflect.Value.Type
+./encode_pointer.go:43:24: inlining call to knownEncodeType
+./encode_pointer.go:36:19: inlining call to abi.NoEscape
+./encode_pointer.go:29:25: inlining call to knownEncodeType
+./encode_pointer.go:50:44: inlining call to (*SprotoField).nativeInteger
+./encode_integer_record.go:52:22: inlining call to (*encodeLayout).next
+./encode_integer_record.go:53:13: inlining call to writeUint16
+./encode_integer_record.go:63:35: inlining call to encodePointer.integer
+./encode_integer_record.go:67:21: inlining call to skipTag
+./encode_integer_record.go:68:15: inlining call to writeUint16
+./encode_integer_record.go:79:38: inlining call to encodeIntegerInto
+./encode_integer_record.go:81:14: inlining call to writeUint16
+./encode_integer_record.go:85:15: inlining call to writeUint32
+./encode_integer_record.go:53:13: inlining call to binary.littleEndian.PutUint16
+./encode_integer_record.go:68:15: inlining call to binary.littleEndian.PutUint16
+./encode_integer_record.go:79:38: inlining call to integerWidth
+./encode_integer_record.go:79:38: inlining call to writeUint32
+./encode_integer_record.go:79:38: inlining call to writeUint64
+./encode_integer_record.go:81:14: inlining call to binary.littleEndian.PutUint16
+./encode_integer_record.go:85:15: inlining call to binary.littleEndian.PutUint32
+./encode_integer_record.go:79:38: inlining call to binary.littleEndian.PutUint32
+./encode_integer_record.go:79:38: inlining call to binary.littleEndian.PutUint64
+./encode.go:247:16: inlining call to reflect.Value.Bool
+./encode.go:256:24: inlining call to integerWidth
+./encode.go:258:15: inlining call to writeUint32
+./encode.go:260:15: inlining call to writeUint64
+./encode.go:264:55: inlining call to reflect.Value.Float
+./encode.go:264:43: inlining call to math.Float64bits
+./encode.go:264:14: inlining call to writeUint64
+./encode.go:267:16: inlining call to reflect.Value.Kind
+./encode.go:268:43: inlining call to reflect.Value.String
+./encode.go:270:41: inlining call to reflect.Value.Bytes
+./encode.go:247:16: inlining call to reflect.flag.kind
+./encode.go:258:15: inlining call to binary.littleEndian.PutUint32
+./encode.go:260:15: inlining call to binary.littleEndian.PutUint64
+./encode.go:264:55: inlining call to reflect.flag.kind
+./encode.go:264:55: inlining call to reflect.flag.kind
+./encode.go:264:14: inlining call to binary.littleEndian.PutUint64
+./encode.go:267:16: inlining call to reflect.flag.kind
+./encode.go:268:43: inlining call to reflect.flag.kind
+./encode.go:124:22: inlining call to (*encodeLayout).next
+./encode.go:125:13: inlining call to writeUint16
+./encode.go:126:16: inlining call to reflect.Value.IsNil
+./encode.go:130:33: inlining call to messageEncodePointer
+./encode.go:137:50: inlining call to (*SprotoField).nativeInteger
+./encode.go:142:35: inlining call to encodePointer.integer
+./encode.go:148:19: inlining call to omittedField
+./encode.go:152:21: inlining call to skipTag
+./encode.go:153:15: inlining call to writeUint16
+./encode.go:159:38: inlining call to encodeIntegerInto
+./encode.go:165:14: inlining call to writeUint16
+./encode.go:169:15: inlining call to writeUint32
+./encode.go:125:13: inlining call to binary.littleEndian.PutUint16
+./encode.go:126:16: inlining call to reflect.flag.kind
+./encode.go:126:16: inlining call to reflect.flag.kind
+./encode.go:148:19: inlining call to reflect.Value.IsNil
+./encode.go:153:15: inlining call to binary.littleEndian.PutUint16
+./encode.go:159:38: inlining call to integerWidth
+./encode.go:159:38: inlining call to writeUint32
+./encode.go:159:38: inlining call to writeUint64
+./encode.go:165:14: inlining call to binary.littleEndian.PutUint16
+./encode.go:169:15: inlining call to binary.littleEndian.PutUint32
+./encode.go:148:19: inlining call to reflect.flag.kind
+./encode.go:148:19: inlining call to reflect.flag.kind
+./encode.go:159:38: inlining call to binary.littleEndian.PutUint32
+./encode.go:159:38: inlining call to binary.littleEndian.PutUint64
+./encode.go:178:15: inlining call to reflect.Value.Len
+./encode.go:184:24: inlining call to (*encodeLayout).next
+./encode.go:186:52: inlining call to reflect.Value.Interface
+./encode.go:186:28: inlining call to encodeInt64Slice
+./encode.go:189:37: inlining call to reflect.Value.Len
+./encode.go:192:17: inlining call to writeUint32
+./encode.go:194:17: inlining call to writeUint64
+./encode.go:197:32: inlining call to reflect.Value.Len
+./encode.go:201:37: inlining call to reflect.Value.Len
+./encode.go:202:75: inlining call to reflect.Value.Float
+./encode.go:202:50: inlining call to math.Float64bits
+./encode.go:202:16: inlining call to writeUint64
+./encode.go:206:37: inlining call to reflect.Value.Len
+./encode.go:207:31: inlining call to reflect.Value.Bool
+./encode.go:213:22: inlining call to reflect.Value.Len
+./encode.go:215:37: inlining call to reflect.Value.Len
+./encode.go:216:38: inlining call to reflect.Value.String
+./encode.go:217:16: inlining call to writeUint32
+./encode.go:221:35: inlining call to bindEncodeChild
+./encode.go:222:91: inlining call to (*SprotoType).nativeIntegerFields
+./encode.go:223:37: inlining call to reflect.Value.Len
+./encode.go:226:37: inlining call to messageEncodePointer
+./encode.go:231:16: inlining call to writeUint32
+./encode.go:237:75: inlining call to bindEncodeChild
+./encode.go:178:15: inlining call to reflect.flag.kind
+./encode.go:186:28: inlining call to writeUint32
+./encode.go:186:28: inlining call to writeUint64
+./encode.go:189:37: inlining call to reflect.flag.kind
+./encode.go:192:17: inlining call to binary.littleEndian.PutUint32
+./encode.go:194:17: inlining call to binary.littleEndian.PutUint64
+./encode.go:197:32: inlining call to reflect.flag.kind
+./encode.go:201:37: inlining call to reflect.flag.kind
+./encode.go:202:75: inlining call to reflect.flag.kind
+./encode.go:202:75: inlining call to reflect.flag.kind
+./encode.go:202:16: inlining call to binary.littleEndian.PutUint64
+./encode.go:206:37: inlining call to reflect.flag.kind
+./encode.go:207:31: inlining call to reflect.flag.kind
+./encode.go:213:22: inlining call to reflect.flag.kind
+./encode.go:215:37: inlining call to reflect.flag.kind
+./encode.go:216:38: inlining call to reflect.flag.kind
+./encode.go:217:16: inlining call to binary.littleEndian.PutUint32
+./encode.go:221:35: inlining call to knownEncodeType
+./encode.go:222:91: inlining call to (*SprotoField).nativeInteger
+./encode.go:223:37: inlining call to reflect.flag.kind
+./encode.go:231:16: inlining call to binary.littleEndian.PutUint32
+./encode.go:237:75: inlining call to knownEncodeType
+./encode.go:186:28: inlining call to binary.littleEndian.PutUint32
+./encode.go:186:28: inlining call to binary.littleEndian.PutUint64
+./encode_integer_record.go:11:27: inlining call to (*encodeLayout).add
+./encode_integer_record.go:21:35: inlining call to encodePointer.integer
+./encode_integer_record.go:25:23: inlining call to (*decodeBudget).add
+./encode_integer_record.go:40:28: inlining call to integerWidth
+./encode_integer_record.go:46:12: inlining call to (*encodeLayout).set
+./limits.go:122:27: inlining call to (*encodeLayout).add
+./limits.go:123:16: inlining call to reflect.Value.IsNil
+./limits.go:127:33: inlining call to messageEncodePointer
+./limits.go:134:50: inlining call to (*SprotoField).nativeInteger
+./limits.go:139:35: inlining call to encodePointer.integer
+./limits.go:145:19: inlining call to omittedField
+./limits.go:149:23: inlining call to (*decodeBudget).add
+./limits.go:167:29: inlining call to signedSize
+./limits.go:181:12: inlining call to (*encodeLayout).set
+./limits.go:123:16: inlining call to reflect.flag.kind
+./limits.go:123:16: inlining call to reflect.flag.kind
+./limits.go:145:19: inlining call to reflect.Value.IsNil
+./limits.go:167:29: inlining call to integerWidth
+./limits.go:145:19: inlining call to reflect.flag.kind
+./limits.go:145:19: inlining call to reflect.flag.kind
+./limits.go:187:33: inlining call to reflect.Value.Len
+./limits.go:187:23: inlining call to (*decodeBudget).add
+./limits.go:194:38: inlining call to reflect.Value.Interface
+./limits.go:204:16: inlining call to (*encodeLayout).add
+./limits.go:209:29: inlining call to reflect.Value.Len
+./limits.go:214:20: inlining call to integerWidth
+./limits.go:218:16: inlining call to reflect.Value.Len
+./limits.go:219:31: inlining call to reflect.Value.Len
+./limits.go:220:15: inlining call to (*encodeLayout).add
+./limits.go:223:16: inlining call to reflect.Value.Len
+./limits.go:224:27: inlining call to reflect.Value.Len
+./limits.go:227:20: inlining call to reflect.Value.Len
+./limits.go:229:29: inlining call to reflect.Value.Len
+./limits.go:230:35: inlining call to reflect.Value.Len
+./limits.go:237:16: inlining call to reflect.Value.Len
+./limits.go:238:35: inlining call to bindEncodeChild
+./limits.go:241:91: inlining call to (*SprotoType).nativeIntegerFields
+./limits.go:242:29: inlining call to reflect.Value.Len
+./limits.go:246:37: inlining call to messageEncodePointer
+./limits.go:266:85: inlining call to bindEncodeChild
+./limits.go:278:22: inlining call to integerWidth
+./limits.go:284:19: inlining call to reflect.Value.Len
+./limits.go:187:33: inlining call to reflect.flag.kind
+./limits.go:209:29: inlining call to reflect.flag.kind
+./limits.go:218:16: inlining call to reflect.flag.kind
+./limits.go:219:31: inlining call to reflect.flag.kind
+./limits.go:223:16: inlining call to reflect.flag.kind
+./limits.go:224:27: inlining call to reflect.flag.kind
+./limits.go:227:20: inlining call to reflect.flag.kind
+./limits.go:229:29: inlining call to reflect.flag.kind
+./limits.go:230:35: inlining call to reflect.flag.kind
+./limits.go:237:16: inlining call to reflect.flag.kind
+./limits.go:238:35: inlining call to knownEncodeType
+./limits.go:241:91: inlining call to (*SprotoField).nativeInteger
+./limits.go:242:29: inlining call to reflect.flag.kind
+./limits.go:266:85: inlining call to knownEncodeType
+./limits.go:284:19: inlining call to reflect.flag.kind
+./limits.go:77:32: inlining call to normalizeLimits
+./limits.go:91:28: inlining call to knownEncodeType
+./limits.go:100:30: inlining call to packedBufferSize
+./pack.go:58:28: inlining call to bytes.IndexByte
+./pack.go:73:37: inlining call to binary.littleEndian.Uint64
+./pack.go:77:23: inlining call to packFFMergeable
+./pack.go:112:37: inlining call to binary.littleEndian.Uint64
+./pack.go:117:11: inlining call to writeFF
+./pack.go:165:24: inlining call to packSegment
+./encode.go:295:25: inlining call to EncodeWithLimits
+./limits.go:291:27: inlining call to normalizeLimits
+./pack.go:104:47: inlining call to packedBufferSize
+./pack.go:175:37: inlining call to binary.littleEndian.Uint64
+./pack.go:210:32: inlining call to zeroHeaderPrefix
+./pack.go:223:31: inlining call to bits.OnesCount8
+./pack.go:241:31: inlining call to zeroHeaderPrefix
+./pack.go:210:32: inlining call to binary.littleEndian.Uint64
+./pack.go:241:31: inlining call to binary.littleEndian.Uint64
+./rpc.go:65:27: inlining call to Unpack
+./rpc.go:71:23: inlining call to Decode
+./rpc.go:84:52: inlining call to reflect.Value.Interface
+./rpc.go:85:22: inlining call to Decode
+./rpc.go:99:24: inlining call to sync.(*Mutex).Lock
+./rpc.go:110:53: inlining call to reflect.Value.Interface
+./rpc.go:111:22: inlining call to Decode
+./rpc.go:99:24: inlining call to sync.(*Mutex).Lock
+./rpc.go:100:32: inlining call to sync.(*Mutex).Unlock
+./rpc.go:100:32: inlining call to sync.(*Mutex).Unlock
+./rpc.go:125:32: inlining call to normalizeLimits
+./rpc.go:137:13: inlining call to writeUint16
+./rpc.go:143:23: inlining call to (*decodeBudget).add
+./rpc.go:146:21: inlining call to skipTag
+./rpc.go:147:15: inlining call to writeUint16
+./rpc.go:150:42: inlining call to encodeIntegerInto
+./rpc.go:151:14: inlining call to writeUint16
+./rpc.go:154:15: inlining call to writeUint32
+./rpc.go:137:13: inlining call to binary.littleEndian.PutUint16
+./rpc.go:147:15: inlining call to binary.littleEndian.PutUint16
+./rpc.go:150:42: inlining call to integerWidth
+./rpc.go:150:42: inlining call to writeUint32
+./rpc.go:150:42: inlining call to writeUint64
+./rpc.go:151:14: inlining call to binary.littleEndian.PutUint16
+./rpc.go:154:15: inlining call to binary.littleEndian.PutUint32
+./rpc.go:150:42: inlining call to binary.littleEndian.PutUint32
+./rpc.go:150:42: inlining call to binary.littleEndian.PutUint64
+./rpc.go:175:41: inlining call to packedBufferSize
+./rpc.go:195:20: inlining call to reflect.TypeOf
+./rpc.go:195:20: inlining call to abi.TypeOf
+./rpc.go:195:20: inlining call to reflect.toType
+./rpc.go:195:20: inlining call to abi.NoEscape
+./rpc.go:195:20: inlining call to reflect.toRType
+./rpc.go:220:20: inlining call to reflect.TypeOf
+./rpc.go:223:27: inlining call to (*Protocol).HasResponse
+./rpc.go:249:25: inlining call to (*Protocol).HasResponse
+./rpc.go:253:24: inlining call to sync.(*Mutex).Lock
+./rpc.go:220:20: inlining call to abi.TypeOf
+./rpc.go:220:20: inlining call to reflect.toType
+./rpc.go:253:24: inlining call to sync.(*Mutex).Lock
+./rpc.go:220:20: inlining call to abi.NoEscape
+./rpc.go:220:20: inlining call to reflect.toRType
+./rpc.go:254:32: inlining call to sync.(*Mutex).Unlock
+./rpc.go:254:32: inlining call to sync.(*Mutex).Unlock
+./rpc.go:316:23: inlining call to sync.(*Mutex).Lock
+./rpc.go:316:23: inlining call to sync.(*Mutex).Lock
+./rpc.go:317:31: inlining call to sync.(*Mutex).Unlock
+./rpc.go:317:31: inlining call to sync.(*Mutex).Unlock
+./rpc.go:323:23: inlining call to sync.(*Mutex).Lock
+./rpc.go:323:23: inlining call to sync.(*Mutex).Lock
+./rpc.go:324:31: inlining call to sync.(*Mutex).Unlock
+./rpc.go:324:31: inlining call to sync.(*Mutex).Unlock
+./sproto.go:83:25: inlining call to Unpack
+./sproto.go:87:17: inlining call to Decode
+<autogenerated>:1: inlining call to Limits.Validate
+<autogenerated>:1: inlining call to normalizeLimits
+<autogenerated>:1: inlining call to decodePointer.setInteger
+<autogenerated>:1: inlining call to (*SprotoField).nativeInteger
+<autogenerated>:1: inlining call to encodePointer.integer
+<autogenerated>:1: inlining call to reflect.flag.kind
+<autogenerated>:1: inlining call to reflect.flag.kind
+<autogenerated>:1: inlining call to reflect.flag.mustBe
+<autogenerated>:1: inlining call to reflect.flag.kind
+<autogenerated>:1: inlining call to reflect.flag.mustBe
+<autogenerated>:1: inlining call to reflect.flag.kind
+<autogenerated>:1: inlining call to reflect.flag.mustBeAssignable
+<autogenerated>:1: inlining call to reflect.flag.mustBeAssignable
+<autogenerated>:1: inlining call to reflect.flag.mustBeExported
+<autogenerated>:1: inlining call to reflect.flag.mustBeExported
+<autogenerated>:1: inlining call to reflect.flag.ro
+<autogenerated>:1: inlining call to reflect.flag.ro
+./meta.go:22:14: make(map[reflect.Type]*SprotoType) escapes to heap:
+./meta.go:22:14:   flow: {heap} = &{storage for make(map[reflect.Type]*SprotoType)}:
+./meta.go:22:14:     from make(map[reflect.Type]*SprotoType) (spill) at ./meta.go:22:14
+./meta.go:22:14:     from stMap = make(map[reflect.Type]*SprotoType) (assign) at ./meta.go:22:2
+./meta.go:22:14: make(map[reflect.Type]*SprotoType) escapes to heap
+./decode.go:14:17: buffer does not escape
+./decode.go:18:17: buffer does not escape
+./decode.go:22:17: buffer does not escape
+./decode.go:26:16: parameter chunk leaks to ~r1 with derefs=0:
+./decode.go:26:16:   flow: ~r1 = chunk:
+./decode.go:26:16:     from chunk[4:end] (slice) at ./decode.go:35:19
+./decode.go:26:16:     from return end, chunk[4:end], nil (return) at ./decode.go:35:2
+./decode.go:26:16: leaking param: chunk to result ~r1 level=0
+./decode.go:38:18: parameter field leaks to {heap} with derefs=1:
+./decode.go:38:18:   flow: {heap} = *field:
+./decode.go:38:18:     from field.valueType (dot of pointer) at ./decode.go:40:30
+./decode.go:38:18:     from reflect.New(field.valueType) (call parameter) at ./decode.go:40:24
+./decode.go:38:38: parameter value leaks to {heap} with derefs=0:
+./decode.go:38:38:   flow: {heap} = value:
+./decode.go:38:38:     from reflect.Value.Set(value, reflect.New(field.valueType)) (call parameter) at ./decode.go:40:12
+./decode.go:38:38: parameter value leaks to ~r0 with derefs=0:
+./decode.go:38:38:   flow: ~r0 = value:
+./decode.go:38:38:     from reflect.Value.Elem(value) (call parameter) at ./decode.go:41:20
+./decode.go:38:38:     from return reflect.Value.Elem(value) (return) at ./decode.go:41:3
+./decode.go:38:18: leaking param content: field
+./decode.go:38:38: leaking param: value
+./decode.go:50:23: &reflect.ValueError{...} escapes to heap:
+./decode.go:50:23:   flow: {heap} = &{storage for &reflect.ValueError{...}}:
+./decode.go:50:23:     from &reflect.ValueError{...} (spill) at ./decode.go:50:23
+./decode.go:50:23:     from &reflect.ValueError{...} (interface-converted) at ./decode.go:50:23
+./decode.go:50:23:     from panic(&reflect.ValueError{...}) (call parameter) at ./decode.go:50:23
+./decode.go:55:43: &reflect.ValueError{...} escapes to heap:
+./decode.go:55:43:   flow: {heap} = &{storage for &reflect.ValueError{...}}:
+./decode.go:55:43:     from &reflect.ValueError{...} (spill) at ./decode.go:55:43
+./decode.go:55:43:     from &reflect.ValueError{...} (interface-converted) at ./decode.go:55:43
+./decode.go:55:43:     from panic(&reflect.ValueError{...}) (call parameter) at ./decode.go:55:43
+./decode.go:46:17: value does not escape
+./decode.go:50:23: &reflect.ValueError{...} escapes to heap
+./decode.go:55:43: &reflect.ValueError{...} escapes to heap
+./decode.go:65:78: parameter value leaks to {heap} with derefs=0:
+./decode.go:65:78:   flow: {heap} = value:
+./decode.go:65:78:     from targetValue(field, value) (call parameter) at ./decode.go:69:13
+./decode.go:65:58: parameter field leaks to {heap} with derefs=1:
+./decode.go:65:58:   flow: {heap} = *field:
+./decode.go:65:58:     from targetValue(field, value) (call parameter) at ./decode.go:69:13
+./decode.go:65:58: leaking param content: field
+./decode.go:65:78: leaking param: value
+./decode.go:74:48: data does not escape
+./decode.go:88:80: parameter value leaks to {heap} with derefs=0:
+./decode.go:88:80:   flow: {heap} = value:
+./decode.go:88:80:     from targetValue(field, value) (call parameter) at ./decode.go:93:31
+./decode.go:88:60: parameter field leaks to {heap} with derefs=1:
+./decode.go:88:60:   flow: {heap} = *field:
+./decode.go:88:60:     from targetValue(field, value) (call parameter) at ./decode.go:93:31
+./decode.go:88:47: data does not escape
+./decode.go:88:60: leaking param content: field
+./decode.go:88:80: leaking param: value
+./decode.go:97:82: parameter value leaks to {heap} with derefs=0:
+./decode.go:97:82:   flow: {heap} = value:
+./decode.go:97:82:     from targetValue(field, value) (call parameter) at ./decode.go:102:13
+./decode.go:97:62: parameter field leaks to {heap} with derefs=1:
+./decode.go:97:62:   flow: {heap} = *field:
+./decode.go:97:62:     from targetValue(field, value) (call parameter) at ./decode.go:102:13
+./decode.go:97:49: data does not escape
+./decode.go:97:62: leaking param content: field
+./decode.go:97:82: leaking param: value
+./decode.go:112:15: new(int64) escapes to heap:
+./decode.go:112:15:   flow: result = &{storage for new(int64)}:
+./decode.go:112:15:     from new(int64) (spill) at ./decode.go:112:15
+./decode.go:112:15:     from result := new(int64) (assign) at ./decode.go:112:9
+./decode.go:112:15:   flow: reflect.i = result:
+./decode.go:112:15:     from result (interface-converted) at ./decode.go:114:28
+./decode.go:112:15:     from reflect.i := result (assign-pair) at ./decode.go:114:27
+./decode.go:112:15:   flow: reflect.i = reflect.i:
+./decode.go:112:15:     from reflect.i := reflect.i (assign-pair) at ./decode.go:114:27
+./decode.go:112:15:   flow: reflect.e = &reflect.i:
+./decode.go:112:15:     from &reflect.i (address-of) at ./decode.go:114:27
+./decode.go:112:15:     from reflect.e := (*abi.EmptyInterface)(unsafe.Pointer(&reflect.i)) (assign) at ./decode.go:114:27
+./decode.go:112:15:   flow: ~r0 = *reflect.e:
+./decode.go:112:15:     from reflect.e.Data (dot of pointer) at ./decode.go:114:27
+./decode.go:112:15:     from reflect.Value{...} (struct literal element) at ./decode.go:114:27
+./decode.go:112:15:     from ~r0 = reflect.Value{...} (assign-pair) at ./decode.go:114:27
+./decode.go:112:15:   flow: ~r0 = ~r0:
+./decode.go:112:15:     from ~r0 = ~r0 (assign-pair) at ./decode.go:114:27
+./decode.go:112:15:   flow: {heap} = ~r0:
+./decode.go:112:15:     from reflect.Value.Set(value, ~r0) (call parameter) at ./decode.go:114:11
+./decode.go:107:85: parameter value leaks to {heap} with derefs=0:
+./decode.go:107:85:   flow: {heap} = value:
+./decode.go:107:85:     from reflect.Value.Set(value, ~r0) (call parameter) at ./decode.go:114:11
+./decode.go:107:56: data does not escape
+./decode.go:107:85: leaking param: value
+./decode.go:112:15: new(int64) escapes to heap
+./decode.go:118:83: parameter value leaks to {heap} with derefs=0:
+./decode.go:118:83:   flow: {heap} = value:
+./decode.go:118:83:     from targetValue(field, value) (call parameter) at ./decode.go:123:13
+./decode.go:118:63: parameter field leaks to {heap} with derefs=1:
+./decode.go:118:63:   flow: {heap} = *field:
+./decode.go:118:63:     from targetValue(field, value) (call parameter) at ./decode.go:123:13
+./decode.go:118:50: data does not escape
+./decode.go:118:63: leaking param content: field
+./decode.go:118:83: leaking param: value
+./decode.go:128:45: string(data) escapes to heap:
+./decode.go:128:45:   flow: {heap} = &{storage for string(data)}:
+./decode.go:128:45:     from string(data) (spill) at ./decode.go:128:45
+./decode.go:128:45:     from reflect.Value.SetString(targetValue(field, value), string(data)) (call parameter) at ./decode.go:128:37
+./decode.go:127:70: parameter value leaks to {heap} with derefs=0:
+./decode.go:127:70:   flow: {heap} = value:
+./decode.go:127:70:     from targetValue(field, value) (call parameter) at ./decode.go:128:13
+./decode.go:127:50: parameter field leaks to {heap} with derefs=1:
+./decode.go:127:50:   flow: {heap} = *field:
+./decode.go:127:50:     from targetValue(field, value) (call parameter) at ./decode.go:128:13
+./decode.go:127:37: data does not escape
+./decode.go:127:50: leaking param content: field
+./decode.go:127:70: leaking param: value
+./decode.go:128:45: string(data) escapes to heap
+./decode.go:135:19: string(data) escapes to heap:
+./decode.go:135:19:   flow: {heap} = &{storage for string(data)}:
+./decode.go:135:19:     from string(data) (spill) at ./decode.go:135:19
+./decode.go:135:19:     from *result = string(data) (assign) at ./decode.go:135:10
+./decode.go:134:15: new(string) escapes to heap:
+./decode.go:134:15:   flow: result = &{storage for new(string)}:
+./decode.go:134:15:     from new(string) (spill) at ./decode.go:134:15
+./decode.go:134:15:     from result := new(string) (assign) at ./decode.go:134:9
+./decode.go:134:15:   flow: reflect.i = result:
+./decode.go:134:15:     from result (interface-converted) at ./decode.go:136:28
+./decode.go:134:15:     from reflect.i := result (assign-pair) at ./decode.go:136:27
+./decode.go:134:15:   flow: reflect.i = reflect.i:
+./decode.go:134:15:     from reflect.i := reflect.i (assign-pair) at ./decode.go:136:27
+./decode.go:134:15:   flow: reflect.e = &reflect.i:
+./decode.go:134:15:     from &reflect.i (address-of) at ./decode.go:136:27
+./decode.go:134:15:     from reflect.e := (*abi.EmptyInterface)(unsafe.Pointer(&reflect.i)) (assign) at ./decode.go:136:27
+./decode.go:134:15:   flow: ~r0 = *reflect.e:
+./decode.go:134:15:     from reflect.e.Data (dot of pointer) at ./decode.go:136:27
+./decode.go:134:15:     from reflect.Value{...} (struct literal element) at ./decode.go:136:27
+./decode.go:134:15:     from ~r0 = reflect.Value{...} (assign-pair) at ./decode.go:136:27
+./decode.go:134:15:   flow: ~r0 = ~r0:
+./decode.go:134:15:     from ~r0 = ~r0 (assign-pair) at ./decode.go:136:27
+./decode.go:134:15:   flow: {heap} = ~r0:
+./decode.go:134:15:     from reflect.Value.Set(value, ~r0) (call parameter) at ./decode.go:136:11
+./decode.go:133:73: parameter value leaks to {heap} with derefs=0:
+./decode.go:133:73:   flow: {heap} = value:
+./decode.go:133:73:     from reflect.Value.Set(value, ~r0) (call parameter) at ./decode.go:136:11
+./decode.go:133:44: data does not escape
+./decode.go:133:73: leaking param: value
+./decode.go:134:15: new(string) escapes to heap
+./decode.go:135:19: string(data) escapes to heap
+./decode.go:141:30: []byte{} escapes to heap:
+./decode.go:141:30:   flow: {temp} = &{storage for []byte{}}:
+./decode.go:141:30:     from []byte{} (spill) at ./decode.go:141:30
+./decode.go:141:30:     from append([]byte{}, data...) (call parameter) at ./decode.go:141:23
+./decode.go:141:30:   flow: {heap} = {temp}:
+./decode.go:141:30:     from reflect.Value.SetBytes(value, append([]byte{}, data...)) (call parameter) at ./decode.go:141:16
+./decode.go:140:36: data does not escape
+./decode.go:140:65: value does not escape
+./decode.go:141:30: []byte{} escapes to heap
+./decode.go:145:69: parameter value leaks to {heap} with derefs=0:
+./decode.go:145:69:   flow: {heap} = value:
+./decode.go:145:69:     from reflect.Value.Set(value, result) (call parameter) at ./decode.go:153:11
+./decode.go:145:40: data does not escape
+./decode.go:145:69: leaking param: value
+./decode.go:145:90: budget does not escape
+./decode.go:161:50: []int64{} escapes to heap:
+./decode.go:161:50:   flow: {heap} = &{storage for []int64{}}:
+./decode.go:161:50:     from []int64{} (spill) at ./decode.go:161:50
+./decode.go:161:50:     from *(reflect.i).(*[]int64) = []int64{} (assign) at ./decode.go:161:41
+./decode.go:177:17: make([]int64, count) escapes to heap:
+./decode.go:177:17:   flow: {heap} = &{storage for make([]int64, count)}:
+./decode.go:177:17:     from make([]int64, count) (non-constant size) at ./decode.go:177:17
+./decode.go:157:72: parameter value leaks to {heap} with derefs=0:
+./decode.go:157:72:   flow: {heap} = value:
+./decode.go:157:72:     from reflect.Value.Set(value, reflect.MakeSlice(~r0, 0, 0)) (call parameter) at ./decode.go:164:12
+./decode.go:157:39: data does not escape
+./decode.go:157:52: field does not escape
+./decode.go:157:72: leaking param: value
+./decode.go:157:93: budget does not escape
+./decode.go:161:50: []int64{} escapes to heap
+./decode.go:177:17: make([]int64, count) escapes to heap
+./decode.go:209:18: data does not escape
+./decode.go:209:31: budget does not escape
+./decode.go:236:40: string(content) escapes to heap:
+./decode.go:236:40:   flow: {heap} = &{storage for string(content)}:
+./decode.go:236:40:     from string(content) (spill) at ./decode.go:236:40
+./decode.go:236:40:     from reflect.Value.SetString(reflect.Value.Index(result, index), string(content)) (call parameter) at ./decode.go:236:32
+./decode.go:225:71: parameter value leaks to {heap} with derefs=0:
+./decode.go:225:71:   flow: {heap} = value:
+./decode.go:225:71:     from reflect.Value.Set(value, result) (call parameter) at ./decode.go:239:11
+./decode.go:225:42: data does not escape
+./decode.go:225:71: leaking param: value
+./decode.go:225:92: budget does not escape
+./decode.go:236:40: string(content) escapes to heap
+./decode.go:282:75: decodeMessage capturing by value: budget (addr=false assign=false width=8)
+./decode.go:282:75: parameter budget leaks to {heap} with derefs=0:
+./decode.go:282:75:   flow: {heap} = budget:
+./decode.go:282:75:     from field.dec(inline, hasInline, content, field, reflect.Value.Field(record, field.index[0]), budget) (call parameter) at ./decode.go:343:22
+./decode.go:282:34: parameter schema leaks to {heap} with derefs=2:
+./decode.go:282:34:   flow: st = schema:
+./decode.go:282:34:     from st, tag := schema, tag (assign-pair) at ./decode.go:323:29
+./decode.go:282:34:   flow: ~r0 = **st:
+./decode.go:282:34:     from st.Fields (dot of pointer) at ./decode.go:323:29
+./decode.go:282:34:     from st.Fields[index - 1] (dot of pointer) at ./decode.go:323:29
+./decode.go:282:34:     from ~r0 = st.Fields[index - 1] (assign-pair) at ./decode.go:323:29
+./decode.go:282:34:   flow: field = ~r0:
+./decode.go:282:34:     from field := ~r0 (assign) at ./decode.go:323:9
+./decode.go:282:34:   flow: {heap} = field:
+./decode.go:282:34:     from field.dec(inline, hasInline, content, field, reflect.Value.Field(record, field.index[0]), budget) (call parameter) at ./decode.go:343:22
+./decode.go:282:20: parameter chunk leaks to {heap} with derefs=0:
+./decode.go:282:20:   flow: chunk = chunk:
+./decode.go:282:20:     from chunk[total:] (slice) at ./decode.go:316:38
+./decode.go:282:20:     from chunk := chunk[total:] (assign-pair) at ./decode.go:316:32
+./decode.go:282:20:   flow: ~r1 = chunk:
+./decode.go:282:20:     from chunk[4:end] (slice) at ./decode.go:316:32
+./decode.go:282:20:     from ~r0, ~r1, ~r2 = end, chunk[4:end], nil (assign-pair) at ./decode.go:316:32
+./decode.go:282:20:   flow: .autotmp_22 = ~r1:
+./decode.go:282:20:   flow: data = .autotmp_22:
+./decode.go:282:20:     from used, data, err := int(.autotmp_21), .autotmp_22, .autotmp_23 (assign-pair) at ./decode.go:316:20
+./decode.go:282:20:   flow: content = data:
+./decode.go:282:20:     from content = data (assign) at ./decode.go:321:12
+./decode.go:282:20:   flow: {heap} = content:
+./decode.go:282:20:     from field.dec(inline, hasInline, content, field, reflect.Value.Field(record, field.index[0]), budget) (call parameter) at ./decode.go:343:22
+./decode.go:336:17: new(int64) escapes to heap:
+./decode.go:336:17:   flow: result = &{storage for new(int64)}:
+./decode.go:336:17:     from new(int64) (spill) at ./decode.go:336:17
+./decode.go:336:17:     from result := new(int64) (assign) at ./decode.go:336:11
+./decode.go:336:17:   flow: reflect.i = result:
+./decode.go:336:17:     from result (interface-converted) at ./decode.go:339:54
+./decode.go:336:17:     from reflect.i := result (assign-pair) at ./decode.go:339:53
+./decode.go:336:17:   flow: reflect.i = reflect.i:
+./decode.go:336:17:     from reflect.i := reflect.i (assign-pair) at ./decode.go:339:53
+./decode.go:336:17:   flow: reflect.e = &reflect.i:
+./decode.go:336:17:     from &reflect.i (address-of) at ./decode.go:339:53
+./decode.go:336:17:     from reflect.e := (*abi.EmptyInterface)(unsafe.Pointer(&reflect.i)) (assign) at ./decode.go:339:53
+./decode.go:336:17:   flow: ~r0 = *reflect.e:
+./decode.go:336:17:     from reflect.e.Data (dot of pointer) at ./decode.go:339:53
+./decode.go:336:17:     from reflect.Value{...} (struct literal element) at ./decode.go:339:53
+./decode.go:336:17:     from ~r0 = reflect.Value{...} (assign-pair) at ./decode.go:339:53
+./decode.go:336:17:   flow: ~r0 = ~r0:
+./decode.go:336:17:     from ~r0 = ~r0 (assign-pair) at ./decode.go:339:53
+./decode.go:336:17:   flow: {heap} = ~r0:
+./decode.go:336:17:     from reflect.Value.Set(reflect.Value.Field(record, field.index[0]), ~r0) (call parameter) at ./decode.go:339:37
+./decode.go:282:54: parameter value leaks to {heap} with derefs=0:
+./decode.go:282:54:   flow: record = value:
+./decode.go:282:54:     from reflect.Value.Elem(value) (call parameter) at ./decode.go:299:22
+./decode.go:282:54:     from record := reflect.Value.Elem(value) (assign) at ./decode.go:299:9
+./decode.go:282:54:   flow: {heap} = record:
+./decode.go:282:54:     from reflect.Value.Field(record, field.index[0]) (call parameter) at ./decode.go:339:17
+./decode.go:282:54:     from reflect.Value.Set(reflect.Value.Field(record, field.index[0]), ~r0) (call parameter) at ./decode.go:339:37
+./decode.go:282:20: leaking param: chunk
+./decode.go:282:34: leaking param content: schema
+./decode.go:282:54: leaking param: value
+./decode.go:282:75: leaking param: budget
+./decode.go:284:8: func literal does not escape
+./decode.go:336:17: new(int64) escapes to heap
+./decode.go:243:70: parameter value leaks to {heap} with derefs=0:
+./decode.go:243:70:   flow: {heap} = value:
+./decode.go:243:70:     from reflect.Value.Set(value, result) (call parameter) at ./decode.go:252:11
+./decode.go:243:91: parameter budget leaks to {heap} with derefs=0:
+./decode.go:243:91:   flow: {heap} = budget:
+./decode.go:243:91:     from decodeMessage(data, field.st, result, budget) (call parameter) at ./decode.go:245:28
+./decode.go:243:37: parameter data leaks to {heap} with derefs=0:
+./decode.go:243:37:   flow: {heap} = data:
+./decode.go:243:37:     from decodeMessage(data, field.st, result, budget) (call parameter) at ./decode.go:245:28
+./decode.go:243:50: parameter field leaks to {heap} with derefs=1:
+./decode.go:243:50:   flow: {heap} = *field:
+./decode.go:243:50:     from field.valueType (dot of pointer) at ./decode.go:244:29
+./decode.go:243:50:     from reflect.New(field.valueType) (call parameter) at ./decode.go:244:23
+./decode.go:243:37: leaking param: data
+./decode.go:243:50: leaking param content: field
+./decode.go:243:70: leaking param: value
+./decode.go:243:91: leaking param: budget
+./decode.go:256:75: parameter value leaks to {heap} with derefs=0:
+./decode.go:256:75:   flow: {heap} = value:
+./decode.go:256:75:     from reflect.Value.Set(value, result) (call parameter) at ./decode.go:278:11
+./decode.go:256:96: parameter budget leaks to {heap} with derefs=0:
+./decode.go:256:96:   flow: {heap} = budget:
+./decode.go:256:96:     from decodeMessage(content, field.st, current, budget) (call parameter) at ./decode.go:268:33
+./decode.go:256:42: parameter data leaks to {heap} with derefs=0:
+./decode.go:256:42:   flow: chunk = data:
+./decode.go:256:42:     from chunk := data (assign-pair) at ./decode.go:263:34
+./decode.go:256:42:   flow: ~r1 = chunk:
+./decode.go:256:42:     from chunk[4:end] (slice) at ./decode.go:263:34
+./decode.go:256:42:     from ~r0, ~r1, ~r2 = end, chunk[4:end], nil (assign-pair) at ./decode.go:263:34
+./decode.go:256:42:   flow: .autotmp_17 = ~r1:
+./decode.go:256:42:   flow: content = .autotmp_17:
+./decode.go:256:42:     from used, content, err := int(.autotmp_16), .autotmp_17, .autotmp_18 (assign-pair) at ./decode.go:263:22
+./decode.go:256:42:   flow: {heap} = content:
+./decode.go:256:42:     from decodeMessage(content, field.st, current, budget) (call parameter) at ./decode.go:268:33
+./decode.go:256:55: parameter field leaks to {heap} with derefs=2:
+./decode.go:256:55:   flow: {heap} = **field:
+./decode.go:256:55:     from field.st (dot of pointer) at ./decode.go:267:31
+./decode.go:256:55:     from field.st.typ (dot of pointer) at ./decode.go:267:34
+./decode.go:256:55:     from reflect.New(field.st.typ) (call parameter) at ./decode.go:267:25
+./decode.go:256:42: leaking param: data
+./decode.go:256:55: leaking param content: field
+./decode.go:256:75: leaking param: value
+./decode.go:256:96: leaking param: budget
+./meta.go:359:12: &reflect.ValueError{...} escapes to heap:
+./meta.go:359:12:   flow: {heap} = &{storage for &reflect.ValueError{...}}:
+./meta.go:359:12:     from &reflect.ValueError{...} (spill) at ./meta.go:359:12
+./meta.go:359:12:     from &reflect.ValueError{...} (interface-converted) at ./meta.go:359:12
+./meta.go:359:12:     from panic(&reflect.ValueError{...}) (call parameter) at ./meta.go:359:12
+./meta.go:341:14: parameter sp leaks to v with derefs=0:
+./meta.go:341:14:   flow: reflect.i = sp:
+./meta.go:341:14:     from reflect.i := sp (assign-pair) at ./meta.go:358:21
+./meta.go:341:14:   flow: reflect.i = reflect.i:
+./meta.go:341:14:     from reflect.i := reflect.i (assign-pair) at ./meta.go:358:21
+./meta.go:341:14:   flow: reflect.e = &reflect.i:
+./meta.go:341:14:     from &reflect.i (address-of) at ./meta.go:358:21
+./meta.go:341:14:     from reflect.e := (*abi.EmptyInterface)(unsafe.Pointer(&reflect.i)) (assign) at ./meta.go:358:21
+./meta.go:341:14:   flow: ~r0 = *reflect.e:
+./meta.go:341:14:     from reflect.e.Data (dot of pointer) at ./meta.go:358:21
+./meta.go:341:14:     from reflect.Value{...} (struct literal element) at ./meta.go:358:21
+./meta.go:341:14:     from ~r0 = reflect.Value{...} (assign-pair) at ./meta.go:358:21
+./meta.go:341:14:   flow: ~r0 = ~r0:
+./meta.go:341:14:     from ~r0 = ~r0 (assign-pair) at ./meta.go:358:21
+./meta.go:341:14:   flow: v = ~r0:
+./meta.go:341:14:     from v = ~r0 (assign) at ./meta.go:358:4
+./meta.go:341:14: leaking param: sp to result v level=0
+./meta.go:359:12: &reflect.ValueError{...} escapes to heap
+./meta.go:66:53: s escapes to heap:
+./meta.go:66:53:   flow: {storage for ... argument} = &{storage for s}:
+./meta.go:66:53:     from s (spill) at ./meta.go:66:53
+./meta.go:66:53:     from ... argument (slice-literal-element) at ./meta.go:66:20
+./meta.go:66:53:   flow: {heap} = {storage for ... argument}:
+./meta.go:66:53:     from ... argument (spill) at ./meta.go:66:20
+./meta.go:66:53:     from fmt.Errorf("sproto: invalid field tag %q", ... argument...) (call parameter) at ./meta.go:66:20
+./meta.go:60:69: sf.Wire escapes to heap:
+./meta.go:60:69:   flow: {storage for ... argument} = &{storage for sf.Wire}:
+./meta.go:60:69:     from sf.Wire (spill) at ./meta.go:60:69
+./meta.go:60:69:     from ... argument (slice-literal-element) at ./meta.go:60:20
+./meta.go:60:69:   flow: {heap} = {storage for ... argument}:
+./meta.go:60:69:     from ... argument (spill) at ./meta.go:60:20
+./meta.go:60:69:     from fmt.Errorf("sproto: parse(%s) unknown wire type: %s", ... argument...) (call parameter) at ./meta.go:60:20
+./meta.go:60:64: s escapes to heap:
+./meta.go:60:64:   flow: {storage for ... argument} = &{storage for s}:
+./meta.go:60:64:     from s (spill) at ./meta.go:60:64
+./meta.go:60:64:     from ... argument (slice-literal-element) at ./meta.go:60:20
+./meta.go:60:64:   flow: {heap} = {storage for ... argument}:
+./meta.go:60:64:     from ... argument (spill) at ./meta.go:60:20
+./meta.go:60:64:     from fmt.Errorf("sproto: parse(%s) unknown wire type: %s", ... argument...) (call parameter) at ./meta.go:60:20
+./meta.go:54:73: s escapes to heap:
+./meta.go:54:73:   flow: {storage for ... argument} = &{storage for s}:
+./meta.go:54:73:     from s (spill) at ./meta.go:54:73
+./meta.go:54:73:     from ... argument (slice-literal-element) at ./meta.go:54:20
+./meta.go:54:73:   flow: {heap} = {storage for ... argument}:
+./meta.go:54:73:     from ... argument (spill) at ./meta.go:54:20
+./meta.go:54:73:     from fmt.Errorf("sproto: parse(%s) tag must have 2 or more fields", ... argument...) (call parameter) at ./meta.go:54:20
+./meta.go:50:30: parameter s leaks to {heap} with derefs=0:
+./meta.go:50:30:   flow: strings.s = s:
+./meta.go:50:30:     from strings.s, strings.sep := s, "," (assign-pair) at ./meta.go:52:25
+./meta.go:50:30:   flow: {heap} = strings.s:
+./meta.go:50:30:     from strings.genSplit(strings.s, strings.sep, 0, -1) (call parameter) at ./meta.go:52:25
+./meta.go:50:30: parameter s leaks to {storage for s} with derefs=0:
+./meta.go:50:30:   flow: {storage for s} = s:
+./meta.go:50:30:     from s (interface-converted) at ./meta.go:66:53
+./meta.go:50:7: parameter sf leaks to {storage for sf.Wire} with derefs=1:
+./meta.go:50:7:   flow: {storage for sf.Wire} = *sf:
+./meta.go:50:7:     from sf.Wire (dot of pointer) at ./meta.go:60:69
+./meta.go:50:7:     from sf.Wire (interface-converted) at ./meta.go:60:69
+./meta.go:50:30: parameter s leaks to {storage for s} with derefs=0:
+./meta.go:50:30:   flow: {storage for s} = s:
+./meta.go:50:30:     from s (interface-converted) at ./meta.go:60:64
+./meta.go:50:30: parameter s leaks to {storage for s} with derefs=0:
+./meta.go:50:30:   flow: {storage for s} = s:
+./meta.go:50:30:     from s (interface-converted) at ./meta.go:54:73
+./meta.go:50:7: leaking param content: sf
+./meta.go:50:30: leaking param: s
+./meta.go:54:20: ... argument does not escape
+./meta.go:54:73: s escapes to heap
+./meta.go:60:20: ... argument does not escape
+./meta.go:60:64: s escapes to heap
+./meta.go:60:69: sf.Wire escapes to heap
+./meta.go:66:20: ... argument does not escape
+./meta.go:66:53: s escapes to heap
+./meta.go:90:70: n escapes to heap:
+./meta.go:90:70:   flow: {storage for ... argument} = &{storage for n}:
+./meta.go:90:70:     from n (spill) at ./meta.go:90:70
+./meta.go:90:70:     from ... argument (slice-literal-element) at ./meta.go:90:20
+./meta.go:90:70:   flow: {heap} = {storage for ... argument}:
+./meta.go:90:70:     from ... argument (spill) at ./meta.go:90:20
+./meta.go:90:70:     from fmt.Errorf("sproto: field(%s) should %s be array", ... argument...) (call parameter) at ./meta.go:90:20
+./meta.go:90:63: sf.Name escapes to heap:
+./meta.go:90:63:   flow: {storage for ... argument} = &{storage for sf.Name}:
+./meta.go:90:63:     from sf.Name (spill) at ./meta.go:90:63
+./meta.go:90:63:     from ... argument (slice-literal-element) at ./meta.go:90:20
+./meta.go:90:63:   flow: {heap} = {storage for ... argument}:
+./meta.go:90:63:     from ... argument (spill) at ./meta.go:90:20
+./meta.go:90:63:     from fmt.Errorf("sproto: field(%s) should %s be array", ... argument...) (call parameter) at ./meta.go:90:20
+./meta.go:83:88: sf.Wire escapes to heap:
+./meta.go:83:88:   flow: {storage for ... argument} = &{storage for sf.Wire}:
+./meta.go:83:88:     from sf.Wire (spill) at ./meta.go:83:88
+./meta.go:83:88:     from ... argument (slice-literal-element) at ./meta.go:83:20
+./meta.go:83:88:   flow: {heap} = {storage for ... argument}:
+./meta.go:83:88:     from ... argument (spill) at ./meta.go:83:20
+./meta.go:83:88:     from fmt.Errorf("sproto: field(%s) expect %s but get %s", ... argument...) (call parameter) at ./meta.go:83:20
+./meta.go:83:72: expectedWire escapes to heap:
+./meta.go:83:72:   flow: {storage for ... argument} = &{storage for expectedWire}:
+./meta.go:83:72:     from expectedWire (spill) at ./meta.go:83:72
+./meta.go:83:72:     from ... argument (slice-literal-element) at ./meta.go:83:20
+./meta.go:83:72:   flow: {heap} = {storage for ... argument}:
+./meta.go:83:72:     from ... argument (spill) at ./meta.go:83:20
+./meta.go:83:72:     from fmt.Errorf("sproto: field(%s) expect %s but get %s", ... argument...) (call parameter) at ./meta.go:83:20
+./meta.go:83:65: sf.Name escapes to heap:
+./meta.go:83:65:   flow: {storage for ... argument} = &{storage for sf.Name}:
+./meta.go:83:65:     from sf.Name (spill) at ./meta.go:83:65
+./meta.go:83:65:     from ... argument (slice-literal-element) at ./meta.go:83:20
+./meta.go:83:65:   flow: {heap} = {storage for ... argument}:
+./meta.go:83:65:     from ... argument (spill) at ./meta.go:83:20
+./meta.go:83:65:     from fmt.Errorf("sproto: field(%s) expect %s but get %s", ... argument...) (call parameter) at ./meta.go:83:20
+./meta.go:81:7: parameter sf leaks to {storage for sf.Name} with derefs=1:
+./meta.go:81:7:   flow: {storage for sf.Name} = *sf:
+./meta.go:81:7:     from sf.Name (dot of pointer) at ./meta.go:90:63
+./meta.go:81:7:     from sf.Name (interface-converted) at ./meta.go:90:63
+./meta.go:81:7: parameter sf leaks to {storage for sf.Wire} with derefs=1:
+./meta.go:81:7:   flow: {storage for sf.Wire} = *sf:
+./meta.go:81:7:     from sf.Wire (dot of pointer) at ./meta.go:83:88
+./meta.go:81:7:     from sf.Wire (interface-converted) at ./meta.go:83:88
+./meta.go:81:35: parameter expectedWire leaks to {storage for expectedWire} with derefs=0:
+./meta.go:81:35:   flow: {storage for expectedWire} = expectedWire:
+./meta.go:81:35:     from expectedWire (interface-converted) at ./meta.go:83:72
+./meta.go:81:7: parameter sf leaks to {storage for sf.Name} with derefs=1:
+./meta.go:81:7:   flow: {storage for sf.Name} = *sf:
+./meta.go:81:7:     from sf.Name (dot of pointer) at ./meta.go:83:65
+./meta.go:81:7:     from sf.Name (interface-converted) at ./meta.go:83:65
+./meta.go:81:7: leaking param content: sf
+./meta.go:81:35: leaking param: expectedWire
+./meta.go:83:20: ... argument does not escape
+./meta.go:83:65: sf.Name escapes to heap
+./meta.go:83:72: expectedWire escapes to heap
+./meta.go:83:88: sf.Wire escapes to heap
+./meta.go:90:20: ... argument does not escape
+./meta.go:90:63: sf.Name escapes to heap
+./meta.go:90:70: n escapes to heap
+/Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/reflect/type.go:2857:17: reflect.v does not escape
+./meta.go:286:18: make([]*SprotoField, numField) escapes to heap:
+./meta.go:286:18:   flow: {heap} = &{storage for make([]*SprotoField, numField)}:
+./meta.go:286:18:     from make([]*SprotoField, numField) (spill) at ./meta.go:286:18
+./meta.go:286:18:     from st.Fields = make([]*SprotoField, numField) (assign) at ./meta.go:286:12
+./meta.go:287:17: make([]int, numField) escapes to heap:
+./meta.go:287:17:   flow: {heap} = &{storage for make([]int, numField)}:
+./meta.go:287:17:     from make([]int, numField) (spill) at ./meta.go:287:17
+./meta.go:287:17:     from st.order = make([]int, numField) (assign) at ./meta.go:287:11
+./meta.go:288:18: make(map[int]int) escapes to heap:
+./meta.go:288:18:   flow: {heap} = &{storage for make(map[int]int)}:
+./meta.go:288:18:     from make(map[int]int) (spill) at ./meta.go:288:18
+./meta.go:288:18:     from st.tagMap = make(map[int]int) (assign) at ./meta.go:288:12
+./meta.go:330:18: make([]int, denseLength) escapes to heap:
+./meta.go:330:18:   flow: {heap} = &{storage for make([]int, denseLength)}:
+./meta.go:330:18:     from make([]int, denseLength) (spill) at ./meta.go:330:18
+./meta.go:330:18:     from st.dense = make([]int, denseLength) (assign) at ./meta.go:330:12
+./meta.go:286:18: make([]*SprotoField, numField) escapes to heap:
+./meta.go:286:18:   flow: {heap} = &{storage for make([]*SprotoField, numField)}:
+./meta.go:286:18:     from make([]*SprotoField, numField) (non-constant size) at ./meta.go:286:18
+./meta.go:287:17: make([]int, numField) escapes to heap:
+./meta.go:287:17:   flow: {heap} = &{storage for make([]int, numField)}:
+./meta.go:287:17:     from make([]int, numField) (non-constant size) at ./meta.go:287:17
+./meta.go:330:18: make([]int, denseLength) escapes to heap:
+./meta.go:330:18:   flow: {heap} = &{storage for make([]int, denseLength)}:
+./meta.go:330:18:     from make([]int, denseLength) (non-constant size) at ./meta.go:330:18
+./meta.go:183:83: ~r0 escapes to heap:
+./meta.go:183:83:   flow: {storage for ... argument} = &{storage for ~r0}:
+./meta.go:183:83:     from ~r0 (spill) at ./meta.go:183:83
+./meta.go:183:83:     from ... argument (slice-literal-element) at ./meta.go:183:19
+./meta.go:183:83:   flow: {heap} = {storage for ... argument}:
+./meta.go:183:83:     from ... argument (spill) at ./meta.go:183:19
+./meta.go:183:83:     from fmt.Errorf("sproto: field(%s) no coders for %s", ... argument...) (call parameter) at ./meta.go:183:19
+./meta.go:183:60: sf.Name escapes to heap:
+./meta.go:183:60:   flow: {storage for ... argument} = &{storage for sf.Name}:
+./meta.go:183:60:     from sf.Name (spill) at ./meta.go:183:60
+./meta.go:183:60:     from ... argument (slice-literal-element) at ./meta.go:183:19
+./meta.go:183:60:   flow: {heap} = {storage for ... argument}:
+./meta.go:183:60:     from ... argument (spill) at ./meta.go:183:19
+./meta.go:183:60:     from fmt.Errorf("sproto: field(%s) no coders for %s", ... argument...) (call parameter) at ./meta.go:183:19
+./meta.go:180:110: ~r0 escapes to heap:
+./meta.go:180:110:   flow: {storage for ... argument} = &{storage for ~r0}:
+./meta.go:180:110:     from ~r0 (spill) at ./meta.go:180:110
+./meta.go:180:110:     from ... argument (slice-literal-element) at ./meta.go:180:20
+./meta.go:180:110:   flow: {heap} = {storage for ... argument}:
+./meta.go:180:110:     from ... argument (spill) at ./meta.go:180:20
+./meta.go:180:110:     from fmt.Errorf("sproto: field(%s) no coders for %s -> %s", ... argument...) (call parameter) at ./meta.go:180:20
+./meta.go:180:90: ~r0 escapes to heap:
+./meta.go:180:90:   flow: {storage for ... argument} = &{storage for ~r0}:
+./meta.go:180:90:     from ~r0 (spill) at ./meta.go:180:90
+./meta.go:180:90:     from ... argument (slice-literal-element) at ./meta.go:180:20
+./meta.go:180:90:   flow: {heap} = {storage for ... argument}:
+./meta.go:180:90:     from ... argument (spill) at ./meta.go:180:20
+./meta.go:180:90:     from fmt.Errorf("sproto: field(%s) no coders for %s -> %s", ... argument...) (call parameter) at ./meta.go:180:20
+./meta.go:180:67: sf.Name escapes to heap:
+./meta.go:180:67:   flow: {storage for ... argument} = &{storage for sf.Name}:
+./meta.go:180:67:     from sf.Name (spill) at ./meta.go:180:67
+./meta.go:180:67:     from ... argument (slice-literal-element) at ./meta.go:180:20
+./meta.go:180:67:   flow: {heap} = {storage for ... argument}:
+./meta.go:180:67:     from ... argument (spill) at ./meta.go:180:20
+./meta.go:180:67:     from fmt.Errorf("sproto: field(%s) no coders for %s -> %s", ... argument...) (call parameter) at ./meta.go:180:20
+./meta.go:177:137: ~r0 escapes to heap:
+./meta.go:177:137:   flow: {storage for ... argument} = &{storage for ~r0}:
+./meta.go:177:137:     from ~r0 (spill) at ./meta.go:177:137
+./meta.go:177:137:     from ... argument (slice-literal-element) at ./meta.go:177:21
+./meta.go:177:137:   flow: {heap} = {storage for ... argument}:
+./meta.go:177:137:     from ... argument (spill) at ./meta.go:177:21
+./meta.go:177:137:     from fmt.Errorf("sproto: field(%s) no coders for %s -> %s -> %s", ... argument...) (call parameter) at ./meta.go:177:21
+./meta.go:177:117: ~r0 escapes to heap:
+./meta.go:177:117:   flow: {storage for ... argument} = &{storage for ~r0}:
+./meta.go:177:117:     from ~r0 (spill) at ./meta.go:177:117
+./meta.go:177:117:     from ... argument (slice-literal-element) at ./meta.go:177:21
+./meta.go:177:117:   flow: {heap} = {storage for ... argument}:
+./meta.go:177:117:     from ... argument (spill) at ./meta.go:177:21
+./meta.go:177:117:     from fmt.Errorf("sproto: field(%s) no coders for %s -> %s -> %s", ... argument...) (call parameter) at ./meta.go:177:21
+./meta.go:177:97: ~r0 escapes to heap:
+./meta.go:177:97:   flow: {storage for ... argument} = &{storage for ~r0}:
+./meta.go:177:97:     from ~r0 (spill) at ./meta.go:177:97
+./meta.go:177:97:     from ... argument (slice-literal-element) at ./meta.go:177:21
+./meta.go:177:97:   flow: {heap} = {storage for ... argument}:
+./meta.go:177:97:     from ... argument (spill) at ./meta.go:177:21
+./meta.go:177:97:     from fmt.Errorf("sproto: field(%s) no coders for %s -> %s -> %s", ... argument...) (call parameter) at ./meta.go:177:21
+./meta.go:177:74: sf.Name escapes to heap:
+./meta.go:177:74:   flow: {storage for ... argument} = &{storage for sf.Name}:
+./meta.go:177:74:     from sf.Name (spill) at ./meta.go:177:74
+./meta.go:177:74:     from ... argument (slice-literal-element) at ./meta.go:177:21
+./meta.go:177:74:   flow: {heap} = {storage for ... argument}:
+./meta.go:177:74:     from ... argument (spill) at ./meta.go:177:21
+./meta.go:177:74:     from fmt.Errorf("sproto: field(%s) no coders for %s -> %s -> %s", ... argument...) (call parameter) at ./meta.go:177:21
+./meta.go:95:7: parameter sf leaks to {heap} with derefs=1:
+./meta.go:95:7:   flow: {heap} = *sf:
+./meta.go:95:7:     from (*SprotoField).assertWire(sf, "boolean", false) (call parameter) at ./meta.go:117:22
+./meta.go:198:7: parameter sf leaks to {heap} with derefs=1:
+./meta.go:198:7:   flow: sf = sf:
+./meta.go:198:7:     from (*SprotoField).configureType(sf, f) (call parameter) at ./meta.go:217:28
+./meta.go:198:7:   flow: {heap} = *sf:
+./meta.go:198:7:     from (*SprotoField).assertWire(sf, "boolean", false) (call parameter) at ./meta.go:117:22
+./meta.go:95:38: parameter f leaks to {heap} with derefs=1:
+./meta.go:95:38:   flow: {heap} = *f:
+./meta.go:95:38:     from f.Type (dot of pointer) at ./meta.go:106:16
+./meta.go:95:38:     from f.Type.Kind() (call parameter) at ./meta.go:106:26
+./meta.go:198:29: parameter f leaks to {heap} with derefs=1:
+./meta.go:198:29:   flow: {heap} = *f:
+./meta.go:198:29:     from f.Name (dot of pointer) at ./meta.go:199:13
+./meta.go:198:29:     from sf.Name = f.Name (assign) at ./meta.go:199:10
+./meta.go:307:76: sf.Name escapes to heap:
+./meta.go:307:76:   flow: {storage for ... argument} = &{storage for sf.Name}:
+./meta.go:307:76:     from sf.Name (spill) at ./meta.go:307:76
+./meta.go:307:76:     from ... argument (slice-literal-element) at ./meta.go:307:27
+./meta.go:307:76:   flow: {heap} = {storage for ... argument}:
+./meta.go:307:76:     from ... argument (spill) at ./meta.go:307:27
+./meta.go:307:76:     from fmt.Errorf("sproto: field(%s.%s) tag repeated", ... argument...) (call parameter) at ./meta.go:307:27
+./meta.go:307:67: st.Name escapes to heap:
+./meta.go:307:67:   flow: {storage for ... argument} = &{storage for st.Name}:
+./meta.go:307:67:     from st.Name (spill) at ./meta.go:307:67
+./meta.go:307:67:     from ... argument (slice-literal-element) at ./meta.go:307:27
+./meta.go:307:67:   flow: {heap} = {storage for ... argument}:
+./meta.go:307:67:     from ... argument (spill) at ./meta.go:307:27
+./meta.go:307:67:     from fmt.Errorf("sproto: field(%s.%s) tag repeated", ... argument...) (call parameter) at ./meta.go:307:27
+./meta.go:291:9: &SprotoField{...} escapes to heap:
+./meta.go:291:9:   flow: sf = &{storage for &SprotoField{...}}:
+./meta.go:291:9:     from &SprotoField{...} (spill) at ./meta.go:291:9
+./meta.go:291:9:     from sf := &SprotoField{...} (assign) at ./meta.go:291:6
+./meta.go:291:9:   flow: {heap} = sf:
+./meta.go:291:9:     from st.Fields[i] = sf (assign) at ./meta.go:302:16
+./meta.go:281:8: &SprotoType{...} escapes to heap:
+./meta.go:281:8:   flow: st = &{storage for &SprotoType{...}}:
+./meta.go:281:8:     from &SprotoType{...} (spill) at ./meta.go:281:8
+./meta.go:281:8:     from st := &SprotoType{...} (assign) at ./meta.go:281:5
+./meta.go:281:8:   flow: {heap} = st:
+./meta.go:281:8:     from stMap[t] = st (assign) at ./meta.go:282:11
+./meta.go:276:26: parameter t leaks to {heap} with derefs=0:
+./meta.go:276:26:   flow: {heap} = t:
+./meta.go:276:26:     from stMap[t] (key of map put) at ./meta.go:282:7
+./meta.go:183:83: "kind" + ~r0 escapes to heap:
+./meta.go:183:83:   flow: ~r0 = &{storage for "kind" + ~r0}:
+./meta.go:183:83:     from "kind" + ~r0 (spill) at ./meta.go:183:83
+./meta.go:183:83:     from ~r0 = "kind" + ~r0 (assign-pair) at ./meta.go:183:83
+./meta.go:183:83:   flow: {storage for ~r0} = ~r0:
+./meta.go:183:83:     from ~r0 (interface-converted) at ./meta.go:183:83
+./meta.go:95:7: parameter sf leaks to {storage for sf.Name} with derefs=1:
+./meta.go:95:7:   flow: {storage for sf.Name} = *sf:
+./meta.go:95:7:     from sf.Name (dot of pointer) at ./meta.go:183:60
+./meta.go:95:7:     from sf.Name (interface-converted) at ./meta.go:183:60
+./meta.go:198:7: parameter sf leaks to {storage for sf.Name} with derefs=1:
+./meta.go:198:7:   flow: sf = sf:
+./meta.go:198:7:     from (*SprotoField).configureType(sf, f) (call parameter) at ./meta.go:217:28
+./meta.go:198:7:   flow: {storage for sf.Name} = *sf:
+./meta.go:198:7:     from sf.Name (dot of pointer) at ./meta.go:183:60
+./meta.go:198:7:     from sf.Name (interface-converted) at ./meta.go:183:60
+./meta.go:180:110: "kind" + ~r0 escapes to heap:
+./meta.go:180:110:   flow: ~r0 = &{storage for "kind" + ~r0}:
+./meta.go:180:110:     from "kind" + ~r0 (spill) at ./meta.go:180:110
+./meta.go:180:110:     from ~r0 = "kind" + ~r0 (assign-pair) at ./meta.go:180:110
+./meta.go:180:110:   flow: {storage for ~r0} = ~r0:
+./meta.go:180:110:     from ~r0 (interface-converted) at ./meta.go:180:110
+./meta.go:180:90: "kind" + ~r0 escapes to heap:
+./meta.go:180:90:   flow: ~r0 = &{storage for "kind" + ~r0}:
+./meta.go:180:90:     from "kind" + ~r0 (spill) at ./meta.go:180:90
+./meta.go:180:90:     from ~r0 = "kind" + ~r0 (assign-pair) at ./meta.go:180:90
+./meta.go:180:90:   flow: {storage for ~r0} = ~r0:
+./meta.go:180:90:     from ~r0 (interface-converted) at ./meta.go:180:90
+./meta.go:95:7: parameter sf leaks to {storage for sf.Name} with derefs=1:
+./meta.go:95:7:   flow: {storage for sf.Name} = *sf:
+./meta.go:95:7:     from sf.Name (dot of pointer) at ./meta.go:180:67
+./meta.go:95:7:     from sf.Name (interface-converted) at ./meta.go:180:67
+./meta.go:198:7: parameter sf leaks to {storage for sf.Name} with derefs=1:
+./meta.go:198:7:   flow: sf = sf:
+./meta.go:198:7:     from (*SprotoField).configureType(sf, f) (call parameter) at ./meta.go:217:28
+./meta.go:198:7:   flow: {storage for sf.Name} = *sf:
+./meta.go:198:7:     from sf.Name (dot of pointer) at ./meta.go:180:67
+./meta.go:198:7:     from sf.Name (interface-converted) at ./meta.go:180:67
+./meta.go:177:137: "kind" + ~r0 escapes to heap:
+./meta.go:177:137:   flow: ~r0 = &{storage for "kind" + ~r0}:
+./meta.go:177:137:     from "kind" + ~r0 (spill) at ./meta.go:177:137
+./meta.go:177:137:     from ~r0 = "kind" + ~r0 (assign-pair) at ./meta.go:177:137
+./meta.go:177:137:   flow: {storage for ~r0} = ~r0:
+./meta.go:177:137:     from ~r0 (interface-converted) at ./meta.go:177:137
+./meta.go:177:117: "kind" + ~r0 escapes to heap:
+./meta.go:177:117:   flow: ~r0 = &{storage for "kind" + ~r0}:
+./meta.go:177:117:     from "kind" + ~r0 (spill) at ./meta.go:177:117
+./meta.go:177:117:     from ~r0 = "kind" + ~r0 (assign-pair) at ./meta.go:177:117
+./meta.go:177:117:   flow: {storage for ~r0} = ~r0:
+./meta.go:177:117:     from ~r0 (interface-converted) at ./meta.go:177:117
+./meta.go:177:97: "kind" + ~r0 escapes to heap:
+./meta.go:177:97:   flow: ~r0 = &{storage for "kind" + ~r0}:
+./meta.go:177:97:     from "kind" + ~r0 (spill) at ./meta.go:177:97
+./meta.go:177:97:     from ~r0 = "kind" + ~r0 (assign-pair) at ./meta.go:177:97
+./meta.go:177:97:   flow: {storage for ~r0} = ~r0:
+./meta.go:177:97:     from ~r0 (interface-converted) at ./meta.go:177:97
+./meta.go:95:7: parameter sf leaks to {storage for sf.Name} with derefs=1:
+./meta.go:95:7:   flow: {storage for sf.Name} = *sf:
+./meta.go:95:7:     from sf.Name (dot of pointer) at ./meta.go:177:74
+./meta.go:95:7:     from sf.Name (interface-converted) at ./meta.go:177:74
+./meta.go:198:7: parameter sf leaks to {storage for sf.Name} with derefs=1:
+./meta.go:198:7:   flow: sf = sf:
+./meta.go:198:7:     from (*SprotoField).configureType(sf, f) (call parameter) at ./meta.go:217:28
+./meta.go:198:7:   flow: {storage for sf.Name} = *sf:
+./meta.go:198:7:     from sf.Name (dot of pointer) at ./meta.go:177:74
+./meta.go:198:7:     from sf.Name (interface-converted) at ./meta.go:177:74
+./meta.go:276:26: parameter t leaks to {storage for &SprotoType{...}} with derefs=0:
+./meta.go:276:26:   flow: {storage for &SprotoType{...}} = t:
+./meta.go:276:26:     from SprotoType{...} (struct literal element) at ./meta.go:281:19
+./meta.go:95:38: parameter f leaks to {storage for &SprotoType{...}} with derefs=1:
+./meta.go:95:38:   flow: t1 = *f:
+./meta.go:95:38:     from f.Type (dot of pointer) at ./meta.go:98:9
+./meta.go:95:38:     from t1 := f.Type (assign) at ./meta.go:98:5
+./meta.go:95:38:   flow: stype = t1:
+./meta.go:95:38:     from stype = t1 (assign) at ./meta.go:142:9
+./meta.go:95:38:   flow: t = stype:
+./meta.go:95:38:     from getSprotoTypeLocked(stype) (call parameter) at ./meta.go:191:38
+./meta.go:95:38:   flow: {storage for &SprotoType{...}} = t:
+./meta.go:95:38:     from SprotoType{...} (struct literal element) at ./meta.go:281:19
+./meta.go:198:29: parameter f leaks to {storage for &SprotoType{...}} with derefs=1:
+./meta.go:198:29:   flow: f = f:
+./meta.go:198:29:     from (*SprotoField).configureType(sf, f) (call parameter) at ./meta.go:217:28
+./meta.go:198:29:   flow: t1 = *f:
+./meta.go:198:29:     from f.Type (dot of pointer) at ./meta.go:98:9
+./meta.go:198:29:     from t1 := f.Type (assign) at ./meta.go:98:5
+./meta.go:198:29:   flow: stype = t1:
+./meta.go:198:29:     from stype = t1 (assign) at ./meta.go:142:9
+./meta.go:198:29:   flow: t = stype:
+./meta.go:198:29:     from getSprotoTypeLocked(stype) (call parameter) at ./meta.go:191:38
+./meta.go:198:29:   flow: {storage for &SprotoType{...}} = t:
+./meta.go:198:29:     from SprotoType{...} (struct literal element) at ./meta.go:281:19
+./meta.go:276:26: leaking param: t
+./meta.go:198:7: leaking param content: sf
+./meta.go:198:29: leaking param content: f
+./meta.go:95:7: leaking param content: sf
+./meta.go:95:38: leaking param content: f
+./meta.go:281:8: &SprotoType{...} escapes to heap
+./meta.go:286:18: make([]*SprotoField, numField) escapes to heap
+./meta.go:287:17: make([]int, numField) escapes to heap
+./meta.go:288:18: make(map[int]int) escapes to heap
+./meta.go:291:9: &SprotoField{...} escapes to heap
+./meta.go:307:27: ... argument does not escape
+./meta.go:307:67: st.Name escapes to heap
+./meta.go:307:76: sf.Name escapes to heap
+./meta.go:330:18: make([]int, denseLength) escapes to heap
+./meta.go:177:21: ... argument does not escape
+./meta.go:177:74: sf.Name escapes to heap
+./meta.go:177:97: ~r0 escapes to heap
+./meta.go:177:97: "kind" + ~r0 escapes to heap
+./meta.go:177:117: ~r0 escapes to heap
+./meta.go:177:117: "kind" + ~r0 escapes to heap
+./meta.go:177:137: ~r0 escapes to heap
+./meta.go:177:137: "kind" + ~r0 escapes to heap
+./meta.go:180:20: ... argument does not escape
+./meta.go:180:67: sf.Name escapes to heap
+./meta.go:180:90: ~r0 escapes to heap
+./meta.go:180:90: "kind" + ~r0 escapes to heap
+./meta.go:180:110: ~r0 escapes to heap
+./meta.go:180:110: "kind" + ~r0 escapes to heap
+./meta.go:183:19: ... argument does not escape
+./meta.go:183:60: sf.Name escapes to heap
+./meta.go:183:83: ~r0 escapes to heap
+./meta.go:183:83: "kind" + ~r0 escapes to heap
+./meta.go:264:18: make(map[reflect.Type]*SprotoType, len(stMap)) escapes to heap:
+./meta.go:264:18:   flow: previous = &{storage for make(map[reflect.Type]*SprotoType, len(stMap))}:
+./meta.go:264:18:     from make(map[reflect.Type]*SprotoType, len(stMap)) (spill) at ./meta.go:264:18
+./meta.go:264:18:     from previous := make(map[reflect.Type]*SprotoType, len(stMap)) (assign) at ./meta.go:264:11
+./meta.go:264:18:   flow: {heap} = previous:
+./meta.go:264:18:     from stMap = previous (assign) at ./meta.go:270:9
+./meta.go:255:20: parameter t leaks to {heap} with derefs=0:
+./meta.go:255:20:   flow: {heap} = t:
+./meta.go:255:20:     from t.Kind() (call parameter) at ./meta.go:256:23
+./meta.go:255:20: leaking param: t
+./meta.go:264:18: make(map[reflect.Type]*SprotoType, len(stMap)) escapes to heap
+./decode.go:373:51: &decodeBudget{...} escapes to heap:
+./decode.go:373:51:   flow: {heap} = &{storage for &decodeBudget{...}}:
+./decode.go:373:51:     from &decodeBudget{...} (spill) at ./decode.go:373:51
+./decode.go:373:51:     from decodeMessage(data, schema, result, &decodeBudget{...}) (call parameter) at ./decode.go:373:28
+./decode.go:356:36: parameter message leaks to {heap} with derefs=0:
+./decode.go:356:36:   flow: .autotmp_11 = message:
+./decode.go:356:36:     from getbase(message) (call parameter) at ./decode.go:364:28
+./decode.go:356:36:   flow: value = .autotmp_11:
+./decode.go:356:36:     from typ, value, err := reflect.Type(.autotmp_10), .autotmp_11, .autotmp_12 (assign-pair) at ./decode.go:364:18
+./decode.go:356:36:   flow: {heap} = value:
+./decode.go:356:36:     from reflect.Value.Elem(value) (call parameter) at ./decode.go:377:12
+./decode.go:356:36:     from reflect.Value.Set(reflect.Value.Elem(value), reflect.Value.Elem(result)) (call parameter) at ./decode.go:377:18
+./decode.go:356:23: parameter data leaks to {heap} with derefs=0:
+./decode.go:356:23:   flow: {heap} = data:
+./decode.go:356:23:     from decodeMessage(data, schema, result, &decodeBudget{...}) (call parameter) at ./decode.go:373:28
+./decode.go:356:23: leaking param: data
+./decode.go:356:36: leaking param: message
+./decode.go:373:51: &decodeBudget{...} escapes to heap
+./decode.go:351:26: parameter message leaks to {heap} with derefs=0:
+./decode.go:351:26:   flow: {heap} = message:
+./decode.go:351:26:     from DecodeWithLimits(data, message, Limits{}) (call parameter) at ./decode.go:352:25
+./decode.go:351:13: parameter data leaks to {heap} with derefs=0:
+./decode.go:351:13:   flow: {heap} = data:
+./decode.go:351:13:     from DecodeWithLimits(data, message, Limits{}) (call parameter) at ./decode.go:352:25
+./decode.go:351:13: leaking param: data
+./decode.go:351:26: leaking param: message
+./decode.go:381:30: parameter message leaks to {heap} with derefs=0:
+./decode.go:381:30:   flow: message = message:
+./decode.go:381:30:     from data, message := data, message (assign-pair) at ./decode.go:382:21
+./decode.go:381:30:   flow: {heap} = message:
+./decode.go:381:30:     from DecodeWithLimits(data, message, Limits{}) (call parameter) at ./decode.go:382:21
+./decode.go:381:17: parameter data leaks to {heap} with derefs=0:
+./decode.go:381:17:   flow: data = data:
+./decode.go:381:17:     from data, message := data, message (assign-pair) at ./decode.go:382:21
+./decode.go:381:17:   flow: {heap} = data:
+./decode.go:381:17:     from DecodeWithLimits(data, message, Limits{}) (call parameter) at ./decode.go:382:21
+./decode.go:381:17: leaking param: data
+./decode.go:381:30: leaking param: message
+./decode_pointer.go:15:27: parameter value leaks to ~r0 with derefs=0:
+./decode_pointer.go:15:27:   flow: ~r0 = value:
+./decode_pointer.go:15:27:     from reflect.Value.UnsafePointer(value) (call parameter) at ./decode_pointer.go:19:49
+./decode_pointer.go:15:27:     from decodePointer{...} (struct literal element) at ./decode_pointer.go:19:22
+./decode_pointer.go:15:27:     from return decodePointer{...} (return) at ./decode_pointer.go:19:2
+./decode_pointer.go:15:27: leaking param: value to result ~r0 level=0
+./decode_pointer.go:23:81: parameter value leaks to {heap} with derefs=0:
+./decode_pointer.go:23:81:   flow: {heap} = value:
+./decode_pointer.go:23:81:     from *(**int64)(unsafe.Add(pointer.value, field.encOffset)) = value (assign) at ./decode_pointer.go:28:57
+./decode_pointer.go:23:7: pointer does not escape
+./decode_pointer.go:23:41: schema does not escape
+./decode_pointer.go:23:61: field does not escape
+./decode_pointer.go:23:81: leaking param: value
+./encode.go:40:16: (*encodeLayout).add ignoring self-assignment in layout.extra = layout.extra[:offset + 1]
+./encode.go:36:17: make([]uint32, offset, capacity) escapes to heap:
+./encode.go:36:17:   flow: {heap} = &{storage for make([]uint32, offset, capacity)}:
+./encode.go:36:17:     from make([]uint32, offset, capacity) (non-constant size) at ./encode.go:36:17
+./encode.go:26:7: layout does not escape
+./encode.go:36:17: make([]uint32, offset, capacity) escapes to heap
+./encode.go:47:7: layout does not escape
+./encode.go:55:7: layout does not escape
+./encode.go:64:18: buffer does not escape
+./encode.go:68:18: buffer does not escape
+./encode.go:72:18: buffer does not escape
+./encode.go:78:20: &reflect.ValueError{...} escapes to heap:
+./encode.go:78:20:   flow: {heap} = &{storage for &reflect.ValueError{...}}:
+./encode.go:78:20:     from &reflect.ValueError{...} (spill) at ./encode.go:78:20
+./encode.go:78:20:     from &reflect.ValueError{...} (interface-converted) at ./encode.go:78:20
+./encode.go:78:20:     from panic(&reflect.ValueError{...}) (call parameter) at ./encode.go:78:20
+./encode.go:80:25: &reflect.ValueError{...} escapes to heap:
+./encode.go:80:25:   flow: {heap} = &{storage for &reflect.ValueError{...}}:
+./encode.go:80:25:     from &reflect.ValueError{...} (spill) at ./encode.go:80:25
+./encode.go:80:25:     from &reflect.ValueError{...} (interface-converted) at ./encode.go:80:25
+./encode.go:80:25:     from panic(&reflect.ValueError{...}) (call parameter) at ./encode.go:80:25
+./encode.go:76:18: field does not escape
+./encode.go:76:38: value does not escape
+./encode.go:78:20: &reflect.ValueError{...} escapes to heap
+./encode.go:80:25: &reflect.ValueError{...} escapes to heap
+./encode.go:98:37: output does not escape
+./encode.go:112:37: &reflect.ValueError{...} escapes to heap:
+./encode.go:112:37:   flow: {heap} = &{storage for &reflect.ValueError{...}}:
+./encode.go:112:37:     from &reflect.ValueError{...} (spill) at ./encode.go:112:37
+./encode.go:112:37:     from &reflect.ValueError{...} (interface-converted) at ./encode.go:112:37
+./encode.go:112:37:     from panic(&reflect.ValueError{...}) (call parameter) at ./encode.go:112:37
+./encode.go:111:19: field does not escape
+./encode.go:111:39: value does not escape
+./encode.go:112:37: &reflect.ValueError{...} escapes to heap
+./encode_pointer.go:35:23: field does not escape
+./encode_pointer.go:35:43: value does not escape
+./encode_integer_record.go:51:30: schema does not escape
+./encode_integer_record.go:51:50: pointer does not escape
+./encode_integer_record.go:51:73: output does not escape
+./encode_integer_record.go:51:88: layout does not escape
+./encode.go:264:55: &reflect.ValueError{...} escapes to heap:
+./encode.go:264:55:   flow: {heap} = &{storage for &reflect.ValueError{...}}:
+./encode.go:264:55:     from &reflect.ValueError{...} (spill) at ./encode.go:264:55
+./encode.go:264:55:     from &reflect.ValueError{...} (interface-converted) at ./encode.go:264:55
+./encode.go:264:55:     from panic(&reflect.ValueError{...}) (call parameter) at ./encode.go:264:55
+./encode.go:241:23: field does not escape
+./encode.go:241:43: value does not escape
+./encode.go:241:64: output does not escape
+./encode.go:264:55: &reflect.ValueError{...} escapes to heap
+./encode.go:126:16: &reflect.ValueError{...} escapes to heap:
+./encode.go:126:16:   flow: {heap} = &{storage for &reflect.ValueError{...}}:
+./encode.go:126:16:     from &reflect.ValueError{...} (spill) at ./encode.go:126:16
+./encode.go:126:16:     from &reflect.ValueError{...} (interface-converted) at ./encode.go:126:16
+./encode.go:126:16:     from panic(&reflect.ValueError{...}) (call parameter) at ./encode.go:126:16
+./encode.go:148:19: &reflect.ValueError{...} escapes to heap:
+./encode.go:148:19:   flow: {heap} = &{storage for &reflect.ValueError{...}}:
+./encode.go:148:19:     from &reflect.ValueError{...} (spill) at ./encode.go:148:19
+./encode.go:148:19:     from &reflect.ValueError{...} (interface-converted) at ./encode.go:148:19
+./encode.go:148:19:     from panic(&reflect.ValueError{...}) (call parameter) at ./encode.go:148:19
+./encode.go:202:75: &reflect.ValueError{...} escapes to heap:
+./encode.go:202:75:   flow: {heap} = &{storage for &reflect.ValueError{...}}:
+./encode.go:202:75:     from &reflect.ValueError{...} (spill) at ./encode.go:202:75
+./encode.go:202:75:     from &reflect.ValueError{...} (interface-converted) at ./encode.go:202:75
+./encode.go:202:75:     from panic(&reflect.ValueError{...}) (call parameter) at ./encode.go:202:75
+./encode.go:176:42: parameter value leaks to {heap} with derefs=0:
+./encode.go:176:42:   flow: reflect.v = value:
+./encode.go:176:42:     from reflect.Value.Addr(value) (call parameter) at ./encode.go:186:40
+./encode.go:176:42:     from reflect.v := reflect.Value.Addr(value) (assign-pair) at ./encode.go:186:52
+./encode.go:176:42:   flow: {heap} = reflect.v:
+./encode.go:176:42:     from reflect.valueInterface(reflect.v, true) (call parameter) at ./encode.go:186:52
+./encode.go:123:44: parameter value leaks to {heap} with derefs=0:
+./encode.go:123:44:   flow: record = value:
+./encode.go:123:44:     from reflect.Value.Elem(value) (call parameter) at ./encode.go:129:22
+./encode.go:123:44:     from record := reflect.Value.Elem(value) (assign) at ./encode.go:129:9
+./encode.go:123:44:   flow: current = record:
+./encode.go:123:44:     from reflect.Value.Field(record, field.index[0]) (call parameter) at ./encode.go:147:26
+./encode.go:123:44:     from current = reflect.Value.Field(record, field.index[0]) (assign) at ./encode.go:147:12
+./encode.go:123:44:   flow: value = current:
+./encode.go:123:44:     from encodeFieldInto(field, current, output[bodyOffset + 4:], layout, binding.exact && field.encOwner == schema && field.Array != field.pointer) (call parameter) at ./encode.go:161:28
+./encode.go:123:44:   flow: reflect.v = value:
+./encode.go:123:44:     from reflect.Value.Addr(value) (call parameter) at ./encode.go:186:40
+./encode.go:123:44:     from reflect.v := reflect.Value.Addr(value) (assign-pair) at ./encode.go:186:52
+./encode.go:123:44:   flow: {heap} = reflect.v:
+./encode.go:123:44:     from reflect.valueInterface(reflect.v, true) (call parameter) at ./encode.go:186:52
+./encode.go:123:24: schema does not escape
+./encode.go:123:44: leaking param: value
+./encode.go:123:65: output does not escape
+./encode.go:123:80: layout does not escape
+./encode.go:176:22: field does not escape
+./encode.go:176:42: leaking param: value
+./encode.go:176:63: output does not escape
+./encode.go:176:78: layout does not escape
+./encode.go:126:16: &reflect.ValueError{...} escapes to heap
+./encode.go:148:19: &reflect.ValueError{...} escapes to heap
+./encode.go:202:75: &reflect.ValueError{...} escapes to heap
+./encode.go:276:23: values does not escape
+./encode.go:276:50: output does not escape
+./encode_integer_record.go:11:27: encodedIntegerRecordSize ignoring self-assignment in layout.extra = layout.extra[:offset + 1]
+./encode_integer_record.go:11:27: make([]uint32, offset, capacity) escapes to heap:
+./encode_integer_record.go:11:27:   flow: {heap} = &{storage for make([]uint32, offset, capacity)}:
+./encode_integer_record.go:11:27:     from make([]uint32, offset, capacity) (non-constant size) at ./encode_integer_record.go:11:27
+./encode_integer_record.go:7:31: schema does not escape
+./encode_integer_record.go:7:51: pointer does not escape
+./encode_integer_record.go:7:74: budget does not escape
+./encode_integer_record.go:7:107: layout does not escape
+./encode_integer_record.go:11:27: make([]uint32, offset, capacity) escapes to heap
+./encode_integer_record.go:30:24: ... argument does not escape
+./limits.go:122:27: encodedSize ignoring self-assignment in layout.extra = layout.extra[:offset + 1]
+./limits.go:123:16: &reflect.ValueError{...} escapes to heap:
+./limits.go:123:16:   flow: {heap} = &{storage for &reflect.ValueError{...}}:
+./limits.go:123:16:     from &reflect.ValueError{...} (spill) at ./limits.go:123:16
+./limits.go:123:16:     from &reflect.ValueError{...} (interface-converted) at ./limits.go:123:16
+./limits.go:123:16:     from panic(&reflect.ValueError{...}) (call parameter) at ./limits.go:123:16
+./limits.go:145:19: &reflect.ValueError{...} escapes to heap:
+./limits.go:145:19:   flow: {heap} = &{storage for &reflect.ValueError{...}}:
+./limits.go:145:19:     from &reflect.ValueError{...} (spill) at ./limits.go:145:19
+./limits.go:145:19:     from &reflect.ValueError{...} (interface-converted) at ./limits.go:145:19
+./limits.go:145:19:     from panic(&reflect.ValueError{...}) (call parameter) at ./limits.go:145:19
+./limits.go:204:16: fieldSize ignoring self-assignment in layout.extra = layout.extra[:offset + 1]
+./limits.go:220:15: fieldSize ignoring self-assignment in layout.extra = layout.extra[:offset + 1]
+./limits.go:122:27: make([]uint32, offset, capacity) escapes to heap:
+./limits.go:122:27:   flow: {heap} = &{storage for make([]uint32, offset, capacity)}:
+./limits.go:122:27:     from make([]uint32, offset, capacity) (non-constant size) at ./limits.go:122:27
+./limits.go:204:16: make([]uint32, offset, capacity) escapes to heap:
+./limits.go:204:16:   flow: {heap} = &{storage for make([]uint32, offset, capacity)}:
+./limits.go:204:16:     from make([]uint32, offset, capacity) (non-constant size) at ./limits.go:204:16
+./limits.go:220:15: make([]uint32, offset, capacity) escapes to heap:
+./limits.go:220:15:   flow: {heap} = &{storage for make([]uint32, offset, capacity)}:
+./limits.go:220:15:     from make([]uint32, offset, capacity) (non-constant size) at ./limits.go:220:15
+./limits.go:185:36: parameter value leaks to {heap} with derefs=0:
+./limits.go:185:36:   flow: reflect.v = value:
+./limits.go:185:36:     from reflect.Value.Addr(value) (call parameter) at ./limits.go:194:26
+./limits.go:185:36:     from reflect.v := reflect.Value.Addr(value) (assign-pair) at ./limits.go:194:38
+./limits.go:185:36:   flow: {heap} = reflect.v:
+./limits.go:185:36:     from reflect.valueInterface(reflect.v, true) (call parameter) at ./limits.go:194:38
+./limits.go:114:38: parameter value leaks to {heap} with derefs=0:
+./limits.go:114:38:   flow: record = value:
+./limits.go:114:38:     from reflect.Value.Elem(value) (call parameter) at ./limits.go:126:22
+./limits.go:114:38:     from record := reflect.Value.Elem(value) (assign) at ./limits.go:126:9
+./limits.go:114:38:   flow: current = record:
+./limits.go:114:38:     from reflect.Value.Field(record, field.index[0]) (call parameter) at ./limits.go:144:26
+./limits.go:114:38:     from current = reflect.Value.Field(record, field.index[0]) (assign) at ./limits.go:144:12
+./limits.go:114:38:   flow: value = current:
+./limits.go:114:38:     from fieldSize(field, current, budget, depth, layout, binding.exact && field.encOwner == schema && field.Array != field.pointer) (call parameter) at ./limits.go:169:33
+./limits.go:114:38:   flow: reflect.v = value:
+./limits.go:114:38:     from reflect.Value.Addr(value) (call parameter) at ./limits.go:194:26
+./limits.go:114:38:     from reflect.v := reflect.Value.Addr(value) (assign-pair) at ./limits.go:194:38
+./limits.go:114:38:   flow: {heap} = reflect.v:
+./limits.go:114:38:     from reflect.valueInterface(reflect.v, true) (call parameter) at ./limits.go:194:38
+./limits.go:114:18: schema does not escape
+./limits.go:114:38: leaking param: value
+./limits.go:114:59: budget does not escape
+./limits.go:114:92: layout does not escape
+./limits.go:185:16: field does not escape
+./limits.go:185:36: leaking param: value
+./limits.go:185:57: budget does not escape
+./limits.go:185:90: layout does not escape
+./limits.go:122:27: make([]uint32, offset, capacity) escapes to heap
+./limits.go:123:16: &reflect.ValueError{...} escapes to heap
+./limits.go:145:19: &reflect.ValueError{...} escapes to heap
+./limits.go:154:24: ... argument does not escape
+./limits.go:204:16: make([]uint32, offset, capacity) escapes to heap
+./limits.go:212:33: ... argument does not escape
+./limits.go:220:15: make([]uint32, offset, capacity) escapes to heap
+./limits.go:276:31: ... argument does not escape
+./limits.go:104:16: make([]byte, capacity) escapes to heap:
+./limits.go:104:16:   flow: {heap} = &{storage for make([]byte, capacity)}:
+./limits.go:104:16:     from make([]byte, capacity) (non-constant size) at ./limits.go:104:16
+./limits.go:76:29: parameter message leaks to {heap} with derefs=0:
+./limits.go:76:29:   flow: .autotmp_13 = message:
+./limits.go:76:29:     from getbase(message) (call parameter) at ./limits.go:81:28
+./limits.go:76:29:   flow: value = .autotmp_13:
+./limits.go:76:29:     from typ, value, err := reflect.Type(.autotmp_12), .autotmp_13, .autotmp_14 (assign-pair) at ./limits.go:81:18
+./limits.go:76:29:   flow: {heap} = value:
+./limits.go:76:29:     from encodedSize(schema, value, budget, 1, &layout, binding) (call parameter) at ./limits.go:92:26
+./limits.go:76:29: leaking param: message
+./limits.go:76:83: prefix does not escape
+./limits.go:89:12: &decodeBudget{...} does not escape
+./limits.go:104:16: make([]byte, capacity) escapes to heap
+./pack.go:56:23: src does not escape
+./pack.go:66:17: src does not escape
+./pack.go:109:15: parameter packed leaks to ~r0 with derefs=0:
+./pack.go:109:15:   flow: ~r0 = packed:
+./pack.go:109:15:     from packed[:offset] (slice) at ./pack.go:167:15
+./pack.go:109:15:     from return packed[:offset] (return) at ./pack.go:167:2
+./pack.go:109:15: leaking param: packed to result ~r0 level=0
+./pack.go:109:23: src does not escape
+./limits.go:63:23: parameter message leaks to {heap} with derefs=0:
+./limits.go:63:23:   flow: {heap} = message:
+./limits.go:63:23:     from encodeBufferWithLimits(message, limits, packResult, prefix) (call parameter) at ./limits.go:64:48
+./limits.go:63:23: leaking param: message
+./limits.go:63:76: prefix does not escape
+./encode.go:294:13: parameter sp leaks to {heap} with derefs=0:
+./encode.go:294:13:   flow: message = sp:
+./encode.go:294:13:     from message, limits := sp, Limits{} (assign-pair) at ./encode.go:295:25
+./encode.go:294:13:   flow: {heap} = message:
+./encode.go:294:13:     from encodeWithLimits(message, limits, false, nil) (call parameter) at ./encode.go:295:25
+./encode.go:294:13: leaking param: sp
+./encode.go:299:17: parameter sp leaks to {heap} with derefs=0:
+./encode.go:299:17:   flow: {heap} = sp:
+./encode.go:299:17:     from Encode(sp) (call parameter) at ./encode.go:300:24
+./encode.go:299:17: leaking param: sp
+./encode_pointer.go:22:22: schema does not escape
+./encode_pointer.go:27:22: field does not escape
+./encode_pointer.go:27:42: value does not escape
+./encode_pointer.go:47:7: schema does not escape
+./encode_pointer.go:57:27: parameter value leaks to ~r0 with derefs=0:
+./encode_pointer.go:57:27:   flow: ~r0 = value:
+./encode_pointer.go:57:27:     from reflect.Value.UnsafePointer(value) (call parameter) at ./encode_pointer.go:61:49
+./encode_pointer.go:57:27:     from encodePointer{...} (struct literal element) at ./encode_pointer.go:61:22
+./encode_pointer.go:57:27:     from return encodePointer{...} (return) at ./encode_pointer.go:61:2
+./encode_pointer.go:57:27: leaking param: value to result ~r0 level=0
+./encode_pointer.go:65:7: field does not escape
+./encode_pointer.go:65:41: schema does not escape
+./encode_pointer.go:70:7: pointer does not escape
+./limits.go:48:7: budget does not escape
+./limits.go:57:23: parameter message leaks to {heap} with derefs=0:
+./limits.go:57:23:   flow: {heap} = message:
+./limits.go:57:23:     from encodeWithLimits(message, limits, false, nil) (call parameter) at ./limits.go:58:25
+./limits.go:57:23: leaking param: message
+./meta.go:234:7: st does not escape
+./meta.go:235:7: st does not escape
+./meta.go:239:27: (*SprotoType).Swap ignoring self-assignment in st.order[i], st.order[j] = st.order[j], st.order[i]
+./meta.go:239:27: (*SprotoType).Swap ignoring self-assignment in st.order[i], st.order[j] = st.order[j], st.order[i]
+./meta.go:238:7: st does not escape
+./meta.go:242:7: parameter st leaks to ~r0 with derefs=2:
+./meta.go:242:7:   flow: ~r0 = **st:
+./meta.go:242:7:     from st.Fields (dot of pointer) at ./meta.go:245:13
+./meta.go:242:7:     from st.Fields[index - 1] (dot of pointer) at ./meta.go:245:20
+./meta.go:242:7:     from return st.Fields[index - 1] (return) at ./meta.go:245:4
+./meta.go:242:7: leaking param: st to result ~r0 level=2
+./pack.go:9:18: dst does not escape
+./pack.go:9:30: src does not escape
+./pack.go:35:14: dst does not escape
+./pack.go:35:19: src does not escape
+./pack.go:104:22: make([]byte, ~r0) escapes to heap:
+./pack.go:104:22:   flow: {heap} = &{storage for make([]byte, ~r0)}:
+./pack.go:104:22:     from make([]byte, ~r0) (non-constant size) at ./pack.go:104:22
+./pack.go:103:11: src does not escape
+./pack.go:104:22: make([]byte, ~r0) escapes to heap
+./pack.go:172:23: src does not escape
+./pack.go:234:18: make([]byte, size) escapes to heap:
+./pack.go:234:18:   flow: {heap} = &{storage for make([]byte, size)}:
+./pack.go:234:18:     from make([]byte, size) (non-constant size) at ./pack.go:234:18
+./pack.go:193:22: src does not escape
+./pack.go:234:18: make([]byte, size) escapes to heap
+./pack.go:188:13: src does not escape
+./rpc.go:35:7: p does not escape
+./rpc.go:39:7: p does not escape
+./rpc.go:51:23: parameter typ leaks to {heap} with derefs=0:
+./rpc.go:51:23:   flow: {heap} = typ:
+./rpc.go:51:23:     from typ.Kind() (call parameter) at ./rpc.go:56:13
+./rpc.go:51:23: leaking param: typ
+./rpc.go:100:25: (*Rpc).Dispatch capturing by value: .autotmp_21 (addr=false assign=false width=8)
+./rpc.go:63:7: parameter rpc leaks to {heap} with derefs=0:
+./rpc.go:63:7:   flow: .autotmp_21 = rpc:
+./rpc.go:63:7:     from rpc.sessionMutex (dot of pointer) at ./rpc.go:100:12
+./rpc.go:63:7:     from rpc.sessionMutex (address-of) at ./rpc.go:100:25
+./rpc.go:63:7:     from .autotmp_21 = rpc.sessionMutex (assign-pair) at ./rpc.go:100:3
+./rpc.go:63:7:   flow: sync.m = .autotmp_21:
+./rpc.go:63:7:     from sync.m := .autotmp_21 (assign-pair) at ./rpc.go:100:32
+./rpc.go:63:7:   flow: sync.m = sync.m:
+./rpc.go:63:7:     from sync.m.mu (dot of pointer) at ./rpc.go:100:32
+./rpc.go:63:7:     from sync.m.mu (address-of) at ./rpc.go:100:32
+./rpc.go:63:7:     from sync.m := sync.m.mu (assign-pair) at ./rpc.go:100:32
+./rpc.go:63:7:   flow: {heap} = sync.m:
+./rpc.go:63:7:     from (*sync.Mutex).unlockSlow(sync.m, sync.new) (call parameter) at ./rpc.go:100:32
+./rpc.go:70:2: header escapes to heap:
+./rpc.go:70:2:   flow: message = &header:
+./rpc.go:70:2:     from &header (address-of) at ./rpc.go:71:34
+./rpc.go:70:2:     from &header (interface-converted) at ./rpc.go:71:34
+./rpc.go:70:2:     from data, message := unpacked, &header (assign-pair) at ./rpc.go:71:23
+./rpc.go:70:2:   flow: {heap} = message:
+./rpc.go:70:2:     from DecodeWithLimits(data, message, Limits{}) (call parameter) at ./rpc.go:71:23
+./rpc.go:63:7: parameter rpc leaks to name with derefs=3:
+./rpc.go:63:7:   flow: proto = **rpc:
+./rpc.go:63:7:     from rpc.protocols (dot of pointer) at ./rpc.go:82:14
+./rpc.go:63:7:     from rpc.protocols[index] (dot of pointer) at ./rpc.go:82:24
+./rpc.go:63:7:     from proto = rpc.protocols[index] (assign) at ./rpc.go:82:9
+./rpc.go:63:7:   flow: name = *proto:
+./rpc.go:63:7:     from proto.Name (dot of pointer) at ./rpc.go:117:14
+./rpc.go:63:7:     from name = proto.Name (assign) at ./rpc.go:117:7
+./rpc.go:63:7: leaking param: rpc
+./rpc.go:63:26: packed does not escape
+./rpc.go:70:2: moved to heap: header
+./rpc.go:124:22: header does not escape
+./rpc.go:124:41: encodedHeader does not escape
+./rpc.go:129:12: &decodeBudget{...} does not escape
+./rpc.go:175:16: make([]byte, ~r0) escapes to heap:
+./rpc.go:175:16:   flow: {heap} = &{storage for make([]byte, ~r0)}:
+./rpc.go:175:16:     from make([]byte, ~r0) (non-constant size) at ./rpc.go:175:16
+./rpc.go:168:19: header does not escape
+./rpc.go:168:38: body does not escape
+./rpc.go:175:16: make([]byte, ~r0) escapes to heap
+./rpc.go:183:60: parameter response leaks to {heap} with derefs=0:
+./rpc.go:183:60:   flow: {heap} = response:
+./rpc.go:183:60:     from encodeWithLimits(response, Limits{}, true, encodedHeader[:headerSize]) (call parameter) at ./rpc.go:203:26
+./rpc.go:183:7: rpc does not escape
+./rpc.go:183:32: name does not escape
+./rpc.go:183:60: leaking param: response
+./rpc.go:199:38: &rpcHeader{...} does not escape
+./rpc.go:206:22: &rpcHeader{...} does not escape
+./rpc.go:254:25: (*Rpc).RequestEncode capturing by value: .autotmp_30 (addr=false assign=false width=8)
+./rpc.go:256:52: session escapes to heap:
+./rpc.go:256:52:   flow: {storage for ... argument} = &{storage for session}:
+./rpc.go:256:52:     from session (spill) at ./rpc.go:256:52
+./rpc.go:256:52:     from ... argument (slice-literal-element) at ./rpc.go:256:20
+./rpc.go:256:52:   flow: {heap} = {storage for ... argument}:
+./rpc.go:256:52:     from ... argument (spill) at ./rpc.go:256:20
+./rpc.go:256:52:     from fmt.Errorf("sproto: repeated session:%d", ... argument...) (call parameter) at ./rpc.go:256:20
+./rpc.go:210:7: parameter rpc leaks to {heap} with derefs=0:
+./rpc.go:210:7:   flow: .autotmp_30 = rpc:
+./rpc.go:210:7:     from rpc.sessionMutex (dot of pointer) at ./rpc.go:254:12
+./rpc.go:210:7:     from rpc.sessionMutex (address-of) at ./rpc.go:254:25
+./rpc.go:210:7:     from .autotmp_30 = rpc.sessionMutex (assign-pair) at ./rpc.go:254:3
+./rpc.go:210:7:   flow: sync.m = .autotmp_30:
+./rpc.go:210:7:     from sync.m := .autotmp_30 (assign-pair) at ./rpc.go:254:32
+./rpc.go:210:7:   flow: sync.m = sync.m:
+./rpc.go:210:7:     from sync.m.mu (dot of pointer) at ./rpc.go:254:32
+./rpc.go:210:7:     from sync.m.mu (address-of) at ./rpc.go:254:32
+./rpc.go:210:7:     from sync.m := sync.m.mu (assign-pair) at ./rpc.go:254:32
+./rpc.go:210:7:   flow: {heap} = sync.m:
+./rpc.go:210:7:     from (*sync.Mutex).unlockSlow(sync.m, sync.new) (call parameter) at ./rpc.go:254:32
+./rpc.go:210:59: parameter req leaks to {heap} with derefs=0:
+./rpc.go:210:59:   flow: {heap} = req:
+./rpc.go:210:59:     from encodeWithLimits(req, Limits{}, true, encodedHeader[:headerSize]) (call parameter) at ./rpc.go:229:27
+./rpc.go:210:7: leaking param: rpc
+./rpc.go:210:31: name does not escape
+./rpc.go:210:59: leaking param: req
+./rpc.go:225:39: &rpcHeader{...} does not escape
+./rpc.go:233:44: &rpcHeader{...} does not escape
+./rpc.go:256:20: ... argument does not escape
+./rpc.go:256:52: session escapes to heap
+./rpc.go:276:7: parameter rpc leaks to ~r0 with derefs=2:
+./rpc.go:276:7:   flow: ~r0 = **rpc:
+./rpc.go:276:7:     from rpc.protocols (dot of pointer) at ./rpc.go:278:13
+./rpc.go:276:7:     from rpc.protocols[index] (dot of pointer) at ./rpc.go:278:23
+./rpc.go:276:7:     from return rpc.protocols[index] (return) at ./rpc.go:278:3
+./rpc.go:276:7: leaking param: rpc to result ~r0 level=2
+./rpc.go:276:35: name does not escape
+./rpc.go:283:13: parameter protocols leaks to {heap} with derefs=2:
+./rpc.go:283:13:   flow: {temp} = protocols:
+./rpc.go:283:13:   flow: protocol = *{temp}:
+./rpc.go:283:13:     from for loop (range-deref) at ./rpc.go:286:21
+./rpc.go:283:13:   flow: {heap} = *protocol:
+./rpc.go:283:13:     from protocol.Request (dot of pointer) at ./rpc.go:290:41
+./rpc.go:283:13:     from getRpcSprotoType(protocol.Request) (call parameter) at ./rpc.go:290:32
+./rpc.go:288:81: i escapes to heap:
+./rpc.go:288:81:   flow: {storage for ... argument} = &{storage for i}:
+./rpc.go:288:81:     from i (spill) at ./rpc.go:288:81
+./rpc.go:288:81:     from ... argument (slice-literal-element) at ./rpc.go:288:26
+./rpc.go:288:81:   flow: {heap} = {storage for ... argument}:
+./rpc.go:288:81:     from ... argument (spill) at ./rpc.go:288:26
+./rpc.go:288:81:     from fmt.Errorf("%w: nil definition at index %d", ... argument...) (call parameter) at ./rpc.go:288:26
+./rpc.go:305:9: &Rpc{...} escapes to heap:
+./rpc.go:305:9:   flow: rpc = &{storage for &Rpc{...}}:
+./rpc.go:305:9:     from &Rpc{...} (spill) at ./rpc.go:305:9
+./rpc.go:305:9:     from rpc := &Rpc{...} (assign) at ./rpc.go:305:6
+./rpc.go:305:9:   flow: ~r0 = rpc:
+./rpc.go:305:9:     from return rpc, nil (return) at ./rpc.go:311:2
+./rpc.go:309:18: make(map[int32]int) escapes to heap:
+./rpc.go:309:18:   flow: {storage for &Rpc{...}} = &{storage for make(map[int32]int)}:
+./rpc.go:309:18:     from make(map[int32]int) (spill) at ./rpc.go:309:18
+./rpc.go:309:18:     from Rpc{...} (struct literal element) at ./rpc.go:305:13
+./rpc.go:285:17: make(map[string]int) escapes to heap:
+./rpc.go:285:17:   flow: nameMap = &{storage for make(map[string]int)}:
+./rpc.go:285:17:     from make(map[string]int) (spill) at ./rpc.go:285:17
+./rpc.go:285:17:     from nameMap := make(map[string]int) (assign) at ./rpc.go:285:10
+./rpc.go:285:17:   flow: {storage for &Rpc{...}} = nameMap:
+./rpc.go:285:17:     from Rpc{...} (struct literal element) at ./rpc.go:305:13
+./rpc.go:284:15: make(map[int32]int) escapes to heap:
+./rpc.go:284:15:   flow: idMap = &{storage for make(map[int32]int)}:
+./rpc.go:284:15:     from make(map[int32]int) (spill) at ./rpc.go:284:15
+./rpc.go:284:15:     from idMap := make(map[int32]int) (assign) at ./rpc.go:284:8
+./rpc.go:284:15:   flow: {storage for &Rpc{...}} = idMap:
+./rpc.go:284:15:     from Rpc{...} (struct literal element) at ./rpc.go:305:13
+./rpc.go:283:13: parameter protocols leaks to {storage for &Rpc{...}} with derefs=0:
+./rpc.go:283:13:   flow: {storage for &Rpc{...}} = protocols:
+./rpc.go:283:13:     from Rpc{...} (struct literal element) at ./rpc.go:305:13
+./rpc.go:283:13: leaking param: protocols
+./rpc.go:284:15: make(map[int32]int) escapes to heap
+./rpc.go:285:17: make(map[string]int) escapes to heap
+./rpc.go:288:26: ... argument does not escape
+./rpc.go:288:81: i escapes to heap
+./rpc.go:305:9: &Rpc{...} escapes to heap
+./rpc.go:309:18: make(map[int32]int) escapes to heap
+./rpc.go:317:24: (*Rpc).CancelSession capturing by value: .autotmp_2 (addr=false assign=false width=8)
+./rpc.go:315:7: parameter rpc leaks to {heap} with derefs=0:
+./rpc.go:315:7:   flow: .autotmp_2 = rpc:
+./rpc.go:315:7:     from rpc.sessionMutex (dot of pointer) at ./rpc.go:317:11
+./rpc.go:315:7:     from rpc.sessionMutex (address-of) at ./rpc.go:317:24
+./rpc.go:315:7:     from .autotmp_2 = rpc.sessionMutex (assign-pair) at ./rpc.go:317:2
+./rpc.go:315:7:   flow: sync.m = .autotmp_2:
+./rpc.go:315:7:     from sync.m := .autotmp_2 (assign-pair) at ./rpc.go:317:31
+./rpc.go:315:7:   flow: sync.m = sync.m:
+./rpc.go:315:7:     from sync.m.mu (dot of pointer) at ./rpc.go:317:31
+./rpc.go:315:7:     from sync.m.mu (address-of) at ./rpc.go:317:31
+./rpc.go:315:7:     from sync.m := sync.m.mu (assign-pair) at ./rpc.go:317:31
+./rpc.go:315:7:   flow: {heap} = sync.m:
+./rpc.go:315:7:     from (*sync.Mutex).unlockSlow(sync.m, sync.new) (call parameter) at ./rpc.go:317:31
+./rpc.go:315:7: leaking param: rpc
+./rpc.go:324:24: (*Rpc).ResetSessions capturing by value: .autotmp_1 (addr=false assign=false width=8)
+./rpc.go:322:7: parameter rpc leaks to {heap} with derefs=0:
+./rpc.go:322:7:   flow: .autotmp_1 = rpc:
+./rpc.go:322:7:     from rpc.sessionMutex (dot of pointer) at ./rpc.go:324:11
+./rpc.go:322:7:     from rpc.sessionMutex (address-of) at ./rpc.go:324:24
+./rpc.go:322:7:     from .autotmp_1 = rpc.sessionMutex (assign-pair) at ./rpc.go:324:2
+./rpc.go:322:7:   flow: sync.m = .autotmp_1:
+./rpc.go:322:7:     from sync.m := .autotmp_1 (assign-pair) at ./rpc.go:324:31
+./rpc.go:322:7:   flow: sync.m = sync.m:
+./rpc.go:322:7:     from sync.m.mu (dot of pointer) at ./rpc.go:324:31
+./rpc.go:322:7:     from sync.m.mu (address-of) at ./rpc.go:324:31
+./rpc.go:322:7:     from sync.m := sync.m.mu (assign-pair) at ./rpc.go:324:31
+./rpc.go:322:7:   flow: {heap} = sync.m:
+./rpc.go:322:7:     from (*sync.Mutex).unlockSlow(sync.m, sync.new) (call parameter) at ./rpc.go:324:31
+./rpc.go:322:7: leaking param: rpc
+./sproto.go:19:14: make([]byte, (l + len(src)) * 2) escapes to heap:
+./sproto.go:19:14:   flow: {heap} = &{storage for make([]byte, (l + len(src)) * 2)}:
+./sproto.go:19:14:     from make([]byte, (l + len(src)) * 2) (non-constant size) at ./sproto.go:19:14
+./sproto.go:15:13: parameter dst leaks to ~r0 with derefs=0:
+./sproto.go:15:13:   flow: ~r0 = dst:
+./sproto.go:15:13:     from return dst (return) at ./sproto.go:25:2
+./sproto.go:15:13: leaking param: dst to result ~r0 level=0
+./sproto.go:15:18: src does not escape
+./sproto.go:19:14: make([]byte, (l + len(src)) * 2) escapes to heap
+./sproto.go:28:13: v escapes to heap:
+./sproto.go:28:13:   flow: ~r0 = &v:
+./sproto.go:28:13:     from &v (address-of) at ./sproto.go:29:9
+./sproto.go:28:13:     from return &v (return) at ./sproto.go:29:2
+./sproto.go:28:13: parameter v leaks to ~r0 with derefs=0:
+./sproto.go:28:13:   flow: ~r0 = &v:
+./sproto.go:28:13:     from &v (address-of) at ./sproto.go:29:9
+./sproto.go:28:13:     from return &v (return) at ./sproto.go:29:2
+./sproto.go:28:13: moved to heap: v
+./sproto.go:32:11: v escapes to heap:
+./sproto.go:32:11:   flow: ~r0 = &v:
+./sproto.go:32:11:     from &v (address-of) at ./sproto.go:33:9
+./sproto.go:32:11:     from return &v (return) at ./sproto.go:33:2
+./sproto.go:32:11: parameter v leaks to ~r0 with derefs=0:
+./sproto.go:32:11:   flow: ~r0 = &v:
+./sproto.go:32:11:     from &v (address-of) at ./sproto.go:33:9
+./sproto.go:32:11:     from return &v (return) at ./sproto.go:33:2
+./sproto.go:32:11: moved to heap: v
+./sproto.go:36:11: v escapes to heap:
+./sproto.go:36:11:   flow: ~r0 = &v:
+./sproto.go:36:11:     from &v (address-of) at ./sproto.go:37:9
+./sproto.go:36:11:     from return &v (return) at ./sproto.go:37:2
+./sproto.go:36:11: parameter v leaks to ~r0 with derefs=0:
+./sproto.go:36:11:   flow: ~r0 = &v:
+./sproto.go:36:11:     from &v (address-of) at ./sproto.go:37:9
+./sproto.go:36:11:     from return &v (return) at ./sproto.go:37:2
+./sproto.go:36:11: moved to heap: v
+./sproto.go:40:12: v escapes to heap:
+./sproto.go:40:12:   flow: ~r0 = &v:
+./sproto.go:40:12:     from &v (address-of) at ./sproto.go:41:9
+./sproto.go:40:12:     from return &v (return) at ./sproto.go:41:2
+./sproto.go:40:12: parameter v leaks to ~r0 with derefs=0:
+./sproto.go:40:12:   flow: ~r0 = &v:
+./sproto.go:40:12:     from &v (address-of) at ./sproto.go:41:9
+./sproto.go:40:12:     from return &v (return) at ./sproto.go:41:2
+./sproto.go:40:12: moved to heap: v
+./sproto.go:44:12: v escapes to heap:
+./sproto.go:44:12:   flow: ~r0 = &v:
+./sproto.go:44:12:     from &v (address-of) at ./sproto.go:45:9
+./sproto.go:44:12:     from return &v (return) at ./sproto.go:45:2
+./sproto.go:44:12: parameter v leaks to ~r0 with derefs=0:
+./sproto.go:44:12:   flow: ~r0 = &v:
+./sproto.go:44:12:     from &v (address-of) at ./sproto.go:45:9
+./sproto.go:44:12:     from return &v (return) at ./sproto.go:45:2
+./sproto.go:44:12: moved to heap: v
+./sproto.go:48:13: v escapes to heap:
+./sproto.go:48:13:   flow: ~r0 = &v:
+./sproto.go:48:13:     from &v (address-of) at ./sproto.go:49:9
+./sproto.go:48:13:     from return &v (return) at ./sproto.go:49:2
+./sproto.go:48:13: parameter v leaks to ~r0 with derefs=0:
+./sproto.go:48:13:   flow: ~r0 = &v:
+./sproto.go:48:13:     from &v (address-of) at ./sproto.go:49:9
+./sproto.go:48:13:     from return &v (return) at ./sproto.go:49:2
+./sproto.go:48:13: moved to heap: v
+./sproto.go:52:12: v escapes to heap:
+./sproto.go:52:12:   flow: ~r0 = &v:
+./sproto.go:52:12:     from &v (address-of) at ./sproto.go:53:9
+./sproto.go:52:12:     from return &v (return) at ./sproto.go:53:2
+./sproto.go:52:12: parameter v leaks to ~r0 with derefs=0:
+./sproto.go:52:12:   flow: ~r0 = &v:
+./sproto.go:52:12:     from &v (address-of) at ./sproto.go:53:9
+./sproto.go:52:12:     from return &v (return) at ./sproto.go:53:2
+./sproto.go:52:12: moved to heap: v
+./sproto.go:56:13: v escapes to heap:
+./sproto.go:56:13:   flow: ~r0 = &v:
+./sproto.go:56:13:     from &v (address-of) at ./sproto.go:57:9
+./sproto.go:56:13:     from return &v (return) at ./sproto.go:57:2
+./sproto.go:56:13: parameter v leaks to ~r0 with derefs=0:
+./sproto.go:56:13:   flow: ~r0 = &v:
+./sproto.go:56:13:     from &v (address-of) at ./sproto.go:57:9
+./sproto.go:56:13:     from return &v (return) at ./sproto.go:57:2
+./sproto.go:56:13: moved to heap: v
+./sproto.go:60:12: v escapes to heap:
+./sproto.go:60:12:   flow: ~r0 = &v:
+./sproto.go:60:12:     from &v (address-of) at ./sproto.go:61:9
+./sproto.go:60:12:     from return &v (return) at ./sproto.go:61:2
+./sproto.go:60:12: parameter v leaks to ~r0 with derefs=0:
+./sproto.go:60:12:   flow: ~r0 = &v:
+./sproto.go:60:12:     from &v (address-of) at ./sproto.go:61:9
+./sproto.go:60:12:     from return &v (return) at ./sproto.go:61:2
+./sproto.go:60:12: moved to heap: v
+./sproto.go:64:13: v escapes to heap:
+./sproto.go:64:13:   flow: ~r0 = &v:
+./sproto.go:64:13:     from &v (address-of) at ./sproto.go:65:9
+./sproto.go:64:13:     from return &v (return) at ./sproto.go:65:2
+./sproto.go:64:13: parameter v leaks to ~r0 with derefs=0:
+./sproto.go:64:13:   flow: ~r0 = &v:
+./sproto.go:64:13:     from &v (address-of) at ./sproto.go:65:9
+./sproto.go:64:13:     from return &v (return) at ./sproto.go:65:2
+./sproto.go:64:13: moved to heap: v
+./sproto.go:68:10: v escapes to heap:
+./sproto.go:68:10:   flow: ~r0 = &v:
+./sproto.go:68:10:     from &v (address-of) at ./sproto.go:69:9
+./sproto.go:68:10:     from return &v (return) at ./sproto.go:69:2
+./sproto.go:68:10: parameter v leaks to ~r0 with derefs=0:
+./sproto.go:68:10:   flow: ~r0 = &v:
+./sproto.go:68:10:     from &v (address-of) at ./sproto.go:69:9
+./sproto.go:68:10:     from return &v (return) at ./sproto.go:69:2
+./sproto.go:68:10: moved to heap: v
+./sproto.go:72:11: v escapes to heap:
+./sproto.go:72:11:   flow: ~r0 = &v:
+./sproto.go:72:11:     from &v (address-of) at ./sproto.go:73:9
+./sproto.go:72:11:     from return &v (return) at ./sproto.go:73:2
+./sproto.go:72:11: parameter v leaks to ~r0 with derefs=0:
+./sproto.go:72:11:   flow: ~r0 = &v:
+./sproto.go:72:11:     from &v (address-of) at ./sproto.go:73:9
+./sproto.go:72:11:     from return &v (return) at ./sproto.go:73:2
+./sproto.go:72:11: moved to heap: v
+./sproto.go:77:19: parameter sp leaks to {heap} with derefs=0:
+./sproto.go:77:19:   flow: {heap} = sp:
+./sproto.go:77:19:     from encodeWithLimits(sp, Limits{}, true, nil) (call parameter) at ./sproto.go:78:25
+./sproto.go:77:19: leaking param: sp
+./sproto.go:82:32: parameter sp leaks to {heap} with derefs=0:
+./sproto.go:82:32:   flow: message = sp:
+./sproto.go:82:32:     from data, message := unpacked, sp (assign-pair) at ./sproto.go:87:17
+./sproto.go:82:32:   flow: {heap} = message:
+./sproto.go:82:32:     from DecodeWithLimits(data, message, Limits{}) (call parameter) at ./sproto.go:87:17
+./sproto.go:82:19: data does not escape
+./sproto.go:82:32: leaking param: sp
+./decode_pointer.go:23:81: parameter value leaks to {heap} with derefs=0:
+./decode_pointer.go:23:81:   flow: value = value:
+./decode_pointer.go:23:81:     from pointer, schema, field, value := pointer, schema, field, value (assign-pair) at <autogenerated>:1
+./decode_pointer.go:23:81:   flow: {heap} = value:
+./decode_pointer.go:23:81:     from *(**int64)(unsafe.Add(pointer.value, field.encOffset)) = value (assign) at <autogenerated>:1
+<autogenerated>:1: &reflect.ValueError{...} escapes to heap:
+<autogenerated>:1:   flow: {heap} = &{storage for &reflect.ValueError{...}}:
+<autogenerated>:1:     from &reflect.ValueError{...} (spill) at <autogenerated>:1
+<autogenerated>:1:     from &reflect.ValueError{...} (interface-converted) at <autogenerated>:1
+<autogenerated>:1:     from panic(&reflect.ValueError{...}) (call parameter) at <autogenerated>:1
+<autogenerated>:1: &reflect.ValueError{...} escapes to heap
+<autogenerated>:1: &reflect.ValueError{...} escapes to heap:
+<autogenerated>:1:   flow: {heap} = &{storage for &reflect.ValueError{...}}:
+<autogenerated>:1:     from &reflect.ValueError{...} (spill) at <autogenerated>:1
+<autogenerated>:1:     from &reflect.ValueError{...} (interface-converted) at <autogenerated>:1
+<autogenerated>:1:     from panic(&reflect.ValueError{...}) (call parameter) at <autogenerated>:1
+<autogenerated>:1: &reflect.ValueError{...} escapes to heap
+./pack.go:223:31: index bounds check elided

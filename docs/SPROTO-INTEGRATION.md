@@ -271,4 +271,7 @@ Pack前缀已提交为库a161158、GSR d6c672c，均未推送。后续只读布�
 后续[结构数组schema局部复用](benchmarks/2026-10-19-gosproto-decode-array-schema/RESULTS.md)只保存同步调用内子schema链接，208条指令不变、栈帧224→240B。固定40项两轮中，含数组记录Decode快0.92%/1.05%，但大型Decode+1.25%/+0.79%、nil长数组Decode+1.59%/+1.81%，综合取舍未采用，不设最低收益比例。160进程/15,360块复算，self27/40、clone30/40；对象数不变，字节尾差/累计翻转/全部离群保留。目标契约/harness/vet/差分/fresh与指纹通过；主库从未应用补丁，源码等于913c465、工作树干净，未重复生产完整验收。该轮报告已本地提交为GSR `26a5748`，未推送；库保持913c465，依赖v0.4.0、Decode继续开放。
 
 
-后续[原生整数资格前移](benchmarks/2026-10-19-gosproto-decode-integer-proof/RESULTS.md)保留全部guard，在独占分配前计算写入资格，返回同一对象用于原生或反射回退。helper仍内联、parser664条/320B不变，重复标记加载2→1；固定40项两轮大型Decode+1.76%/+1.51%，含数组记录Decode+2.31%/+1.22%，主要目标成本超过当前局部收益，未采用，不设最低收益比例。160进程/15,360块复算，self28/40、clone25/40，对象数不变，全部尾差/翻转/异常保留；目标测试/harness/vet/差分/fresh和源码/二进制核对通过。主库未应用候选、保持913c465且干净，未重复生产完整验收。新报告未提交，依赖v0.4.0、Decode继续开放。
+后续[原生整数资格前移](benchmarks/2026-10-19-gosproto-decode-integer-proof/RESULTS.md)保留全部guard，在独占分配前计算写入资格，返回同一对象用于原生或反射回退。helper仍内联、parser664条/320B不变，重复标记加载2→1；固定40项两轮大型Decode+1.76%/+1.51%，含数组记录Decode+2.31%/+1.22%，主要目标成本超过当前局部收益，未采用，不设最低收益比例。160进程/15,360块复算，self28/40、clone25/40，对象数不变，全部尾差/翻转/异常保留；目标测试/harness/vet/差分/fresh和源码/二进制核对通过。主库未应用候选、保持913c465且干净，未重复生产完整验收。该轮报告已本地提交为GSR `f7381dd`，未推送；库保持913c465，依赖v0.4.0、Decode继续开放。
+
+
+后续[固定header视图](benchmarks/2026-10-19-gosproto-decode-header-view/RESULTS.md)只收窄readUint16的len/cap为2，原len/预算/错误/独占/全部字段guard不变。parser664→660条、320B不变；计时前两索引初稿证据另存，未计时。原40项两轮half4096 PDecode快2.41%/2.54%且双控制通过，大型PDecode快1.72%/1.89%；保留单行收益并接受短Echo/含数组记录等成本，self21/40、clone13/40及全部翻转/离群不删。160进程/15,360块复算、fresh/全部指纹、库全测/官方/race/checkptr/vet、有限Codec/Decode fuzz432,127/38,718次、GSR三包/GoTS7/7零跳过通过，Decode fuzz后段计数停止如实保留。新库实现与报告未提交，依赖v0.4.0、Decode继续开放。

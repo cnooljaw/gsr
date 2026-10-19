@@ -2,7 +2,7 @@
 
 状态：2026-10-17，范围已按用户“提交，继续”采纳并完成最小实现，已本地提交为 gosproto `fc3246a`、GSR `862fa8b`。此前安全 inline 与提案/回归已分别本地提交为 gosproto `70d985c` / `5be3b26`、GSR `d0328fd` / `2872d46`；均未推送/发布。Decode 性能阶段已按用户决定冻结于 `a09fb00`（生产源码同 `fc3246a`），最终入口候选未达保留门槛，见 [冻结报告](benchmarks/2026-10-17-gosproto-decode-freeze/RESULTS.md)。正式依赖仍为 v0.4.0。下文保留提案依据，封装后的新数据见 [实施验收](benchmarks/2026-10-17-gosproto-decode-store/RESULTS.md)。
 
-当前状态（2026-10-19）：用户明确解除Decode阶段性冻结，允许按证据继续入口、解析和构造/写入优化；本页保留历史提案/验收，入口复核已本地提交为库 `913c465`、GSR `b708108`，见[Decode解冻报告](benchmarks/2026-10-19-gosproto-decode-resume/RESULTS.md)；后续[结构数组schema实验](benchmarks/2026-10-19-gosproto-decode-array-schema/RESULTS.md)未采用且报告已提交为GSR `26a5748`；当前[整数资格前移实验](benchmarks/2026-10-19-gosproto-decode-integer-proof/RESULTS.md)也未采用，库保持913c465且Decode继续开放。官方wire、预算、失败原子性、独占与写屏障约束不变。
+当前状态（2026-10-19）：用户明确解除Decode阶段性冻结，允许按证据继续入口、解析和构造/写入优化；本页保留历史提案/验收，入口复核已本地提交为库 `913c465`、GSR `b708108`，见[Decode解冻报告](benchmarks/2026-10-19-gosproto-decode-resume/RESULTS.md)；后续[结构数组schema实验](benchmarks/2026-10-19-gosproto-decode-array-schema/RESULTS.md)未采用且报告已提交为GSR `26a5748`；当前[整数资格前移实验](benchmarks/2026-10-19-gosproto-decode-integer-proof/RESULTS.md)也未采用，报告已提交为GSR `f7381dd`；后续保留[固定header视图](benchmarks/2026-10-19-gosproto-decode-header-view/RESULTS.md)，新单行实现未提交，Decode继续开放。官方wire、预算、失败原子性、独占与写屏障约束不变。
 
 ## 问题与本轮证据
 
