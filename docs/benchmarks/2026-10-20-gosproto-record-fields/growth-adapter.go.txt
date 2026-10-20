@@ -1,0 +1,12 @@
+package benchmarks
+import (
+ "strings"
+ "testing"
+)
+func pairOperations(t *testing.T,mode string) []pairOperation {
+ result:=originalPairOperations(t,mode)
+ for _,op:=range growthPairOperations(t,mode) {
+  if !strings.HasSuffix(op.name,"/request_cancel") {result=append(result,op)}
+ }
+ return result
+}

@@ -1,0 +1,224 @@
+{
+  "baselineCommit": "a93bb0d66678c33e328c94d39036f8ff9772a5e9",
+  "gsrCommit": "28c494f386004d08f74e60f39fb533b4bcc01979",
+  "counts": {
+    "processes": 148,
+    "blocks": 14208,
+    "quartets": 3552,
+    "rounds": 888,
+    "snapshots": 592
+  },
+  "successfulCommands": 178,
+  "measurementPreparationAndRawVerified": [
+    {
+      "mode": "self",
+      "changedGoFiles": [],
+      "allInputsAndRawVerified": true
+    },
+    {
+      "mode": "clone",
+      "changedGoFiles": [],
+      "allInputsAndRawVerified": true
+    },
+    {
+      "mode": "pass1",
+      "changedGoFiles": [
+        "encode.go",
+        "encode_integer_record.go",
+        "encode_pointer.go",
+        "limits.go"
+      ],
+      "allInputsAndRawVerified": true
+    },
+    {
+      "mode": "pass2",
+      "changedGoFiles": [
+        "encode.go",
+        "encode_integer_record.go",
+        "encode_pointer.go",
+        "limits.go"
+      ],
+      "allInputsAndRawVerified": true
+    }
+  ],
+  "controlAndTelemetrySummary": {
+    "self": {
+      "controlAccepted": 27,
+      "sameAllocation": 37,
+      "initialLimiterNonzero": 0,
+      "anyLimiterChange": 0,
+      "largestSampledHeap": 4197320,
+      "unequalAllocations": [],
+      "failedControls": [
+        "addressbook/sproto_encode",
+        "addressbook/sproto_pencode",
+        "game_small/sproto_encode",
+        "game_small/sproto_pencode",
+        "int32_edges/sproto_pencode",
+        "ascii32/frame",
+        "zeros4k/frame",
+        "flat/full/4096/pencode",
+        "flat/half/4096/encode",
+        "array_record/4096/encode"
+      ]
+    },
+    "clone": {
+      "controlAccepted": 18,
+      "sameAllocation": 36,
+      "initialLimiterNonzero": 0,
+      "anyLimiterChange": 0,
+      "largestSampledHeap": 4404656,
+      "unequalAllocations": [
+        "zeros4k/frame"
+      ],
+      "failedControls": [
+        "game_small/sproto_encode",
+        "game_small/sproto_pencode",
+        "game_large/sproto_encode",
+        "game_large/sproto_pencode",
+        "echo_ascii4k/sproto_encode",
+        "echo_ascii4k/sproto_pencode",
+        "utf8_1k/frame",
+        "zeros4k/frame",
+        "flat/full/32/encode",
+        "flat/full/32/pencode",
+        "flat/full/33/encode",
+        "flat/full/33/pencode",
+        "flat/full/4096/encode",
+        "flat/full/4096/pencode",
+        "flat/half/4096/encode",
+        "flat/half/4096/pencode",
+        "nested/32x128/encode",
+        "nested/32x128/pencode",
+        "array_record/4096/pencode"
+      ]
+    },
+    "pass1": {
+      "controlAccepted": null,
+      "sameAllocation": 37,
+      "initialLimiterNonzero": 0,
+      "anyLimiterChange": 0,
+      "largestSampledHeap": 4057936,
+      "unequalAllocations": [],
+      "failedControls": null
+    },
+    "pass2": {
+      "controlAccepted": null,
+      "sameAllocation": 37,
+      "initialLimiterNonzero": 0,
+      "anyLimiterChange": 0,
+      "largestSampledHeap": 4030248,
+      "unequalAllocations": [],
+      "failedControls": null
+    }
+  },
+  "libraryStatus": " D .github/workflows/test.yml\n D LICENSE\n D examples/echo/echo.sproto\n D examples/echo/main.go\n D go.mod\n D testdata/fuzz/FuzzPackRoundTrip/4756e628ac53e8fe\n",
+  "runtimeSourceStillBaseline": true,
+  "cumulativeReversalCount": 28,
+  "allocationTailCount": 1,
+  "scope": "integer-record per-array field reference candidate, original19 plus18 growth cases; no production modification or new PB/TS ranking",
+  "artifactsSha256": {
+    ".gitattributes": "fb25a78a6381f5646d71aacea4486f6aeeeb03c4d71740227011024be0d20a8f",
+    "ALL-CASES.md": "aa779f7aeafaf846d7a01a2b3aa904e5ee9a2f9b1a81ed48abc543fb56bdf107",
+    "RESULTS.md": "65534cde3a2010d08a8ae5021fd99abe26878291269ac16b7713bddaf5782441",
+    "allocation-tails.json": "6648a69beff99e9a75bf340dd6dbf99553a275f38e6009a43af4cbc2b042c1a0",
+    "analysis.json": "a13d8266c0a80a67dd4edfb5655d15a03ebc1ce3563256624f2b857310814e49",
+    "analyze.py": "e714d8a1e11a7103694e535b6f755e48c97bf77a8d918dc3492bb95b29d8f063",
+    "assembly-summary.json": "dd5eae74c1512e79a8e31d839f7d239108c3474c6c6b3e4cbb44ab18ef22543a",
+    "before-compiler.txt": "98d4503aabb4470c12da079e11536c4dfb855085bcdc395c3dd02a2ecf5fc105",
+    "before-encode-assembly.txt": "b68a9a847c270272408dade9ecb0c1a0990b34c63de50998f3858edbac2b35bb",
+    "candidate-compiler.txt": "1c197b5b7c080cd9bc6f81f49672fae7b72dc7dcd6a9e522d39c94172ca7061b",
+    "candidate-encode-assembly.txt": "908354322facdbdcec9ec7acc466b473abcde1dfa6b15c36338f06819aa55e0a",
+    "candidate.patch": "10457dce690b94d80d0a95a69ee438ac8f6069fc05655e9a25b6d4d219caa63a",
+    "clone/case-list.json": "d443c765146fad875b2ec9e08094255f8739f1fca17de3edd6d7b932bfe0e7a3",
+    "clone/inputs.json": "01d486fdb2e6f16e0b5890a3dbef71585aaf4897e167d6dcd49d2426113ea5d1",
+    "clone/raw.json": "a16a526de7084707eec471879b938927528e2478db78496fdbeb79e0c48bc2ff",
+    "clone/summary.json": "c3361c7249595464557440680f41958b5606ee438f852f737920de90f4367a5b",
+    "commands.json": "30d98b384dedd38876fdf7eca0644cba04bf160a1d2ae762cb7495e0141ed2c8",
+    "cumulative-reversals.json": "9d260204555c125c02a5c09b15af875e59bbeb501d288085d500fd63b3617219",
+    "fallback/analysis.json": "1770d06628a2dff8d7717b7d093b83190265670685083715ce70dace370997a0",
+    "fallback/clone/case-list.json": "a0972618c2c42b0745812e99293c7b20a18dd6e977b493127fdf248c2c14025c",
+    "fallback/clone/inputs.json": "996c93039fedfe1e80f31cfa7f4648877049b2807c98d41f09cb0228c92b21cd",
+    "fallback/clone/raw.json": "56088b9ad612a92b92a1b901eb68417425a0ad58de79a27e57b977e3a156908c",
+    "fallback/clone/summary.json": "5f9e41afe1d5dc5b55466f9347548a0e04b7eb706899ac7d2cf0bddee5a91f68",
+    "fallback/commands.json": "12b2370f861557086c8a6a43773629cf543adb13b120b7351adf3e9fdc6e4bd4",
+    "fallback/pass1/case-list.json": "a0972618c2c42b0745812e99293c7b20a18dd6e977b493127fdf248c2c14025c",
+    "fallback/pass1/inputs.json": "d6dae306f7dd86f84ca264cf88a4b2933e433f2b6ad3c1591d21ec7337676c05",
+    "fallback/pass1/raw.json": "b2e7fa13c6be8a216c092310f4ba18329d92c78709c771a8a2a40321fd9d6624",
+    "fallback/pass1/summary.json": "23d63374d3b2cc77a8451750c74658c0017491ba24b9fb55e8af2e35a40e52b6",
+    "fallback/pass2/case-list.json": "a0972618c2c42b0745812e99293c7b20a18dd6e977b493127fdf248c2c14025c",
+    "fallback/pass2/inputs.json": "a052fcda3b34594a88b0c98639945eec6df18e2e99d32e69299a8e3b6beb16dc",
+    "fallback/pass2/raw.json": "7ff477e60188176fbb68ca445c7951a6aa882332b1485be98bc3f0e81302c427",
+    "fallback/pass2/summary.json": "9cdec2e2fe6f4620336cf4a9cf8e65dde3b48165aa66c9d8303c352345778444",
+    "fallback/self/case-list.json": "a0972618c2c42b0745812e99293c7b20a18dd6e977b493127fdf248c2c14025c",
+    "fallback/self/inputs.json": "ffab7f6216c6906fda285929c0d9f6d6ed9a79539a0eba324c18e87ddfdc668d",
+    "fallback/self/raw.json": "8736424768dc628dbea05e89a64f38d9b0d98d121bcfea7d6d3be4caed432aab",
+    "fallback/self/summary.json": "209bc5df375778d089e2d128ef9d2b49805b415c9f59c690ec9b9c5ccd26bddd",
+    "fallback-analyze.py": "a25bfc471b35f1d5415ca5f918c7b695b8196ad9125e6228add8e728a286a3b6",
+    "fallback-plan.json": "958405bf960745d0689af3a6538e7b553b1f038a512aa759c0d3e9c3a52daeca",
+    "fallback-probe.go.txt": "626ae75594a8c2328c0347ebab89c8b66ea08287de662517eac8c0a305a5570a",
+    "fallback.py": "5a28a6acbdd99336a54254b843b6b3e524682f03b39be9fc231045a75c5db0c8",
+    "field-regression.json": "43a0ea36fc3313dc8fa03012edbc090b91e49679a65dbd39061904d014ceb48a",
+    "fields-test.go.txt": "71898680ff0c85fa12fe34488a3622d04892da1a91955b28c696cb76d7700a7d",
+    "growth-adapter.go.txt": "c45d5619bdc3341e4c102e4910c390fa029e20de0ad66f74359f0600fc73d4e3",
+    "pass1/case-list.json": "d443c765146fad875b2ec9e08094255f8739f1fca17de3edd6d7b932bfe0e7a3",
+    "pass1/inputs.json": "7d1c6ead31eca3e8ad56899223a743758f789669392a97a3810a6368b44c448a",
+    "pass1/raw.json": "b7336e909e69bb9266006e1523dffb862808a057cd784b6370440451d0bc60da",
+    "pass1/summary.json": "35b5799343b487e4c07689f4ff40f3a484404641a5a6034e922e14983b8be481",
+    "pass2/case-list.json": "d443c765146fad875b2ec9e08094255f8739f1fca17de3edd6d7b932bfe0e7a3",
+    "pass2/inputs.json": "ec24c084899d50b4905f1e8f7363df106e024a08224aad1674d4208c44a27507",
+    "pass2/raw.json": "f8ff8c866c6fcd9e4215043c7eb325f20a0c9837ff10bb403b28d31b630e5715",
+    "pass2/summary.json": "143885653cf109012b24aa986a50ac9363b2d740e8382528541b5199b5437930",
+    "plan.json": "db188f50256686a264208ecd89fdfb70693e2c8ed971a762178153cdac52d7e6",
+    "reproduce.py": "79296bac89d74a0f86df7706e4d0ce3c600c063a0a635400eef5109c91f96634",
+    "self/case-list.json": "d443c765146fad875b2ec9e08094255f8739f1fca17de3edd6d7b932bfe0e7a3",
+    "self/inputs.json": "965a811a313edcc077dcba90b95b582a8619377e9a2be84f3ac0dbcd3f8cf0df",
+    "self/raw.json": "9486bff26e606a4d4e964f7eb0c7bd4ec6e9acec752c9a37c72b9297ff2f8f32",
+    "self/summary.json": "564b4124609a1883acded581ee39ae267dd929575db3aeb620de9175b033d276"
+  },
+  "productionCandidateRetained": false,
+  "decision": "Not adopted: repeated target and over16 fallback regressions; retain all positive/cumulative reversals; no minimum gain floor",
+  "supplementaryCounts": {
+    "processes": 16,
+    "blocks": 1536,
+    "quartets": 384,
+    "rounds": 96,
+    "snapshots": 64
+  },
+  "supplementarySuccessfulCommands": 46,
+  "supplementaryInputsVerified": true,
+  "fieldRegression": [
+    {
+      "side": "before",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "-gcflags=all=-d=checkptr=2",
+        "-run",
+        "^TestEncodeRecordFieldProjection$",
+        ".",
+        "-timeout=1m"
+      ],
+      "seconds": 3.322751874104142,
+      "exitCode": 0,
+      "output": "ok  \tgithub.com/cnooljaw/gosproto\t1.789s\n"
+    },
+    {
+      "side": "candidate",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "-gcflags=all=-d=checkptr=2",
+        "-run",
+        "^TestEncodeRecordFieldProjection$",
+        ".",
+        "-timeout=1m"
+      ],
+      "seconds": 2.1935495417565107,
+      "exitCode": 0,
+      "output": "ok  \tgithub.com/cnooljaw/gosproto\t1.345s\n"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "baselineCommit": "a93bb0d66678c33e328c94d39036f8ff9772a5e9",
+  "gsrCommit": "28c494f386004d08f74e60f39fb533b4bcc01979",
+  "scope": "Predeclared supplementary over16-field fallback check, 33 records per message, mixed nil/inline/wide values; same candidate.",
+  "modes": [
+    "self",
+    "clone",
+    "pass1",
+    "pass2"
+  ],
+  "cases": [
+    "fallback/17/encode",
+    "fallback/17/pencode",
+    "fallback/32/encode",
+    "fallback/32/pencode"
+  ],
+  "telemetry": [
+    "after_gc_before_warmup",
+    "after_calibration",
+    "after_timing",
+    "after_allocation"
+  ],
+  "growthCases": [
+    "flat/full/32",
+    "flat/full/33",
+    "flat/full/4096",
+    "flat/nil/4096",
+    "flat/half/4096",
+    "nested/32x128",
+    "array_record/32",
+    "array_record/33",
+    "array_record/4096"
+  ]
+}

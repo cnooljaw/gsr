@@ -1,0 +1,40 @@
+package benchmarks
+import (
+ "bytes"
+ "fmt"
+ "reflect"
+ "testing"
+ before "github.com/cnooljaw/gosproto-before"
+ sproto "github.com/cnooljaw/gosproto"
+)
+func pairOperations(t *testing.T,mode string) []pairOperation {
+ var pairs []pairOperation
+ for _,count:=range []int{17,32} {
+  fields:=make([]reflect.StructField,count)
+  for i:=range fields {fields[i]=reflect.StructField{Name:fmt.Sprintf("FallbackValue%d",i),Type:reflect.TypeFor[*int64](),Tag:reflect.StructTag(fmt.Sprintf("sproto:\"integer,%d\"",(count-1-i)*2))}}
+  typ:=reflect.StructOf(fields)
+  rows:=reflect.MakeSlice(reflect.SliceOf(reflect.PointerTo(typ)),33,33)
+  for i:=0;i<rows.Len();i++ {
+   row:=reflect.New(typ)
+   for j:=range fields {
+    if (i+j)%5==0 {continue}
+    value:=new(int64);*value=int64(i*100+j)
+    if j%3==0 {*value= -(1<<40)+*value}
+    row.Elem().Field(j).Set(reflect.ValueOf(value))
+   }
+   rows.Index(i).Set(row)
+  }
+  docType:=reflect.StructOf([]reflect.StructField{{Name:"Rows",Type:rows.Type(),Tag:"sproto:\"struct,0,array\""}})
+  doc:=reflect.New(docType);doc.Elem().Field(0).Set(rows);message:=doc.Interface()
+  a,err:=before.Encode(message);if err!=nil {t.Fatal(err)}
+  b,err:=sproto.Encode(message);if err!=nil||!bytes.Equal(a,b)||cap(a)!=cap(b) {t.Fatal("fallback wire/cap",err)}
+  for _,packed:=range []bool{false,true} {
+   op:="encode";if packed {op="pencode"}
+   left:=func()error {var err error;if packed {encodedSink,err=before.EncodePacked(message)} else {encodedSink,err=before.Encode(message)};return err}
+   right:=func()error {var err error;if packed {encodedSink,err=sproto.EncodePacked(message)} else {encodedSink,err=sproto.Encode(message)};return err}
+   if mode=="self" {left=right}
+   pairs=append(pairs,pairOperation{fmt.Sprintf("fallback/%d/%s",count,op),left,right})
+  }
+ }
+ return pairs
+}
