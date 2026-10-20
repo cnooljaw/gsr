@@ -863,3 +863,6 @@ self40/55、clone37/55，66项累计反向、2项分配尾差与全部异常保�
 
 
 2026-10-20：[Decode优化后Packing成本更新](benchmarks/2026-10-20-gosproto-packing-refresh/RESULTS.md)基于已提交5360fe0完成三消息Unpack/PDecode共12份独立CPU/全量allocation profile，56条流程及1条实际wire审计通过。大型/整数数组普通写出源码行约占完整Unpack样本25.1%/14.0%，实际386/321个word为3～6非零字节；ASCII几乎全走FF，kevent/GC上下文保留，不重算分母或当网络瓶颈。下一单一候选为按有效字节数range连续源窗口，先核对popcount/检查/栈成本再测，完整首遍和ownership保持；本轮尚未实现。无新生产改动或PB/TS排名，库5360fe0与GSR b0b1c4c已提交，新报告留审查，原6项删除及正式依赖不变，Body继续开放。
+
+
+2026-10-20：[Unpack连续源窗口遍历](benchmarks/2026-10-20-gosproto-unpack-source-range/RESULTS.md)不采用通用替换。少一个循环源索引检查，但增加每word计数/窗口检查，机器字行388→396、栈不变；大型Unpack两轮+13.04%/+12.87%、整数数组+13.52%/+14.12%。固定4～7字节密度的重复收益、小包正向、21项累计反向和全部控制/长尾保留，不按最低收益比例舍弃。84进程8064块、115条命令、全部mask三入口race/checkptr、夹具/vet/预检/指纹复算通过。下一步区分固定密度和真实混合mask顺序，不直接按密度分流。本轮无新生产代码，库5360fe0、正式依赖和原6项删除不动；前轮诊断已提交63d8015，新报告留审查，Body与Packing继续。
