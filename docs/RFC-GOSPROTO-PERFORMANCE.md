@@ -845,3 +845,5 @@ self40/55、clone37/55，66项累计反向、2项分配尾差与全部异常保�
 据此追加固定单模块独立二进制诊断，A/B仅一个官方模块名导入、两记录函数链接地址相同；A/A控制与A/B比较各两入口六轮ABBA/BAAB，96worker每次100000调用。Encode比较+1.95%/IQR6.52pp、控制−1.76%/3.09pp；PEncode比较−0.86%/1.36pp、控制−0.92%/3.27pp。所有3968B/2次分配。未确认净收益，候选不采用，小正面观察保留，不设比例门槛；不丢−9.03%控制轮等异常，也不把补充结果当原比值修正。
 
 原178条流程、109形态525差分及fresh/输入/二进制/raw核对；补充102条构建/worker命令与1e-12逐轮复算、原样复用描述替换回归的两侧race/checkptr均通过。没有新生产代码，不重复全库/oracle/fuzz/GoTS。后续关键候选增加单模块复核，历史结果不统一扣差或回填。下一步以a93bb0d单一SP实例重新对齐Go/PB公开API基线，再定位Body/Packing缺口，不冻结Decode。前轮440f436已提交，新[报告](benchmarks/2026-10-20-gosproto-record-tag/RESULTS.md)留审查；库和原6项删除、依赖v0.4.0保持。
+
+2026-10-20：[Decode/Unpack 独立进程诊断](benchmarks/2026-10-20-gosproto-decode-cost/RESULTS.md)完成18份profile和80条命令。大型Decode的对象构造、普通mask解包写出均为实测热点；下一Packing切片先测固定八字节目标视图，保留首遍预算/边界预检，Body字段/presence路径继续开放。尚无新候选实现或收益结论。

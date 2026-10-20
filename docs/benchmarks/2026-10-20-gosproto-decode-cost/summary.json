@@ -1,0 +1,2545 @@
+[
+  {
+    "case": "addressbook",
+    "op": "sproto_decode",
+    "nodes": [
+      {
+        "flat": "0.53s",
+        "flatPercent": 23.98,
+        "cum": "0.53s",
+        "cumPercent": 23.98,
+        "function": "runtime.kevent"
+      },
+      {
+        "flat": "0.19s",
+        "flatPercent": 8.6,
+        "cum": "0.88s",
+        "cumPercent": 39.82,
+        "function": "runtime.mallocgc"
+      },
+      {
+        "flat": "0.11s",
+        "flatPercent": 4.98,
+        "cum": "0.39s",
+        "cumPercent": 17.65,
+        "function": "runtime.mallocgcSmallScanNoHeader"
+      },
+      {
+        "flat": "0.09s",
+        "flatPercent": 4.07,
+        "cum": "1.44s",
+        "cumPercent": 65.16,
+        "function": "github.com/cnooljaw/gosproto.decodeMessage"
+      },
+      {
+        "flat": "0.09s",
+        "flatPercent": 4.07,
+        "cum": "0.14s",
+        "cumPercent": 6.33,
+        "function": "runtime.mallocgcTiny"
+      },
+      {
+        "flat": "0.09s",
+        "flatPercent": 4.07,
+        "cum": "0.09s",
+        "cumPercent": 4.07,
+        "function": "runtime.memclrNoHeapPointers"
+      },
+      {
+        "flat": "0.05s",
+        "flatPercent": 2.26,
+        "cum": "1.43s",
+        "cumPercent": 64.71,
+        "function": "github.com/cnooljaw/gosproto.decodeStructSlice"
+      },
+      {
+        "flat": "0.04s",
+        "flatPercent": 1.81,
+        "cum": "0.04s",
+        "cumPercent": 1.81,
+        "function": "reflect.Value.Field"
+      },
+      {
+        "flat": "0.04s",
+        "flatPercent": 1.81,
+        "cum": "0.10s",
+        "cumPercent": 4.52,
+        "function": "reflect.Value.Set"
+      },
+      {
+        "flat": "0.04s",
+        "flatPercent": 1.81,
+        "cum": "0.05s",
+        "cumPercent": 2.26,
+        "function": "reflect.elem"
+      },
+      {
+        "flat": "0.04s",
+        "flatPercent": 1.81,
+        "cum": "0.13s",
+        "cumPercent": 5.88,
+        "function": "runtime.deductAssistCredit"
+      },
+      {
+        "flat": "0.04s",
+        "flatPercent": 1.81,
+        "cum": "0.04s",
+        "cumPercent": 1.81,
+        "function": "runtime.mapaccess1_fast32"
+      },
+      {
+        "flat": "0.04s",
+        "flatPercent": 1.81,
+        "cum": "0.04s",
+        "cumPercent": 1.81,
+        "function": "runtime.memmove"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.36,
+        "cum": "0.10s",
+        "cumPercent": 4.52,
+        "function": "reflect.(*rtype).ptrTo"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.36,
+        "cum": "0.03s",
+        "cumPercent": 1.36,
+        "function": "runtime.getGCMask (inline)"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.36,
+        "cum": "0.03s",
+        "cumPercent": 1.36,
+        "function": "runtime.markBits.setMarked (inline)"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.36,
+        "cum": "0.52s",
+        "cumPercent": 23.53,
+        "function": "runtime.newobject"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.36,
+        "cum": "0.04s",
+        "cumPercent": 1.81,
+        "function": "runtime.nextFreeFast (inline)"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.36,
+        "cum": "0.03s",
+        "cumPercent": 1.36,
+        "function": "runtime.releasem (inline)"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.36,
+        "cum": "0.07s",
+        "cumPercent": 3.17,
+        "function": "runtime.resolveTypeOff"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.9,
+        "cum": "0.02s",
+        "cumPercent": 0.9,
+        "function": "github.com/cnooljaw/gosproto.(*SprotoType).FieldByTag (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.9,
+        "cum": "0.02s",
+        "cumPercent": 0.9,
+        "function": "reflect.Value.Elem"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.9,
+        "cum": "0.02s",
+        "cumPercent": 0.9,
+        "function": "reflect.Value.IsNil (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.9,
+        "cum": "0.02s",
+        "cumPercent": 0.9,
+        "function": "reflect.directlyAssignable"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.9,
+        "cum": "0.05s",
+        "cumPercent": 2.26,
+        "function": "runtime.(*mspan).writeHeapBitsSmall"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.9,
+        "cum": "0.02s",
+        "cumPercent": 0.9,
+        "function": "runtime.(*pageCache).alloc"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.9,
+        "cum": "0.03s",
+        "cumPercent": 1.36,
+        "function": "runtime.(*sweepLocked).sweep"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.9,
+        "cum": "0.03s",
+        "cumPercent": 1.36,
+        "function": "runtime.findObject"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.9,
+        "cum": "0.02s",
+        "cumPercent": 0.9,
+        "function": "runtime.getMCache (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.9,
+        "cum": "0.02s",
+        "cumPercent": 0.9,
+        "function": "runtime.ifaceeq"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.9,
+        "cum": "0.02s",
+        "cumPercent": 0.9,
+        "function": "runtime.scanblock"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.9,
+        "cum": "0.04s",
+        "cumPercent": 1.81,
+        "function": "runtime.typePointers.next"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.45,
+        "cum": "1.62s",
+        "cumPercent": 73.3,
+        "function": "github.com/cnooljaw/gosproto.DecodeWithLimits"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.45,
+        "cum": "0.02s",
+        "cumPercent": 0.9,
+        "function": "internal/runtime/maps.(*Map).getWithKeySmall"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.45,
+        "cum": "0.07s",
+        "cumPercent": 3.17,
+        "function": "reflect.(*rtype).Elem"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.45,
+        "cum": "0.24s",
+        "cumPercent": 10.86,
+        "function": "reflect.MakeSlice"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.45,
+        "cum": "0.32s",
+        "cumPercent": 14.48,
+        "function": "reflect.New"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.45,
+        "cum": "0.04s",
+        "cumPercent": 1.81,
+        "function": "reflect.Value.assignTo"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.45,
+        "cum": "0.02s",
+        "cumPercent": 0.9,
+        "function": "reflect.ValueOf (inline)"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.45,
+        "cum": "0.04s",
+        "cumPercent": 1.81,
+        "function": "runtime.gcmarknewobject"
+      }
+    ],
+    "loopBytes": 528,
+    "loopAllocs": 29
+  },
+  {
+    "case": "addressbook",
+    "op": "sproto_unpack",
+    "nodes": [
+      {
+        "flat": "0.69s",
+        "flatPercent": 44.52,
+        "cum": "1.04s",
+        "cumPercent": 67.1,
+        "function": "github.com/cnooljaw/gosproto.UnpackWithLimit"
+      },
+      {
+        "flat": "0.41s",
+        "flatPercent": 26.45,
+        "cum": "0.41s",
+        "cumPercent": 26.45,
+        "function": "runtime.kevent"
+      },
+      {
+        "flat": "0.10s",
+        "flatPercent": 6.45,
+        "cum": "0.10s",
+        "cumPercent": 6.45,
+        "function": "runtime.memclrNoHeapPointers"
+      },
+      {
+        "flat": "0.05s",
+        "flatPercent": 3.23,
+        "cum": "0.05s",
+        "cumPercent": 3.23,
+        "function": "math/bits.OnesCount8 (inline)"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.94,
+        "cum": "1.08s",
+        "cumPercent": 69.68,
+        "function": "gosprotobodystudy.representativeOperations.func6"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.94,
+        "cum": "0.03s",
+        "cumPercent": 1.94,
+        "function": "runtime.memmove"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.94,
+        "cum": "0.03s",
+        "cumPercent": 1.94,
+        "function": "runtime.scanblock"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.94,
+        "cum": "0.04s",
+        "cumPercent": 2.58,
+        "function": "runtime.scanobject"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 1.29,
+        "cum": "0.27s",
+        "cumPercent": 17.42,
+        "function": "runtime.makeslice"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 1.29,
+        "cum": "0.25s",
+        "cumPercent": 16.13,
+        "function": "runtime.mallocgc"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.65,
+        "cum": "1.10s",
+        "cumPercent": 70.97,
+        "function": "gosprotobodystudy.BenchmarkBodyCost"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.65,
+        "cum": "0.01s",
+        "cumPercent": 0.65,
+        "function": "internal/runtime/atomic.(*Uint8).Store (inline)"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.65,
+        "cum": "0.01s",
+        "cumPercent": 0.65,
+        "function": "runtime.freeSomeWbufs"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.65,
+        "cum": "0.07s",
+        "cumPercent": 4.52,
+        "function": "runtime.gcDrainN"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.65,
+        "cum": "0.01s",
+        "cumPercent": 0.65,
+        "function": "runtime.gcmarknewobject"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.65,
+        "cum": "0.01s",
+        "cumPercent": 0.65,
+        "function": "runtime.madvise"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.65,
+        "cum": "0.16s",
+        "cumPercent": 10.32,
+        "function": "runtime.mallocgcSmallNoscan"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.65,
+        "cum": "0.01s",
+        "cumPercent": 0.65,
+        "function": "runtime.markBits.isMarked (inline)"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.65,
+        "cum": "0.01s",
+        "cumPercent": 0.65,
+        "function": "runtime.newMarkBits"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.65,
+        "cum": "0.01s",
+        "cumPercent": 0.65,
+        "function": "runtime.pcvalue"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.65,
+        "cum": "0.01s",
+        "cumPercent": 0.65,
+        "function": "runtime.releasem (inline)"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.65,
+        "cum": "0.01s",
+        "cumPercent": 0.65,
+        "function": "runtime.typePointers.next"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.65,
+        "cum": "0.01s",
+        "cumPercent": 0.65,
+        "function": "runtime/pprof.(*profileBuilder).addCPUData"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.65,
+        "cum": "0.01s",
+        "cumPercent": 0.65,
+        "function": "testing.(*B).Loop (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.01s",
+        "cumPercent": 0.65,
+        "function": "gcWriteBarrier"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.04s",
+        "cumPercent": 67.1,
+        "function": "github.com/cnooljaw/gosproto.Unpack (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.01s",
+        "cumPercent": 0.65,
+        "function": "runtime.(*inlineUnwinder).resolveInternal (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.01s",
+        "cumPercent": 0.65,
+        "function": "runtime.(*mSpanStateBox).set (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 1.29,
+        "function": "runtime.(*mcache).nextFree"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 1.29,
+        "function": "runtime.(*mcache).refill"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 1.29,
+        "function": "runtime.(*mcentral).cacheSpan"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.01s",
+        "cumPercent": 0.65,
+        "function": "runtime.(*mcentral).grow"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.01s",
+        "cumPercent": 0.65,
+        "function": "runtime.(*mheap).alloc"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 1.29,
+        "function": "runtime.(*mheap).alloc.func1"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 1.29,
+        "function": "runtime.(*mheap).allocSpan"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.01s",
+        "cumPercent": 0.65,
+        "function": "runtime.(*mheap).initSpan"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.01s",
+        "cumPercent": 0.65,
+        "function": "runtime.(*sweepLocked).sweep"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.01s",
+        "cumPercent": 0.65,
+        "function": "runtime.bgsweep"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.01s",
+        "cumPercent": 0.65,
+        "function": "runtime.callers"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.01s",
+        "cumPercent": 0.65,
+        "function": "runtime.callers.func1"
+      }
+    ],
+    "loopBytes": 144,
+    "loopAllocs": 1
+  },
+  {
+    "case": "addressbook",
+    "op": "sproto_pdecode",
+    "nodes": [
+      {
+        "flat": "0.54s",
+        "flatPercent": 24.66,
+        "cum": "0.54s",
+        "cumPercent": 24.66,
+        "function": "runtime.kevent"
+      },
+      {
+        "flat": "0.16s",
+        "flatPercent": 7.31,
+        "cum": "1.24s",
+        "cumPercent": 56.62,
+        "function": "github.com/cnooljaw/gosproto.decodeMessage"
+      },
+      {
+        "flat": "0.15s",
+        "flatPercent": 6.85,
+        "cum": "0.34s",
+        "cumPercent": 15.53,
+        "function": "runtime.mallocgcSmallScanNoHeader"
+      },
+      {
+        "flat": "0.13s",
+        "flatPercent": 5.94,
+        "cum": "0.20s",
+        "cumPercent": 9.13,
+        "function": "github.com/cnooljaw/gosproto.UnpackWithLimit"
+      },
+      {
+        "flat": "0.13s",
+        "flatPercent": 5.94,
+        "cum": "0.13s",
+        "cumPercent": 5.94,
+        "function": "runtime.memclrNoHeapPointers"
+      },
+      {
+        "flat": "0.10s",
+        "flatPercent": 4.57,
+        "cum": "0.72s",
+        "cumPercent": 32.88,
+        "function": "runtime.mallocgc"
+      },
+      {
+        "flat": "0.07s",
+        "flatPercent": 3.2,
+        "cum": "1.21s",
+        "cumPercent": 55.25,
+        "function": "github.com/cnooljaw/gosproto.decodeStructSlice"
+      },
+      {
+        "flat": "0.07s",
+        "flatPercent": 3.2,
+        "cum": "0.10s",
+        "cumPercent": 4.57,
+        "function": "runtime.mallocgcTiny"
+      },
+      {
+        "flat": "0.04s",
+        "flatPercent": 1.83,
+        "cum": "0.04s",
+        "cumPercent": 1.83,
+        "function": "encoding/binary.littleEndian.Uint16 (inline)"
+      },
+      {
+        "flat": "0.04s",
+        "flatPercent": 1.83,
+        "cum": "0.04s",
+        "cumPercent": 1.83,
+        "function": "runtime.(*mspan).writeHeapBitsSmall"
+      },
+      {
+        "flat": "0.04s",
+        "flatPercent": 1.83,
+        "cum": "0.05s",
+        "cumPercent": 2.28,
+        "function": "runtime.findObject"
+      },
+      {
+        "flat": "0.04s",
+        "flatPercent": 1.83,
+        "cum": "0.05s",
+        "cumPercent": 2.28,
+        "function": "runtime.typePointers.next"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.37,
+        "cum": "0.03s",
+        "cumPercent": 1.37,
+        "function": "reflect.Value.Elem"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.37,
+        "cum": "0.03s",
+        "cumPercent": 1.37,
+        "function": "reflect.flag.kind (inline)"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.37,
+        "cum": "0.08s",
+        "cumPercent": 3.65,
+        "function": "runtime.mallocgcSmallNoscan"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.37,
+        "cum": "0.05s",
+        "cumPercent": 2.28,
+        "function": "runtime.resolveTypeOff"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.91,
+        "cum": "0.04s",
+        "cumPercent": 1.83,
+        "function": "gosprotobodystudy.representativeMessages.func2"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.91,
+        "cum": "0.02s",
+        "cumPercent": 0.91,
+        "function": "internal/abi.(*Type).Pointers (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.91,
+        "cum": "0.09s",
+        "cumPercent": 4.11,
+        "function": "reflect.Value.Set"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.91,
+        "cum": "0.03s",
+        "cumPercent": 1.37,
+        "function": "reflect.Value.assignTo"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.91,
+        "cum": "0.02s",
+        "cumPercent": 0.91,
+        "function": "runtime.getMCache (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.91,
+        "cum": "0.02s",
+        "cumPercent": 0.91,
+        "function": "runtime.ifaceeq"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.91,
+        "cum": "0.02s",
+        "cumPercent": 0.91,
+        "function": "runtime.mapaccess1_fast32"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.91,
+        "cum": "0.02s",
+        "cumPercent": 0.91,
+        "function": "runtime.memmove"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.91,
+        "cum": "0.02s",
+        "cumPercent": 0.91,
+        "function": "runtime.scanblock"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.91,
+        "cum": "0.07s",
+        "cumPercent": 3.2,
+        "function": "runtime.slicebytetostring"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.46,
+        "cum": "1.39s",
+        "cumPercent": 63.47,
+        "function": "github.com/cnooljaw/gosproto.DecodeWithLimits"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.46,
+        "cum": "0.25s",
+        "cumPercent": 11.42,
+        "function": "github.com/cnooljaw/gosproto.decodeStringPointer"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.46,
+        "cum": "0.06s",
+        "cumPercent": 2.74,
+        "function": "reflect.(*rtype).ptrTo"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.46,
+        "cum": "0.19s",
+        "cumPercent": 8.68,
+        "function": "reflect.MakeSlice"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.46,
+        "cum": "0.27s",
+        "cumPercent": 12.33,
+        "function": "reflect.New"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.46,
+        "cum": "0.02s",
+        "cumPercent": 0.91,
+        "function": "reflect.Value.Field"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.46,
+        "cum": "0.22s",
+        "cumPercent": 10.05,
+        "function": "reflect.unsafe_New"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.46,
+        "cum": "0.06s",
+        "cumPercent": 2.74,
+        "function": "reflect.unsafe_NewArray"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.46,
+        "cum": "0.06s",
+        "cumPercent": 2.74,
+        "function": "runtime.(*mcache).nextFree"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.46,
+        "cum": "0.05s",
+        "cumPercent": 2.28,
+        "function": "runtime.(*mcache).refill"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.46,
+        "cum": "0.03s",
+        "cumPercent": 1.37,
+        "function": "runtime.(*mheap).allocSpan"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.46,
+        "cum": "0.09s",
+        "cumPercent": 4.11,
+        "function": "runtime.deductAssistCredit"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.46,
+        "cum": "0.02s",
+        "cumPercent": 0.91,
+        "function": "runtime.interhash"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.46,
+        "cum": "0.05s",
+        "cumPercent": 2.28,
+        "function": "runtime.newarray"
+      }
+    ],
+    "loopBytes": 672,
+    "loopAllocs": 30
+  },
+  {
+    "case": "game_large",
+    "op": "sproto_decode",
+    "nodes": [
+      {
+        "flat": "0.41s",
+        "flatPercent": 18.14,
+        "cum": "0.41s",
+        "cumPercent": 18.14,
+        "function": "runtime.kevent"
+      },
+      {
+        "flat": "0.33s",
+        "flatPercent": 14.6,
+        "cum": "1.80s",
+        "cumPercent": 79.65,
+        "function": "github.com/cnooljaw/gosproto.decodeMessage"
+      },
+      {
+        "flat": "0.19s",
+        "flatPercent": 8.41,
+        "cum": "0.88s",
+        "cumPercent": 38.94,
+        "function": "runtime.mallocgc"
+      },
+      {
+        "flat": "0.12s",
+        "flatPercent": 5.31,
+        "cum": "0.23s",
+        "cumPercent": 10.18,
+        "function": "runtime.mallocgcTiny"
+      },
+      {
+        "flat": "0.08s",
+        "flatPercent": 3.54,
+        "cum": "0.08s",
+        "cumPercent": 3.54,
+        "function": "github.com/cnooljaw/gosproto.(*SprotoField).nativeInteger (inline)"
+      },
+      {
+        "flat": "0.06s",
+        "flatPercent": 2.65,
+        "cum": "0.08s",
+        "cumPercent": 3.54,
+        "function": "github.com/cnooljaw/gosproto.countChunks"
+      },
+      {
+        "flat": "0.06s",
+        "flatPercent": 2.65,
+        "cum": "0.07s",
+        "cumPercent": 3.1,
+        "function": "runtime.(*mspan).writeHeapBitsSmall"
+      },
+      {
+        "flat": "0.06s",
+        "flatPercent": 2.65,
+        "cum": "0.26s",
+        "cumPercent": 11.5,
+        "function": "runtime.mallocgcSmallScanNoHeader"
+      },
+      {
+        "flat": "0.05s",
+        "flatPercent": 2.21,
+        "cum": "1.68s",
+        "cumPercent": 74.34,
+        "function": "github.com/cnooljaw/gosproto.decodeStructSlice"
+      },
+      {
+        "flat": "0.04s",
+        "flatPercent": 1.77,
+        "cum": "0.07s",
+        "cumPercent": 3.1,
+        "function": "github.com/cnooljaw/gosproto.decodeIntSlice"
+      },
+      {
+        "flat": "0.04s",
+        "flatPercent": 1.77,
+        "cum": "0.17s",
+        "cumPercent": 7.52,
+        "function": "github.com/cnooljaw/gosproto.decodePointer.setInteger (inline)"
+      },
+      {
+        "flat": "0.04s",
+        "flatPercent": 1.77,
+        "cum": "0.04s",
+        "cumPercent": 1.77,
+        "function": "runtime.(*mspan).nextFreeIndex"
+      },
+      {
+        "flat": "0.04s",
+        "flatPercent": 1.77,
+        "cum": "0.04s",
+        "cumPercent": 1.77,
+        "function": "runtime.memclrNoHeapPointers"
+      },
+      {
+        "flat": "0.04s",
+        "flatPercent": 1.77,
+        "cum": "0.51s",
+        "cumPercent": 22.57,
+        "function": "runtime.newobject"
+      },
+      {
+        "flat": "0.04s",
+        "flatPercent": 1.77,
+        "cum": "0.04s",
+        "cumPercent": 1.77,
+        "function": "runtime.nextFreeFast (inline)"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.33,
+        "cum": "0.08s",
+        "cumPercent": 3.54,
+        "function": "gcWriteBarrier"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.33,
+        "cum": "0.03s",
+        "cumPercent": 1.33,
+        "function": "github.com/cnooljaw/gosproto.readChunk (inline)"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.33,
+        "cum": "0.03s",
+        "cumPercent": 1.33,
+        "function": "runtime.(*mspan).base (inline)"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.33,
+        "cum": "0.03s",
+        "cumPercent": 1.33,
+        "function": "runtime.getGCMask (inline)"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.33,
+        "cum": "0.03s",
+        "cumPercent": 1.33,
+        "function": "runtime.getMCache (inline)"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.33,
+        "cum": "0.04s",
+        "cumPercent": 1.77,
+        "function": "runtime.resolveTypeOff"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.33,
+        "cum": "0.03s",
+        "cumPercent": 1.33,
+        "function": "runtime.scanblock"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.33,
+        "cum": "0.06s",
+        "cumPercent": 2.65,
+        "function": "runtime.typePointers.next"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.88,
+        "cum": "0.02s",
+        "cumPercent": 0.88,
+        "function": "encoding/binary.littleEndian.Uint16 (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.88,
+        "cum": "0.02s",
+        "cumPercent": 0.88,
+        "function": "github.com/cnooljaw/gosproto.(*SprotoType).FieldByTag (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.88,
+        "cum": "0.02s",
+        "cumPercent": 0.88,
+        "function": "reflect.Value.Elem"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.88,
+        "cum": "0.02s",
+        "cumPercent": 0.88,
+        "function": "reflect.flag.kind (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.88,
+        "cum": "0.16s",
+        "cumPercent": 7.08,
+        "function": "runtime.deductAssistCredit"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.88,
+        "cum": "0.04s",
+        "cumPercent": 1.77,
+        "function": "runtime.findObject"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.88,
+        "cum": "0.02s",
+        "cumPercent": 0.88,
+        "function": "runtime.ifaceeq"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.88,
+        "cum": "0.02s",
+        "cumPercent": 0.88,
+        "function": "runtime.madvise"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.05s",
+        "cumPercent": 2.21,
+        "function": "reflect.(*rtype).ptrTo"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.05s",
+        "cumPercent": 2.21,
+        "function": "reflect.Value.UnsafePointer"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.02s",
+        "cumPercent": 0.88,
+        "function": "reflect.Value.pointer (inline)"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.30s",
+        "cumPercent": 13.27,
+        "function": "reflect.unsafe_New"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.02s",
+        "cumPercent": 0.88,
+        "function": "runtime.(*mspan).typePointersOfUnchecked"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.02s",
+        "cumPercent": 0.88,
+        "function": "runtime.(*spanSet).push"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.14s",
+        "cumPercent": 6.19,
+        "function": "runtime.gcDrainN"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.04s",
+        "cumPercent": 1.77,
+        "function": "runtime.gcmarknewobject"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.02s",
+        "cumPercent": 0.88,
+        "function": "runtime.mallocgcSmallScanHeader"
+      }
+    ],
+    "loopBytes": 10416,
+    "loopAllocs": 532
+  },
+  {
+    "case": "game_large",
+    "op": "sproto_unpack",
+    "nodes": [
+      {
+        "flat": "1.37s",
+        "flatPercent": 59.57,
+        "cum": "1.62s",
+        "cumPercent": 70.43,
+        "function": "github.com/cnooljaw/gosproto.UnpackWithLimit"
+      },
+      {
+        "flat": "0.66s",
+        "flatPercent": 28.7,
+        "cum": "0.66s",
+        "cumPercent": 28.7,
+        "function": "runtime.kevent"
+      },
+      {
+        "flat": "0.10s",
+        "flatPercent": 4.35,
+        "cum": "0.10s",
+        "cumPercent": 4.35,
+        "function": "math/bits.OnesCount8 (inline)"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.3,
+        "cum": "0.03s",
+        "cumPercent": 1.3,
+        "function": "runtime.memclrNoHeapPointers"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.87,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "runtime.madvise"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.87,
+        "cum": "0.05s",
+        "cumPercent": 2.17,
+        "function": "runtime.scanobject"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.87,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "runtime.step"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "runtime.(*stkframe).getStackMap"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.09s",
+        "cumPercent": 3.91,
+        "function": "runtime.gcDrainN"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.62s",
+        "cumPercent": 70.43,
+        "function": "github.com/cnooljaw/gosproto.Unpack (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.62s",
+        "cumPercent": 70.43,
+        "function": "gosprotobodystudy.BenchmarkBodyCost"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.62s",
+        "cumPercent": 70.43,
+        "function": "gosprotobodystudy.representativeOperations.func6"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "runtime.(*mheap).alloc.func1"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "runtime.(*mheap).allocSpan"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.09s",
+        "cumPercent": 3.91,
+        "function": "runtime.deductAssistCredit"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.09s",
+        "cumPercent": 3.91,
+        "function": "runtime.gcAssistAlloc"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.09s",
+        "cumPercent": 3.91,
+        "function": "runtime.gcAssistAlloc.func2"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.09s",
+        "cumPercent": 3.91,
+        "function": "runtime.gcAssistAlloc1"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.35s",
+        "cumPercent": 15.22,
+        "function": "runtime.gcMarkTermination.func3"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.31s",
+        "cumPercent": 13.48,
+        "function": "runtime.gcStart.func4"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.14s",
+        "cumPercent": 6.09,
+        "function": "runtime.makeslice"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.14s",
+        "cumPercent": 6.09,
+        "function": "runtime.mallocgc"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.05s",
+        "cumPercent": 2.17,
+        "function": "runtime.mallocgcSmallNoscan"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.3,
+        "function": "runtime.markroot"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.3,
+        "function": "runtime.markroot.func1"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.66s",
+        "cumPercent": 28.7,
+        "function": "runtime.netpoll"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "runtime.pcvalue"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "runtime.scanframeworker"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.3,
+        "function": "runtime.scanstack"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.66s",
+        "cumPercent": 28.7,
+        "function": "runtime.startTheWorldWithSema"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "runtime.sysUsed (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "runtime.sysUsedOS (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.78s",
+        "cumPercent": 33.91,
+        "function": "runtime.systemstack"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.62s",
+        "cumPercent": 70.43,
+        "function": "testing.(*B).run1.func1"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.62s",
+        "cumPercent": 70.43,
+        "function": "testing.(*B).runN"
+      }
+    ],
+    "loopBytes": 3456,
+    "loopAllocs": 1
+  },
+  {
+    "case": "game_large",
+    "op": "sproto_pdecode",
+    "nodes": [
+      {
+        "flat": "0.67s",
+        "flatPercent": 28.39,
+        "cum": "0.67s",
+        "cumPercent": 28.39,
+        "function": "runtime.kevent"
+      },
+      {
+        "flat": "0.38s",
+        "flatPercent": 16.1,
+        "cum": "0.41s",
+        "cumPercent": 17.37,
+        "function": "github.com/cnooljaw/gosproto.UnpackWithLimit"
+      },
+      {
+        "flat": "0.28s",
+        "flatPercent": 11.86,
+        "cum": "1.23s",
+        "cumPercent": 52.12,
+        "function": "github.com/cnooljaw/gosproto.decodeMessage"
+      },
+      {
+        "flat": "0.11s",
+        "flatPercent": 4.66,
+        "cum": "0.53s",
+        "cumPercent": 22.46,
+        "function": "runtime.mallocgc"
+      },
+      {
+        "flat": "0.06s",
+        "flatPercent": 2.54,
+        "cum": "1.13s",
+        "cumPercent": 47.88,
+        "function": "github.com/cnooljaw/gosproto.decodeStructSlice"
+      },
+      {
+        "flat": "0.06s",
+        "flatPercent": 2.54,
+        "cum": "0.22s",
+        "cumPercent": 9.32,
+        "function": "runtime.mallocgcSmallScanNoHeader"
+      },
+      {
+        "flat": "0.05s",
+        "flatPercent": 2.12,
+        "cum": "0.07s",
+        "cumPercent": 2.97,
+        "function": "runtime.(*mspan).writeHeapBitsSmall"
+      },
+      {
+        "flat": "0.05s",
+        "flatPercent": 2.12,
+        "cum": "0.10s",
+        "cumPercent": 4.24,
+        "function": "runtime.mallocgcTiny"
+      },
+      {
+        "flat": "0.05s",
+        "flatPercent": 2.12,
+        "cum": "0.05s",
+        "cumPercent": 2.12,
+        "function": "runtime.memclrNoHeapPointers"
+      },
+      {
+        "flat": "0.04s",
+        "flatPercent": 1.69,
+        "cum": "0.04s",
+        "cumPercent": 1.69,
+        "function": "github.com/cnooljaw/gosproto.(*SprotoType).FieldByTag (inline)"
+      },
+      {
+        "flat": "0.04s",
+        "flatPercent": 1.69,
+        "cum": "0.05s",
+        "cumPercent": 2.12,
+        "function": "github.com/cnooljaw/gosproto.readChunk (inline)"
+      },
+      {
+        "flat": "0.04s",
+        "flatPercent": 1.69,
+        "cum": "0.06s",
+        "cumPercent": 2.54,
+        "function": "runtime.wbBufFlush1"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.27,
+        "cum": "0.05s",
+        "cumPercent": 2.12,
+        "function": "reflect.Value.UnsafePointer"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.27,
+        "cum": "0.03s",
+        "cumPercent": 1.27,
+        "function": "runtime.ifaceeq"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.85,
+        "cum": "0.02s",
+        "cumPercent": 0.85,
+        "function": "github.com/cnooljaw/gosproto.(*SprotoField).nativeInteger (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.85,
+        "cum": "0.05s",
+        "cumPercent": 2.12,
+        "function": "github.com/cnooljaw/gosproto.decodeIntSlice"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.85,
+        "cum": "0.31s",
+        "cumPercent": 13.14,
+        "function": "reflect.New"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.85,
+        "cum": "0.04s",
+        "cumPercent": 1.69,
+        "function": "runtime.findObject"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.85,
+        "cum": "0.02s",
+        "cumPercent": 0.85,
+        "function": "runtime.getGCMask (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.85,
+        "cum": "0.23s",
+        "cumPercent": 9.75,
+        "function": "runtime.newobject"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.85,
+        "cum": "0.02s",
+        "cumPercent": 0.85,
+        "function": "runtime.nextFreeFast (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.85,
+        "cum": "0.02s",
+        "cumPercent": 0.85,
+        "function": "runtime.releasem (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.85,
+        "cum": "0.02s",
+        "cumPercent": 0.85,
+        "function": "runtime.resolveTypeOff"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.85,
+        "cum": "0.02s",
+        "cumPercent": 0.85,
+        "function": "runtime.spanOf (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.85,
+        "cum": "0.02s",
+        "cumPercent": 0.85,
+        "function": "runtime.typePointers.next"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.42,
+        "cum": "0.09s",
+        "cumPercent": 3.81,
+        "function": "github.com/cnooljaw/gosproto.decodePointer.setInteger (inline)"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.42,
+        "cum": "0.05s",
+        "cumPercent": 2.12,
+        "function": "github.com/cnooljaw/gosproto.messageDecodePointer (inline)"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.42,
+        "cum": "0.04s",
+        "cumPercent": 1.69,
+        "function": "reflect.(*rtype).ptrTo"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.42,
+        "cum": "0.03s",
+        "cumPercent": 1.27,
+        "function": "reflect.resolveTypeOff"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.42,
+        "cum": "0.25s",
+        "cumPercent": 10.59,
+        "function": "reflect.unsafe_New"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.42,
+        "cum": "0.03s",
+        "cumPercent": 1.27,
+        "function": "runtime.(*mheap).allocSpan"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.42,
+        "cum": "0.02s",
+        "cumPercent": 0.85,
+        "function": "runtime.(*sweepLocked).sweep"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.42,
+        "cum": "0.02s",
+        "cumPercent": 0.85,
+        "function": "runtime.scanblock"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.42,
+        "cum": "0.05s",
+        "cumPercent": 2.12,
+        "function": "runtime.scanobject"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.42,
+        "cum": "0.02s",
+        "cumPercent": 0.85,
+        "function": "runtime.slicebytetostring"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.42,
+        "cum": "0.87s",
+        "cumPercent": 36.86,
+        "function": "runtime.systemstack"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.06s",
+        "cumPercent": 2.54,
+        "function": "gcWriteBarrier"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.25s",
+        "cumPercent": 52.97,
+        "function": "github.com/cnooljaw/gosproto.Decode (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.66s",
+        "cumPercent": 70.34,
+        "function": "github.com/cnooljaw/gosproto.DecodePacked"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.25s",
+        "cumPercent": 52.97,
+        "function": "github.com/cnooljaw/gosproto.DecodeWithLimits"
+      }
+    ],
+    "loopBytes": 13872,
+    "loopAllocs": 533
+  },
+  {
+    "case": "int32_edges",
+    "op": "sproto_decode",
+    "nodes": [
+      {
+        "flat": "1.17s",
+        "flatPercent": 66.48,
+        "cum": "1.17s",
+        "cumPercent": 66.48,
+        "function": "runtime.kevent"
+      },
+      {
+        "flat": "0.22s",
+        "flatPercent": 12.5,
+        "cum": "0.54s",
+        "cumPercent": 30.68,
+        "function": "github.com/cnooljaw/gosproto.decodeIntSlice"
+      },
+      {
+        "flat": "0.07s",
+        "flatPercent": 3.98,
+        "cum": "0.08s",
+        "cumPercent": 4.55,
+        "function": "runtime.typePointers.next"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.7,
+        "cum": "0.03s",
+        "cumPercent": 1.7,
+        "function": "runtime.findObject"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.7,
+        "cum": "0.03s",
+        "cumPercent": 1.7,
+        "function": "runtime.memclrNoHeapPointers"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 1.14,
+        "cum": "0.02s",
+        "cumPercent": 1.14,
+        "function": "encoding/binary.littleEndian.Uint32 (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 1.14,
+        "cum": "0.13s",
+        "cumPercent": 7.39,
+        "function": "runtime.mallocgcSmallNoscan"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 1.14,
+        "cum": "0.13s",
+        "cumPercent": 7.39,
+        "function": "runtime.scanobject"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.57,
+        "cum": "0.01s",
+        "cumPercent": 0.57,
+        "function": "gcWriteBarrier"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.57,
+        "cum": "0.01s",
+        "cumPercent": 0.57,
+        "function": "internal/runtime/atomic.(*Uint64).Add (inline)"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.57,
+        "cum": "0.01s",
+        "cumPercent": 0.57,
+        "function": "internal/runtime/atomic.(*Uintptr).Add (inline)"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.57,
+        "cum": "0.01s",
+        "cumPercent": 0.57,
+        "function": "reflect.(*rtype).Elem"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.57,
+        "cum": "0.01s",
+        "cumPercent": 0.57,
+        "function": "reflect.flag.kind (inline)"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.57,
+        "cum": "0.08s",
+        "cumPercent": 4.55,
+        "function": "runtime.(*mcache).nextFree"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.57,
+        "cum": "0.01s",
+        "cumPercent": 0.57,
+        "function": "runtime.(*mheap).allocMSpanLocked"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.57,
+        "cum": "0.04s",
+        "cumPercent": 2.27,
+        "function": "runtime.(*mheap).allocSpan"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.57,
+        "cum": "0.02s",
+        "cumPercent": 1.14,
+        "function": "runtime.(*mheap).initSpan"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.57,
+        "cum": "0.03s",
+        "cumPercent": 1.7,
+        "function": "runtime.(*sweepLocked).sweep"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.57,
+        "cum": "0.01s",
+        "cumPercent": 0.57,
+        "function": "runtime.findfunc"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.57,
+        "cum": "0.01s",
+        "cumPercent": 0.57,
+        "function": "runtime.greyobject"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.57,
+        "cum": "0.01s",
+        "cumPercent": 0.57,
+        "function": "runtime.lock2"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.57,
+        "cum": "0.01s",
+        "cumPercent": 0.57,
+        "function": "runtime.madvise"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.57,
+        "cum": "0.31s",
+        "cumPercent": 17.61,
+        "function": "runtime.mallocgc"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.57,
+        "cum": "0.01s",
+        "cumPercent": 0.57,
+        "function": "runtime.memhash64"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.57,
+        "cum": "0.01s",
+        "cumPercent": 0.57,
+        "function": "runtime.readUintptr (inline)"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.57,
+        "cum": "0.02s",
+        "cumPercent": 1.14,
+        "function": "runtime.scanblock"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.57s",
+        "cumPercent": 32.39,
+        "function": "github.com/cnooljaw/gosproto.Decode (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.57s",
+        "cumPercent": 32.39,
+        "function": "github.com/cnooljaw/gosproto.DecodeWithLimits"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.01s",
+        "cumPercent": 0.57,
+        "function": "github.com/cnooljaw/gosproto.GetSprotoType"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.54s",
+        "cumPercent": 30.68,
+        "function": "github.com/cnooljaw/gosproto.decodeMessage"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 1.14,
+        "function": "github.com/cnooljaw/gosproto.readUint32 (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.58s",
+        "cumPercent": 32.95,
+        "function": "gosprotobodystudy.BenchmarkBodyCost"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.01s",
+        "cumPercent": 0.57,
+        "function": "gosprotobodystudy.representativeMessages.func6"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.58s",
+        "cumPercent": 32.95,
+        "function": "gosprotobodystudy.representativeOperations.func4"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.01s",
+        "cumPercent": 0.57,
+        "function": "reflect.Value.Interface (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.01s",
+        "cumPercent": 0.57,
+        "function": "reflect.valueInterface"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.07s",
+        "cumPercent": 3.98,
+        "function": "runtime.(*mcache).refill"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.07s",
+        "cumPercent": 3.98,
+        "function": "runtime.(*mcentral).cacheSpan"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.04s",
+        "cumPercent": 2.27,
+        "function": "runtime.(*mcentral).grow"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.04s",
+        "cumPercent": 2.27,
+        "function": "runtime.(*mheap).alloc"
+      }
+    ],
+    "loopBytes": 8288,
+    "loopAllocs": 4
+  },
+  {
+    "case": "int32_edges",
+    "op": "sproto_unpack",
+    "nodes": [
+      {
+        "flat": "1.27s",
+        "flatPercent": 54.04,
+        "cum": "1.60s",
+        "cumPercent": 68.09,
+        "function": "github.com/cnooljaw/gosproto.UnpackWithLimit"
+      },
+      {
+        "flat": "0.68s",
+        "flatPercent": 28.94,
+        "cum": "0.68s",
+        "cumPercent": 28.94,
+        "function": "runtime.kevent"
+      },
+      {
+        "flat": "0.14s",
+        "flatPercent": 5.96,
+        "cum": "0.14s",
+        "cumPercent": 5.96,
+        "function": "math/bits.OnesCount8 (inline)"
+      },
+      {
+        "flat": "0.06s",
+        "flatPercent": 2.55,
+        "cum": "0.06s",
+        "cumPercent": 2.55,
+        "function": "runtime.madvise"
+      },
+      {
+        "flat": "0.05s",
+        "flatPercent": 2.13,
+        "cum": "0.05s",
+        "cumPercent": 2.13,
+        "function": "runtime.typePointers.next"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.85,
+        "cum": "0.08s",
+        "cumPercent": 3.4,
+        "function": "runtime.mallocgcSmallNoscan"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.85,
+        "cum": "0.02s",
+        "cumPercent": 0.85,
+        "function": "runtime.scanblock"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.02s",
+        "cumPercent": 0.85,
+        "function": "runtime.(*mheap).initSpan"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.02s",
+        "cumPercent": 0.85,
+        "function": "runtime.(*pageAlloc).update"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.18s",
+        "cumPercent": 7.66,
+        "function": "runtime.makeslice"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.60s",
+        "cumPercent": 68.09,
+        "function": "github.com/cnooljaw/gosproto.Unpack (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.60s",
+        "cumPercent": 68.09,
+        "function": "gosprotobodystudy.BenchmarkBodyCost"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.60s",
+        "cumPercent": 68.09,
+        "function": "gosprotobodystudy.representativeOperations.func6"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.06s",
+        "cumPercent": 2.55,
+        "function": "runtime.(*mcache).nextFree"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.06s",
+        "cumPercent": 2.55,
+        "function": "runtime.(*mcache).refill"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.05s",
+        "cumPercent": 2.13,
+        "function": "runtime.(*mcentral).cacheSpan"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.85,
+        "function": "runtime.(*mcentral).grow"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.85,
+        "function": "runtime.(*mheap).alloc"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.08s",
+        "cumPercent": 3.4,
+        "function": "runtime.(*mheap).alloc.func1"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.08s",
+        "cumPercent": 3.4,
+        "function": "runtime.(*mheap).allocSpan"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.85,
+        "function": "runtime.(*mheap).freeSpan (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.85,
+        "function": "runtime.(*mheap).freeSpanLocked"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.85,
+        "function": "runtime.(*pageAlloc).free"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.85,
+        "function": "runtime.(*sweepLocked).sweep"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.85,
+        "function": "runtime.(*sweepLocked).sweep.(*mheap).freeSpan.func2"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.08s",
+        "cumPercent": 3.4,
+        "function": "runtime.deductAssistCredit"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.28,
+        "function": "runtime.deductSweepCredit"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.08s",
+        "cumPercent": 3.4,
+        "function": "runtime.gcAssistAlloc"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.08s",
+        "cumPercent": 3.4,
+        "function": "runtime.gcAssistAlloc.func2"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.08s",
+        "cumPercent": 3.4,
+        "function": "runtime.gcAssistAlloc1"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.08s",
+        "cumPercent": 3.4,
+        "function": "runtime.gcDrainN"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.30s",
+        "cumPercent": 12.77,
+        "function": "runtime.gcMarkTermination.func3"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.38s",
+        "cumPercent": 16.17,
+        "function": "runtime.gcStart.func4"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.16s",
+        "cumPercent": 6.81,
+        "function": "runtime.mallocgc"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.28,
+        "function": "runtime.markroot"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.85,
+        "function": "runtime.markrootBlock"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.68s",
+        "cumPercent": 28.94,
+        "function": "runtime.netpoll"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.85,
+        "function": "runtime.newstack"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.05s",
+        "cumPercent": 2.13,
+        "function": "runtime.scanobject"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.68s",
+        "cumPercent": 28.94,
+        "function": "runtime.startTheWorldWithSema"
+      }
+    ],
+    "loopBytes": 4096,
+    "loopAllocs": 1
+  },
+  {
+    "case": "int32_edges",
+    "op": "sproto_pdecode",
+    "nodes": [
+      {
+        "flat": "1.32s",
+        "flatPercent": 58.41,
+        "cum": "1.32s",
+        "cumPercent": 58.41,
+        "function": "runtime.kevent"
+      },
+      {
+        "flat": "0.59s",
+        "flatPercent": 26.11,
+        "cum": "0.72s",
+        "cumPercent": 31.86,
+        "function": "github.com/cnooljaw/gosproto.UnpackWithLimit"
+      },
+      {
+        "flat": "0.10s",
+        "flatPercent": 4.42,
+        "cum": "0.19s",
+        "cumPercent": 8.41,
+        "function": "github.com/cnooljaw/gosproto.decodeIntSlice"
+      },
+      {
+        "flat": "0.07s",
+        "flatPercent": 3.1,
+        "cum": "0.07s",
+        "cumPercent": 3.1,
+        "function": "math/bits.OnesCount8 (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.88,
+        "cum": "0.02s",
+        "cumPercent": 0.88,
+        "function": "runtime.greyobject"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.88,
+        "cum": "0.03s",
+        "cumPercent": 1.33,
+        "function": "runtime.scanblock"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.04s",
+        "cumPercent": 1.77,
+        "function": "runtime.(*mcache).refill"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.02s",
+        "cumPercent": 0.88,
+        "function": "runtime.(*mheap).alloc"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.05s",
+        "cumPercent": 2.21,
+        "function": "runtime.scanobject"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.03s",
+        "cumPercent": 1.33,
+        "function": "runtime.typePointers.next"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.21s",
+        "cumPercent": 9.29,
+        "function": "github.com/cnooljaw/gosproto.Decode (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.93s",
+        "cumPercent": 41.15,
+        "function": "github.com/cnooljaw/gosproto.DecodePacked"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.21s",
+        "cumPercent": 9.29,
+        "function": "github.com/cnooljaw/gosproto.DecodeWithLimits"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.72s",
+        "cumPercent": 31.86,
+        "function": "github.com/cnooljaw/gosproto.Unpack (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.19s",
+        "cumPercent": 8.41,
+        "function": "github.com/cnooljaw/gosproto.decodeMessage"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.93s",
+        "cumPercent": 41.15,
+        "function": "gosprotobodystudy.BenchmarkBodyCost"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.93s",
+        "cumPercent": 41.15,
+        "function": "gosprotobodystudy.representativeOperations.func8"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.88,
+        "function": "reflect.New"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.04s",
+        "cumPercent": 1.77,
+        "function": "runtime.(*mcache).nextFree"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.88,
+        "function": "runtime.(*mcentral).cacheSpan"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.88,
+        "function": "runtime.(*mcentral).grow"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.08s",
+        "cumPercent": 3.54,
+        "function": "runtime.deductAssistCredit"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.08s",
+        "cumPercent": 3.54,
+        "function": "runtime.gcAssistAlloc"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.08s",
+        "cumPercent": 3.54,
+        "function": "runtime.gcAssistAlloc.func2"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.08s",
+        "cumPercent": 3.54,
+        "function": "runtime.gcAssistAlloc1"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.08s",
+        "cumPercent": 3.54,
+        "function": "runtime.gcDrainN"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.64s",
+        "cumPercent": 28.32,
+        "function": "runtime.gcMarkTermination.func3"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.68s",
+        "cumPercent": 30.09,
+        "function": "runtime.gcStart.func4"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.15s",
+        "cumPercent": 6.64,
+        "function": "runtime.makeslice"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.15s",
+        "cumPercent": 6.64,
+        "function": "runtime.mallocgc"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.06s",
+        "cumPercent": 2.65,
+        "function": "runtime.mallocgcSmallNoscan"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.33,
+        "function": "runtime.markroot"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.33,
+        "function": "runtime.markrootBlock"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.32s",
+        "cumPercent": 58.41,
+        "function": "runtime.netpoll"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.32s",
+        "cumPercent": 58.41,
+        "function": "runtime.startTheWorldWithSema"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.42s",
+        "cumPercent": 62.83,
+        "function": "runtime.systemstack"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.93s",
+        "cumPercent": 41.15,
+        "function": "testing.(*B).run1.func1"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.93s",
+        "cumPercent": 41.15,
+        "function": "testing.(*B).runN"
+      }
+    ],
+    "loopBytes": 12384,
+    "loopAllocs": 5
+  }
+]

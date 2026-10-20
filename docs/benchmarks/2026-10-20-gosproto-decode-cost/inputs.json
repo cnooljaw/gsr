@@ -1,0 +1,157 @@
+{
+  "date": "2026-10-20",
+  "gsrHead": "d84e94a81a35c21ab0110587d523886f43d79d7f",
+  "libraryCommit": "a93bb0d66678c33e328c94d39036f8ff9772a5e9",
+  "go": "go version go1.24.13 darwin/arm64",
+  "platform": "macOS-14.4.1-arm64-arm-64bit",
+  "loadBefore": [
+    6.9111328125,
+    5.8779296875,
+    4.609375
+  ],
+  "cases": [
+    "addressbook",
+    "game_large",
+    "int32_edges"
+  ],
+  "ops": [
+    "sproto_decode",
+    "sproto_unpack",
+    "sproto_pdecode"
+  ],
+  "kinds": [
+    "cpu",
+    "allocation"
+  ],
+  "cpuTime": "2s",
+  "allocationCalls": 5000,
+  "allocationProfileRate": 1,
+  "gc": "GOMAXPROCS1/GOGC100/unlimitedGOMEMLIMIT",
+  "source": {
+    "limits.go": "c7a68601f92d897c3339d33bd860eabee7bf4f2a6d18a782dc8a8d46227edc96",
+    "fuzz_test.go": "10eb7cb2d2fcd8afe47b6880cd61f64121f17b0a3355a6073b41ceb87e8d435c",
+    "sproto_test.go": "20a255950d0628f27a00cf5923448d524c729b05f16ed18df3a095d2c6449d9e",
+    "encode.go": "b7ea1b48122b35ba3aad5418d9fb2f55a951b1bddf700eec0217f5065f30b36e",
+    "rpc_limits_test.go": "6c0361cbda2870b3d4abf578b7313acc44728ed78de0ea92336c8c1170ee39b1",
+    "pack.go": "54f2c365a99ae620f53bd02bf3ca4da84332c7f9102e871a88fb4ee05af00087",
+    "encode_record_pointers_test.go": "a5b3cce54ae370a98bfbafaafca2fa45e673499226dee54c562e0f7cf960b961",
+    "decode_pointer.go": "4045dae3ebd404b13efea429fbcc1dd23f764bdfa51164464b92a3992826367f",
+    "decode_struct_slots_test.go": "5c8f1fe4dd8261af4df00f7524d92a5bff99816478f38677a0d1ed1005e073e2",
+    "encode_integer_record.go": "0aaa3de8cde3571f70b857b51532cc332d116c6eb6293f62bed6e349b563aa60",
+    "encode_pointer.go": "9bb4abd440157c27e4c93228153fe073488cea2c3ff8fb5340cd9e12b27d3e1b",
+    "rpc_test.go": "4db20f87186685ef4bd78bc0e021940a8afe718a28ae8bddd6b66bede3017468",
+    "sproto.go": "2d35ffddf1ec0492fe6425f3d1dd7ede5d4edb3794773f6971fc4f36ceb80f4d",
+    "rpc.go": "6a5d29737047ecdcc2286b68a35df3330affa9dd8948ffbd5fde09104eed7899",
+    "meta.go": "6badd4a5ac60d8a15caaa1f35634268101c436b275cf4a0fe120b91db417d217",
+    "limits_test.go": "9612667b2dd51f286ee972d8303d1609a0c6bb274050f0056abe392447f29809",
+    "decode.go": "b7c26ada4fc71524684ec05d4e744a7d43a33b53e85ea44ac41f97e3670811dd",
+    "pack_test.go": "70e79e8fa5273d4a9f31fb6afc885efbb1f2f86ca9d68b1bba4c1c97e8deed56",
+    "encode_test.go": "d28095ae5b5b820eb0d5aed634397bb86159361b5876c3126100d59e37d41099",
+    "official_compat_test.go": "fa413db0126e78205f7ee2d56f8f5d521bc29d82b723953385b79b0407412b60"
+  },
+  "harnessGo": {
+    "protocol_benchmark_test.go": "5da22792f620ff303e002c5c38fbc88f2c0205369f5f92914f134546c5d2f8e7",
+    "body_profile_test.go": "deb1f71ceb0753e97aed770954f0adf9f42b07fe205cb2417f8e29a961fe407e",
+    "representative_benchmark_test.go": "773830c5a7a2d06d35d371368a2596b5bd28e8f08a61e87b7ce634a2a8ad74c4"
+  },
+  "frozenInputs": {
+    "docs/benchmarks/2026-10-20-gosproto-decode-cost/body-profile.go.txt": "97da4ba6dfc2cb2f0cbd1b0d47a321ba94c1bcb4161ebb3d2240a6e9a05c9bd4",
+    "docs/benchmarks/2026-10-20-gosproto-decode-cost/reproduce.py": "91cf120c641cac82352073e4dd2f0ab9c216140f32f8cc5ae627e9b61458a5f9",
+    "examples/websocket-gate/benchmarks/gen/pb/representative.pb.go": "bde7cba1e55f7782c1572124de9aa86d85893ee80ed8e2ad5eab2b5d3db82450",
+    "examples/websocket-gate/benchmarks/gen/sproto/representative.go": "25f6aa66a2d35e5acaea7f90f8cd47f957772c96a30ab4e8ae34b4e2509bdbec",
+    "examples/websocket-gate/gen/go/gsr/example/echo/v1/echo_registry.pb.go": "8f986de4ce5ae3ce65a8322b63e2577ee9365e94fbd07cf03f12028af0eb07b5",
+    "examples/websocket-gate/gen/go/gsr/example/echo/v1/echo.pb.go": "7fb0ba8bbdb0855614bb62e7e0881855921e4bbda584c4ac910330f1ebf8b52f",
+    "examples/websocket-gate/gen/sproto/c2s/c2s.go": "11ccc6602e33c58dcc8654d3ff718924416026b646db76bb16a2834c3e334b90",
+    "examples/websocket-gate/gen/sproto/s2c/s2c.go": "90a6f2b4374e45deee46882a9d60ae82ca4e9795872e007df76e2f76673ac5cd",
+    "protocol/gen/go/gsr/protocol/v1/options.pb.go": "e8ff490a21a3ad701cb5d63fc7d86bbb2ac6394e800a04ad77a33d3cd358294a",
+    "protocol/gen/go/gsr/common/v1/common_registry.pb.go": "7bde4808497ae0fa7a98ea2b0e850f24415de2f0789fb38c110697410e43aefd",
+    "protocol/gen/go/gsr/common/v1/common_test.go": "ac74eb32e8510bd183e0861a84f1e8b82765d08bc2cc661fb00a9f1739e20f1a",
+    "protocol/gen/go/gsr/common/v1/doc.go": "03009f1fd60f1b12f997e869033ab19664005e649348b8a95998efe887caea5c",
+    "protocol/gen/go/gsr/common/v1/common.pb.go": "49d7ca5b04cbd1f0b6cbf031b64f4fb0ebb067a7b135c900d647b76b1eea41b4",
+    "examples/websocket-gate/benchmarks/protocol_benchmark_test.go": "5da22792f620ff303e002c5c38fbc88f2c0205369f5f92914f134546c5d2f8e7",
+    "examples/websocket-gate/benchmarks/representative_benchmark_test.go": "773830c5a7a2d06d35d371368a2596b5bd28e8f08a61e87b7ce634a2a8ad74c4",
+    "examples/websocket-gate/benchmarks/cases.json": "aa77345f5b8560ae6a10beeb3b492bd5b2d722230da3df667d776eaa9b580d70",
+    "examples/websocket-gate/benchmarks/representative.json": "5d4ead8bcf974f35e9ca9b7c4b41e946790ea5d68534fdf231813f6f7ff9ea33"
+  },
+  "scope": "Independent CPU and allocation processes. Allocation profile includes initialization/warmup; loop B/op and allocs are ResetTimer-only. No timing ranking, no candidate production changes; Decode/Unpack/PDecode public paths.",
+  "binarySha256": "39940aa3cbd437e096f3f807c3950d7cd89fb6b7d457d94eecebb3fae8a14ab7",
+  "profiles": {
+    "addressbook-sproto_decode-cpu": {
+      "rawSha256": "d7a82a8383711e19a749cfba34d8c2c237ec66aae35cfd884bbd4d7013ff6d7b",
+      "metadataSha256": "50e05d776b21791440c5b51ad32e52121d7a60e5901b104743ba764aee087cf4"
+    },
+    "addressbook-sproto_decode-allocation": {
+      "rawSha256": "43982dc84e05769bf93d4f64a7ecfdb09a65bc4089d0e0c33288e51c50a0fdd1",
+      "metadataSha256": "fa2c53152a79f03ab1566991d1a8fefb3422281b116c78ba6afb0dc21c82fc6f"
+    },
+    "addressbook-sproto_unpack-cpu": {
+      "rawSha256": "c2a077dd99a41308607193c8c5b3f4b1f935ed8d6d0cd76a3ab92b1af063f675",
+      "metadataSha256": "b283046b70f3df88e9a7c2e41e13d1b147104adaac57521147f0218373e24d8c"
+    },
+    "addressbook-sproto_unpack-allocation": {
+      "rawSha256": "19005c3303812a7274cef3f5eab9e4ae7acf18199d1688bc1bc382d0b527d02e",
+      "metadataSha256": "63e3e511713d75d7488437a22e9a5d23661955371368e904c9f1135414d86e15"
+    },
+    "addressbook-sproto_pdecode-cpu": {
+      "rawSha256": "54cd3116fb338100c46a46cec7e3d5c653a3aac2c7618b355296687171bb4d04",
+      "metadataSha256": "1063136fc1b67b63e15c349f2e16eba173952cf31edf2b85568a9beb674b994e"
+    },
+    "addressbook-sproto_pdecode-allocation": {
+      "rawSha256": "1a8bece7bfae50ef05d29be096ddce8febbe674c3dee8a24898cb90cc9103171",
+      "metadataSha256": "65fe01d23a6aa79fe43f1c0a0f9698cfde214c95d8d3ebdb5286cd457c7e2635"
+    },
+    "game_large-sproto_decode-cpu": {
+      "rawSha256": "5ebc1628743e1265c21c14ffed6fbff13b5dda9fddba54a8ccfd0cc9f309a176",
+      "metadataSha256": "f16cfbc2352c77528eb03f96a1a9477becf240a1f21f518a17952293b1c29eb8"
+    },
+    "game_large-sproto_decode-allocation": {
+      "rawSha256": "f66611b4e21d10f706be5d71c6bbfc84027a4fa51c736556bbf547b42c5342b1",
+      "metadataSha256": "c0ff8048686a409ef78330283791edbc8e4291d71e67fe6331d8a0f1dd86511f"
+    },
+    "game_large-sproto_unpack-cpu": {
+      "rawSha256": "9feb19826b6f1d842ad0120d8a51c00ca4ef10c180995a12de743a6a65e98c94",
+      "metadataSha256": "e1ba15c9ec4530629e37e979a6417d545b1dec2235b9702f177d488ec7b167d2"
+    },
+    "game_large-sproto_unpack-allocation": {
+      "rawSha256": "d8d36e686ef6f5a8770b4fb6c5be74b325b20d17643f22716a011f41eb3d20f4",
+      "metadataSha256": "3cd1932972d6572eeec0aa85ee836a7e9843b1ce95c05dc4b586225e449194bd"
+    },
+    "game_large-sproto_pdecode-cpu": {
+      "rawSha256": "7284b890867082a4b791bfac8280b763bd0729fcc7a447f298a00d3b41050d47",
+      "metadataSha256": "8bb1aa30d43c8be50a56ec46123ce12544e845e6dc340d08333efcdcdf3c06f2"
+    },
+    "game_large-sproto_pdecode-allocation": {
+      "rawSha256": "a372fe4362fd7b2f2fb74c0510d43e8b1c839047426fa3dcb4663748c87daaac",
+      "metadataSha256": "77ac371353d17fd5574d936b000a014e684d5889c082132b7a3f64365fb1c43c"
+    },
+    "int32_edges-sproto_decode-cpu": {
+      "rawSha256": "85e0b973e132316d55c3d4dc8d9513bb85f2839afb19ed4e45cfc230fba96e83",
+      "metadataSha256": "e585a71f02ed205d179d7d96683711ff49c94e6b9524ed4dcfa219ecf4fe836f"
+    },
+    "int32_edges-sproto_decode-allocation": {
+      "rawSha256": "e4eecbeddfbfbc39fddcc1e6f7bc41ca29c2bfdfe8d5a6b6ed7bad3f724b9582",
+      "metadataSha256": "6a2056fa4e8de8306d1eb38bc5c4de45629d539a3e6ff26dc1b30a78216cc542"
+    },
+    "int32_edges-sproto_unpack-cpu": {
+      "rawSha256": "871c719abe48f42a38308d7bb57339f8b2e9edee28d58611329273ca50558732",
+      "metadataSha256": "740f436baf6b15efa0328a815e3333885d0dad6c68a9ad59d8c296fe79b72e18"
+    },
+    "int32_edges-sproto_unpack-allocation": {
+      "rawSha256": "6600b3f6c899b093ee971d8399514c0efbaac5be7d32c1a9fa37120bd74cc5ca",
+      "metadataSha256": "9b9045aecf8f9b1608072d1d6458299be9420df8957cb48e4d77e5fb235f1838"
+    },
+    "int32_edges-sproto_pdecode-cpu": {
+      "rawSha256": "8f40566bfc64d5afcb80c772ea88f28bb4b5f0d3e90cd745b17de69494efa7d9",
+      "metadataSha256": "da516d57f419e568ccafb5fc056c96dea2037c8d5419bee94c592883560535eb"
+    },
+    "int32_edges-sproto_pdecode-allocation": {
+      "rawSha256": "4f804a34984b7bf719e62734c8211bc38c222f380b917a7ea240641e743d218f",
+      "metadataSha256": "bb684cd372986039024bf392efc83e3294958efb963294b603f3427c3acf3897"
+    }
+  },
+  "loadAfter": [
+    6.55224609375,
+    5.892578125,
+    4.6640625
+  ]
+}

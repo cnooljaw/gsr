@@ -836,3 +836,5 @@ TestRuntimePacedMultiServiceLoad 已补 8 个真实 Service 共享文件 Logger 
 当前Body实现（2026-10-20）：[结构数组受控指针槽](benchmarks/2026-10-20-gosproto-decode-struct-slots/RESULTS.md)已保留并提交独立库 e43df35。相同对象构造下大型Decode−3.50%/−3.63%、Dispatch−5.80%/−3.04%，长结构重复改善、对象数中位不变；AddressBook PDecode+2.56%/+2.07%及全部控制/累计反向保留。新低GOGC/命名类型/元数据回退/异构指针拒绝回归、全库/官方/race/checkptr/vet/有限fuzz/GSR三包/GoTS7of7通过。新增unsafe仅同步借用已核对类型的新切片槽，GC屏障与反射回退保留。前轮成本诊断已提交06adf22，正式依赖v0.4.0不变，原库6项已有删除不动；Body与Packing继续。
 
 2026-10-20：已完成 [a93bb0d 单模块 Go/PB 当前基线](benchmarks/2026-10-20-go-sp-pb-current/RESULTS.md)，72 项 × 5 轮，夹具及源码/模块/二进制哈希核对通过。大型 Encode −41.6%、PEncode −21.8%，PDecode +10.9%；保留全部原始波动，正式依赖不变。
+
+2026-10-20：[Decode/Unpack 独立进程诊断](benchmarks/2026-10-20-gosproto-decode-cost/RESULTS.md)完成18份profile和80条命令。大型Decode的对象构造、普通mask解包写出均为实测热点；下一Packing切片先测固定八字节目标视图，保留首遍预算/边界预检，Body字段/presence路径继续开放。尚无新候选实现或收益结论。

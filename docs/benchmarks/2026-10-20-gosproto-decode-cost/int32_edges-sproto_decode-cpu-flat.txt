@@ -1,0 +1,47 @@
+File: body.test
+Type: cpu
+Time: 2026-10-20 13:54:13 CST
+Duration: 2.17s, Total samples = 1.76s (80.93%)
+Showing nodes accounting for 1.76s, 100% of 1.76s total
+Showing top 40 nodes out of 73
+      flat  flat%   sum%        cum   cum%
+     1.17s 66.48% 66.48%      1.17s 66.48%  runtime.kevent
+     0.22s 12.50% 78.98%      0.54s 30.68%  github.com/cnooljaw/gosproto.decodeIntSlice
+     0.07s  3.98% 82.95%      0.08s  4.55%  runtime.typePointers.next
+     0.03s  1.70% 84.66%      0.03s  1.70%  runtime.findObject
+     0.03s  1.70% 86.36%      0.03s  1.70%  runtime.memclrNoHeapPointers
+     0.02s  1.14% 87.50%      0.02s  1.14%  encoding/binary.littleEndian.Uint32 (inline)
+     0.02s  1.14% 88.64%      0.13s  7.39%  runtime.mallocgcSmallNoscan
+     0.02s  1.14% 89.77%      0.13s  7.39%  runtime.scanobject
+     0.01s  0.57% 90.34%      0.01s  0.57%  gcWriteBarrier
+     0.01s  0.57% 90.91%      0.01s  0.57%  internal/runtime/atomic.(*Uint64).Add (inline)
+     0.01s  0.57% 91.48%      0.01s  0.57%  internal/runtime/atomic.(*Uintptr).Add (inline)
+     0.01s  0.57% 92.05%      0.01s  0.57%  reflect.(*rtype).Elem
+     0.01s  0.57% 92.61%      0.01s  0.57%  reflect.flag.kind (inline)
+     0.01s  0.57% 93.18%      0.08s  4.55%  runtime.(*mcache).nextFree
+     0.01s  0.57% 93.75%      0.01s  0.57%  runtime.(*mheap).allocMSpanLocked
+     0.01s  0.57% 94.32%      0.04s  2.27%  runtime.(*mheap).allocSpan
+     0.01s  0.57% 94.89%      0.02s  1.14%  runtime.(*mheap).initSpan
+     0.01s  0.57% 95.45%      0.03s  1.70%  runtime.(*sweepLocked).sweep
+     0.01s  0.57% 96.02%      0.01s  0.57%  runtime.findfunc
+     0.01s  0.57% 96.59%      0.01s  0.57%  runtime.greyobject
+     0.01s  0.57% 97.16%      0.01s  0.57%  runtime.lock2
+     0.01s  0.57% 97.73%      0.01s  0.57%  runtime.madvise
+     0.01s  0.57% 98.30%      0.31s 17.61%  runtime.mallocgc
+     0.01s  0.57% 98.86%      0.01s  0.57%  runtime.memhash64
+     0.01s  0.57% 99.43%      0.01s  0.57%  runtime.readUintptr (inline)
+     0.01s  0.57%   100%      0.02s  1.14%  runtime.scanblock
+         0     0%   100%      0.57s 32.39%  github.com/cnooljaw/gosproto.Decode (inline)
+         0     0%   100%      0.57s 32.39%  github.com/cnooljaw/gosproto.DecodeWithLimits
+         0     0%   100%      0.01s  0.57%  github.com/cnooljaw/gosproto.GetSprotoType
+         0     0%   100%      0.54s 30.68%  github.com/cnooljaw/gosproto.decodeMessage
+         0     0%   100%      0.02s  1.14%  github.com/cnooljaw/gosproto.readUint32 (inline)
+         0     0%   100%      0.58s 32.95%  gosprotobodystudy.BenchmarkBodyCost
+         0     0%   100%      0.01s  0.57%  gosprotobodystudy.representativeMessages.func6
+         0     0%   100%      0.58s 32.95%  gosprotobodystudy.representativeOperations.func4
+         0     0%   100%      0.01s  0.57%  reflect.Value.Interface (inline)
+         0     0%   100%      0.01s  0.57%  reflect.valueInterface
+         0     0%   100%      0.07s  3.98%  runtime.(*mcache).refill
+         0     0%   100%      0.07s  3.98%  runtime.(*mcentral).cacheSpan
+         0     0%   100%      0.04s  2.27%  runtime.(*mcentral).grow
+         0     0%   100%      0.04s  2.27%  runtime.(*mheap).alloc

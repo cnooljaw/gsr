@@ -1,0 +1,48 @@
+File: body.test
+Type: cpu
+Time: 2026-10-20 13:53:48 CST
+Duration: 2.53s, Total samples = 2.21s (87.48%)
+Showing nodes accounting for 1.37s, 61.99% of 2.21s total
+Dropped 55 nodes (cum <= 0.01s)
+Showing top 40 nodes out of 90
+      flat  flat%   sum%        cum   cum%
+         0     0%     0%      1.65s 74.66%  gosprotobodystudy.BenchmarkBodyCost
+         0     0%     0%      1.65s 74.66%  gosprotobodystudy.representativeOperations.func4
+         0     0%     0%      1.65s 74.66%  testing.(*B).run1.func1
+         0     0%     0%      1.65s 74.66%  testing.(*B).runN
+         0     0%     0%      1.62s 73.30%  github.com/cnooljaw/gosproto.Decode (inline)
+     0.01s  0.45%  0.45%      1.62s 73.30%  github.com/cnooljaw/gosproto.DecodeWithLimits
+     0.09s  4.07%  4.52%      1.44s 65.16%  github.com/cnooljaw/gosproto.decodeMessage
+     0.05s  2.26%  6.79%      1.43s 64.71%  github.com/cnooljaw/gosproto.decodeStructSlice
+     0.19s  8.60% 15.38%      0.88s 39.82%  runtime.mallocgc
+         0     0% 15.38%      0.72s 32.58%  runtime.systemstack
+     0.53s 23.98% 39.37%      0.53s 23.98%  runtime.kevent
+         0     0% 39.37%      0.53s 23.98%  runtime.netpoll
+         0     0% 39.37%      0.53s 23.98%  runtime.startTheWorldWithSema
+     0.03s  1.36% 40.72%      0.52s 23.53%  runtime.newobject
+     0.11s  4.98% 45.70%      0.39s 17.65%  runtime.mallocgcSmallScanNoHeader
+         0     0% 45.70%      0.34s 15.38%  github.com/cnooljaw/gosproto.decodeStringPointer
+     0.01s  0.45% 46.15%      0.32s 14.48%  reflect.New
+         0     0% 46.15%      0.29s 13.12%  runtime.gcStart.func4
+         0     0% 46.15%      0.25s 11.31%  reflect.unsafe_New
+     0.01s  0.45% 46.61%      0.24s 10.86%  reflect.MakeSlice
+         0     0% 46.61%      0.24s 10.86%  runtime.gcMarkTermination.func3
+     0.09s  4.07% 50.68%      0.14s  6.33%  runtime.mallocgcTiny
+     0.01s  0.45% 51.13%      0.14s  6.33%  runtime.slicebytetostring
+     0.04s  1.81% 52.94%      0.13s  5.88%  runtime.deductAssistCredit
+     0.03s  1.36% 54.30%      0.10s  4.52%  reflect.(*rtype).ptrTo
+     0.04s  1.81% 56.11%      0.10s  4.52%  reflect.Value.Set
+         0     0% 56.11%      0.09s  4.07%  runtime.gcAssistAlloc
+         0     0% 56.11%      0.09s  4.07%  runtime.gcAssistAlloc.func2
+         0     0% 56.11%      0.09s  4.07%  runtime.gcAssistAlloc1
+         0     0% 56.11%      0.09s  4.07%  runtime.gcDrainN
+     0.09s  4.07% 60.18%      0.09s  4.07%  runtime.memclrNoHeapPointers
+     0.01s  0.45% 60.63%      0.07s  3.17%  reflect.(*rtype).Elem
+         0     0% 60.63%      0.07s  3.17%  reflect.(*rtype).typeOff (inline)
+         0     0% 60.63%      0.07s  3.17%  reflect.resolveTypeOff
+     0.03s  1.36% 61.99%      0.07s  3.17%  runtime.resolveTypeOff
+         0     0% 61.99%      0.07s  3.17%  runtime.rtype.typeOff (inline)
+         0     0% 61.99%      0.06s  2.71%  reflect.ptrTo (inline)
+         0     0% 61.99%      0.06s  2.71%  runtime.(*mcache).nextFree
+         0     0% 61.99%      0.06s  2.71%  runtime.(*mcache).refill
+         0     0% 61.99%      0.06s  2.71%  runtime.(*mcentral).cacheSpan

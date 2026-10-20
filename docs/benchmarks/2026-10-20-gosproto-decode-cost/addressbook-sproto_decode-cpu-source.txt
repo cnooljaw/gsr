@@ -1,0 +1,152 @@
+Total: 2.21s
+ROUTINE ======================== github.com/cnooljaw/gosproto.decodeMessage in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-decode-cost-20261020/gosproto/decode.go
+      90ms      1.80s (flat, cum) 81.45% of Total
+         .          .    294:func decodeMessage(chunk []byte, schema *SprotoType, value reflect.Value, budget *decodeBudget) (int, error) {
+         .          .    295:	budget.depth++
+         .          .    296:	defer func() { budget.depth-- }()
+      10ms       10ms    297:	if budget.depth > budget.limits.MaxDepth {
+         .          .    298:		return 0, ErrLimit
+         .          .    299:	}
+         .          .    300:	if len(chunk) < 2 {
+         .          .    301:		return 0, ErrDecode
+         .          .    302:	}
+         .          .    303:	count := int(readUint16(chunk))
+         .          .    304:	total := 2 + count*2
+         .          .    305:	if total > len(chunk) {
+         .          .    306:		return 0, ErrDecode
+         .          .    307:	}
+         .          .    308:	if err := budget.add(count); err != nil {
+         .          .    309:		return 0, err
+         .          .    310:	}
+         .       10ms    311:	record := value.Elem()
+      10ms       20ms    312:	exactNative := schema.nativeInt64Pointer && record.Type() == schema.typ
+         .       10ms    313:	pointer := messageDecodePointer(value, exactNative)
+         .          .    314:	tag := 0
+      20ms       20ms    315:	for index := 0; index < count; index++ {
+      10ms       20ms    316:		entry := int(readUint16(chunk[2+index*2 : 4+index*2 : 4+index*2]))
+         .          .    317:		if entry%2 == 1 {
+         .          .    318:			tag += (entry + 1) / 2
+         .          .    319:			continue
+         .          .    320:		}
+         .          .    321:		if tag > 65535 {
+         .          .    322:			return 0, ErrDecode
+         .          .    323:		}
+         .          .    324:		hasInline := entry != 0
+         .          .    325:		inline := uint16(entry/2 - 1)
+         .          .    326:		var content []byte
+         .          .    327:		if !hasInline {
+         .       10ms    328:			used, data, err := readChunk(chunk[total:])
+         .          .    329:			if err != nil {
+         .          .    330:				return 0, err
+         .          .    331:			}
+         .          .    332:			total += used
+         .          .    333:			content = data
+         .          .    334:		}
+         .       20ms    335:		field := schema.FieldByTag(tag)
+      20ms       20ms    336:		tag++
+         .          .    337:		if field == nil {
+         .          .    338:			continue
+         .          .    339:		}
+         .          .    340:		if hasInline && (field.Array || field.Wire == WireBytesName || field.Wire == WireStructName) {
+         .          .    341:			return 0, ErrDecode
+         .          .    342:		}
+         .          .    343:		if field.nativeInt64Pointer {
+         .          .    344:			bits, err := scalarBits(inline, hasInline, content)
+         .          .    345:			if err != nil {
+         .          .    346:				return 0, err
+         .          .    347:			}
+         .      180ms    348:			result := new(int64)
+         .          .    349:			*result = int64(bits)
+         .       30ms    350:			if !pointer.setInteger(schema, field, result) {
+         .          .    351:				record.Field(field.index[0]).Set(reflect.ValueOf(result))
+         .          .    352:			}
+         .          .    353:			continue
+         .          .    354:		}
+      10ms      1.44s    355:		if err := field.dec(inline, hasInline, content, field, record.Field(field.index[0]), budget); err != nil {
+         .          .    356:			return 0, err
+         .          .    357:		}
+         .          .    358:	}
+      10ms       10ms    359:	return total, nil
+         .          .    360:}
+         .          .    361:
+         .          .    362:// Decode 解码一个结构体，使用默认有限预算，返回已消费的字节数。
+         .          .    363:func Decode(data []byte, message interface{}) (int, error) {
+         .          .    364:	return DecodeWithLimits(data, message, Limits{})
+ROUTINE ======================== github.com/cnooljaw/gosproto.decodeStructSlice in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-decode-cost-20261020/gosproto/decode.go
+      50ms      1.81s (flat, cum) 81.90% of Total
+         .          .    257:func decodeStructSlice(_ uint16, _ bool, data []byte, field *SprotoField, value reflect.Value, budget *decodeBudget) error {
+         .       10ms    258:	count, err := countChunks(data, budget)
+         .          .    259:	if err != nil {
+         .          .    260:		return err
+         .          .    261:	}
+         .      240ms    262:	result := reflect.MakeSlice(value.Type(), count, count)
+         .          .    263:	var slots []unsafe.Pointer
+         .          .    264:	if count > 0 && field.Array && field.Wire == WireStructName && field.st != nil &&
+         .       60ms    265:		value.Type().Elem() == reflect.PointerTo(field.st.typ) {
+         .          .    266:		// 同步借用新切片的指针槽；实际元素类型已核对，不缓存地址。
+         .          .    267:		slots = unsafe.Slice((*unsafe.Pointer)(result.UnsafePointer()), count)
+         .          .    268:	}
+         .          .    269:	for index := 0; index < count; index++ {
+      10ms       10ms    270:		used, content, err := readChunk(data)
+      10ms       10ms    271:		if err != nil {
+         .          .    272:			return err
+         .          .    273:		}
+      10ms      290ms    274:		current := reflect.New(field.st.typ)
+      10ms      1.13s    275:		consumed, err := decodeMessage(content, field.st, current, budget)
+         .          .    276:		if err != nil {
+         .          .    277:			return err
+         .          .    278:		}
+         .          .    279:		if consumed != len(content) {
+         .          .    280:			return ErrDecode
+         .          .    281:		}
+         .          .    282:		if slots != nil {
+         .          .    283:			// Go 指针赋值保留 GC 写屏障，不能改成字节复制或 uintptr 存储。
+      10ms       30ms    284:			slots[index] = current.UnsafePointer()
+         .          .    285:		} else {
+         .          .    286:			result.Index(index).Set(current)
+         .          .    287:		}
+         .          .    288:		data = data[used:]
+         .          .    289:	}
+         .       30ms    290:	value.Set(result)
+         .          .    291:	return nil
+         .          .    292:}
+         .          .    293:
+         .          .    294:func decodeMessage(chunk []byte, schema *SprotoType, value reflect.Value, budget *decodeBudget) (int, error) {
+         .          .    295:	budget.depth++
+ROUTINE ======================== github.com/cnooljaw/gosproto.messageDecodePointer in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-decode-cost-20261020/gosproto/decode_pointer.go
+      10ms       10ms (flat, cum)  0.45% of Total
+         .          .     15:func messageDecodePointer(value reflect.Value, exactNative bool) decodePointer {
+      10ms       10ms     16:	if !exactNative {
+         .          .     17:		return decodePointer{}
+         .          .     18:	}
+         .          .     19:	return decodePointer{value: value.UnsafePointer()}
+         .          .     20:}
+         .          .     21:
+ROUTINE ======================== gosprotobodystudy.representativeOperations.func4 in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-decode-cost-20261020/harness/representative_benchmark_test.go
+         0      1.65s (flat, cum) 74.66% of Total
+         .          .    114:		{"sproto_decode", func() error {
+         .       30ms    115:			message := newSproto()
+         .      1.62s    116:			_, err := sproto.Decode(sprotoWire, message)
+         .          .    117:			representativeSink = message
+         .          .    118:			return err
+         .          .    119:		}},
+         .          .    120:		{"sproto_pack", func() error {
+         .          .    121:			encodedSink = sproto.Pack(sprotoWire)
+ROUTINE ======================== reflect.New in /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/reflect/value.go
+      10ms      320ms (flat, cum) 14.48% of Total
+      10ms       10ms   3011:func New(typ Type) Value {
+         .          .   3012:	if typ == nil {
+         .          .   3013:		panic("reflect: New(nil)")
+         .          .   3014:	}
+         .          .   3015:	t := &typ.(*rtype).t
+         .       60ms   3016:	pt := ptrTo(t)
+         .          .   3017:	if pt.IfaceIndir() {
+         .          .   3018:		// This is a pointer to a not-in-heap type.
+         .          .   3019:		panic("reflect: New of type that may not be allocated in heap (possibly undefined cgo C type)")
+         .          .   3020:	}
+         .      250ms   3021:	ptr := unsafe_New(t)
+         .          .   3022:	fl := flag(Pointer)
+         .          .   3023:	return Value{pt, ptr, fl}
+         .          .   3024:}
+         .          .   3025:
+         .          .   3026:// NewAt returns a Value representing a pointer to a value of the

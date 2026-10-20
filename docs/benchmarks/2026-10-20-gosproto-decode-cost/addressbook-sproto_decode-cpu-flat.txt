@@ -1,0 +1,48 @@
+File: body.test
+Type: cpu
+Time: 2026-10-20 13:53:48 CST
+Duration: 2.53s, Total samples = 2.21s (87.48%)
+Showing nodes accounting for 1.92s, 86.88% of 2.21s total
+Dropped 55 nodes (cum <= 0.01s)
+Showing top 40 nodes out of 90
+      flat  flat%   sum%        cum   cum%
+     0.53s 23.98% 23.98%      0.53s 23.98%  runtime.kevent
+     0.19s  8.60% 32.58%      0.88s 39.82%  runtime.mallocgc
+     0.11s  4.98% 37.56%      0.39s 17.65%  runtime.mallocgcSmallScanNoHeader
+     0.09s  4.07% 41.63%      1.44s 65.16%  github.com/cnooljaw/gosproto.decodeMessage
+     0.09s  4.07% 45.70%      0.14s  6.33%  runtime.mallocgcTiny
+     0.09s  4.07% 49.77%      0.09s  4.07%  runtime.memclrNoHeapPointers
+     0.05s  2.26% 52.04%      1.43s 64.71%  github.com/cnooljaw/gosproto.decodeStructSlice
+     0.04s  1.81% 53.85%      0.04s  1.81%  reflect.Value.Field
+     0.04s  1.81% 55.66%      0.10s  4.52%  reflect.Value.Set
+     0.04s  1.81% 57.47%      0.05s  2.26%  reflect.elem
+     0.04s  1.81% 59.28%      0.13s  5.88%  runtime.deductAssistCredit
+     0.04s  1.81% 61.09%      0.04s  1.81%  runtime.mapaccess1_fast32
+     0.04s  1.81% 62.90%      0.04s  1.81%  runtime.memmove
+     0.03s  1.36% 64.25%      0.10s  4.52%  reflect.(*rtype).ptrTo
+     0.03s  1.36% 65.61%      0.03s  1.36%  runtime.getGCMask (inline)
+     0.03s  1.36% 66.97%      0.03s  1.36%  runtime.markBits.setMarked (inline)
+     0.03s  1.36% 68.33%      0.52s 23.53%  runtime.newobject
+     0.03s  1.36% 69.68%      0.04s  1.81%  runtime.nextFreeFast (inline)
+     0.03s  1.36% 71.04%      0.03s  1.36%  runtime.releasem (inline)
+     0.03s  1.36% 72.40%      0.07s  3.17%  runtime.resolveTypeOff
+     0.02s   0.9% 73.30%      0.02s   0.9%  github.com/cnooljaw/gosproto.(*SprotoType).FieldByTag (inline)
+     0.02s   0.9% 74.21%      0.02s   0.9%  reflect.Value.Elem
+     0.02s   0.9% 75.11%      0.02s   0.9%  reflect.Value.IsNil (inline)
+     0.02s   0.9% 76.02%      0.02s   0.9%  reflect.directlyAssignable
+     0.02s   0.9% 76.92%      0.05s  2.26%  runtime.(*mspan).writeHeapBitsSmall
+     0.02s   0.9% 77.83%      0.02s   0.9%  runtime.(*pageCache).alloc
+     0.02s   0.9% 78.73%      0.03s  1.36%  runtime.(*sweepLocked).sweep
+     0.02s   0.9% 79.64%      0.03s  1.36%  runtime.findObject
+     0.02s   0.9% 80.54%      0.02s   0.9%  runtime.getMCache (inline)
+     0.02s   0.9% 81.45%      0.02s   0.9%  runtime.ifaceeq
+     0.02s   0.9% 82.35%      0.02s   0.9%  runtime.scanblock
+     0.02s   0.9% 83.26%      0.04s  1.81%  runtime.typePointers.next
+     0.01s  0.45% 83.71%      1.62s 73.30%  github.com/cnooljaw/gosproto.DecodeWithLimits
+     0.01s  0.45% 84.16%      0.02s   0.9%  internal/runtime/maps.(*Map).getWithKeySmall
+     0.01s  0.45% 84.62%      0.07s  3.17%  reflect.(*rtype).Elem
+     0.01s  0.45% 85.07%      0.24s 10.86%  reflect.MakeSlice
+     0.01s  0.45% 85.52%      0.32s 14.48%  reflect.New
+     0.01s  0.45% 85.97%      0.04s  1.81%  reflect.Value.assignTo
+     0.01s  0.45% 86.43%      0.02s   0.9%  reflect.ValueOf (inline)
+     0.01s  0.45% 86.88%      0.04s  1.81%  runtime.gcmarknewobject
