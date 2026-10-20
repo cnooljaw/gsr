@@ -1,0 +1,225 @@
+package sproto
+
+import "reflect"
+
+func experimentHeaderBaseline(chunk []byte, schema *SprotoType, value reflect.Value, budget *decodeBudget) (int, error) {
+	budget.depth++
+	defer func() { budget.depth-- }()
+	if budget.depth > budget.limits.MaxDepth {
+		return 0, ErrLimit
+	}
+	if len(chunk) < 2 {
+		return 0, ErrDecode
+	}
+	count := int(readUint16(chunk))
+	total := 2 + count*2
+	if total > len(chunk) {
+		return 0, ErrDecode
+	}
+	if err := budget.add(count); err != nil {
+		return 0, err
+	}
+	record := value.Elem()
+	exactNative := schema.nativeInt64Pointer && record.Type() == schema.typ
+	pointer := messageDecodePointer(value, exactNative)
+	tag := 0
+	for index := 0; index < count; index++ {
+		entry := int(readUint16(chunk[2+index*2 : 4+index*2 : 4+index*2]))
+		if entry%2 == 1 {
+			tag += (entry + 1) / 2
+			continue
+		}
+		if tag > 65535 {
+			return 0, ErrDecode
+		}
+		hasInline := entry != 0
+		inline := uint16(entry/2 - 1)
+		var content []byte
+		if !hasInline {
+			used, data, err := readChunk(chunk[total:])
+			if err != nil {
+				return 0, err
+			}
+			total += used
+			content = data
+		}
+		field := schema.FieldByTag(tag)
+		tag++
+		if field == nil {
+			continue
+		}
+		if hasInline && (field.Array || field.Wire == WireBytesName || field.Wire == WireStructName) {
+			return 0, ErrDecode
+		}
+		if field.nativeInt64Pointer {
+			bits, err := scalarBits(inline, hasInline, content)
+			if err != nil {
+				return 0, err
+			}
+			result := new(int64)
+			*result = int64(bits)
+			if !pointer.setInteger(schema, field, result) {
+				record.Field(field.index[0]).Set(reflect.ValueOf(result))
+			}
+			continue
+		}
+		if err := field.dec(inline, hasInline, content, field, record.Field(field.index[0]), budget); err != nil {
+			return 0, err
+		}
+	}
+	return total, nil
+}
+
+func experimentHeaderClone(chunk []byte, schema *SprotoType, value reflect.Value, budget *decodeBudget) (int, error) {
+	budget.depth++
+	defer func() { budget.depth-- }()
+	if budget.depth > budget.limits.MaxDepth {
+		return 0, ErrLimit
+	}
+	if len(chunk) < 2 {
+		return 0, ErrDecode
+	}
+	count := int(readUint16(chunk))
+	total := 2 + count*2
+	if total > len(chunk) {
+		return 0, ErrDecode
+	}
+	if err := budget.add(count); err != nil {
+		return 0, err
+	}
+	record := value.Elem()
+	exactNative := schema.nativeInt64Pointer && record.Type() == schema.typ
+	pointer := messageDecodePointer(value, exactNative)
+	tag := 0
+	for index := 0; index < count; index++ {
+		entry := int(readUint16(chunk[2+index*2 : 4+index*2 : 4+index*2]))
+		if entry%2 == 1 {
+			tag += (entry + 1) / 2
+			continue
+		}
+		if tag > 65535 {
+			return 0, ErrDecode
+		}
+		hasInline := entry != 0
+		inline := uint16(entry/2 - 1)
+		var content []byte
+		if !hasInline {
+			used, data, err := readChunk(chunk[total:])
+			if err != nil {
+				return 0, err
+			}
+			total += used
+			content = data
+		}
+		field := schema.FieldByTag(tag)
+		tag++
+		if field == nil {
+			continue
+		}
+		if hasInline && (field.Array || field.Wire == WireBytesName || field.Wire == WireStructName) {
+			return 0, ErrDecode
+		}
+		if field.nativeInt64Pointer {
+			bits, err := scalarBits(inline, hasInline, content)
+			if err != nil {
+				return 0, err
+			}
+			result := new(int64)
+			*result = int64(bits)
+			if !pointer.setInteger(schema, field, result) {
+				record.Field(field.index[0]).Set(reflect.ValueOf(result))
+			}
+			continue
+		}
+		if err := field.dec(inline, hasInline, content, field, record.Field(field.index[0]), budget); err != nil {
+			return 0, err
+		}
+	}
+	return total, nil
+}
+
+func experimentHeaderCandidate(chunk []byte, schema *SprotoType, value reflect.Value, budget *decodeBudget) (int, error) {
+	budget.depth++
+	defer func() { budget.depth-- }()
+	if budget.depth > budget.limits.MaxDepth {
+		return 0, ErrLimit
+	}
+	if len(chunk) < 2 {
+		return 0, ErrDecode
+	}
+	count := int(readUint16(chunk))
+	total := 2 + count*2
+	if total > len(chunk) {
+		return 0, ErrDecode
+	}
+	if err := budget.add(count); err != nil {
+		return 0, err
+	}
+	record := value.Elem()
+	exactNative := schema.nativeInt64Pointer && record.Type() == schema.typ
+	pointer := messageDecodePointer(value, exactNative)
+	headers := chunk[2:total:total]
+	tag := 0
+	for len(headers) > 0 {
+		entry := int(readUint16(headers))
+		headers = headers[2:]
+		if entry%2 == 1 {
+			tag += (entry + 1) / 2
+			continue
+		}
+		if tag > 65535 {
+			return 0, ErrDecode
+		}
+		hasInline := entry != 0
+		inline := uint16(entry/2 - 1)
+		var content []byte
+		if !hasInline {
+			used, data, err := readChunk(chunk[total:])
+			if err != nil {
+				return 0, err
+			}
+			total += used
+			content = data
+		}
+		field := schema.FieldByTag(tag)
+		tag++
+		if field == nil {
+			continue
+		}
+		if hasInline && (field.Array || field.Wire == WireBytesName || field.Wire == WireStructName) {
+			return 0, ErrDecode
+		}
+		if field.nativeInt64Pointer {
+			bits, err := scalarBits(inline, hasInline, content)
+			if err != nil {
+				return 0, err
+			}
+			result := new(int64)
+			*result = int64(bits)
+			if !pointer.setInteger(schema, field, result) {
+				record.Field(field.index[0]).Set(reflect.ValueOf(result))
+			}
+			continue
+		}
+		if err := field.dec(inline, hasInline, content, field, record.Field(field.index[0]), budget); err != nil {
+			return 0, err
+		}
+	}
+	return total, nil
+}
+
+var experimentHeaderSelected = experimentHeaderBaseline
+
+// ExperimentHeaderMode 只在实验归档中选择全递归parser，计时外调用。
+func ExperimentHeaderMode(mode string) {
+	switch mode {
+	case "baseline":
+		experimentHeaderSelected = experimentHeaderBaseline
+	case "clone":
+		experimentHeaderSelected = experimentHeaderClone
+	case "candidate":
+		experimentHeaderSelected = experimentHeaderCandidate
+	default:
+		panic("invalid header experiment mode")
+	}
+}

@@ -846,3 +846,5 @@ TestRuntimePacedMultiServiceLoad 已补 8 个真实 Service 共享文件 Logger 
 2026-10-20：[同模块/同进程Unpack实验及采纳](benchmarks/2026-10-20-gosproto-unpack-inprocess/RESULTS.md)完成60进程/5760块。保留固定视图＋非零mask索引范围表达：整数数组Unpack两轮中位−1.03%/−2.50%，7非零字节word−3.00%/−3.87%；大型及组合路径不确定、局部小包成本与21项中位/累计反向保留。同源大型控制仍偏，不声称噪声消失。完整库/官方/race/checkptr/vet/有限fuzz/GSR三包/GoTS7of7通过，fuzz3310次后停增如实记录。生产代码及永久回归已提交独立库50c69e1、逐文件等于验收快照，原6项删除和正式依赖v0.4.0不变，未推送。
 
 2026-10-20：[字符串数组受控写槽](benchmarks/2026-10-20-gosproto-string-slots/RESULTS.md)保留长数组收益及小数组代价。实际元素恰为原生string时同步借用新切片，命名元素反射回退、完整预检/复制/GC屏障保持；128/512项Decode两轮约−9%，512项PDecode约−7%，3项及现有大型Decode有局部代价，不宣称整体游戏提速。88进程/8448块、基线新增回归、完整库/官方/race/checkptr/vet/有限fuzz/GSR三包/GoTS7of7通过；Codec456532次，Decode13781次后停增如实记录。代码及永久回归已提交独立库aef6876且等于验收快照，原6项删除和正式依赖不变，未推送。
+
+2026-10-20：[消息头顺序游标实验](benchmarks/2026-10-20-gosproto-header-cursor/RESULTS.md)未采用。大型Decode中位两轮+0.32%/+0.12%，PDecode−0.79%/−0.29%的小幅正向及所有反向保留；控制同阶，机器字行不变、栈320→336B。修正一次超出当前编码跨度的新增夹具，初次18个self样本与失败命令单独保留；完整v2为80进程/7680块/110条成功命令，全部20输入预检、头部上限/跳跃/预算等三parser race/checkptr通过。原库仅原6项删除，生产仍aef6876。下一Body候选考察整数记录数组入口的当前字段/类型证明复用，不改逐项wire/预算/对象独占，不跨调用缓存。

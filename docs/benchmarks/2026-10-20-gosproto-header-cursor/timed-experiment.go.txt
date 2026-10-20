@@ -1,0 +1,216 @@
+package benchmarks
+
+import (
+	"bytes"
+	"encoding/json"
+	"math"
+	"os"
+	"reflect"
+	"runtime"
+	"strconv"
+	"testing"
+	"time"
+
+	sp "github.com/cnooljaw/gosproto"
+)
+
+type unpackBlock struct {
+	Arm                   string `json:"arm"`
+	Calls                 int    `json:"calls"`
+	Nanoseconds           int64  `json:"nanoseconds"`
+	Bytes, Allocs         uint64
+	GC                    uint32
+	PauseNs               uint64
+	HeapBefore, HeapAfter uint64
+}
+
+type unpackQuartet struct {
+	Round, Index int
+	Order        string
+	Blocks       []unpackBlock
+	Ratio        float64
+}
+
+// TestHeaderInProcessExperiment 在同一模块/进程交错消息头parser，保留全部GC、分配与时间块。
+func TestHeaderInProcessExperiment(t *testing.T) {
+	if runtime.GOMAXPROCS(0) != 1 {
+		t.Fatal("GOMAXPROCS1 required")
+	}
+	name, mode := os.Getenv("GSR_CASE"), os.Getenv("GSR_MODE")
+	var wire, packed []byte
+	var newMessage func() any
+	for _, sample := range representativeCases(t) {
+		if sample.Name != name {
+			continue
+		}
+		_, wires := representativeOperations(t, sample)
+		checkRepresentativeWire(t, sample, wires)
+		wire, packed = wires["sproto_encode"], wires["sproto_pack"]
+		_, newMessage = representativeMessages(sample.Type)
+	}
+	if wire == nil {
+		var message any
+		if name == "header_jump" {
+			v := int64(7)
+			message = &experimentJump{Value: &v}
+			newMessage = func() any { return new(experimentJump) }
+		} else {
+			count := 64
+			if name == "header8" {
+				count = 8
+			}
+			fields := make([]reflect.StructField, count)
+			for i := range fields {
+				fields[i] = reflect.StructField{Name: "F" + strconv.Itoa(i), Type: reflect.TypeFor[*int64](), Tag: reflect.StructTag("sproto:\"integer," + strconv.Itoa(i) + "\"")}
+			}
+			typ := reflect.StructOf(fields)
+			value := reflect.New(typ)
+			if name != "header_empty" {
+				for i := 0; i < count; i++ {
+					v := int64(i + 1)
+					if name == "header64mixed" {
+						if i%3 == 0 {
+							v = -v
+						} else if i%3 == 1 {
+							v = 1<<40 + v
+						}
+					}
+					value.Elem().Field(i).Set(reflect.ValueOf(&v))
+				}
+			}
+			message = value.Interface()
+			newMessage = func() any { return reflect.New(typ).Interface() }
+		}
+		var err error
+		if name == "header_jump" {
+			wire = []byte{3, 0, 255, 255, 253, 255, 16, 0}
+		} else {
+			wire, err = sp.Encode(message)
+		}
+		if err != nil {
+			t.Fatal(err)
+		}
+		packed = sp.Pack(wire)
+	}
+	operation := os.Getenv("GSR_OP")
+	if operation != "decode" && operation != "pdecode" {
+		t.Fatal("invalid operation")
+	}
+	selectMode := sp.ExperimentHeaderMode
+	defer selectMode("baseline")
+	right := "candidate"
+	switch mode {
+	case "self":
+		right = "baseline"
+	case "clone":
+		right = "clone"
+	case "pass1", "pass2":
+	default:
+		t.Fatal("unknown mode")
+	}
+	selections := map[string]string{"A": "baseline", "B": right}
+	beforeInput := append([]byte(nil), packed...)
+	expected := newMessage()
+	selectMode("baseline")
+	if _, err := sp.Decode(wire, expected); err != nil {
+		t.Fatal(err)
+	}
+	for _, variant := range []string{"baseline", right} {
+		selectMode(variant)
+		decoded := newMessage()
+		if _, err := sp.Decode(wire, decoded); err != nil || !reflect.DeepEqual(decoded, expected) {
+			t.Fatal("body mismatch", err)
+		}
+		decoded = newMessage()
+		if err := sp.DecodePacked(packed, decoded); err != nil || !reflect.DeepEqual(decoded, expected) {
+			t.Fatal("packed mismatch", err)
+		}
+	}
+	if name == "header_jump" && reflect.ValueOf(expected).Elem().Field(0).Elem().Int() != 7 {
+		t.Fatal("jump fixture value")
+	}
+	if os.Getenv("GSR_PREFLIGHT") == "1" {
+		return
+	}
+	run := func() {
+		message := newMessage()
+		if operation == "decode" {
+			if _, err := sp.Decode(wire, message); err != nil {
+				t.Fatal(err)
+			}
+		} else if err := sp.DecodePacked(packed, message); err != nil {
+			t.Fatal(err)
+		}
+		representativeSink = message
+	}
+	runs := map[string]func(){"A": run, "B": run}
+	runtime.GC()
+	for _, arm := range []string{"A", "B"} {
+		selectMode(selections[arm])
+		start := time.Now()
+		for time.Since(start) < 50*time.Millisecond {
+			for range 64 {
+				runs[arm]()
+			}
+		}
+	}
+	selectMode("baseline")
+	start := time.Now()
+	for range 256 {
+		runs["A"]()
+	}
+	calls := int(float64(20*time.Millisecond) / float64(time.Since(start)) * 256)
+	calls = max(1, min(calls, 1<<20))
+	blocks := []unpackQuartet{}
+	for round := 0; round < 6; round++ {
+		for quartet := 0; quartet < 4; quartet++ {
+			order := "ABBA"
+			if (round+quartet)%2 != 0 {
+				order = "BAAB"
+			}
+			q := unpackQuartet{Round: round, Index: quartet, Order: order}
+			logRatio := 0.0
+			for _, label := range order {
+				arm := string(label)
+				var before, after runtime.MemStats
+				selectMode(selections[arm])
+				runtime.ReadMemStats(&before)
+				run := runs[arm]
+				start := time.Now()
+				for range calls {
+					run()
+				}
+				ns := time.Since(start).Nanoseconds()
+				runtime.ReadMemStats(&after)
+				block := unpackBlock{Arm: arm, Calls: calls, Nanoseconds: ns, Bytes: after.TotalAlloc - before.TotalAlloc, Allocs: after.Mallocs - before.Mallocs, GC: after.NumGC - before.NumGC, PauseNs: after.PauseTotalNs - before.PauseTotalNs, HeapBefore: before.HeapAlloc, HeapAfter: after.HeapAlloc}
+				q.Blocks = append(q.Blocks, block)
+				sign := 1.0
+				if arm == "A" {
+					sign = -1
+				}
+				logRatio += sign * math.Log(float64(ns)/float64(calls))
+			}
+			q.Ratio = math.Exp(logRatio / 2)
+			blocks = append(blocks, q)
+		}
+	}
+	if !bytes.Equal(packed, beforeInput) {
+		t.Fatal("input modified")
+	}
+	raw, err := json.MarshalIndent(struct {
+		Name, Operation, Mode string
+		CallsPerBlock         int
+		Quartets              []unpackQuartet
+	}{name, operation, mode, calls, blocks}, "", "  ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(os.Getenv("GSR_OUTPUT"), append(raw, '\n'), 0644); err != nil {
+		t.Fatal(err)
+	}
+	runtime.KeepAlive(runs)
+}
+
+type experimentJump struct {
+	Value *int64 `sproto:"integer,65535"`
+}
