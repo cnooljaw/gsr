@@ -1,0 +1,1161 @@
+TEXT github.com/cnooljaw/gosproto.UnpackWithLimit(SB) /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/gosproto/pack.go
+  pack.go:193		0x100157340		f9400b90		MOVD 16(R28), R16					
+  pack.go:193		0x100157344		eb3063ff		CMP R16, RSP						
+  pack.go:193		0x100157348		54002e89		BLS 372(PC)						
+  pack.go:193		0x10015734c		f8190ffe		MOVD.W R30, -112(RSP)					
+  pack.go:193		0x100157350		f81f83fd		MOVD R29, -8(RSP)					
+  pack.go:193		0x100157354		d10023fd		SUB $8, RSP, R29					
+  pack.go:193		0x100157358		f9003fe0		MOVD R0, 120(RSP)					
+  pack.go:194		0x10015735c		f100007f		CMP $0, R3						
+  pack.go:194		0x100157360		540000cd		BLE 6(PC)						
+  pack.go:194		0x100157364		aa0103e4		MOVD R1, R4						
+  pack.go:194		0x100157368		aa0203e5		MOVD R2, R5						
+  pack.go:194		0x10015736c		aa0003e6		MOVD R0, R6						
+  pack.go:194		0x100157370		aa1f03e7		MOVD ZR, R7						
+  pack.go:199		0x100157374		14000010		JMP 16(PC)						
+  pack.go:195		0x100157378		f0001b7b		ADRP 3600384(PC), R27					
+  pack.go:195		0x10015737c		f940fb63		MOVD 496(R27), R3					
+  pack.go:195		0x100157380		f0001b7b		ADRP 3600384(PC), R27					
+  pack.go:195		0x100157384		f940ff64		MOVD 504(R27), R4					
+  pack.go:195		0x100157388		aa1f03e0		MOVD ZR, R0						
+  pack.go:195		0x10015738c		aa1f03e1		MOVD ZR, R1						
+  pack.go:195		0x100157390		aa0103e2		MOVD R1, R2						
+  pack.go:195		0x100157394		f85f83fd		MOVD -8(RSP), R29					
+  pack.go:195		0x100157398		f84707fe		MOVD.P 112(RSP), R30					
+  pack.go:195		0x10015739c		d65f03c0		RET							
+  pack.go:232		0x1001573a0		cb090042		SUB R9, R2, R2						
+  pack.go:232		0x1001573a4		cb0203e8		NEG R2, R8						
+  pack.go:232		0x1001573a8		8a88fd28		AND R8->63, R9, R8					
+  pack.go:232		0x1001573ac		cb090021		SUB R9, R1, R1						
+  pack.go:232		0x1001573b0		8b080000		ADD R8, R0, R0						
+  pack.go:199		0x1001573b4		b40009a1		CBZ R1, 77(PC)						
+  pack.go:200		0x1001573b8		39400008		MOVBU (R0), R8						
+  pack.go:202		0x1001573bc		aa0803e9		MOVD R8, R9						
+  pack.go:202		0x1001573c0		350003c9		CBNZW R9, 30(PC)					
+  pack.go:203		0x1001573c4		f100083f		CMP $2, R1						
+  pack.go:203		0x1001573c8		5400032b		BLT 25(PC)						
+  pack.go:203		0x1001573cc		39400408		MOVBU 1(R0), R8						
+  pack.go:203		0x1001573d0		35000288		CBNZW R8, 20(PC)					
+  pack.go:204		0x1001573d4		cb070068		SUB R7, R3, R8						
+  pack.go:204		0x1001573d8		937ffd09		ASR $63, R8, R9						
+  pack.go:204		0x1001573dc		8b49f508		ADD R9>>61, R8, R8					
+  pack.go:204		0x1001573e0		9343fd09		ASR $3, R8, R9						
+  pack.go:205		0x1001573e4		f100093f		CMP $2, R9						
+  pack.go:205		0x1001573e8		5400058b		BLT 44(PC)						
+  pack.go:209		0x1001573ec		9100052a		ADD $1, R9, R10						
+  pack.go:209		0x1001573f0		eb0a003f		CMP R10, R1						
+  pack.go:209		0x1001573f4		9a89d429		CSINC LE, R1, R9, R9					
+  pack.go:210		0x1001573f8		eb09005f		CMP R9, R2						
+  pack.go:209		0x1001573fc		54002883		BCC 324(PC)						
+  pack.go:210		0x100157400		d100084a		SUB $2, R2, R10						
+  pack.go:210		0x100157404		cb0a03ea		NEG R10, R10						
+  pack.go:210		0x100157408		937ffd4a		ASR $63, R10, R10					
+  pack.go:210		0x10015740c		927f014a		AND $2, R10, R10					
+  pack.go:210		0x100157410		8b0a000a		ADD R10, R0, R10					
+  pack.go:210		0x100157414		d100092b		SUB $2, R9, R11						
+  pack.go:210		0x100157418		aa1f03ec		MOVD ZR, R12						
+  pack.go:174		0x10015741c		1400010e		JMP 270(PC)						
+  pack.go:174		0x100157420		b24003e8		ORR $1, ZR, R8						
+  pack.go:174		0x100157424		b27d03e9		ORR $8, ZR, R9						
+  pack.go:203		0x100157428		14000106		JMP 262(PC)						
+  pack.go:203		0x10015742c		b24003e8		ORR $1, ZR, R8						
+  pack.go:203		0x100157430		b27d03e9		ORR $8, ZR, R9						
+  pack.go:203		0x100157434		14000103		JMP 259(PC)						
+  pack.go:216		0x100157438		7103fd3f		CMPW $255, R9						
+  pack.go:216		0x10015743c		54000101		BNE 8(PC)						
+  pack.go:217		0x100157440		f100083f		CMP $2, R1						
+  pack.go:217		0x100157444		540003eb		BLT 31(PC)						
+  pack.go:220		0x100157448		39400408		MOVBU 1(R0), R8						
+  pack.go:220		0x10015744c		91000508		ADD $1, R8, R8						
+  pack.go:220		0x100157450		d37df108		LSL $3, R8, R8						
+  pack.go:221		0x100157454		91000909		ADD $2, R8, R9						
+  pack.go:221		0x100157458		14000007		JMP 7(PC)						
+  bits.go:126		0x10015745c		aa0803ea		MOVD R8, R10						
+  bits.go:126		0x100157460		b000070b		ADRP 921600(PC), R11					
+  bits.go:126		0x100157464		913db16b		ADD $3948, R11, R11					
+  bits.go:126		0x100157468		386a696a		MOVBU (R11)(R10), R10					
+  pack.go:223		0x10015746c		91000549		ADD $1, R10, R9						
+  pack.go:223		0x100157470		b27d03e8		ORR $8, ZR, R8						
+  pack.go:225		0x100157474		eb01013f		CMP R1, R9						
+  pack.go:225		0x100157478		54001ccc		BGT 230(PC)						
+  pack.go:228		0x10015747c		cb07006a		SUB R7, R3, R10						
+  pack.go:228		0x100157480		eb0a011f		CMP R10, R8						
+  pack.go:228		0x100157484		54001b2c		BGT 217(PC)						
+  pack.go:231		0x100157488		8b0800e7		ADD R8, R7, R7						
+  pack.go:225		0x10015748c		eb01013f		CMP R1, R9						
+  pack.go:232		0x100157490		54fff889		BLS -60(PC)						
+  pack.go:232		0x100157494		140000e9		JMP 233(PC)						
+  pack.go:206		0x100157498		f0001b7b		ADRP 3600384(PC), R27					
+  pack.go:206		0x10015749c		f940f363		MOVD 480(R27), R3					
+  pack.go:206		0x1001574a0		f0001b7b		ADRP 3600384(PC), R27					
+  pack.go:206		0x1001574a4		f940f764		MOVD 488(R27), R4					
+  pack.go:206		0x1001574a8		aa1f03e0		MOVD ZR, R0						
+  pack.go:206		0x1001574ac		aa1f03e1		MOVD ZR, R1						
+  pack.go:206		0x1001574b0		aa0103e2		MOVD R1, R2						
+  pack.go:206		0x1001574b4		f85f83fd		MOVD -8(RSP), R29					
+  pack.go:206		0x1001574b8		f84707fe		MOVD.P 112(RSP), R30					
+  pack.go:206		0x1001574bc		d65f03c0		RET							
+  pack.go:218		0x1001574c0		f0001b7b		ADRP 3600384(PC), R27					
+  pack.go:218		0x1001574c4		f9412b63		MOVD 592(R27), R3					
+  pack.go:218		0x1001574c8		f0001b7b		ADRP 3600384(PC), R27					
+  pack.go:218		0x1001574cc		f9412f64		MOVD 600(R27), R4					
+  pack.go:218		0x1001574d0		aa1f03e0		MOVD ZR, R0						
+  pack.go:218		0x1001574d4		aa1f03e1		MOVD ZR, R1						
+  pack.go:218		0x1001574d8		aa0103e2		MOVD R1, R2						
+  pack.go:218		0x1001574dc		f85f83fd		MOVD -8(RSP), R29					
+  pack.go:218		0x1001574e0		f84707fe		MOVD.P 112(RSP), R30					
+  pack.go:218		0x1001574e4		d65f03c0		RET							
+  pack.go:194		0x1001574e8		f9002be4		MOVD R4, 80(RSP)					
+  pack.go:194		0x1001574ec		f90033e6		MOVD R6, 96(RSP)					
+  pack.go:194		0x1001574f0		f90027e5		MOVD R5, 72(RSP)					
+  pack.go:228		0x1001574f4		f90013e7		MOVD R7, 32(RSP)					
+  pack.go:234		0x1001574f8		90000aa0		ADRP 1392640(PC), R0					
+  pack.go:234		0x1001574fc		91388000		ADD $3616, R0, R0					
+  pack.go:234		0x100157500		aa0703e1		MOVD R7, R1						
+  pack.go:234		0x100157504		aa0103e2		MOVD R1, R2						
+  pack.go:234		0x100157508		97fc6c12		CALL runtime.makeslice(SB)				
+  pack.go:234		0x10015750c		f9002fe0		MOVD R0, 88(RSP)					
+  pack.go:236		0x100157510		f94013e2		MOVD 32(RSP), R2					
+  pack.go:236		0x100157514		f94033e3		MOVD 96(RSP), R3					
+  pack.go:236		0x100157518		f94027e4		MOVD 72(RSP), R4					
+  pack.go:236		0x10015751c		f9402be5		MOVD 80(RSP), R5					
+  pack.go:236		0x100157520		aa1f03e1		MOVD ZR, R1						
+  pack.go:236		0x100157524		14000004		JMP 4(PC)						
+  pack.go:236		0x100157528		aa0603e4		MOVD R6, R4						
+  pack.go:236		0x10015752c		aa0803e3		MOVD R8, R3						
+  pack.go:260		0x100157530		aa0703e1		MOVD R7, R1						
+  pack.go:236		0x100157534		b4000ae5		CBZ R5, 87(PC)						
+  pack.go:237		0x100157538		39400066		MOVBU (R3), R6						
+  pack.go:238		0x10015753c		aa0603e7		MOVD R6, R7						
+  pack.go:238		0x100157540		350001e7		CBNZW R7, 15(PC)					
+  pack.go:240		0x100157544		f10008bf		CMP $2, R5						
+  pack.go:240		0x100157548		5400016b		BLT 11(PC)						
+  pack.go:240		0x10015754c		39400466		MOVBU 1(R3), R6						
+  pack.go:240		0x100157550		35000126		CBNZW R6, 9(PC)						
+  pack.go:241		0x100157554		d1000886		SUB $2, R4, R6						
+  pack.go:241		0x100157558		cb0603e6		NEG R6, R6						
+  pack.go:241		0x10015755c		937ffcc6		ASR $63, R6, R6						
+  pack.go:241		0x100157560		927f00c6		AND $2, R6, R6						
+  pack.go:241		0x100157564		8b060066		ADD R6, R3, R6						
+  pack.go:241		0x100157568		d10008a7		SUB $2, R5, R7						
+  pack.go:241		0x10015756c		aa1f03e8		MOVD ZR, R8						
+  pack.go:174		0x100157570		1400007f		JMP 127(PC)						
+  pack.go:174		0x100157574		b24003e6		ORR $1, ZR, R6						
+  pack.go:240		0x100157578		1400006f		JMP 111(PC)						
+  pack.go:248		0x10015757c		d1000488		SUB $1, R4, R8						
+  pack.go:248		0x100157580		cb0803e9		NEG R8, R9						
+  pack.go:248		0x100157584		937ffd29		ASR $63, R9, R9						
+  pack.go:248		0x100157588		92400129		AND $1, R9, R9						
+  pack.go:248		0x10015758c		8b03012a		ADD R3, R9, R10						
+  pack.go:248		0x100157590		d10004ab		SUB $1, R5, R11						
+  pack.go:249		0x100157594		7103fcff		CMPW $255, R7						
+  pack.go:249		0x100157598		54000661		BNE 51(PC)						
+  pack.go:250		0x10015759c		f100017f		CMP $0, R11						
+  pack.go:250		0x1001575a0		54000c49		BLS 98(PC)						
+  pack.go:250		0x1001575a4		38696866		MOVBU (R3)(R9), R6					
+  pack.go:251		0x1001575a8		eb02003f		CMP R2, R1						
+  pack.go:251		0x1001575ac		54000b88		BHI 92(PC)						
+  pack.go:250		0x1001575b0		910004c6		ADD $1, R6, R6						
+  pack.go:250		0x1001575b4		d37df0c7		LSL $3, R6, R7						
+  pack.go:251		0x1001575b8		cb010049		SUB R1, R2, R9						
+  pack.go:251		0x1001575bc		cb0903ec		NEG R9, R12						
+  pack.go:251		0x1001575c0		8a8cfc2c		AND R12->63, R1, R12					
+  pack.go:251		0x1001575c4		910004ed		ADD $1, R7, R13						
+  pack.go:251		0x1001575c8		8b0c000c		ADD R12, R0, R12					
+  pack.go:251		0x1001575cc		eb0d011f		CMP R13, R8						
+  pack.go:251		0x1001575d0		54000a03		BCC 80(PC)						
+  pack.go:251		0x1001575d4		91000548		ADD $1, R10, R8						
+  pack.go:251		0x1001575d8		eb060d3f		CMP R6<<3, R9						
+  pack.go:251		0x1001575dc		9a89c0e7		CSEL GT, R7, R9, R7					
+  pack.go:251		0x1001575e0		eb0c011f		CMP R12, R8						
+  pack.go:251		0x1001575e4		540002a0		BEQ 21(PC)						
+  pack.go:236		0x1001575e8		f9002be4		MOVD R4, 80(RSP)					
+  pack.go:236		0x1001575ec		f90027e5		MOVD R5, 72(RSP)					
+  pack.go:248		0x1001575f0		f90023eb		MOVD R11, 64(RSP)					
+  pack.go:248		0x1001575f4		f90033ea		MOVD R10, 96(RSP)					
+  pack.go:250		0x1001575f8		f9001fe6		MOVD R6, 56(RSP)					
+  pack.go:251		0x1001575fc		f9001bed		MOVD R13, 48(RSP)					
+  pack.go:260		0x100157600		f90017e1		MOVD R1, 40(RSP)					
+  pack.go:251		0x100157604		aa0c03e0		MOVD R12, R0						
+  pack.go:251		0x100157608		aa0803e1		MOVD R8, R1						
+  pack.go:251		0x10015760c		aa0703e2		MOVD R7, R2						
+  pack.go:251		0x100157610		97fc8540		CALL runtime.memmove(SB)				
+  pack.go:251		0x100157614		f9402fe0		MOVD 88(RSP), R0					
+  pack.go:252		0x100157618		f94017e1		MOVD 40(RSP), R1					
+  pack.go:251		0x10015761c		f94013e2		MOVD 32(RSP), R2					
+  pack.go:253		0x100157620		f9402be4		MOVD 80(RSP), R4					
+  pack.go:253		0x100157624		f94027e5		MOVD 72(RSP), R5					
+  pack.go:252		0x100157628		f9401fe6		MOVD 56(RSP), R6					
+  pack.go:253		0x10015762c		f94033ea		MOVD 96(RSP), R10					
+  pack.go:253		0x100157630		f94023eb		MOVD 64(RSP), R11					
+  pack.go:253		0x100157634		f9401bed		MOVD 48(RSP), R13					
+  pack.go:252		0x100157638		8b060c27		ADD R6<<3, R1, R7					
+  pack.go:253		0x10015763c		eb0d017f		CMP R13, R11						
+  pack.go:253		0x100157640		54000623		BCC 49(PC)						
+  pack.go:253		0x100157644		cb060c88		SUB R6<<3, R4, R8					
+  pack.go:253		0x100157648		cb060ca5		SUB R6<<3, R5, R5					
+  pack.go:253		0x10015764c		d1000906		SUB $2, R8, R6						
+  pack.go:253		0x100157650		cb0603e8		NEG R6, R8						
+  pack.go:253		0x100157654		8a88fda8		AND R8->63, R13, R8					
+  pack.go:253		0x100157658		8b0a0108		ADD R10, R8, R8						
+  pack.go:253		0x10015765c		d10008a5		SUB $2, R5, R5						
+  pack.go:254		0x100157660		17ffffb2		JMP -78(PC)						
+  pack.go:254		0x100157664		aa1f03e3		MOVD ZR, R3						
+  pack.go:258		0x100157668		14000011		JMP 17(PC)						
+  pack.go:267		0x10015766c		cb0300a9		SUB R3, R5, R9						
+  pack.go:267		0x100157670		cb03008b		SUB R3, R4, R11						
+  pack.go:267		0x100157674		d1000966		SUB $2, R11, R6						
+  pack.go:267		0x100157678		cb0603eb		NEG R6, R11						
+  pack.go:267		0x10015767c		8a8bfceb		AND R11->63, R7, R11					
+  pack.go:267		0x100157680		8b0a0168		ADD R10, R11, R8					
+  pack.go:267		0x100157684		d1000925		SUB $2, R9, R5						
+  pack.go:268		0x100157688		91002027		ADD $8, R1, R7						
+  pack.go:268		0x10015768c		17ffffa7		JMP -89(PC)						
+  pack.go:270		0x100157690		aa0203e1		MOVD R2, R1						
+  pack.go:270		0x100157694		aa1f03e3		MOVD ZR, R3						
+  pack.go:270		0x100157698		aa1f03e4		MOVD ZR, R4						
+  pack.go:270		0x10015769c		f85f83fd		MOVD -8(RSP), R29					
+  pack.go:270		0x1001576a0		f84707fe		MOVD.P 112(RSP), R30					
+  pack.go:270		0x1001576a4		d65f03c0		RET							
+  pack.go:260		0x1001576a8		aa0703e3		MOVD R7, R3						
+  pack.go:259		0x1001576ac		b27800c7		ORR $256, R6, R7					
+  pack.go:259		0x1001576b0		5ac000e7		RBITW R7, R7						
+  pack.go:259		0x1001576b4		5ac010e7		CLZW R7, R7						
+  pack.go:260		0x1001576b8		8b0100e7		ADD R1, R7, R7						
+  pack.go:260		0x1001576bc		eb0b007f		CMP R11, R3						
+  pack.go:260		0x1001576c0		540001c2		BCS 14(PC)						
+  pack.go:260		0x1001576c4		38636948		MOVBU (R10)(R3), R8					
+  pack.go:260		0x1001576c8		eb07005f		CMP R7, R2						
+  pack.go:260		0x1001576cc		54000109		BLS 8(PC)						
+  pack.go:260		0x1001576d0		38276808		MOVB R8, (R0)(R7)					
+  pack.go:262		0x1001576d4		d10004c7		SUB $1, R6, R7						
+  pack.go:262		0x1001576d8		8a0700c6		AND R7, R6, R6						
+  pack.go:261		0x1001576dc		91000467		ADD $1, R3, R7						
+  pack.go:263		0x1001576e0		d3401cc8		UBFX $0, R6, $8, R8					
+  pack.go:263		0x1001576e4		35fffe28		CBNZW R8, -15(PC)					
+  pack.go:263		0x1001576e8		17ffffe1		JMP -31(PC)						
+  pack.go:260		0x1001576ec		aa0703e0		MOVD R7, R0						
+  pack.go:260		0x1001576f0		aa0203e1		MOVD R2, R1						
+  pack.go:260		0x1001576f4		97fc839b		CALL runtime.panicIndex(SB)				
+  pack.go:260		0x1001576f8		aa0303e0		MOVD R3, R0						
+  pack.go:260		0x1001576fc		aa0b03e1		MOVD R11, R1						
+  pack.go:260		0x100157700		97fc8398		CALL runtime.panicIndex(SB)				
+  pack.go:253		0x100157704		aa0d03e0		MOVD R13, R0						
+  pack.go:253		0x100157708		aa0b03e1		MOVD R11, R1						
+  pack.go:253		0x10015770c		97fc83ad		CALL runtime.panicSliceB(SB)				
+  pack.go:251		0x100157710		aa0d03e1		MOVD R13, R1						
+  pack.go:251		0x100157714		aa0803e2		MOVD R8, R2						
+  pack.go:251		0x100157718		97fc83a2		CALL runtime.panicSliceAcap(SB)				
+  pack.go:251		0x10015771c		aa0103e0		MOVD R1, R0						
+  pack.go:251		0x100157720		aa0203e1		MOVD R2, R1						
+  pack.go:251		0x100157724		97fc83a7		CALL runtime.panicSliceB(SB)				
+  pack.go:250		0x100157728		aa1f03e0		MOVD ZR, R0						
+  pack.go:250		0x10015772c		aa0003e1		MOVD R0, R1						
+  pack.go:250		0x100157730		97fc838c		CALL runtime.panicIndex(SB)				
+  pack.go:244		0x100157734		8b060c27		ADD R6<<3, R1, R7					
+  pack.go:245		0x100157738		eb0500df		CMP R5, R6						
+  pack.go:245		0x10015773c		54000108		BHI 8(PC)						
+  pack.go:245		0x100157740		cb060089		SUB R6, R4, R9						
+  pack.go:245		0x100157744		cb0903ea		NEG R9, R10						
+  pack.go:245		0x100157748		8a8afcca		AND R10->63, R6, R10					
+  pack.go:245		0x10015774c		cb0600a5		SUB R6, R5, R5						
+  pack.go:245		0x100157750		8b0a0068		ADD R10, R3, R8						
+  pack.go:236		0x100157754		aa0903e6		MOVD R9, R6						
+  pack.go:246		0x100157758		17ffff74		JMP -140(PC)						
+  pack.go:245		0x10015775c		aa0603e0		MOVD R6, R0						
+  pack.go:245		0x100157760		aa0503e1		MOVD R5, R1						
+  pack.go:245		0x100157764		97fc8397		CALL runtime.panicSliceB(SB)				
+  pack.go:179		0x100157768		91002108		ADD $8, R8, R8						
+  pack.go:174		0x10015776c		cb0800a9		SUB R8, R5, R9						
+  pack.go:174		0x100157770		d1000929		SUB $2, R9, R9						
+  pack.go:174		0x100157774		f100213f		CMP $8, R9						
+  pack.go:174		0x100157778		540001eb		BLT 15(PC)						
+  pack.go:175		0x10015777c		eb07011f		CMP R7, R8						
+  pack.go:175		0x100157780		540002e8		BHI 23(PC)						
+  pack.go:175		0x100157784		cb080089		SUB R8, R4, R9						
+  pack.go:175		0x100157788		d1000929		SUB $2, R9, R9						
+  pack.go:175		0x10015778c		cb0903e9		NEG R9, R9						
+  pack.go:175		0x100157790		8a89fd09		AND R9->63, R8, R9					
+  binary.go:117		0x100157794		f86968c9		MOVD (R6)(R9), R9					
+  pack.go:176		0x100157798		b4fffe89		CBZ R9, -12(PC)						
+  pack.go:177		0x10015779c		dac00126		RBIT R9, R6						
+  pack.go:177		0x1001577a0		dac010c6		CLZ R6, R6						
+  pack.go:177		0x1001577a4		8b460d06		ADD R6>>3, R8, R6					
+  pack.go:241		0x1001577a8		aa0603e8		MOVD R6, R8						
+  pack.go:241		0x1001577ac		14000007		JMP 7(PC)						
+  pack.go:182		0x1001577b0		91000508		ADD $1, R8, R8						
+  pack.go:181		0x1001577b4		eb07011f		CMP R7, R8						
+  pack.go:181		0x1001577b8		5400008a		BGE 4(PC)						
+  pack.go:181		0x1001577bc		540000a2		BCS 5(PC)						
+  pack.go:181		0x1001577c0		386868c9		MOVBU (R6)(R8), R9					
+  pack.go:181		0x1001577c4		34ffff69		CBZW R9, -5(PC)						
+  pack.go:241		0x1001577c8		91000906		ADD $2, R8, R6						
+  pack.go:241		0x1001577cc		17ffffda		JMP -38(PC)						
+  pack.go:181		0x1001577d0		aa0803e0		MOVD R8, R0						
+  pack.go:181		0x1001577d4		aa0703e1		MOVD R7, R1						
+  pack.go:181		0x1001577d8		97fc8362		CALL runtime.panicIndex(SB)				
+  pack.go:175		0x1001577dc		aa0803e0		MOVD R8, R0						
+  pack.go:175		0x1001577e0		aa0703e1		MOVD R7, R1						
+  pack.go:175		0x1001577e4		97fc8377		CALL runtime.panicSliceB(SB)				
+  pack.go:229		0x1001577e8		f0001b7b		ADRP 3600384(PC), R27					
+  pack.go:229		0x1001577ec		f940f363		MOVD 480(R27), R3					
+  pack.go:229		0x1001577f0		f0001b7b		ADRP 3600384(PC), R27					
+  pack.go:229		0x1001577f4		f940f764		MOVD 488(R27), R4					
+  pack.go:229		0x1001577f8		aa1f03e0		MOVD ZR, R0						
+  pack.go:229		0x1001577fc		aa1f03e1		MOVD ZR, R1						
+  pack.go:229		0x100157800		aa0103e2		MOVD R1, R2						
+  pack.go:229		0x100157804		f85f83fd		MOVD -8(RSP), R29					
+  pack.go:229		0x100157808		f84707fe		MOVD.P 112(RSP), R30					
+  pack.go:229		0x10015780c		d65f03c0		RET							
+  pack.go:226		0x100157810		f0001b7b		ADRP 3600384(PC), R27					
+  pack.go:226		0x100157814		f9412b63		MOVD 592(R27), R3					
+  pack.go:226		0x100157818		f0001b7b		ADRP 3600384(PC), R27					
+  pack.go:226		0x10015781c		f9412f64		MOVD 600(R27), R4					
+  pack.go:226		0x100157820		aa1f03e0		MOVD ZR, R0						
+  pack.go:226		0x100157824		aa1f03e1		MOVD ZR, R1						
+  pack.go:226		0x100157828		aa0103e2		MOVD R1, R2						
+  pack.go:226		0x10015782c		f85f83fd		MOVD -8(RSP), R29					
+  pack.go:226		0x100157830		f84707fe		MOVD.P 112(RSP), R30					
+  pack.go:226		0x100157834		d65f03c0		RET							
+  pack.go:232		0x100157838		aa0903e0		MOVD R9, R0						
+  pack.go:232		0x10015783c		97fc8361		CALL runtime.panicSliceB(SB)				
+  pack.go:225		0x100157840		aa0903ea		MOVD R9, R10						
+  pack.go:225		0x100157844		aa0803e9		MOVD R8, R9						
+  pack.go:228		0x100157848		aa0a03e8		MOVD R10, R8						
+  pack.go:228		0x10015784c		17ffff0a		JMP -246(PC)						
+  pack.go:179		0x100157850		9100218c		ADD $8, R12, R12					
+  pack.go:174		0x100157854		cb0c012d		SUB R12, R9, R13					
+  pack.go:174		0x100157858		d10009ad		SUB $2, R13, R13					
+  pack.go:174		0x10015785c		f10021bf		CMP $8, R13						
+  pack.go:174		0x100157860		540001eb		BLT 15(PC)						
+  pack.go:175		0x100157864		eb0b019f		CMP R11, R12						
+  pack.go:175		0x100157868		540004c8		BHI 38(PC)						
+  pack.go:175		0x10015786c		cb0c004d		SUB R12, R2, R13					
+  pack.go:175		0x100157870		d10009ad		SUB $2, R13, R13					
+  pack.go:175		0x100157874		cb0d03ed		NEG R13, R13						
+  pack.go:175		0x100157878		8a8dfd8d		AND R13->63, R12, R13					
+  binary.go:117		0x10015787c		f86d694d		MOVD (R10)(R13), R13					
+  pack.go:176		0x100157880		b4fffe8d		CBZ R13, -12(PC)					
+  pack.go:177		0x100157884		dac001a9		RBIT R13, R9						
+  pack.go:177		0x100157888		dac01129		CLZ R9, R9						
+  pack.go:177		0x10015788c		8b490d89		ADD R9>>3, R12, R9					
+  pack.go:210		0x100157890		aa0903ec		MOVD R9, R12						
+  pack.go:210		0x100157894		14000007		JMP 7(PC)						
+  pack.go:182		0x100157898		9100058c		ADD $1, R12, R12					
+  pack.go:181		0x10015789c		eb0b019f		CMP R11, R12						
+  pack.go:181		0x1001578a0		5400008a		BGE 4(PC)						
+  pack.go:181		0x1001578a4		54000282		BCS 20(PC)						
+  pack.go:181		0x1001578a8		386c6949		MOVBU (R10)(R12), R9					
+  pack.go:181		0x1001578ac		34ffff69		CBZW R9, -5(PC)						
+  pack.go:210		0x1001578b0		91000989		ADD $2, R12, R9						
+  pack.go:211		0x1001578b4		eb880d3f		CMP R8->3, R9						
+  pack.go:211		0x1001578b8		540000ac		BGT 5(PC)						
+  pack.go:214		0x1001578bc		d37df12a		LSL $3, R9, R10						
+  pack.go:225		0x1001578c0		aa0903e8		MOVD R9, R8						
+  pack.go:228		0x1001578c4		aa0a03e9		MOVD R10, R9						
+  pack.go:214		0x1001578c8		17ffffde		JMP -34(PC)						
+  pack.go:212		0x1001578cc		f0001b7b		ADRP 3600384(PC), R27					
+  pack.go:212		0x1001578d0		f940f363		MOVD 480(R27), R3					
+  pack.go:212		0x1001578d4		f0001b7b		ADRP 3600384(PC), R27					
+  pack.go:212		0x1001578d8		f940f764		MOVD 488(R27), R4					
+  pack.go:212		0x1001578dc		aa1f03e0		MOVD ZR, R0						
+  pack.go:212		0x1001578e0		aa1f03e1		MOVD ZR, R1						
+  pack.go:212		0x1001578e4		aa0103e2		MOVD R1, R2						
+  pack.go:212		0x1001578e8		f85f83fd		MOVD -8(RSP), R29					
+  pack.go:212		0x1001578ec		f84707fe		MOVD.P 112(RSP), R30					
+  pack.go:212		0x1001578f0		d65f03c0		RET							
+  pack.go:181		0x1001578f4		aa0c03e0		MOVD R12, R0						
+  pack.go:181		0x1001578f8		aa0b03e1		MOVD R11, R1						
+  pack.go:181		0x1001578fc		97fc8319		CALL runtime.panicIndex(SB)				
+  pack.go:175		0x100157900		aa0c03e0		MOVD R12, R0						
+  pack.go:175		0x100157904		aa0b03e1		MOVD R11, R1						
+  pack.go:175		0x100157908		97fc832e		CALL runtime.panicSliceB(SB)				
+  pack.go:210		0x10015790c		aa0903e1		MOVD R9, R1						
+  pack.go:210		0x100157910		97fc8324		CALL runtime.panicSliceAcap(SB)				
+  pack.go:210		0x100157914		d503201f		NOOP							
+  pack.go:193		0x100157918		a90087e0		STP (R0, R1), 8(RSP)					
+  pack.go:193		0x10015791c		a9018fe2		STP (R2, R3), 24(RSP)					
+  pack.go:193		0x100157920		aa1e03e3		MOVD R30, R3						
+  pack.go:193		0x100157924		97fc79b7		CALL runtime.morestack_noctxt.abi0(SB)			
+  pack.go:193		0x100157928		a94087e0		LDP 8(RSP), (R0, R1)					
+  pack.go:193		0x10015792c		a9418fe2		LDP 24(RSP), (R2, R3)					
+  pack.go:193		0x100157930		17fffe84		JMP github.com/cnooljaw/gosproto.UnpackWithLimit(SB)	
+  pack.go:193		0x100157934		00000000		?							
+  pack.go:193		0x100157938		00000000		?							
+  pack.go:193		0x10015793c		00000000		?							
+
+TEXT github.com/cnooljaw/gosproto.ExperimentUnpackClone(SB) /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/gosproto/unpack_experiment.go
+  unpack_experiment.go:5	0x1001579e0		f9400b90		MOVD 16(R28), R16						
+  unpack_experiment.go:5	0x1001579e4		eb3063ff		CMP R16, RSP							
+  unpack_experiment.go:5	0x1001579e8		54002e89		BLS 372(PC)							
+  unpack_experiment.go:5	0x1001579ec		f8190ffe		MOVD.W R30, -112(RSP)						
+  unpack_experiment.go:5	0x1001579f0		f81f83fd		MOVD R29, -8(RSP)						
+  unpack_experiment.go:5	0x1001579f4		d10023fd		SUB $8, RSP, R29						
+  unpack_experiment.go:5	0x1001579f8		f9003fe0		MOVD R0, 120(RSP)						
+  unpack_experiment.go:6	0x1001579fc		f100007f		CMP $0, R3							
+  unpack_experiment.go:6	0x100157a00		540000cd		BLE 6(PC)							
+  unpack_experiment.go:6	0x100157a04		aa0103e4		MOVD R1, R4							
+  unpack_experiment.go:6	0x100157a08		aa0203e5		MOVD R2, R5							
+  unpack_experiment.go:6	0x100157a0c		aa0003e6		MOVD R0, R6							
+  unpack_experiment.go:6	0x100157a10		aa1f03e7		MOVD ZR, R7							
+  unpack_experiment.go:11	0x100157a14		14000010		JMP 16(PC)							
+  unpack_experiment.go:7	0x100157a18		f0001b7b		ADRP 3600384(PC), R27						
+  unpack_experiment.go:7	0x100157a1c		f940fb63		MOVD 496(R27), R3						
+  unpack_experiment.go:7	0x100157a20		f0001b7b		ADRP 3600384(PC), R27						
+  unpack_experiment.go:7	0x100157a24		f940ff64		MOVD 504(R27), R4						
+  unpack_experiment.go:7	0x100157a28		aa1f03e0		MOVD ZR, R0							
+  unpack_experiment.go:7	0x100157a2c		aa1f03e1		MOVD ZR, R1							
+  unpack_experiment.go:7	0x100157a30		aa0103e2		MOVD R1, R2							
+  unpack_experiment.go:7	0x100157a34		f85f83fd		MOVD -8(RSP), R29						
+  unpack_experiment.go:7	0x100157a38		f84707fe		MOVD.P 112(RSP), R30						
+  unpack_experiment.go:7	0x100157a3c		d65f03c0		RET								
+  unpack_experiment.go:44	0x100157a40		cb090042		SUB R9, R2, R2							
+  unpack_experiment.go:44	0x100157a44		cb0203e8		NEG R2, R8							
+  unpack_experiment.go:44	0x100157a48		8a88fd28		AND R8->63, R9, R8						
+  unpack_experiment.go:44	0x100157a4c		cb090021		SUB R9, R1, R1							
+  unpack_experiment.go:44	0x100157a50		8b080000		ADD R8, R0, R0							
+  unpack_experiment.go:11	0x100157a54		b40009a1		CBZ R1, 77(PC)							
+  unpack_experiment.go:12	0x100157a58		39400008		MOVBU (R0), R8							
+  unpack_experiment.go:14	0x100157a5c		aa0803e9		MOVD R8, R9							
+  unpack_experiment.go:14	0x100157a60		350003c9		CBNZW R9, 30(PC)						
+  unpack_experiment.go:15	0x100157a64		f100083f		CMP $2, R1							
+  unpack_experiment.go:15	0x100157a68		5400032b		BLT 25(PC)							
+  unpack_experiment.go:15	0x100157a6c		39400408		MOVBU 1(R0), R8							
+  unpack_experiment.go:15	0x100157a70		35000288		CBNZW R8, 20(PC)						
+  unpack_experiment.go:16	0x100157a74		cb070068		SUB R7, R3, R8							
+  unpack_experiment.go:16	0x100157a78		937ffd09		ASR $63, R8, R9							
+  unpack_experiment.go:16	0x100157a7c		8b49f508		ADD R9>>61, R8, R8						
+  unpack_experiment.go:16	0x100157a80		9343fd09		ASR $3, R8, R9							
+  unpack_experiment.go:17	0x100157a84		f100093f		CMP $2, R9							
+  unpack_experiment.go:17	0x100157a88		5400058b		BLT 44(PC)							
+  unpack_experiment.go:21	0x100157a8c		9100052a		ADD $1, R9, R10							
+  unpack_experiment.go:21	0x100157a90		eb0a003f		CMP R10, R1							
+  unpack_experiment.go:21	0x100157a94		9a89d429		CSINC LE, R1, R9, R9						
+  unpack_experiment.go:22	0x100157a98		eb09005f		CMP R9, R2							
+  unpack_experiment.go:21	0x100157a9c		54002883		BCC 324(PC)							
+  unpack_experiment.go:22	0x100157aa0		d100084a		SUB $2, R2, R10							
+  unpack_experiment.go:22	0x100157aa4		cb0a03ea		NEG R10, R10							
+  unpack_experiment.go:22	0x100157aa8		937ffd4a		ASR $63, R10, R10						
+  unpack_experiment.go:22	0x100157aac		927f014a		AND $2, R10, R10						
+  unpack_experiment.go:22	0x100157ab0		8b0a000a		ADD R10, R0, R10						
+  unpack_experiment.go:22	0x100157ab4		d100092b		SUB $2, R9, R11							
+  unpack_experiment.go:22	0x100157ab8		aa1f03ec		MOVD ZR, R12							
+  pack.go:174			0x100157abc		1400010e		JMP 270(PC)							
+  pack.go:174			0x100157ac0		b24003e8		ORR $1, ZR, R8							
+  pack.go:174			0x100157ac4		b27d03e9		ORR $8, ZR, R9							
+  unpack_experiment.go:15	0x100157ac8		14000106		JMP 262(PC)							
+  unpack_experiment.go:15	0x100157acc		b24003e8		ORR $1, ZR, R8							
+  unpack_experiment.go:15	0x100157ad0		b27d03e9		ORR $8, ZR, R9							
+  unpack_experiment.go:15	0x100157ad4		14000103		JMP 259(PC)							
+  unpack_experiment.go:28	0x100157ad8		7103fd3f		CMPW $255, R9							
+  unpack_experiment.go:28	0x100157adc		54000101		BNE 8(PC)							
+  unpack_experiment.go:29	0x100157ae0		f100083f		CMP $2, R1							
+  unpack_experiment.go:29	0x100157ae4		540003eb		BLT 31(PC)							
+  unpack_experiment.go:32	0x100157ae8		39400408		MOVBU 1(R0), R8							
+  unpack_experiment.go:32	0x100157aec		91000508		ADD $1, R8, R8							
+  unpack_experiment.go:32	0x100157af0		d37df108		LSL $3, R8, R8							
+  unpack_experiment.go:33	0x100157af4		91000909		ADD $2, R8, R9							
+  unpack_experiment.go:33	0x100157af8		14000007		JMP 7(PC)							
+  bits.go:126			0x100157afc		aa0803ea		MOVD R8, R10							
+  bits.go:126			0x100157b00		b000070b		ADRP 921600(PC), R11						
+  bits.go:126			0x100157b04		913db16b		ADD $3948, R11, R11						
+  bits.go:126			0x100157b08		386a696a		MOVBU (R11)(R10), R10						
+  unpack_experiment.go:35	0x100157b0c		91000549		ADD $1, R10, R9							
+  unpack_experiment.go:35	0x100157b10		b27d03e8		ORR $8, ZR, R8							
+  unpack_experiment.go:37	0x100157b14		eb01013f		CMP R1, R9							
+  unpack_experiment.go:37	0x100157b18		54001ccc		BGT 230(PC)							
+  unpack_experiment.go:40	0x100157b1c		cb07006a		SUB R7, R3, R10							
+  unpack_experiment.go:40	0x100157b20		eb0a011f		CMP R10, R8							
+  unpack_experiment.go:40	0x100157b24		54001b2c		BGT 217(PC)							
+  unpack_experiment.go:43	0x100157b28		8b0800e7		ADD R8, R7, R7							
+  unpack_experiment.go:37	0x100157b2c		eb01013f		CMP R1, R9							
+  unpack_experiment.go:44	0x100157b30		54fff889		BLS -60(PC)							
+  unpack_experiment.go:44	0x100157b34		140000e9		JMP 233(PC)							
+  unpack_experiment.go:18	0x100157b38		f0001b7b		ADRP 3600384(PC), R27						
+  unpack_experiment.go:18	0x100157b3c		f940f363		MOVD 480(R27), R3						
+  unpack_experiment.go:18	0x100157b40		f0001b7b		ADRP 3600384(PC), R27						
+  unpack_experiment.go:18	0x100157b44		f940f764		MOVD 488(R27), R4						
+  unpack_experiment.go:18	0x100157b48		aa1f03e0		MOVD ZR, R0							
+  unpack_experiment.go:18	0x100157b4c		aa1f03e1		MOVD ZR, R1							
+  unpack_experiment.go:18	0x100157b50		aa0103e2		MOVD R1, R2							
+  unpack_experiment.go:18	0x100157b54		f85f83fd		MOVD -8(RSP), R29						
+  unpack_experiment.go:18	0x100157b58		f84707fe		MOVD.P 112(RSP), R30						
+  unpack_experiment.go:18	0x100157b5c		d65f03c0		RET								
+  unpack_experiment.go:30	0x100157b60		f0001b7b		ADRP 3600384(PC), R27						
+  unpack_experiment.go:30	0x100157b64		f9412b63		MOVD 592(R27), R3						
+  unpack_experiment.go:30	0x100157b68		f0001b7b		ADRP 3600384(PC), R27						
+  unpack_experiment.go:30	0x100157b6c		f9412f64		MOVD 600(R27), R4						
+  unpack_experiment.go:30	0x100157b70		aa1f03e0		MOVD ZR, R0							
+  unpack_experiment.go:30	0x100157b74		aa1f03e1		MOVD ZR, R1							
+  unpack_experiment.go:30	0x100157b78		aa0103e2		MOVD R1, R2							
+  unpack_experiment.go:30	0x100157b7c		f85f83fd		MOVD -8(RSP), R29						
+  unpack_experiment.go:30	0x100157b80		f84707fe		MOVD.P 112(RSP), R30						
+  unpack_experiment.go:30	0x100157b84		d65f03c0		RET								
+  unpack_experiment.go:6	0x100157b88		f9002be4		MOVD R4, 80(RSP)						
+  unpack_experiment.go:6	0x100157b8c		f90033e6		MOVD R6, 96(RSP)						
+  unpack_experiment.go:6	0x100157b90		f90027e5		MOVD R5, 72(RSP)						
+  unpack_experiment.go:40	0x100157b94		f90013e7		MOVD R7, 32(RSP)						
+  unpack_experiment.go:46	0x100157b98		90000aa0		ADRP 1392640(PC), R0						
+  unpack_experiment.go:46	0x100157b9c		91388000		ADD $3616, R0, R0						
+  unpack_experiment.go:46	0x100157ba0		aa0703e1		MOVD R7, R1							
+  unpack_experiment.go:46	0x100157ba4		aa0103e2		MOVD R1, R2							
+  unpack_experiment.go:46	0x100157ba8		97fc6a6a		CALL runtime.makeslice(SB)					
+  unpack_experiment.go:46	0x100157bac		f9002fe0		MOVD R0, 88(RSP)						
+  unpack_experiment.go:48	0x100157bb0		f94013e2		MOVD 32(RSP), R2						
+  unpack_experiment.go:48	0x100157bb4		f94033e3		MOVD 96(RSP), R3						
+  unpack_experiment.go:48	0x100157bb8		f94027e4		MOVD 72(RSP), R4						
+  unpack_experiment.go:48	0x100157bbc		f9402be5		MOVD 80(RSP), R5						
+  unpack_experiment.go:48	0x100157bc0		aa1f03e1		MOVD ZR, R1							
+  unpack_experiment.go:48	0x100157bc4		14000004		JMP 4(PC)							
+  unpack_experiment.go:48	0x100157bc8		aa0603e4		MOVD R6, R4							
+  unpack_experiment.go:48	0x100157bcc		aa0803e3		MOVD R8, R3							
+  unpack_experiment.go:72	0x100157bd0		aa0703e1		MOVD R7, R1							
+  unpack_experiment.go:48	0x100157bd4		b4000ae5		CBZ R5, 87(PC)							
+  unpack_experiment.go:49	0x100157bd8		39400066		MOVBU (R3), R6							
+  unpack_experiment.go:50	0x100157bdc		aa0603e7		MOVD R6, R7							
+  unpack_experiment.go:50	0x100157be0		350001e7		CBNZW R7, 15(PC)						
+  unpack_experiment.go:52	0x100157be4		f10008bf		CMP $2, R5							
+  unpack_experiment.go:52	0x100157be8		5400016b		BLT 11(PC)							
+  unpack_experiment.go:52	0x100157bec		39400466		MOVBU 1(R3), R6							
+  unpack_experiment.go:52	0x100157bf0		35000126		CBNZW R6, 9(PC)							
+  unpack_experiment.go:53	0x100157bf4		d1000886		SUB $2, R4, R6							
+  unpack_experiment.go:53	0x100157bf8		cb0603e6		NEG R6, R6							
+  unpack_experiment.go:53	0x100157bfc		937ffcc6		ASR $63, R6, R6							
+  unpack_experiment.go:53	0x100157c00		927f00c6		AND $2, R6, R6							
+  unpack_experiment.go:53	0x100157c04		8b060066		ADD R6, R3, R6							
+  unpack_experiment.go:53	0x100157c08		d10008a7		SUB $2, R5, R7							
+  unpack_experiment.go:53	0x100157c0c		aa1f03e8		MOVD ZR, R8							
+  pack.go:174			0x100157c10		1400007f		JMP 127(PC)							
+  pack.go:174			0x100157c14		b24003e6		ORR $1, ZR, R6							
+  unpack_experiment.go:52	0x100157c18		1400006f		JMP 111(PC)							
+  unpack_experiment.go:60	0x100157c1c		d1000488		SUB $1, R4, R8							
+  unpack_experiment.go:60	0x100157c20		cb0803e9		NEG R8, R9							
+  unpack_experiment.go:60	0x100157c24		937ffd29		ASR $63, R9, R9							
+  unpack_experiment.go:60	0x100157c28		92400129		AND $1, R9, R9							
+  unpack_experiment.go:60	0x100157c2c		8b03012a		ADD R3, R9, R10							
+  unpack_experiment.go:60	0x100157c30		d10004ab		SUB $1, R5, R11							
+  unpack_experiment.go:61	0x100157c34		7103fcff		CMPW $255, R7							
+  unpack_experiment.go:61	0x100157c38		54000661		BNE 51(PC)							
+  unpack_experiment.go:62	0x100157c3c		f100017f		CMP $0, R11							
+  unpack_experiment.go:62	0x100157c40		54000c49		BLS 98(PC)							
+  unpack_experiment.go:62	0x100157c44		38696866		MOVBU (R3)(R9), R6						
+  unpack_experiment.go:63	0x100157c48		eb02003f		CMP R2, R1							
+  unpack_experiment.go:63	0x100157c4c		54000b88		BHI 92(PC)							
+  unpack_experiment.go:62	0x100157c50		910004c6		ADD $1, R6, R6							
+  unpack_experiment.go:62	0x100157c54		d37df0c7		LSL $3, R6, R7							
+  unpack_experiment.go:63	0x100157c58		cb010049		SUB R1, R2, R9							
+  unpack_experiment.go:63	0x100157c5c		cb0903ec		NEG R9, R12							
+  unpack_experiment.go:63	0x100157c60		8a8cfc2c		AND R12->63, R1, R12						
+  unpack_experiment.go:63	0x100157c64		910004ed		ADD $1, R7, R13							
+  unpack_experiment.go:63	0x100157c68		8b0c000c		ADD R12, R0, R12						
+  unpack_experiment.go:63	0x100157c6c		eb0d011f		CMP R13, R8							
+  unpack_experiment.go:63	0x100157c70		54000a03		BCC 80(PC)							
+  unpack_experiment.go:63	0x100157c74		91000548		ADD $1, R10, R8							
+  unpack_experiment.go:63	0x100157c78		eb060d3f		CMP R6<<3, R9							
+  unpack_experiment.go:63	0x100157c7c		9a89c0e7		CSEL GT, R7, R9, R7						
+  unpack_experiment.go:63	0x100157c80		eb0c011f		CMP R12, R8							
+  unpack_experiment.go:63	0x100157c84		540002a0		BEQ 21(PC)							
+  unpack_experiment.go:48	0x100157c88		f9002be4		MOVD R4, 80(RSP)						
+  unpack_experiment.go:48	0x100157c8c		f90027e5		MOVD R5, 72(RSP)						
+  unpack_experiment.go:60	0x100157c90		f90023eb		MOVD R11, 64(RSP)						
+  unpack_experiment.go:60	0x100157c94		f90033ea		MOVD R10, 96(RSP)						
+  unpack_experiment.go:62	0x100157c98		f9001fe6		MOVD R6, 56(RSP)						
+  unpack_experiment.go:63	0x100157c9c		f9001bed		MOVD R13, 48(RSP)						
+  unpack_experiment.go:72	0x100157ca0		f90017e1		MOVD R1, 40(RSP)						
+  unpack_experiment.go:63	0x100157ca4		aa0c03e0		MOVD R12, R0							
+  unpack_experiment.go:63	0x100157ca8		aa0803e1		MOVD R8, R1							
+  unpack_experiment.go:63	0x100157cac		aa0703e2		MOVD R7, R2							
+  unpack_experiment.go:63	0x100157cb0		97fc8398		CALL runtime.memmove(SB)					
+  unpack_experiment.go:63	0x100157cb4		f9402fe0		MOVD 88(RSP), R0						
+  unpack_experiment.go:64	0x100157cb8		f94017e1		MOVD 40(RSP), R1						
+  unpack_experiment.go:63	0x100157cbc		f94013e2		MOVD 32(RSP), R2						
+  unpack_experiment.go:65	0x100157cc0		f9402be4		MOVD 80(RSP), R4						
+  unpack_experiment.go:65	0x100157cc4		f94027e5		MOVD 72(RSP), R5						
+  unpack_experiment.go:64	0x100157cc8		f9401fe6		MOVD 56(RSP), R6						
+  unpack_experiment.go:65	0x100157ccc		f94033ea		MOVD 96(RSP), R10						
+  unpack_experiment.go:65	0x100157cd0		f94023eb		MOVD 64(RSP), R11						
+  unpack_experiment.go:65	0x100157cd4		f9401bed		MOVD 48(RSP), R13						
+  unpack_experiment.go:64	0x100157cd8		8b060c27		ADD R6<<3, R1, R7						
+  unpack_experiment.go:65	0x100157cdc		eb0d017f		CMP R13, R11							
+  unpack_experiment.go:65	0x100157ce0		54000623		BCC 49(PC)							
+  unpack_experiment.go:65	0x100157ce4		cb060c88		SUB R6<<3, R4, R8						
+  unpack_experiment.go:65	0x100157ce8		cb060ca5		SUB R6<<3, R5, R5						
+  unpack_experiment.go:65	0x100157cec		d1000906		SUB $2, R8, R6							
+  unpack_experiment.go:65	0x100157cf0		cb0603e8		NEG R6, R8							
+  unpack_experiment.go:65	0x100157cf4		8a88fda8		AND R8->63, R13, R8						
+  unpack_experiment.go:65	0x100157cf8		8b0a0108		ADD R10, R8, R8							
+  unpack_experiment.go:65	0x100157cfc		d10008a5		SUB $2, R5, R5							
+  unpack_experiment.go:66	0x100157d00		17ffffb2		JMP -78(PC)							
+  unpack_experiment.go:66	0x100157d04		aa1f03e3		MOVD ZR, R3							
+  unpack_experiment.go:70	0x100157d08		14000011		JMP 17(PC)							
+  unpack_experiment.go:79	0x100157d0c		cb0300a9		SUB R3, R5, R9							
+  unpack_experiment.go:79	0x100157d10		cb03008b		SUB R3, R4, R11							
+  unpack_experiment.go:79	0x100157d14		d1000966		SUB $2, R11, R6							
+  unpack_experiment.go:79	0x100157d18		cb0603eb		NEG R6, R11							
+  unpack_experiment.go:79	0x100157d1c		8a8bfceb		AND R11->63, R7, R11						
+  unpack_experiment.go:79	0x100157d20		8b0a0168		ADD R10, R11, R8						
+  unpack_experiment.go:79	0x100157d24		d1000925		SUB $2, R9, R5							
+  unpack_experiment.go:80	0x100157d28		91002027		ADD $8, R1, R7							
+  unpack_experiment.go:80	0x100157d2c		17ffffa7		JMP -89(PC)							
+  unpack_experiment.go:82	0x100157d30		aa0203e1		MOVD R2, R1							
+  unpack_experiment.go:82	0x100157d34		aa1f03e3		MOVD ZR, R3							
+  unpack_experiment.go:82	0x100157d38		aa1f03e4		MOVD ZR, R4							
+  unpack_experiment.go:82	0x100157d3c		f85f83fd		MOVD -8(RSP), R29						
+  unpack_experiment.go:82	0x100157d40		f84707fe		MOVD.P 112(RSP), R30						
+  unpack_experiment.go:82	0x100157d44		d65f03c0		RET								
+  unpack_experiment.go:72	0x100157d48		aa0703e3		MOVD R7, R3							
+  unpack_experiment.go:71	0x100157d4c		b27800c7		ORR $256, R6, R7						
+  unpack_experiment.go:71	0x100157d50		5ac000e7		RBITW R7, R7							
+  unpack_experiment.go:71	0x100157d54		5ac010e7		CLZW R7, R7							
+  unpack_experiment.go:72	0x100157d58		8b0100e7		ADD R1, R7, R7							
+  unpack_experiment.go:72	0x100157d5c		eb0b007f		CMP R11, R3							
+  unpack_experiment.go:72	0x100157d60		540001c2		BCS 14(PC)							
+  unpack_experiment.go:72	0x100157d64		38636948		MOVBU (R10)(R3), R8						
+  unpack_experiment.go:72	0x100157d68		eb07005f		CMP R7, R2							
+  unpack_experiment.go:72	0x100157d6c		54000109		BLS 8(PC)							
+  unpack_experiment.go:72	0x100157d70		38276808		MOVB R8, (R0)(R7)						
+  unpack_experiment.go:74	0x100157d74		d10004c7		SUB $1, R6, R7							
+  unpack_experiment.go:74	0x100157d78		8a0700c6		AND R7, R6, R6							
+  unpack_experiment.go:73	0x100157d7c		91000467		ADD $1, R3, R7							
+  unpack_experiment.go:75	0x100157d80		d3401cc8		UBFX $0, R6, $8, R8						
+  unpack_experiment.go:75	0x100157d84		35fffe28		CBNZW R8, -15(PC)						
+  unpack_experiment.go:75	0x100157d88		17ffffe1		JMP -31(PC)							
+  unpack_experiment.go:72	0x100157d8c		aa0703e0		MOVD R7, R0							
+  unpack_experiment.go:72	0x100157d90		aa0203e1		MOVD R2, R1							
+  unpack_experiment.go:72	0x100157d94		97fc81f3		CALL runtime.panicIndex(SB)					
+  unpack_experiment.go:72	0x100157d98		aa0303e0		MOVD R3, R0							
+  unpack_experiment.go:72	0x100157d9c		aa0b03e1		MOVD R11, R1							
+  unpack_experiment.go:72	0x100157da0		97fc81f0		CALL runtime.panicIndex(SB)					
+  unpack_experiment.go:65	0x100157da4		aa0d03e0		MOVD R13, R0							
+  unpack_experiment.go:65	0x100157da8		aa0b03e1		MOVD R11, R1							
+  unpack_experiment.go:65	0x100157dac		97fc8205		CALL runtime.panicSliceB(SB)					
+  unpack_experiment.go:63	0x100157db0		aa0d03e1		MOVD R13, R1							
+  unpack_experiment.go:63	0x100157db4		aa0803e2		MOVD R8, R2							
+  unpack_experiment.go:63	0x100157db8		97fc81fa		CALL runtime.panicSliceAcap(SB)					
+  unpack_experiment.go:63	0x100157dbc		aa0103e0		MOVD R1, R0							
+  unpack_experiment.go:63	0x100157dc0		aa0203e1		MOVD R2, R1							
+  unpack_experiment.go:63	0x100157dc4		97fc81ff		CALL runtime.panicSliceB(SB)					
+  unpack_experiment.go:62	0x100157dc8		aa1f03e0		MOVD ZR, R0							
+  unpack_experiment.go:62	0x100157dcc		aa0003e1		MOVD R0, R1							
+  unpack_experiment.go:62	0x100157dd0		97fc81e4		CALL runtime.panicIndex(SB)					
+  unpack_experiment.go:56	0x100157dd4		8b060c27		ADD R6<<3, R1, R7						
+  unpack_experiment.go:57	0x100157dd8		eb0500df		CMP R5, R6							
+  unpack_experiment.go:57	0x100157ddc		54000108		BHI 8(PC)							
+  unpack_experiment.go:57	0x100157de0		cb060089		SUB R6, R4, R9							
+  unpack_experiment.go:57	0x100157de4		cb0903ea		NEG R9, R10							
+  unpack_experiment.go:57	0x100157de8		8a8afcca		AND R10->63, R6, R10						
+  unpack_experiment.go:57	0x100157dec		cb0600a5		SUB R6, R5, R5							
+  unpack_experiment.go:57	0x100157df0		8b0a0068		ADD R10, R3, R8							
+  unpack_experiment.go:48	0x100157df4		aa0903e6		MOVD R9, R6							
+  unpack_experiment.go:58	0x100157df8		17ffff74		JMP -140(PC)							
+  unpack_experiment.go:57	0x100157dfc		aa0603e0		MOVD R6, R0							
+  unpack_experiment.go:57	0x100157e00		aa0503e1		MOVD R5, R1							
+  unpack_experiment.go:57	0x100157e04		97fc81ef		CALL runtime.panicSliceB(SB)					
+  pack.go:179			0x100157e08		91002108		ADD $8, R8, R8							
+  pack.go:174			0x100157e0c		cb0800a9		SUB R8, R5, R9							
+  pack.go:174			0x100157e10		d1000929		SUB $2, R9, R9							
+  pack.go:174			0x100157e14		f100213f		CMP $8, R9							
+  pack.go:174			0x100157e18		540001eb		BLT 15(PC)							
+  pack.go:175			0x100157e1c		eb07011f		CMP R7, R8							
+  pack.go:175			0x100157e20		540002e8		BHI 23(PC)							
+  pack.go:175			0x100157e24		cb080089		SUB R8, R4, R9							
+  pack.go:175			0x100157e28		d1000929		SUB $2, R9, R9							
+  pack.go:175			0x100157e2c		cb0903e9		NEG R9, R9							
+  pack.go:175			0x100157e30		8a89fd09		AND R9->63, R8, R9						
+  binary.go:117			0x100157e34		f86968c9		MOVD (R6)(R9), R9						
+  pack.go:176			0x100157e38		b4fffe89		CBZ R9, -12(PC)							
+  pack.go:177			0x100157e3c		dac00126		RBIT R9, R6							
+  pack.go:177			0x100157e40		dac010c6		CLZ R6, R6							
+  pack.go:177			0x100157e44		8b460d06		ADD R6>>3, R8, R6						
+  unpack_experiment.go:53	0x100157e48		aa0603e8		MOVD R6, R8							
+  unpack_experiment.go:53	0x100157e4c		14000007		JMP 7(PC)							
+  pack.go:182			0x100157e50		91000508		ADD $1, R8, R8							
+  pack.go:181			0x100157e54		eb07011f		CMP R7, R8							
+  pack.go:181			0x100157e58		5400008a		BGE 4(PC)							
+  pack.go:181			0x100157e5c		540000a2		BCS 5(PC)							
+  pack.go:181			0x100157e60		386868c9		MOVBU (R6)(R8), R9						
+  pack.go:181			0x100157e64		34ffff69		CBZW R9, -5(PC)							
+  unpack_experiment.go:53	0x100157e68		91000906		ADD $2, R8, R6							
+  unpack_experiment.go:53	0x100157e6c		17ffffda		JMP -38(PC)							
+  pack.go:181			0x100157e70		aa0803e0		MOVD R8, R0							
+  pack.go:181			0x100157e74		aa0703e1		MOVD R7, R1							
+  pack.go:181			0x100157e78		97fc81ba		CALL runtime.panicIndex(SB)					
+  pack.go:175			0x100157e7c		aa0803e0		MOVD R8, R0							
+  pack.go:175			0x100157e80		aa0703e1		MOVD R7, R1							
+  pack.go:175			0x100157e84		97fc81cf		CALL runtime.panicSliceB(SB)					
+  unpack_experiment.go:41	0x100157e88		f0001b7b		ADRP 3600384(PC), R27						
+  unpack_experiment.go:41	0x100157e8c		f940f363		MOVD 480(R27), R3						
+  unpack_experiment.go:41	0x100157e90		f0001b7b		ADRP 3600384(PC), R27						
+  unpack_experiment.go:41	0x100157e94		f940f764		MOVD 488(R27), R4						
+  unpack_experiment.go:41	0x100157e98		aa1f03e0		MOVD ZR, R0							
+  unpack_experiment.go:41	0x100157e9c		aa1f03e1		MOVD ZR, R1							
+  unpack_experiment.go:41	0x100157ea0		aa0103e2		MOVD R1, R2							
+  unpack_experiment.go:41	0x100157ea4		f85f83fd		MOVD -8(RSP), R29						
+  unpack_experiment.go:41	0x100157ea8		f84707fe		MOVD.P 112(RSP), R30						
+  unpack_experiment.go:41	0x100157eac		d65f03c0		RET								
+  unpack_experiment.go:38	0x100157eb0		f0001b7b		ADRP 3600384(PC), R27						
+  unpack_experiment.go:38	0x100157eb4		f9412b63		MOVD 592(R27), R3						
+  unpack_experiment.go:38	0x100157eb8		f0001b7b		ADRP 3600384(PC), R27						
+  unpack_experiment.go:38	0x100157ebc		f9412f64		MOVD 600(R27), R4						
+  unpack_experiment.go:38	0x100157ec0		aa1f03e0		MOVD ZR, R0							
+  unpack_experiment.go:38	0x100157ec4		aa1f03e1		MOVD ZR, R1							
+  unpack_experiment.go:38	0x100157ec8		aa0103e2		MOVD R1, R2							
+  unpack_experiment.go:38	0x100157ecc		f85f83fd		MOVD -8(RSP), R29						
+  unpack_experiment.go:38	0x100157ed0		f84707fe		MOVD.P 112(RSP), R30						
+  unpack_experiment.go:38	0x100157ed4		d65f03c0		RET								
+  unpack_experiment.go:44	0x100157ed8		aa0903e0		MOVD R9, R0							
+  unpack_experiment.go:44	0x100157edc		97fc81b9		CALL runtime.panicSliceB(SB)					
+  unpack_experiment.go:37	0x100157ee0		aa0903ea		MOVD R9, R10							
+  unpack_experiment.go:37	0x100157ee4		aa0803e9		MOVD R8, R9							
+  unpack_experiment.go:40	0x100157ee8		aa0a03e8		MOVD R10, R8							
+  unpack_experiment.go:40	0x100157eec		17ffff0a		JMP -246(PC)							
+  pack.go:179			0x100157ef0		9100218c		ADD $8, R12, R12						
+  pack.go:174			0x100157ef4		cb0c012d		SUB R12, R9, R13						
+  pack.go:174			0x100157ef8		d10009ad		SUB $2, R13, R13						
+  pack.go:174			0x100157efc		f10021bf		CMP $8, R13							
+  pack.go:174			0x100157f00		540001eb		BLT 15(PC)							
+  pack.go:175			0x100157f04		eb0b019f		CMP R11, R12							
+  pack.go:175			0x100157f08		540004c8		BHI 38(PC)							
+  pack.go:175			0x100157f0c		cb0c004d		SUB R12, R2, R13						
+  pack.go:175			0x100157f10		d10009ad		SUB $2, R13, R13						
+  pack.go:175			0x100157f14		cb0d03ed		NEG R13, R13							
+  pack.go:175			0x100157f18		8a8dfd8d		AND R13->63, R12, R13						
+  binary.go:117			0x100157f1c		f86d694d		MOVD (R10)(R13), R13						
+  pack.go:176			0x100157f20		b4fffe8d		CBZ R13, -12(PC)						
+  pack.go:177			0x100157f24		dac001a9		RBIT R13, R9							
+  pack.go:177			0x100157f28		dac01129		CLZ R9, R9							
+  pack.go:177			0x100157f2c		8b490d89		ADD R9>>3, R12, R9						
+  unpack_experiment.go:22	0x100157f30		aa0903ec		MOVD R9, R12							
+  unpack_experiment.go:22	0x100157f34		14000007		JMP 7(PC)							
+  pack.go:182			0x100157f38		9100058c		ADD $1, R12, R12						
+  pack.go:181			0x100157f3c		eb0b019f		CMP R11, R12							
+  pack.go:181			0x100157f40		5400008a		BGE 4(PC)							
+  pack.go:181			0x100157f44		54000282		BCS 20(PC)							
+  pack.go:181			0x100157f48		386c6949		MOVBU (R10)(R12), R9						
+  pack.go:181			0x100157f4c		34ffff69		CBZW R9, -5(PC)							
+  unpack_experiment.go:22	0x100157f50		91000989		ADD $2, R12, R9							
+  unpack_experiment.go:23	0x100157f54		eb880d3f		CMP R8->3, R9							
+  unpack_experiment.go:23	0x100157f58		540000ac		BGT 5(PC)							
+  unpack_experiment.go:26	0x100157f5c		d37df12a		LSL $3, R9, R10							
+  unpack_experiment.go:37	0x100157f60		aa0903e8		MOVD R9, R8							
+  unpack_experiment.go:40	0x100157f64		aa0a03e9		MOVD R10, R9							
+  unpack_experiment.go:26	0x100157f68		17ffffde		JMP -34(PC)							
+  unpack_experiment.go:24	0x100157f6c		f0001b7b		ADRP 3600384(PC), R27						
+  unpack_experiment.go:24	0x100157f70		f940f363		MOVD 480(R27), R3						
+  unpack_experiment.go:24	0x100157f74		f0001b7b		ADRP 3600384(PC), R27						
+  unpack_experiment.go:24	0x100157f78		f940f764		MOVD 488(R27), R4						
+  unpack_experiment.go:24	0x100157f7c		aa1f03e0		MOVD ZR, R0							
+  unpack_experiment.go:24	0x100157f80		aa1f03e1		MOVD ZR, R1							
+  unpack_experiment.go:24	0x100157f84		aa0103e2		MOVD R1, R2							
+  unpack_experiment.go:24	0x100157f88		f85f83fd		MOVD -8(RSP), R29						
+  unpack_experiment.go:24	0x100157f8c		f84707fe		MOVD.P 112(RSP), R30						
+  unpack_experiment.go:24	0x100157f90		d65f03c0		RET								
+  pack.go:181			0x100157f94		aa0c03e0		MOVD R12, R0							
+  pack.go:181			0x100157f98		aa0b03e1		MOVD R11, R1							
+  pack.go:181			0x100157f9c		97fc8171		CALL runtime.panicIndex(SB)					
+  pack.go:175			0x100157fa0		aa0c03e0		MOVD R12, R0							
+  pack.go:175			0x100157fa4		aa0b03e1		MOVD R11, R1							
+  pack.go:175			0x100157fa8		97fc8186		CALL runtime.panicSliceB(SB)					
+  unpack_experiment.go:22	0x100157fac		aa0903e1		MOVD R9, R1							
+  unpack_experiment.go:22	0x100157fb0		97fc817c		CALL runtime.panicSliceAcap(SB)					
+  unpack_experiment.go:22	0x100157fb4		d503201f		NOOP								
+  unpack_experiment.go:5	0x100157fb8		a90087e0		STP (R0, R1), 8(RSP)						
+  unpack_experiment.go:5	0x100157fbc		a9018fe2		STP (R2, R3), 24(RSP)						
+  unpack_experiment.go:5	0x100157fc0		aa1e03e3		MOVD R30, R3							
+  unpack_experiment.go:5	0x100157fc4		97fc780f		CALL runtime.morestack_noctxt.abi0(SB)				
+  unpack_experiment.go:5	0x100157fc8		a94087e0		LDP 8(RSP), (R0, R1)						
+  unpack_experiment.go:5	0x100157fcc		a9418fe2		LDP 24(RSP), (R2, R3)						
+  unpack_experiment.go:5	0x100157fd0		17fffe84		JMP github.com/cnooljaw/gosproto.ExperimentUnpackClone(SB)	
+  unpack_experiment.go:5	0x100157fd4		00000000		?								
+  unpack_experiment.go:5	0x100157fd8		00000000		?								
+  unpack_experiment.go:5	0x100157fdc		00000000		?								
+
+TEXT github.com/cnooljaw/gosproto.ExperimentUnpackCandidate(SB) /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/gosproto/unpack_experiment.go
+  unpack_experiment.go:85	0x100157fe0		f9400b90		MOVD 16(R28), R16						
+  unpack_experiment.go:85	0x100157fe4		eb3063ff		CMP R16, RSP							
+  unpack_experiment.go:85	0x100157fe8		54002f49		BLS 378(PC)							
+  unpack_experiment.go:85	0x100157fec		f8190ffe		MOVD.W R30, -112(RSP)						
+  unpack_experiment.go:85	0x100157ff0		f81f83fd		MOVD R29, -8(RSP)						
+  unpack_experiment.go:85	0x100157ff4		d10023fd		SUB $8, RSP, R29						
+  unpack_experiment.go:85	0x100157ff8		f9003fe0		MOVD R0, 120(RSP)						
+  unpack_experiment.go:86	0x100157ffc		f100007f		CMP $0, R3							
+  unpack_experiment.go:86	0x100158000		540000cd		BLE 6(PC)							
+  unpack_experiment.go:86	0x100158004		aa0103e4		MOVD R1, R4							
+  unpack_experiment.go:86	0x100158008		aa0203e5		MOVD R2, R5							
+  unpack_experiment.go:86	0x10015800c		aa0003e6		MOVD R0, R6							
+  unpack_experiment.go:86	0x100158010		aa1f03e7		MOVD ZR, R7							
+  unpack_experiment.go:91	0x100158014		14000010		JMP 16(PC)							
+  unpack_experiment.go:87	0x100158018		d0001b7b		ADRP 3596288(PC), R27						
+  unpack_experiment.go:87	0x10015801c		f940fb63		MOVD 496(R27), R3						
+  unpack_experiment.go:87	0x100158020		d0001b7b		ADRP 3596288(PC), R27						
+  unpack_experiment.go:87	0x100158024		f940ff64		MOVD 504(R27), R4						
+  unpack_experiment.go:87	0x100158028		aa1f03e0		MOVD ZR, R0							
+  unpack_experiment.go:87	0x10015802c		aa1f03e1		MOVD ZR, R1							
+  unpack_experiment.go:87	0x100158030		aa0103e2		MOVD R1, R2							
+  unpack_experiment.go:87	0x100158034		f85f83fd		MOVD -8(RSP), R29						
+  unpack_experiment.go:87	0x100158038		f84707fe		MOVD.P 112(RSP), R30						
+  unpack_experiment.go:87	0x10015803c		d65f03c0		RET								
+  unpack_experiment.go:124	0x100158040		cb090042		SUB R9, R2, R2							
+  unpack_experiment.go:124	0x100158044		cb0203e8		NEG R2, R8							
+  unpack_experiment.go:124	0x100158048		8a88fd28		AND R8->63, R9, R8						
+  unpack_experiment.go:124	0x10015804c		cb090021		SUB R9, R1, R1							
+  unpack_experiment.go:124	0x100158050		8b080000		ADD R8, R0, R0							
+  unpack_experiment.go:91	0x100158054		b40009a1		CBZ R1, 77(PC)							
+  unpack_experiment.go:92	0x100158058		39400008		MOVBU (R0), R8							
+  unpack_experiment.go:94	0x10015805c		aa0803e9		MOVD R8, R9							
+  unpack_experiment.go:94	0x100158060		350003c9		CBNZW R9, 30(PC)						
+  unpack_experiment.go:95	0x100158064		f100083f		CMP $2, R1							
+  unpack_experiment.go:95	0x100158068		5400032b		BLT 25(PC)							
+  unpack_experiment.go:95	0x10015806c		39400408		MOVBU 1(R0), R8							
+  unpack_experiment.go:95	0x100158070		35000288		CBNZW R8, 20(PC)						
+  unpack_experiment.go:96	0x100158074		cb070068		SUB R7, R3, R8							
+  unpack_experiment.go:96	0x100158078		937ffd09		ASR $63, R8, R9							
+  unpack_experiment.go:96	0x10015807c		8b49f508		ADD R9>>61, R8, R8						
+  unpack_experiment.go:96	0x100158080		9343fd09		ASR $3, R8, R9							
+  unpack_experiment.go:97	0x100158084		f100093f		CMP $2, R9							
+  unpack_experiment.go:97	0x100158088		5400058b		BLT 44(PC)							
+  unpack_experiment.go:101	0x10015808c		9100052a		ADD $1, R9, R10							
+  unpack_experiment.go:101	0x100158090		eb0a003f		CMP R10, R1							
+  unpack_experiment.go:101	0x100158094		9a89d429		CSINC LE, R1, R9, R9						
+  unpack_experiment.go:102	0x100158098		eb09005f		CMP R9, R2							
+  unpack_experiment.go:101	0x10015809c		54002943		BCC 330(PC)							
+  unpack_experiment.go:102	0x1001580a0		d100084a		SUB $2, R2, R10							
+  unpack_experiment.go:102	0x1001580a4		cb0a03ea		NEG R10, R10							
+  unpack_experiment.go:102	0x1001580a8		937ffd4a		ASR $63, R10, R10						
+  unpack_experiment.go:102	0x1001580ac		927f014a		AND $2, R10, R10						
+  unpack_experiment.go:102	0x1001580b0		8b0a000a		ADD R10, R0, R10						
+  unpack_experiment.go:102	0x1001580b4		d100092b		SUB $2, R9, R11							
+  unpack_experiment.go:102	0x1001580b8		aa1f03ec		MOVD ZR, R12							
+  pack.go:174			0x1001580bc		14000114		JMP 276(PC)							
+  pack.go:174			0x1001580c0		b24003e8		ORR $1, ZR, R8							
+  pack.go:174			0x1001580c4		b27d03e9		ORR $8, ZR, R9							
+  unpack_experiment.go:95	0x1001580c8		1400010c		JMP 268(PC)							
+  unpack_experiment.go:95	0x1001580cc		b24003e8		ORR $1, ZR, R8							
+  unpack_experiment.go:95	0x1001580d0		b27d03e9		ORR $8, ZR, R9							
+  unpack_experiment.go:95	0x1001580d4		14000109		JMP 265(PC)							
+  unpack_experiment.go:108	0x1001580d8		7103fd3f		CMPW $255, R9							
+  unpack_experiment.go:108	0x1001580dc		54000101		BNE 8(PC)							
+  unpack_experiment.go:109	0x1001580e0		f100083f		CMP $2, R1							
+  unpack_experiment.go:109	0x1001580e4		540003eb		BLT 31(PC)							
+  unpack_experiment.go:112	0x1001580e8		39400408		MOVBU 1(R0), R8							
+  unpack_experiment.go:112	0x1001580ec		91000508		ADD $1, R8, R8							
+  unpack_experiment.go:112	0x1001580f0		d37df108		LSL $3, R8, R8							
+  unpack_experiment.go:113	0x1001580f4		91000909		ADD $2, R8, R9							
+  unpack_experiment.go:113	0x1001580f8		14000007		JMP 7(PC)							
+  bits.go:126			0x1001580fc		aa0803ea		MOVD R8, R10							
+  bits.go:126			0x100158100		9000070b		ADRP 917504(PC), R11						
+  bits.go:126			0x100158104		913db16b		ADD $3948, R11, R11						
+  bits.go:126			0x100158108		386a696a		MOVBU (R11)(R10), R10						
+  unpack_experiment.go:115	0x10015810c		91000549		ADD $1, R10, R9							
+  unpack_experiment.go:115	0x100158110		b27d03e8		ORR $8, ZR, R8							
+  unpack_experiment.go:117	0x100158114		eb01013f		CMP R1, R9							
+  unpack_experiment.go:117	0x100158118		54001d8c		BGT 236(PC)							
+  unpack_experiment.go:120	0x10015811c		cb07006a		SUB R7, R3, R10							
+  unpack_experiment.go:120	0x100158120		eb0a011f		CMP R10, R8							
+  unpack_experiment.go:120	0x100158124		54001bec		BGT 223(PC)							
+  unpack_experiment.go:123	0x100158128		8b0800e7		ADD R8, R7, R7							
+  unpack_experiment.go:117	0x10015812c		eb01013f		CMP R1, R9							
+  unpack_experiment.go:124	0x100158130		54fff889		BLS -60(PC)							
+  unpack_experiment.go:124	0x100158134		140000ef		JMP 239(PC)							
+  unpack_experiment.go:98	0x100158138		d0001b7b		ADRP 3596288(PC), R27						
+  unpack_experiment.go:98	0x10015813c		f940f363		MOVD 480(R27), R3						
+  unpack_experiment.go:98	0x100158140		d0001b7b		ADRP 3596288(PC), R27						
+  unpack_experiment.go:98	0x100158144		f940f764		MOVD 488(R27), R4						
+  unpack_experiment.go:98	0x100158148		aa1f03e0		MOVD ZR, R0							
+  unpack_experiment.go:98	0x10015814c		aa1f03e1		MOVD ZR, R1							
+  unpack_experiment.go:98	0x100158150		aa0103e2		MOVD R1, R2							
+  unpack_experiment.go:98	0x100158154		f85f83fd		MOVD -8(RSP), R29						
+  unpack_experiment.go:98	0x100158158		f84707fe		MOVD.P 112(RSP), R30						
+  unpack_experiment.go:98	0x10015815c		d65f03c0		RET								
+  unpack_experiment.go:110	0x100158160		d0001b7b		ADRP 3596288(PC), R27						
+  unpack_experiment.go:110	0x100158164		f9412b63		MOVD 592(R27), R3						
+  unpack_experiment.go:110	0x100158168		d0001b7b		ADRP 3596288(PC), R27						
+  unpack_experiment.go:110	0x10015816c		f9412f64		MOVD 600(R27), R4						
+  unpack_experiment.go:110	0x100158170		aa1f03e0		MOVD ZR, R0							
+  unpack_experiment.go:110	0x100158174		aa1f03e1		MOVD ZR, R1							
+  unpack_experiment.go:110	0x100158178		aa0103e2		MOVD R1, R2							
+  unpack_experiment.go:110	0x10015817c		f85f83fd		MOVD -8(RSP), R29						
+  unpack_experiment.go:110	0x100158180		f84707fe		MOVD.P 112(RSP), R30						
+  unpack_experiment.go:110	0x100158184		d65f03c0		RET								
+  unpack_experiment.go:86	0x100158188		f9002be5		MOVD R5, 80(RSP)						
+  unpack_experiment.go:86	0x10015818c		f90027e4		MOVD R4, 72(RSP)						
+  unpack_experiment.go:86	0x100158190		f90033e6		MOVD R6, 96(RSP)						
+  unpack_experiment.go:120	0x100158194		f90013e7		MOVD R7, 32(RSP)						
+  unpack_experiment.go:126	0x100158198		f0000a80		ADRP 1388544(PC), R0						
+  unpack_experiment.go:126	0x10015819c		91388000		ADD $3616, R0, R0						
+  unpack_experiment.go:126	0x1001581a0		aa0703e1		MOVD R7, R1							
+  unpack_experiment.go:126	0x1001581a4		aa0103e2		MOVD R1, R2							
+  unpack_experiment.go:126	0x1001581a8		97fc68ea		CALL runtime.makeslice(SB)					
+  unpack_experiment.go:126	0x1001581ac		f9002fe0		MOVD R0, 88(RSP)						
+  unpack_experiment.go:128	0x1001581b0		f94013e2		MOVD 32(RSP), R2						
+  unpack_experiment.go:128	0x1001581b4		f94033e3		MOVD 96(RSP), R3						
+  unpack_experiment.go:128	0x1001581b8		f9402be4		MOVD 80(RSP), R4						
+  unpack_experiment.go:128	0x1001581bc		f94027e5		MOVD 72(RSP), R5						
+  unpack_experiment.go:128	0x1001581c0		aa1f03e1		MOVD ZR, R1							
+  unpack_experiment.go:128	0x1001581c4		14000004		JMP 4(PC)							
+  unpack_experiment.go:128	0x1001581c8		aa0603e4		MOVD R6, R4							
+  unpack_experiment.go:128	0x1001581cc		aa0803e3		MOVD R8, R3							
+  unpack_experiment.go:143	0x1001581d0		aa0703e1		MOVD R7, R1							
+  unpack_experiment.go:128	0x1001581d4		b4000b85		CBZ R5, 92(PC)							
+  unpack_experiment.go:129	0x1001581d8		39400066		MOVBU (R3), R6							
+  unpack_experiment.go:130	0x1001581dc		aa0603e7		MOVD R6, R7							
+  unpack_experiment.go:130	0x1001581e0		350001e7		CBNZW R7, 15(PC)						
+  unpack_experiment.go:132	0x1001581e4		f10008bf		CMP $2, R5							
+  unpack_experiment.go:132	0x1001581e8		5400016b		BLT 11(PC)							
+  unpack_experiment.go:132	0x1001581ec		39400466		MOVBU 1(R3), R6							
+  unpack_experiment.go:132	0x1001581f0		35000126		CBNZW R6, 9(PC)							
+  unpack_experiment.go:133	0x1001581f4		d1000886		SUB $2, R4, R6							
+  unpack_experiment.go:133	0x1001581f8		cb0603e6		NEG R6, R6							
+  unpack_experiment.go:133	0x1001581fc		937ffcc6		ASR $63, R6, R6							
+  unpack_experiment.go:133	0x100158200		927f00c6		AND $2, R6, R6							
+  unpack_experiment.go:133	0x100158204		8b060066		ADD R6, R3, R6							
+  unpack_experiment.go:133	0x100158208		d10008a7		SUB $2, R5, R7							
+  unpack_experiment.go:133	0x10015820c		aa1f03e8		MOVD ZR, R8							
+  pack.go:174			0x100158210		14000085		JMP 133(PC)							
+  pack.go:174			0x100158214		b24003e6		ORR $1, ZR, R6							
+  unpack_experiment.go:132	0x100158218		14000075		JMP 117(PC)							
+  unpack_experiment.go:140	0x10015821c		d1000488		SUB $1, R4, R8							
+  unpack_experiment.go:140	0x100158220		cb0803e9		NEG R8, R9							
+  unpack_experiment.go:140	0x100158224		937ffd29		ASR $63, R9, R9							
+  unpack_experiment.go:140	0x100158228		92400129		AND $1, R9, R9							
+  unpack_experiment.go:140	0x10015822c		8b03012a		ADD R3, R9, R10							
+  unpack_experiment.go:140	0x100158230		d10004ab		SUB $1, R5, R11							
+  unpack_experiment.go:141	0x100158234		7103fcff		CMPW $255, R7							
+  unpack_experiment.go:141	0x100158238		54000661		BNE 51(PC)							
+  unpack_experiment.go:142	0x10015823c		f100017f		CMP $0, R11							
+  unpack_experiment.go:142	0x100158240		54000d09		BLS 104(PC)							
+  unpack_experiment.go:142	0x100158244		38696866		MOVBU (R3)(R9), R6						
+  unpack_experiment.go:143	0x100158248		eb02003f		CMP R2, R1							
+  unpack_experiment.go:143	0x10015824c		54000c48		BHI 98(PC)							
+  unpack_experiment.go:142	0x100158250		910004c6		ADD $1, R6, R6							
+  unpack_experiment.go:142	0x100158254		d37df0c7		LSL $3, R6, R7							
+  unpack_experiment.go:143	0x100158258		cb010049		SUB R1, R2, R9							
+  unpack_experiment.go:143	0x10015825c		cb0903ec		NEG R9, R12							
+  unpack_experiment.go:143	0x100158260		8a8cfc2c		AND R12->63, R1, R12						
+  unpack_experiment.go:143	0x100158264		910004ed		ADD $1, R7, R13							
+  unpack_experiment.go:143	0x100158268		8b0c000c		ADD R12, R0, R12						
+  unpack_experiment.go:143	0x10015826c		eb0d011f		CMP R13, R8							
+  unpack_experiment.go:143	0x100158270		54000ac3		BCC 86(PC)							
+  unpack_experiment.go:143	0x100158274		91000548		ADD $1, R10, R8							
+  unpack_experiment.go:143	0x100158278		eb060d3f		CMP R6<<3, R9							
+  unpack_experiment.go:143	0x10015827c		9a89c0e7		CSEL GT, R7, R9, R7						
+  unpack_experiment.go:143	0x100158280		eb0c011f		CMP R12, R8							
+  unpack_experiment.go:143	0x100158284		540002a0		BEQ 21(PC)							
+  unpack_experiment.go:128	0x100158288		f9002be4		MOVD R4, 80(RSP)						
+  unpack_experiment.go:128	0x10015828c		f90027e5		MOVD R5, 72(RSP)						
+  unpack_experiment.go:140	0x100158290		f90023eb		MOVD R11, 64(RSP)						
+  unpack_experiment.go:140	0x100158294		f90033ea		MOVD R10, 96(RSP)						
+  unpack_experiment.go:142	0x100158298		f9001fe6		MOVD R6, 56(RSP)						
+  unpack_experiment.go:143	0x10015829c		f9001bed		MOVD R13, 48(RSP)						
+  unpack_experiment.go:143	0x1001582a0		f90017e1		MOVD R1, 40(RSP)						
+  unpack_experiment.go:143	0x1001582a4		aa0c03e0		MOVD R12, R0							
+  unpack_experiment.go:143	0x1001582a8		aa0803e1		MOVD R8, R1							
+  unpack_experiment.go:143	0x1001582ac		aa0703e2		MOVD R7, R2							
+  unpack_experiment.go:143	0x1001582b0		97fc8218		CALL runtime.memmove(SB)					
+  unpack_experiment.go:149	0x1001582b4		f9402fe0		MOVD 88(RSP), R0						
+  unpack_experiment.go:144	0x1001582b8		f94017e1		MOVD 40(RSP), R1						
+  unpack_experiment.go:149	0x1001582bc		f94013e2		MOVD 32(RSP), R2						
+  unpack_experiment.go:145	0x1001582c0		f9402be4		MOVD 80(RSP), R4						
+  unpack_experiment.go:145	0x1001582c4		f94027e5		MOVD 72(RSP), R5						
+  unpack_experiment.go:144	0x1001582c8		f9401fe6		MOVD 56(RSP), R6						
+  unpack_experiment.go:145	0x1001582cc		f94033ea		MOVD 96(RSP), R10						
+  unpack_experiment.go:145	0x1001582d0		f94023eb		MOVD 64(RSP), R11						
+  unpack_experiment.go:145	0x1001582d4		f9401bed		MOVD 48(RSP), R13						
+  unpack_experiment.go:144	0x1001582d8		8b060c27		ADD R6<<3, R1, R7						
+  unpack_experiment.go:145	0x1001582dc		eb0d017f		CMP R13, R11							
+  unpack_experiment.go:145	0x1001582e0		540006e3		BCC 55(PC)							
+  unpack_experiment.go:145	0x1001582e4		cb060ca5		SUB R6<<3, R5, R5						
+  unpack_experiment.go:145	0x1001582e8		cb060c86		SUB R6<<3, R4, R6						
+  unpack_experiment.go:145	0x1001582ec		d10008c6		SUB $2, R6, R6							
+  unpack_experiment.go:145	0x1001582f0		cb0603e8		NEG R6, R8							
+  unpack_experiment.go:145	0x1001582f4		8a88fda8		AND R8->63, R13, R8						
+  unpack_experiment.go:145	0x1001582f8		8b0a0108		ADD R10, R8, R8							
+  unpack_experiment.go:145	0x1001582fc		d10008a5		SUB $2, R5, R5							
+  unpack_experiment.go:146	0x100158300		17ffffb2		JMP -78(PC)							
+  unpack_experiment.go:149	0x100158304		91002027		ADD $8, R1, R7							
+  unpack_experiment.go:149	0x100158308		eb07005f		CMP R7, R2							
+  unpack_experiment.go:149	0x10015830c		54000523		BCC 41(PC)							
+  unpack_experiment.go:149	0x100158310		eb07003f		CMP R7, R1							
+  unpack_experiment.go:149	0x100158314		54000488		BHI 36(PC)							
+  unpack_experiment.go:149	0x100158318		8b010008		ADD R1, R0, R8							
+  unpack_experiment.go:149	0x10015831c		aa1f03e1		MOVD ZR, R1							
+  unpack_experiment.go:151	0x100158320		14000010		JMP 16(PC)							
+  unpack_experiment.go:160	0x100158324		cb0100ab		SUB R1, R5, R11							
+  unpack_experiment.go:160	0x100158328		cb01008c		SUB R1, R4, R12							
+  unpack_experiment.go:160	0x10015832c		d1000986		SUB $2, R12, R6							
+  unpack_experiment.go:160	0x100158330		cb0603ec		NEG R6, R12							
+  unpack_experiment.go:160	0x100158334		8a8cfd29		AND R12->63, R9, R9						
+  unpack_experiment.go:160	0x100158338		8b0a0128		ADD R10, R9, R8							
+  unpack_experiment.go:160	0x10015833c		d1000965		SUB $2, R11, R5							
+  unpack_experiment.go:161	0x100158340		17ffffa2		JMP -94(PC)							
+  unpack_experiment.go:163	0x100158344		aa0203e1		MOVD R2, R1							
+  unpack_experiment.go:163	0x100158348		aa1f03e3		MOVD ZR, R3							
+  unpack_experiment.go:163	0x10015834c		aa1f03e4		MOVD ZR, R4							
+  unpack_experiment.go:163	0x100158350		f85f83fd		MOVD -8(RSP), R29						
+  unpack_experiment.go:163	0x100158354		f84707fe		MOVD.P 112(RSP), R30						
+  unpack_experiment.go:163	0x100158358		d65f03c0		RET								
+  unpack_experiment.go:153	0x10015835c		aa0903e1		MOVD R9, R1							
+  unpack_experiment.go:153	0x100158360		eb0b003f		CMP R11, R1							
+  unpack_experiment.go:153	0x100158364		540001a2		BCS 13(PC)							
+  unpack_experiment.go:152	0x100158368		b27800c9		ORR $256, R6, R9						
+  unpack_experiment.go:152	0x10015836c		5ac00129		RBITW R9, R9							
+  unpack_experiment.go:152	0x100158370		5ac01129		CLZW R9, R9							
+  unpack_experiment.go:152	0x100158374		92400929		AND $7, R9, R9							
+  unpack_experiment.go:153	0x100158378		3861694c		MOVBU (R10)(R1), R12						
+  unpack_experiment.go:153	0x10015837c		3829690c		MOVB R12, (R8)(R9)						
+  unpack_experiment.go:155	0x100158380		d10004c9		SUB $1, R6, R9							
+  unpack_experiment.go:155	0x100158384		8a0900c6		AND R9, R6, R6							
+  unpack_experiment.go:154	0x100158388		91000429		ADD $1, R1, R9							
+  unpack_experiment.go:156	0x10015838c		d3401ccc		UBFX $0, R6, $8, R12						
+  unpack_experiment.go:156	0x100158390		35fffe6c		CBNZW R12, -13(PC)						
+  unpack_experiment.go:156	0x100158394		17ffffe4		JMP -28(PC)							
+  unpack_experiment.go:153	0x100158398		aa0103e0		MOVD R1, R0							
+  unpack_experiment.go:153	0x10015839c		aa0b03e1		MOVD R11, R1							
+  unpack_experiment.go:153	0x1001583a0		97fc8070		CALL runtime.panicIndex(SB)					
+  unpack_experiment.go:149	0x1001583a4		aa0103e0		MOVD R1, R0							
+  unpack_experiment.go:149	0x1001583a8		aa0703e1		MOVD R7, R1							
+  unpack_experiment.go:149	0x1001583ac		97fc8099		CALL runtime.panicSlice3C(SB)					
+  unpack_experiment.go:149	0x1001583b0		aa0203e3		MOVD R2, R3							
+  unpack_experiment.go:149	0x1001583b4		aa0703e2		MOVD R7, R2							
+  unpack_experiment.go:149	0x1001583b8		97fc808e		CALL runtime.panicSlice3Acap(SB)				
+  unpack_experiment.go:145	0x1001583bc		aa0d03e0		MOVD R13, R0							
+  unpack_experiment.go:145	0x1001583c0		aa0b03e1		MOVD R11, R1							
+  unpack_experiment.go:145	0x1001583c4		97fc807f		CALL runtime.panicSliceB(SB)					
+  unpack_experiment.go:143	0x1001583c8		aa0d03e1		MOVD R13, R1							
+  unpack_experiment.go:143	0x1001583cc		aa0803e2		MOVD R8, R2							
+  unpack_experiment.go:143	0x1001583d0		97fc8074		CALL runtime.panicSliceAcap(SB)					
+  unpack_experiment.go:143	0x1001583d4		aa0103e0		MOVD R1, R0							
+  unpack_experiment.go:143	0x1001583d8		aa0203e1		MOVD R2, R1							
+  unpack_experiment.go:143	0x1001583dc		97fc8079		CALL runtime.panicSliceB(SB)					
+  unpack_experiment.go:142	0x1001583e0		aa1f03e0		MOVD ZR, R0							
+  unpack_experiment.go:142	0x1001583e4		aa0003e1		MOVD R0, R1							
+  unpack_experiment.go:142	0x1001583e8		97fc805e		CALL runtime.panicIndex(SB)					
+  unpack_experiment.go:136	0x1001583ec		8b060c27		ADD R6<<3, R1, R7						
+  unpack_experiment.go:137	0x1001583f0		eb0500df		CMP R5, R6							
+  unpack_experiment.go:137	0x1001583f4		54000108		BHI 8(PC)							
+  unpack_experiment.go:137	0x1001583f8		cb060089		SUB R6, R4, R9							
+  unpack_experiment.go:137	0x1001583fc		cb0903ea		NEG R9, R10							
+  unpack_experiment.go:137	0x100158400		8a8afcca		AND R10->63, R6, R10						
+  unpack_experiment.go:137	0x100158404		cb0600a5		SUB R6, R5, R5							
+  unpack_experiment.go:137	0x100158408		8b0a0068		ADD R10, R3, R8							
+  unpack_experiment.go:128	0x10015840c		aa0903e6		MOVD R9, R6							
+  unpack_experiment.go:138	0x100158410		17ffff6e		JMP -146(PC)							
+  unpack_experiment.go:137	0x100158414		aa0603e0		MOVD R6, R0							
+  unpack_experiment.go:137	0x100158418		aa0503e1		MOVD R5, R1							
+  unpack_experiment.go:137	0x10015841c		97fc8069		CALL runtime.panicSliceB(SB)					
+  pack.go:179			0x100158420		91002108		ADD $8, R8, R8							
+  pack.go:174			0x100158424		cb0800a9		SUB R8, R5, R9							
+  pack.go:174			0x100158428		d1000929		SUB $2, R9, R9							
+  pack.go:174			0x10015842c		f100213f		CMP $8, R9							
+  pack.go:174			0x100158430		540001eb		BLT 15(PC)							
+  pack.go:175			0x100158434		eb07011f		CMP R7, R8							
+  pack.go:175			0x100158438		540002e8		BHI 23(PC)							
+  pack.go:175			0x10015843c		cb080089		SUB R8, R4, R9							
+  pack.go:175			0x100158440		d1000929		SUB $2, R9, R9							
+  pack.go:175			0x100158444		cb0903e9		NEG R9, R9							
+  pack.go:175			0x100158448		8a89fd09		AND R9->63, R8, R9						
+  binary.go:117			0x10015844c		f86968c9		MOVD (R6)(R9), R9						
+  pack.go:176			0x100158450		b4fffe89		CBZ R9, -12(PC)							
+  pack.go:177			0x100158454		dac00126		RBIT R9, R6							
+  pack.go:177			0x100158458		dac010c6		CLZ R6, R6							
+  pack.go:177			0x10015845c		8b460d06		ADD R6>>3, R8, R6						
+  unpack_experiment.go:133	0x100158460		aa0603e8		MOVD R6, R8							
+  unpack_experiment.go:133	0x100158464		14000007		JMP 7(PC)							
+  pack.go:182			0x100158468		91000508		ADD $1, R8, R8							
+  pack.go:181			0x10015846c		eb07011f		CMP R7, R8							
+  pack.go:181			0x100158470		5400008a		BGE 4(PC)							
+  pack.go:181			0x100158474		540000a2		BCS 5(PC)							
+  pack.go:181			0x100158478		386868c9		MOVBU (R6)(R8), R9						
+  pack.go:181			0x10015847c		34ffff69		CBZW R9, -5(PC)							
+  unpack_experiment.go:133	0x100158480		91000906		ADD $2, R8, R6							
+  unpack_experiment.go:133	0x100158484		17ffffda		JMP -38(PC)							
+  pack.go:181			0x100158488		aa0803e0		MOVD R8, R0							
+  pack.go:181			0x10015848c		aa0703e1		MOVD R7, R1							
+  pack.go:181			0x100158490		97fc8034		CALL runtime.panicIndex(SB)					
+  pack.go:175			0x100158494		aa0803e0		MOVD R8, R0							
+  pack.go:175			0x100158498		aa0703e1		MOVD R7, R1							
+  pack.go:175			0x10015849c		97fc8049		CALL runtime.panicSliceB(SB)					
+  unpack_experiment.go:121	0x1001584a0		d0001b7b		ADRP 3596288(PC), R27						
+  unpack_experiment.go:121	0x1001584a4		f940f363		MOVD 480(R27), R3						
+  unpack_experiment.go:121	0x1001584a8		d0001b7b		ADRP 3596288(PC), R27						
+  unpack_experiment.go:121	0x1001584ac		f940f764		MOVD 488(R27), R4						
+  unpack_experiment.go:121	0x1001584b0		aa1f03e0		MOVD ZR, R0							
+  unpack_experiment.go:121	0x1001584b4		aa1f03e1		MOVD ZR, R1							
+  unpack_experiment.go:121	0x1001584b8		aa0103e2		MOVD R1, R2							
+  unpack_experiment.go:121	0x1001584bc		f85f83fd		MOVD -8(RSP), R29						
+  unpack_experiment.go:121	0x1001584c0		f84707fe		MOVD.P 112(RSP), R30						
+  unpack_experiment.go:121	0x1001584c4		d65f03c0		RET								
+  unpack_experiment.go:118	0x1001584c8		d0001b7b		ADRP 3596288(PC), R27						
+  unpack_experiment.go:118	0x1001584cc		f9412b63		MOVD 592(R27), R3						
+  unpack_experiment.go:118	0x1001584d0		d0001b7b		ADRP 3596288(PC), R27						
+  unpack_experiment.go:118	0x1001584d4		f9412f64		MOVD 600(R27), R4						
+  unpack_experiment.go:118	0x1001584d8		aa1f03e0		MOVD ZR, R0							
+  unpack_experiment.go:118	0x1001584dc		aa1f03e1		MOVD ZR, R1							
+  unpack_experiment.go:118	0x1001584e0		aa0103e2		MOVD R1, R2							
+  unpack_experiment.go:118	0x1001584e4		f85f83fd		MOVD -8(RSP), R29						
+  unpack_experiment.go:118	0x1001584e8		f84707fe		MOVD.P 112(RSP), R30						
+  unpack_experiment.go:118	0x1001584ec		d65f03c0		RET								
+  unpack_experiment.go:124	0x1001584f0		aa0903e0		MOVD R9, R0							
+  unpack_experiment.go:124	0x1001584f4		97fc8033		CALL runtime.panicSliceB(SB)					
+  unpack_experiment.go:117	0x1001584f8		aa0903ea		MOVD R9, R10							
+  unpack_experiment.go:117	0x1001584fc		aa0803e9		MOVD R8, R9							
+  unpack_experiment.go:120	0x100158500		aa0a03e8		MOVD R10, R8							
+  unpack_experiment.go:120	0x100158504		17ffff04		JMP -252(PC)							
+  pack.go:179			0x100158508		9100218c		ADD $8, R12, R12						
+  pack.go:174			0x10015850c		cb0c012d		SUB R12, R9, R13						
+  pack.go:174			0x100158510		d10009ad		SUB $2, R13, R13						
+  pack.go:174			0x100158514		f10021bf		CMP $8, R13							
+  pack.go:174			0x100158518		540001eb		BLT 15(PC)							
+  pack.go:175			0x10015851c		eb0b019f		CMP R11, R12							
+  pack.go:175			0x100158520		540004c8		BHI 38(PC)							
+  pack.go:175			0x100158524		cb0c004d		SUB R12, R2, R13						
+  pack.go:175			0x100158528		d10009ad		SUB $2, R13, R13						
+  pack.go:175			0x10015852c		cb0d03ed		NEG R13, R13							
+  pack.go:175			0x100158530		8a8dfd8d		AND R13->63, R12, R13						
+  binary.go:117			0x100158534		f86d694d		MOVD (R10)(R13), R13						
+  pack.go:176			0x100158538		b4fffe8d		CBZ R13, -12(PC)						
+  pack.go:177			0x10015853c		dac001a9		RBIT R13, R9							
+  pack.go:177			0x100158540		dac01129		CLZ R9, R9							
+  pack.go:177			0x100158544		8b490d89		ADD R9>>3, R12, R9						
+  unpack_experiment.go:102	0x100158548		aa0903ec		MOVD R9, R12							
+  unpack_experiment.go:102	0x10015854c		14000007		JMP 7(PC)							
+  pack.go:182			0x100158550		9100058c		ADD $1, R12, R12						
+  pack.go:181			0x100158554		eb0b019f		CMP R11, R12							
+  pack.go:181			0x100158558		5400008a		BGE 4(PC)							
+  pack.go:181			0x10015855c		54000282		BCS 20(PC)							
+  pack.go:181			0x100158560		386c6949		MOVBU (R10)(R12), R9						
+  pack.go:181			0x100158564		34ffff69		CBZW R9, -5(PC)							
+  unpack_experiment.go:102	0x100158568		91000989		ADD $2, R12, R9							
+  unpack_experiment.go:103	0x10015856c		eb880d3f		CMP R8->3, R9							
+  unpack_experiment.go:103	0x100158570		540000ac		BGT 5(PC)							
+  unpack_experiment.go:106	0x100158574		d37df12a		LSL $3, R9, R10							
+  unpack_experiment.go:117	0x100158578		aa0903e8		MOVD R9, R8							
+  unpack_experiment.go:120	0x10015857c		aa0a03e9		MOVD R10, R9							
+  unpack_experiment.go:106	0x100158580		17ffffde		JMP -34(PC)							
+  unpack_experiment.go:104	0x100158584		d0001b7b		ADRP 3596288(PC), R27						
+  unpack_experiment.go:104	0x100158588		f940f363		MOVD 480(R27), R3						
+  unpack_experiment.go:104	0x10015858c		d0001b7b		ADRP 3596288(PC), R27						
+  unpack_experiment.go:104	0x100158590		f940f764		MOVD 488(R27), R4						
+  unpack_experiment.go:104	0x100158594		aa1f03e0		MOVD ZR, R0							
+  unpack_experiment.go:104	0x100158598		aa1f03e1		MOVD ZR, R1							
+  unpack_experiment.go:104	0x10015859c		aa0103e2		MOVD R1, R2							
+  unpack_experiment.go:104	0x1001585a0		f85f83fd		MOVD -8(RSP), R29						
+  unpack_experiment.go:104	0x1001585a4		f84707fe		MOVD.P 112(RSP), R30						
+  unpack_experiment.go:104	0x1001585a8		d65f03c0		RET								
+  pack.go:181			0x1001585ac		aa0c03e0		MOVD R12, R0							
+  pack.go:181			0x1001585b0		aa0b03e1		MOVD R11, R1							
+  pack.go:181			0x1001585b4		97fc7feb		CALL runtime.panicIndex(SB)					
+  pack.go:175			0x1001585b8		aa0c03e0		MOVD R12, R0							
+  pack.go:175			0x1001585bc		aa0b03e1		MOVD R11, R1							
+  pack.go:175			0x1001585c0		97fc8000		CALL runtime.panicSliceB(SB)					
+  unpack_experiment.go:102	0x1001585c4		aa0903e1		MOVD R9, R1							
+  unpack_experiment.go:102	0x1001585c8		97fc7ff6		CALL runtime.panicSliceAcap(SB)					
+  unpack_experiment.go:102	0x1001585cc		d503201f		NOOP								
+  unpack_experiment.go:85	0x1001585d0		a90087e0		STP (R0, R1), 8(RSP)						
+  unpack_experiment.go:85	0x1001585d4		a9018fe2		STP (R2, R3), 24(RSP)						
+  unpack_experiment.go:85	0x1001585d8		aa1e03e3		MOVD R30, R3							
+  unpack_experiment.go:85	0x1001585dc		97fc7689		CALL runtime.morestack_noctxt.abi0(SB)				
+  unpack_experiment.go:85	0x1001585e0		a94087e0		LDP 8(RSP), (R0, R1)						
+  unpack_experiment.go:85	0x1001585e4		a9418fe2		LDP 24(RSP), (R2, R3)						
+  unpack_experiment.go:85	0x1001585e8		17fffe7e		JMP github.com/cnooljaw/gosproto.ExperimentUnpackCandidate(SB)	
+  unpack_experiment.go:85	0x1001585ec		00000000		?								

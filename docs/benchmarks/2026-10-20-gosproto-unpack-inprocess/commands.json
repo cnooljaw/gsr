@@ -1,0 +1,1426 @@
+[
+  {
+    "args": [
+      "git",
+      "rev-parse",
+      "a93bb0d"
+    ],
+    "cwd": "/private/tmp/gsr-gosproto-fork",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.023700499907135963,
+    "output": "a93bb0d66678c33e328c94d39036f8ff9772a5e9\n"
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "unpack_experiment.go",
+      "unpack_experiment_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/gosproto",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.02214374952018261,
+    "output": ""
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "experiment_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.0037876665592193604,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-gcflags=all=-d=checkptr=2",
+      "-run",
+      "^(TestUnpackExperimentBounds|TestPack|TestUnpack)",
+      "-timeout=2m",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/gosproto",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 4.9205687921494246,
+    "output": "ok  \tgithub.com/cnooljaw/gosproto\t2.929s\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-run",
+      "^TestRepresentativeFixtures$",
+      "-timeout=30s",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 1.499564291909337,
+    "output": "ok  \tunpackinprocess\t0.338s\n"
+  },
+  {
+    "args": [
+      "go",
+      "vet",
+      "-mod=mod",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 0.19803650118410587,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-c",
+      "-o",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 0.4381328746676445,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "list",
+      "-m",
+      "-json",
+      "github.com/cnooljaw/gosproto"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 0.012796664610505104,
+    "output": "{\n\t\"Path\": \"github.com/cnooljaw/gosproto\",\n\t\"Version\": \"v0.4.0\",\n\t\"Replace\": {\n\t\t\"Path\": \"/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/gosproto\",\n\t\t\"Dir\": \"/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/gosproto\",\n\t\t\"GoMod\": \"/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/gosproto/go.mod\",\n\t\t\"GoVersion\": \"1.24.0\"\n\t},\n\t\"Dir\": \"/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/gosproto\",\n\t\"GoMod\": \"/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/gosproto/go.mod\",\n\t\"GoVersion\": \"1.24.0\"\n}\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "objdump",
+      "-s",
+      "github.com/cnooljaw/gosproto\\.(UnpackWithLimit|ExperimentUnpackClone|ExperimentUnpackCandidate)",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.03563412465155125,
+    "output": "TEXT github.com/cnooljaw/gosproto.UnpackWithLimit(SB) /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/gosproto/pack.go\n  pack.go:193\t\t0x100157340\t\tf9400b90\t\tMOVD 16(R28), R16\t\t\t\t\t\n  pack.go:193\t\t0x100157344\t\teb3063ff\t\tCMP R16, RSP\t\t\t\t\t\t\n  pack.go:193\t\t0x100157348\t\t54002e89\t\tBLS 372(PC)\t\t\t\t\t\t\n  pack.go:193\t\t0x10015734c\t\tf8190ffe\t\tMOVD.W R30, -112(RSP)\t\t\t\t\t\n  pack.go:193\t\t0x100157350\t\tf81f83fd\t\tMOVD R29, -8(RSP)\t\t\t\t\t\n  pack.go:193\t\t0x100157354\t\td10023fd\t\tSUB $8, RSP, R29\t\t\t\t\t\n  pack.go:193\t\t0x100157358\t\tf9003fe0\t\tMOVD R0, 120(RSP)\t\t\t\t\t\n  pack.go:194\t\t0x10015735c\t\tf100007f\t\tCMP $0, R3\t\t\t\t\t\t\n  pack.go:194\t\t0x100157360\t\t540000cd\t\tBLE 6(PC)\t\t\t\t\t\t\n  pack.go:194\t\t0x100157364\t\taa0103e4\t\tMOVD R1, R4\t\t\t\t\t\t\n  pack.go:194\t\t0x100157368\t\taa0203e5\t\tMOVD R2, R5\t\t\t\t\t\t\n  pack.go:194\t\t0x10015736c\t\taa0003e6\t\tMOVD R0, R6\t\t\t\t\t\t\n  pack.go:194\t\t0x100157370\t\taa1f03e7\t\tMOVD ZR, R7\t\t\t\t\t\t\n  pack.go:199\t\t0x100157374\t\t14000010\t\tJMP 16(PC)\t\t\t\t\t\t\n  pack.go:195\t\t0x100157378\t\tf0001b7b\t\tADRP 3600384(PC), R27\t\t\t\t\t\n  pack.go:195\t\t0x10015737c\t\tf940fb63\t\tMOVD 496(R27), R3\t\t\t\t\t\n  pack.go:195\t\t0x100157380\t\tf0001b7b\t\tADRP 3600384(PC), R27\t\t\t\t\t\n  pack.go:195\t\t0x100157384\t\tf940ff64\t\tMOVD 504(R27), R4\t\t\t\t\t\n  pack.go:195\t\t0x100157388\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\n  pack.go:195\t\t0x10015738c\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\n  pack.go:195\t\t0x100157390\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\n  pack.go:195\t\t0x100157394\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\n  pack.go:195\t\t0x100157398\t\tf84707fe\t\tMOVD.P 112(RSP), R30\t\t\t\t\t\n  pack.go:195\t\t0x10015739c\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\n  pack.go:232\t\t0x1001573a0\t\tcb090042\t\tSUB R9, R2, R2\t\t\t\t\t\t\n  pack.go:232\t\t0x1001573a4\t\tcb0203e8\t\tNEG R2, R8\t\t\t\t\t\t\n  pack.go:232\t\t0x1001573a8\t\t8a88fd28\t\tAND R8->63, R9, R8\t\t\t\t\t\n  pack.go:232\t\t0x1001573ac\t\tcb090021\t\tSUB R9, R1, R1\t\t\t\t\t\t\n  pack.go:232\t\t0x1001573b0\t\t8b080000\t\tADD R8, R0, R0\t\t\t\t\t\t\n  pack.go:199\t\t0x1001573b4\t\tb40009a1\t\tCBZ R1, 77(PC)\t\t\t\t\t\t\n  pack.go:200\t\t0x1001573b8\t\t39400008\t\tMOVBU (R0), R8\t\t\t\t\t\t\n  pack.go:202\t\t0x1001573bc\t\taa0803e9\t\tMOVD R8, R9\t\t\t\t\t\t\n  pack.go:202\t\t0x1001573c0\t\t350003c9\t\tCBNZW R9, 30(PC)\t\t\t\t\t\n  pack.go:203\t\t0x1001573c4\t\tf100083f\t\tCMP $2, R1\t\t\t\t\t\t\n  pack.go:203\t\t0x1001573c8\t\t5400032b\t\tBLT 25(PC)\t\t\t\t\t\t\n  pack.go:203\t\t0x1001573cc\t\t39400408\t\tMOVBU 1(R0), R8\t\t\t\t\t\t\n  pack.go:203\t\t0x1001573d0\t\t35000288\t\tCBNZW R8, 20(PC)\t\t\t\t\t\n  pack.go:204\t\t0x1001573d4\t\tcb070068\t\tSUB R7, R3, R8\t\t\t\t\t\t\n  pack.go:204\t\t0x1001573d8\t\t937ffd09\t\tASR $63, R8, R9\t\t\t\t\t\t\n  pack.go:204\t\t0x1001573dc\t\t8b49f508\t\tADD R9>>61, R8, R8\t\t\t\t\t\n  pack.go:204\t\t0x1001573e0\t\t9343fd09\t\tASR $3, R8, R9\t\t\t\t\t\t\n  pack.go:205\t\t0x1001573e4\t\tf100093f\t\tCMP $2, R9\t\t\t\t\t\t\n  pack.go:205\t\t0x1001573e8\t\t5400058b\t\tBLT 44(PC)\t\t\t\t\t\t\n  pack.go:209\t\t0x1001573ec\t\t9100052a\t\tADD $1, R9, R10\t\t\t\t\t\t\n  pack.go:209\t\t0x1001573f0\t\teb0a003f\t\tCMP R10, R1\t\t\t\t\t\t\n  pack.go:209\t\t0x1001573f4\t\t9a89d429\t\tCSINC LE, R1, R9, R9\t\t\t\t\t\n  pack.go:210\t\t0x1001573f8\t\teb09005f\t\tCMP R9, R2\t\t\t\t\t\t\n  pack.go:209\t\t0x1001573fc\t\t54002883\t\tBCC 324(PC)\t\t\t\t\t\t\n  pack.go:210\t\t0x100157400\t\td100084a\t\tSUB $2, R2, R10\t\t\t\t\t\t\n  pack.go:210\t\t0x100157404\t\tcb0a03ea\t\tNEG R10, R10\t\t\t\t\t\t\n  pack.go:210\t\t0x100157408\t\t937ffd4a\t\tASR $63, R10, R10\t\t\t\t\t\n  pack.go:210\t\t0x10015740c\t\t927f014a\t\tAND $2, R10, R10\t\t\t\t\t\n  pack.go:210\t\t0x100157410\t\t8b0a000a\t\tADD R10, R0, R10\t\t\t\t\t\n  pack.go:210\t\t0x100157414\t\td100092b\t\tSUB $2, R9, R11\t\t\t\t\t\t\n  pack.go:210\t\t0x100157418\t\taa1f03ec\t\tMOVD ZR, R12\t\t\t\t\t\t\n  pack.go:174\t\t0x10015741c\t\t1400010e\t\tJMP 270(PC)\t\t\t\t\t\t\n  pack.go:174\t\t0x100157420\t\tb24003e8\t\tORR $1, ZR, R8\t\t\t\t\t\t\n  pack.go:174\t\t0x100157424\t\tb27d03e9\t\tORR $8, ZR, R9\t\t\t\t\t\t\n  pack.go:203\t\t0x100157428\t\t14000106\t\tJMP 262(PC)\t\t\t\t\t\t\n  pack.go:203\t\t0x10015742c\t\tb24003e8\t\tORR $1, ZR, R8\t\t\t\t\t\t\n  pack.go:203\t\t0x100157430\t\tb27d03e9\t\tORR $8, ZR, R9\t\t\t\t\t\t\n  pack.go:203\t\t0x100157434\t\t14000103\t\tJMP 259(PC)\t\t\t\t\t\t\n  pack.go:216\t\t0x100157438\t\t7103fd3f\t\tCMPW $255, R9\t\t\t\t\t\t\n  pack.go:216\t\t0x10015743c\t\t54000101\t\tBNE 8(PC)\t\t\t\t\t\t\n  pack.go:217\t\t0x100157440\t\tf100083f\t\tCMP $2, R1\t\t\t\t\t\t\n  pack.go:217\t\t0x100157444\t\t540003eb\t\tBLT 31(PC)\t\t\t\t\t\t\n  pack.go:220\t\t0x100157448\t\t39400408\t\tMOVBU 1(R0), R8\t\t\t\t\t\t\n  pack.go:220\t\t0x10015744c\t\t91000508\t\tADD $1, R8, R8\t\t\t\t\t\t\n  pack.go:220\t\t0x100157450\t\td37df108\t\tLSL $3, R8, R8\t\t\t\t\t\t\n  pack.go:221\t\t0x100157454\t\t91000909\t\tADD $2, R8, R9\t\t\t\t\t\t\n  pack.go:221\t\t0x100157458\t\t14000007\t\tJMP 7(PC)\t\t\t\t\t\t\n  bits.go:126\t\t0x10015745c\t\taa0803ea\t\tMOVD R8, R10\t\t\t\t\t\t\n  bits.go:126\t\t0x100157460\t\tb000070b\t\tADRP 921600(PC), R11\t\t\t\t\t\n  bits.go:126\t\t0x100157464\t\t913db16b\t\tADD $3948, R11, R11\t\t\t\t\t\n  bits.go:126\t\t0x100157468\t\t386a696a\t\tMOVBU (R11)(R10), R10\t\t\t\t\t\n  pack.go:223\t\t0x10015746c\t\t91000549\t\tADD $1, R10, R9\t\t\t\t\t\t\n  pack.go:223\t\t0x100157470\t\tb27d03e8\t\tORR $8, ZR, R8\t\t\t\t\t\t\n  pack.go:225\t\t0x100157474\t\teb01013f\t\tCMP R1, R9\t\t\t\t\t\t\n  pack.go:225\t\t0x100157478\t\t54001ccc\t\tBGT 230(PC)\t\t\t\t\t\t\n  pack.go:228\t\t0x10015747c\t\tcb07006a\t\tSUB R7, R3, R10\t\t\t\t\t\t\n  pack.go:228\t\t0x100157480\t\teb0a011f\t\tCMP R10, R8\t\t\t\t\t\t\n  pack.go:228\t\t0x100157484\t\t54001b2c\t\tBGT 217(PC)\t\t\t\t\t\t\n  pack.go:231\t\t0x100157488\t\t8b0800e7\t\tADD R8, R7, R7\t\t\t\t\t\t\n  pack.go:225\t\t0x10015748c\t\teb01013f\t\tCMP R1, R9\t\t\t\t\t\t\n  pack.go:232\t\t0x100157490\t\t54fff889\t\tBLS -60(PC)\t\t\t\t\t\t\n  pack.go:232\t\t0x100157494\t\t140000e9\t\tJMP 233(PC)\t\t\t\t\t\t\n  pack.go:206\t\t0x100157498\t\tf0001b7b\t\tADRP 3600384(PC), R27\t\t\t\t\t\n  pack.go:206\t\t0x10015749c\t\tf940f363\t\tMOVD 480(R27), R3\t\t\t\t\t\n  pack.go:206\t\t0x1001574a0\t\tf0001b7b\t\tADRP 3600384(PC), R27\t\t\t\t\t\n  pack.go:206\t\t0x1001574a4\t\tf940f764\t\tMOVD 488(R27), R4\t\t\t\t\t\n  pack.go:206\t\t0x1001574a8\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\n  pack.go:206\t\t0x1001574ac\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\n  pack.go:206\t\t0x1001574b0\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\n  pack.go:206\t\t0x1001574b4\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\n  pack.go:206\t\t0x1001574b8\t\tf84707fe\t\tMOVD.P 112(RSP), R30\t\t\t\t\t\n  pack.go:206\t\t0x1001574bc\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\n  pack.go:218\t\t0x1001574c0\t\tf0001b7b\t\tADRP 3600384(PC), R27\t\t\t\t\t\n  pack.go:218\t\t0x1001574c4\t\tf9412b63\t\tMOVD 592(R27), R3\t\t\t\t\t\n  pack.go:218\t\t0x1001574c8\t\tf0001b7b\t\tADRP 3600384(PC), R27\t\t\t\t\t\n  pack.go:218\t\t0x1001574cc\t\tf9412f64\t\tMOVD 600(R27), R4\t\t\t\t\t\n  pack.go:218\t\t0x1001574d0\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\n  pack.go:218\t\t0x1001574d4\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\n  pack.go:218\t\t0x1001574d8\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\n  pack.go:218\t\t0x1001574dc\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\n  pack.go:218\t\t0x1001574e0\t\tf84707fe\t\tMOVD.P 112(RSP), R30\t\t\t\t\t\n  pack.go:218\t\t0x1001574e4\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\n  pack.go:194\t\t0x1001574e8\t\tf9002be4\t\tMOVD R4, 80(RSP)\t\t\t\t\t\n  pack.go:194\t\t0x1001574ec\t\tf90033e6\t\tMOVD R6, 96(RSP)\t\t\t\t\t\n  pack.go:194\t\t0x1001574f0\t\tf90027e5\t\tMOVD R5, 72(RSP)\t\t\t\t\t\n  pack.go:228\t\t0x1001574f4\t\tf90013e7\t\tMOVD R7, 32(RSP)\t\t\t\t\t\n  pack.go:234\t\t0x1001574f8\t\t90000aa0\t\tADRP 1392640(PC), R0\t\t\t\t\t\n  pack.go:234\t\t0x1001574fc\t\t91388000\t\tADD $3616, R0, R0\t\t\t\t\t\n  pack.go:234\t\t0x100157500\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\n  pack.go:234\t\t0x100157504\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\n  pack.go:234\t\t0x100157508\t\t97fc6c12\t\tCALL runtime.makeslice(SB)\t\t\t\t\n  pack.go:234\t\t0x10015750c\t\tf9002fe0\t\tMOVD R0, 88(RSP)\t\t\t\t\t\n  pack.go:236\t\t0x100157510\t\tf94013e2\t\tMOVD 32(RSP), R2\t\t\t\t\t\n  pack.go:236\t\t0x100157514\t\tf94033e3\t\tMOVD 96(RSP), R3\t\t\t\t\t\n  pack.go:236\t\t0x100157518\t\tf94027e4\t\tMOVD 72(RSP), R4\t\t\t\t\t\n  pack.go:236\t\t0x10015751c\t\tf9402be5\t\tMOVD 80(RSP), R5\t\t\t\t\t\n  pack.go:236\t\t0x100157520\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\n  pack.go:236\t\t0x100157524\t\t14000004\t\tJMP 4(PC)\t\t\t\t\t\t\n  pack.go:236\t\t0x100157528\t\taa0603e4\t\tMOVD R6, R4\t\t\t\t\t\t\n  pack.go:236\t\t0x10015752c\t\taa0803e3\t\tMOVD R8, R3\t\t\t\t\t\t\n  pack.go:260\t\t0x100157530\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\n  pack.go:236\t\t0x100157534\t\tb4000ae5\t\tCBZ R5, 87(PC)\t\t\t\t\t\t\n  pack.go:237\t\t0x100157538\t\t39400066\t\tMOVBU (R3), R6\t\t\t\t\t\t\n  pack.go:238\t\t0x10015753c\t\taa0603e7\t\tMOVD R6, R7\t\t\t\t\t\t\n  pack.go:238\t\t0x100157540\t\t350001e7\t\tCBNZW R7, 15(PC)\t\t\t\t\t\n  pack.go:240\t\t0x100157544\t\tf10008bf\t\tCMP $2, R5\t\t\t\t\t\t\n  pack.go:240\t\t0x100157548\t\t5400016b\t\tBLT 11(PC)\t\t\t\t\t\t\n  pack.go:240\t\t0x10015754c\t\t39400466\t\tMOVBU 1(R3), R6\t\t\t\t\t\t\n  pack.go:240\t\t0x100157550\t\t35000126\t\tCBNZW R6, 9(PC)\t\t\t\t\t\t\n  pack.go:241\t\t0x100157554\t\td1000886\t\tSUB $2, R4, R6\t\t\t\t\t\t\n  pack.go:241\t\t0x100157558\t\tcb0603e6\t\tNEG R6, R6\t\t\t\t\t\t\n  pack.go:241\t\t0x10015755c\t\t937ffcc6\t\tASR $63, R6, R6\t\t\t\t\t\t\n  pack.go:241\t\t0x100157560\t\t927f00c6\t\tAND $2, R6, R6\t\t\t\t\t\t\n  pack.go:241\t\t0x100157564\t\t8b060066\t\tADD R6, R3, R6\t\t\t\t\t\t\n  pack.go:241\t\t0x100157568\t\td10008a7\t\tSUB $2, R5, R7\t\t\t\t\t\t\n  pack.go:241\t\t0x10015756c\t\taa1f03e8\t\tMOVD ZR, R8\t\t\t\t\t\t\n  pack.go:174\t\t0x100157570\t\t1400007f\t\tJMP 127(PC)\t\t\t\t\t\t\n  pack.go:174\t\t0x100157574\t\tb24003e6\t\tORR $1, ZR, R6\t\t\t\t\t\t\n  pack.go:240\t\t0x100157578\t\t1400006f\t\tJMP 111(PC)\t\t\t\t\t\t\n  pack.go:248\t\t0x10015757c\t\td1000488\t\tSUB $1, R4, R8\t\t\t\t\t\t\n  pack.go:248\t\t0x100157580\t\tcb0803e9\t\tNEG R8, R9\t\t\t\t\t\t\n  pack.go:248\t\t0x100157584\t\t937ffd29\t\tASR $63, R9, R9\t\t\t\t\t\t\n  pack.go:248\t\t0x100157588\t\t92400129\t\tAND $1, R9, R9\t\t\t\t\t\t\n  pack.go:248\t\t0x10015758c\t\t8b03012a\t\tADD R3, R9, R10\t\t\t\t\t\t\n  pack.go:248\t\t0x100157590\t\td10004ab\t\tSUB $1, R5, R11\t\t\t\t\t\t\n  pack.go:249\t\t0x100157594\t\t7103fcff\t\tCMPW $255, R7\t\t\t\t\t\t\n  pack.go:249\t\t0x100157598\t\t54000661\t\tBNE 51(PC)\t\t\t\t\t\t\n  pack.go:250\t\t0x10015759c\t\tf100017f\t\tCMP $0, R11\t\t\t\t\t\t\n  pack.go:250\t\t0x1001575a0\t\t54000c49\t\tBLS 98(PC)\t\t\t\t\t\t\n  pack.go:250\t\t0x1001575a4\t\t38696866\t\tMOVBU (R3)(R9), R6\t\t\t\t\t\n  pack.go:251\t\t0x1001575a8\t\teb02003f\t\tCMP R2, R1\t\t\t\t\t\t\n  pack.go:251\t\t0x1001575ac\t\t54000b88\t\tBHI 92(PC)\t\t\t\t\t\t\n  pack.go:250\t\t0x1001575b0\t\t910004c6\t\tADD $1, R6, R6\t\t\t\t\t\t\n  pack.go:250\t\t0x1001575b4\t\td37df0c7\t\tLSL $3, R6, R7\t\t\t\t\t\t\n  pack.go:251\t\t0x1001575b8\t\tcb010049\t\tSUB R1, R2, R9\t\t\t\t\t\t\n  pack.go:251\t\t0x1001575bc\t\tcb0903ec\t\tNEG R9, R12\t\t\t\t\t\t\n  pack.go:251\t\t0x1001575c0\t\t8a8cfc2c\t\tAND R12->63, R1, R12\t\t\t\t\t\n  pack.go:251\t\t0x1001575c4\t\t910004ed\t\tADD $1, R7, R13\t\t\t\t\t\t\n  pack.go:251\t\t0x1001575c8\t\t8b0c000c\t\tADD R12, R0, R12\t\t\t\t\t\n  pack.go:251\t\t0x1001575cc\t\teb0d011f\t\tCMP R13, R8\t\t\t\t\t\t\n  pack.go:251\t\t0x1001575d0\t\t54000a03\t\tBCC 80(PC)\t\t\t\t\t\t\n  pack.go:251\t\t0x1001575d4\t\t91000548\t\tADD $1, R10, R8\t\t\t\t\t\t\n  pack.go:251\t\t0x1001575d8\t\teb060d3f\t\tCMP R6<<3, R9\t\t\t\t\t\t\n  pack.go:251\t\t0x1001575dc\t\t9a89c0e7\t\tCSEL GT, R7, R9, R7\t\t\t\t\t\n  pack.go:251\t\t0x1001575e0\t\teb0c011f\t\tCMP R12, R8\t\t\t\t\t\t\n  pack.go:251\t\t0x1001575e4\t\t540002a0\t\tBEQ 21(PC)\t\t\t\t\t\t\n  pack.go:236\t\t0x1001575e8\t\tf9002be4\t\tMOVD R4, 80(RSP)\t\t\t\t\t\n  pack.go:236\t\t0x1001575ec\t\tf90027e5\t\tMOVD R5, 72(RSP)\t\t\t\t\t\n  pack.go:248\t\t0x1001575f0\t\tf90023eb\t\tMOVD R11, 64(RSP)\t\t\t\t\t\n  pack.go:248\t\t0x1001575f4\t\tf90033ea\t\tMOVD R10, 96(RSP)\t\t\t\t\t\n  pack.go:250\t\t0x1001575f8\t\tf9001fe6\t\tMOVD R6, 56(RSP)\t\t\t\t\t\n  pack.go:251\t\t0x1001575fc\t\tf9001bed\t\tMOVD R13, 48(RSP)\t\t\t\t\t\n  pack.go:260\t\t0x100157600\t\tf90017e1\t\tMOVD R1, 40(RSP)\t\t\t\t\t\n  pack.go:251\t\t0x100157604\t\taa0c03e0\t\tMOVD R12, R0\t\t\t\t\t\t\n  pack.go:251\t\t0x100157608\t\taa0803e1\t\tMOVD R8, R1\t\t\t\t\t\t\n  pack.go:251\t\t0x10015760c\t\taa0703e2\t\tMOVD R7, R2\t\t\t\t\t\t\n  pack.go:251\t\t0x100157610\t\t97fc8540\t\tCALL runtime.memmove(SB)\t\t\t\t\n  pack.go:251\t\t0x100157614\t\tf9402fe0\t\tMOVD 88(RSP), R0\t\t\t\t\t\n  pack.go:252\t\t0x100157618\t\tf94017e1\t\tMOVD 40(RSP), R1\t\t\t\t\t\n  pack.go:251\t\t0x10015761c\t\tf94013e2\t\tMOVD 32(RSP), R2\t\t\t\t\t\n  pack.go:253\t\t0x100157620\t\tf9402be4\t\tMOVD 80(RSP), R4\t\t\t\t\t\n  pack.go:253\t\t0x100157624\t\tf94027e5\t\tMOVD 72(RSP), R5\t\t\t\t\t\n  pack.go:252\t\t0x100157628\t\tf9401fe6\t\tMOVD 56(RSP), R6\t\t\t\t\t\n  pack.go:253\t\t0x10015762c\t\tf94033ea\t\tMOVD 96(RSP), R10\t\t\t\t\t\n  pack.go:253\t\t0x100157630\t\tf94023eb\t\tMOVD 64(RSP), R11\t\t\t\t\t\n  pack.go:253\t\t0x100157634\t\tf9401bed\t\tMOVD 48(RSP), R13\t\t\t\t\t\n  pack.go:252\t\t0x100157638\t\t8b060c27\t\tADD R6<<3, R1, R7\t\t\t\t\t\n  pack.go:253\t\t0x10015763c\t\teb0d017f\t\tCMP R13, R11\t\t\t\t\t\t\n  pack.go:253\t\t0x100157640\t\t54000623\t\tBCC 49(PC)\t\t\t\t\t\t\n  pack.go:253\t\t0x100157644\t\tcb060c88\t\tSUB R6<<3, R4, R8\t\t\t\t\t\n  pack.go:253\t\t0x100157648\t\tcb060ca5\t\tSUB R6<<3, R5, R5\t\t\t\t\t\n  pack.go:253\t\t0x10015764c\t\td1000906\t\tSUB $2, R8, R6\t\t\t\t\t\t\n  pack.go:253\t\t0x100157650\t\tcb0603e8\t\tNEG R6, R8\t\t\t\t\t\t\n  pack.go:253\t\t0x100157654\t\t8a88fda8\t\tAND R8->63, R13, R8\t\t\t\t\t\n  pack.go:253\t\t0x100157658\t\t8b0a0108\t\tADD R10, R8, R8\t\t\t\t\t\t\n  pack.go:253\t\t0x10015765c\t\td10008a5\t\tSUB $2, R5, R5\t\t\t\t\t\t\n  pack.go:254\t\t0x100157660\t\t17ffffb2\t\tJMP -78(PC)\t\t\t\t\t\t\n  pack.go:254\t\t0x100157664\t\taa1f03e3\t\tMOVD ZR, R3\t\t\t\t\t\t\n  pack.go:258\t\t0x100157668\t\t14000011\t\tJMP 17(PC)\t\t\t\t\t\t\n  pack.go:267\t\t0x10015766c\t\tcb0300a9\t\tSUB R3, R5, R9\t\t\t\t\t\t\n  pack.go:267\t\t0x100157670\t\tcb03008b\t\tSUB R3, R4, R11\t\t\t\t\t\t\n  pack.go:267\t\t0x100157674\t\td1000966\t\tSUB $2, R11, R6\t\t\t\t\t\t\n  pack.go:267\t\t0x100157678\t\tcb0603eb\t\tNEG R6, R11\t\t\t\t\t\t\n  pack.go:267\t\t0x10015767c\t\t8a8bfceb\t\tAND R11->63, R7, R11\t\t\t\t\t\n  pack.go:267\t\t0x100157680\t\t8b0a0168\t\tADD R10, R11, R8\t\t\t\t\t\n  pack.go:267\t\t0x100157684\t\td1000925\t\tSUB $2, R9, R5\t\t\t\t\t\t\n  pack.go:268\t\t0x100157688\t\t91002027\t\tADD $8, R1, R7\t\t\t\t\t\t\n  pack.go:268\t\t0x10015768c\t\t17ffffa7\t\tJMP -89(PC)\t\t\t\t\t\t\n  pack.go:270\t\t0x100157690\t\taa0203e1\t\tMOVD R2, R1\t\t\t\t\t\t\n  pack.go:270\t\t0x100157694\t\taa1f03e3\t\tMOVD ZR, R3\t\t\t\t\t\t\n  pack.go:270\t\t0x100157698\t\taa1f03e4\t\tMOVD ZR, R4\t\t\t\t\t\t\n  pack.go:270\t\t0x10015769c\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\n  pack.go:270\t\t0x1001576a0\t\tf84707fe\t\tMOVD.P 112(RSP), R30\t\t\t\t\t\n  pack.go:270\t\t0x1001576a4\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\n  pack.go:260\t\t0x1001576a8\t\taa0703e3\t\tMOVD R7, R3\t\t\t\t\t\t\n  pack.go:259\t\t0x1001576ac\t\tb27800c7\t\tORR $256, R6, R7\t\t\t\t\t\n  pack.go:259\t\t0x1001576b0\t\t5ac000e7\t\tRBITW R7, R7\t\t\t\t\t\t\n  pack.go:259\t\t0x1001576b4\t\t5ac010e7\t\tCLZW R7, R7\t\t\t\t\t\t\n  pack.go:260\t\t0x1001576b8\t\t8b0100e7\t\tADD R1, R7, R7\t\t\t\t\t\t\n  pack.go:260\t\t0x1001576bc\t\teb0b007f\t\tCMP R11, R3\t\t\t\t\t\t\n  pack.go:260\t\t0x1001576c0\t\t540001c2\t\tBCS 14(PC)\t\t\t\t\t\t\n  pack.go:260\t\t0x1001576c4\t\t38636948\t\tMOVBU (R10)(R3), R8\t\t\t\t\t\n  pack.go:260\t\t0x1001576c8\t\teb07005f\t\tCMP R7, R2\t\t\t\t\t\t\n  pack.go:260\t\t0x1001576cc\t\t54000109\t\tBLS 8(PC)\t\t\t\t\t\t\n  pack.go:260\t\t0x1001576d0\t\t38276808\t\tMOVB R8, (R0)(R7)\t\t\t\t\t\n  pack.go:262\t\t0x1001576d4\t\td10004c7\t\tSUB $1, R6, R7\t\t\t\t\t\t\n  pack.go:262\t\t0x1001576d8\t\t8a0700c6\t\tAND R7, R6, R6\t\t\t\t\t\t\n  pack.go:261\t\t0x1001576dc\t\t91000467\t\tADD $1, R3, R7\t\t\t\t\t\t\n  pack.go:263\t\t0x1001576e0\t\td3401cc8\t\tUBFX $0, R6, $8, R8\t\t\t\t\t\n  pack.go:263\t\t0x1001576e4\t\t35fffe28\t\tCBNZW R8, -15(PC)\t\t\t\t\t\n  pack.go:263\t\t0x1001576e8\t\t17ffffe1\t\tJMP -31(PC)\t\t\t\t\t\t\n  pack.go:260\t\t0x1001576ec\t\taa0703e0\t\tMOVD R7, R0\t\t\t\t\t\t\n  pack.go:260\t\t0x1001576f0\t\taa0203e1\t\tMOVD R2, R1\t\t\t\t\t\t\n  pack.go:260\t\t0x1001576f4\t\t97fc839b\t\tCALL runtime.panicIndex(SB)\t\t\t\t\n  pack.go:260\t\t0x1001576f8\t\taa0303e0\t\tMOVD R3, R0\t\t\t\t\t\t\n  pack.go:260\t\t0x1001576fc\t\taa0b03e1\t\tMOVD R11, R1\t\t\t\t\t\t\n  pack.go:260\t\t0x100157700\t\t97fc8398\t\tCALL runtime.panicIndex(SB)\t\t\t\t\n  pack.go:253\t\t0x100157704\t\taa0d03e0\t\tMOVD R13, R0\t\t\t\t\t\t\n  pack.go:253\t\t0x100157708\t\taa0b03e1\t\tMOVD R11, R1\t\t\t\t\t\t\n  pack.go:253\t\t0x10015770c\t\t97fc83ad\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\n  pack.go:251\t\t0x100157710\t\taa0d03e1\t\tMOVD R13, R1\t\t\t\t\t\t\n  pack.go:251\t\t0x100157714\t\taa0803e2\t\tMOVD R8, R2\t\t\t\t\t\t\n  pack.go:251\t\t0x100157718\t\t97fc83a2\t\tCALL runtime.panicSliceAcap(SB)\t\t\t\t\n  pack.go:251\t\t0x10015771c\t\taa0103e0\t\tMOVD R1, R0\t\t\t\t\t\t\n  pack.go:251\t\t0x100157720\t\taa0203e1\t\tMOVD R2, R1\t\t\t\t\t\t\n  pack.go:251\t\t0x100157724\t\t97fc83a7\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\n  pack.go:250\t\t0x100157728\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\n  pack.go:250\t\t0x10015772c\t\taa0003e1\t\tMOVD R0, R1\t\t\t\t\t\t\n  pack.go:250\t\t0x100157730\t\t97fc838c\t\tCALL runtime.panicIndex(SB)\t\t\t\t\n  pack.go:244\t\t0x100157734\t\t8b060c27\t\tADD R6<<3, R1, R7\t\t\t\t\t\n  pack.go:245\t\t0x100157738\t\teb0500df\t\tCMP R5, R6\t\t\t\t\t\t\n  pack.go:245\t\t0x10015773c\t\t54000108\t\tBHI 8(PC)\t\t\t\t\t\t\n  pack.go:245\t\t0x100157740\t\tcb060089\t\tSUB R6, R4, R9\t\t\t\t\t\t\n  pack.go:245\t\t0x100157744\t\tcb0903ea\t\tNEG R9, R10\t\t\t\t\t\t\n  pack.go:245\t\t0x100157748\t\t8a8afcca\t\tAND R10->63, R6, R10\t\t\t\t\t\n  pack.go:245\t\t0x10015774c\t\tcb0600a5\t\tSUB R6, R5, R5\t\t\t\t\t\t\n  pack.go:245\t\t0x100157750\t\t8b0a0068\t\tADD R10, R3, R8\t\t\t\t\t\t\n  pack.go:236\t\t0x100157754\t\taa0903e6\t\tMOVD R9, R6\t\t\t\t\t\t\n  pack.go:246\t\t0x100157758\t\t17ffff74\t\tJMP -140(PC)\t\t\t\t\t\t\n  pack.go:245\t\t0x10015775c\t\taa0603e0\t\tMOVD R6, R0\t\t\t\t\t\t\n  pack.go:245\t\t0x100157760\t\taa0503e1\t\tMOVD R5, R1\t\t\t\t\t\t\n  pack.go:245\t\t0x100157764\t\t97fc8397\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\n  pack.go:179\t\t0x100157768\t\t91002108\t\tADD $8, R8, R8\t\t\t\t\t\t\n  pack.go:174\t\t0x10015776c\t\tcb0800a9\t\tSUB R8, R5, R9\t\t\t\t\t\t\n  pack.go:174\t\t0x100157770\t\td1000929\t\tSUB $2, R9, R9\t\t\t\t\t\t\n  pack.go:174\t\t0x100157774\t\tf100213f\t\tCMP $8, R9\t\t\t\t\t\t\n  pack.go:174\t\t0x100157778\t\t540001eb\t\tBLT 15(PC)\t\t\t\t\t\t\n  pack.go:175\t\t0x10015777c\t\teb07011f\t\tCMP R7, R8\t\t\t\t\t\t\n  pack.go:175\t\t0x100157780\t\t540002e8\t\tBHI 23(PC)\t\t\t\t\t\t\n  pack.go:175\t\t0x100157784\t\tcb080089\t\tSUB R8, R4, R9\t\t\t\t\t\t\n  pack.go:175\t\t0x100157788\t\td1000929\t\tSUB $2, R9, R9\t\t\t\t\t\t\n  pack.go:175\t\t0x10015778c\t\tcb0903e9\t\tNEG R9, R9\t\t\t\t\t\t\n  pack.go:175\t\t0x100157790\t\t8a89fd09\t\tAND R9->63, R8, R9\t\t\t\t\t\n  binary.go:117\t\t0x100157794\t\tf86968c9\t\tMOVD (R6)(R9), R9\t\t\t\t\t\n  pack.go:176\t\t0x100157798\t\tb4fffe89\t\tCBZ R9, -12(PC)\t\t\t\t\t\t\n  pack.go:177\t\t0x10015779c\t\tdac00126\t\tRBIT R9, R6\t\t\t\t\t\t\n  pack.go:177\t\t0x1001577a0\t\tdac010c6\t\tCLZ R6, R6\t\t\t\t\t\t\n  pack.go:177\t\t0x1001577a4\t\t8b460d06\t\tADD R6>>3, R8, R6\t\t\t\t\t\n  pack.go:241\t\t0x1001577a8\t\taa0603e8\t\tMOVD R6, R8\t\t\t\t\t\t\n  pack.go:241\t\t0x1001577ac\t\t14000007\t\tJMP 7(PC)\t\t\t\t\t\t\n  pack.go:182\t\t0x1001577b0\t\t91000508\t\tADD $1, R8, R8\t\t\t\t\t\t\n  pack.go:181\t\t0x1001577b4\t\teb07011f\t\tCMP R7, R8\t\t\t\t\t\t\n  pack.go:181\t\t0x1001577b8\t\t5400008a\t\tBGE 4(PC)\t\t\t\t\t\t\n  pack.go:181\t\t0x1001577bc\t\t540000a2\t\tBCS 5(PC)\t\t\t\t\t\t\n  pack.go:181\t\t0x1001577c0\t\t386868c9\t\tMOVBU (R6)(R8), R9\t\t\t\t\t\n  pack.go:181\t\t0x1001577c4\t\t34ffff69\t\tCBZW R9, -5(PC)\t\t\t\t\t\t\n  pack.go:241\t\t0x1001577c8\t\t91000906\t\tADD $2, R8, R6\t\t\t\t\t\t\n  pack.go:241\t\t0x1001577cc\t\t17ffffda\t\tJMP -38(PC)\t\t\t\t\t\t\n  pack.go:181\t\t0x1001577d0\t\taa0803e0\t\tMOVD R8, R0\t\t\t\t\t\t\n  pack.go:181\t\t0x1001577d4\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\n  pack.go:181\t\t0x1001577d8\t\t97fc8362\t\tCALL runtime.panicIndex(SB)\t\t\t\t\n  pack.go:175\t\t0x1001577dc\t\taa0803e0\t\tMOVD R8, R0\t\t\t\t\t\t\n  pack.go:175\t\t0x1001577e0\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\n  pack.go:175\t\t0x1001577e4\t\t97fc8377\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\n  pack.go:229\t\t0x1001577e8\t\tf0001b7b\t\tADRP 3600384(PC), R27\t\t\t\t\t\n  pack.go:229\t\t0x1001577ec\t\tf940f363\t\tMOVD 480(R27), R3\t\t\t\t\t\n  pack.go:229\t\t0x1001577f0\t\tf0001b7b\t\tADRP 3600384(PC), R27\t\t\t\t\t\n  pack.go:229\t\t0x1001577f4\t\tf940f764\t\tMOVD 488(R27), R4\t\t\t\t\t\n  pack.go:229\t\t0x1001577f8\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\n  pack.go:229\t\t0x1001577fc\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\n  pack.go:229\t\t0x100157800\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\n  pack.go:229\t\t0x100157804\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\n  pack.go:229\t\t0x100157808\t\tf84707fe\t\tMOVD.P 112(RSP), R30\t\t\t\t\t\n  pack.go:229\t\t0x10015780c\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\n  pack.go:226\t\t0x100157810\t\tf0001b7b\t\tADRP 3600384(PC), R27\t\t\t\t\t\n  pack.go:226\t\t0x100157814\t\tf9412b63\t\tMOVD 592(R27), R3\t\t\t\t\t\n  pack.go:226\t\t0x100157818\t\tf0001b7b\t\tADRP 3600384(PC), R27\t\t\t\t\t\n  pack.go:226\t\t0x10015781c\t\tf9412f64\t\tMOVD 600(R27), R4\t\t\t\t\t\n  pack.go:226\t\t0x100157820\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\n  pack.go:226\t\t0x100157824\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\n  pack.go:226\t\t0x100157828\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\n  pack.go:226\t\t0x10015782c\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\n  pack.go:226\t\t0x100157830\t\tf84707fe\t\tMOVD.P 112(RSP), R30\t\t\t\t\t\n  pack.go:226\t\t0x100157834\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\n  pack.go:232\t\t0x100157838\t\taa0903e0\t\tMOVD R9, R0\t\t\t\t\t\t\n  pack.go:232\t\t0x10015783c\t\t97fc8361\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\n  pack.go:225\t\t0x100157840\t\taa0903ea\t\tMOVD R9, R10\t\t\t\t\t\t\n  pack.go:225\t\t0x100157844\t\taa0803e9\t\tMOVD R8, R9\t\t\t\t\t\t\n  pack.go:228\t\t0x100157848\t\taa0a03e8\t\tMOVD R10, R8\t\t\t\t\t\t\n  pack.go:228\t\t0x10015784c\t\t17ffff0a\t\tJMP -246(PC)\t\t\t\t\t\t\n  pack.go:179\t\t0x100157850\t\t9100218c\t\tADD $8, R12, R12\t\t\t\t\t\n  pack.go:174\t\t0x100157854\t\tcb0c012d\t\tSUB R12, R9, R13\t\t\t\t\t\n  pack.go:174\t\t0x100157858\t\td10009ad\t\tSUB $2, R13, R13\t\t\t\t\t\n  pack.go:174\t\t0x10015785c\t\tf10021bf\t\tCMP $8, R13\t\t\t\t\t\t\n  pack.go:174\t\t0x100157860\t\t540001eb\t\tBLT 15(PC)\t\t\t\t\t\t\n  pack.go:175\t\t0x100157864\t\teb0b019f\t\tCMP R11, R12\t\t\t\t\t\t\n  pack.go:175\t\t0x100157868\t\t540004c8\t\tBHI 38(PC)\t\t\t\t\t\t\n  pack.go:175\t\t0x10015786c\t\tcb0c004d\t\tSUB R12, R2, R13\t\t\t\t\t\n  pack.go:175\t\t0x100157870\t\td10009ad\t\tSUB $2, R13, R13\t\t\t\t\t\n  pack.go:175\t\t0x100157874\t\tcb0d03ed\t\tNEG R13, R13\t\t\t\t\t\t\n  pack.go:175\t\t0x100157878\t\t8a8dfd8d\t\tAND R13->63, R12, R13\t\t\t\t\t\n  binary.go:117\t\t0x10015787c\t\tf86d694d\t\tMOVD (R10)(R13), R13\t\t\t\t\t\n  pack.go:176\t\t0x100157880\t\tb4fffe8d\t\tCBZ R13, -12(PC)\t\t\t\t\t\n  pack.go:177\t\t0x100157884\t\tdac001a9\t\tRBIT R13, R9\t\t\t\t\t\t\n  pack.go:177\t\t0x100157888\t\tdac01129\t\tCLZ R9, R9\t\t\t\t\t\t\n  pack.go:177\t\t0x10015788c\t\t8b490d89\t\tADD R9>>3, R12, R9\t\t\t\t\t\n  pack.go:210\t\t0x100157890\t\taa0903ec\t\tMOVD R9, R12\t\t\t\t\t\t\n  pack.go:210\t\t0x100157894\t\t14000007\t\tJMP 7(PC)\t\t\t\t\t\t\n  pack.go:182\t\t0x100157898\t\t9100058c\t\tADD $1, R12, R12\t\t\t\t\t\n  pack.go:181\t\t0x10015789c\t\teb0b019f\t\tCMP R11, R12\t\t\t\t\t\t\n  pack.go:181\t\t0x1001578a0\t\t5400008a\t\tBGE 4(PC)\t\t\t\t\t\t\n  pack.go:181\t\t0x1001578a4\t\t54000282\t\tBCS 20(PC)\t\t\t\t\t\t\n  pack.go:181\t\t0x1001578a8\t\t386c6949\t\tMOVBU (R10)(R12), R9\t\t\t\t\t\n  pack.go:181\t\t0x1001578ac\t\t34ffff69\t\tCBZW R9, -5(PC)\t\t\t\t\t\t\n  pack.go:210\t\t0x1001578b0\t\t91000989\t\tADD $2, R12, R9\t\t\t\t\t\t\n  pack.go:211\t\t0x1001578b4\t\teb880d3f\t\tCMP R8->3, R9\t\t\t\t\t\t\n  pack.go:211\t\t0x1001578b8\t\t540000ac\t\tBGT 5(PC)\t\t\t\t\t\t\n  pack.go:214\t\t0x1001578bc\t\td37df12a\t\tLSL $3, R9, R10\t\t\t\t\t\t\n  pack.go:225\t\t0x1001578c0\t\taa0903e8\t\tMOVD R9, R8\t\t\t\t\t\t\n  pack.go:228\t\t0x1001578c4\t\taa0a03e9\t\tMOVD R10, R9\t\t\t\t\t\t\n  pack.go:214\t\t0x1001578c8\t\t17ffffde\t\tJMP -34(PC)\t\t\t\t\t\t\n  pack.go:212\t\t0x1001578cc\t\tf0001b7b\t\tADRP 3600384(PC), R27\t\t\t\t\t\n  pack.go:212\t\t0x1001578d0\t\tf940f363\t\tMOVD 480(R27), R3\t\t\t\t\t\n  pack.go:212\t\t0x1001578d4\t\tf0001b7b\t\tADRP 3600384(PC), R27\t\t\t\t\t\n  pack.go:212\t\t0x1001578d8\t\tf940f764\t\tMOVD 488(R27), R4\t\t\t\t\t\n  pack.go:212\t\t0x1001578dc\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\n  pack.go:212\t\t0x1001578e0\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\n  pack.go:212\t\t0x1001578e4\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\n  pack.go:212\t\t0x1001578e8\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\n  pack.go:212\t\t0x1001578ec\t\tf84707fe\t\tMOVD.P 112(RSP), R30\t\t\t\t\t\n  pack.go:212\t\t0x1001578f0\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\n  pack.go:181\t\t0x1001578f4\t\taa0c03e0\t\tMOVD R12, R0\t\t\t\t\t\t\n  pack.go:181\t\t0x1001578f8\t\taa0b03e1\t\tMOVD R11, R1\t\t\t\t\t\t\n  pack.go:181\t\t0x1001578fc\t\t97fc8319\t\tCALL runtime.panicIndex(SB)\t\t\t\t\n  pack.go:175\t\t0x100157900\t\taa0c03e0\t\tMOVD R12, R0\t\t\t\t\t\t\n  pack.go:175\t\t0x100157904\t\taa0b03e1\t\tMOVD R11, R1\t\t\t\t\t\t\n  pack.go:175\t\t0x100157908\t\t97fc832e\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\n  pack.go:210\t\t0x10015790c\t\taa0903e1\t\tMOVD R9, R1\t\t\t\t\t\t\n  pack.go:210\t\t0x100157910\t\t97fc8324\t\tCALL runtime.panicSliceAcap(SB)\t\t\t\t\n  pack.go:210\t\t0x100157914\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\n  pack.go:193\t\t0x100157918\t\ta90087e0\t\tSTP (R0, R1), 8(RSP)\t\t\t\t\t\n  pack.go:193\t\t0x10015791c\t\ta9018fe2\t\tSTP (R2, R3), 24(RSP)\t\t\t\t\t\n  pack.go:193\t\t0x100157920\t\taa1e03e3\t\tMOVD R30, R3\t\t\t\t\t\t\n  pack.go:193\t\t0x100157924\t\t97fc79b7\t\tCALL runtime.morestack_noctxt.abi0(SB)\t\t\t\n  pack.go:193\t\t0x100157928\t\ta94087e0\t\tLDP 8(RSP), (R0, R1)\t\t\t\t\t\n  pack.go:193\t\t0x10015792c\t\ta9418fe2\t\tLDP 24(RSP), (R2, R3)\t\t\t\t\t\n  pack.go:193\t\t0x100157930\t\t17fffe84\t\tJMP github.com/cnooljaw/gosproto.UnpackWithLimit(SB)\t\n  pack.go:193\t\t0x100157934\t\t00000000\t\t?\t\t\t\t\t\t\t\n  pack.go:193\t\t0x100157938\t\t00000000\t\t?\t\t\t\t\t\t\t\n  pack.go:193\t\t0x10015793c\t\t00000000\t\t?\t\t\t\t\t\t\t\n\nTEXT github.com/cnooljaw/gosproto.ExperimentUnpackClone(SB) /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/gosproto/unpack_experiment.go\n  unpack_experiment.go:5\t0x1001579e0\t\tf9400b90\t\tMOVD 16(R28), R16\t\t\t\t\t\t\n  unpack_experiment.go:5\t0x1001579e4\t\teb3063ff\t\tCMP R16, RSP\t\t\t\t\t\t\t\n  unpack_experiment.go:5\t0x1001579e8\t\t54002e89\t\tBLS 372(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:5\t0x1001579ec\t\tf8190ffe\t\tMOVD.W R30, -112(RSP)\t\t\t\t\t\t\n  unpack_experiment.go:5\t0x1001579f0\t\tf81f83fd\t\tMOVD R29, -8(RSP)\t\t\t\t\t\t\n  unpack_experiment.go:5\t0x1001579f4\t\td10023fd\t\tSUB $8, RSP, R29\t\t\t\t\t\t\n  unpack_experiment.go:5\t0x1001579f8\t\tf9003fe0\t\tMOVD R0, 120(RSP)\t\t\t\t\t\t\n  unpack_experiment.go:6\t0x1001579fc\t\tf100007f\t\tCMP $0, R3\t\t\t\t\t\t\t\n  unpack_experiment.go:6\t0x100157a00\t\t540000cd\t\tBLE 6(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:6\t0x100157a04\t\taa0103e4\t\tMOVD R1, R4\t\t\t\t\t\t\t\n  unpack_experiment.go:6\t0x100157a08\t\taa0203e5\t\tMOVD R2, R5\t\t\t\t\t\t\t\n  unpack_experiment.go:6\t0x100157a0c\t\taa0003e6\t\tMOVD R0, R6\t\t\t\t\t\t\t\n  unpack_experiment.go:6\t0x100157a10\t\taa1f03e7\t\tMOVD ZR, R7\t\t\t\t\t\t\t\n  unpack_experiment.go:11\t0x100157a14\t\t14000010\t\tJMP 16(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:7\t0x100157a18\t\tf0001b7b\t\tADRP 3600384(PC), R27\t\t\t\t\t\t\n  unpack_experiment.go:7\t0x100157a1c\t\tf940fb63\t\tMOVD 496(R27), R3\t\t\t\t\t\t\n  unpack_experiment.go:7\t0x100157a20\t\tf0001b7b\t\tADRP 3600384(PC), R27\t\t\t\t\t\t\n  unpack_experiment.go:7\t0x100157a24\t\tf940ff64\t\tMOVD 504(R27), R4\t\t\t\t\t\t\n  unpack_experiment.go:7\t0x100157a28\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\t\n  unpack_experiment.go:7\t0x100157a2c\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:7\t0x100157a30\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\t\n  unpack_experiment.go:7\t0x100157a34\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  unpack_experiment.go:7\t0x100157a38\t\tf84707fe\t\tMOVD.P 112(RSP), R30\t\t\t\t\t\t\n  unpack_experiment.go:7\t0x100157a3c\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  unpack_experiment.go:44\t0x100157a40\t\tcb090042\t\tSUB R9, R2, R2\t\t\t\t\t\t\t\n  unpack_experiment.go:44\t0x100157a44\t\tcb0203e8\t\tNEG R2, R8\t\t\t\t\t\t\t\n  unpack_experiment.go:44\t0x100157a48\t\t8a88fd28\t\tAND R8->63, R9, R8\t\t\t\t\t\t\n  unpack_experiment.go:44\t0x100157a4c\t\tcb090021\t\tSUB R9, R1, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:44\t0x100157a50\t\t8b080000\t\tADD R8, R0, R0\t\t\t\t\t\t\t\n  unpack_experiment.go:11\t0x100157a54\t\tb40009a1\t\tCBZ R1, 77(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:12\t0x100157a58\t\t39400008\t\tMOVBU (R0), R8\t\t\t\t\t\t\t\n  unpack_experiment.go:14\t0x100157a5c\t\taa0803e9\t\tMOVD R8, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:14\t0x100157a60\t\t350003c9\t\tCBNZW R9, 30(PC)\t\t\t\t\t\t\n  unpack_experiment.go:15\t0x100157a64\t\tf100083f\t\tCMP $2, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:15\t0x100157a68\t\t5400032b\t\tBLT 25(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:15\t0x100157a6c\t\t39400408\t\tMOVBU 1(R0), R8\t\t\t\t\t\t\t\n  unpack_experiment.go:15\t0x100157a70\t\t35000288\t\tCBNZW R8, 20(PC)\t\t\t\t\t\t\n  unpack_experiment.go:16\t0x100157a74\t\tcb070068\t\tSUB R7, R3, R8\t\t\t\t\t\t\t\n  unpack_experiment.go:16\t0x100157a78\t\t937ffd09\t\tASR $63, R8, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:16\t0x100157a7c\t\t8b49f508\t\tADD R9>>61, R8, R8\t\t\t\t\t\t\n  unpack_experiment.go:16\t0x100157a80\t\t9343fd09\t\tASR $3, R8, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:17\t0x100157a84\t\tf100093f\t\tCMP $2, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:17\t0x100157a88\t\t5400058b\t\tBLT 44(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:21\t0x100157a8c\t\t9100052a\t\tADD $1, R9, R10\t\t\t\t\t\t\t\n  unpack_experiment.go:21\t0x100157a90\t\teb0a003f\t\tCMP R10, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:21\t0x100157a94\t\t9a89d429\t\tCSINC LE, R1, R9, R9\t\t\t\t\t\t\n  unpack_experiment.go:22\t0x100157a98\t\teb09005f\t\tCMP R9, R2\t\t\t\t\t\t\t\n  unpack_experiment.go:21\t0x100157a9c\t\t54002883\t\tBCC 324(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:22\t0x100157aa0\t\td100084a\t\tSUB $2, R2, R10\t\t\t\t\t\t\t\n  unpack_experiment.go:22\t0x100157aa4\t\tcb0a03ea\t\tNEG R10, R10\t\t\t\t\t\t\t\n  unpack_experiment.go:22\t0x100157aa8\t\t937ffd4a\t\tASR $63, R10, R10\t\t\t\t\t\t\n  unpack_experiment.go:22\t0x100157aac\t\t927f014a\t\tAND $2, R10, R10\t\t\t\t\t\t\n  unpack_experiment.go:22\t0x100157ab0\t\t8b0a000a\t\tADD R10, R0, R10\t\t\t\t\t\t\n  unpack_experiment.go:22\t0x100157ab4\t\td100092b\t\tSUB $2, R9, R11\t\t\t\t\t\t\t\n  unpack_experiment.go:22\t0x100157ab8\t\taa1f03ec\t\tMOVD ZR, R12\t\t\t\t\t\t\t\n  pack.go:174\t\t\t0x100157abc\t\t1400010e\t\tJMP 270(PC)\t\t\t\t\t\t\t\n  pack.go:174\t\t\t0x100157ac0\t\tb24003e8\t\tORR $1, ZR, R8\t\t\t\t\t\t\t\n  pack.go:174\t\t\t0x100157ac4\t\tb27d03e9\t\tORR $8, ZR, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:15\t0x100157ac8\t\t14000106\t\tJMP 262(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:15\t0x100157acc\t\tb24003e8\t\tORR $1, ZR, R8\t\t\t\t\t\t\t\n  unpack_experiment.go:15\t0x100157ad0\t\tb27d03e9\t\tORR $8, ZR, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:15\t0x100157ad4\t\t14000103\t\tJMP 259(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:28\t0x100157ad8\t\t7103fd3f\t\tCMPW $255, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:28\t0x100157adc\t\t54000101\t\tBNE 8(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:29\t0x100157ae0\t\tf100083f\t\tCMP $2, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:29\t0x100157ae4\t\t540003eb\t\tBLT 31(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:32\t0x100157ae8\t\t39400408\t\tMOVBU 1(R0), R8\t\t\t\t\t\t\t\n  unpack_experiment.go:32\t0x100157aec\t\t91000508\t\tADD $1, R8, R8\t\t\t\t\t\t\t\n  unpack_experiment.go:32\t0x100157af0\t\td37df108\t\tLSL $3, R8, R8\t\t\t\t\t\t\t\n  unpack_experiment.go:33\t0x100157af4\t\t91000909\t\tADD $2, R8, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:33\t0x100157af8\t\t14000007\t\tJMP 7(PC)\t\t\t\t\t\t\t\n  bits.go:126\t\t\t0x100157afc\t\taa0803ea\t\tMOVD R8, R10\t\t\t\t\t\t\t\n  bits.go:126\t\t\t0x100157b00\t\tb000070b\t\tADRP 921600(PC), R11\t\t\t\t\t\t\n  bits.go:126\t\t\t0x100157b04\t\t913db16b\t\tADD $3948, R11, R11\t\t\t\t\t\t\n  bits.go:126\t\t\t0x100157b08\t\t386a696a\t\tMOVBU (R11)(R10), R10\t\t\t\t\t\t\n  unpack_experiment.go:35\t0x100157b0c\t\t91000549\t\tADD $1, R10, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:35\t0x100157b10\t\tb27d03e8\t\tORR $8, ZR, R8\t\t\t\t\t\t\t\n  unpack_experiment.go:37\t0x100157b14\t\teb01013f\t\tCMP R1, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:37\t0x100157b18\t\t54001ccc\t\tBGT 230(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:40\t0x100157b1c\t\tcb07006a\t\tSUB R7, R3, R10\t\t\t\t\t\t\t\n  unpack_experiment.go:40\t0x100157b20\t\teb0a011f\t\tCMP R10, R8\t\t\t\t\t\t\t\n  unpack_experiment.go:40\t0x100157b24\t\t54001b2c\t\tBGT 217(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:43\t0x100157b28\t\t8b0800e7\t\tADD R8, R7, R7\t\t\t\t\t\t\t\n  unpack_experiment.go:37\t0x100157b2c\t\teb01013f\t\tCMP R1, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:44\t0x100157b30\t\t54fff889\t\tBLS -60(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:44\t0x100157b34\t\t140000e9\t\tJMP 233(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:18\t0x100157b38\t\tf0001b7b\t\tADRP 3600384(PC), R27\t\t\t\t\t\t\n  unpack_experiment.go:18\t0x100157b3c\t\tf940f363\t\tMOVD 480(R27), R3\t\t\t\t\t\t\n  unpack_experiment.go:18\t0x100157b40\t\tf0001b7b\t\tADRP 3600384(PC), R27\t\t\t\t\t\t\n  unpack_experiment.go:18\t0x100157b44\t\tf940f764\t\tMOVD 488(R27), R4\t\t\t\t\t\t\n  unpack_experiment.go:18\t0x100157b48\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\t\n  unpack_experiment.go:18\t0x100157b4c\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:18\t0x100157b50\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\t\n  unpack_experiment.go:18\t0x100157b54\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  unpack_experiment.go:18\t0x100157b58\t\tf84707fe\t\tMOVD.P 112(RSP), R30\t\t\t\t\t\t\n  unpack_experiment.go:18\t0x100157b5c\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  unpack_experiment.go:30\t0x100157b60\t\tf0001b7b\t\tADRP 3600384(PC), R27\t\t\t\t\t\t\n  unpack_experiment.go:30\t0x100157b64\t\tf9412b63\t\tMOVD 592(R27), R3\t\t\t\t\t\t\n  unpack_experiment.go:30\t0x100157b68\t\tf0001b7b\t\tADRP 3600384(PC), R27\t\t\t\t\t\t\n  unpack_experiment.go:30\t0x100157b6c\t\tf9412f64\t\tMOVD 600(R27), R4\t\t\t\t\t\t\n  unpack_experiment.go:30\t0x100157b70\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\t\n  unpack_experiment.go:30\t0x100157b74\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:30\t0x100157b78\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\t\n  unpack_experiment.go:30\t0x100157b7c\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  unpack_experiment.go:30\t0x100157b80\t\tf84707fe\t\tMOVD.P 112(RSP), R30\t\t\t\t\t\t\n  unpack_experiment.go:30\t0x100157b84\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  unpack_experiment.go:6\t0x100157b88\t\tf9002be4\t\tMOVD R4, 80(RSP)\t\t\t\t\t\t\n  unpack_experiment.go:6\t0x100157b8c\t\tf90033e6\t\tMOVD R6, 96(RSP)\t\t\t\t\t\t\n  unpack_experiment.go:6\t0x100157b90\t\tf90027e5\t\tMOVD R5, 72(RSP)\t\t\t\t\t\t\n  unpack_experiment.go:40\t0x100157b94\t\tf90013e7\t\tMOVD R7, 32(RSP)\t\t\t\t\t\t\n  unpack_experiment.go:46\t0x100157b98\t\t90000aa0\t\tADRP 1392640(PC), R0\t\t\t\t\t\t\n  unpack_experiment.go:46\t0x100157b9c\t\t91388000\t\tADD $3616, R0, R0\t\t\t\t\t\t\n  unpack_experiment.go:46\t0x100157ba0\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:46\t0x100157ba4\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\t\n  unpack_experiment.go:46\t0x100157ba8\t\t97fc6a6a\t\tCALL runtime.makeslice(SB)\t\t\t\t\t\n  unpack_experiment.go:46\t0x100157bac\t\tf9002fe0\t\tMOVD R0, 88(RSP)\t\t\t\t\t\t\n  unpack_experiment.go:48\t0x100157bb0\t\tf94013e2\t\tMOVD 32(RSP), R2\t\t\t\t\t\t\n  unpack_experiment.go:48\t0x100157bb4\t\tf94033e3\t\tMOVD 96(RSP), R3\t\t\t\t\t\t\n  unpack_experiment.go:48\t0x100157bb8\t\tf94027e4\t\tMOVD 72(RSP), R4\t\t\t\t\t\t\n  unpack_experiment.go:48\t0x100157bbc\t\tf9402be5\t\tMOVD 80(RSP), R5\t\t\t\t\t\t\n  unpack_experiment.go:48\t0x100157bc0\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:48\t0x100157bc4\t\t14000004\t\tJMP 4(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:48\t0x100157bc8\t\taa0603e4\t\tMOVD R6, R4\t\t\t\t\t\t\t\n  unpack_experiment.go:48\t0x100157bcc\t\taa0803e3\t\tMOVD R8, R3\t\t\t\t\t\t\t\n  unpack_experiment.go:72\t0x100157bd0\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:48\t0x100157bd4\t\tb4000ae5\t\tCBZ R5, 87(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:49\t0x100157bd8\t\t39400066\t\tMOVBU (R3), R6\t\t\t\t\t\t\t\n  unpack_experiment.go:50\t0x100157bdc\t\taa0603e7\t\tMOVD R6, R7\t\t\t\t\t\t\t\n  unpack_experiment.go:50\t0x100157be0\t\t350001e7\t\tCBNZW R7, 15(PC)\t\t\t\t\t\t\n  unpack_experiment.go:52\t0x100157be4\t\tf10008bf\t\tCMP $2, R5\t\t\t\t\t\t\t\n  unpack_experiment.go:52\t0x100157be8\t\t5400016b\t\tBLT 11(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:52\t0x100157bec\t\t39400466\t\tMOVBU 1(R3), R6\t\t\t\t\t\t\t\n  unpack_experiment.go:52\t0x100157bf0\t\t35000126\t\tCBNZW R6, 9(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:53\t0x100157bf4\t\td1000886\t\tSUB $2, R4, R6\t\t\t\t\t\t\t\n  unpack_experiment.go:53\t0x100157bf8\t\tcb0603e6\t\tNEG R6, R6\t\t\t\t\t\t\t\n  unpack_experiment.go:53\t0x100157bfc\t\t937ffcc6\t\tASR $63, R6, R6\t\t\t\t\t\t\t\n  unpack_experiment.go:53\t0x100157c00\t\t927f00c6\t\tAND $2, R6, R6\t\t\t\t\t\t\t\n  unpack_experiment.go:53\t0x100157c04\t\t8b060066\t\tADD R6, R3, R6\t\t\t\t\t\t\t\n  unpack_experiment.go:53\t0x100157c08\t\td10008a7\t\tSUB $2, R5, R7\t\t\t\t\t\t\t\n  unpack_experiment.go:53\t0x100157c0c\t\taa1f03e8\t\tMOVD ZR, R8\t\t\t\t\t\t\t\n  pack.go:174\t\t\t0x100157c10\t\t1400007f\t\tJMP 127(PC)\t\t\t\t\t\t\t\n  pack.go:174\t\t\t0x100157c14\t\tb24003e6\t\tORR $1, ZR, R6\t\t\t\t\t\t\t\n  unpack_experiment.go:52\t0x100157c18\t\t1400006f\t\tJMP 111(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:60\t0x100157c1c\t\td1000488\t\tSUB $1, R4, R8\t\t\t\t\t\t\t\n  unpack_experiment.go:60\t0x100157c20\t\tcb0803e9\t\tNEG R8, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:60\t0x100157c24\t\t937ffd29\t\tASR $63, R9, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:60\t0x100157c28\t\t92400129\t\tAND $1, R9, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:60\t0x100157c2c\t\t8b03012a\t\tADD R3, R9, R10\t\t\t\t\t\t\t\n  unpack_experiment.go:60\t0x100157c30\t\td10004ab\t\tSUB $1, R5, R11\t\t\t\t\t\t\t\n  unpack_experiment.go:61\t0x100157c34\t\t7103fcff\t\tCMPW $255, R7\t\t\t\t\t\t\t\n  unpack_experiment.go:61\t0x100157c38\t\t54000661\t\tBNE 51(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:62\t0x100157c3c\t\tf100017f\t\tCMP $0, R11\t\t\t\t\t\t\t\n  unpack_experiment.go:62\t0x100157c40\t\t54000c49\t\tBLS 98(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:62\t0x100157c44\t\t38696866\t\tMOVBU (R3)(R9), R6\t\t\t\t\t\t\n  unpack_experiment.go:63\t0x100157c48\t\teb02003f\t\tCMP R2, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:63\t0x100157c4c\t\t54000b88\t\tBHI 92(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:62\t0x100157c50\t\t910004c6\t\tADD $1, R6, R6\t\t\t\t\t\t\t\n  unpack_experiment.go:62\t0x100157c54\t\td37df0c7\t\tLSL $3, R6, R7\t\t\t\t\t\t\t\n  unpack_experiment.go:63\t0x100157c58\t\tcb010049\t\tSUB R1, R2, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:63\t0x100157c5c\t\tcb0903ec\t\tNEG R9, R12\t\t\t\t\t\t\t\n  unpack_experiment.go:63\t0x100157c60\t\t8a8cfc2c\t\tAND R12->63, R1, R12\t\t\t\t\t\t\n  unpack_experiment.go:63\t0x100157c64\t\t910004ed\t\tADD $1, R7, R13\t\t\t\t\t\t\t\n  unpack_experiment.go:63\t0x100157c68\t\t8b0c000c\t\tADD R12, R0, R12\t\t\t\t\t\t\n  unpack_experiment.go:63\t0x100157c6c\t\teb0d011f\t\tCMP R13, R8\t\t\t\t\t\t\t\n  unpack_experiment.go:63\t0x100157c70\t\t54000a03\t\tBCC 80(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:63\t0x100157c74\t\t91000548\t\tADD $1, R10, R8\t\t\t\t\t\t\t\n  unpack_experiment.go:63\t0x100157c78\t\teb060d3f\t\tCMP R6<<3, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:63\t0x100157c7c\t\t9a89c0e7\t\tCSEL GT, R7, R9, R7\t\t\t\t\t\t\n  unpack_experiment.go:63\t0x100157c80\t\teb0c011f\t\tCMP R12, R8\t\t\t\t\t\t\t\n  unpack_experiment.go:63\t0x100157c84\t\t540002a0\t\tBEQ 21(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:48\t0x100157c88\t\tf9002be4\t\tMOVD R4, 80(RSP)\t\t\t\t\t\t\n  unpack_experiment.go:48\t0x100157c8c\t\tf90027e5\t\tMOVD R5, 72(RSP)\t\t\t\t\t\t\n  unpack_experiment.go:60\t0x100157c90\t\tf90023eb\t\tMOVD R11, 64(RSP)\t\t\t\t\t\t\n  unpack_experiment.go:60\t0x100157c94\t\tf90033ea\t\tMOVD R10, 96(RSP)\t\t\t\t\t\t\n  unpack_experiment.go:62\t0x100157c98\t\tf9001fe6\t\tMOVD R6, 56(RSP)\t\t\t\t\t\t\n  unpack_experiment.go:63\t0x100157c9c\t\tf9001bed\t\tMOVD R13, 48(RSP)\t\t\t\t\t\t\n  unpack_experiment.go:72\t0x100157ca0\t\tf90017e1\t\tMOVD R1, 40(RSP)\t\t\t\t\t\t\n  unpack_experiment.go:63\t0x100157ca4\t\taa0c03e0\t\tMOVD R12, R0\t\t\t\t\t\t\t\n  unpack_experiment.go:63\t0x100157ca8\t\taa0803e1\t\tMOVD R8, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:63\t0x100157cac\t\taa0703e2\t\tMOVD R7, R2\t\t\t\t\t\t\t\n  unpack_experiment.go:63\t0x100157cb0\t\t97fc8398\t\tCALL runtime.memmove(SB)\t\t\t\t\t\n  unpack_experiment.go:63\t0x100157cb4\t\tf9402fe0\t\tMOVD 88(RSP), R0\t\t\t\t\t\t\n  unpack_experiment.go:64\t0x100157cb8\t\tf94017e1\t\tMOVD 40(RSP), R1\t\t\t\t\t\t\n  unpack_experiment.go:63\t0x100157cbc\t\tf94013e2\t\tMOVD 32(RSP), R2\t\t\t\t\t\t\n  unpack_experiment.go:65\t0x100157cc0\t\tf9402be4\t\tMOVD 80(RSP), R4\t\t\t\t\t\t\n  unpack_experiment.go:65\t0x100157cc4\t\tf94027e5\t\tMOVD 72(RSP), R5\t\t\t\t\t\t\n  unpack_experiment.go:64\t0x100157cc8\t\tf9401fe6\t\tMOVD 56(RSP), R6\t\t\t\t\t\t\n  unpack_experiment.go:65\t0x100157ccc\t\tf94033ea\t\tMOVD 96(RSP), R10\t\t\t\t\t\t\n  unpack_experiment.go:65\t0x100157cd0\t\tf94023eb\t\tMOVD 64(RSP), R11\t\t\t\t\t\t\n  unpack_experiment.go:65\t0x100157cd4\t\tf9401bed\t\tMOVD 48(RSP), R13\t\t\t\t\t\t\n  unpack_experiment.go:64\t0x100157cd8\t\t8b060c27\t\tADD R6<<3, R1, R7\t\t\t\t\t\t\n  unpack_experiment.go:65\t0x100157cdc\t\teb0d017f\t\tCMP R13, R11\t\t\t\t\t\t\t\n  unpack_experiment.go:65\t0x100157ce0\t\t54000623\t\tBCC 49(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:65\t0x100157ce4\t\tcb060c88\t\tSUB R6<<3, R4, R8\t\t\t\t\t\t\n  unpack_experiment.go:65\t0x100157ce8\t\tcb060ca5\t\tSUB R6<<3, R5, R5\t\t\t\t\t\t\n  unpack_experiment.go:65\t0x100157cec\t\td1000906\t\tSUB $2, R8, R6\t\t\t\t\t\t\t\n  unpack_experiment.go:65\t0x100157cf0\t\tcb0603e8\t\tNEG R6, R8\t\t\t\t\t\t\t\n  unpack_experiment.go:65\t0x100157cf4\t\t8a88fda8\t\tAND R8->63, R13, R8\t\t\t\t\t\t\n  unpack_experiment.go:65\t0x100157cf8\t\t8b0a0108\t\tADD R10, R8, R8\t\t\t\t\t\t\t\n  unpack_experiment.go:65\t0x100157cfc\t\td10008a5\t\tSUB $2, R5, R5\t\t\t\t\t\t\t\n  unpack_experiment.go:66\t0x100157d00\t\t17ffffb2\t\tJMP -78(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:66\t0x100157d04\t\taa1f03e3\t\tMOVD ZR, R3\t\t\t\t\t\t\t\n  unpack_experiment.go:70\t0x100157d08\t\t14000011\t\tJMP 17(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:79\t0x100157d0c\t\tcb0300a9\t\tSUB R3, R5, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:79\t0x100157d10\t\tcb03008b\t\tSUB R3, R4, R11\t\t\t\t\t\t\t\n  unpack_experiment.go:79\t0x100157d14\t\td1000966\t\tSUB $2, R11, R6\t\t\t\t\t\t\t\n  unpack_experiment.go:79\t0x100157d18\t\tcb0603eb\t\tNEG R6, R11\t\t\t\t\t\t\t\n  unpack_experiment.go:79\t0x100157d1c\t\t8a8bfceb\t\tAND R11->63, R7, R11\t\t\t\t\t\t\n  unpack_experiment.go:79\t0x100157d20\t\t8b0a0168\t\tADD R10, R11, R8\t\t\t\t\t\t\n  unpack_experiment.go:79\t0x100157d24\t\td1000925\t\tSUB $2, R9, R5\t\t\t\t\t\t\t\n  unpack_experiment.go:80\t0x100157d28\t\t91002027\t\tADD $8, R1, R7\t\t\t\t\t\t\t\n  unpack_experiment.go:80\t0x100157d2c\t\t17ffffa7\t\tJMP -89(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:82\t0x100157d30\t\taa0203e1\t\tMOVD R2, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:82\t0x100157d34\t\taa1f03e3\t\tMOVD ZR, R3\t\t\t\t\t\t\t\n  unpack_experiment.go:82\t0x100157d38\t\taa1f03e4\t\tMOVD ZR, R4\t\t\t\t\t\t\t\n  unpack_experiment.go:82\t0x100157d3c\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  unpack_experiment.go:82\t0x100157d40\t\tf84707fe\t\tMOVD.P 112(RSP), R30\t\t\t\t\t\t\n  unpack_experiment.go:82\t0x100157d44\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  unpack_experiment.go:72\t0x100157d48\t\taa0703e3\t\tMOVD R7, R3\t\t\t\t\t\t\t\n  unpack_experiment.go:71\t0x100157d4c\t\tb27800c7\t\tORR $256, R6, R7\t\t\t\t\t\t\n  unpack_experiment.go:71\t0x100157d50\t\t5ac000e7\t\tRBITW R7, R7\t\t\t\t\t\t\t\n  unpack_experiment.go:71\t0x100157d54\t\t5ac010e7\t\tCLZW R7, R7\t\t\t\t\t\t\t\n  unpack_experiment.go:72\t0x100157d58\t\t8b0100e7\t\tADD R1, R7, R7\t\t\t\t\t\t\t\n  unpack_experiment.go:72\t0x100157d5c\t\teb0b007f\t\tCMP R11, R3\t\t\t\t\t\t\t\n  unpack_experiment.go:72\t0x100157d60\t\t540001c2\t\tBCS 14(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:72\t0x100157d64\t\t38636948\t\tMOVBU (R10)(R3), R8\t\t\t\t\t\t\n  unpack_experiment.go:72\t0x100157d68\t\teb07005f\t\tCMP R7, R2\t\t\t\t\t\t\t\n  unpack_experiment.go:72\t0x100157d6c\t\t54000109\t\tBLS 8(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:72\t0x100157d70\t\t38276808\t\tMOVB R8, (R0)(R7)\t\t\t\t\t\t\n  unpack_experiment.go:74\t0x100157d74\t\td10004c7\t\tSUB $1, R6, R7\t\t\t\t\t\t\t\n  unpack_experiment.go:74\t0x100157d78\t\t8a0700c6\t\tAND R7, R6, R6\t\t\t\t\t\t\t\n  unpack_experiment.go:73\t0x100157d7c\t\t91000467\t\tADD $1, R3, R7\t\t\t\t\t\t\t\n  unpack_experiment.go:75\t0x100157d80\t\td3401cc8\t\tUBFX $0, R6, $8, R8\t\t\t\t\t\t\n  unpack_experiment.go:75\t0x100157d84\t\t35fffe28\t\tCBNZW R8, -15(PC)\t\t\t\t\t\t\n  unpack_experiment.go:75\t0x100157d88\t\t17ffffe1\t\tJMP -31(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:72\t0x100157d8c\t\taa0703e0\t\tMOVD R7, R0\t\t\t\t\t\t\t\n  unpack_experiment.go:72\t0x100157d90\t\taa0203e1\t\tMOVD R2, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:72\t0x100157d94\t\t97fc81f3\t\tCALL runtime.panicIndex(SB)\t\t\t\t\t\n  unpack_experiment.go:72\t0x100157d98\t\taa0303e0\t\tMOVD R3, R0\t\t\t\t\t\t\t\n  unpack_experiment.go:72\t0x100157d9c\t\taa0b03e1\t\tMOVD R11, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:72\t0x100157da0\t\t97fc81f0\t\tCALL runtime.panicIndex(SB)\t\t\t\t\t\n  unpack_experiment.go:65\t0x100157da4\t\taa0d03e0\t\tMOVD R13, R0\t\t\t\t\t\t\t\n  unpack_experiment.go:65\t0x100157da8\t\taa0b03e1\t\tMOVD R11, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:65\t0x100157dac\t\t97fc8205\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\t\n  unpack_experiment.go:63\t0x100157db0\t\taa0d03e1\t\tMOVD R13, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:63\t0x100157db4\t\taa0803e2\t\tMOVD R8, R2\t\t\t\t\t\t\t\n  unpack_experiment.go:63\t0x100157db8\t\t97fc81fa\t\tCALL runtime.panicSliceAcap(SB)\t\t\t\t\t\n  unpack_experiment.go:63\t0x100157dbc\t\taa0103e0\t\tMOVD R1, R0\t\t\t\t\t\t\t\n  unpack_experiment.go:63\t0x100157dc0\t\taa0203e1\t\tMOVD R2, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:63\t0x100157dc4\t\t97fc81ff\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\t\n  unpack_experiment.go:62\t0x100157dc8\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\t\n  unpack_experiment.go:62\t0x100157dcc\t\taa0003e1\t\tMOVD R0, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:62\t0x100157dd0\t\t97fc81e4\t\tCALL runtime.panicIndex(SB)\t\t\t\t\t\n  unpack_experiment.go:56\t0x100157dd4\t\t8b060c27\t\tADD R6<<3, R1, R7\t\t\t\t\t\t\n  unpack_experiment.go:57\t0x100157dd8\t\teb0500df\t\tCMP R5, R6\t\t\t\t\t\t\t\n  unpack_experiment.go:57\t0x100157ddc\t\t54000108\t\tBHI 8(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:57\t0x100157de0\t\tcb060089\t\tSUB R6, R4, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:57\t0x100157de4\t\tcb0903ea\t\tNEG R9, R10\t\t\t\t\t\t\t\n  unpack_experiment.go:57\t0x100157de8\t\t8a8afcca\t\tAND R10->63, R6, R10\t\t\t\t\t\t\n  unpack_experiment.go:57\t0x100157dec\t\tcb0600a5\t\tSUB R6, R5, R5\t\t\t\t\t\t\t\n  unpack_experiment.go:57\t0x100157df0\t\t8b0a0068\t\tADD R10, R3, R8\t\t\t\t\t\t\t\n  unpack_experiment.go:48\t0x100157df4\t\taa0903e6\t\tMOVD R9, R6\t\t\t\t\t\t\t\n  unpack_experiment.go:58\t0x100157df8\t\t17ffff74\t\tJMP -140(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:57\t0x100157dfc\t\taa0603e0\t\tMOVD R6, R0\t\t\t\t\t\t\t\n  unpack_experiment.go:57\t0x100157e00\t\taa0503e1\t\tMOVD R5, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:57\t0x100157e04\t\t97fc81ef\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\t\n  pack.go:179\t\t\t0x100157e08\t\t91002108\t\tADD $8, R8, R8\t\t\t\t\t\t\t\n  pack.go:174\t\t\t0x100157e0c\t\tcb0800a9\t\tSUB R8, R5, R9\t\t\t\t\t\t\t\n  pack.go:174\t\t\t0x100157e10\t\td1000929\t\tSUB $2, R9, R9\t\t\t\t\t\t\t\n  pack.go:174\t\t\t0x100157e14\t\tf100213f\t\tCMP $8, R9\t\t\t\t\t\t\t\n  pack.go:174\t\t\t0x100157e18\t\t540001eb\t\tBLT 15(PC)\t\t\t\t\t\t\t\n  pack.go:175\t\t\t0x100157e1c\t\teb07011f\t\tCMP R7, R8\t\t\t\t\t\t\t\n  pack.go:175\t\t\t0x100157e20\t\t540002e8\t\tBHI 23(PC)\t\t\t\t\t\t\t\n  pack.go:175\t\t\t0x100157e24\t\tcb080089\t\tSUB R8, R4, R9\t\t\t\t\t\t\t\n  pack.go:175\t\t\t0x100157e28\t\td1000929\t\tSUB $2, R9, R9\t\t\t\t\t\t\t\n  pack.go:175\t\t\t0x100157e2c\t\tcb0903e9\t\tNEG R9, R9\t\t\t\t\t\t\t\n  pack.go:175\t\t\t0x100157e30\t\t8a89fd09\t\tAND R9->63, R8, R9\t\t\t\t\t\t\n  binary.go:117\t\t\t0x100157e34\t\tf86968c9\t\tMOVD (R6)(R9), R9\t\t\t\t\t\t\n  pack.go:176\t\t\t0x100157e38\t\tb4fffe89\t\tCBZ R9, -12(PC)\t\t\t\t\t\t\t\n  pack.go:177\t\t\t0x100157e3c\t\tdac00126\t\tRBIT R9, R6\t\t\t\t\t\t\t\n  pack.go:177\t\t\t0x100157e40\t\tdac010c6\t\tCLZ R6, R6\t\t\t\t\t\t\t\n  pack.go:177\t\t\t0x100157e44\t\t8b460d06\t\tADD R6>>3, R8, R6\t\t\t\t\t\t\n  unpack_experiment.go:53\t0x100157e48\t\taa0603e8\t\tMOVD R6, R8\t\t\t\t\t\t\t\n  unpack_experiment.go:53\t0x100157e4c\t\t14000007\t\tJMP 7(PC)\t\t\t\t\t\t\t\n  pack.go:182\t\t\t0x100157e50\t\t91000508\t\tADD $1, R8, R8\t\t\t\t\t\t\t\n  pack.go:181\t\t\t0x100157e54\t\teb07011f\t\tCMP R7, R8\t\t\t\t\t\t\t\n  pack.go:181\t\t\t0x100157e58\t\t5400008a\t\tBGE 4(PC)\t\t\t\t\t\t\t\n  pack.go:181\t\t\t0x100157e5c\t\t540000a2\t\tBCS 5(PC)\t\t\t\t\t\t\t\n  pack.go:181\t\t\t0x100157e60\t\t386868c9\t\tMOVBU (R6)(R8), R9\t\t\t\t\t\t\n  pack.go:181\t\t\t0x100157e64\t\t34ffff69\t\tCBZW R9, -5(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:53\t0x100157e68\t\t91000906\t\tADD $2, R8, R6\t\t\t\t\t\t\t\n  unpack_experiment.go:53\t0x100157e6c\t\t17ffffda\t\tJMP -38(PC)\t\t\t\t\t\t\t\n  pack.go:181\t\t\t0x100157e70\t\taa0803e0\t\tMOVD R8, R0\t\t\t\t\t\t\t\n  pack.go:181\t\t\t0x100157e74\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\t\n  pack.go:181\t\t\t0x100157e78\t\t97fc81ba\t\tCALL runtime.panicIndex(SB)\t\t\t\t\t\n  pack.go:175\t\t\t0x100157e7c\t\taa0803e0\t\tMOVD R8, R0\t\t\t\t\t\t\t\n  pack.go:175\t\t\t0x100157e80\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\t\n  pack.go:175\t\t\t0x100157e84\t\t97fc81cf\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\t\n  unpack_experiment.go:41\t0x100157e88\t\tf0001b7b\t\tADRP 3600384(PC), R27\t\t\t\t\t\t\n  unpack_experiment.go:41\t0x100157e8c\t\tf940f363\t\tMOVD 480(R27), R3\t\t\t\t\t\t\n  unpack_experiment.go:41\t0x100157e90\t\tf0001b7b\t\tADRP 3600384(PC), R27\t\t\t\t\t\t\n  unpack_experiment.go:41\t0x100157e94\t\tf940f764\t\tMOVD 488(R27), R4\t\t\t\t\t\t\n  unpack_experiment.go:41\t0x100157e98\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\t\n  unpack_experiment.go:41\t0x100157e9c\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:41\t0x100157ea0\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\t\n  unpack_experiment.go:41\t0x100157ea4\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  unpack_experiment.go:41\t0x100157ea8\t\tf84707fe\t\tMOVD.P 112(RSP), R30\t\t\t\t\t\t\n  unpack_experiment.go:41\t0x100157eac\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  unpack_experiment.go:38\t0x100157eb0\t\tf0001b7b\t\tADRP 3600384(PC), R27\t\t\t\t\t\t\n  unpack_experiment.go:38\t0x100157eb4\t\tf9412b63\t\tMOVD 592(R27), R3\t\t\t\t\t\t\n  unpack_experiment.go:38\t0x100157eb8\t\tf0001b7b\t\tADRP 3600384(PC), R27\t\t\t\t\t\t\n  unpack_experiment.go:38\t0x100157ebc\t\tf9412f64\t\tMOVD 600(R27), R4\t\t\t\t\t\t\n  unpack_experiment.go:38\t0x100157ec0\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\t\n  unpack_experiment.go:38\t0x100157ec4\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:38\t0x100157ec8\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\t\n  unpack_experiment.go:38\t0x100157ecc\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  unpack_experiment.go:38\t0x100157ed0\t\tf84707fe\t\tMOVD.P 112(RSP), R30\t\t\t\t\t\t\n  unpack_experiment.go:38\t0x100157ed4\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  unpack_experiment.go:44\t0x100157ed8\t\taa0903e0\t\tMOVD R9, R0\t\t\t\t\t\t\t\n  unpack_experiment.go:44\t0x100157edc\t\t97fc81b9\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\t\n  unpack_experiment.go:37\t0x100157ee0\t\taa0903ea\t\tMOVD R9, R10\t\t\t\t\t\t\t\n  unpack_experiment.go:37\t0x100157ee4\t\taa0803e9\t\tMOVD R8, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:40\t0x100157ee8\t\taa0a03e8\t\tMOVD R10, R8\t\t\t\t\t\t\t\n  unpack_experiment.go:40\t0x100157eec\t\t17ffff0a\t\tJMP -246(PC)\t\t\t\t\t\t\t\n  pack.go:179\t\t\t0x100157ef0\t\t9100218c\t\tADD $8, R12, R12\t\t\t\t\t\t\n  pack.go:174\t\t\t0x100157ef4\t\tcb0c012d\t\tSUB R12, R9, R13\t\t\t\t\t\t\n  pack.go:174\t\t\t0x100157ef8\t\td10009ad\t\tSUB $2, R13, R13\t\t\t\t\t\t\n  pack.go:174\t\t\t0x100157efc\t\tf10021bf\t\tCMP $8, R13\t\t\t\t\t\t\t\n  pack.go:174\t\t\t0x100157f00\t\t540001eb\t\tBLT 15(PC)\t\t\t\t\t\t\t\n  pack.go:175\t\t\t0x100157f04\t\teb0b019f\t\tCMP R11, R12\t\t\t\t\t\t\t\n  pack.go:175\t\t\t0x100157f08\t\t540004c8\t\tBHI 38(PC)\t\t\t\t\t\t\t\n  pack.go:175\t\t\t0x100157f0c\t\tcb0c004d\t\tSUB R12, R2, R13\t\t\t\t\t\t\n  pack.go:175\t\t\t0x100157f10\t\td10009ad\t\tSUB $2, R13, R13\t\t\t\t\t\t\n  pack.go:175\t\t\t0x100157f14\t\tcb0d03ed\t\tNEG R13, R13\t\t\t\t\t\t\t\n  pack.go:175\t\t\t0x100157f18\t\t8a8dfd8d\t\tAND R13->63, R12, R13\t\t\t\t\t\t\n  binary.go:117\t\t\t0x100157f1c\t\tf86d694d\t\tMOVD (R10)(R13), R13\t\t\t\t\t\t\n  pack.go:176\t\t\t0x100157f20\t\tb4fffe8d\t\tCBZ R13, -12(PC)\t\t\t\t\t\t\n  pack.go:177\t\t\t0x100157f24\t\tdac001a9\t\tRBIT R13, R9\t\t\t\t\t\t\t\n  pack.go:177\t\t\t0x100157f28\t\tdac01129\t\tCLZ R9, R9\t\t\t\t\t\t\t\n  pack.go:177\t\t\t0x100157f2c\t\t8b490d89\t\tADD R9>>3, R12, R9\t\t\t\t\t\t\n  unpack_experiment.go:22\t0x100157f30\t\taa0903ec\t\tMOVD R9, R12\t\t\t\t\t\t\t\n  unpack_experiment.go:22\t0x100157f34\t\t14000007\t\tJMP 7(PC)\t\t\t\t\t\t\t\n  pack.go:182\t\t\t0x100157f38\t\t9100058c\t\tADD $1, R12, R12\t\t\t\t\t\t\n  pack.go:181\t\t\t0x100157f3c\t\teb0b019f\t\tCMP R11, R12\t\t\t\t\t\t\t\n  pack.go:181\t\t\t0x100157f40\t\t5400008a\t\tBGE 4(PC)\t\t\t\t\t\t\t\n  pack.go:181\t\t\t0x100157f44\t\t54000282\t\tBCS 20(PC)\t\t\t\t\t\t\t\n  pack.go:181\t\t\t0x100157f48\t\t386c6949\t\tMOVBU (R10)(R12), R9\t\t\t\t\t\t\n  pack.go:181\t\t\t0x100157f4c\t\t34ffff69\t\tCBZW R9, -5(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:22\t0x100157f50\t\t91000989\t\tADD $2, R12, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:23\t0x100157f54\t\teb880d3f\t\tCMP R8->3, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:23\t0x100157f58\t\t540000ac\t\tBGT 5(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:26\t0x100157f5c\t\td37df12a\t\tLSL $3, R9, R10\t\t\t\t\t\t\t\n  unpack_experiment.go:37\t0x100157f60\t\taa0903e8\t\tMOVD R9, R8\t\t\t\t\t\t\t\n  unpack_experiment.go:40\t0x100157f64\t\taa0a03e9\t\tMOVD R10, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:26\t0x100157f68\t\t17ffffde\t\tJMP -34(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:24\t0x100157f6c\t\tf0001b7b\t\tADRP 3600384(PC), R27\t\t\t\t\t\t\n  unpack_experiment.go:24\t0x100157f70\t\tf940f363\t\tMOVD 480(R27), R3\t\t\t\t\t\t\n  unpack_experiment.go:24\t0x100157f74\t\tf0001b7b\t\tADRP 3600384(PC), R27\t\t\t\t\t\t\n  unpack_experiment.go:24\t0x100157f78\t\tf940f764\t\tMOVD 488(R27), R4\t\t\t\t\t\t\n  unpack_experiment.go:24\t0x100157f7c\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\t\n  unpack_experiment.go:24\t0x100157f80\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:24\t0x100157f84\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\t\n  unpack_experiment.go:24\t0x100157f88\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  unpack_experiment.go:24\t0x100157f8c\t\tf84707fe\t\tMOVD.P 112(RSP), R30\t\t\t\t\t\t\n  unpack_experiment.go:24\t0x100157f90\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  pack.go:181\t\t\t0x100157f94\t\taa0c03e0\t\tMOVD R12, R0\t\t\t\t\t\t\t\n  pack.go:181\t\t\t0x100157f98\t\taa0b03e1\t\tMOVD R11, R1\t\t\t\t\t\t\t\n  pack.go:181\t\t\t0x100157f9c\t\t97fc8171\t\tCALL runtime.panicIndex(SB)\t\t\t\t\t\n  pack.go:175\t\t\t0x100157fa0\t\taa0c03e0\t\tMOVD R12, R0\t\t\t\t\t\t\t\n  pack.go:175\t\t\t0x100157fa4\t\taa0b03e1\t\tMOVD R11, R1\t\t\t\t\t\t\t\n  pack.go:175\t\t\t0x100157fa8\t\t97fc8186\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\t\n  unpack_experiment.go:22\t0x100157fac\t\taa0903e1\t\tMOVD R9, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:22\t0x100157fb0\t\t97fc817c\t\tCALL runtime.panicSliceAcap(SB)\t\t\t\t\t\n  unpack_experiment.go:22\t0x100157fb4\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\t\n  unpack_experiment.go:5\t0x100157fb8\t\ta90087e0\t\tSTP (R0, R1), 8(RSP)\t\t\t\t\t\t\n  unpack_experiment.go:5\t0x100157fbc\t\ta9018fe2\t\tSTP (R2, R3), 24(RSP)\t\t\t\t\t\t\n  unpack_experiment.go:5\t0x100157fc0\t\taa1e03e3\t\tMOVD R30, R3\t\t\t\t\t\t\t\n  unpack_experiment.go:5\t0x100157fc4\t\t97fc780f\t\tCALL runtime.morestack_noctxt.abi0(SB)\t\t\t\t\n  unpack_experiment.go:5\t0x100157fc8\t\ta94087e0\t\tLDP 8(RSP), (R0, R1)\t\t\t\t\t\t\n  unpack_experiment.go:5\t0x100157fcc\t\ta9418fe2\t\tLDP 24(RSP), (R2, R3)\t\t\t\t\t\t\n  unpack_experiment.go:5\t0x100157fd0\t\t17fffe84\t\tJMP github.com/cnooljaw/gosproto.ExperimentUnpackClone(SB)\t\n  unpack_experiment.go:5\t0x100157fd4\t\t00000000\t\t?\t\t\t\t\t\t\t\t\n  unpack_experiment.go:5\t0x100157fd8\t\t00000000\t\t?\t\t\t\t\t\t\t\t\n  unpack_experiment.go:5\t0x100157fdc\t\t00000000\t\t?\t\t\t\t\t\t\t\t\n\nTEXT github.com/cnooljaw/gosproto.ExperimentUnpackCandidate(SB) /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/gosproto/unpack_experiment.go\n  unpack_experiment.go:85\t0x100157fe0\t\tf9400b90\t\tMOVD 16(R28), R16\t\t\t\t\t\t\n  unpack_experiment.go:85\t0x100157fe4\t\teb3063ff\t\tCMP R16, RSP\t\t\t\t\t\t\t\n  unpack_experiment.go:85\t0x100157fe8\t\t54002f49\t\tBLS 378(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:85\t0x100157fec\t\tf8190ffe\t\tMOVD.W R30, -112(RSP)\t\t\t\t\t\t\n  unpack_experiment.go:85\t0x100157ff0\t\tf81f83fd\t\tMOVD R29, -8(RSP)\t\t\t\t\t\t\n  unpack_experiment.go:85\t0x100157ff4\t\td10023fd\t\tSUB $8, RSP, R29\t\t\t\t\t\t\n  unpack_experiment.go:85\t0x100157ff8\t\tf9003fe0\t\tMOVD R0, 120(RSP)\t\t\t\t\t\t\n  unpack_experiment.go:86\t0x100157ffc\t\tf100007f\t\tCMP $0, R3\t\t\t\t\t\t\t\n  unpack_experiment.go:86\t0x100158000\t\t540000cd\t\tBLE 6(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:86\t0x100158004\t\taa0103e4\t\tMOVD R1, R4\t\t\t\t\t\t\t\n  unpack_experiment.go:86\t0x100158008\t\taa0203e5\t\tMOVD R2, R5\t\t\t\t\t\t\t\n  unpack_experiment.go:86\t0x10015800c\t\taa0003e6\t\tMOVD R0, R6\t\t\t\t\t\t\t\n  unpack_experiment.go:86\t0x100158010\t\taa1f03e7\t\tMOVD ZR, R7\t\t\t\t\t\t\t\n  unpack_experiment.go:91\t0x100158014\t\t14000010\t\tJMP 16(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:87\t0x100158018\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\t\n  unpack_experiment.go:87\t0x10015801c\t\tf940fb63\t\tMOVD 496(R27), R3\t\t\t\t\t\t\n  unpack_experiment.go:87\t0x100158020\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\t\n  unpack_experiment.go:87\t0x100158024\t\tf940ff64\t\tMOVD 504(R27), R4\t\t\t\t\t\t\n  unpack_experiment.go:87\t0x100158028\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\t\n  unpack_experiment.go:87\t0x10015802c\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:87\t0x100158030\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\t\n  unpack_experiment.go:87\t0x100158034\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  unpack_experiment.go:87\t0x100158038\t\tf84707fe\t\tMOVD.P 112(RSP), R30\t\t\t\t\t\t\n  unpack_experiment.go:87\t0x10015803c\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  unpack_experiment.go:124\t0x100158040\t\tcb090042\t\tSUB R9, R2, R2\t\t\t\t\t\t\t\n  unpack_experiment.go:124\t0x100158044\t\tcb0203e8\t\tNEG R2, R8\t\t\t\t\t\t\t\n  unpack_experiment.go:124\t0x100158048\t\t8a88fd28\t\tAND R8->63, R9, R8\t\t\t\t\t\t\n  unpack_experiment.go:124\t0x10015804c\t\tcb090021\t\tSUB R9, R1, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:124\t0x100158050\t\t8b080000\t\tADD R8, R0, R0\t\t\t\t\t\t\t\n  unpack_experiment.go:91\t0x100158054\t\tb40009a1\t\tCBZ R1, 77(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:92\t0x100158058\t\t39400008\t\tMOVBU (R0), R8\t\t\t\t\t\t\t\n  unpack_experiment.go:94\t0x10015805c\t\taa0803e9\t\tMOVD R8, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:94\t0x100158060\t\t350003c9\t\tCBNZW R9, 30(PC)\t\t\t\t\t\t\n  unpack_experiment.go:95\t0x100158064\t\tf100083f\t\tCMP $2, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:95\t0x100158068\t\t5400032b\t\tBLT 25(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:95\t0x10015806c\t\t39400408\t\tMOVBU 1(R0), R8\t\t\t\t\t\t\t\n  unpack_experiment.go:95\t0x100158070\t\t35000288\t\tCBNZW R8, 20(PC)\t\t\t\t\t\t\n  unpack_experiment.go:96\t0x100158074\t\tcb070068\t\tSUB R7, R3, R8\t\t\t\t\t\t\t\n  unpack_experiment.go:96\t0x100158078\t\t937ffd09\t\tASR $63, R8, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:96\t0x10015807c\t\t8b49f508\t\tADD R9>>61, R8, R8\t\t\t\t\t\t\n  unpack_experiment.go:96\t0x100158080\t\t9343fd09\t\tASR $3, R8, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:97\t0x100158084\t\tf100093f\t\tCMP $2, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:97\t0x100158088\t\t5400058b\t\tBLT 44(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:101\t0x10015808c\t\t9100052a\t\tADD $1, R9, R10\t\t\t\t\t\t\t\n  unpack_experiment.go:101\t0x100158090\t\teb0a003f\t\tCMP R10, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:101\t0x100158094\t\t9a89d429\t\tCSINC LE, R1, R9, R9\t\t\t\t\t\t\n  unpack_experiment.go:102\t0x100158098\t\teb09005f\t\tCMP R9, R2\t\t\t\t\t\t\t\n  unpack_experiment.go:101\t0x10015809c\t\t54002943\t\tBCC 330(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:102\t0x1001580a0\t\td100084a\t\tSUB $2, R2, R10\t\t\t\t\t\t\t\n  unpack_experiment.go:102\t0x1001580a4\t\tcb0a03ea\t\tNEG R10, R10\t\t\t\t\t\t\t\n  unpack_experiment.go:102\t0x1001580a8\t\t937ffd4a\t\tASR $63, R10, R10\t\t\t\t\t\t\n  unpack_experiment.go:102\t0x1001580ac\t\t927f014a\t\tAND $2, R10, R10\t\t\t\t\t\t\n  unpack_experiment.go:102\t0x1001580b0\t\t8b0a000a\t\tADD R10, R0, R10\t\t\t\t\t\t\n  unpack_experiment.go:102\t0x1001580b4\t\td100092b\t\tSUB $2, R9, R11\t\t\t\t\t\t\t\n  unpack_experiment.go:102\t0x1001580b8\t\taa1f03ec\t\tMOVD ZR, R12\t\t\t\t\t\t\t\n  pack.go:174\t\t\t0x1001580bc\t\t14000114\t\tJMP 276(PC)\t\t\t\t\t\t\t\n  pack.go:174\t\t\t0x1001580c0\t\tb24003e8\t\tORR $1, ZR, R8\t\t\t\t\t\t\t\n  pack.go:174\t\t\t0x1001580c4\t\tb27d03e9\t\tORR $8, ZR, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:95\t0x1001580c8\t\t1400010c\t\tJMP 268(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:95\t0x1001580cc\t\tb24003e8\t\tORR $1, ZR, R8\t\t\t\t\t\t\t\n  unpack_experiment.go:95\t0x1001580d0\t\tb27d03e9\t\tORR $8, ZR, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:95\t0x1001580d4\t\t14000109\t\tJMP 265(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:108\t0x1001580d8\t\t7103fd3f\t\tCMPW $255, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:108\t0x1001580dc\t\t54000101\t\tBNE 8(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:109\t0x1001580e0\t\tf100083f\t\tCMP $2, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:109\t0x1001580e4\t\t540003eb\t\tBLT 31(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:112\t0x1001580e8\t\t39400408\t\tMOVBU 1(R0), R8\t\t\t\t\t\t\t\n  unpack_experiment.go:112\t0x1001580ec\t\t91000508\t\tADD $1, R8, R8\t\t\t\t\t\t\t\n  unpack_experiment.go:112\t0x1001580f0\t\td37df108\t\tLSL $3, R8, R8\t\t\t\t\t\t\t\n  unpack_experiment.go:113\t0x1001580f4\t\t91000909\t\tADD $2, R8, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:113\t0x1001580f8\t\t14000007\t\tJMP 7(PC)\t\t\t\t\t\t\t\n  bits.go:126\t\t\t0x1001580fc\t\taa0803ea\t\tMOVD R8, R10\t\t\t\t\t\t\t\n  bits.go:126\t\t\t0x100158100\t\t9000070b\t\tADRP 917504(PC), R11\t\t\t\t\t\t\n  bits.go:126\t\t\t0x100158104\t\t913db16b\t\tADD $3948, R11, R11\t\t\t\t\t\t\n  bits.go:126\t\t\t0x100158108\t\t386a696a\t\tMOVBU (R11)(R10), R10\t\t\t\t\t\t\n  unpack_experiment.go:115\t0x10015810c\t\t91000549\t\tADD $1, R10, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:115\t0x100158110\t\tb27d03e8\t\tORR $8, ZR, R8\t\t\t\t\t\t\t\n  unpack_experiment.go:117\t0x100158114\t\teb01013f\t\tCMP R1, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:117\t0x100158118\t\t54001d8c\t\tBGT 236(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:120\t0x10015811c\t\tcb07006a\t\tSUB R7, R3, R10\t\t\t\t\t\t\t\n  unpack_experiment.go:120\t0x100158120\t\teb0a011f\t\tCMP R10, R8\t\t\t\t\t\t\t\n  unpack_experiment.go:120\t0x100158124\t\t54001bec\t\tBGT 223(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:123\t0x100158128\t\t8b0800e7\t\tADD R8, R7, R7\t\t\t\t\t\t\t\n  unpack_experiment.go:117\t0x10015812c\t\teb01013f\t\tCMP R1, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:124\t0x100158130\t\t54fff889\t\tBLS -60(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:124\t0x100158134\t\t140000ef\t\tJMP 239(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:98\t0x100158138\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\t\n  unpack_experiment.go:98\t0x10015813c\t\tf940f363\t\tMOVD 480(R27), R3\t\t\t\t\t\t\n  unpack_experiment.go:98\t0x100158140\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\t\n  unpack_experiment.go:98\t0x100158144\t\tf940f764\t\tMOVD 488(R27), R4\t\t\t\t\t\t\n  unpack_experiment.go:98\t0x100158148\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\t\n  unpack_experiment.go:98\t0x10015814c\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:98\t0x100158150\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\t\n  unpack_experiment.go:98\t0x100158154\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  unpack_experiment.go:98\t0x100158158\t\tf84707fe\t\tMOVD.P 112(RSP), R30\t\t\t\t\t\t\n  unpack_experiment.go:98\t0x10015815c\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  unpack_experiment.go:110\t0x100158160\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\t\n  unpack_experiment.go:110\t0x100158164\t\tf9412b63\t\tMOVD 592(R27), R3\t\t\t\t\t\t\n  unpack_experiment.go:110\t0x100158168\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\t\n  unpack_experiment.go:110\t0x10015816c\t\tf9412f64\t\tMOVD 600(R27), R4\t\t\t\t\t\t\n  unpack_experiment.go:110\t0x100158170\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\t\n  unpack_experiment.go:110\t0x100158174\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:110\t0x100158178\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\t\n  unpack_experiment.go:110\t0x10015817c\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  unpack_experiment.go:110\t0x100158180\t\tf84707fe\t\tMOVD.P 112(RSP), R30\t\t\t\t\t\t\n  unpack_experiment.go:110\t0x100158184\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  unpack_experiment.go:86\t0x100158188\t\tf9002be5\t\tMOVD R5, 80(RSP)\t\t\t\t\t\t\n  unpack_experiment.go:86\t0x10015818c\t\tf90027e4\t\tMOVD R4, 72(RSP)\t\t\t\t\t\t\n  unpack_experiment.go:86\t0x100158190\t\tf90033e6\t\tMOVD R6, 96(RSP)\t\t\t\t\t\t\n  unpack_experiment.go:120\t0x100158194\t\tf90013e7\t\tMOVD R7, 32(RSP)\t\t\t\t\t\t\n  unpack_experiment.go:126\t0x100158198\t\tf0000a80\t\tADRP 1388544(PC), R0\t\t\t\t\t\t\n  unpack_experiment.go:126\t0x10015819c\t\t91388000\t\tADD $3616, R0, R0\t\t\t\t\t\t\n  unpack_experiment.go:126\t0x1001581a0\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:126\t0x1001581a4\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\t\n  unpack_experiment.go:126\t0x1001581a8\t\t97fc68ea\t\tCALL runtime.makeslice(SB)\t\t\t\t\t\n  unpack_experiment.go:126\t0x1001581ac\t\tf9002fe0\t\tMOVD R0, 88(RSP)\t\t\t\t\t\t\n  unpack_experiment.go:128\t0x1001581b0\t\tf94013e2\t\tMOVD 32(RSP), R2\t\t\t\t\t\t\n  unpack_experiment.go:128\t0x1001581b4\t\tf94033e3\t\tMOVD 96(RSP), R3\t\t\t\t\t\t\n  unpack_experiment.go:128\t0x1001581b8\t\tf9402be4\t\tMOVD 80(RSP), R4\t\t\t\t\t\t\n  unpack_experiment.go:128\t0x1001581bc\t\tf94027e5\t\tMOVD 72(RSP), R5\t\t\t\t\t\t\n  unpack_experiment.go:128\t0x1001581c0\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:128\t0x1001581c4\t\t14000004\t\tJMP 4(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:128\t0x1001581c8\t\taa0603e4\t\tMOVD R6, R4\t\t\t\t\t\t\t\n  unpack_experiment.go:128\t0x1001581cc\t\taa0803e3\t\tMOVD R8, R3\t\t\t\t\t\t\t\n  unpack_experiment.go:143\t0x1001581d0\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:128\t0x1001581d4\t\tb4000b85\t\tCBZ R5, 92(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:129\t0x1001581d8\t\t39400066\t\tMOVBU (R3), R6\t\t\t\t\t\t\t\n  unpack_experiment.go:130\t0x1001581dc\t\taa0603e7\t\tMOVD R6, R7\t\t\t\t\t\t\t\n  unpack_experiment.go:130\t0x1001581e0\t\t350001e7\t\tCBNZW R7, 15(PC)\t\t\t\t\t\t\n  unpack_experiment.go:132\t0x1001581e4\t\tf10008bf\t\tCMP $2, R5\t\t\t\t\t\t\t\n  unpack_experiment.go:132\t0x1001581e8\t\t5400016b\t\tBLT 11(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:132\t0x1001581ec\t\t39400466\t\tMOVBU 1(R3), R6\t\t\t\t\t\t\t\n  unpack_experiment.go:132\t0x1001581f0\t\t35000126\t\tCBNZW R6, 9(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:133\t0x1001581f4\t\td1000886\t\tSUB $2, R4, R6\t\t\t\t\t\t\t\n  unpack_experiment.go:133\t0x1001581f8\t\tcb0603e6\t\tNEG R6, R6\t\t\t\t\t\t\t\n  unpack_experiment.go:133\t0x1001581fc\t\t937ffcc6\t\tASR $63, R6, R6\t\t\t\t\t\t\t\n  unpack_experiment.go:133\t0x100158200\t\t927f00c6\t\tAND $2, R6, R6\t\t\t\t\t\t\t\n  unpack_experiment.go:133\t0x100158204\t\t8b060066\t\tADD R6, R3, R6\t\t\t\t\t\t\t\n  unpack_experiment.go:133\t0x100158208\t\td10008a7\t\tSUB $2, R5, R7\t\t\t\t\t\t\t\n  unpack_experiment.go:133\t0x10015820c\t\taa1f03e8\t\tMOVD ZR, R8\t\t\t\t\t\t\t\n  pack.go:174\t\t\t0x100158210\t\t14000085\t\tJMP 133(PC)\t\t\t\t\t\t\t\n  pack.go:174\t\t\t0x100158214\t\tb24003e6\t\tORR $1, ZR, R6\t\t\t\t\t\t\t\n  unpack_experiment.go:132\t0x100158218\t\t14000075\t\tJMP 117(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:140\t0x10015821c\t\td1000488\t\tSUB $1, R4, R8\t\t\t\t\t\t\t\n  unpack_experiment.go:140\t0x100158220\t\tcb0803e9\t\tNEG R8, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:140\t0x100158224\t\t937ffd29\t\tASR $63, R9, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:140\t0x100158228\t\t92400129\t\tAND $1, R9, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:140\t0x10015822c\t\t8b03012a\t\tADD R3, R9, R10\t\t\t\t\t\t\t\n  unpack_experiment.go:140\t0x100158230\t\td10004ab\t\tSUB $1, R5, R11\t\t\t\t\t\t\t\n  unpack_experiment.go:141\t0x100158234\t\t7103fcff\t\tCMPW $255, R7\t\t\t\t\t\t\t\n  unpack_experiment.go:141\t0x100158238\t\t54000661\t\tBNE 51(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:142\t0x10015823c\t\tf100017f\t\tCMP $0, R11\t\t\t\t\t\t\t\n  unpack_experiment.go:142\t0x100158240\t\t54000d09\t\tBLS 104(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:142\t0x100158244\t\t38696866\t\tMOVBU (R3)(R9), R6\t\t\t\t\t\t\n  unpack_experiment.go:143\t0x100158248\t\teb02003f\t\tCMP R2, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:143\t0x10015824c\t\t54000c48\t\tBHI 98(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:142\t0x100158250\t\t910004c6\t\tADD $1, R6, R6\t\t\t\t\t\t\t\n  unpack_experiment.go:142\t0x100158254\t\td37df0c7\t\tLSL $3, R6, R7\t\t\t\t\t\t\t\n  unpack_experiment.go:143\t0x100158258\t\tcb010049\t\tSUB R1, R2, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:143\t0x10015825c\t\tcb0903ec\t\tNEG R9, R12\t\t\t\t\t\t\t\n  unpack_experiment.go:143\t0x100158260\t\t8a8cfc2c\t\tAND R12->63, R1, R12\t\t\t\t\t\t\n  unpack_experiment.go:143\t0x100158264\t\t910004ed\t\tADD $1, R7, R13\t\t\t\t\t\t\t\n  unpack_experiment.go:143\t0x100158268\t\t8b0c000c\t\tADD R12, R0, R12\t\t\t\t\t\t\n  unpack_experiment.go:143\t0x10015826c\t\teb0d011f\t\tCMP R13, R8\t\t\t\t\t\t\t\n  unpack_experiment.go:143\t0x100158270\t\t54000ac3\t\tBCC 86(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:143\t0x100158274\t\t91000548\t\tADD $1, R10, R8\t\t\t\t\t\t\t\n  unpack_experiment.go:143\t0x100158278\t\teb060d3f\t\tCMP R6<<3, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:143\t0x10015827c\t\t9a89c0e7\t\tCSEL GT, R7, R9, R7\t\t\t\t\t\t\n  unpack_experiment.go:143\t0x100158280\t\teb0c011f\t\tCMP R12, R8\t\t\t\t\t\t\t\n  unpack_experiment.go:143\t0x100158284\t\t540002a0\t\tBEQ 21(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:128\t0x100158288\t\tf9002be4\t\tMOVD R4, 80(RSP)\t\t\t\t\t\t\n  unpack_experiment.go:128\t0x10015828c\t\tf90027e5\t\tMOVD R5, 72(RSP)\t\t\t\t\t\t\n  unpack_experiment.go:140\t0x100158290\t\tf90023eb\t\tMOVD R11, 64(RSP)\t\t\t\t\t\t\n  unpack_experiment.go:140\t0x100158294\t\tf90033ea\t\tMOVD R10, 96(RSP)\t\t\t\t\t\t\n  unpack_experiment.go:142\t0x100158298\t\tf9001fe6\t\tMOVD R6, 56(RSP)\t\t\t\t\t\t\n  unpack_experiment.go:143\t0x10015829c\t\tf9001bed\t\tMOVD R13, 48(RSP)\t\t\t\t\t\t\n  unpack_experiment.go:143\t0x1001582a0\t\tf90017e1\t\tMOVD R1, 40(RSP)\t\t\t\t\t\t\n  unpack_experiment.go:143\t0x1001582a4\t\taa0c03e0\t\tMOVD R12, R0\t\t\t\t\t\t\t\n  unpack_experiment.go:143\t0x1001582a8\t\taa0803e1\t\tMOVD R8, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:143\t0x1001582ac\t\taa0703e2\t\tMOVD R7, R2\t\t\t\t\t\t\t\n  unpack_experiment.go:143\t0x1001582b0\t\t97fc8218\t\tCALL runtime.memmove(SB)\t\t\t\t\t\n  unpack_experiment.go:149\t0x1001582b4\t\tf9402fe0\t\tMOVD 88(RSP), R0\t\t\t\t\t\t\n  unpack_experiment.go:144\t0x1001582b8\t\tf94017e1\t\tMOVD 40(RSP), R1\t\t\t\t\t\t\n  unpack_experiment.go:149\t0x1001582bc\t\tf94013e2\t\tMOVD 32(RSP), R2\t\t\t\t\t\t\n  unpack_experiment.go:145\t0x1001582c0\t\tf9402be4\t\tMOVD 80(RSP), R4\t\t\t\t\t\t\n  unpack_experiment.go:145\t0x1001582c4\t\tf94027e5\t\tMOVD 72(RSP), R5\t\t\t\t\t\t\n  unpack_experiment.go:144\t0x1001582c8\t\tf9401fe6\t\tMOVD 56(RSP), R6\t\t\t\t\t\t\n  unpack_experiment.go:145\t0x1001582cc\t\tf94033ea\t\tMOVD 96(RSP), R10\t\t\t\t\t\t\n  unpack_experiment.go:145\t0x1001582d0\t\tf94023eb\t\tMOVD 64(RSP), R11\t\t\t\t\t\t\n  unpack_experiment.go:145\t0x1001582d4\t\tf9401bed\t\tMOVD 48(RSP), R13\t\t\t\t\t\t\n  unpack_experiment.go:144\t0x1001582d8\t\t8b060c27\t\tADD R6<<3, R1, R7\t\t\t\t\t\t\n  unpack_experiment.go:145\t0x1001582dc\t\teb0d017f\t\tCMP R13, R11\t\t\t\t\t\t\t\n  unpack_experiment.go:145\t0x1001582e0\t\t540006e3\t\tBCC 55(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:145\t0x1001582e4\t\tcb060ca5\t\tSUB R6<<3, R5, R5\t\t\t\t\t\t\n  unpack_experiment.go:145\t0x1001582e8\t\tcb060c86\t\tSUB R6<<3, R4, R6\t\t\t\t\t\t\n  unpack_experiment.go:145\t0x1001582ec\t\td10008c6\t\tSUB $2, R6, R6\t\t\t\t\t\t\t\n  unpack_experiment.go:145\t0x1001582f0\t\tcb0603e8\t\tNEG R6, R8\t\t\t\t\t\t\t\n  unpack_experiment.go:145\t0x1001582f4\t\t8a88fda8\t\tAND R8->63, R13, R8\t\t\t\t\t\t\n  unpack_experiment.go:145\t0x1001582f8\t\t8b0a0108\t\tADD R10, R8, R8\t\t\t\t\t\t\t\n  unpack_experiment.go:145\t0x1001582fc\t\td10008a5\t\tSUB $2, R5, R5\t\t\t\t\t\t\t\n  unpack_experiment.go:146\t0x100158300\t\t17ffffb2\t\tJMP -78(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:149\t0x100158304\t\t91002027\t\tADD $8, R1, R7\t\t\t\t\t\t\t\n  unpack_experiment.go:149\t0x100158308\t\teb07005f\t\tCMP R7, R2\t\t\t\t\t\t\t\n  unpack_experiment.go:149\t0x10015830c\t\t54000523\t\tBCC 41(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:149\t0x100158310\t\teb07003f\t\tCMP R7, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:149\t0x100158314\t\t54000488\t\tBHI 36(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:149\t0x100158318\t\t8b010008\t\tADD R1, R0, R8\t\t\t\t\t\t\t\n  unpack_experiment.go:149\t0x10015831c\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:151\t0x100158320\t\t14000010\t\tJMP 16(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:160\t0x100158324\t\tcb0100ab\t\tSUB R1, R5, R11\t\t\t\t\t\t\t\n  unpack_experiment.go:160\t0x100158328\t\tcb01008c\t\tSUB R1, R4, R12\t\t\t\t\t\t\t\n  unpack_experiment.go:160\t0x10015832c\t\td1000986\t\tSUB $2, R12, R6\t\t\t\t\t\t\t\n  unpack_experiment.go:160\t0x100158330\t\tcb0603ec\t\tNEG R6, R12\t\t\t\t\t\t\t\n  unpack_experiment.go:160\t0x100158334\t\t8a8cfd29\t\tAND R12->63, R9, R9\t\t\t\t\t\t\n  unpack_experiment.go:160\t0x100158338\t\t8b0a0128\t\tADD R10, R9, R8\t\t\t\t\t\t\t\n  unpack_experiment.go:160\t0x10015833c\t\td1000965\t\tSUB $2, R11, R5\t\t\t\t\t\t\t\n  unpack_experiment.go:161\t0x100158340\t\t17ffffa2\t\tJMP -94(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:163\t0x100158344\t\taa0203e1\t\tMOVD R2, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:163\t0x100158348\t\taa1f03e3\t\tMOVD ZR, R3\t\t\t\t\t\t\t\n  unpack_experiment.go:163\t0x10015834c\t\taa1f03e4\t\tMOVD ZR, R4\t\t\t\t\t\t\t\n  unpack_experiment.go:163\t0x100158350\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  unpack_experiment.go:163\t0x100158354\t\tf84707fe\t\tMOVD.P 112(RSP), R30\t\t\t\t\t\t\n  unpack_experiment.go:163\t0x100158358\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  unpack_experiment.go:153\t0x10015835c\t\taa0903e1\t\tMOVD R9, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:153\t0x100158360\t\teb0b003f\t\tCMP R11, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:153\t0x100158364\t\t540001a2\t\tBCS 13(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:152\t0x100158368\t\tb27800c9\t\tORR $256, R6, R9\t\t\t\t\t\t\n  unpack_experiment.go:152\t0x10015836c\t\t5ac00129\t\tRBITW R9, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:152\t0x100158370\t\t5ac01129\t\tCLZW R9, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:152\t0x100158374\t\t92400929\t\tAND $7, R9, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:153\t0x100158378\t\t3861694c\t\tMOVBU (R10)(R1), R12\t\t\t\t\t\t\n  unpack_experiment.go:153\t0x10015837c\t\t3829690c\t\tMOVB R12, (R8)(R9)\t\t\t\t\t\t\n  unpack_experiment.go:155\t0x100158380\t\td10004c9\t\tSUB $1, R6, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:155\t0x100158384\t\t8a0900c6\t\tAND R9, R6, R6\t\t\t\t\t\t\t\n  unpack_experiment.go:154\t0x100158388\t\t91000429\t\tADD $1, R1, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:156\t0x10015838c\t\td3401ccc\t\tUBFX $0, R6, $8, R12\t\t\t\t\t\t\n  unpack_experiment.go:156\t0x100158390\t\t35fffe6c\t\tCBNZW R12, -13(PC)\t\t\t\t\t\t\n  unpack_experiment.go:156\t0x100158394\t\t17ffffe4\t\tJMP -28(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:153\t0x100158398\t\taa0103e0\t\tMOVD R1, R0\t\t\t\t\t\t\t\n  unpack_experiment.go:153\t0x10015839c\t\taa0b03e1\t\tMOVD R11, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:153\t0x1001583a0\t\t97fc8070\t\tCALL runtime.panicIndex(SB)\t\t\t\t\t\n  unpack_experiment.go:149\t0x1001583a4\t\taa0103e0\t\tMOVD R1, R0\t\t\t\t\t\t\t\n  unpack_experiment.go:149\t0x1001583a8\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:149\t0x1001583ac\t\t97fc8099\t\tCALL runtime.panicSlice3C(SB)\t\t\t\t\t\n  unpack_experiment.go:149\t0x1001583b0\t\taa0203e3\t\tMOVD R2, R3\t\t\t\t\t\t\t\n  unpack_experiment.go:149\t0x1001583b4\t\taa0703e2\t\tMOVD R7, R2\t\t\t\t\t\t\t\n  unpack_experiment.go:149\t0x1001583b8\t\t97fc808e\t\tCALL runtime.panicSlice3Acap(SB)\t\t\t\t\n  unpack_experiment.go:145\t0x1001583bc\t\taa0d03e0\t\tMOVD R13, R0\t\t\t\t\t\t\t\n  unpack_experiment.go:145\t0x1001583c0\t\taa0b03e1\t\tMOVD R11, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:145\t0x1001583c4\t\t97fc807f\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\t\n  unpack_experiment.go:143\t0x1001583c8\t\taa0d03e1\t\tMOVD R13, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:143\t0x1001583cc\t\taa0803e2\t\tMOVD R8, R2\t\t\t\t\t\t\t\n  unpack_experiment.go:143\t0x1001583d0\t\t97fc8074\t\tCALL runtime.panicSliceAcap(SB)\t\t\t\t\t\n  unpack_experiment.go:143\t0x1001583d4\t\taa0103e0\t\tMOVD R1, R0\t\t\t\t\t\t\t\n  unpack_experiment.go:143\t0x1001583d8\t\taa0203e1\t\tMOVD R2, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:143\t0x1001583dc\t\t97fc8079\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\t\n  unpack_experiment.go:142\t0x1001583e0\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\t\n  unpack_experiment.go:142\t0x1001583e4\t\taa0003e1\t\tMOVD R0, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:142\t0x1001583e8\t\t97fc805e\t\tCALL runtime.panicIndex(SB)\t\t\t\t\t\n  unpack_experiment.go:136\t0x1001583ec\t\t8b060c27\t\tADD R6<<3, R1, R7\t\t\t\t\t\t\n  unpack_experiment.go:137\t0x1001583f0\t\teb0500df\t\tCMP R5, R6\t\t\t\t\t\t\t\n  unpack_experiment.go:137\t0x1001583f4\t\t54000108\t\tBHI 8(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:137\t0x1001583f8\t\tcb060089\t\tSUB R6, R4, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:137\t0x1001583fc\t\tcb0903ea\t\tNEG R9, R10\t\t\t\t\t\t\t\n  unpack_experiment.go:137\t0x100158400\t\t8a8afcca\t\tAND R10->63, R6, R10\t\t\t\t\t\t\n  unpack_experiment.go:137\t0x100158404\t\tcb0600a5\t\tSUB R6, R5, R5\t\t\t\t\t\t\t\n  unpack_experiment.go:137\t0x100158408\t\t8b0a0068\t\tADD R10, R3, R8\t\t\t\t\t\t\t\n  unpack_experiment.go:128\t0x10015840c\t\taa0903e6\t\tMOVD R9, R6\t\t\t\t\t\t\t\n  unpack_experiment.go:138\t0x100158410\t\t17ffff6e\t\tJMP -146(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:137\t0x100158414\t\taa0603e0\t\tMOVD R6, R0\t\t\t\t\t\t\t\n  unpack_experiment.go:137\t0x100158418\t\taa0503e1\t\tMOVD R5, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:137\t0x10015841c\t\t97fc8069\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\t\n  pack.go:179\t\t\t0x100158420\t\t91002108\t\tADD $8, R8, R8\t\t\t\t\t\t\t\n  pack.go:174\t\t\t0x100158424\t\tcb0800a9\t\tSUB R8, R5, R9\t\t\t\t\t\t\t\n  pack.go:174\t\t\t0x100158428\t\td1000929\t\tSUB $2, R9, R9\t\t\t\t\t\t\t\n  pack.go:174\t\t\t0x10015842c\t\tf100213f\t\tCMP $8, R9\t\t\t\t\t\t\t\n  pack.go:174\t\t\t0x100158430\t\t540001eb\t\tBLT 15(PC)\t\t\t\t\t\t\t\n  pack.go:175\t\t\t0x100158434\t\teb07011f\t\tCMP R7, R8\t\t\t\t\t\t\t\n  pack.go:175\t\t\t0x100158438\t\t540002e8\t\tBHI 23(PC)\t\t\t\t\t\t\t\n  pack.go:175\t\t\t0x10015843c\t\tcb080089\t\tSUB R8, R4, R9\t\t\t\t\t\t\t\n  pack.go:175\t\t\t0x100158440\t\td1000929\t\tSUB $2, R9, R9\t\t\t\t\t\t\t\n  pack.go:175\t\t\t0x100158444\t\tcb0903e9\t\tNEG R9, R9\t\t\t\t\t\t\t\n  pack.go:175\t\t\t0x100158448\t\t8a89fd09\t\tAND R9->63, R8, R9\t\t\t\t\t\t\n  binary.go:117\t\t\t0x10015844c\t\tf86968c9\t\tMOVD (R6)(R9), R9\t\t\t\t\t\t\n  pack.go:176\t\t\t0x100158450\t\tb4fffe89\t\tCBZ R9, -12(PC)\t\t\t\t\t\t\t\n  pack.go:177\t\t\t0x100158454\t\tdac00126\t\tRBIT R9, R6\t\t\t\t\t\t\t\n  pack.go:177\t\t\t0x100158458\t\tdac010c6\t\tCLZ R6, R6\t\t\t\t\t\t\t\n  pack.go:177\t\t\t0x10015845c\t\t8b460d06\t\tADD R6>>3, R8, R6\t\t\t\t\t\t\n  unpack_experiment.go:133\t0x100158460\t\taa0603e8\t\tMOVD R6, R8\t\t\t\t\t\t\t\n  unpack_experiment.go:133\t0x100158464\t\t14000007\t\tJMP 7(PC)\t\t\t\t\t\t\t\n  pack.go:182\t\t\t0x100158468\t\t91000508\t\tADD $1, R8, R8\t\t\t\t\t\t\t\n  pack.go:181\t\t\t0x10015846c\t\teb07011f\t\tCMP R7, R8\t\t\t\t\t\t\t\n  pack.go:181\t\t\t0x100158470\t\t5400008a\t\tBGE 4(PC)\t\t\t\t\t\t\t\n  pack.go:181\t\t\t0x100158474\t\t540000a2\t\tBCS 5(PC)\t\t\t\t\t\t\t\n  pack.go:181\t\t\t0x100158478\t\t386868c9\t\tMOVBU (R6)(R8), R9\t\t\t\t\t\t\n  pack.go:181\t\t\t0x10015847c\t\t34ffff69\t\tCBZW R9, -5(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:133\t0x100158480\t\t91000906\t\tADD $2, R8, R6\t\t\t\t\t\t\t\n  unpack_experiment.go:133\t0x100158484\t\t17ffffda\t\tJMP -38(PC)\t\t\t\t\t\t\t\n  pack.go:181\t\t\t0x100158488\t\taa0803e0\t\tMOVD R8, R0\t\t\t\t\t\t\t\n  pack.go:181\t\t\t0x10015848c\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\t\n  pack.go:181\t\t\t0x100158490\t\t97fc8034\t\tCALL runtime.panicIndex(SB)\t\t\t\t\t\n  pack.go:175\t\t\t0x100158494\t\taa0803e0\t\tMOVD R8, R0\t\t\t\t\t\t\t\n  pack.go:175\t\t\t0x100158498\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\t\n  pack.go:175\t\t\t0x10015849c\t\t97fc8049\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\t\n  unpack_experiment.go:121\t0x1001584a0\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\t\n  unpack_experiment.go:121\t0x1001584a4\t\tf940f363\t\tMOVD 480(R27), R3\t\t\t\t\t\t\n  unpack_experiment.go:121\t0x1001584a8\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\t\n  unpack_experiment.go:121\t0x1001584ac\t\tf940f764\t\tMOVD 488(R27), R4\t\t\t\t\t\t\n  unpack_experiment.go:121\t0x1001584b0\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\t\n  unpack_experiment.go:121\t0x1001584b4\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:121\t0x1001584b8\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\t\n  unpack_experiment.go:121\t0x1001584bc\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  unpack_experiment.go:121\t0x1001584c0\t\tf84707fe\t\tMOVD.P 112(RSP), R30\t\t\t\t\t\t\n  unpack_experiment.go:121\t0x1001584c4\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  unpack_experiment.go:118\t0x1001584c8\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\t\n  unpack_experiment.go:118\t0x1001584cc\t\tf9412b63\t\tMOVD 592(R27), R3\t\t\t\t\t\t\n  unpack_experiment.go:118\t0x1001584d0\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\t\n  unpack_experiment.go:118\t0x1001584d4\t\tf9412f64\t\tMOVD 600(R27), R4\t\t\t\t\t\t\n  unpack_experiment.go:118\t0x1001584d8\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\t\n  unpack_experiment.go:118\t0x1001584dc\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:118\t0x1001584e0\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\t\n  unpack_experiment.go:118\t0x1001584e4\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  unpack_experiment.go:118\t0x1001584e8\t\tf84707fe\t\tMOVD.P 112(RSP), R30\t\t\t\t\t\t\n  unpack_experiment.go:118\t0x1001584ec\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  unpack_experiment.go:124\t0x1001584f0\t\taa0903e0\t\tMOVD R9, R0\t\t\t\t\t\t\t\n  unpack_experiment.go:124\t0x1001584f4\t\t97fc8033\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\t\n  unpack_experiment.go:117\t0x1001584f8\t\taa0903ea\t\tMOVD R9, R10\t\t\t\t\t\t\t\n  unpack_experiment.go:117\t0x1001584fc\t\taa0803e9\t\tMOVD R8, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:120\t0x100158500\t\taa0a03e8\t\tMOVD R10, R8\t\t\t\t\t\t\t\n  unpack_experiment.go:120\t0x100158504\t\t17ffff04\t\tJMP -252(PC)\t\t\t\t\t\t\t\n  pack.go:179\t\t\t0x100158508\t\t9100218c\t\tADD $8, R12, R12\t\t\t\t\t\t\n  pack.go:174\t\t\t0x10015850c\t\tcb0c012d\t\tSUB R12, R9, R13\t\t\t\t\t\t\n  pack.go:174\t\t\t0x100158510\t\td10009ad\t\tSUB $2, R13, R13\t\t\t\t\t\t\n  pack.go:174\t\t\t0x100158514\t\tf10021bf\t\tCMP $8, R13\t\t\t\t\t\t\t\n  pack.go:174\t\t\t0x100158518\t\t540001eb\t\tBLT 15(PC)\t\t\t\t\t\t\t\n  pack.go:175\t\t\t0x10015851c\t\teb0b019f\t\tCMP R11, R12\t\t\t\t\t\t\t\n  pack.go:175\t\t\t0x100158520\t\t540004c8\t\tBHI 38(PC)\t\t\t\t\t\t\t\n  pack.go:175\t\t\t0x100158524\t\tcb0c004d\t\tSUB R12, R2, R13\t\t\t\t\t\t\n  pack.go:175\t\t\t0x100158528\t\td10009ad\t\tSUB $2, R13, R13\t\t\t\t\t\t\n  pack.go:175\t\t\t0x10015852c\t\tcb0d03ed\t\tNEG R13, R13\t\t\t\t\t\t\t\n  pack.go:175\t\t\t0x100158530\t\t8a8dfd8d\t\tAND R13->63, R12, R13\t\t\t\t\t\t\n  binary.go:117\t\t\t0x100158534\t\tf86d694d\t\tMOVD (R10)(R13), R13\t\t\t\t\t\t\n  pack.go:176\t\t\t0x100158538\t\tb4fffe8d\t\tCBZ R13, -12(PC)\t\t\t\t\t\t\n  pack.go:177\t\t\t0x10015853c\t\tdac001a9\t\tRBIT R13, R9\t\t\t\t\t\t\t\n  pack.go:177\t\t\t0x100158540\t\tdac01129\t\tCLZ R9, R9\t\t\t\t\t\t\t\n  pack.go:177\t\t\t0x100158544\t\t8b490d89\t\tADD R9>>3, R12, R9\t\t\t\t\t\t\n  unpack_experiment.go:102\t0x100158548\t\taa0903ec\t\tMOVD R9, R12\t\t\t\t\t\t\t\n  unpack_experiment.go:102\t0x10015854c\t\t14000007\t\tJMP 7(PC)\t\t\t\t\t\t\t\n  pack.go:182\t\t\t0x100158550\t\t9100058c\t\tADD $1, R12, R12\t\t\t\t\t\t\n  pack.go:181\t\t\t0x100158554\t\teb0b019f\t\tCMP R11, R12\t\t\t\t\t\t\t\n  pack.go:181\t\t\t0x100158558\t\t5400008a\t\tBGE 4(PC)\t\t\t\t\t\t\t\n  pack.go:181\t\t\t0x10015855c\t\t54000282\t\tBCS 20(PC)\t\t\t\t\t\t\t\n  pack.go:181\t\t\t0x100158560\t\t386c6949\t\tMOVBU (R10)(R12), R9\t\t\t\t\t\t\n  pack.go:181\t\t\t0x100158564\t\t34ffff69\t\tCBZW R9, -5(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:102\t0x100158568\t\t91000989\t\tADD $2, R12, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:103\t0x10015856c\t\teb880d3f\t\tCMP R8->3, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:103\t0x100158570\t\t540000ac\t\tBGT 5(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:106\t0x100158574\t\td37df12a\t\tLSL $3, R9, R10\t\t\t\t\t\t\t\n  unpack_experiment.go:117\t0x100158578\t\taa0903e8\t\tMOVD R9, R8\t\t\t\t\t\t\t\n  unpack_experiment.go:120\t0x10015857c\t\taa0a03e9\t\tMOVD R10, R9\t\t\t\t\t\t\t\n  unpack_experiment.go:106\t0x100158580\t\t17ffffde\t\tJMP -34(PC)\t\t\t\t\t\t\t\n  unpack_experiment.go:104\t0x100158584\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\t\n  unpack_experiment.go:104\t0x100158588\t\tf940f363\t\tMOVD 480(R27), R3\t\t\t\t\t\t\n  unpack_experiment.go:104\t0x10015858c\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\t\n  unpack_experiment.go:104\t0x100158590\t\tf940f764\t\tMOVD 488(R27), R4\t\t\t\t\t\t\n  unpack_experiment.go:104\t0x100158594\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\t\n  unpack_experiment.go:104\t0x100158598\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:104\t0x10015859c\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\t\n  unpack_experiment.go:104\t0x1001585a0\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  unpack_experiment.go:104\t0x1001585a4\t\tf84707fe\t\tMOVD.P 112(RSP), R30\t\t\t\t\t\t\n  unpack_experiment.go:104\t0x1001585a8\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  pack.go:181\t\t\t0x1001585ac\t\taa0c03e0\t\tMOVD R12, R0\t\t\t\t\t\t\t\n  pack.go:181\t\t\t0x1001585b0\t\taa0b03e1\t\tMOVD R11, R1\t\t\t\t\t\t\t\n  pack.go:181\t\t\t0x1001585b4\t\t97fc7feb\t\tCALL runtime.panicIndex(SB)\t\t\t\t\t\n  pack.go:175\t\t\t0x1001585b8\t\taa0c03e0\t\tMOVD R12, R0\t\t\t\t\t\t\t\n  pack.go:175\t\t\t0x1001585bc\t\taa0b03e1\t\tMOVD R11, R1\t\t\t\t\t\t\t\n  pack.go:175\t\t\t0x1001585c0\t\t97fc8000\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\t\n  unpack_experiment.go:102\t0x1001585c4\t\taa0903e1\t\tMOVD R9, R1\t\t\t\t\t\t\t\n  unpack_experiment.go:102\t0x1001585c8\t\t97fc7ff6\t\tCALL runtime.panicSliceAcap(SB)\t\t\t\t\t\n  unpack_experiment.go:102\t0x1001585cc\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\t\n  unpack_experiment.go:85\t0x1001585d0\t\ta90087e0\t\tSTP (R0, R1), 8(RSP)\t\t\t\t\t\t\n  unpack_experiment.go:85\t0x1001585d4\t\ta9018fe2\t\tSTP (R2, R3), 24(RSP)\t\t\t\t\t\t\n  unpack_experiment.go:85\t0x1001585d8\t\taa1e03e3\t\tMOVD R30, R3\t\t\t\t\t\t\t\n  unpack_experiment.go:85\t0x1001585dc\t\t97fc7689\t\tCALL runtime.morestack_noctxt.abi0(SB)\t\t\t\t\n  unpack_experiment.go:85\t0x1001585e0\t\ta94087e0\t\tLDP 8(RSP), (R0, R1)\t\t\t\t\t\t\n  unpack_experiment.go:85\t0x1001585e4\t\ta9418fe2\t\tLDP 24(RSP), (R2, R3)\t\t\t\t\t\t\n  unpack_experiment.go:85\t0x1001585e8\t\t17fffe7e\t\tJMP github.com/cnooljaw/gosproto.ExperimentUnpackCandidate(SB)\t\n  unpack_experiment.go:85\t0x1001585ec\t\t00000000\t\t?\t\t\t\t\t\t\t\t\n"
+  },
+  {
+    "args": [
+      "go",
+      "version"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.011232875287532806,
+    "output": "go version go1.24.13 darwin/arm64\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "addressbook",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/self-addressbook-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.673018790781498,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "addressbook",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/self-addressbook-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.0705497078597546,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_small",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/self-game_small-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.6736315432935953,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_small",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/self-game_small-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.209777707234025,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/self-game_large-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.162855250760913,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/self-game_large-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.0652542486786842,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/self-int32_edges-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.0582494996488094,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/self-int32_edges-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.135753333568573,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "echo_ascii4k",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/self-echo_ascii4k-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 0.8970302920788527,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "echo_ascii4k",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/self-echo_ascii4k-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.6873751673847437,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "density1",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/self-density1-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.2374042496085167,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "density4",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/self-density4-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.076580250635743,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "density7",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/self-density7-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.9552395846694708,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "zero4096",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/self-zero4096-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.3586948327720165,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "ff4096",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/self-ff4096-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.796535873785615,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "addressbook",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/clone-addressbook-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.022519124671817,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "addressbook",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/clone-addressbook-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.6624421663582325,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_small",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/clone-game_small-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.7895517908036709,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_small",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/clone-game_small-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.2777514588087797,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/clone-game_large-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 0.5868409592658281,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/clone-game_large-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.1658747904002666,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/clone-int32_edges-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.15131145901978,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/clone-int32_edges-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.043601417914033,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "echo_ascii4k",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/clone-echo_ascii4k-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.281098334118724,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "echo_ascii4k",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/clone-echo_ascii4k-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.4459922909736633,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "density1",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/clone-density1-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.8759189993143082,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "density4",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/clone-density4-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.9249562080949545,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "density7",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/clone-density7-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.110408917069435,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "zero4096",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/clone-zero4096-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.7861464153975248,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "ff4096",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/clone-ff4096-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.2753865402191877,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "addressbook",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/pass1-addressbook-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.1638145837932825,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "addressbook",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/pass1-addressbook-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.5652184151113033,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_small",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/pass1-game_small-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 0.3772047907114029,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_small",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/pass1-game_small-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.7428326681256294,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/pass1-game_large-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.019012000411749,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/pass1-game_large-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.1495444998145103,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/pass1-int32_edges-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.138639250770211,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/pass1-int32_edges-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.0923320837318897,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "echo_ascii4k",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/pass1-echo_ascii4k-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 0.35243920981884,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "echo_ascii4k",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/pass1-echo_ascii4k-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.0273272916674614,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "density1",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/pass1-density1-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.010850541293621,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "density4",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/pass1-density4-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.9387941658496857,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "density7",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/pass1-density7-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.0035434160381556,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "zero4096",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/pass1-zero4096-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.6820785831660032,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "ff4096",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/pass1-ff4096-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.7541424985975027,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "addressbook",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/pass2-addressbook-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.7267459593713284,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "addressbook",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/pass2-addressbook-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.6900804992765188,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_small",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/pass2-game_small-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.6589681673794985,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_small",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/pass2-game_small-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.7188142500817776,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/pass2-game_large-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 0.29746149852871895,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/pass2-game_large-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.8075334168970585,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/pass2-int32_edges-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.2076002918183804,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/pass2-int32_edges-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.054433584213257,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "echo_ascii4k",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/pass2-echo_ascii4k-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 3.079183293506503,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "echo_ascii4k",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/pass2-echo_ascii4k-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.3760316241532564,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "density1",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/pass2-density1-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.023207539692521,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "density4",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/pass2-density4-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.019335376098752,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "density7",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/pass2-density7-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.097087124362588,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "zero4096",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/pass2-zero4096-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.9122582487761974,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "ff4096",
+      "GSR_OP": "unpack",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-inprocess-20261020/pass2-ff4096-unpack.json"
+    },
+    "exitCode": 0,
+    "seconds": 3.491685790941119,
+    "output": "PASS\n"
+  }
+]

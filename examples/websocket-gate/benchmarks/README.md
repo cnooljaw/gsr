@@ -300,3 +300,5 @@ SPROTO_ORACLE_DIR=/path/to/pinned/sproto \
 [稀疏 word 与 A/A 诊断](../../../docs/benchmarks/2026-10-17-gosproto-pack-sparse/RESULTS.md) 保存 191 项三轮候选筛选和 59 项三轮独立 A/A，共 750 个样本。候选组合回退未过门；同源码 A/A 也有明显差值，下一步应先校准测量，不能以约 6% 的纯 Pack 差值作为稳定收益。正式库未改，该轮诊断已本地提交为 GSR `8f0003f`，未推送。
 
 2026-10-20：已完成 [a93bb0d 单模块 Go/PB 当前基线](../../../docs/benchmarks/2026-10-20-go-sp-pb-current/RESULTS.md)，72 项 × 5 轮，夹具及源码/模块/二进制哈希核对通过。大型 Encode −41.6%、PEncode −21.8%，PDecode +10.9%；保留全部原始波动，正式依赖不变。
+
+2026-10-20：[同模块/同进程Unpack实验及采纳](../../../docs/benchmarks/2026-10-20-gosproto-unpack-inprocess/RESULTS.md)完成60进程/5760块。保留固定视图＋非零mask索引范围表达：整数数组Unpack两轮中位−1.03%/−2.50%，7非零字节word−3.00%/−3.87%；大型及组合路径不确定、局部小包成本与21项中位/累计反向保留。同源大型控制仍偏，不声称噪声消失。完整库/官方/race/checkptr/vet/有限fuzz/GSR三包/GoTS7of7通过，fuzz3310次后停增如实记录。生产代码及永久回归已提交独立库50c69e1、逐文件等于验收快照，原6项删除和正式依赖v0.4.0不变，未推送。
