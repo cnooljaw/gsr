@@ -1,0 +1,47 @@
+File: profile.test
+Type: cpu
+Time: 2026-10-20 16:04:06 CST
+Duration: 2.21s, Total samples = 1.93s (87.30%)
+Showing nodes accounting for 1.93s, 100% of 1.93s total
+Showing top 40 nodes out of 58
+      flat  flat%   sum%        cum   cum%
+     1.43s 74.09% 74.09%      1.64s 84.97%  github.com/cnooljaw/gosproto.UnpackWithLimit
+     0.26s 13.47% 87.56%      0.26s 13.47%  runtime.kevent
+     0.08s  4.15% 91.71%      0.08s  4.15%  math/bits.OnesCount8 (inline)
+     0.03s  1.55% 93.26%      0.03s  1.55%  runtime.madvise
+     0.02s  1.04% 94.30%      0.03s  1.55%  runtime.findObject
+     0.02s  1.04% 95.34%      0.02s  1.04%  runtime.typePointers.next
+     0.01s  0.52% 95.85%      0.01s  0.52%  runtime.(*mLockProfile).recordUnlock
+     0.01s  0.52% 96.37%      0.02s  1.04%  runtime.(*mheap).initSpan
+     0.01s  0.52% 96.89%      0.01s  0.52%  runtime.(*mheap).setSpans
+     0.01s  0.52% 97.41%      0.01s  0.52%  runtime.(*mspan).heapBitsSmallForAddr
+     0.01s  0.52% 97.93%      0.01s  0.52%  runtime.(*pageBits).setRange
+     0.01s  0.52% 98.45%      0.02s  1.04%  runtime.(*sweepLocked).sweep
+     0.01s  0.52% 98.96%      0.01s  0.52%  runtime.memclrNoHeapPointers
+     0.01s  0.52% 99.48%      0.05s  2.59%  runtime.scanobject
+     0.01s  0.52%   100%      0.01s  0.52%  runtime.spanOf (inline)
+         0     0%   100%      0.05s  2.59%  runtime.(*mcache).nextFree
+         0     0%   100%      0.05s  2.59%  runtime.(*mcache).refill
+         0     0%   100%      0.05s  2.59%  runtime.(*mcentral).cacheSpan
+         0     0%   100%      0.03s  1.55%  runtime.(*mcentral).grow
+         0     0%   100%      0.03s  1.55%  runtime.(*mheap).alloc
+         0     0%   100%      0.06s  3.11%  runtime.(*mheap).alloc.func1
+         0     0%   100%      0.06s  3.11%  runtime.(*mheap).allocSpan
+         0     0%   100%      0.01s  0.52%  runtime.(*mspan).typePointersOfUnchecked
+         0     0%   100%      0.01s  0.52%  runtime.(*pageAlloc).alloc
+         0     0%   100%      0.01s  0.52%  runtime.(*pageAlloc).allocRange
+         0     0%   100%      0.01s  0.52%  runtime.(*pallocBits).allocRange (inline)
+         0     0%   100%      0.01s  0.52%  runtime.(*pallocData).allocRange
+         0     0%   100%      0.01s  0.52%  runtime.(*spanSet).push
+         0     0%   100%      0.07s  3.63%  runtime.deductAssistCredit
+         0     0%   100%      0.02s  1.04%  runtime.deductSweepCredit
+         0     0%   100%      0.07s  3.63%  runtime.gcAssistAlloc
+         0     0%   100%      0.07s  3.63%  runtime.gcAssistAlloc.func2
+         0     0%   100%      0.07s  3.63%  runtime.gcAssistAlloc1
+         0     0%   100%      0.07s  3.63%  runtime.gcDrainN
+         0     0%   100%      0.10s  5.18%  runtime.gcMarkTermination.func3
+         0     0%   100%      0.16s  8.29%  runtime.gcStart.func4
+         0     0%   100%      0.13s  6.74%  runtime.makeslice
+         0     0%   100%      0.13s  6.74%  runtime.mallocgc
+         0     0%   100%      0.06s  3.11%  runtime.mallocgcSmallNoscan
+         0     0%   100%      0.01s  0.52%  runtime.markroot

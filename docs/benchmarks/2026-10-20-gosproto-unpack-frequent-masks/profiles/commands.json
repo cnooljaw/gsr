@@ -1,0 +1,331 @@
+[
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "body_profile_test.go"
+    ],
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.024203624576330185,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-run",
+      "^TestRepresentativeFixtures$",
+      "."
+    ],
+    "env": {},
+    "exitCode": 0,
+    "seconds": 2.710056083276868,
+    "output": "ok  \tunpackinprocess\t0.639s\n"
+  },
+  {
+    "args": [
+      "go",
+      "vet",
+      "-mod=mod",
+      "."
+    ],
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.3134353756904602,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-c",
+      "-o",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-profile-20261020/profile.test",
+      "."
+    ],
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.6002457495778799,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "list",
+      "-m",
+      "-json",
+      "github.com/cnooljaw/gosproto"
+    ],
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.013944458216428757,
+    "output": "{\n\t\"Path\": \"github.com/cnooljaw/gosproto\",\n\t\"Version\": \"v0.4.0\",\n\t\"Replace\": {\n\t\t\"Path\": \"/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-masks-20261020/gosproto\",\n\t\t\"Dir\": \"/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-masks-20261020/gosproto\",\n\t\t\"GoMod\": \"/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-masks-20261020/gosproto/go.mod\",\n\t\t\"GoVersion\": \"1.24.0\"\n\t},\n\t\"Dir\": \"/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-masks-20261020/gosproto\",\n\t\"GoMod\": \"/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-masks-20261020/gosproto/go.mod\",\n\t\"GoVersion\": \"1.24.0\"\n}\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-profile-20261020/profile.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkBodyCost$",
+      "-test.benchmem",
+      "-test.benchtime=2s",
+      "-test.timeout=1m"
+    ],
+    "env": {
+      "GSR_BODY_CASE": "game_large",
+      "GSR_BODY_OP": "sproto_unpack",
+      "GSR_PROFILE_KIND": "cpu",
+      "GSR_PROFILE_META": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-profile-20261020/game_large-baseline.json",
+      "GSR_PROFILE_CPU": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-profile-20261020/game_large-baseline.cpu",
+      "GSR_PROFILE_VARIANT": "baseline"
+    },
+    "exitCode": 0,
+    "seconds": 2.8218760415911674,
+    "output": "goos: darwin\ngoarch: arm64\npkg: unpackinprocess\ncpu: Apple M2\nBenchmarkBodyCost \t  400908\t      5317 ns/op\t    3456 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-top",
+      "-nodecount=40",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-profile-20261020/profile.test",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-profile-20261020/game_large-baseline.cpu"
+    ],
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.09626304171979427,
+    "output": "File: profile.test\nType: cpu\nTime: 2026-10-20 16:04:06 CST\nDuration: 2.21s, Total samples = 1.93s (87.30%)\nShowing nodes accounting for 1.93s, 100% of 1.93s total\nShowing top 40 nodes out of 58\n      flat  flat%   sum%        cum   cum%\n     1.43s 74.09% 74.09%      1.64s 84.97%  github.com/cnooljaw/gosproto.UnpackWithLimit\n     0.26s 13.47% 87.56%      0.26s 13.47%  runtime.kevent\n     0.08s  4.15% 91.71%      0.08s  4.15%  math/bits.OnesCount8 (inline)\n     0.03s  1.55% 93.26%      0.03s  1.55%  runtime.madvise\n     0.02s  1.04% 94.30%      0.03s  1.55%  runtime.findObject\n     0.02s  1.04% 95.34%      0.02s  1.04%  runtime.typePointers.next\n     0.01s  0.52% 95.85%      0.01s  0.52%  runtime.(*mLockProfile).recordUnlock\n     0.01s  0.52% 96.37%      0.02s  1.04%  runtime.(*mheap).initSpan\n     0.01s  0.52% 96.89%      0.01s  0.52%  runtime.(*mheap).setSpans\n     0.01s  0.52% 97.41%      0.01s  0.52%  runtime.(*mspan).heapBitsSmallForAddr\n     0.01s  0.52% 97.93%      0.01s  0.52%  runtime.(*pageBits).setRange\n     0.01s  0.52% 98.45%      0.02s  1.04%  runtime.(*sweepLocked).sweep\n     0.01s  0.52% 98.96%      0.01s  0.52%  runtime.memclrNoHeapPointers\n     0.01s  0.52% 99.48%      0.05s  2.59%  runtime.scanobject\n     0.01s  0.52%   100%      0.01s  0.52%  runtime.spanOf (inline)\n         0     0%   100%      0.05s  2.59%  runtime.(*mcache).nextFree\n         0     0%   100%      0.05s  2.59%  runtime.(*mcache).refill\n         0     0%   100%      0.05s  2.59%  runtime.(*mcentral).cacheSpan\n         0     0%   100%      0.03s  1.55%  runtime.(*mcentral).grow\n         0     0%   100%      0.03s  1.55%  runtime.(*mheap).alloc\n         0     0%   100%      0.06s  3.11%  runtime.(*mheap).alloc.func1\n         0     0%   100%      0.06s  3.11%  runtime.(*mheap).allocSpan\n         0     0%   100%      0.01s  0.52%  runtime.(*mspan).typePointersOfUnchecked\n         0     0%   100%      0.01s  0.52%  runtime.(*pageAlloc).alloc\n         0     0%   100%      0.01s  0.52%  runtime.(*pageAlloc).allocRange\n         0     0%   100%      0.01s  0.52%  runtime.(*pallocBits).allocRange (inline)\n         0     0%   100%      0.01s  0.52%  runtime.(*pallocData).allocRange\n         0     0%   100%      0.01s  0.52%  runtime.(*spanSet).push\n         0     0%   100%      0.07s  3.63%  runtime.deductAssistCredit\n         0     0%   100%      0.02s  1.04%  runtime.deductSweepCredit\n         0     0%   100%      0.07s  3.63%  runtime.gcAssistAlloc\n         0     0%   100%      0.07s  3.63%  runtime.gcAssistAlloc.func2\n         0     0%   100%      0.07s  3.63%  runtime.gcAssistAlloc1\n         0     0%   100%      0.07s  3.63%  runtime.gcDrainN\n         0     0%   100%      0.10s  5.18%  runtime.gcMarkTermination.func3\n         0     0%   100%      0.16s  8.29%  runtime.gcStart.func4\n         0     0%   100%      0.13s  6.74%  runtime.makeslice\n         0     0%   100%      0.13s  6.74%  runtime.mallocgc\n         0     0%   100%      0.06s  3.11%  runtime.mallocgcSmallNoscan\n         0     0%   100%      0.01s  0.52%  runtime.markroot\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-list=UnpackWithLimit|ExperimentUnpackCandidate",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-profile-20261020/profile.test",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-profile-20261020/game_large-baseline.cpu"
+    ],
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.01979954168200493,
+    "output": "Total: 1.93s\nROUTINE ======================== github.com/cnooljaw/gosproto.UnpackWithLimit in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-masks-20261020/gosproto/pack.go\n     1.43s      1.64s (flat, cum) 84.97% of Total\n         .          .    193:func UnpackWithLimit(src []byte, maxBytes int) ([]byte, error) {\n      10ms       10ms    194:\tif maxBytes < 1 {\n         .          .    195:\t\treturn nil, ErrInvalidLimits\n         .          .    196:\t}\n         .          .    197:\t// \u9996\u6b21\u53ea\u626b\u63cf tag/\u8fde\u7eed\u5757\u957f\u5ea6\uff0c\u5728\u5206\u914d\u524d\u786e\u8ba4\u5b8c\u6574\u8fb9\u754c\u53ca\u6709\u9650\u7684\u786e\u5207\u8f93\u51fa\u957f\u5ea6\u3002\n         .          .    198:\tsize := 0\n         .          .    199:\tfor remaining := src; len(remaining) > 0; {\n     170ms      170ms    200:\t\theader := remaining[0]\n         .          .    201:\t\tconsumed, produced := 1, 8\n         .          .    202:\t\tif header == 0 {\n         .          .    203:\t\t\tif len(remaining) >= 2 && remaining[1] == 0 {\n         .          .    204:\t\t\t\twords := (maxBytes - size) / 8\n         .          .    205:\t\t\t\tif words < 2 {\n         .          .    206:\t\t\t\t\treturn nil, ErrLimit\n         .          .    207:\t\t\t\t}\n         .          .    208:\t\t\t\t// \u591a\u68c0\u67e5\u4e00\u4e2a\u96f6 mask \u5373\u53ef\u5224\u5b9a\u8d85\u989d\uff0c\u4e0d\u4e3a\u5c0f\u9884\u7b97\u626b\u63cf\u6574\u6bb5\u5927\u8f93\u5165\u3002\n         .          .    209:\t\t\t\tend := min(len(remaining), words+1)\n         .          .    210:\t\t\t\trun := 2 + zeroHeaderPrefix(remaining[2:end])\n         .          .    211:\t\t\t\tif run > words {\n         .          .    212:\t\t\t\t\treturn nil, ErrLimit\n         .          .    213:\t\t\t\t}\n         .          .    214:\t\t\t\tconsumed, produced = run, run*8\n         .          .    215:\t\t\t}\n      80ms       80ms    216:\t\t} else if header == 0xff {\n         .          .    217:\t\t\tif len(remaining) < 2 {\n         .          .    218:\t\t\t\treturn nil, ErrUnpack\n         .          .    219:\t\t\t}\n         .          .    220:\t\t\tproduced = (int(remaining[1]) + 1) * 8\n         .          .    221:\t\t\tconsumed = 2 + produced\n         .          .    222:\t\t} else {\n      30ms      110ms    223:\t\t\tconsumed += bits.OnesCount8(header)\n         .          .    224:\t\t}\n      10ms       10ms    225:\t\tif consumed > len(remaining) {\n         .          .    226:\t\t\treturn nil, ErrUnpack\n         .          .    227:\t\t}\n     110ms      110ms    228:\t\tif produced > maxBytes-size {\n         .          .    229:\t\t\treturn nil, ErrLimit\n         .          .    230:\t\t}\n     100ms      100ms    231:\t\tsize += produced\n     110ms      110ms    232:\t\tremaining = remaining[consumed:]\n         .          .    233:\t}\n         .      130ms    234:\tunpacked := make([]byte, size)\n         .          .    235:\toffset := 0\n     110ms      110ms    236:\tfor len(src) > 0 {\n      30ms       30ms    237:\t\theader := src[0]\n         .          .    238:\t\tif header == 0 {\n         .          .    239:\t\t\trun := 1\n         .          .    240:\t\t\tif len(src) >= 2 && src[1] == 0 {\n         .          .    241:\t\t\t\trun = 2 + zeroHeaderPrefix(src[2:])\n         .          .    242:\t\t\t}\n         .          .    243:\t\t\t// \u8f93\u51fa\u7531\u672c\u6b21 make \u6e05\u96f6\uff0c\u5df2\u9884\u68c0\u7684\u96f6\u6bb5\u53ea\u9700\u63a8\u8fdb\u6e38\u6807\u3002\n         .          .    244:\t\t\toffset += run * 8\n         .          .    245:\t\t\tsrc = src[run:]\n         .          .    246:\t\t\tcontinue\n         .          .    247:\t\t}\n      50ms       50ms    248:\t\tsrc = src[1:]\n      40ms       40ms    249:\t\tif header == 0xff {\n         .          .    250:\t\t\tlength := (int(src[0]) + 1) * 8\n      10ms       10ms    251:\t\t\tcopy(unpacked[offset:], src[1:1+length])\n         .          .    252:\t\t\toffset += length\n         .          .    253:\t\t\tsrc = src[1+length:]\n         .          .    254:\t\t\tcontinue\n         .          .    255:\t\t}\n         .          .    256:\t\t// \u96f6 mask \u5df2\u5728\u4e0a\u65b9\u6d88\u8d39\uff0c\u666e\u901a mask \u81f3\u5c11\u6709\u4e00\u4e2a\u6709\u6548\u5b57\u8282\u3002\n         .          .    257:\t\t// \u9996\u904d\u5df2\u8bc1\u660e\u5b8c\u6574 word \u7684\u8f93\u51fa\u957f\u5ea6\uff0c\u56fa\u5b9a\u89c6\u56fe\u8ba9\u76ee\u6807\u7d22\u5f15\u9650\u4e8e 0\uff5e7\u3002\n      40ms       40ms    258:\t\tdst := unpacked[offset : offset+8 : offset+8]\n         .          .    259:\t\tused := 0\n         .          .    260:\t\tfor mask := header; ; {\n         .          .    261:\t\t\tindex := bits.TrailingZeros8(mask) & 7\n     490ms      490ms    262:\t\t\tdst[index] = src[used]\n         .          .    263:\t\t\tused++\n      10ms       10ms    264:\t\t\tmask &= mask - 1\n      30ms       30ms    265:\t\t\tif mask == 0 {\n         .          .    266:\t\t\t\tbreak\n         .          .    267:\t\t\t}\n         .          .    268:\t\t}\n         .          .    269:\t\tsrc = src[used:]\n         .          .    270:\t\toffset += 8\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-top",
+      "-cum",
+      "-nodecount=40",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-profile-20261020/profile.test",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-profile-20261020/game_large-baseline.cpu"
+    ],
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.01802149973809719,
+    "output": "File: profile.test\nType: cpu\nTime: 2026-10-20 16:04:06 CST\nDuration: 2.21s, Total samples = 1.93s (87.30%)\nShowing nodes accounting for 1.90s, 98.45% of 1.93s total\nShowing top 40 nodes out of 58\n      flat  flat%   sum%        cum   cum%\n     1.43s 74.09% 74.09%      1.64s 84.97%  github.com/cnooljaw/gosproto.UnpackWithLimit\n         0     0% 74.09%      1.64s 84.97%  testing.(*B).run1.func1\n         0     0% 74.09%      1.64s 84.97%  testing.(*B).runN\n         0     0% 74.09%      1.64s 84.97%  unpackinprocess.BenchmarkBodyCost\n         0     0% 74.09%      1.64s 84.97%  unpackinprocess.BenchmarkBodyCost.func1\n         0     0% 74.09%      0.39s 20.21%  runtime.systemstack\n     0.26s 13.47% 87.56%      0.26s 13.47%  runtime.kevent\n         0     0% 87.56%      0.26s 13.47%  runtime.netpoll\n         0     0% 87.56%      0.26s 13.47%  runtime.startTheWorldWithSema\n         0     0% 87.56%      0.16s  8.29%  runtime.gcStart.func4\n         0     0% 87.56%      0.13s  6.74%  runtime.makeslice\n         0     0% 87.56%      0.13s  6.74%  runtime.mallocgc\n         0     0% 87.56%      0.10s  5.18%  runtime.gcMarkTermination.func3\n     0.08s  4.15% 91.71%      0.08s  4.15%  math/bits.OnesCount8 (inline)\n         0     0% 91.71%      0.07s  3.63%  runtime.deductAssistCredit\n         0     0% 91.71%      0.07s  3.63%  runtime.gcAssistAlloc\n         0     0% 91.71%      0.07s  3.63%  runtime.gcAssistAlloc.func2\n         0     0% 91.71%      0.07s  3.63%  runtime.gcAssistAlloc1\n         0     0% 91.71%      0.07s  3.63%  runtime.gcDrainN\n         0     0% 91.71%      0.06s  3.11%  runtime.(*mheap).alloc.func1\n         0     0% 91.71%      0.06s  3.11%  runtime.(*mheap).allocSpan\n         0     0% 91.71%      0.06s  3.11%  runtime.mallocgcSmallNoscan\n         0     0% 91.71%      0.05s  2.59%  runtime.(*mcache).nextFree\n         0     0% 91.71%      0.05s  2.59%  runtime.(*mcache).refill\n         0     0% 91.71%      0.05s  2.59%  runtime.(*mcentral).cacheSpan\n     0.01s  0.52% 92.23%      0.05s  2.59%  runtime.scanobject\n         0     0% 92.23%      0.03s  1.55%  runtime.(*mcentral).grow\n         0     0% 92.23%      0.03s  1.55%  runtime.(*mheap).alloc\n     0.02s  1.04% 93.26%      0.03s  1.55%  runtime.findObject\n     0.03s  1.55% 94.82%      0.03s  1.55%  runtime.madvise\n         0     0% 94.82%      0.03s  1.55%  runtime.sysUsed (inline)\n         0     0% 94.82%      0.03s  1.55%  runtime.sysUsedOS (inline)\n     0.01s  0.52% 95.34%      0.02s  1.04%  runtime.(*mheap).initSpan\n     0.01s  0.52% 95.85%      0.02s  1.04%  runtime.(*sweepLocked).sweep\n         0     0% 95.85%      0.02s  1.04%  runtime.deductSweepCredit\n         0     0% 95.85%      0.02s  1.04%  runtime.sweepone\n     0.02s  1.04% 96.89%      0.02s  1.04%  runtime.typePointers.next\n     0.01s  0.52% 97.41%      0.01s  0.52%  runtime.(*mLockProfile).recordUnlock\n     0.01s  0.52% 97.93%      0.01s  0.52%  runtime.(*mheap).setSpans\n     0.01s  0.52% 98.45%      0.01s  0.52%  runtime.(*mspan).heapBitsSmallForAddr\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-profile-20261020/profile.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkBodyCost$",
+      "-test.benchmem",
+      "-test.benchtime=2s",
+      "-test.timeout=1m"
+    ],
+    "env": {
+      "GSR_BODY_CASE": "game_large",
+      "GSR_BODY_OP": "sproto_unpack",
+      "GSR_PROFILE_KIND": "cpu",
+      "GSR_PROFILE_META": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-profile-20261020/game_large-candidate.json",
+      "GSR_PROFILE_CPU": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-profile-20261020/game_large-candidate.cpu",
+      "GSR_PROFILE_VARIANT": "candidate"
+    },
+    "exitCode": 0,
+    "seconds": 2.7387299593538046,
+    "output": "goos: darwin\ngoarch: arm64\npkg: unpackinprocess\ncpu: Apple M2\nBenchmarkBodyCost \t  454918\t      5601 ns/op\t    3456 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-top",
+      "-nodecount=40",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-profile-20261020/profile.test",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-profile-20261020/game_large-candidate.cpu"
+    ],
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.02067733369767666,
+    "output": "File: profile.test\nType: cpu\nTime: 2026-10-20 16:04:08 CST\nDuration: 2.67s, Total samples = 2.36s (88.52%)\nShowing nodes accounting for 2.31s, 97.88% of 2.36s total\nDropped 25 nodes (cum <= 0.01s)\n      flat  flat%   sum%        cum   cum%\n     1.43s 60.59% 60.59%      1.73s 73.31%  github.com/cnooljaw/gosproto.ExperimentUnpackCandidate\n     0.60s 25.42% 86.02%      0.60s 25.42%  runtime.kevent\n     0.12s  5.08% 91.10%      0.12s  5.08%  math/bits.OnesCount8 (inline)\n     0.04s  1.69% 92.80%      0.04s  1.69%  runtime.findObject\n     0.04s  1.69% 94.49%      0.04s  1.69%  runtime.typePointers.next\n     0.02s  0.85% 95.34%      0.02s  0.85%  runtime.(*sysMemStat).add\n     0.02s  0.85% 96.19%      0.02s  0.85%  runtime.madvise\n     0.02s  0.85% 97.03%      0.04s  1.69%  runtime.scanblock\n     0.01s  0.42% 97.46%      0.14s  5.93%  runtime.gcDrainN\n     0.01s  0.42% 97.88%      0.08s  3.39%  runtime.scanobject\n         0     0% 97.88%      0.03s  1.27%  runtime.(*mcache).nextFree\n         0     0% 97.88%      0.03s  1.27%  runtime.(*mcache).refill\n         0     0% 97.88%      0.03s  1.27%  runtime.(*mcentral).cacheSpan\n         0     0% 97.88%      0.02s  0.85%  runtime.(*mcentral).grow\n         0     0% 97.88%      0.02s  0.85%  runtime.(*mheap).alloc\n         0     0% 97.88%      0.04s  1.69%  runtime.(*mheap).alloc.func1\n         0     0% 97.88%      0.04s  1.69%  runtime.(*mheap).allocSpan\n         0     0% 97.88%      0.14s  5.93%  runtime.deductAssistCredit\n         0     0% 97.88%      0.14s  5.93%  runtime.gcAssistAlloc\n         0     0% 97.88%      0.14s  5.93%  runtime.gcAssistAlloc.func2\n         0     0% 97.88%      0.14s  5.93%  runtime.gcAssistAlloc1\n         0     0% 97.88%      0.27s 11.44%  runtime.gcMarkTermination.func3\n         0     0% 97.88%      0.33s 13.98%  runtime.gcStart.func4\n         0     0% 97.88%      0.18s  7.63%  runtime.makeslice\n         0     0% 97.88%      0.18s  7.63%  runtime.mallocgc\n         0     0% 97.88%      0.04s  1.69%  runtime.mallocgcSmallNoscan\n         0     0% 97.88%      0.05s  2.12%  runtime.markroot\n         0     0% 97.88%      0.04s  1.69%  runtime.markrootBlock\n         0     0% 97.88%      0.60s 25.42%  runtime.netpoll\n         0     0% 97.88%      0.60s 25.42%  runtime.startTheWorldWithSema\n         0     0% 97.88%      0.02s  0.85%  runtime.sysUsed (inline)\n         0     0% 97.88%      0.02s  0.85%  runtime.sysUsedOS (inline)\n         0     0% 97.88%      0.81s 34.32%  runtime.systemstack\n         0     0% 97.88%      1.73s 73.31%  testing.(*B).run1.func1\n         0     0% 97.88%      1.73s 73.31%  testing.(*B).runN\n         0     0% 97.88%      1.73s 73.31%  unpackinprocess.BenchmarkBodyCost\n         0     0% 97.88%      1.73s 73.31%  unpackinprocess.BenchmarkBodyCost.func1\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-list=UnpackWithLimit|ExperimentUnpackCandidate",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-profile-20261020/profile.test",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-profile-20261020/game_large-candidate.cpu"
+    ],
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.01847987435758114,
+    "output": "Total: 2.36s\nROUTINE ======================== github.com/cnooljaw/gosproto.ExperimentUnpackCandidate in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-masks-20261020/gosproto/unpack_experiment.go\n     1.43s      1.73s (flat, cum) 73.31% of Total\n         .          .     87:func ExperimentUnpackCandidate(src []byte, maxBytes int) ([]byte, error) {\n         .          .     88:\tif maxBytes < 1 {\n         .          .     89:\t\treturn nil, ErrInvalidLimits\n         .          .     90:\t}\n         .          .     91:\t// \u9996\u6b21\u53ea\u626b\u63cf tag/\u8fde\u7eed\u5757\u957f\u5ea6\uff0c\u5728\u5206\u914d\u524d\u786e\u8ba4\u5b8c\u6574\u8fb9\u754c\u53ca\u6709\u9650\u7684\u786e\u5207\u8f93\u51fa\u957f\u5ea6\u3002\n         .          .     92:\tsize := 0\n         .          .     93:\tfor remaining := src; len(remaining) > 0; {\n     250ms      250ms     94:\t\theader := remaining[0]\n         .          .     95:\t\tconsumed, produced := 1, 8\n      10ms       10ms     96:\t\tif header == 0 {\n         .          .     97:\t\t\tif len(remaining) >= 2 && remaining[1] == 0 {\n         .          .     98:\t\t\t\twords := (maxBytes - size) / 8\n         .          .     99:\t\t\t\tif words < 2 {\n         .          .    100:\t\t\t\t\treturn nil, ErrLimit\n         .          .    101:\t\t\t\t}\n         .          .    102:\t\t\t\t// \u591a\u68c0\u67e5\u4e00\u4e2a\u96f6 mask \u5373\u53ef\u5224\u5b9a\u8d85\u989d\uff0c\u4e0d\u4e3a\u5c0f\u9884\u7b97\u626b\u63cf\u6574\u6bb5\u5927\u8f93\u5165\u3002\n         .          .    103:\t\t\t\tend := min(len(remaining), words+1)\n         .          .    104:\t\t\t\trun := 2 + zeroHeaderPrefix(remaining[2:end])\n         .          .    105:\t\t\t\tif run > words {\n         .          .    106:\t\t\t\t\treturn nil, ErrLimit\n         .          .    107:\t\t\t\t}\n         .          .    108:\t\t\t\tconsumed, produced = run, run*8\n         .          .    109:\t\t\t}\n     130ms      130ms    110:\t\t} else if header == 0xff {\n      20ms       20ms    111:\t\t\tif len(remaining) < 2 {\n         .          .    112:\t\t\t\treturn nil, ErrUnpack\n         .          .    113:\t\t\t}\n         .          .    114:\t\t\tproduced = (int(remaining[1]) + 1) * 8\n         .          .    115:\t\t\tconsumed = 2 + produced\n         .          .    116:\t\t} else {\n         .       70ms    117:\t\t\tconsumed += bits.OnesCount8(header)\n         .          .    118:\t\t}\n      30ms       30ms    119:\t\tif consumed > len(remaining) {\n         .          .    120:\t\t\treturn nil, ErrUnpack\n         .          .    121:\t\t}\n     150ms      150ms    122:\t\tif produced > maxBytes-size {\n         .          .    123:\t\t\treturn nil, ErrLimit\n         .          .    124:\t\t}\n      50ms       50ms    125:\t\tsize += produced\n      60ms       60ms    126:\t\tremaining = remaining[consumed:]\n         .          .    127:\t}\n         .      180ms    128:\tunpacked := make([]byte, size)\n         .          .    129:\toffset := 0\n     100ms      100ms    130:\tfor len(src) > 0 {\n      20ms       20ms    131:\t\theader := src[0]\n         .          .    132:\t\tif header == 0 {\n         .          .    133:\t\t\trun := 1\n         .          .    134:\t\t\tif len(src) >= 2 && src[1] == 0 {\n         .          .    135:\t\t\t\trun = 2 + zeroHeaderPrefix(src[2:])\n         .          .    136:\t\t\t}\n         .          .    137:\t\t\t// \u8f93\u51fa\u7531\u672c\u6b21 make \u6e05\u96f6\uff0c\u5df2\u9884\u68c0\u7684\u96f6\u6bb5\u53ea\u9700\u63a8\u8fdb\u6e38\u6807\u3002\n         .          .    138:\t\t\toffset += run * 8\n         .          .    139:\t\t\tsrc = src[run:]\n         .          .    140:\t\t\tcontinue\n         .          .    141:\t\t}\n      30ms       30ms    142:\t\tsrc = src[1:]\n      60ms       60ms    143:\t\tif header == 0xff {\n         .          .    144:\t\t\tlength := (int(src[0]) + 1) * 8\n         .          .    145:\t\t\tcopy(unpacked[offset:], src[1:1+length])\n         .          .    146:\t\t\toffset += length\n         .          .    147:\t\t\tsrc = src[1+length:]\n         .          .    148:\t\t\tcontinue\n         .          .    149:\t\t}\n         .          .    150:\t\t// \u96f6 mask \u5df2\u5728\u4e0a\u65b9\u6d88\u8d39\uff0c\u666e\u901a mask \u81f3\u5c11\u6709\u4e00\u4e2a\u6709\u6548\u5b57\u8282\u3002\n         .          .    151:\t\t// \u9996\u904d\u5df2\u8bc1\u660e\u5b8c\u6574 word \u7684\u8f93\u51fa\u957f\u5ea6\uff0c\u56fa\u5b9a\u89c6\u56fe\u8ba9\u76ee\u6807\u7d22\u5f15\u9650\u4e8e 0\uff5e7\u3002\n      70ms       70ms    152:\t\tdst := unpacked[offset : offset+8 : offset+8]\n         .       50ms    153:\t\tused := bits.OnesCount8(header)\n         .          .    154:\t\tmask := header\n     100ms      100ms    155:\t\tfor _, value := range src[:used:used] {\n         .          .    156:\t\t\tindex := bits.TrailingZeros8(mask) & 7\n     330ms      330ms    157:\t\t\tdst[index] = value\n      10ms       10ms    158:\t\t\tmask &= mask - 1\n         .          .    159:\t\t}\n      10ms       10ms    160:\t\tsrc = src[used:]\n         .          .    161:\t\toffset += 8\n         .          .    162:\t}\n         .          .    163:\treturn unpacked, nil\n         .          .    164:}\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-top",
+      "-cum",
+      "-nodecount=40",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-profile-20261020/profile.test",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-profile-20261020/game_large-candidate.cpu"
+    ],
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.01894383318722248,
+    "output": "File: profile.test\nType: cpu\nTime: 2026-10-20 16:04:08 CST\nDuration: 2.67s, Total samples = 2.36s (88.52%)\nShowing nodes accounting for 2.31s, 97.88% of 2.36s total\nDropped 25 nodes (cum <= 0.01s)\n      flat  flat%   sum%        cum   cum%\n     1.43s 60.59% 60.59%      1.73s 73.31%  github.com/cnooljaw/gosproto.ExperimentUnpackCandidate\n         0     0% 60.59%      1.73s 73.31%  testing.(*B).run1.func1\n         0     0% 60.59%      1.73s 73.31%  testing.(*B).runN\n         0     0% 60.59%      1.73s 73.31%  unpackinprocess.BenchmarkBodyCost\n         0     0% 60.59%      1.73s 73.31%  unpackinprocess.BenchmarkBodyCost.func1\n         0     0% 60.59%      0.81s 34.32%  runtime.systemstack\n     0.60s 25.42% 86.02%      0.60s 25.42%  runtime.kevent\n         0     0% 86.02%      0.60s 25.42%  runtime.netpoll\n         0     0% 86.02%      0.60s 25.42%  runtime.startTheWorldWithSema\n         0     0% 86.02%      0.33s 13.98%  runtime.gcStart.func4\n         0     0% 86.02%      0.27s 11.44%  runtime.gcMarkTermination.func3\n         0     0% 86.02%      0.18s  7.63%  runtime.makeslice\n         0     0% 86.02%      0.18s  7.63%  runtime.mallocgc\n         0     0% 86.02%      0.14s  5.93%  runtime.deductAssistCredit\n         0     0% 86.02%      0.14s  5.93%  runtime.gcAssistAlloc\n         0     0% 86.02%      0.14s  5.93%  runtime.gcAssistAlloc.func2\n         0     0% 86.02%      0.14s  5.93%  runtime.gcAssistAlloc1\n     0.01s  0.42% 86.44%      0.14s  5.93%  runtime.gcDrainN\n     0.12s  5.08% 91.53%      0.12s  5.08%  math/bits.OnesCount8 (inline)\n     0.01s  0.42% 91.95%      0.08s  3.39%  runtime.scanobject\n         0     0% 91.95%      0.05s  2.12%  runtime.markroot\n         0     0% 91.95%      0.04s  1.69%  runtime.(*mheap).alloc.func1\n         0     0% 91.95%      0.04s  1.69%  runtime.(*mheap).allocSpan\n     0.04s  1.69% 93.64%      0.04s  1.69%  runtime.findObject\n         0     0% 93.64%      0.04s  1.69%  runtime.mallocgcSmallNoscan\n         0     0% 93.64%      0.04s  1.69%  runtime.markrootBlock\n     0.02s  0.85% 94.49%      0.04s  1.69%  runtime.scanblock\n     0.04s  1.69% 96.19%      0.04s  1.69%  runtime.typePointers.next\n         0     0% 96.19%      0.03s  1.27%  runtime.(*mcache).nextFree\n         0     0% 96.19%      0.03s  1.27%  runtime.(*mcache).refill\n         0     0% 96.19%      0.03s  1.27%  runtime.(*mcentral).cacheSpan\n         0     0% 96.19%      0.02s  0.85%  runtime.(*mcentral).grow\n         0     0% 96.19%      0.02s  0.85%  runtime.(*mheap).alloc\n     0.02s  0.85% 97.03%      0.02s  0.85%  runtime.(*sysMemStat).add\n     0.02s  0.85% 97.88%      0.02s  0.85%  runtime.madvise\n         0     0% 97.88%      0.02s  0.85%  runtime.sysUsed (inline)\n         0     0% 97.88%      0.02s  0.85%  runtime.sysUsedOS (inline)\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-profile-20261020/profile.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkBodyCost$",
+      "-test.benchmem",
+      "-test.benchtime=2s",
+      "-test.timeout=1m"
+    ],
+    "env": {
+      "GSR_BODY_CASE": "int32_edges",
+      "GSR_BODY_OP": "sproto_unpack",
+      "GSR_PROFILE_KIND": "cpu",
+      "GSR_PROFILE_META": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-profile-20261020/int32_edges-baseline.json",
+      "GSR_PROFILE_CPU": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-profile-20261020/int32_edges-baseline.cpu",
+      "GSR_PROFILE_VARIANT": "baseline"
+    },
+    "exitCode": 0,
+    "seconds": 2.5859452076256275,
+    "output": "goos: darwin\ngoarch: arm64\npkg: unpackinprocess\ncpu: Apple M2\nBenchmarkBodyCost \t  455247\t      5274 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-top",
+      "-nodecount=40",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-profile-20261020/profile.test",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-profile-20261020/int32_edges-baseline.cpu"
+    ],
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.019504249095916748,
+    "output": "File: profile.test\nType: cpu\nTime: 2026-10-20 16:04:11 CST\nDuration: 2.52s, Total samples = 2.24s (89.04%)\nShowing nodes accounting for 2.16s, 96.43% of 2.24s total\nDropped 22 nodes (cum <= 0.01s)\n      flat  flat%   sum%        cum   cum%\n     1.17s 52.23% 52.23%      1.43s 63.84%  github.com/cnooljaw/gosproto.UnpackWithLimit\n     0.76s 33.93% 86.16%      0.76s 33.93%  runtime.kevent\n     0.12s  5.36% 91.52%      0.12s  5.36%  math/bits.OnesCount8 (inline)\n     0.03s  1.34% 92.86%      0.03s  1.34%  runtime.memclrNoHeapPointers\n     0.02s  0.89% 93.75%      0.02s  0.89%  runtime.findObject\n     0.02s  0.89% 94.64%      0.02s  0.89%  runtime.headTailIndex.head (inline)\n     0.02s  0.89% 95.54%      0.04s  1.79%  runtime.scanobject\n     0.01s  0.45% 95.98%      0.02s  0.89%  runtime.scanblock\n     0.01s  0.45% 96.43%      1.45s 64.73%  unpackinprocess.BenchmarkBodyCost.func1\n         0     0% 96.43%      0.03s  1.34%  runtime.(*mcache).nextFree\n         0     0% 96.43%      0.03s  1.34%  runtime.(*mcache).refill\n         0     0% 96.43%      0.03s  1.34%  runtime.(*mcentral).cacheSpan\n         0     0% 96.43%      0.02s  0.89%  runtime.(*spanSet).pop\n         0     0% 96.43%      0.07s  3.12%  runtime.deductAssistCredit\n         0     0% 96.43%      0.02s  0.89%  runtime.deductSweepCredit\n         0     0% 96.43%      0.07s  3.12%  runtime.gcAssistAlloc\n         0     0% 96.43%      0.07s  3.12%  runtime.gcAssistAlloc.func2\n         0     0% 96.43%      0.07s  3.12%  runtime.gcAssistAlloc1\n         0     0% 96.43%      0.07s  3.12%  runtime.gcDrainN\n         0     0% 96.43%      0.32s 14.29%  runtime.gcMarkTermination.func3\n         0     0% 96.43%      0.44s 19.64%  runtime.gcStart.func4\n         0     0% 96.43%      0.02s  0.89%  runtime.headTailIndex.split (inline)\n         0     0% 96.43%      0.14s  6.25%  runtime.makeslice\n         0     0% 96.43%      0.14s  6.25%  runtime.mallocgc\n         0     0% 96.43%      0.07s  3.12%  runtime.mallocgcSmallNoscan\n         0     0% 96.43%      0.02s  0.89%  runtime.markroot\n         0     0% 96.43%      0.02s  0.89%  runtime.markrootBlock\n         0     0% 96.43%      0.76s 33.93%  runtime.netpoll\n         0     0% 96.43%      0.76s 33.93%  runtime.startTheWorldWithSema\n         0     0% 96.43%      0.02s  0.89%  runtime.sweepone\n         0     0% 96.43%      0.85s 37.95%  runtime.systemstack\n         0     0% 96.43%      1.45s 64.73%  testing.(*B).run1.func1\n         0     0% 96.43%      1.45s 64.73%  testing.(*B).runN\n         0     0% 96.43%      1.45s 64.73%  unpackinprocess.BenchmarkBodyCost\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-list=UnpackWithLimit|ExperimentUnpackCandidate",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-profile-20261020/profile.test",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-profile-20261020/int32_edges-baseline.cpu"
+    ],
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.02029387466609478,
+    "output": "Total: 2.24s\nROUTINE ======================== github.com/cnooljaw/gosproto.UnpackWithLimit in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-masks-20261020/gosproto/pack.go\n     1.17s      1.43s (flat, cum) 63.84% of Total\n         .          .    193:func UnpackWithLimit(src []byte, maxBytes int) ([]byte, error) {\n      10ms       10ms    194:\tif maxBytes < 1 {\n         .          .    195:\t\treturn nil, ErrInvalidLimits\n         .          .    196:\t}\n         .          .    197:\t// \u9996\u6b21\u53ea\u626b\u63cf tag/\u8fde\u7eed\u5757\u957f\u5ea6\uff0c\u5728\u5206\u914d\u524d\u786e\u8ba4\u5b8c\u6574\u8fb9\u754c\u53ca\u6709\u9650\u7684\u786e\u5207\u8f93\u51fa\u957f\u5ea6\u3002\n         .          .    198:\tsize := 0\n         .          .    199:\tfor remaining := src; len(remaining) > 0; {\n     180ms      180ms    200:\t\theader := remaining[0]\n         .          .    201:\t\tconsumed, produced := 1, 8\n         .          .    202:\t\tif header == 0 {\n         .          .    203:\t\t\tif len(remaining) >= 2 && remaining[1] == 0 {\n         .          .    204:\t\t\t\twords := (maxBytes - size) / 8\n         .          .    205:\t\t\t\tif words < 2 {\n         .          .    206:\t\t\t\t\treturn nil, ErrLimit\n         .          .    207:\t\t\t\t}\n         .          .    208:\t\t\t\t// \u591a\u68c0\u67e5\u4e00\u4e2a\u96f6 mask \u5373\u53ef\u5224\u5b9a\u8d85\u989d\uff0c\u4e0d\u4e3a\u5c0f\u9884\u7b97\u626b\u63cf\u6574\u6bb5\u5927\u8f93\u5165\u3002\n         .          .    209:\t\t\t\tend := min(len(remaining), words+1)\n         .          .    210:\t\t\t\trun := 2 + zeroHeaderPrefix(remaining[2:end])\n         .          .    211:\t\t\t\tif run > words {\n         .          .    212:\t\t\t\t\treturn nil, ErrLimit\n         .          .    213:\t\t\t\t}\n         .          .    214:\t\t\t\tconsumed, produced = run, run*8\n         .          .    215:\t\t\t}\n      80ms       80ms    216:\t\t} else if header == 0xff {\n         .          .    217:\t\t\tif len(remaining) < 2 {\n         .          .    218:\t\t\t\treturn nil, ErrUnpack\n         .          .    219:\t\t\t}\n         .          .    220:\t\t\tproduced = (int(remaining[1]) + 1) * 8\n         .          .    221:\t\t\tconsumed = 2 + produced\n         .          .    222:\t\t} else {\n      10ms      130ms    223:\t\t\tconsumed += bits.OnesCount8(header)\n         .          .    224:\t\t}\n      10ms       10ms    225:\t\tif consumed > len(remaining) {\n         .          .    226:\t\t\treturn nil, ErrUnpack\n         .          .    227:\t\t}\n     110ms      110ms    228:\t\tif produced > maxBytes-size {\n         .          .    229:\t\t\treturn nil, ErrLimit\n         .          .    230:\t\t}\n      90ms       90ms    231:\t\tsize += produced\n      60ms       60ms    232:\t\tremaining = remaining[consumed:]\n         .          .    233:\t}\n         .      140ms    234:\tunpacked := make([]byte, size)\n         .          .    235:\toffset := 0\n      70ms       70ms    236:\tfor len(src) > 0 {\n      10ms       10ms    237:\t\theader := src[0]\n      10ms       10ms    238:\t\tif header == 0 {\n         .          .    239:\t\t\trun := 1\n         .          .    240:\t\t\tif len(src) >= 2 && src[1] == 0 {\n         .          .    241:\t\t\t\trun = 2 + zeroHeaderPrefix(src[2:])\n         .          .    242:\t\t\t}\n         .          .    243:\t\t\t// \u8f93\u51fa\u7531\u672c\u6b21 make \u6e05\u96f6\uff0c\u5df2\u9884\u68c0\u7684\u96f6\u6bb5\u53ea\u9700\u63a8\u8fdb\u6e38\u6807\u3002\n         .          .    244:\t\t\toffset += run * 8\n         .          .    245:\t\t\tsrc = src[run:]\n         .          .    246:\t\t\tcontinue\n         .          .    247:\t\t}\n      20ms       20ms    248:\t\tsrc = src[1:]\n      80ms       80ms    249:\t\tif header == 0xff {\n         .          .    250:\t\t\tlength := (int(src[0]) + 1) * 8\n      20ms       20ms    251:\t\t\tcopy(unpacked[offset:], src[1:1+length])\n         .          .    252:\t\t\toffset += length\n         .          .    253:\t\t\tsrc = src[1+length:]\n         .          .    254:\t\t\tcontinue\n         .          .    255:\t\t}\n         .          .    256:\t\t// \u96f6 mask \u5df2\u5728\u4e0a\u65b9\u6d88\u8d39\uff0c\u666e\u901a mask \u81f3\u5c11\u6709\u4e00\u4e2a\u6709\u6548\u5b57\u8282\u3002\n         .          .    257:\t\t// \u9996\u904d\u5df2\u8bc1\u660e\u5b8c\u6574 word \u7684\u8f93\u51fa\u957f\u5ea6\uff0c\u56fa\u5b9a\u89c6\u56fe\u8ba9\u76ee\u6807\u7d22\u5f15\u9650\u4e8e 0\uff5e7\u3002\n      50ms       50ms    258:\t\tdst := unpacked[offset : offset+8 : offset+8]\n         .          .    259:\t\tused := 0\n         .          .    260:\t\tfor mask := header; ; {\n      10ms       10ms    261:\t\t\tindex := bits.TrailingZeros8(mask) & 7\n     320ms      320ms    262:\t\t\tdst[index] = src[used]\n         .          .    263:\t\t\tused++\n      20ms       20ms    264:\t\t\tmask &= mask - 1\n      10ms       10ms    265:\t\t\tif mask == 0 {\n         .          .    266:\t\t\t\tbreak\n         .          .    267:\t\t\t}\n         .          .    268:\t\t}\n         .          .    269:\t\tsrc = src[used:]\n         .          .    270:\t\toffset += 8\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-top",
+      "-cum",
+      "-nodecount=40",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-profile-20261020/profile.test",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-profile-20261020/int32_edges-baseline.cpu"
+    ],
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.019093666225671768,
+    "output": "File: profile.test\nType: cpu\nTime: 2026-10-20 16:04:11 CST\nDuration: 2.52s, Total samples = 2.24s (89.04%)\nShowing nodes accounting for 2.16s, 96.43% of 2.24s total\nDropped 22 nodes (cum <= 0.01s)\n      flat  flat%   sum%        cum   cum%\n         0     0%     0%      1.45s 64.73%  testing.(*B).run1.func1\n         0     0%     0%      1.45s 64.73%  testing.(*B).runN\n         0     0%     0%      1.45s 64.73%  unpackinprocess.BenchmarkBodyCost\n     0.01s  0.45%  0.45%      1.45s 64.73%  unpackinprocess.BenchmarkBodyCost.func1\n     1.17s 52.23% 52.68%      1.43s 63.84%  github.com/cnooljaw/gosproto.UnpackWithLimit\n         0     0% 52.68%      0.85s 37.95%  runtime.systemstack\n     0.76s 33.93% 86.61%      0.76s 33.93%  runtime.kevent\n         0     0% 86.61%      0.76s 33.93%  runtime.netpoll\n         0     0% 86.61%      0.76s 33.93%  runtime.startTheWorldWithSema\n         0     0% 86.61%      0.44s 19.64%  runtime.gcStart.func4\n         0     0% 86.61%      0.32s 14.29%  runtime.gcMarkTermination.func3\n         0     0% 86.61%      0.14s  6.25%  runtime.makeslice\n         0     0% 86.61%      0.14s  6.25%  runtime.mallocgc\n     0.12s  5.36% 91.96%      0.12s  5.36%  math/bits.OnesCount8 (inline)\n         0     0% 91.96%      0.07s  3.12%  runtime.deductAssistCredit\n         0     0% 91.96%      0.07s  3.12%  runtime.gcAssistAlloc\n         0     0% 91.96%      0.07s  3.12%  runtime.gcAssistAlloc.func2\n         0     0% 91.96%      0.07s  3.12%  runtime.gcAssistAlloc1\n         0     0% 91.96%      0.07s  3.12%  runtime.gcDrainN\n         0     0% 91.96%      0.07s  3.12%  runtime.mallocgcSmallNoscan\n     0.02s  0.89% 92.86%      0.04s  1.79%  runtime.scanobject\n         0     0% 92.86%      0.03s  1.34%  runtime.(*mcache).nextFree\n         0     0% 92.86%      0.03s  1.34%  runtime.(*mcache).refill\n         0     0% 92.86%      0.03s  1.34%  runtime.(*mcentral).cacheSpan\n     0.03s  1.34% 94.20%      0.03s  1.34%  runtime.memclrNoHeapPointers\n         0     0% 94.20%      0.02s  0.89%  runtime.(*spanSet).pop\n         0     0% 94.20%      0.02s  0.89%  runtime.deductSweepCredit\n     0.02s  0.89% 95.09%      0.02s  0.89%  runtime.findObject\n     0.02s  0.89% 95.98%      0.02s  0.89%  runtime.headTailIndex.head (inline)\n         0     0% 95.98%      0.02s  0.89%  runtime.headTailIndex.split (inline)\n         0     0% 95.98%      0.02s  0.89%  runtime.markroot\n         0     0% 95.98%      0.02s  0.89%  runtime.markrootBlock\n     0.01s  0.45% 96.43%      0.02s  0.89%  runtime.scanblock\n         0     0% 96.43%      0.02s  0.89%  runtime.sweepone\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-profile-20261020/profile.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkBodyCost$",
+      "-test.benchmem",
+      "-test.benchtime=2s",
+      "-test.timeout=1m"
+    ],
+    "env": {
+      "GSR_BODY_CASE": "int32_edges",
+      "GSR_BODY_OP": "sproto_unpack",
+      "GSR_PROFILE_KIND": "cpu",
+      "GSR_PROFILE_META": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-profile-20261020/int32_edges-candidate.json",
+      "GSR_PROFILE_CPU": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-profile-20261020/int32_edges-candidate.cpu",
+      "GSR_PROFILE_VARIANT": "candidate"
+    },
+    "exitCode": 0,
+    "seconds": 2.527162792161107,
+    "output": "goos: darwin\ngoarch: arm64\npkg: unpackinprocess\ncpu: Apple M2\nBenchmarkBodyCost \t  367249\t      6287 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-top",
+      "-nodecount=40",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-profile-20261020/profile.test",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-profile-20261020/int32_edges-candidate.cpu"
+    ],
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.019155750051140785,
+    "output": "File: profile.test\nType: cpu\nTime: 2026-10-20 16:04:14 CST\nDuration: 2.44s, Total samples = 2.07s (84.95%)\nShowing nodes accounting for 2s, 96.62% of 2.07s total\nDropped 26 nodes (cum <= 0.01s)\n      flat  flat%   sum%        cum   cum%\n     1.10s 53.14% 53.14%      1.34s 64.73%  github.com/cnooljaw/gosproto.ExperimentUnpackCandidate\n     0.66s 31.88% 85.02%      0.66s 31.88%  runtime.kevent\n     0.09s  4.35% 89.37%      0.09s  4.35%  math/bits.OnesCount8 (inline)\n     0.04s  1.93% 91.30%      0.04s  1.93%  runtime.madvise\n     0.04s  1.93% 93.24%      0.04s  1.93%  runtime.typePointers.next\n     0.03s  1.45% 94.69%      0.03s  1.45%  runtime.memclrNoHeapPointers\n     0.01s  0.48% 95.17%      0.05s  2.42%  runtime.(*mheap).allocSpan\n     0.01s  0.48% 95.65%      0.03s  1.45%  runtime.newstack\n     0.01s  0.48% 96.14%      0.06s  2.90%  runtime.scanobject\n     0.01s  0.48% 96.62%      0.80s 38.65%  runtime.systemstack\n         0     0% 96.62%      0.03s  1.45%  runtime.(*mcache).nextFree\n         0     0% 96.62%      0.03s  1.45%  runtime.(*mcache).refill\n         0     0% 96.62%      0.02s  0.97%  runtime.(*mcentral).cacheSpan\n         0     0% 96.62%      0.05s  2.42%  runtime.(*mheap).alloc.func1\n         0     0% 96.62%      0.06s  2.90%  runtime.deductAssistCredit\n         0     0% 96.62%      0.02s  0.97%  runtime.findRunnable\n         0     0% 96.62%      0.06s  2.90%  runtime.gcAssistAlloc\n         0     0% 96.62%      0.06s  2.90%  runtime.gcAssistAlloc.func2\n         0     0% 96.62%      0.06s  2.90%  runtime.gcAssistAlloc1\n         0     0% 96.62%      0.06s  2.90%  runtime.gcDrainN\n         0     0% 96.62%      0.30s 14.49%  runtime.gcMarkTermination.func3\n         0     0% 96.62%      0.36s 17.39%  runtime.gcStart.func4\n         0     0% 96.62%      0.02s  0.97%  runtime.gopreempt_m (inline)\n         0     0% 96.62%      0.02s  0.97%  runtime.goschedImpl\n         0     0% 96.62%      0.15s  7.25%  runtime.makeslice\n         0     0% 96.62%      0.14s  6.76%  runtime.mallocgc\n         0     0% 96.62%      0.08s  3.86%  runtime.mallocgcSmallNoscan\n         0     0% 96.62%      0.02s  0.97%  runtime.morestack\n         0     0% 96.62%      0.66s 31.88%  runtime.netpoll\n         0     0% 96.62%      0.02s  0.97%  runtime.schedule\n         0     0% 96.62%      0.66s 31.88%  runtime.startTheWorldWithSema\n         0     0% 96.62%      0.04s  1.93%  runtime.sysUsed (inline)\n         0     0% 96.62%      0.04s  1.93%  runtime.sysUsedOS (inline)\n         0     0% 96.62%      1.34s 64.73%  testing.(*B).run1.func1\n         0     0% 96.62%      1.34s 64.73%  testing.(*B).runN\n         0     0% 96.62%      1.34s 64.73%  unpackinprocess.BenchmarkBodyCost\n         0     0% 96.62%      1.34s 64.73%  unpackinprocess.BenchmarkBodyCost.func1\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-list=UnpackWithLimit|ExperimentUnpackCandidate",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-profile-20261020/profile.test",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-profile-20261020/int32_edges-candidate.cpu"
+    ],
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.017797958105802536,
+    "output": "Total: 2.07s\nROUTINE ======================== github.com/cnooljaw/gosproto.ExperimentUnpackCandidate in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-masks-20261020/gosproto/unpack_experiment.go\n     1.10s      1.34s (flat, cum) 64.73% of Total\n         .          .     87:func ExperimentUnpackCandidate(src []byte, maxBytes int) ([]byte, error) {\n         .          .     88:\tif maxBytes < 1 {\n         .          .     89:\t\treturn nil, ErrInvalidLimits\n         .          .     90:\t}\n         .          .     91:\t// \u9996\u6b21\u53ea\u626b\u63cf tag/\u8fde\u7eed\u5757\u957f\u5ea6\uff0c\u5728\u5206\u914d\u524d\u786e\u8ba4\u5b8c\u6574\u8fb9\u754c\u53ca\u6709\u9650\u7684\u786e\u5207\u8f93\u51fa\u957f\u5ea6\u3002\n         .          .     92:\tsize := 0\n         .          .     93:\tfor remaining := src; len(remaining) > 0; {\n     220ms      220ms     94:\t\theader := remaining[0]\n         .          .     95:\t\tconsumed, produced := 1, 8\n         .          .     96:\t\tif header == 0 {\n         .          .     97:\t\t\tif len(remaining) >= 2 && remaining[1] == 0 {\n         .          .     98:\t\t\t\twords := (maxBytes - size) / 8\n         .          .     99:\t\t\t\tif words < 2 {\n         .          .    100:\t\t\t\t\treturn nil, ErrLimit\n         .          .    101:\t\t\t\t}\n         .          .    102:\t\t\t\t// \u591a\u68c0\u67e5\u4e00\u4e2a\u96f6 mask \u5373\u53ef\u5224\u5b9a\u8d85\u989d\uff0c\u4e0d\u4e3a\u5c0f\u9884\u7b97\u626b\u63cf\u6574\u6bb5\u5927\u8f93\u5165\u3002\n         .          .    103:\t\t\t\tend := min(len(remaining), words+1)\n         .          .    104:\t\t\t\trun := 2 + zeroHeaderPrefix(remaining[2:end])\n         .          .    105:\t\t\t\tif run > words {\n         .          .    106:\t\t\t\t\treturn nil, ErrLimit\n         .          .    107:\t\t\t\t}\n         .          .    108:\t\t\t\tconsumed, produced = run, run*8\n         .          .    109:\t\t\t}\n      70ms       70ms    110:\t\t} else if header == 0xff {\n         .          .    111:\t\t\tif len(remaining) < 2 {\n         .          .    112:\t\t\t\treturn nil, ErrUnpack\n         .          .    113:\t\t\t}\n         .          .    114:\t\t\tproduced = (int(remaining[1]) + 1) * 8\n         .          .    115:\t\t\tconsumed = 2 + produced\n         .          .    116:\t\t} else {\n         .       40ms    117:\t\t\tconsumed += bits.OnesCount8(header)\n         .          .    118:\t\t}\n         .          .    119:\t\tif consumed > len(remaining) {\n         .          .    120:\t\t\treturn nil, ErrUnpack\n         .          .    121:\t\t}\n      90ms       90ms    122:\t\tif produced > maxBytes-size {\n         .          .    123:\t\t\treturn nil, ErrLimit\n         .          .    124:\t\t}\n      30ms       30ms    125:\t\tsize += produced\n      20ms       20ms    126:\t\tremaining = remaining[consumed:]\n         .          .    127:\t}\n         .      150ms    128:\tunpacked := make([]byte, size)\n         .          .    129:\toffset := 0\n      30ms       30ms    130:\tfor len(src) > 0 {\n         .          .    131:\t\theader := src[0]\n      10ms       10ms    132:\t\tif header == 0 {\n         .          .    133:\t\t\trun := 1\n         .          .    134:\t\t\tif len(src) >= 2 && src[1] == 0 {\n         .          .    135:\t\t\t\trun = 2 + zeroHeaderPrefix(src[2:])\n         .          .    136:\t\t\t}\n         .          .    137:\t\t\t// \u8f93\u51fa\u7531\u672c\u6b21 make \u6e05\u96f6\uff0c\u5df2\u9884\u68c0\u7684\u96f6\u6bb5\u53ea\u9700\u63a8\u8fdb\u6e38\u6807\u3002\n         .          .    138:\t\t\toffset += run * 8\n         .          .    139:\t\t\tsrc = src[run:]\n         .          .    140:\t\t\tcontinue\n         .          .    141:\t\t}\n      40ms       40ms    142:\t\tsrc = src[1:]\n      20ms       20ms    143:\t\tif header == 0xff {\n         .          .    144:\t\t\tlength := (int(src[0]) + 1) * 8\n         .          .    145:\t\t\tcopy(unpacked[offset:], src[1:1+length])\n         .          .    146:\t\t\toffset += length\n         .          .    147:\t\t\tsrc = src[1+length:]\n         .          .    148:\t\t\tcontinue\n         .          .    149:\t\t}\n         .          .    150:\t\t// \u96f6 mask \u5df2\u5728\u4e0a\u65b9\u6d88\u8d39\uff0c\u666e\u901a mask \u81f3\u5c11\u6709\u4e00\u4e2a\u6709\u6548\u5b57\u8282\u3002\n         .          .    151:\t\t// \u9996\u904d\u5df2\u8bc1\u660e\u5b8c\u6574 word \u7684\u8f93\u51fa\u957f\u5ea6\uff0c\u56fa\u5b9a\u89c6\u56fe\u8ba9\u76ee\u6807\u7d22\u5f15\u9650\u4e8e 0\uff5e7\u3002\n      70ms       70ms    152:\t\tdst := unpacked[offset : offset+8 : offset+8]\n         .       50ms    153:\t\tused := bits.OnesCount8(header)\n         .          .    154:\t\tmask := header\n     110ms      110ms    155:\t\tfor _, value := range src[:used:used] {\n      10ms       10ms    156:\t\t\tindex := bits.TrailingZeros8(mask) & 7\n     340ms      340ms    157:\t\t\tdst[index] = value\n         .          .    158:\t\t\tmask &= mask - 1\n         .          .    159:\t\t}\n      30ms       30ms    160:\t\tsrc = src[used:]\n         .          .    161:\t\toffset += 8\n         .          .    162:\t}\n      10ms       10ms    163:\treturn unpacked, nil\n         .          .    164:}\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-top",
+      "-cum",
+      "-nodecount=40",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-profile-20261020/profile.test",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-frequent-profile-20261020/int32_edges-candidate.cpu"
+    ],
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.018280373886227608,
+    "output": "File: profile.test\nType: cpu\nTime: 2026-10-20 16:04:14 CST\nDuration: 2.44s, Total samples = 2.07s (84.95%)\nShowing nodes accounting for 2s, 96.62% of 2.07s total\nDropped 26 nodes (cum <= 0.01s)\n      flat  flat%   sum%        cum   cum%\n     1.10s 53.14% 53.14%      1.34s 64.73%  github.com/cnooljaw/gosproto.ExperimentUnpackCandidate\n         0     0% 53.14%      1.34s 64.73%  testing.(*B).run1.func1\n         0     0% 53.14%      1.34s 64.73%  testing.(*B).runN\n         0     0% 53.14%      1.34s 64.73%  unpackinprocess.BenchmarkBodyCost\n         0     0% 53.14%      1.34s 64.73%  unpackinprocess.BenchmarkBodyCost.func1\n     0.01s  0.48% 53.62%      0.80s 38.65%  runtime.systemstack\n     0.66s 31.88% 85.51%      0.66s 31.88%  runtime.kevent\n         0     0% 85.51%      0.66s 31.88%  runtime.netpoll\n         0     0% 85.51%      0.66s 31.88%  runtime.startTheWorldWithSema\n         0     0% 85.51%      0.36s 17.39%  runtime.gcStart.func4\n         0     0% 85.51%      0.30s 14.49%  runtime.gcMarkTermination.func3\n         0     0% 85.51%      0.15s  7.25%  runtime.makeslice\n         0     0% 85.51%      0.14s  6.76%  runtime.mallocgc\n     0.09s  4.35% 89.86%      0.09s  4.35%  math/bits.OnesCount8 (inline)\n         0     0% 89.86%      0.08s  3.86%  runtime.mallocgcSmallNoscan\n         0     0% 89.86%      0.06s  2.90%  runtime.deductAssistCredit\n         0     0% 89.86%      0.06s  2.90%  runtime.gcAssistAlloc\n         0     0% 89.86%      0.06s  2.90%  runtime.gcAssistAlloc.func2\n         0     0% 89.86%      0.06s  2.90%  runtime.gcAssistAlloc1\n         0     0% 89.86%      0.06s  2.90%  runtime.gcDrainN\n     0.01s  0.48% 90.34%      0.06s  2.90%  runtime.scanobject\n         0     0% 90.34%      0.05s  2.42%  runtime.(*mheap).alloc.func1\n     0.01s  0.48% 90.82%      0.05s  2.42%  runtime.(*mheap).allocSpan\n     0.04s  1.93% 92.75%      0.04s  1.93%  runtime.madvise\n         0     0% 92.75%      0.04s  1.93%  runtime.sysUsed (inline)\n         0     0% 92.75%      0.04s  1.93%  runtime.sysUsedOS (inline)\n     0.04s  1.93% 94.69%      0.04s  1.93%  runtime.typePointers.next\n         0     0% 94.69%      0.03s  1.45%  runtime.(*mcache).nextFree\n         0     0% 94.69%      0.03s  1.45%  runtime.(*mcache).refill\n     0.03s  1.45% 96.14%      0.03s  1.45%  runtime.memclrNoHeapPointers\n     0.01s  0.48% 96.62%      0.03s  1.45%  runtime.newstack\n         0     0% 96.62%      0.02s  0.97%  runtime.(*mcentral).cacheSpan\n         0     0% 96.62%      0.02s  0.97%  runtime.findRunnable\n         0     0% 96.62%      0.02s  0.97%  runtime.gopreempt_m (inline)\n         0     0% 96.62%      0.02s  0.97%  runtime.goschedImpl\n         0     0% 96.62%      0.02s  0.97%  runtime.morestack\n         0     0% 96.62%      0.02s  0.97%  runtime.schedule\n"
+  }
+]

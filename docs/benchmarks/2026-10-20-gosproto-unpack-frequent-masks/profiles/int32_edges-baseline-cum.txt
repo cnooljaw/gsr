@@ -1,0 +1,41 @@
+File: profile.test
+Type: cpu
+Time: 2026-10-20 16:04:11 CST
+Duration: 2.52s, Total samples = 2.24s (89.04%)
+Showing nodes accounting for 2.16s, 96.43% of 2.24s total
+Dropped 22 nodes (cum <= 0.01s)
+      flat  flat%   sum%        cum   cum%
+         0     0%     0%      1.45s 64.73%  testing.(*B).run1.func1
+         0     0%     0%      1.45s 64.73%  testing.(*B).runN
+         0     0%     0%      1.45s 64.73%  unpackinprocess.BenchmarkBodyCost
+     0.01s  0.45%  0.45%      1.45s 64.73%  unpackinprocess.BenchmarkBodyCost.func1
+     1.17s 52.23% 52.68%      1.43s 63.84%  github.com/cnooljaw/gosproto.UnpackWithLimit
+         0     0% 52.68%      0.85s 37.95%  runtime.systemstack
+     0.76s 33.93% 86.61%      0.76s 33.93%  runtime.kevent
+         0     0% 86.61%      0.76s 33.93%  runtime.netpoll
+         0     0% 86.61%      0.76s 33.93%  runtime.startTheWorldWithSema
+         0     0% 86.61%      0.44s 19.64%  runtime.gcStart.func4
+         0     0% 86.61%      0.32s 14.29%  runtime.gcMarkTermination.func3
+         0     0% 86.61%      0.14s  6.25%  runtime.makeslice
+         0     0% 86.61%      0.14s  6.25%  runtime.mallocgc
+     0.12s  5.36% 91.96%      0.12s  5.36%  math/bits.OnesCount8 (inline)
+         0     0% 91.96%      0.07s  3.12%  runtime.deductAssistCredit
+         0     0% 91.96%      0.07s  3.12%  runtime.gcAssistAlloc
+         0     0% 91.96%      0.07s  3.12%  runtime.gcAssistAlloc.func2
+         0     0% 91.96%      0.07s  3.12%  runtime.gcAssistAlloc1
+         0     0% 91.96%      0.07s  3.12%  runtime.gcDrainN
+         0     0% 91.96%      0.07s  3.12%  runtime.mallocgcSmallNoscan
+     0.02s  0.89% 92.86%      0.04s  1.79%  runtime.scanobject
+         0     0% 92.86%      0.03s  1.34%  runtime.(*mcache).nextFree
+         0     0% 92.86%      0.03s  1.34%  runtime.(*mcache).refill
+         0     0% 92.86%      0.03s  1.34%  runtime.(*mcentral).cacheSpan
+     0.03s  1.34% 94.20%      0.03s  1.34%  runtime.memclrNoHeapPointers
+         0     0% 94.20%      0.02s  0.89%  runtime.(*spanSet).pop
+         0     0% 94.20%      0.02s  0.89%  runtime.deductSweepCredit
+     0.02s  0.89% 95.09%      0.02s  0.89%  runtime.findObject
+     0.02s  0.89% 95.98%      0.02s  0.89%  runtime.headTailIndex.head (inline)
+         0     0% 95.98%      0.02s  0.89%  runtime.headTailIndex.split (inline)
+         0     0% 95.98%      0.02s  0.89%  runtime.markroot
+         0     0% 95.98%      0.02s  0.89%  runtime.markrootBlock
+     0.01s  0.45% 96.43%      0.02s  0.89%  runtime.scanblock
+         0     0% 96.43%      0.02s  0.89%  runtime.sweepone
