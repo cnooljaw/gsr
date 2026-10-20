@@ -302,3 +302,5 @@ SPROTO_ORACLE_DIR=/path/to/pinned/sproto \
 2026-10-20：已完成 [a93bb0d 单模块 Go/PB 当前基线](../../../docs/benchmarks/2026-10-20-go-sp-pb-current/RESULTS.md)，72 项 × 5 轮，夹具及源码/模块/二进制哈希核对通过。大型 Encode −41.6%、PEncode −21.8%，PDecode +10.9%；保留全部原始波动，正式依赖不变。
 
 2026-10-20：[同模块/同进程Unpack实验及采纳](../../../docs/benchmarks/2026-10-20-gosproto-unpack-inprocess/RESULTS.md)完成60进程/5760块。保留固定视图＋非零mask索引范围表达：整数数组Unpack两轮中位−1.03%/−2.50%，7非零字节word−3.00%/−3.87%；大型及组合路径不确定、局部小包成本与21项中位/累计反向保留。同源大型控制仍偏，不声称噪声消失。完整库/官方/race/checkptr/vet/有限fuzz/GSR三包/GoTS7of7通过，fuzz3310次后停增如实记录。生产代码及永久回归已提交独立库50c69e1、逐文件等于验收快照，原6项删除和正式依赖v0.4.0不变，未推送。
+
+2026-10-20：[字符串数组受控写槽](../../../docs/benchmarks/2026-10-20-gosproto-string-slots/RESULTS.md)保留长数组收益及小数组代价。实际元素恰为原生string时同步借用新切片，命名元素反射回退、完整预检/复制/GC屏障保持；128/512项Decode两轮约−9%，512项PDecode约−7%，3项及现有大型Decode有局部代价，不宣称整体游戏提速。88进程/8448块、基线新增回归、完整库/官方/race/checkptr/vet/有限fuzz/GSR三包/GoTS7of7通过；Codec456532次，Decode13781次后停增如实记录。代码及永久回归已提交独立库aef6876且等于验收快照，原6项删除和正式依赖不变，未推送。

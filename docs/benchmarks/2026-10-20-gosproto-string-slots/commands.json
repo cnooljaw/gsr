@@ -1,0 +1,2014 @@
+[
+  {
+    "args": [
+      "git",
+      "rev-parse",
+      "50c69e1"
+    ],
+    "cwd": "/private/tmp/gsr-gosproto-fork",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.021704459562897682,
+    "output": "50c69e192ed49b3255326fdd0f1d1d4c83a0ddcd\n"
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "string_experiment.go",
+      "string_experiment_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/gosproto",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.01479191705584526,
+    "output": ""
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "experiment_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.003961874172091484,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-gcflags=all=-d=checkptr=2",
+      "-run",
+      "^(TestStringSlotsExperiment|TestDecode|TestStructSliceDecode)",
+      "-timeout=2m",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/gosproto",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 4.207842959091067,
+    "output": "ok  \tgithub.com/cnooljaw/gosproto\t1.611s\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-run",
+      "^TestRepresentativeFixtures$",
+      "-timeout=30s",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 1.2779846675693989,
+    "output": "ok  \tunpackinprocess\t0.324s\n"
+  },
+  {
+    "args": [
+      "go",
+      "vet",
+      "-mod=mod",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 0.19793708436191082,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-c",
+      "-o",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 0.42890858463943005,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "list",
+      "-m",
+      "-json",
+      "github.com/cnooljaw/gosproto"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 0.011668290942907333,
+    "output": "{\n\t\"Path\": \"github.com/cnooljaw/gosproto\",\n\t\"Version\": \"v0.4.0\",\n\t\"Replace\": {\n\t\t\"Path\": \"/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/gosproto\",\n\t\t\"Dir\": \"/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/gosproto\",\n\t\t\"GoMod\": \"/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/gosproto/go.mod\",\n\t\t\"GoVersion\": \"1.24.0\"\n\t},\n\t\"Dir\": \"/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/gosproto\",\n\t\"GoMod\": \"/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/gosproto/go.mod\",\n\t\"GoVersion\": \"1.24.0\"\n}\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "objdump",
+      "-s",
+      "github.com/cnooljaw/gosproto\\.(decodeStringSlice|experimentStringClone|experimentStringCandidate)",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.0321625005453825,
+    "output": "TEXT github.com/cnooljaw/gosproto.decodeStringSlice(SB) /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/gosproto/decode.go\n  decode.go:226\t\t0x10014ee20\t\tf9400b90\t\tMOVD 16(R28), R16\t\t\t\t\t\n  decode.go:226\t\t0x10014ee24\t\td10143f1\t\tSUB $80, RSP, R17\t\t\t\t\t\n  decode.go:226\t\t0x10014ee28\t\teb10023f\t\tCMP R16, R17\t\t\t\t\t\t\n  decode.go:226\t\t0x10014ee2c\t\t54001369\t\tBLS 155(PC)\t\t\t\t\t\t\n  decode.go:226\t\t0x10014ee30\t\tf8130ffe\t\tMOVD.W R30, -208(RSP)\t\t\t\t\t\n  decode.go:226\t\t0x10014ee34\t\tf81f83fd\t\tMOVD R29, -8(RSP)\t\t\t\t\t\n  decode.go:226\t\t0x10014ee38\t\td10023fd\t\tSUB $8, RSP, R29\t\t\t\t\t\n  decode.go:226\t\t0x10014ee3c\t\tf90083e6\t\tMOVD R6, 256(RSP)\t\t\t\t\t\n  decode.go:226\t\t0x10014ee40\t\tf90087e7\t\tMOVD R7, 264(RSP)\t\t\t\t\t\n  decode.go:228\t\t0x10014ee44\t\tf90043e8\t\tMOVD R8, 128(RSP)\t\t\t\t\t\n  decode.go:228\t\t0x10014ee48\t\tf90063e7\t\tMOVD R7, 192(RSP)\t\t\t\t\t\n  decode.go:228\t\t0x10014ee4c\t\tf9005fe6\t\tMOVD R6, 184(RSP)\t\t\t\t\t\n  decode.go:228\t\t0x10014ee50\t\tf9007be4\t\tMOVD R4, 240(RSP)\t\t\t\t\t\n  decode.go:228\t\t0x10014ee54\t\tf90077e3\t\tMOVD R3, 232(RSP)\t\t\t\t\t\n  decode.go:228\t\t0x10014ee58\t\tf90073e2\t\tMOVD R2, 224(RSP)\t\t\t\t\t\n  decode.go:227\t\t0x10014ee5c\t\taa0203e0\t\tMOVD R2, R0\t\t\t\t\t\t\n  decode.go:227\t\t0x10014ee60\t\taa0303e1\t\tMOVD R3, R1\t\t\t\t\t\t\n  decode.go:227\t\t0x10014ee64\t\taa0403e2\t\tMOVD R4, R2\t\t\t\t\t\t\n  decode.go:227\t\t0x10014ee68\t\taa0903e3\t\tMOVD R9, R3\t\t\t\t\t\t\n  decode.go:227\t\t0x10014ee6c\t\t97ffff8d\t\tCALL github.com/cnooljaw/gosproto.countChunks(SB)\t\n  decode.go:228\t\t0x10014ee70\t\tb50003c1\t\tCBNZ R1, 30(PC)\t\t\t\t\t\t\n  decode.go:227\t\t0x10014ee74\t\tf9002fe0\t\tMOVD R0, 88(RSP)\t\t\t\t\t\n  value.go:2380\t\t0x10014ee78\t\tf94043e1\t\tMOVD 128(RSP), R1\t\t\t\t\t\n  value.go:2380\t\t0x10014ee7c\t\tb40000c1\t\tCBZ R1, 6(PC)\t\t\t\t\t\t\n  value.go:2380\t\t0x10014ee80\t\t374800a1\t\tTBNZ $9, R1, 5(PC)\t\t\t\t\t\n  value.go:2380\t\t0x10014ee84\t\td0000e42\t\tADRP 1875968(PC), R2\t\t\t\t\t\n  value.go:2380\t\t0x10014ee88\t\t91334042\t\tADD $3280, R2, R2\t\t\t\t\t\n  decode.go:231\t\t0x10014ee8c\t\tf9405fe3\t\tMOVD 184(RSP), R3\t\t\t\t\t\n  decode.go:231\t\t0x10014ee90\t\t14000008\t\tJMP 8(PC)\t\t\t\t\t\t\n  value.go:2383\t\t0x10014ee94\t\tf9405fe0\t\tMOVD 184(RSP), R0\t\t\t\t\t\n  value.go:2383\t\t0x10014ee98\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\n  value.go:2383\t\t0x10014ee9c\t\tf94063e1\t\tMOVD 192(RSP), R1\t\t\t\t\t\n  value.go:2383\t\t0x10014eea0\t\t97fde108\t\tCALL reflect.Value.typeSlow(SB)\t\t\t\t\n  decode.go:231\t\t0x10014eea4\t\taa0003e2\t\tMOVD R0, R2\t\t\t\t\t\t\n  decode.go:231\t\t0x10014eea8\t\taa0103e3\t\tMOVD R1, R3\t\t\t\t\t\t\n  decode.go:231\t\t0x10014eeac\t\tf9402fe0\t\tMOVD 88(RSP), R0\t\t\t\t\t\n  decode.go:231\t\t0x10014eeb0\t\taa0303e1\t\tMOVD R3, R1\t\t\t\t\t\t\n  decode.go:231\t\t0x10014eeb4\t\taa0003e3\t\tMOVD R0, R3\t\t\t\t\t\t\n  decode.go:231\t\t0x10014eeb8\t\taa0203e0\t\tMOVD R2, R0\t\t\t\t\t\t\n  decode.go:231\t\t0x10014eebc\t\taa0303e2\t\tMOVD R3, R2\t\t\t\t\t\t\n  decode.go:231\t\t0x10014eec0\t\t97fde31c\t\tCALL reflect.MakeSlice(SB)\t\t\t\t\n  decode.go:231\t\t0x10014eec4\t\tf9005be0\t\tMOVD R0, 176(RSP)\t\t\t\t\t\n  decode.go:231\t\t0x10014eec8\t\tf90057e1\t\tMOVD R1, 168(RSP)\t\t\t\t\t\n  decode.go:231\t\t0x10014eecc\t\tf9003fe2\t\tMOVD R2, 120(RSP)\t\t\t\t\t\n  decode.go:232\t\t0x10014eed0\t\tf9402fe3\t\tMOVD 88(RSP), R3\t\t\t\t\t\n  decode.go:232\t\t0x10014eed4\t\tf94073e4\t\tMOVD 224(RSP), R4\t\t\t\t\t\n  decode.go:232\t\t0x10014eed8\t\tf9407be5\t\tMOVD 240(RSP), R5\t\t\t\t\t\n  decode.go:232\t\t0x10014eedc\t\tf94077e6\t\tMOVD 232(RSP), R6\t\t\t\t\t\n  decode.go:232\t\t0x10014eee0\t\taa1f03e7\t\tMOVD ZR, R7\t\t\t\t\t\t\n  decode.go:232\t\t0x10014eee4\t\t14000013\t\tJMP 19(PC)\t\t\t\t\t\t\n  decode.go:229\t\t0x10014eee8\t\taa0103e0\t\tMOVD R1, R0\t\t\t\t\t\t\n  decode.go:229\t\t0x10014eeec\t\taa0203e1\t\tMOVD R2, R1\t\t\t\t\t\t\n  decode.go:229\t\t0x10014eef0\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\n  decode.go:229\t\t0x10014eef4\t\tf84d07fe\t\tMOVD.P 208(RSP), R30\t\t\t\t\t\n  decode.go:229\t\t0x10014eef8\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\n  decode.go:238\t\t0x10014eefc\t\tf94037e8\t\tMOVD 104(RSP), R8\t\t\t\t\t\n  decode.go:238\t\t0x10014ef00\t\tcb000105\t\tSUB R0, R8, R5\t\t\t\t\t\t\n  decode.go:238\t\t0x10014ef04\t\tcb0503e8\t\tNEG R5, R8\t\t\t\t\t\t\n  decode.go:238\t\t0x10014ef08\t\t8a88fc08\t\tAND R8->63, R0, R8\t\t\t\t\t\n  decode.go:232\t\t0x10014ef0c\t\tf9402be9\t\tMOVD 80(RSP), R9\t\t\t\t\t\n  decode.go:232\t\t0x10014ef10\t\t91000527\t\tADD $1, R9, R7\t\t\t\t\t\t\n  decode.go:238\t\t0x10014ef14\t\tcb000026\t\tSUB R0, R1, R6\t\t\t\t\t\t\n  decode.go:238\t\t0x10014ef18\t\tf9404be9\t\tMOVD 144(RSP), R9\t\t\t\t\t\n  decode.go:238\t\t0x10014ef1c\t\t8b090104\t\tADD R9, R8, R4\t\t\t\t\t\t\n  decode.go:232\t\t0x10014ef20\t\tf9405be0\t\tMOVD 176(RSP), R0\t\t\t\t\t\n  decode.go:232\t\t0x10014ef24\t\tf94057e1\t\tMOVD 168(RSP), R1\t\t\t\t\t\n  decode.go:232\t\t0x10014ef28\t\tf9402fe3\t\tMOVD 88(RSP), R3\t\t\t\t\t\n  decode.go:232\t\t0x10014ef2c\t\tf9403fe2\t\tMOVD 120(RSP), R2\t\t\t\t\t\n  decode.go:232\t\t0x10014ef30\t\teb07007f\t\tCMP R7, R3\t\t\t\t\t\t\n  decode.go:232\t\t0x10014ef34\t\t5400090d\t\tBLE 72(PC)\t\t\t\t\t\t\n  decode.go:28\t\t0x10014ef38\t\tf10010df\t\tCMP $4, R6\t\t\t\t\t\t\n  decode.go:28\t\t0x10014ef3c\t\t5400016a\t\tBGE 11(PC)\t\t\t\t\t\t\n  decode.go:233\t\t0x10014ef40\t\t90001bdb\t\tADRP 3637248(PC), R27\t\t\t\t\t\n  decode.go:233\t\t0x10014ef44\t\tf9412368\t\tMOVD 576(R27), R8\t\t\t\t\t\n  decode.go:233\t\t0x10014ef48\t\t90001bdb\t\tADRP 3637248(PC), R27\t\t\t\t\t\n  decode.go:233\t\t0x10014ef4c\t\tf9412769\t\tMOVD 584(R27), R9\t\t\t\t\t\n  decode.go:233\t\t0x10014ef50\t\taa0803eb\t\tMOVD R8, R11\t\t\t\t\t\t\n  decode.go:233\t\t0x10014ef54\t\taa0903ec\t\tMOVD R9, R12\t\t\t\t\t\t\n  decode.go:233\t\t0x10014ef58\t\taa1f03ea\t\tMOVD ZR, R10\t\t\t\t\t\t\n  decode.go:233\t\t0x10014ef5c\t\taa1f03e8\t\tMOVD ZR, R8\t\t\t\t\t\t\n  decode.go:233\t\t0x10014ef60\t\taa1f03e9\t\tMOVD ZR, R9\t\t\t\t\t\t\n  decode.go:233\t\t0x10014ef64\t\t1400001b\t\tJMP 27(PC)\t\t\t\t\t\t\n  decode.go:32\t\t0x10014ef68\t\td10010c8\t\tSUB $4, R6, R8\t\t\t\t\t\t\n  binary.go:92\t\t0x10014ef6c\t\tb9400089\t\tMOVWU (R4), R9\t\t\t\t\t\t\n  decode.go:31\t\t0x10014ef70\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\n  decode.go:20\t\t0x10014ef74\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\n  decode.go:32\t\t0x10014ef78\t\teb08013f\t\tCMP R8, R9\t\t\t\t\t\t\n  decode.go:32\t\t0x10014ef7c\t\t54000169\t\tBLS 11(PC)\t\t\t\t\t\t\n  decode.go:233\t\t0x10014ef80\t\t90001bdb\t\tADRP 3637248(PC), R27\t\t\t\t\t\n  decode.go:233\t\t0x10014ef84\t\tf9412368\t\tMOVD 576(R27), R8\t\t\t\t\t\n  decode.go:233\t\t0x10014ef88\t\t90001bdb\t\tADRP 3637248(PC), R27\t\t\t\t\t\n  decode.go:233\t\t0x10014ef8c\t\tf9412769\t\tMOVD 584(R27), R9\t\t\t\t\t\n  decode.go:233\t\t0x10014ef90\t\taa0803eb\t\tMOVD R8, R11\t\t\t\t\t\t\n  decode.go:233\t\t0x10014ef94\t\taa0903ec\t\tMOVD R9, R12\t\t\t\t\t\t\n  decode.go:233\t\t0x10014ef98\t\taa1f03ea\t\tMOVD ZR, R10\t\t\t\t\t\t\n  decode.go:233\t\t0x10014ef9c\t\taa1f03e8\t\tMOVD ZR, R8\t\t\t\t\t\t\n  decode.go:233\t\t0x10014efa0\t\taa1f03e9\t\tMOVD ZR, R9\t\t\t\t\t\t\n  decode.go:233\t\t0x10014efa4\t\t1400000b\t\tJMP 11(PC)\t\t\t\t\t\t\n  decode.go:35\t\t0x10014efa8\t\t91001128\t\tADD $4, R9, R8\t\t\t\t\t\t\n  decode.go:36\t\t0x10014efac\t\teb0800bf\t\tCMP R8, R5\t\t\t\t\t\t\n  decode.go:36\t\t0x10014efb0\t\t540006c3\t\tBCC 54(PC)\t\t\t\t\t\t\n  decode.go:36\t\t0x10014efb4\t\td10010aa\t\tSUB $4, R5, R10\t\t\t\t\t\t\n  decode.go:36\t\t0x10014efb8\t\tcb0a03ea\t\tNEG R10, R10\t\t\t\t\t\t\n  decode.go:36\t\t0x10014efbc\t\t937ffd4a\t\tASR $63, R10, R10\t\t\t\t\t\n  decode.go:36\t\t0x10014efc0\t\t927e014a\t\tAND $4, R10, R10\t\t\t\t\t\n  decode.go:36\t\t0x10014efc4\t\t8b04014a\t\tADD R4, R10, R10\t\t\t\t\t\n  decode.go:36\t\t0x10014efc8\t\taa1f03eb\t\tMOVD ZR, R11\t\t\t\t\t\t\n  decode.go:36\t\t0x10014efcc\t\taa1f03ec\t\tMOVD ZR, R12\t\t\t\t\t\t\n  decode.go:234\t\t0x10014efd0\t\tb500038b\t\tCBNZ R11, 28(PC)\t\t\t\t\t\n  decode.go:232\t\t0x10014efd4\t\tf9002be7\t\tMOVD R7, 80(RSP)\t\t\t\t\t\n  decode.go:233\t\t0x10014efd8\t\tf90023e9\t\tMOVD R9, 64(RSP)\t\t\t\t\t\n  decode.go:233\t\t0x10014efdc\t\tf90047ea\t\tMOVD R10, 136(RSP)\t\t\t\t\t\n  decode.go:233\t\t0x10014efe0\t\tf90033e6\t\tMOVD R6, 96(RSP)\t\t\t\t\t\n  decode.go:233\t\t0x10014efe4\t\tf9004be4\t\tMOVD R4, 144(RSP)\t\t\t\t\t\n  decode.go:233\t\t0x10014efe8\t\tf90027e8\t\tMOVD R8, 72(RSP)\t\t\t\t\t\n  decode.go:233\t\t0x10014efec\t\tf90037e5\t\tMOVD R5, 104(RSP)\t\t\t\t\t\n  decode.go:237\t\t0x10014eff0\t\taa0703e3\t\tMOVD R7, R3\t\t\t\t\t\t\n  decode.go:237\t\t0x10014eff4\t\t97fdd6c3\t\tCALL reflect.Value.Index(SB)\t\t\t\t\n  decode.go:237\t\t0x10014eff8\t\tf90053e0\t\tMOVD R0, 160(RSP)\t\t\t\t\t\n  decode.go:237\t\t0x10014effc\t\tf9004fe1\t\tMOVD R1, 152(RSP)\t\t\t\t\t\n  decode.go:237\t\t0x10014f000\t\tf9003be2\t\tMOVD R2, 112(RSP)\t\t\t\t\t\n  decode.go:237\t\t0x10014f004\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\n  decode.go:237\t\t0x10014f008\t\tf94047e1\t\tMOVD 136(RSP), R1\t\t\t\t\t\n  decode.go:237\t\t0x10014f00c\t\tf94023e2\t\tMOVD 64(RSP), R2\t\t\t\t\t\n  decode.go:237\t\t0x10014f010\t\t97fc2578\t\tCALL runtime.slicebytetostring(SB)\t\t\t\n  decode.go:237\t\t0x10014f014\t\tf9403be2\t\tMOVD 112(RSP), R2\t\t\t\t\t\n  decode.go:237\t\t0x10014f018\t\taa0003e3\t\tMOVD R0, R3\t\t\t\t\t\t\n  decode.go:237\t\t0x10014f01c\t\taa0103e4\t\tMOVD R1, R4\t\t\t\t\t\t\n  decode.go:237\t\t0x10014f020\t\tf94053e0\t\tMOVD 160(RSP), R0\t\t\t\t\t\n  decode.go:237\t\t0x10014f024\t\tf9404fe1\t\tMOVD 152(RSP), R1\t\t\t\t\t\n  decode.go:237\t\t0x10014f028\t\t97fddf76\t\tCALL reflect.Value.SetString(SB)\t\t\t\n  decode.go:238\t\t0x10014f02c\t\tf94027e0\t\tMOVD 72(RSP), R0\t\t\t\t\t\n  decode.go:238\t\t0x10014f030\t\tf94033e1\t\tMOVD 96(RSP), R1\t\t\t\t\t\n  decode.go:238\t\t0x10014f034\t\teb01001f\t\tCMP R1, R0\t\t\t\t\t\t\n  decode.go:238\t\t0x10014f038\t\t54fff629\t\tBLS -79(PC)\t\t\t\t\t\t\n  decode.go:238\t\t0x10014f03c\t\t14000012\t\tJMP 18(PC)\t\t\t\t\t\t\n  decode.go:235\t\t0x10014f040\t\taa0b03e0\t\tMOVD R11, R0\t\t\t\t\t\t\n  decode.go:235\t\t0x10014f044\t\taa0c03e1\t\tMOVD R12, R1\t\t\t\t\t\t\n  decode.go:235\t\t0x10014f048\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\n  decode.go:235\t\t0x10014f04c\t\tf84d07fe\t\tMOVD.P 208(RSP), R30\t\t\t\t\t\n  decode.go:235\t\t0x10014f050\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\n  decode.go:240\t\t0x10014f054\t\taa0003e3\t\tMOVD R0, R3\t\t\t\t\t\t\n  decode.go:240\t\t0x10014f058\t\taa0103e4\t\tMOVD R1, R4\t\t\t\t\t\t\n  decode.go:240\t\t0x10014f05c\t\taa0203e5\t\tMOVD R2, R5\t\t\t\t\t\t\n  decode.go:240\t\t0x10014f060\t\tf9405fe0\t\tMOVD 184(RSP), R0\t\t\t\t\t\n  decode.go:240\t\t0x10014f064\t\tf94063e1\t\tMOVD 192(RSP), R1\t\t\t\t\t\n  decode.go:240\t\t0x10014f068\t\tf94043e2\t\tMOVD 128(RSP), R2\t\t\t\t\t\n  decode.go:240\t\t0x10014f06c\t\t97fddced\t\tCALL reflect.Value.Set(SB)\t\t\t\t\n  decode.go:241\t\t0x10014f070\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\n  decode.go:241\t\t0x10014f074\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\n  decode.go:241\t\t0x10014f078\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\n  decode.go:241\t\t0x10014f07c\t\tf84d07fe\t\tMOVD.P 208(RSP), R30\t\t\t\t\t\n  decode.go:241\t\t0x10014f080\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\n  decode.go:238\t\t0x10014f084\t\t97fca54f\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\n  decode.go:36\t\t0x10014f088\t\taa0803e1\t\tMOVD R8, R1\t\t\t\t\t\t\n  decode.go:36\t\t0x10014f08c\t\taa0503e2\t\tMOVD R5, R2\t\t\t\t\t\t\n  decode.go:36\t\t0x10014f090\t\t97fca544\t\tCALL runtime.panicSliceAcap(SB)\t\t\t\t\n  decode.go:36\t\t0x10014f094\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\n  decode.go:226\t\t0x10014f098\t\t790013e0\t\tMOVH R0, 8(RSP)\t\t\t\t\t\t\n  decode.go:226\t\t0x10014f09c\t\t39002be1\t\tMOVB R1, 10(RSP)\t\t\t\t\t\n  decode.go:226\t\t0x10014f0a0\t\ta9010fe2\t\tSTP (R2, R3), 16(RSP)\t\t\t\t\t\n  decode.go:226\t\t0x10014f0a4\t\ta90217e4\t\tSTP (R4, R5), 32(RSP)\t\t\t\t\t\n  decode.go:226\t\t0x10014f0a8\t\ta9031fe6\t\tSTP (R6, R7), 48(RSP)\t\t\t\t\t\n  decode.go:226\t\t0x10014f0ac\t\ta90427e8\t\tSTP (R8, R9), 64(RSP)\t\t\t\t\t\n  decode.go:226\t\t0x10014f0b0\t\taa1e03e3\t\tMOVD R30, R3\t\t\t\t\t\t\n  decode.go:226\t\t0x10014f0b4\t\t97fc9bd3\t\tCALL runtime.morestack_noctxt.abi0(SB)\t\t\t\n  decode.go:226\t\t0x10014f0b8\t\t794013e0\t\tMOVHU 8(RSP), R0\t\t\t\t\t\n  decode.go:226\t\t0x10014f0bc\t\t39402be1\t\tMOVBU 10(RSP), R1\t\t\t\t\t\n  decode.go:226\t\t0x10014f0c0\t\ta9410fe2\t\tLDP 16(RSP), (R2, R3)\t\t\t\t\t\n  decode.go:226\t\t0x10014f0c4\t\ta94217e4\t\tLDP 32(RSP), (R4, R5)\t\t\t\t\t\n  decode.go:226\t\t0x10014f0c8\t\ta9431fe6\t\tLDP 48(RSP), (R6, R7)\t\t\t\t\t\n  decode.go:226\t\t0x10014f0cc\t\ta94427e8\t\tLDP 64(RSP), (R8, R9)\t\t\t\t\t\n  decode.go:226\t\t0x10014f0d0\t\t17ffff54\t\tJMP github.com/cnooljaw/gosproto.decodeStringSlice(SB)\t\n  decode.go:226\t\t0x10014f0d4\t\t00000000\t\t?\t\t\t\t\t\t\t\n  decode.go:226\t\t0x10014f0d8\t\t00000000\t\t?\t\t\t\t\t\t\t\n  decode.go:226\t\t0x10014f0dc\t\t00000000\t\t?\t\t\t\t\t\t\t\n\nTEXT github.com/cnooljaw/gosproto.experimentStringClone(SB) /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/gosproto/string_experiment.go\n  string_experiment.go:8\t0x100157790\t\tf9400b90\t\tMOVD 16(R28), R16\t\t\t\t\t\t\n  string_experiment.go:8\t0x100157794\t\td10143f1\t\tSUB $80, RSP, R17\t\t\t\t\t\t\n  string_experiment.go:8\t0x100157798\t\teb10023f\t\tCMP R16, R17\t\t\t\t\t\t\t\n  string_experiment.go:8\t0x10015779c\t\t54001369\t\tBLS 155(PC)\t\t\t\t\t\t\t\n  string_experiment.go:8\t0x1001577a0\t\tf8130ffe\t\tMOVD.W R30, -208(RSP)\t\t\t\t\t\t\n  string_experiment.go:8\t0x1001577a4\t\tf81f83fd\t\tMOVD R29, -8(RSP)\t\t\t\t\t\t\n  string_experiment.go:8\t0x1001577a8\t\td10023fd\t\tSUB $8, RSP, R29\t\t\t\t\t\t\n  string_experiment.go:8\t0x1001577ac\t\tf90083e6\t\tMOVD R6, 256(RSP)\t\t\t\t\t\t\n  string_experiment.go:8\t0x1001577b0\t\tf90087e7\t\tMOVD R7, 264(RSP)\t\t\t\t\t\t\n  string_experiment.go:10\t0x1001577b4\t\tf90043e8\t\tMOVD R8, 128(RSP)\t\t\t\t\t\t\n  string_experiment.go:10\t0x1001577b8\t\tf90063e7\t\tMOVD R7, 192(RSP)\t\t\t\t\t\t\n  string_experiment.go:10\t0x1001577bc\t\tf9005fe6\t\tMOVD R6, 184(RSP)\t\t\t\t\t\t\n  string_experiment.go:10\t0x1001577c0\t\tf9007be4\t\tMOVD R4, 240(RSP)\t\t\t\t\t\t\n  string_experiment.go:10\t0x1001577c4\t\tf90077e3\t\tMOVD R3, 232(RSP)\t\t\t\t\t\t\n  string_experiment.go:10\t0x1001577c8\t\tf90073e2\t\tMOVD R2, 224(RSP)\t\t\t\t\t\t\n  string_experiment.go:9\t0x1001577cc\t\taa0203e0\t\tMOVD R2, R0\t\t\t\t\t\t\t\n  string_experiment.go:9\t0x1001577d0\t\taa0303e1\t\tMOVD R3, R1\t\t\t\t\t\t\t\n  string_experiment.go:9\t0x1001577d4\t\taa0403e2\t\tMOVD R4, R2\t\t\t\t\t\t\t\n  string_experiment.go:9\t0x1001577d8\t\taa0903e3\t\tMOVD R9, R3\t\t\t\t\t\t\t\n  string_experiment.go:9\t0x1001577dc\t\t97ffdd31\t\tCALL github.com/cnooljaw/gosproto.countChunks(SB)\t\t\n  string_experiment.go:10\t0x1001577e0\t\tb50003c1\t\tCBNZ R1, 30(PC)\t\t\t\t\t\t\t\n  string_experiment.go:9\t0x1001577e4\t\tf9002fe0\t\tMOVD R0, 88(RSP)\t\t\t\t\t\t\n  value.go:2380\t\t\t0x1001577e8\t\tf94043e1\t\tMOVD 128(RSP), R1\t\t\t\t\t\t\n  value.go:2380\t\t\t0x1001577ec\t\tb40000c1\t\tCBZ R1, 6(PC)\t\t\t\t\t\t\t\n  value.go:2380\t\t\t0x1001577f0\t\t374800a1\t\tTBNZ $9, R1, 5(PC)\t\t\t\t\t\t\n  value.go:2380\t\t\t0x1001577f4\t\tb0000e02\t\tADRP 1839104(PC), R2\t\t\t\t\t\t\n  value.go:2380\t\t\t0x1001577f8\t\t91334042\t\tADD $3280, R2, R2\t\t\t\t\t\t\n  string_experiment.go:13\t0x1001577fc\t\tf9405fe3\t\tMOVD 184(RSP), R3\t\t\t\t\t\t\n  string_experiment.go:13\t0x100157800\t\t14000008\t\tJMP 8(PC)\t\t\t\t\t\t\t\n  value.go:2383\t\t\t0x100157804\t\tf9405fe0\t\tMOVD 184(RSP), R0\t\t\t\t\t\t\n  value.go:2383\t\t\t0x100157808\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\t\n  value.go:2383\t\t\t0x10015780c\t\tf94063e1\t\tMOVD 192(RSP), R1\t\t\t\t\t\t\n  value.go:2383\t\t\t0x100157810\t\t97fdbeac\t\tCALL reflect.Value.typeSlow(SB)\t\t\t\t\t\n  string_experiment.go:13\t0x100157814\t\taa0003e2\t\tMOVD R0, R2\t\t\t\t\t\t\t\n  string_experiment.go:13\t0x100157818\t\taa0103e3\t\tMOVD R1, R3\t\t\t\t\t\t\t\n  string_experiment.go:13\t0x10015781c\t\tf9402fe0\t\tMOVD 88(RSP), R0\t\t\t\t\t\t\n  string_experiment.go:13\t0x100157820\t\taa0303e1\t\tMOVD R3, R1\t\t\t\t\t\t\t\n  string_experiment.go:13\t0x100157824\t\taa0003e3\t\tMOVD R0, R3\t\t\t\t\t\t\t\n  string_experiment.go:13\t0x100157828\t\taa0203e0\t\tMOVD R2, R0\t\t\t\t\t\t\t\n  string_experiment.go:13\t0x10015782c\t\taa0303e2\t\tMOVD R3, R2\t\t\t\t\t\t\t\n  string_experiment.go:13\t0x100157830\t\t97fdc0c0\t\tCALL reflect.MakeSlice(SB)\t\t\t\t\t\n  string_experiment.go:13\t0x100157834\t\tf9005be0\t\tMOVD R0, 176(RSP)\t\t\t\t\t\t\n  string_experiment.go:13\t0x100157838\t\tf90057e1\t\tMOVD R1, 168(RSP)\t\t\t\t\t\t\n  string_experiment.go:13\t0x10015783c\t\tf9003fe2\t\tMOVD R2, 120(RSP)\t\t\t\t\t\t\n  string_experiment.go:14\t0x100157840\t\tf9402fe3\t\tMOVD 88(RSP), R3\t\t\t\t\t\t\n  string_experiment.go:14\t0x100157844\t\tf94073e4\t\tMOVD 224(RSP), R4\t\t\t\t\t\t\n  string_experiment.go:14\t0x100157848\t\tf9407be5\t\tMOVD 240(RSP), R5\t\t\t\t\t\t\n  string_experiment.go:14\t0x10015784c\t\tf94077e6\t\tMOVD 232(RSP), R6\t\t\t\t\t\t\n  string_experiment.go:14\t0x100157850\t\taa1f03e7\t\tMOVD ZR, R7\t\t\t\t\t\t\t\n  string_experiment.go:14\t0x100157854\t\t14000013\t\tJMP 19(PC)\t\t\t\t\t\t\t\n  string_experiment.go:11\t0x100157858\t\taa0103e0\t\tMOVD R1, R0\t\t\t\t\t\t\t\n  string_experiment.go:11\t0x10015785c\t\taa0203e1\t\tMOVD R2, R1\t\t\t\t\t\t\t\n  string_experiment.go:11\t0x100157860\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  string_experiment.go:11\t0x100157864\t\tf84d07fe\t\tMOVD.P 208(RSP), R30\t\t\t\t\t\t\n  string_experiment.go:11\t0x100157868\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  string_experiment.go:20\t0x10015786c\t\tf94037e8\t\tMOVD 104(RSP), R8\t\t\t\t\t\t\n  string_experiment.go:20\t0x100157870\t\tcb000105\t\tSUB R0, R8, R5\t\t\t\t\t\t\t\n  string_experiment.go:20\t0x100157874\t\tcb0503e8\t\tNEG R5, R8\t\t\t\t\t\t\t\n  string_experiment.go:20\t0x100157878\t\t8a88fc08\t\tAND R8->63, R0, R8\t\t\t\t\t\t\n  string_experiment.go:14\t0x10015787c\t\tf9402be9\t\tMOVD 80(RSP), R9\t\t\t\t\t\t\n  string_experiment.go:14\t0x100157880\t\t91000527\t\tADD $1, R9, R7\t\t\t\t\t\t\t\n  string_experiment.go:20\t0x100157884\t\tcb000026\t\tSUB R0, R1, R6\t\t\t\t\t\t\t\n  string_experiment.go:20\t0x100157888\t\tf9404be9\t\tMOVD 144(RSP), R9\t\t\t\t\t\t\n  string_experiment.go:20\t0x10015788c\t\t8b090104\t\tADD R9, R8, R4\t\t\t\t\t\t\t\n  string_experiment.go:14\t0x100157890\t\tf9405be0\t\tMOVD 176(RSP), R0\t\t\t\t\t\t\n  string_experiment.go:14\t0x100157894\t\tf94057e1\t\tMOVD 168(RSP), R1\t\t\t\t\t\t\n  string_experiment.go:14\t0x100157898\t\tf9402fe3\t\tMOVD 88(RSP), R3\t\t\t\t\t\t\n  string_experiment.go:14\t0x10015789c\t\tf9403fe2\t\tMOVD 120(RSP), R2\t\t\t\t\t\t\n  string_experiment.go:14\t0x1001578a0\t\teb07007f\t\tCMP R7, R3\t\t\t\t\t\t\t\n  string_experiment.go:14\t0x1001578a4\t\t5400090d\t\tBLE 72(PC)\t\t\t\t\t\t\t\n  decode.go:28\t\t\t0x1001578a8\t\tf10010df\t\tCMP $4, R6\t\t\t\t\t\t\t\n  decode.go:28\t\t\t0x1001578ac\t\t5400016a\t\tBGE 11(PC)\t\t\t\t\t\t\t\n  string_experiment.go:15\t0x1001578b0\t\tf0001b7b\t\tADRP 3600384(PC), R27\t\t\t\t\t\t\n  string_experiment.go:15\t0x1001578b4\t\tf9412368\t\tMOVD 576(R27), R8\t\t\t\t\t\t\n  string_experiment.go:15\t0x1001578b8\t\tf0001b7b\t\tADRP 3600384(PC), R27\t\t\t\t\t\t\n  string_experiment.go:15\t0x1001578bc\t\tf9412769\t\tMOVD 584(R27), R9\t\t\t\t\t\t\n  string_experiment.go:15\t0x1001578c0\t\taa0803eb\t\tMOVD R8, R11\t\t\t\t\t\t\t\n  string_experiment.go:15\t0x1001578c4\t\taa0903ec\t\tMOVD R9, R12\t\t\t\t\t\t\t\n  string_experiment.go:15\t0x1001578c8\t\taa1f03ea\t\tMOVD ZR, R10\t\t\t\t\t\t\t\n  string_experiment.go:15\t0x1001578cc\t\taa1f03e8\t\tMOVD ZR, R8\t\t\t\t\t\t\t\n  string_experiment.go:15\t0x1001578d0\t\taa1f03e9\t\tMOVD ZR, R9\t\t\t\t\t\t\t\n  string_experiment.go:15\t0x1001578d4\t\t1400001b\t\tJMP 27(PC)\t\t\t\t\t\t\t\n  decode.go:32\t\t\t0x1001578d8\t\td10010c8\t\tSUB $4, R6, R8\t\t\t\t\t\t\t\n  binary.go:92\t\t\t0x1001578dc\t\tb9400089\t\tMOVWU (R4), R9\t\t\t\t\t\t\t\n  decode.go:31\t\t\t0x1001578e0\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\t\n  decode.go:20\t\t\t0x1001578e4\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\t\n  decode.go:32\t\t\t0x1001578e8\t\teb08013f\t\tCMP R8, R9\t\t\t\t\t\t\t\n  decode.go:32\t\t\t0x1001578ec\t\t54000169\t\tBLS 11(PC)\t\t\t\t\t\t\t\n  string_experiment.go:15\t0x1001578f0\t\tf0001b7b\t\tADRP 3600384(PC), R27\t\t\t\t\t\t\n  string_experiment.go:15\t0x1001578f4\t\tf9412368\t\tMOVD 576(R27), R8\t\t\t\t\t\t\n  string_experiment.go:15\t0x1001578f8\t\tf0001b7b\t\tADRP 3600384(PC), R27\t\t\t\t\t\t\n  string_experiment.go:15\t0x1001578fc\t\tf9412769\t\tMOVD 584(R27), R9\t\t\t\t\t\t\n  string_experiment.go:15\t0x100157900\t\taa0803eb\t\tMOVD R8, R11\t\t\t\t\t\t\t\n  string_experiment.go:15\t0x100157904\t\taa0903ec\t\tMOVD R9, R12\t\t\t\t\t\t\t\n  string_experiment.go:15\t0x100157908\t\taa1f03ea\t\tMOVD ZR, R10\t\t\t\t\t\t\t\n  string_experiment.go:15\t0x10015790c\t\taa1f03e8\t\tMOVD ZR, R8\t\t\t\t\t\t\t\n  string_experiment.go:15\t0x100157910\t\taa1f03e9\t\tMOVD ZR, R9\t\t\t\t\t\t\t\n  string_experiment.go:15\t0x100157914\t\t1400000b\t\tJMP 11(PC)\t\t\t\t\t\t\t\n  decode.go:35\t\t\t0x100157918\t\t91001128\t\tADD $4, R9, R8\t\t\t\t\t\t\t\n  decode.go:36\t\t\t0x10015791c\t\teb0800bf\t\tCMP R8, R5\t\t\t\t\t\t\t\n  decode.go:36\t\t\t0x100157920\t\t540006c3\t\tBCC 54(PC)\t\t\t\t\t\t\t\n  decode.go:36\t\t\t0x100157924\t\td10010aa\t\tSUB $4, R5, R10\t\t\t\t\t\t\t\n  decode.go:36\t\t\t0x100157928\t\tcb0a03ea\t\tNEG R10, R10\t\t\t\t\t\t\t\n  decode.go:36\t\t\t0x10015792c\t\t937ffd4a\t\tASR $63, R10, R10\t\t\t\t\t\t\n  decode.go:36\t\t\t0x100157930\t\t927e014a\t\tAND $4, R10, R10\t\t\t\t\t\t\n  decode.go:36\t\t\t0x100157934\t\t8b04014a\t\tADD R4, R10, R10\t\t\t\t\t\t\n  decode.go:36\t\t\t0x100157938\t\taa1f03eb\t\tMOVD ZR, R11\t\t\t\t\t\t\t\n  decode.go:36\t\t\t0x10015793c\t\taa1f03ec\t\tMOVD ZR, R12\t\t\t\t\t\t\t\n  string_experiment.go:16\t0x100157940\t\tb500038b\t\tCBNZ R11, 28(PC)\t\t\t\t\t\t\n  string_experiment.go:14\t0x100157944\t\tf9002be7\t\tMOVD R7, 80(RSP)\t\t\t\t\t\t\n  string_experiment.go:15\t0x100157948\t\tf90023e9\t\tMOVD R9, 64(RSP)\t\t\t\t\t\t\n  string_experiment.go:15\t0x10015794c\t\tf90047ea\t\tMOVD R10, 136(RSP)\t\t\t\t\t\t\n  string_experiment.go:15\t0x100157950\t\tf90033e6\t\tMOVD R6, 96(RSP)\t\t\t\t\t\t\n  string_experiment.go:15\t0x100157954\t\tf9004be4\t\tMOVD R4, 144(RSP)\t\t\t\t\t\t\n  string_experiment.go:15\t0x100157958\t\tf90027e8\t\tMOVD R8, 72(RSP)\t\t\t\t\t\t\n  string_experiment.go:15\t0x10015795c\t\tf90037e5\t\tMOVD R5, 104(RSP)\t\t\t\t\t\t\n  string_experiment.go:19\t0x100157960\t\taa0703e3\t\tMOVD R7, R3\t\t\t\t\t\t\t\n  string_experiment.go:19\t0x100157964\t\t97fdb467\t\tCALL reflect.Value.Index(SB)\t\t\t\t\t\n  string_experiment.go:19\t0x100157968\t\tf90053e0\t\tMOVD R0, 160(RSP)\t\t\t\t\t\t\n  string_experiment.go:19\t0x10015796c\t\tf9004fe1\t\tMOVD R1, 152(RSP)\t\t\t\t\t\t\n  string_experiment.go:19\t0x100157970\t\tf9003be2\t\tMOVD R2, 112(RSP)\t\t\t\t\t\t\n  string_experiment.go:19\t0x100157974\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\t\n  string_experiment.go:19\t0x100157978\t\tf94047e1\t\tMOVD 136(RSP), R1\t\t\t\t\t\t\n  string_experiment.go:19\t0x10015797c\t\tf94023e2\t\tMOVD 64(RSP), R2\t\t\t\t\t\t\n  string_experiment.go:19\t0x100157980\t\t97fc031c\t\tCALL runtime.slicebytetostring(SB)\t\t\t\t\n  string_experiment.go:19\t0x100157984\t\tf9403be2\t\tMOVD 112(RSP), R2\t\t\t\t\t\t\n  string_experiment.go:19\t0x100157988\t\taa0003e3\t\tMOVD R0, R3\t\t\t\t\t\t\t\n  string_experiment.go:19\t0x10015798c\t\taa0103e4\t\tMOVD R1, R4\t\t\t\t\t\t\t\n  string_experiment.go:19\t0x100157990\t\tf94053e0\t\tMOVD 160(RSP), R0\t\t\t\t\t\t\n  string_experiment.go:19\t0x100157994\t\tf9404fe1\t\tMOVD 152(RSP), R1\t\t\t\t\t\t\n  string_experiment.go:19\t0x100157998\t\t97fdbd1a\t\tCALL reflect.Value.SetString(SB)\t\t\t\t\n  string_experiment.go:20\t0x10015799c\t\tf94027e0\t\tMOVD 72(RSP), R0\t\t\t\t\t\t\n  string_experiment.go:20\t0x1001579a0\t\tf94033e1\t\tMOVD 96(RSP), R1\t\t\t\t\t\t\n  string_experiment.go:20\t0x1001579a4\t\teb01001f\t\tCMP R1, R0\t\t\t\t\t\t\t\n  string_experiment.go:20\t0x1001579a8\t\t54fff629\t\tBLS -79(PC)\t\t\t\t\t\t\t\n  string_experiment.go:20\t0x1001579ac\t\t14000012\t\tJMP 18(PC)\t\t\t\t\t\t\t\n  string_experiment.go:17\t0x1001579b0\t\taa0b03e0\t\tMOVD R11, R0\t\t\t\t\t\t\t\n  string_experiment.go:17\t0x1001579b4\t\taa0c03e1\t\tMOVD R12, R1\t\t\t\t\t\t\t\n  string_experiment.go:17\t0x1001579b8\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  string_experiment.go:17\t0x1001579bc\t\tf84d07fe\t\tMOVD.P 208(RSP), R30\t\t\t\t\t\t\n  string_experiment.go:17\t0x1001579c0\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  string_experiment.go:22\t0x1001579c4\t\taa0003e3\t\tMOVD R0, R3\t\t\t\t\t\t\t\n  string_experiment.go:22\t0x1001579c8\t\taa0103e4\t\tMOVD R1, R4\t\t\t\t\t\t\t\n  string_experiment.go:22\t0x1001579cc\t\taa0203e5\t\tMOVD R2, R5\t\t\t\t\t\t\t\n  string_experiment.go:22\t0x1001579d0\t\tf9405fe0\t\tMOVD 184(RSP), R0\t\t\t\t\t\t\n  string_experiment.go:22\t0x1001579d4\t\tf94063e1\t\tMOVD 192(RSP), R1\t\t\t\t\t\t\n  string_experiment.go:22\t0x1001579d8\t\tf94043e2\t\tMOVD 128(RSP), R2\t\t\t\t\t\t\n  string_experiment.go:22\t0x1001579dc\t\t97fdba91\t\tCALL reflect.Value.Set(SB)\t\t\t\t\t\n  string_experiment.go:23\t0x1001579e0\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\t\n  string_experiment.go:23\t0x1001579e4\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\t\n  string_experiment.go:23\t0x1001579e8\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  string_experiment.go:23\t0x1001579ec\t\tf84d07fe\t\tMOVD.P 208(RSP), R30\t\t\t\t\t\t\n  string_experiment.go:23\t0x1001579f0\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  string_experiment.go:20\t0x1001579f4\t\t97fc82f3\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\t\n  decode.go:36\t\t\t0x1001579f8\t\taa0803e1\t\tMOVD R8, R1\t\t\t\t\t\t\t\n  decode.go:36\t\t\t0x1001579fc\t\taa0503e2\t\tMOVD R5, R2\t\t\t\t\t\t\t\n  decode.go:36\t\t\t0x100157a00\t\t97fc82e8\t\tCALL runtime.panicSliceAcap(SB)\t\t\t\t\t\n  decode.go:36\t\t\t0x100157a04\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\t\n  string_experiment.go:8\t0x100157a08\t\t790013e0\t\tMOVH R0, 8(RSP)\t\t\t\t\t\t\t\n  string_experiment.go:8\t0x100157a0c\t\t39002be1\t\tMOVB R1, 10(RSP)\t\t\t\t\t\t\n  string_experiment.go:8\t0x100157a10\t\ta9010fe2\t\tSTP (R2, R3), 16(RSP)\t\t\t\t\t\t\n  string_experiment.go:8\t0x100157a14\t\ta90217e4\t\tSTP (R4, R5), 32(RSP)\t\t\t\t\t\t\n  string_experiment.go:8\t0x100157a18\t\ta9031fe6\t\tSTP (R6, R7), 48(RSP)\t\t\t\t\t\t\n  string_experiment.go:8\t0x100157a1c\t\ta90427e8\t\tSTP (R8, R9), 64(RSP)\t\t\t\t\t\t\n  string_experiment.go:8\t0x100157a20\t\taa1e03e3\t\tMOVD R30, R3\t\t\t\t\t\t\t\n  string_experiment.go:8\t0x100157a24\t\t97fc7977\t\tCALL runtime.morestack_noctxt.abi0(SB)\t\t\t\t\n  string_experiment.go:8\t0x100157a28\t\t794013e0\t\tMOVHU 8(RSP), R0\t\t\t\t\t\t\n  string_experiment.go:8\t0x100157a2c\t\t39402be1\t\tMOVBU 10(RSP), R1\t\t\t\t\t\t\n  string_experiment.go:8\t0x100157a30\t\ta9410fe2\t\tLDP 16(RSP), (R2, R3)\t\t\t\t\t\t\n  string_experiment.go:8\t0x100157a34\t\ta94217e4\t\tLDP 32(RSP), (R4, R5)\t\t\t\t\t\t\n  string_experiment.go:8\t0x100157a38\t\ta9431fe6\t\tLDP 48(RSP), (R6, R7)\t\t\t\t\t\t\n  string_experiment.go:8\t0x100157a3c\t\ta94427e8\t\tLDP 64(RSP), (R8, R9)\t\t\t\t\t\t\n  string_experiment.go:8\t0x100157a40\t\t17ffff54\t\tJMP github.com/cnooljaw/gosproto.experimentStringClone(SB)\t\n  string_experiment.go:8\t0x100157a44\t\t00000000\t\t?\t\t\t\t\t\t\t\t\n  string_experiment.go:8\t0x100157a48\t\t00000000\t\t?\t\t\t\t\t\t\t\t\n  string_experiment.go:8\t0x100157a4c\t\t00000000\t\t?\t\t\t\t\t\t\t\t\n\nTEXT github.com/cnooljaw/gosproto.experimentStringCandidate(SB) /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/gosproto/string_experiment.go\n  string_experiment.go:26\t0x100157a50\t\tf9400b90\t\tMOVD 16(R28), R16\t\t\t\t\t\t\n  string_experiment.go:26\t0x100157a54\t\td101c3f1\t\tSUB $112, RSP, R17\t\t\t\t\t\t\n  string_experiment.go:26\t0x100157a58\t\teb10023f\t\tCMP R16, R17\t\t\t\t\t\t\t\n  string_experiment.go:26\t0x100157a5c\t\t54001f09\t\tBLS 248(PC)\t\t\t\t\t\t\t\n  string_experiment.go:26\t0x100157a60\t\tf8110ffe\t\tMOVD.W R30, -240(RSP)\t\t\t\t\t\t\n  string_experiment.go:26\t0x100157a64\t\tf81f83fd\t\tMOVD R29, -8(RSP)\t\t\t\t\t\t\n  string_experiment.go:26\t0x100157a68\t\td10023fd\t\tSUB $8, RSP, R29\t\t\t\t\t\t\n  string_experiment.go:26\t0x100157a6c\t\tf90093e6\t\tMOVD R6, 288(RSP)\t\t\t\t\t\t\n  string_experiment.go:26\t0x100157a70\t\tf90097e7\t\tMOVD R7, 296(RSP)\t\t\t\t\t\t\n  string_experiment.go:28\t0x100157a74\t\tf90047e8\t\tMOVD R8, 136(RSP)\t\t\t\t\t\t\n  string_experiment.go:28\t0x100157a78\t\tf90067e7\t\tMOVD R7, 200(RSP)\t\t\t\t\t\t\n  string_experiment.go:28\t0x100157a7c\t\tf90063e6\t\tMOVD R6, 192(RSP)\t\t\t\t\t\t\n  string_experiment.go:28\t0x100157a80\t\tf9008be4\t\tMOVD R4, 272(RSP)\t\t\t\t\t\t\n  string_experiment.go:28\t0x100157a84\t\tf90087e3\t\tMOVD R3, 264(RSP)\t\t\t\t\t\t\n  string_experiment.go:28\t0x100157a88\t\tf90083e2\t\tMOVD R2, 256(RSP)\t\t\t\t\t\t\n  string_experiment.go:27\t0x100157a8c\t\taa0203e0\t\tMOVD R2, R0\t\t\t\t\t\t\t\n  string_experiment.go:27\t0x100157a90\t\taa0303e1\t\tMOVD R3, R1\t\t\t\t\t\t\t\n  string_experiment.go:27\t0x100157a94\t\taa0403e2\t\tMOVD R4, R2\t\t\t\t\t\t\t\n  string_experiment.go:27\t0x100157a98\t\taa0903e3\t\tMOVD R9, R3\t\t\t\t\t\t\t\n  string_experiment.go:27\t0x100157a9c\t\t97ffdc81\t\tCALL github.com/cnooljaw/gosproto.countChunks(SB)\t\t\n  string_experiment.go:28\t0x100157aa0\t\tb5000b41\t\tCBNZ R1, 90(PC)\t\t\t\t\t\t\t\n  string_experiment.go:27\t0x100157aa4\t\tf90033e0\t\tMOVD R0, 96(RSP)\t\t\t\t\t\t\n  value.go:2380\t\t\t0x100157aa8\t\tf94047e1\t\tMOVD 136(RSP), R1\t\t\t\t\t\t\n  value.go:2380\t\t\t0x100157aac\t\tb40000c1\t\tCBZ R1, 6(PC)\t\t\t\t\t\t\t\n  value.go:2380\t\t\t0x100157ab0\t\t374800a1\t\tTBNZ $9, R1, 5(PC)\t\t\t\t\t\t\n  value.go:2380\t\t\t0x100157ab4\t\tb0000e02\t\tADRP 1839104(PC), R2\t\t\t\t\t\t\n  value.go:2380\t\t\t0x100157ab8\t\t91334042\t\tADD $3280, R2, R2\t\t\t\t\t\t\n  string_experiment.go:31\t0x100157abc\t\tf94063e3\t\tMOVD 192(RSP), R3\t\t\t\t\t\t\n  string_experiment.go:31\t0x100157ac0\t\t14000008\t\tJMP 8(PC)\t\t\t\t\t\t\t\n  value.go:2383\t\t\t0x100157ac4\t\tf94063e0\t\tMOVD 192(RSP), R0\t\t\t\t\t\t\n  value.go:2383\t\t\t0x100157ac8\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\t\n  value.go:2383\t\t\t0x100157acc\t\tf94067e1\t\tMOVD 200(RSP), R1\t\t\t\t\t\t\n  value.go:2383\t\t\t0x100157ad0\t\t97fdbdfc\t\tCALL reflect.Value.typeSlow(SB)\t\t\t\t\t\n  string_experiment.go:31\t0x100157ad4\t\taa0003e2\t\tMOVD R0, R2\t\t\t\t\t\t\t\n  string_experiment.go:31\t0x100157ad8\t\taa0103e3\t\tMOVD R1, R3\t\t\t\t\t\t\t\n  string_experiment.go:31\t0x100157adc\t\tf94033e0\t\tMOVD 96(RSP), R0\t\t\t\t\t\t\n  string_experiment.go:31\t0x100157ae0\t\taa0303e1\t\tMOVD R3, R1\t\t\t\t\t\t\t\n  string_experiment.go:31\t0x100157ae4\t\taa0003e3\t\tMOVD R0, R3\t\t\t\t\t\t\t\n  string_experiment.go:31\t0x100157ae8\t\taa0203e0\t\tMOVD R2, R0\t\t\t\t\t\t\t\n  string_experiment.go:31\t0x100157aec\t\taa0303e2\t\tMOVD R3, R2\t\t\t\t\t\t\t\n  string_experiment.go:31\t0x100157af0\t\t97fdc010\t\tCALL reflect.MakeSlice(SB)\t\t\t\t\t\n  string_experiment.go:31\t0x100157af4\t\tf9005fe0\t\tMOVD R0, 184(RSP)\t\t\t\t\t\t\n  string_experiment.go:31\t0x100157af8\t\tf9005be1\t\tMOVD R1, 176(RSP)\t\t\t\t\t\t\n  string_experiment.go:31\t0x100157afc\t\tf90043e2\t\tMOVD R2, 128(RSP)\t\t\t\t\t\t\n  string_experiment.go:33\t0x100157b00\t\tf94033e4\t\tMOVD 96(RSP), R4\t\t\t\t\t\t\n  string_experiment.go:33\t0x100157b04\t\tf100009f\t\tCMP $0, R4\t\t\t\t\t\t\t\n  string_experiment.go:33\t0x100157b08\t\t540004ad\t\tBLE 37(PC)\t\t\t\t\t\t\t\n  value.go:2380\t\t\t0x100157b0c\t\tf94047e3\t\tMOVD 136(RSP), R3\t\t\t\t\t\t\n  value.go:2380\t\t\t0x100157b10\t\tb40000c3\t\tCBZ R3, 6(PC)\t\t\t\t\t\t\t\n  value.go:2380\t\t\t0x100157b14\t\t374800a3\t\tTBNZ $9, R3, 5(PC)\t\t\t\t\t\t\n  value.go:2380\t\t\t0x100157b18\t\tb0000e05\t\tADRP 1839104(PC), R5\t\t\t\t\t\t\n  value.go:2380\t\t\t0x100157b1c\t\t913340a5\t\tADD $3280, R5, R5\t\t\t\t\t\t\n  string_experiment.go:33\t0x100157b20\t\tf94063e6\t\tMOVD 192(RSP), R6\t\t\t\t\t\t\n  string_experiment.go:33\t0x100157b24\t\t14000007\t\tJMP 7(PC)\t\t\t\t\t\t\t\n  value.go:2383\t\t\t0x100157b28\t\tf94063e0\t\tMOVD 192(RSP), R0\t\t\t\t\t\t\n  value.go:2383\t\t\t0x100157b2c\t\tf94067e1\t\tMOVD 200(RSP), R1\t\t\t\t\t\t\n  value.go:2383\t\t\t0x100157b30\t\taa0303e2\t\tMOVD R3, R2\t\t\t\t\t\t\t\n  value.go:2383\t\t\t0x100157b34\t\t97fdbde3\t\tCALL reflect.Value.typeSlow(SB)\t\t\t\t\t\n  string_experiment.go:33\t0x100157b38\t\taa0003e5\t\tMOVD R0, R5\t\t\t\t\t\t\t\n  string_experiment.go:33\t0x100157b3c\t\taa0103e6\t\tMOVD R1, R6\t\t\t\t\t\t\t\n  string_experiment.go:33\t0x100157b40\t\tf9402ca1\t\tMOVD 88(R5), R1\t\t\t\t\t\t\t\n  string_experiment.go:33\t0x100157b44\t\taa0603e0\t\tMOVD R6, R0\t\t\t\t\t\t\t\n  string_experiment.go:33\t0x100157b48\t\td63f0020\t\tCALL (R1)\t\t\t\t\t\t\t\n  string_experiment.go:33\t0x100157b4c\t\tf9003fe0\t\tMOVD R0, 120(RSP)\t\t\t\t\t\t\n  string_experiment.go:33\t0x100157b50\t\tf90073e1\t\tMOVD R1, 224(RSP)\t\t\t\t\t\t\n  string_experiment.go:33\t0x100157b54\t\t90000de0\t\tADRP 1818624(PC), R0\t\t\t\t\t\t\n  string_experiment.go:33\t0x100157b58\t\t911f8000\t\tADD $2016, R0, R0\t\t\t\t\t\t\n  string_experiment.go:33\t0x100157b5c\t\t97fef20d\t\tCALL reflect.TypeFor[go.shape.string](SB)\t\t\t\n  string_experiment.go:33\t0x100157b60\t\tf9403fe2\t\tMOVD 120(RSP), R2\t\t\t\t\t\t\n  string_experiment.go:33\t0x100157b64\t\teb02001f\t\tCMP R2, R0\t\t\t\t\t\t\t\n  string_experiment.go:33\t0x100157b68\t\t54000060\t\tBEQ 3(PC)\t\t\t\t\t\t\t\n  string_experiment.go:33\t0x100157b6c\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\t\n  string_experiment.go:33\t0x100157b70\t\t14000005\t\tJMP 5(PC)\t\t\t\t\t\t\t\n  string_experiment.go:33\t0x100157b74\t\taa0203e0\t\tMOVD R2, R0\t\t\t\t\t\t\t\n  string_experiment.go:33\t0x100157b78\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\t\n  string_experiment.go:33\t0x100157b7c\t\tf94073e1\t\tMOVD 224(RSP), R1\t\t\t\t\t\t\n  string_experiment.go:33\t0x100157b80\t\t97facb30\t\tCALL runtime.ifaceeq(SB)\t\t\t\t\t\n  string_experiment.go:44\t0x100157b84\t\tf9405be1\t\tMOVD 176(RSP), R1\t\t\t\t\t\t\n  string_experiment.go:44\t0x100157b88\t\tf94043e2\t\tMOVD 128(RSP), R2\t\t\t\t\t\t\n  string_experiment.go:36\t0x100157b8c\t\tf94033e4\t\tMOVD 96(RSP), R4\t\t\t\t\t\t\n  string_experiment.go:33\t0x100157b90\t\taa0003e3\t\tMOVD R0, R3\t\t\t\t\t\t\t\n  string_experiment.go:44\t0x100157b94\t\tf9405fe0\t\tMOVD 184(RSP), R0\t\t\t\t\t\t\n  string_experiment.go:33\t0x100157b98\t\t14000002\t\tJMP 2(PC)\t\t\t\t\t\t\t\n  string_experiment.go:33\t0x100157b9c\t\taa1f03e3\t\tMOVD ZR, R3\t\t\t\t\t\t\t\n  string_experiment.go:33\t0x100157ba0\t\t37000083\t\tTBNZ $0, R3, 4(PC)\t\t\t\t\t\t\n  string_experiment.go:33\t0x100157ba4\t\taa1f03e6\t\tMOVD ZR, R6\t\t\t\t\t\t\t\n  string_experiment.go:33\t0x100157ba8\t\taa1f03e3\t\tMOVD ZR, R3\t\t\t\t\t\t\t\n  string_experiment.go:33\t0x100157bac\t\t14000010\t\tJMP 16(PC)\t\t\t\t\t\t\t\n  string_experiment.go:34\t0x100157bb0\t\t97fdbe28\t\tCALL reflect.Value.UnsafePointer(SB)\t\t\t\t\n  string_experiment.go:34\t0x100157bb4\t\tf94033e1\t\tMOVD 96(RSP), R1\t\t\t\t\t\t\n  string_experiment.go:34\t0x100157bb8\t\tb7f813e1\t\tTBNZ $63, R1, 159(PC)\t\t\t\t\t\t\n  string_experiment.go:34\t0x100157bbc\t\tb27c03e6\t\tORR $16, ZR, R6\t\t\t\t\t\t\t\n  string_experiment.go:34\t0x100157bc0\t\t9bc17cc6\t\tUMULH R1, R6, R6\t\t\t\t\t\t\n  string_experiment.go:34\t0x100157bc4\t\tb5001346\t\tCBNZ R6, 154(PC)\t\t\t\t\t\t\n  string_experiment.go:34\t0x100157bc8\t\taa0003e6\t\tMOVD R0, R6\t\t\t\t\t\t\t\n  string_experiment.go:34\t0x100157bcc\t\tcb0003e7\t\tNEG R0, R7\t\t\t\t\t\t\t\n  string_experiment.go:34\t0x100157bd0\t\teb0110ff\t\tCMP R1<<4, R7\t\t\t\t\t\t\t\n  string_experiment.go:34\t0x100157bd4\t\t54001263\t\tBCC 147(PC)\t\t\t\t\t\t\t\n  string_experiment.go:44\t0x100157bd8\t\tf9405fe0\t\tMOVD 184(RSP), R0\t\t\t\t\t\t\n  string_experiment.go:44\t0x100157bdc\t\tf9405be1\t\tMOVD 176(RSP), R1\t\t\t\t\t\t\n  string_experiment.go:44\t0x100157be0\t\tf94043e2\t\tMOVD 128(RSP), R2\t\t\t\t\t\t\n  string_experiment.go:36\t0x100157be4\t\tf94033e4\t\tMOVD 96(RSP), R4\t\t\t\t\t\t\n  string_experiment.go:41\t0x100157be8\t\taa0403e3\t\tMOVD R4, R3\t\t\t\t\t\t\t\n  string_experiment.go:41\t0x100157bec\t\tf9002be3\t\tMOVD R3, 80(RSP)\t\t\t\t\t\t\n  string_experiment.go:41\t0x100157bf0\t\tf90053e6\t\tMOVD R6, 160(RSP)\t\t\t\t\t\t\n  string_experiment.go:41\t0x100157bf4\t\tf94083e7\t\tMOVD 256(RSP), R7\t\t\t\t\t\t\n  string_experiment.go:41\t0x100157bf8\t\tf9408be8\t\tMOVD 272(RSP), R8\t\t\t\t\t\t\n  string_experiment.go:41\t0x100157bfc\t\tf94087e9\t\tMOVD 264(RSP), R9\t\t\t\t\t\t\n  string_experiment.go:41\t0x100157c00\t\taa1f03e5\t\tMOVD ZR, R5\t\t\t\t\t\t\t\n  string_experiment.go:41\t0x100157c04\t\t14000012\t\tJMP 18(PC)\t\t\t\t\t\t\t\n  string_experiment.go:29\t0x100157c08\t\taa0103e0\t\tMOVD R1, R0\t\t\t\t\t\t\t\n  string_experiment.go:29\t0x100157c0c\t\taa0203e1\t\tMOVD R2, R1\t\t\t\t\t\t\t\n  string_experiment.go:29\t0x100157c10\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  string_experiment.go:29\t0x100157c14\t\tf84f07fe\t\tMOVD.P 240(RSP), R30\t\t\t\t\t\t\n  string_experiment.go:29\t0x100157c18\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  string_experiment.go:46\t0x100157c1c\t\tf9403bea\t\tMOVD 112(RSP), R10\t\t\t\t\t\t\n  string_experiment.go:46\t0x100157c20\t\tcb000148\t\tSUB R0, R10, R8\t\t\t\t\t\t\t\n  string_experiment.go:46\t0x100157c24\t\tcb0803ea\t\tNEG R8, R10\t\t\t\t\t\t\t\n  string_experiment.go:46\t0x100157c28\t\t8a8afc0a\t\tAND R10->63, R0, R10\t\t\t\t\t\t\n  string_experiment.go:36\t0x100157c2c\t\t91000485\t\tADD $1, R4, R5\t\t\t\t\t\t\t\n  string_experiment.go:46\t0x100157c30\t\tcb000029\t\tSUB R0, R1, R9\t\t\t\t\t\t\t\n  string_experiment.go:46\t0x100157c34\t\tf94057eb\t\tMOVD 168(RSP), R11\t\t\t\t\t\t\n  string_experiment.go:46\t0x100157c38\t\t8b0a0167\t\tADD R10, R11, R7\t\t\t\t\t\t\n  string_experiment.go:36\t0x100157c3c\t\tf9405fe0\t\tMOVD 184(RSP), R0\t\t\t\t\t\t\n  string_experiment.go:36\t0x100157c40\t\tf94043e2\t\tMOVD 128(RSP), R2\t\t\t\t\t\t\n  string_experiment.go:36\t0x100157c44\t\tf94033e4\t\tMOVD 96(RSP), R4\t\t\t\t\t\t\n  string_experiment.go:36\t0x100157c48\t\tf9405be1\t\tMOVD 176(RSP), R1\t\t\t\t\t\t\n  string_experiment.go:36\t0x100157c4c\t\teb05009f\t\tCMP R5, R4\t\t\t\t\t\t\t\n  string_experiment.go:36\t0x100157c50\t\t54000c2d\t\tBLE 97(PC)\t\t\t\t\t\t\t\n  decode.go:28\t\t\t0x100157c54\t\tf100113f\t\tCMP $4, R9\t\t\t\t\t\t\t\n  decode.go:28\t\t\t0x100157c58\t\t5400016a\t\tBGE 11(PC)\t\t\t\t\t\t\t\n  string_experiment.go:37\t0x100157c5c\t\tf0001b7b\t\tADRP 3600384(PC), R27\t\t\t\t\t\t\n  string_experiment.go:37\t0x100157c60\t\tf941236a\t\tMOVD 576(R27), R10\t\t\t\t\t\t\n  string_experiment.go:37\t0x100157c64\t\tf0001b7b\t\tADRP 3600384(PC), R27\t\t\t\t\t\t\n  string_experiment.go:37\t0x100157c68\t\tf941276b\t\tMOVD 584(R27), R11\t\t\t\t\t\t\n  string_experiment.go:37\t0x100157c6c\t\taa0a03ed\t\tMOVD R10, R13\t\t\t\t\t\t\t\n  string_experiment.go:37\t0x100157c70\t\taa1f03ec\t\tMOVD ZR, R12\t\t\t\t\t\t\t\n  string_experiment.go:37\t0x100157c74\t\taa0b03ee\t\tMOVD R11, R14\t\t\t\t\t\t\t\n  string_experiment.go:37\t0x100157c78\t\taa1f03ea\t\tMOVD ZR, R10\t\t\t\t\t\t\t\n  string_experiment.go:37\t0x100157c7c\t\taa1f03eb\t\tMOVD ZR, R11\t\t\t\t\t\t\t\n  string_experiment.go:37\t0x100157c80\t\t1400001b\t\tJMP 27(PC)\t\t\t\t\t\t\t\n  decode.go:32\t\t\t0x100157c84\t\td100112a\t\tSUB $4, R9, R10\t\t\t\t\t\t\t\n  binary.go:92\t\t\t0x100157c88\t\tb94000eb\t\tMOVWU (R7), R11\t\t\t\t\t\t\t\n  decode.go:31\t\t\t0x100157c8c\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\t\n  decode.go:20\t\t\t0x100157c90\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\t\n  decode.go:32\t\t\t0x100157c94\t\teb0a017f\t\tCMP R10, R11\t\t\t\t\t\t\t\n  decode.go:32\t\t\t0x100157c98\t\t54000169\t\tBLS 11(PC)\t\t\t\t\t\t\t\n  string_experiment.go:37\t0x100157c9c\t\tf0001b7b\t\tADRP 3600384(PC), R27\t\t\t\t\t\t\n  string_experiment.go:37\t0x100157ca0\t\tf941236a\t\tMOVD 576(R27), R10\t\t\t\t\t\t\n  string_experiment.go:37\t0x100157ca4\t\tf0001b7b\t\tADRP 3600384(PC), R27\t\t\t\t\t\t\n  string_experiment.go:37\t0x100157ca8\t\tf941276b\t\tMOVD 584(R27), R11\t\t\t\t\t\t\n  string_experiment.go:37\t0x100157cac\t\taa0a03ed\t\tMOVD R10, R13\t\t\t\t\t\t\t\n  string_experiment.go:37\t0x100157cb0\t\taa1f03ec\t\tMOVD ZR, R12\t\t\t\t\t\t\t\n  string_experiment.go:37\t0x100157cb4\t\taa0b03ee\t\tMOVD R11, R14\t\t\t\t\t\t\t\n  string_experiment.go:37\t0x100157cb8\t\taa1f03ea\t\tMOVD ZR, R10\t\t\t\t\t\t\t\n  string_experiment.go:37\t0x100157cbc\t\taa1f03eb\t\tMOVD ZR, R11\t\t\t\t\t\t\t\n  string_experiment.go:37\t0x100157cc0\t\t1400000b\t\tJMP 11(PC)\t\t\t\t\t\t\t\n  decode.go:35\t\t\t0x100157cc4\t\t9100116a\t\tADD $4, R11, R10\t\t\t\t\t\t\n  decode.go:36\t\t\t0x100157cc8\t\teb0a011f\t\tCMP R10, R8\t\t\t\t\t\t\t\n  decode.go:36\t\t\t0x100157ccc\t\t54000a43\t\tBCC 82(PC)\t\t\t\t\t\t\t\n  decode.go:36\t\t\t0x100157cd0\t\td100110c\t\tSUB $4, R8, R12\t\t\t\t\t\t\t\n  decode.go:36\t\t\t0x100157cd4\t\tcb0c03ec\t\tNEG R12, R12\t\t\t\t\t\t\t\n  decode.go:36\t\t\t0x100157cd8\t\t937ffd8c\t\tASR $63, R12, R12\t\t\t\t\t\t\n  decode.go:36\t\t\t0x100157cdc\t\t927e018c\t\tAND $4, R12, R12\t\t\t\t\t\t\n  decode.go:36\t\t\t0x100157ce0\t\t8b0c00ec\t\tADD R12, R7, R12\t\t\t\t\t\t\n  decode.go:36\t\t\t0x100157ce4\t\taa1f03ed\t\tMOVD ZR, R13\t\t\t\t\t\t\t\n  decode.go:36\t\t\t0x100157ce8\t\taa1f03ee\t\tMOVD ZR, R14\t\t\t\t\t\t\t\n  string_experiment.go:38\t0x100157cec\t\tb50006ad\t\tCBNZ R13, 53(PC)\t\t\t\t\t\t\n  string_experiment.go:36\t0x100157cf0\t\tf9002fe5\t\tMOVD R5, 88(RSP)\t\t\t\t\t\t\n  string_experiment.go:37\t0x100157cf4\t\tf90027ea\t\tMOVD R10, 72(RSP)\t\t\t\t\t\t\n  string_experiment.go:37\t0x100157cf8\t\tf9003be8\t\tMOVD R8, 112(RSP)\t\t\t\t\t\t\n  string_experiment.go:37\t0x100157cfc\t\tf90037e9\t\tMOVD R9, 104(RSP)\t\t\t\t\t\t\n  string_experiment.go:37\t0x100157d00\t\tf90057e7\t\tMOVD R7, 168(RSP)\t\t\t\t\t\t\n  string_experiment.go:41\t0x100157d04\t\tb40002c6\t\tCBZ R6, 22(PC)\t\t\t\t\t\t\t\n  string_experiment.go:42\t0x100157d08\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\t\n  string_experiment.go:42\t0x100157d0c\t\taa0c03e1\t\tMOVD R12, R1\t\t\t\t\t\t\t\n  string_experiment.go:42\t0x100157d10\t\taa0b03e2\t\tMOVD R11, R2\t\t\t\t\t\t\t\n  string_experiment.go:42\t0x100157d14\t\t97fc0237\t\tCALL runtime.slicebytetostring(SB)\t\t\t\t\n  string_experiment.go:42\t0x100157d18\t\tf9402be3\t\tMOVD 80(RSP), R3\t\t\t\t\t\t\n  string_experiment.go:42\t0x100157d1c\t\tf9402fe4\t\tMOVD 88(RSP), R4\t\t\t\t\t\t\n  string_experiment.go:42\t0x100157d20\t\teb04007f\t\tCMP R4, R3\t\t\t\t\t\t\t\n  string_experiment.go:42\t0x100157d24\t\t54000729\t\tBLS 57(PC)\t\t\t\t\t\t\t\n  string_experiment.go:42\t0x100157d28\t\tf94053e6\t\tMOVD 160(RSP), R6\t\t\t\t\t\t\n  string_experiment.go:42\t0x100157d2c\t\t8b0410c7\t\tADD R4<<4, R6, R7\t\t\t\t\t\t\n  string_experiment.go:42\t0x100157d30\t\tf90004e1\t\tMOVD R1, 8(R7)\t\t\t\t\t\t\t\n  string_experiment.go:42\t0x100157d34\t\td37cec87\t\tLSL $4, R4, R7\t\t\t\t\t\t\t\n  string_experiment.go:42\t0x100157d38\t\tb0001d3b\t\tADRP 3821568(PC), R27\t\t\t\t\t\t\n  string_experiment.go:42\t0x100157d3c\t\tb946f368\t\tMOVWU 1776(R27), R8\t\t\t\t\t\t\n  string_experiment.go:42\t0x100157d40\t\t340000a8\t\tCBZW R8, 5(PC)\t\t\t\t\t\t\t\n  string_experiment.go:42\t0x100157d44\t\t97fc8153\t\tCALL runtime.gcWriteBarrier2(SB)\t\t\t\t\n  string_experiment.go:42\t0x100157d48\t\tf9000320\t\tMOVD R0, (R25)\t\t\t\t\t\t\t\n  string_experiment.go:42\t0x100157d4c\t\tf86768c8\t\tMOVD (R6)(R7), R8\t\t\t\t\t\t\n  string_experiment.go:42\t0x100157d50\t\tf9000728\t\tMOVD R8, 8(R25)\t\t\t\t\t\t\t\n  string_experiment.go:42\t0x100157d54\t\tf82768c0\t\tMOVD R0, (R6)(R7)\t\t\t\t\t\t\n  string_experiment.go:42\t0x100157d58\t\t14000015\t\tJMP 21(PC)\t\t\t\t\t\t\t\n  string_experiment.go:37\t0x100157d5c\t\tf90023eb\t\tMOVD R11, 64(RSP)\t\t\t\t\t\t\n  string_experiment.go:37\t0x100157d60\t\tf9004fec\t\tMOVD R12, 152(RSP)\t\t\t\t\t\t\n  string_experiment.go:44\t0x100157d64\t\taa0503e3\t\tMOVD R5, R3\t\t\t\t\t\t\t\n  string_experiment.go:44\t0x100157d68\t\t97fdb366\t\tCALL reflect.Value.Index(SB)\t\t\t\t\t\n  string_experiment.go:44\t0x100157d6c\t\tf9006fe0\t\tMOVD R0, 216(RSP)\t\t\t\t\t\t\n  string_experiment.go:44\t0x100157d70\t\tf9006be1\t\tMOVD R1, 208(RSP)\t\t\t\t\t\t\n  string_experiment.go:44\t0x100157d74\t\tf9004be2\t\tMOVD R2, 144(RSP)\t\t\t\t\t\t\n  string_experiment.go:44\t0x100157d78\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\t\n  string_experiment.go:44\t0x100157d7c\t\tf9404fe1\t\tMOVD 152(RSP), R1\t\t\t\t\t\t\n  string_experiment.go:44\t0x100157d80\t\tf94023e2\t\tMOVD 64(RSP), R2\t\t\t\t\t\t\n  string_experiment.go:44\t0x100157d84\t\t97fc021b\t\tCALL runtime.slicebytetostring(SB)\t\t\t\t\n  string_experiment.go:44\t0x100157d88\t\tf9404be2\t\tMOVD 144(RSP), R2\t\t\t\t\t\t\n  string_experiment.go:44\t0x100157d8c\t\taa0003e3\t\tMOVD R0, R3\t\t\t\t\t\t\t\n  string_experiment.go:44\t0x100157d90\t\taa0103e4\t\tMOVD R1, R4\t\t\t\t\t\t\t\n  string_experiment.go:44\t0x100157d94\t\tf9406fe0\t\tMOVD 216(RSP), R0\t\t\t\t\t\t\n  string_experiment.go:44\t0x100157d98\t\tf9406be1\t\tMOVD 208(RSP), R1\t\t\t\t\t\t\n  string_experiment.go:44\t0x100157d9c\t\t97fdbc19\t\tCALL reflect.Value.SetString(SB)\t\t\t\t\n  string_experiment.go:42\t0x100157da0\t\tf9402be3\t\tMOVD 80(RSP), R3\t\t\t\t\t\t\n  string_experiment.go:36\t0x100157da4\t\tf9402fe4\t\tMOVD 88(RSP), R4\t\t\t\t\t\t\n  string_experiment.go:41\t0x100157da8\t\tf94053e6\t\tMOVD 160(RSP), R6\t\t\t\t\t\t\n  string_experiment.go:46\t0x100157dac\t\tf94037e1\t\tMOVD 104(RSP), R1\t\t\t\t\t\t\n  string_experiment.go:46\t0x100157db0\t\tf94027e0\t\tMOVD 72(RSP), R0\t\t\t\t\t\t\n  string_experiment.go:46\t0x100157db4\t\teb00003f\t\tCMP R0, R1\t\t\t\t\t\t\t\n  string_experiment.go:46\t0x100157db8\t\t54fff322\t\tBCS -103(PC)\t\t\t\t\t\t\t\n  string_experiment.go:46\t0x100157dbc\t\t14000012\t\tJMP 18(PC)\t\t\t\t\t\t\t\n  string_experiment.go:39\t0x100157dc0\t\taa0d03e0\t\tMOVD R13, R0\t\t\t\t\t\t\t\n  string_experiment.go:39\t0x100157dc4\t\taa0e03e1\t\tMOVD R14, R1\t\t\t\t\t\t\t\n  string_experiment.go:39\t0x100157dc8\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  string_experiment.go:39\t0x100157dcc\t\tf84f07fe\t\tMOVD.P 240(RSP), R30\t\t\t\t\t\t\n  string_experiment.go:39\t0x100157dd0\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  string_experiment.go:48\t0x100157dd4\t\taa0003e3\t\tMOVD R0, R3\t\t\t\t\t\t\t\n  string_experiment.go:48\t0x100157dd8\t\taa0103e4\t\tMOVD R1, R4\t\t\t\t\t\t\t\n  string_experiment.go:48\t0x100157ddc\t\taa0203e5\t\tMOVD R2, R5\t\t\t\t\t\t\t\n  string_experiment.go:48\t0x100157de0\t\tf94063e0\t\tMOVD 192(RSP), R0\t\t\t\t\t\t\n  string_experiment.go:48\t0x100157de4\t\tf94067e1\t\tMOVD 200(RSP), R1\t\t\t\t\t\t\n  string_experiment.go:48\t0x100157de8\t\tf94047e2\t\tMOVD 136(RSP), R2\t\t\t\t\t\t\n  string_experiment.go:48\t0x100157dec\t\t97fdb98d\t\tCALL reflect.Value.Set(SB)\t\t\t\t\t\n  string_experiment.go:49\t0x100157df0\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\t\n  string_experiment.go:49\t0x100157df4\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\t\n  string_experiment.go:49\t0x100157df8\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  string_experiment.go:49\t0x100157dfc\t\tf84f07fe\t\tMOVD.P 240(RSP), R30\t\t\t\t\t\t\n  string_experiment.go:49\t0x100157e00\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  string_experiment.go:46\t0x100157e04\t\t97fc81ef\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\t\n  string_experiment.go:42\t0x100157e08\t\taa0403e0\t\tMOVD R4, R0\t\t\t\t\t\t\t\n  string_experiment.go:42\t0x100157e0c\t\taa0303e1\t\tMOVD R3, R1\t\t\t\t\t\t\t\n  string_experiment.go:42\t0x100157e10\t\t97fc81d4\t\tCALL runtime.panicIndex(SB)\t\t\t\t\t\n  decode.go:36\t\t\t0x100157e14\t\taa0a03e1\t\tMOVD R10, R1\t\t\t\t\t\t\t\n  decode.go:36\t\t\t0x100157e18\t\taa0803e2\t\tMOVD R8, R2\t\t\t\t\t\t\t\n  decode.go:36\t\t\t0x100157e1c\t\t97fc81e1\t\tCALL runtime.panicSliceAcap(SB)\t\t\t\t\t\n  string_experiment.go:34\t0x100157e20\t\tb4000046\t\tCBZ R6, 2(PC)\t\t\t\t\t\t\t\n  string_experiment.go:34\t0x100157e24\t\t97fc4d83\t\tCALL runtime.panicunsafeslicelen(SB)\t\t\t\t\n  string_experiment.go:34\t0x100157e28\t\t97fc4daa\t\tCALL runtime.panicunsafeslicenilptr(SB)\t\t\t\t\n  string_experiment.go:34\t0x100157e2c\t\taa0003e6\t\tMOVD R0, R6\t\t\t\t\t\t\t\n  string_experiment.go:34\t0x100157e30\t\t17fffffc\t\tJMP -4(PC)\t\t\t\t\t\t\t\n  string_experiment.go:34\t0x100157e34\t\t97fc4d7f\t\tCALL runtime.panicunsafeslicelen(SB)\t\t\t\t\n  string_experiment.go:34\t0x100157e38\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\t\n  string_experiment.go:26\t0x100157e3c\t\t790013e0\t\tMOVH R0, 8(RSP)\t\t\t\t\t\t\t\n  string_experiment.go:26\t0x100157e40\t\t39002be1\t\tMOVB R1, 10(RSP)\t\t\t\t\t\t\n  string_experiment.go:26\t0x100157e44\t\ta9010fe2\t\tSTP (R2, R3), 16(RSP)\t\t\t\t\t\t\n  string_experiment.go:26\t0x100157e48\t\ta90217e4\t\tSTP (R4, R5), 32(RSP)\t\t\t\t\t\t\n  string_experiment.go:26\t0x100157e4c\t\ta9031fe6\t\tSTP (R6, R7), 48(RSP)\t\t\t\t\t\t\n  string_experiment.go:26\t0x100157e50\t\ta90427e8\t\tSTP (R8, R9), 64(RSP)\t\t\t\t\t\t\n  string_experiment.go:26\t0x100157e54\t\taa1e03e3\t\tMOVD R30, R3\t\t\t\t\t\t\t\n  string_experiment.go:26\t0x100157e58\t\t97fc786a\t\tCALL runtime.morestack_noctxt.abi0(SB)\t\t\t\t\n  string_experiment.go:26\t0x100157e5c\t\t794013e0\t\tMOVHU 8(RSP), R0\t\t\t\t\t\t\n  string_experiment.go:26\t0x100157e60\t\t39402be1\t\tMOVBU 10(RSP), R1\t\t\t\t\t\t\n  string_experiment.go:26\t0x100157e64\t\ta9410fe2\t\tLDP 16(RSP), (R2, R3)\t\t\t\t\t\t\n  string_experiment.go:26\t0x100157e68\t\ta94217e4\t\tLDP 32(RSP), (R4, R5)\t\t\t\t\t\t\n  string_experiment.go:26\t0x100157e6c\t\ta9431fe6\t\tLDP 48(RSP), (R6, R7)\t\t\t\t\t\t\n  string_experiment.go:26\t0x100157e70\t\ta94427e8\t\tLDP 64(RSP), (R8, R9)\t\t\t\t\t\t\n  string_experiment.go:26\t0x100157e74\t\t17fffef7\t\tJMP github.com/cnooljaw/gosproto.experimentStringCandidate(SB)\t\n  string_experiment.go:26\t0x100157e78\t\t00000000\t\t?\t\t\t\t\t\t\t\t\n  string_experiment.go:26\t0x100157e7c\t\t00000000\t\t?\t\t\t\t\t\t\t\t\n"
+  },
+  {
+    "args": [
+      "go",
+      "version"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.011436333879828453,
+    "output": "go version go1.24.13 darwin/arm64\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "addressbook",
+      "GSR_OP": "decode",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/self-addressbook-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.6698845829814672,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "addressbook",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/self-addressbook-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.1868348345160484,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_small",
+      "GSR_OP": "decode",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/self-game_small-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.5489193759858608,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_small",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/self-game_small-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.6004057079553604,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "decode",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/self-game_large-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.0442810002714396,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/self-game_large-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.2538900412619114,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "decode",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/self-int32_edges-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.8859254997223616,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/self-int32_edges-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.07097683288157,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "echo_ascii4k",
+      "GSR_OP": "decode",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/self-echo_ascii4k-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.9837117921561003,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "echo_ascii4k",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/self-echo_ascii4k-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 0.904659291729331,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "strings_0",
+      "GSR_OP": "decode",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/self-strings_0-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.0005056243389845,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "strings_0",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/self-strings_0-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.364887084811926,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "strings_3",
+      "GSR_OP": "decode",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/self-strings_3-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.6992720011621714,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "strings_3",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/self-strings_3-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.333058625459671,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "strings_128",
+      "GSR_OP": "decode",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/self-strings_128-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.8974613342434168,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "strings_128",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/self-strings_128-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.7040638756006956,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "strings_512",
+      "GSR_OP": "decode",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/self-strings_512-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.267998708412051,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "strings_512",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/self-strings_512-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.0542974155396223,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "outer128",
+      "GSR_OP": "decode",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/self-outer128-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.072411250323057,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "outer128",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/self-outer128-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.9490573331713676,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "element128",
+      "GSR_OP": "decode",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/self-element128-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.112199790775776,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "element128",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/self-element128-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.1402079574763775,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "addressbook",
+      "GSR_OP": "decode",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/clone-addressbook-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.222622251138091,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "addressbook",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/clone-addressbook-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.35384133271873,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_small",
+      "GSR_OP": "decode",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/clone-game_small-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.7112628314644098,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_small",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/clone-game_small-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.326183792203665,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "decode",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/clone-game_large-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.237084250897169,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/clone-game_large-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.138387916609645,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "decode",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/clone-int32_edges-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.9423771258443594,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/clone-int32_edges-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.0700840428471565,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "echo_ascii4k",
+      "GSR_OP": "decode",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/clone-echo_ascii4k-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 3.1708587501198053,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "echo_ascii4k",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/clone-echo_ascii4k-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.287411917001009,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "strings_0",
+      "GSR_OP": "decode",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/clone-strings_0-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.6572819985449314,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "strings_0",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/clone-strings_0-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.3808187916874886,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "strings_3",
+      "GSR_OP": "decode",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/clone-strings_3-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.348438832908869,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "strings_3",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/clone-strings_3-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.3228811658918858,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "strings_128",
+      "GSR_OP": "decode",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/clone-strings_128-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.8778694160282612,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "strings_128",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/clone-strings_128-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.874000582844019,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "strings_512",
+      "GSR_OP": "decode",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/clone-strings_512-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.1964381262660027,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "strings_512",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/clone-strings_512-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.383094374090433,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "outer128",
+      "GSR_OP": "decode",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/clone-outer128-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.1367984171956778,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "outer128",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/clone-outer128-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.9806017503142357,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "element128",
+      "GSR_OP": "decode",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/clone-element128-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.684535874053836,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "element128",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/clone-element128-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 0.8175927083939314,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "addressbook",
+      "GSR_OP": "decode",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass1-addressbook-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.3293677922338247,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "addressbook",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass1-addressbook-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.5675781667232513,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_small",
+      "GSR_OP": "decode",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass1-game_small-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.7794540841132402,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_small",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass1-game_small-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.4624121263623238,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "decode",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass1-game_large-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.9993302505463362,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass1-game_large-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.1222054585814476,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "decode",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass1-int32_edges-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 0.4609864577651024,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass1-int32_edges-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.9490372091531754,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "echo_ascii4k",
+      "GSR_OP": "decode",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass1-echo_ascii4k-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 3.1397083327174187,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "echo_ascii4k",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass1-echo_ascii4k-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.3716828748583794,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "strings_0",
+      "GSR_OP": "decode",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass1-strings_0-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.362533999606967,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "strings_0",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass1-strings_0-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.0816171672195196,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "strings_3",
+      "GSR_OP": "decode",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass1-strings_3-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.1311765406280756,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "strings_3",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass1-strings_3-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.2640022095292807,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "strings_128",
+      "GSR_OP": "decode",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass1-strings_128-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.715864583849907,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "strings_128",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass1-strings_128-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.8729263339191675,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "strings_512",
+      "GSR_OP": "decode",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass1-strings_512-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.8774748742580414,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "strings_512",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass1-strings_512-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.9252370428293943,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "outer128",
+      "GSR_OP": "decode",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass1-outer128-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.270659126341343,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "outer128",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass1-outer128-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.896833123639226,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "element128",
+      "GSR_OP": "decode",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass1-element128-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.933240957558155,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "element128",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass1-element128-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.158824998885393,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "addressbook",
+      "GSR_OP": "decode",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass2-addressbook-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.036470541730523,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "addressbook",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass2-addressbook-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.251369332894683,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_small",
+      "GSR_OP": "decode",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass2-game_small-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.488865166902542,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_small",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass2-game_small-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.7065740395337343,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "decode",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass2-game_large-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.1360049583017826,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass2-game_large-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.082971042022109,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "decode",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass2-int32_edges-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.4036650005728006,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass2-int32_edges-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.054455790668726,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "echo_ascii4k",
+      "GSR_OP": "decode",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass2-echo_ascii4k-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.9542415402829647,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "echo_ascii4k",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass2-echo_ascii4k-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.2347543742507696,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "strings_0",
+      "GSR_OP": "decode",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass2-strings_0-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.235891418531537,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "strings_0",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass2-strings_0-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.5506859999150038,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "strings_3",
+      "GSR_OP": "decode",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass2-strings_3-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.255070749670267,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "strings_3",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass2-strings_3-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.5478428341448307,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "strings_128",
+      "GSR_OP": "decode",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass2-strings_128-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.0706147514283657,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "strings_128",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass2-strings_128-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 0.9309995416551828,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "strings_512",
+      "GSR_OP": "decode",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass2-strings_512-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.2306813336908817,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "strings_512",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass2-strings_512-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.9645341243594885,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "outer128",
+      "GSR_OP": "decode",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass2-outer128-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.8937863744795322,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "outer128",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass2-outer128-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.994384042918682,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "element128",
+      "GSR_OP": "decode",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass2-element128-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.6491250414401293,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/experiment.test",
+      "-test.run=^TestStringSlotsInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "element128",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-slots-20261020/pass2-element128-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.41614287532866,
+    "output": "PASS\n"
+  }
+]
