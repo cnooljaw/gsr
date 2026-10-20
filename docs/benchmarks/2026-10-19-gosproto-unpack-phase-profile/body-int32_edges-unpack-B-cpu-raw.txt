@@ -1,0 +1,166 @@
+PeriodType: cpu nanoseconds
+Period: 10000000
+Time: 2026-10-19 18:02:37.050089 +0800 CST
+Duration: 2.63
+Samples:
+samples/count cpu/nanoseconds
+          7   70000000: 1 2 3 4 5
+         28  280000000: 6 7 8 9 10
+         16  160000000: 11 2 3 4 5
+         43  430000000: 6 7 8 12 10
+          6   60000000: 13 2 3 4 5
+          2   20000000: 14 15 16 10
+         12  120000000: 17 2 3 4 5
+         16  160000000: 18 2 3 4 5
+          2   20000000: 19 2 3 4 5
+         11  110000000: 20 2 3 4 5
+          9   90000000: 21 2 3 4 5
+         12  120000000: 22 2 3 4 5
+         18  180000000: 23 2 3 4 5
+          1   10000000: 24 2 3 4 5
+          1   10000000: 25 2 3 4 5
+          7   70000000: 26 2 3 4 5
+          2   20000000: 27 2 3 4 5
+          1   10000000: 28 29 10 30 31 32 33 34 35 36 37 38 39 2 3 4 5
+          1   10000000: 40 41 42 43 44 45 10 46 47 48 38 39 2 3 4 5
+          1   10000000: 49 50 51 52 37 38 39 2 3 4 5
+          1   10000000: 53 54 55 56 29 10 30 31 32 33 34 35 36 37 38 39 2 3 4 5
+          1   10000000: 57 58 59 34 35 36 37 38 39 2 3 4 5
+         10  100000000: 60 2 3 4 5
+          1   10000000: 61 62 63 16 10 64 65 66 34 35 36 37 38 39 2 3 4 5
+          4   40000000: 67 2 3 4 5
+          2   20000000: 68 2 3 4 5
+          1   10000000: 69 70 71 32 33 34 35 36 37 38 39 2 3 4 5
+          1   10000000: 72 31 32 33 34 35 36 37 38 39 2 3 4 5
+          1   10000000: 73 34 35 36 37 38 39 2 3 4 5
+          1   10000000: 74 2 3 4 5
+          1   10000000: 75 36 37 38 39 2 3 4 5
+          1   10000000: 76 77 78 44 45 10 46 47 48 38 39 2 3 4 5
+          1   10000000: 79 2 3 4 5
+          1   10000000: 80 37 38 39 2 3 4 5
+          1   10000000: 81 2 3 4 5
+          1   10000000: 82 83 71 32 33 34 35 36 37 38 39 2 3 4 5
+          1   10000000: 84 85 37 38 39 2 3 4 5
+          1   10000000: 86 87 78 44 45 10 46 47 48 38 39 2 3 4 5
+          1   10000000: 88 2 3 4 5
+          1   10000000: 89 90 78 44 45 10 46 47 48 38 39 2 3 4 5
+          1   10000000: 91 2 3 4 5
+          1   10000000: 92 2 3 4 5
+          1   10000000: 93 94 95
+          1   10000000: 96 2 3 4 5
+          1   10000000: 97 77 78 44 45 10 46 47 48 38 39 2 3 4 5
+          1   10000000: 98 2 3 4 5
+Locations
+     1: 0x102bffd90 M=1 github.com/cnooljaw/gosproto.UnpackWithLimit /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-phase-profile-measured/current/candidate/pack.go:232:0 s=193
+     2: 0x102c13f6b M=1 github.com/cnooljaw/gosproto.Unpack /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-phase-profile-measured/current/candidate/pack.go:189:0 s=188
+             codecpairstool.decodeBodyOperations.func4 /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-phase-profile-measured/current/harness/decode_probe_test.go:70:0 s=68
+     3: 0x102c12ec3 M=1 codecpairstool.BenchmarkCurrentOperation /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-phase-profile-measured/current/harness/current_profile_test.go:68:0 s=22
+     4: 0x102ad4583 M=1 testing.(*B).runN /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/testing/benchmark.go:219:0 s=197
+     5: 0x102ad4beb M=1 testing.(*B).run1.func1 /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/testing/benchmark.go:245:0 s=238
+     6: 0x102a480ff M=1 runtime.kevent /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/sys_darwin.go:498:0 s=497
+     7: 0x102a231b7 M=1 runtime.netpoll /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/netpoll_kqueue.go:110:0 s=90
+     8: 0x102a2c38b M=1 runtime.startTheWorldWithSema /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/proc.go:1713:0 s=1708
+     9: 0x102a089ff M=1 runtime.gcMarkTermination.func3 /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mgc.go:1186:0 s=1176
+    10: 0x102a626eb M=1 runtime.systemstack /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/asm_arm64.s:244:0 s=207
+    11: 0x102bffe58 M=1 math/bits.OnesCount8 /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/math/bits/bits.go:126:0 s=125
+             github.com/cnooljaw/gosproto.UnpackWithLimit /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-phase-profile-measured/current/candidate/pack.go:223:0 s=193
+    12: 0x102a0757f M=1 runtime.gcStart.func4 /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mgc.go:803:0 s=802
+    13: 0x102c0009c M=1 github.com/cnooljaw/gosproto.UnpackWithLimit /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-phase-profile-measured/current/candidate/pack.go:259:0 s=193
+    14: 0x102a47d6b M=1 runtime.madvise /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/sys_darwin.go:284:0 s=283
+    15: 0x102a16b9b M=1 runtime.sysUsedOS /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mem_darwin.go:33:0 s=29
+             runtime.sysUsed /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mem.go:77:0 s=75
+             runtime.(*mheap).allocSpan /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mheap.go:1353:0 s=1177
+    16: 0x102a163ab M=1 runtime.(*mheap).alloc.func1 /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mheap.go:970:0 s=964
+    17: 0x102bffe28 M=1 github.com/cnooljaw/gosproto.UnpackWithLimit /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-phase-profile-measured/current/candidate/pack.go:216:0 s=193
+    18: 0x102c000c0 M=1 github.com/cnooljaw/gosproto.UnpackWithLimit /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-phase-profile-measured/current/candidate/pack.go:260:0 s=193
+    19: 0x102bffe60 M=1 github.com/cnooljaw/gosproto.UnpackWithLimit /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-phase-profile-measured/current/candidate/pack.go:223:0 s=193
+    20: 0x102bffe6c M=1 github.com/cnooljaw/gosproto.UnpackWithLimit /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-phase-profile-measured/current/candidate/pack.go:228:0 s=193
+    21: 0x102bfff84 M=1 github.com/cnooljaw/gosproto.UnpackWithLimit /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-phase-profile-measured/current/candidate/pack.go:249:0 s=193
+    22: 0x102c00098 M=1 github.com/cnooljaw/gosproto.UnpackWithLimit /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-phase-profile-measured/current/candidate/pack.go:260:0 s=193
+    23: 0x102bffda8 M=1 github.com/cnooljaw/gosproto.UnpackWithLimit /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-phase-profile-measured/current/candidate/pack.go:200:0 s=193
+    24: 0x102bffed8 M=1 github.com/cnooljaw/gosproto.UnpackWithLimit /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-phase-profile-measured/current/candidate/pack.go:194:0 s=193
+    25: 0x102bfff74 M=1 github.com/cnooljaw/gosproto.UnpackWithLimit /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-phase-profile-measured/current/candidate/pack.go:248:0 s=193
+    26: 0x102bfff28 M=1 github.com/cnooljaw/gosproto.UnpackWithLimit /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-phase-profile-measured/current/candidate/pack.go:237:0 s=193
+    27: 0x102c000d8 M=1 github.com/cnooljaw/gosproto.UnpackWithLimit /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-phase-profile-measured/current/candidate/pack.go:263:0 s=193
+    28: 0x102a17894 M=1 runtime.(*fixalloc).free /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mfixalloc.go:105:0 s=104
+             runtime.(*mheap).freeMSpanLocked /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mheap.go:1157:0 s=1145
+             runtime.(*mheap).freeSpanLocked /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mheap.go:1673:0 s=1621
+    29: 0x102a1415b M=1 runtime.(*sweepLocked).sweep.(*mheap).freeSpan.func2 /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mheap.go:1589:0 s=1566
+    30: 0x102a138d3 M=1 runtime.(*mheap).freeSpan /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mheap.go:1566:0 s=1565
+             runtime.(*sweepLocked).sweep /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mgcsweep.go:772:0 s=497
+    31: 0x102a12dcf M=1 runtime.sweepone /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mgcsweep.go:388:0 s=351
+    32: 0x102a146db M=1 runtime.deductSweepCredit /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mgcsweep.go:935:0 s=897
+    33: 0x102a029c7 M=1 runtime.(*mcentral).cacheSpan /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mcentral.go:84:0 s=81
+    34: 0x102a0232b M=1 runtime.(*mcache).refill /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mcache.go:183:0 s=148
+    35: 0x1029fe913 M=1 runtime.(*mcache).nextFree /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/malloc.go:964:0 s=954
+    36: 0x1029fef1b M=1 runtime.mallocgcSmallNoscan /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/malloc.go:1283:0 s=1254
+    37: 0x102a5b117 M=1 runtime.mallocgc /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/malloc.go:1055:0 s=1010
+    38: 0x102a5ed9f M=1 runtime.makeslice /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/slice.go:116:0 s=101
+    39: 0x102bffefb M=1 github.com/cnooljaw/gosproto.UnpackWithLimit /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-phase-profile-measured/current/candidate/pack.go:234:0 s=193
+    40: 0x102a0d720 M=1 runtime.scanblock /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mgcmark.go:1357:0 s=1343
+    41: 0x102a0b43f M=1 runtime.markrootBlock /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mgcmark.go:285:0 s=264
+    42: 0x102a0b1cf M=1 runtime.markroot /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mgcmark.go:175:0 s=161
+    43: 0x102a0d5f3 M=1 runtime.gcDrainN /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mgcmark.go:1309:0 s=1275
+    44: 0x102a0c127 M=1 runtime.gcAssistAlloc1 /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mgcmark.go:670:0 s=633
+    45: 0x102a0bf93 M=1 runtime.gcAssistAlloc.func2 /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mgcmark.go:561:0 s=560
+    46: 0x102a0bc0b M=1 runtime.gcAssistAlloc /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mgcmark.go:560:0 s=421
+    47: 0x1029ffc33 M=1 runtime.deductAssistCredit /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/malloc.go:1691:0 s=1677
+    48: 0x102a5b0c7 M=1 runtime.mallocgc /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/malloc.go:1044:0 s=1010
+    49: 0x102a0f8e0 M=1 runtime.(*gcControllerState).heapGoalInternal /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mgcpacer.go:925:0 s=920
+    50: 0x102a0fa4f M=1 runtime.(*gcControllerState).trigger /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mgcpacer.go:1109:0 s=1108
+    51: 0x102a06def M=1 runtime.gcTrigger.test /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mgc.go:608:0 s=602
+    52: 0x1029ff033 M=1 runtime.mallocgcSmallNoscan /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/malloc.go:1333:0 s=1254
+    53: 0x102a1c208 M=1 runtime.(*pallocBits).summarize /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mpallocbits.go:188:0 s=132
+    54: 0x102a19437 M=1 runtime.(*pageAlloc).update /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mpagealloc.go:497:0 s=485
+    55: 0x102a1a99b M=1 runtime.(*pageAlloc).free /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mpagealloc.go:969:0 s=933
+    56: 0x102a17847 M=1 runtime.(*mheap).freeSpanLocked /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mheap.go:1669:0 s=1621
+    57: 0x102a18898 M=1 runtime.(*gcBitsArena).tryAlloc /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mheap.go:2455:0 s=2449
+             runtime.newMarkBits /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mheap.go:2471:0 s=2465
+    58: 0x102a13607 M=1 runtime.(*sweepLocked).sweep /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mgcsweep.go:682:0 s=497
+    59: 0x102a02d47 M=1 runtime.(*mcentral).cacheSpan /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mcentral.go:147:0 s=81
+    60: 0x102bffe78 M=1 github.com/cnooljaw/gosproto.UnpackWithLimit /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-phase-profile-measured/current/candidate/pack.go:231:0 s=193
+    61: 0x102a06648 M=1 runtime.(*fixalloc).alloc /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mfixalloc.go:75:0 s=74
+    62: 0x102a166fb M=1 runtime.(*mheap).allocMSpanLocked /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mheap.go:1125:0 s=1113
+    63: 0x102a168fb M=1 runtime.(*mheap).allocSpan /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mheap.go:1266:0 s=1177
+    64: 0x102a16313 M=1 runtime.(*mheap).alloc /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mheap.go:964:0 s=959
+    65: 0x102a02fe7 M=1 runtime.(*mcentral).grow /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mcentral.go:252:0 s=250
+    66: 0x102a02e6b M=1 runtime.(*mcentral).cacheSpan /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mcentral.go:170:0 s=81
+    67: 0x102c000b4 M=1 github.com/cnooljaw/gosproto.UnpackWithLimit /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-phase-profile-measured/current/candidate/pack.go:260:0 s=193
+    68: 0x102bffdb0 M=1 github.com/cnooljaw/gosproto.UnpackWithLimit /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-phase-profile-measured/current/candidate/pack.go:202:0 s=193
+    69: 0x102a20dec M=1 runtime.(*spanSet).pop /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mspanset.go:149:0 s=141
+    70: 0x102a12623 M=1 runtime.(*mheap).nextSpanForSweep /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mgcsweep.go:105:0 s=96
+    71: 0x102a12d67 M=1 runtime.sweepone /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mgcsweep.go:370:0 s=351
+    72: 0x102a135b8 M=1 runtime.(*sweepLocked).sweep /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mgcsweep.go:665:0 s=497
+    73: 0x102a02cf0 M=1 runtime.(*mcentral).fullUnswept /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mcentral.go:71:0 s=70
+             runtime.(*mcentral).cacheSpan /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mcentral.go:141:0 s=81
+    74: 0x102bfff7c M=1 github.com/cnooljaw/gosproto.UnpackWithLimit /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-phase-profile-measured/current/candidate/pack.go:248:0 s=193
+    75: 0x1029fe8f0 M=1 runtime.(*mcache).nextFree /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/malloc.go:960:0 s=954
+    76: 0x102a00a38 M=1 runtime.typePointers.next /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mbitmap.go:277:0 s=274
+    77: 0x102a0d8f7 M=1 runtime.scanobject /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mgcmark.go:1436:0 s=1381
+    78: 0x102a0d60f M=1 runtime.gcDrainN /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mgcmark.go:1317:0 s=1275
+    79: 0x102c000d4 M=1 github.com/cnooljaw/gosproto.UnpackWithLimit /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-phase-profile-measured/current/candidate/pack.go:263:0 s=193
+    80: 0x1029fef7c M=1 runtime.mallocgcSmallNoscan /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/malloc.go:1306:0 s=1254
+    81: 0x102c000a4 M=1 github.com/cnooljaw/gosproto.UnpackWithLimit /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-phase-profile-measured/current/candidate/pack.go:259:0 s=193
+    82: 0x102a20ebc M=1 runtime.(*spanSet).pop /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mspanset.go:190:0 s=141
+    83: 0x102a125ff M=1 runtime.(*mheap).nextSpanForSweep /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mgcsweep.go:103:0 s=96
+    84: 0x102a652f4 M=1 runtime.memclrNoHeapPointers /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/memclr_arm64.s:180:0 s=11
+    85: 0x1029fef5f M=1 runtime.mallocgcSmallNoscan /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/malloc.go:1287:0 s=1254
+    86: 0x102a5bcf0 M=1 runtime.findObject /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mbitmap.go:1332:0 s=1321
+    87: 0x102a0d947 M=1 runtime.scanobject /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mgcmark.go:1462:0 s=1381
+    88: 0x102c000a0 M=1 github.com/cnooljaw/gosproto.UnpackWithLimit /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-phase-profile-measured/current/candidate/pack.go:259:0 s=193
+    89: 0x102a0dde0 M=1 runtime.(*mspan).base /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mheap.go:499:0 s=498
+             runtime.greyobject /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mgcmark.go:1613:0 s=1585
+    90: 0x102a0d963 M=1 runtime.scanobject /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mgcmark.go:1463:0 s=1381
+    91: 0x102bffe74 M=1 github.com/cnooljaw/gosproto.UnpackWithLimit /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-phase-profile-measured/current/candidate/pack.go:228:0 s=193
+    92: 0x102bffd48 M=1 github.com/cnooljaw/gosproto.UnpackWithLimit /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-phase-profile-measured/current/candidate/pack.go:193:0 s=193
+    93: 0x102a12008 M=1 runtime.isFinite /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/float.go:19:0 s=18
+             runtime.isInf /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/float.go:24:0 s=23
+             runtime.(*piController).next /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mgcscavenge.go:1382:0 s=1375
+    94: 0x102a10847 M=1 runtime.(*scavengerState).sleep /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mgcscavenge.go:549:0 s=465
+    95: 0x102a10b2b M=1 runtime.bgscavenge /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mgcscavenge.go:662:0 s=649
+    96: 0x102bffd98 M=1 github.com/cnooljaw/gosproto.UnpackWithLimit /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-phase-profile-measured/current/candidate/pack.go:232:0 s=193
+    97: 0x102a00988 M=1 runtime.readUintptr /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mbitmap.go:1476:0 s=1475
+             runtime.typePointers.next /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/runtime/mbitmap.go:299:0 s=274
+    98: 0x102bffe68 M=1 github.com/cnooljaw/gosproto.UnpackWithLimit /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-phase-profile-measured/current/candidate/pack.go:225:0 s=193
+Mappings
+1: 0x1029ec000/0x102c94000/0x0 /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-phase-profile-measured/current/pairs.test  [FN]

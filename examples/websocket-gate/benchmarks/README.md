@@ -1,5 +1,7 @@
 # 双协议编解码 Benchmark
 
+当前目标（2026-10-20，用户裁决）：同时推进Body Encode/Decode与Pack/Unpack，最终相对各自PB的领先幅度向TS结果靠近。已小幅领先不等于Body完成；Unpack组合缺口也不构成冻结正文的理由。Go/TS逐入口参考、边界与执行规则见[双主线目标](../../../docs/GOSPROTO-DUAL-TRACK.md)。
+
 从仓库根目录运行：
 
 ```sh
@@ -33,6 +35,10 @@ GOMAXPROCS=1 go test ./examples/websocket-gate/benchmarks \
 前轮共享wire/分函数实验已提交 GSR `2ca8864`，未推送。新[分函数＋索引预检组合](../../../docs/benchmarks/2026-10-19-gosproto-unpack-split-indexed/RESULTS.md)完成固定70项：大型PDecode快3.12%/4.38%、4字节大数组快9.84%/9.23%，但普通word两轮慢约4%～33%、FF接稀疏慢约8.5%，组合未消除取舍，未采用。280进程/26,880块、目标契约及138500差分通过，控制/长尾/累计反向全部保留。主库仍af9169d且干净，新报告未提交；依赖v0.4.0，Decode继续开放。
 
 前轮组合实验已提交GSR `885505c`，未推送。新[按word记录预检预算](../../../docs/benchmarks/2026-10-19-gosproto-unpack-word-budget/RESULTS.md)完成固定70项：单/双字节word约快5%～7%、零段小幅改善，但大型Unpack慢6.77%～7.93%、4字节大数组PDecode两轮慢4.02%、FF接稀疏慢约33%～34%，未采用。静态指令384→372但栈帧112→128B，不能据此预测动态收益。159275差分（新增MaxInt附近预算）、目标契约及来源核对通过；控制/尾差/长尾全部保留。主库仍af9169d且干净，新报告未提交，正式依赖v0.4.0、Decode继续开放。
+
+前轮word预算报告已提交GSR `8e9880f`，未推送。新[生产版阶段成本诊断](../../../docs/benchmarks/2026-10-19-gosproto-unpack-phase-profile/RESULTS.md)只读采af9169d的8个CPU入口：大型纯Unpack预检/恢复占完整样本30.40%/32.16%，大型PDecode中Unpack累计17.67%、正文Decode累计53.88%（嵌套项不相加）。countChunks累计4.31%，inline的未用content视图cap守卫仍在；下一候选为仅计数路径消除不使用的视图，尚未实施。55条流程命令＋1条静态objdump、24快照/1827采样权重、fresh/来源核对通过，无新A/B结论。主库仍af9169d干净，报告未提交，依赖v0.4.0、Decode继续开放。
+
+当前总览（2026-10-20）：[Go SP/PB同场五轮](../../../docs/benchmarks/2026-10-20-go-sp-pb/RESULTS.md)使用gosproto af9169d提交归档与PB v1.36.1，共72项360样本；大型packed编码−8.1%、解码+14.9%，int32数组packed编码−36.5%、解码+62.2%。纯Encode/Decode已领先的数值路径被Unpack拖累，保持Body与Packing双主线；Packing侧优先Unpack→PDecode，Body继续定位大型结构成本，不继续以旧大型Encode数据选题。Go-only、无新profile/TS或细小收益统计显著性结论。库工作区有用户删除，采样隔离归档未触碰；正式依赖仍v0.4.0，本轮无提交。
 
 ## Go 局部优化的配对校准
 

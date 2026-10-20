@@ -1,8 +1,10 @@
 # Protobuf / Sproto 接入指南
 
+当前目标（2026-10-20，用户裁决）：同时推进Body Encode/Decode与Pack/Unpack，最终相对各自PB的领先幅度向TS结果靠近。已小幅领先不等于Body完成；Unpack组合缺口也不构成冻结正文的理由。Go/TS逐入口参考、边界与执行规则见[双主线目标](GOSPROTO-DUAL-TRACK.md)。
+
 本计划按 [ADR 0013](adr/0013-client-protocol-boundaries.md) 推进。当前工作树已实现 Protobuf 与独立 `protocol/sproto`，通过 Go/TypeScript Echo 验证。Go 编解码依赖独立维护的 `github.com/cnooljaw/gosproto v0.4.0`。新增 GSR API 尚未发布；已有 GSR 标签及原有协议保持不变。
 
-当前优化切片（2026-10-19）：前轮组合实验已提交GSR `885505c`，未推送。新[按word记录预检预算](benchmarks/2026-10-19-gosproto-unpack-word-budget/RESULTS.md)完成固定70项：单/双字节word约快5%～7%、零段小幅改善，但大型Unpack慢6.77%～7.93%、4字节大数组PDecode两轮慢4.02%、FF接稀疏慢约33%～34%，未采用。静态指令384→372但栈帧112→128B，不能据此预测动态收益。159275差分（新增MaxInt附近预算）、目标契约及来源核对通过；控制/尾差/长尾全部保留。主库仍af9169d且干净，新报告未提交，正式依赖v0.4.0、Decode继续开放。
+当前优化切片（2026-10-19）：前轮word预算报告已提交GSR `8e9880f`，未推送。新[生产版阶段成本诊断](benchmarks/2026-10-19-gosproto-unpack-phase-profile/RESULTS.md)只读采af9169d的8个CPU入口：大型纯Unpack预检/恢复占完整样本30.40%/32.16%，大型PDecode中Unpack累计17.67%、正文Decode累计53.88%（嵌套项不相加）。countChunks累计4.31%，inline的未用content视图cap守卫仍在；下一候选为仅计数路径消除不使用的视图，尚未实施。55条流程命令＋1条静态objdump、24快照/1827采样权重、fresh/来源核对通过，无新A/B结论。主库仍af9169d干净，报告未提交，依赖v0.4.0、Decode继续开放。
 
 ## 边界与步骤
 

@@ -4,6 +4,14 @@
 
 下文历史记录中的示例 Gate 路径是当时运行测试的位置。当前连接实现统一到 `gate`，原 Debug/Prod 用例保留为 Plain/MAC 模式测试；重跑历史命令使用统一路径，历史结果和耗时不因迁移而改写。
 
+## Go SP/PB当前总览（2026-10-20）
+
+当前总览（2026-10-20）：[Go SP/PB同场五轮](benchmarks/2026-10-20-go-sp-pb/RESULTS.md)使用gosproto af9169d提交归档与PB v1.36.1，共72项360样本；大型packed编码−8.1%、解码+14.9%，int32数组packed编码−36.5%、解码+62.2%。纯Encode/Decode已领先的数值路径被Unpack拖累，保持Body与Packing双主线；Packing侧优先Unpack→PDecode，Body继续定位大型结构成本，不继续以旧大型Encode数据选题。Go-only、无新profile/TS或细小收益统计显著性结论。库工作区有用户删除，采样隔离归档未触碰；正式依赖仍v0.4.0，本轮无提交。
+
+## 生产版阶段成本诊断（2026-10-19，只读）
+
+前轮word预算报告已提交GSR `8e9880f`，未推送。新[生产版阶段成本诊断](benchmarks/2026-10-19-gosproto-unpack-phase-profile/RESULTS.md)只读采af9169d的8个CPU入口：大型纯Unpack预检/恢复占完整样本30.40%/32.16%，大型PDecode中Unpack累计17.67%、正文Decode累计53.88%（嵌套项不相加）。countChunks累计4.31%，inline的未用content视图cap守卫仍在；下一候选为仅计数路径消除不使用的视图，尚未实施。55条流程命令＋1条静态objdump、24快照/1827采样权重、fresh/来源核对通过，无新A/B结论。主库仍af9169d干净，报告未提交，依赖v0.4.0、Decode继续开放。
+
 ## 预检word预算（2026-10-19，未采用）
 
 前轮组合实验已提交GSR `885505c`，未推送。新[按word记录预检预算](benchmarks/2026-10-19-gosproto-unpack-word-budget/RESULTS.md)完成固定70项：单/双字节word约快5%～7%、零段小幅改善，但大型Unpack慢6.77%～7.93%、4字节大数组PDecode两轮慢4.02%、FF接稀疏慢约33%～34%，未采用。静态指令384→372但栈帧112→128B，不能据此预测动态收益。159275差分（新增MaxInt附近预算）、目标契约及来源核对通过；控制/尾差/长尾全部保留。主库仍af9169d且干净，新报告未提交，正式依赖v0.4.0、Decode继续开放。
@@ -788,3 +796,7 @@ TestRuntimePacedMultiServiceLoad 已补 8 个真实 Service 共享文件 Logger 
 2026-09-29 Go/TypeScript 生产 Gate 联调：以 `go run ./cmd/debugserver --prod --addr 127.0.0.1:0` 启动现有示例，TypeScript CLI 使用 `--secure` 实际完成固定 X25519 握手及上行 MAC。普通 Echo 请求返回原 `request_id=1` 和文本，Notify 返回 Push，空文本返回业务 `TEXT_REQUIRED` 对应响应；三次 CLI 运行均成功，服务端停止后回环端口释放。本次走 `ws://`，模拟 Ingress 已终止 TLS 的内段，不是跨语言直连 WSS 或目标部署验收；未修改生产代码或客户端协议。
 
 2026-09-29 Go/TypeScript 直连 WSS 示例：`debugserver --prod` 新增成对的 `--tls-cert`/`--tls-key` 文件参数，默认 WS 行为不变。使用临时自签名且包含 `127.0.0.1` SAN 的证书启动 `wss://`，TypeScript CLI 通过 `NODE_EXTRA_CA_CERTS` 信任该测试证书后，以 `--secure` 完成 TLS、X25519、上行 MAC 和 Echo 往返，返回原 `request_id=1`。服务端停止后端口释放，临时证书与私钥已删除；这是本机联调，不代表公网部署、证书管理或目标容量验收。
+
+## 双主线目标确认（2026-10-20）
+
+当前目标（2026-10-20，用户裁决）：同时推进Body Encode/Decode与Pack/Unpack，最终相对各自PB的领先幅度向TS结果靠近。已小幅领先不等于Body完成；Unpack组合缺口也不构成冻结正文的理由。Go/TS逐入口参考、边界与执行规则见[双主线目标](GOSPROTO-DUAL-TRACK.md)。本轮只复算历史TS与当前Go的相对比例、核对共享夹具哈希和文档，不重跑测试/Benchmark，不产生新的性能结果。

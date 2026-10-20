@@ -1,10 +1,12 @@
 # gosproto Decoder 原生整数指针的受控写入提案
 
+当前目标（2026-10-20，用户裁决）：同时推进Body Encode/Decode与Pack/Unpack，最终相对各自PB的领先幅度向TS结果靠近。已小幅领先不等于Body完成；Unpack组合缺口也不构成冻结正文的理由。Go/TS逐入口参考、边界与执行规则见[双主线目标](GOSPROTO-DUAL-TRACK.md)。
+
 状态：2026-10-17，范围已按用户“提交，继续”采纳并完成最小实现，已本地提交为 gosproto `fc3246a`、GSR `862fa8b`。此前安全 inline 与提案/回归已分别本地提交为 gosproto `70d985c` / `5be3b26`、GSR `d0328fd` / `2872d46`；均未推送/发布。Decode 性能阶段已按用户决定冻结于 `a09fb00`（生产源码同 `fc3246a`），最终入口候选未达保留门槛，见 [冻结报告](benchmarks/2026-10-17-gosproto-decode-freeze/RESULTS.md)。正式依赖仍为 v0.4.0。下文保留提案依据，封装后的新数据见 [实施验收](benchmarks/2026-10-17-gosproto-decode-store/RESULTS.md)。
 
 当前状态（2026-10-19）：用户明确解除Decode阶段性冻结，允许按证据继续入口、解析和构造/写入优化；本页保留历史提案/验收，入口复核已本地提交为库 `913c465`、GSR `b708108`，见[Decode解冻报告](benchmarks/2026-10-19-gosproto-decode-resume/RESULTS.md)；后续[结构数组schema实验](benchmarks/2026-10-19-gosproto-decode-array-schema/RESULTS.md)未采用且报告已提交为GSR `26a5748`；当前[整数资格前移实验](benchmarks/2026-10-19-gosproto-decode-integer-proof/RESULTS.md)也未采用，报告已提交为GSR `f7381dd`；后续保留[固定header视图](benchmarks/2026-10-19-gosproto-decode-header-view/RESULTS.md)，已本地提交为库 `503a725`、GSR `2104eca`；后续[字节偏移实验](benchmarks/2026-10-19-gosproto-decode-header-offset/RESULTS.md)未采用且报告已提交为GSR `9699583`；[刷新Decode诊断](benchmarks/2026-10-19-gosproto-decode-current-profile/RESULTS.md)已本地提交为GSR `16d1491`；随后保留[原生整数数组读取视图](benchmarks/2026-10-19-gosproto-decode-array-view/RESULTS.md)，52项两轮大数组Decode快26%～29%、4字节组合快7%～9%，短包代价/控制失败/工具测试补丁偏差与纠正单列。该轮已本地提交为库 `f7022ac`、GSR `b3d4517`，完整兼容/接线验收通过，Decode继续开放。官方wire、预算、失败原子性、独占与写屏障约束不变。
 
-最新切片（2026-10-19）：前轮组合实验已提交GSR `885505c`，未推送。新[按word记录预检预算](benchmarks/2026-10-19-gosproto-unpack-word-budget/RESULTS.md)完成固定70项：单/双字节word约快5%～7%、零段小幅改善，但大型Unpack慢6.77%～7.93%、4字节大数组PDecode两轮慢4.02%、FF接稀疏慢约33%～34%，未采用。静态指令384→372但栈帧112→128B，不能据此预测动态收益。159275差分（新增MaxInt附近预算）、目标契约及来源核对通过；控制/尾差/长尾全部保留。主库仍af9169d且干净，新报告未提交，正式依赖v0.4.0、Decode继续开放。
+最新切片（2026-10-19）：前轮word预算报告已提交GSR `8e9880f`，未推送。新[生产版阶段成本诊断](benchmarks/2026-10-19-gosproto-unpack-phase-profile/RESULTS.md)只读采af9169d的8个CPU入口：大型纯Unpack预检/恢复占完整样本30.40%/32.16%，大型PDecode中Unpack累计17.67%、正文Decode累计53.88%（嵌套项不相加）。countChunks累计4.31%，inline的未用content视图cap守卫仍在；下一候选为仅计数路径消除不使用的视图，尚未实施。55条流程命令＋1条静态objdump、24快照/1827采样权重、fresh/来源核对通过，无新A/B结论。主库仍af9169d干净，报告未提交，依赖v0.4.0、Decode继续开放。
 
 ## 问题与本轮证据
 
