@@ -1,0 +1,32 @@
+package sproto
+
+import (
+ "errors"
+ "testing"
+)
+
+// 验证普通mask先报截断再报本word预算，已完成前缀的预算失败仍先于坏尾部。
+func TestUnpackOrdinaryErrorOrder(t *testing.T) {
+ for mask:=1;mask<255;mask++ {
+  packed:=[]byte{byte(mask)}
+  for bit:=0;bit<8;bit++ {if mask&(1<<bit)!=0 {packed=append(packed,byte(bit+1))}}
+  broken:=packed[:len(packed)-1]
+  for _,limit:=range []int{1,7,8} {
+   output,err:=UnpackWithLimit(broken,limit)
+   if output!=nil || !errors.Is(err,ErrUnpack) {t.Fatalf("mask %x truncated limit %d: %x %v",mask,limit,output,err)}
+   output,err=UnpackWithLimit(packed,limit)
+   if limit<8 {
+    if output!=nil || !errors.Is(err,ErrLimit) {t.Fatalf("mask %x complete limit %d: %x %v",mask,limit,output,err)}
+   }else if err!=nil || len(output)!=8 || cap(output)!=8 {t.Fatalf("exact ordinary budget: %x %v",output,err)}
+  }
+  for _,prefix:=range [][]byte{{0},{255,0,1,2,3,4,5,6,7,8}} {
+   wire:=append(append([]byte(nil),prefix...),broken...)
+   for _,limit:=range []int{7,8} {
+    want:=ErrLimit
+    if limit==8 {want=ErrUnpack}
+    output,err:=UnpackWithLimit(wire,limit)
+    if output!=nil || !errors.Is(err,want) {t.Fatalf("prefix %x mask %x limit %d: %x %v",prefix,mask,limit,output,err)}
+   }
+  }
+ }
+}

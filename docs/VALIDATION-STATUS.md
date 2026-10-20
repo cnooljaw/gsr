@@ -863,3 +863,6 @@ TestRuntimePacedMultiServiceLoad 已补 8 个真实 Service 共享文件 Logger 
 
 
 2026-10-20：[真实高频mask收尾诊断](benchmarks/2026-10-20-gosproto-unpack-frequent-masks/RESULTS.md)完成22入口88进程8448块/120条流程及另4份CPU profile/21条流程。实际4～6字节mask单独重复也有正向，不能把优势只归于低位连续位置；原始大型/整数数组Unpack仍慢约13%～15%，不采用连续源窗口。全部小收益、14项累计反向、控制与长尾保留，不按门槛舍弃，也不声称已定位全部退化根因。全mask三入口race/checkptr、夹具/vet/预检/指纹复算通过；无新生产代码或PB/TS排名。下一切片保留旧写出，单测首遍普通mask预检分支，完整预算/错误顺序/ownership保持，尚未实现。前轮报告已提交0a5eded，新诊断留审查；库5360fe0、正式依赖和原6项删除不变，Body继续开放。
+
+
+2026-10-20：[Unpack普通mask预检两版实验](benchmarks/2026-10-20-gosproto-unpack-precheck-ordinary/RESULTS.md)暂不并入。首版拆普通路径导致机器字行388→420；精简版只合并分类，共用原检查，机器字行/栈不变。小型Unpack两轮约快3%保留，但大型无重复正向、整数数组不一致，组合/累计及23项反向完整披露，不按收益门槛舍弃。两版168进程16128块/230条流程、三入口全mask与新增边界/预算冲突错误顺序race/checkptr、夹具/vet/预检/来源复算通过。下一候选为一次packed产出上界证明及严格预算回退，尚未实现，所有边界/错误顺序/ownership保持。无新生产代码；前轮报告已提交6c40523，新报告留审查，库5360fe0、依赖和原6项删除不动，Body继续开放。
