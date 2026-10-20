@@ -849,3 +849,5 @@ self40/55、clone37/55，66项累计反向、2项分配尾差与全部异常保�
 2026-10-20：[Decode/Unpack 独立进程诊断](benchmarks/2026-10-20-gosproto-decode-cost/RESULTS.md)完成18份profile和80条命令。大型Decode的对象构造、普通mask解包写出均为实测热点；下一Packing切片先测固定八字节目标视图，保留首遍预算/边界预检，Body字段/presence路径继续开放。尚无新候选实现或收益结论。
 
 2026-10-20：[Unpack 固定八字节视图实验](benchmarks/2026-10-20-gosproto-unpack-word/RESULTS.md)完成。960个单模块独立进程、self/clone及两轮比较全部保留；大型Unpack中位两轮约−3%，但控制同阶、整数数组反向和长尾使净收益未确认。静态目标检查未减少（指令384→392），候选暂不并入；全部mask/预算/独占结果两侧race/checkptr通过。下一步先解决索引范围证明，再在明确负载条件下测量，不设最小收益比例门槛。
+
+2026-10-20：[Unpack 非零mask索引范围实验](benchmarks/2026-10-20-gosproto-unpack-index/RESULTS.md)消除目标索引检查（panicIndex静态点5→4），源读取与完整预算/边界预检保留。固定100ms单模块独立进程两轮，整数数组Unpack中位−1.88%/−4.02%，但组合累计方向及ASCII代价不稳、控制波动仍大，净收益未确认，候选尚未并入。全部mask两侧race/checkptr通过。下一步在同一模块/进程隔离纯字节循环，再回到公开入口验收；不设最小收益比例门槛，Body继续开放。
