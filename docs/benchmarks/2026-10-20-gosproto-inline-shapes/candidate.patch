@@ -1,0 +1,16 @@
+--- a/encode.go
++++ b/encode.go
+@@ -156,7 +156,12 @@
+ 		var header uint16
+ 		var length int
+ 		if native {
+-			header, length = encodeIntegerInto(bits, output[bodyOffset:])
++			// 内联整数只占头部，非内联时才构造内容区切片。
++			if bits <= MaxEmbeddedInt {
++				header = uint16((bits + 1) * 2)
++			} else {
++				header, length = encodeIntegerInto(bits, output[bodyOffset:])
++			}
+ 		} else if field.Array || field.Wire == WireStructName {
+ 			length = encodeFieldInto(field, current, output[bodyOffset+4:], layout, binding.exact && field.encOwner == schema && field.Array != field.pointer)
+ 		} else {
