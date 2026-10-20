@@ -800,3 +800,7 @@ TestRuntimePacedMultiServiceLoad 已补 8 个真实 Service 共享文件 Logger 
 ## 双主线目标确认（2026-10-20）
 
 当前目标（2026-10-20，用户裁决）：同时推进Body Encode/Decode与Pack/Unpack，最终相对各自PB的领先幅度向TS结果靠近。已小幅领先不等于Body完成；Unpack组合缺口也不构成冻结正文的理由。Go/TS逐入口参考、边界与执行规则见[双主线目标](GOSPROTO-DUAL-TRACK.md)。本轮只复算历史TS与当前Go的相对比例、核对共享夹具哈希和文档，不重跑测试/Benchmark，不产生新的性能结果。
+
+## countChunks Body实验（2026-10-20，收益待确认）
+
+当前Body实验（2026-10-20）：[countChunks直接计数](benchmarks/2026-10-20-gosproto-chunk-count/RESULTS.md)已完成固定70项两轮比较。大型Decode观察−0.72%/−0.10%，部分结构数组有小收益；self8/70、clone11/70，组合/累计多有翻转，收益尚不能可靠区分。候选保留待确认、未应用生产，不因低于比例门槛丢弃。既有契约/差分、fresh与来源核对通过；库原有删除保持，正式依赖不变。上一轮双主线目标/对照已提交386727c，新实验未提交，Body与Packing继续开放。

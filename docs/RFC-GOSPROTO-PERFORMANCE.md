@@ -2,6 +2,8 @@
 
 当前目标（2026-10-20，用户裁决）：同时推进Body Encode/Decode与Pack/Unpack，最终相对各自PB的领先幅度向TS结果靠近。已小幅领先不等于Body完成；Unpack组合缺口也不构成冻结正文的理由。Go/TS逐入口参考、边界与执行规则见[双主线目标](GOSPROTO-DUAL-TRACK.md)。
 
+当前Body实验（2026-10-20）：[countChunks直接计数](benchmarks/2026-10-20-gosproto-chunk-count/RESULTS.md)已完成固定70项两轮比较。大型Decode观察−0.72%/−0.10%，部分结构数组有小收益；self8/70、clone11/70，组合/累计多有翻转，收益尚不能可靠区分。候选保留待确认、未应用生产，不因低于比例门槛丢弃。既有契约/差分、fresh与来源核对通过；库原有删除保持，正式依赖不变。上一轮双主线目标/对照已提交386727c，新实验未提交，Body与Packing继续开放。
+
 状态更新：2026-10-19，GSR 正式依赖仍为 v0.4.0，后续独立库优化尚未发布。TS 长块和 Go 安全路径见 [首轮结果](benchmarks/2026-10-15-sproto-next/RESULTS.md)，数值 packing、字段查询及类型化构造见 [第二轮结果](benchmarks/2026-10-15-sproto-round2/RESULTS.md)。TS 优化阶段已在 GSR `9801808` 收尾，可迁移经验见 [TS → Go 优化经验](SPROTO-OPTIMIZATION-LESSONS.md)。编码执行层改进见第 9 节，大型 Encode 约 6.54 µs，同场 PB 7.59 µs。混合 word Pack 已本地提交为独立库 `7dc6713`、GSR `e9e1f74`，未推送；长 FF 有界搜索已本地提交为独立库 `07350a9`、GSR `3a78dbd`，见第 11 节。连续零 mask 解包已本地提交为独立库 `22e287e`、GSR `1af93f4`，见第 12 节。普通 Unpack 五个候选已撤回，回归与记录已本地提交为独立库 `d66644a`、GSR `acfb070`，见第 13 节。安全 inline 处理已本地提交为独立库 `70d985c`、GSR `d0328fd`，见第 14 节；后续整数记录 parser 已撤回，原型与提案已本地提交为独立库 `5be3b26`、GSR `2872d46`，见第 15 节；私有 Decode 写入及验收已本地提交为独立库 `fc3246a`、GSR `862fa8b`，见第 16 节；后续四个局部候选均未采用，回归/记录已本地提交为独立库 `a09fb00`、GSR `d1beb28`，见第 17 节。最终入口专项当时未达门槛，Decode 于2026-10-17阶段性冻结，见第18节；用户已于2026-10-19明确解除冻结，当前工作见第54节。公开 API、generator 与预算/所有权契约不变。
 
 第三轮已完成当前基线与候选筛选，只保留调用内布局记录的内存收窄，独立库已本地提交为 `a579920`，GSR 记录提交为 `fdbc736`，均未推送/发布；未取得新的明显 CPU 加速。实测和取舍见 [第三轮结果](benchmarks/2026-10-16-gosproto-round3/RESULTS.md) 及第 8 节。
@@ -707,3 +709,11 @@ countChunks在大型PDecode累计4.31%；采样后静态核对readChunk已inline
 当前总览（2026-10-20）：[Go SP/PB同场五轮](benchmarks/2026-10-20-go-sp-pb/RESULTS.md)使用gosproto af9169d提交归档与PB v1.36.1，共72项360样本；大型packed编码−8.1%、解码+14.9%，int32数组packed编码−36.5%、解码+62.2%。纯Encode/Decode已领先的数值路径被Unpack拖累，保持Body与Packing双主线；Packing侧优先Unpack→PDecode，Body继续定位大型结构成本，不继续以旧大型Encode数据选题。Go-only、无新profile/TS或细小收益统计显著性结论。库工作区有用户删除，采样隔离归档未触碰；正式依赖仍v0.4.0，本轮无提交。
 
 原五组正文与四组Echo共72项各五轮。大型纯Encode5.555µs vs PB7.665、Decode15.489 vs17.807，但PDecode20.463；int32纯Decode1.739 vs4.294，Unpack5.131、PDecode6.967。Packing侧优先解包组合，Body侧继续改进纯Encode/Decode；保留全字节形态预算/错误/ownership约束；不直接恢复此前有泛化代价的游标/分函数/word预算候选。AddressBook和小型消息还存在固定成本。手工package+append帧不等于真实Request/Attach，UTF8差异含PB的UTF8校验契约，不能据此泛化内核优劣。全部耗时/分配/wire/五轮波动在报告保存，后续局部采用仍须配对验证，不设固定收益下限。
+
+## 69. Body countChunks未用视图候选（收益待确认）
+
+仅在countChunks直接读取长度/检查chunk，不构造readChunk的未用content视图；完整输入边界先于逐项budget.add，数组分配前完整预检、失败原子性/所有权/错误顺序保留，size<=len-4保证int转换安全。真正需要content的调用不改。实际countChunks约97→85条，未用cap守卫1→0，输入推进的边界守卫仍在；不以静态条数推定提速。
+
+固定70项280进程/26,880块，大型Decode−0.72%/−0.10%、full记录Decode−0.12%/−1.51%，收益保留；大型PDecode+1.15%/−2.00%且累计两轮慢32.7/3149.4ns，Dispatch中位翻转但累计两轮快。self8/70、clone11/70，目标控制IQR达约5～6个百分点，小收益尚不能可靠区分，故候选留存待确认而不应用。不是优化失败结论或最低收益门槛，也不盲目重采等控制通过。
+
+两侧原契约/70入口/109形态525差分、harness/vet/编译/机器码、fresh/源码/原采样函数/二进制/raw及顺序核对完成。对象数中位相同，26字节尾差/30入口累计翻转全部保留。未采用，不重复生产全验收；原库6个删除保留，生产Go文件仍af9169d。见[完整报告](benchmarks/2026-10-20-gosproto-chunk-count/RESULTS.md)。前轮386727c已提交，新实验未提交，双主线不变。

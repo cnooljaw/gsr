@@ -1,0 +1,76 @@
+# 固定70项全部结果
+
+负值更快。累计时间由全部块时间/调用数计算，不等于六轮比值中位数；控制失败、非目标变化和离群全部保留。
+
+| 入口 | 第1轮 | 第2轮 | 第1轮累计 ns | 第2轮累计 ns | self / clone控制 |
+| --- | ---: | ---: | ---: | ---: | --- |
+| body/addressbook/decode | -0.18% | +1.11% | -4.7 | +4.3 | False / False |
+| body/addressbook/unpack | -0.17% | -0.42% | +3.0 | -1.3 | False / True |
+| body/addressbook/pdecode | -2.12% | -0.31% | -39.7 | -141.6 | True / False |
+| rpc/addressbook/dispatch | -1.10% | -0.97% | +48.7 | -47.8 | False / False |
+| body/game_small/decode | -1.41% | +1.75% | -23.3 | +35.3 | False / False |
+| body/game_small/unpack | -1.65% | -9.09% | -94.7 | -183.2 | False / False |
+| body/game_small/pdecode | -1.48% | -0.48% | -18.0 | -29.7 | False / False |
+| rpc/game_small/dispatch | +3.46% | -3.25% | +102.9 | -227.7 | False / False |
+| body/game_large/decode | -0.72% | -0.10% | -234.8 | -47.4 | False / False |
+| body/game_large/unpack | +0.75% | +1.54% | +349.1 | +18.6 | False / False |
+| body/game_large/pdecode | +1.15% | -2.00% | +32.7 | +3149.4 | False / False |
+| rpc/game_large/dispatch | -1.03% | +2.33% | -856.0 | -1077.5 | False / False |
+| body/int32_edges/decode | -0.75% | -3.38% | -10.4 | -109.6 | False / False |
+| body/int32_edges/unpack | -0.21% | +1.21% | -813.2 | +1602.3 | True / False |
+| body/int32_edges/pdecode | -0.92% | +0.46% | -32.4 | -143.3 | False / False |
+| rpc/int32_edges/dispatch | +3.04% | +1.00% | +649.7 | +905.1 | False / False |
+| body/echo_ascii4k/decode | -5.18% | +1.47% | -3.8 | +439.9 | False / False |
+| body/echo_ascii4k/unpack | +1.57% | -1.29% | +53.2 | +233.8 | False / False |
+| body/echo_ascii4k/pdecode | -1.44% | +7.51% | -148.9 | +1106.3 | False / False |
+| rpc/echo_ascii4k/dispatch | -5.29% | +6.31% | +72.2 | +306.0 | False / False |
+| echo/ascii32/payload_decode | +2.94% | +2.02% | +12.5 | +3.4 | False / False |
+| echo/ascii32/frame_decode | +0.77% | +2.22% | +211.6 | -7.4 | False / False |
+| echo/utf8_1k/payload_decode | -1.24% | +0.69% | -4.2 | +12.4 | False / False |
+| echo/utf8_1k/frame_decode | -0.71% | +2.34% | -84.3 | -139.4 | False / True |
+| echo/ascii4k/payload_decode | +0.10% | +0.84% | -1.0 | +141.4 | False / False |
+| echo/ascii4k/frame_decode | -5.08% | +5.28% | -314.3 | +313.3 | False / False |
+| echo/zeros4k/payload_decode | -0.90% | +0.67% | -4.9 | -111.0 | False / True |
+| echo/zeros4k/frame_decode | -3.00% | -1.09% | -3753.3 | -106.8 | False / False |
+| growth/flat/full/4096/decode | -0.12% | -1.51% | -3113.9 | -149150.5 | False / False |
+| growth/flat/full/4096/pdecode | +0.76% | -0.92% | -26902.1 | -7393.4 | False / False |
+| growth/flat/nil/4096/decode | +0.96% | -1.34% | -9986.7 | +15598.8 | False / False |
+| growth/flat/nil/4096/pdecode | -0.51% | +0.79% | +3772.1 | +10526.5 | False / False |
+| growth/flat/half/4096/decode | -3.78% | +0.60% | -9737.5 | +1115.2 | False / False |
+| growth/flat/half/4096/pdecode | -1.36% | +0.72% | -9818.8 | -25189.8 | False / False |
+| growth/nested/32x128/decode | -2.46% | +0.18% | -25933.8 | -3915.0 | False / False |
+| growth/nested/32x128/pdecode | -1.51% | -0.03% | -165548.3 | -41669.3 | False / False |
+| growth/array_record/4096/decode | -1.55% | -0.06% | +2798.3 | -30531.2 | False / False |
+| growth/array_record/4096/pdecode | -2.34% | +0.28% | -88091.8 | +18288.0 | False / False |
+| array/width4_len3/decode | +0.57% | -3.71% | +28.4 | -8.7 | False / False |
+| array/width4_len3/unpack | +2.74% | -2.85% | +5.3 | +2.9 | True / False |
+| array/width4_len3/pdecode | -1.53% | +1.01% | -47.6 | +2.6 | False / True |
+| rpc/width4_len3/dispatch | -0.78% | +0.09% | +97.8 | +19.7 | False / True |
+| array/width8_len3/decode | +4.83% | +0.61% | +17.3 | -22.4 | False / False |
+| array/width8_len3/unpack | -4.17% | -2.86% | -3.8 | -1.6 | False / False |
+| array/width8_len3/pdecode | -0.80% | +0.27% | -84.7 | +13.6 | False / False |
+| rpc/width8_len3/dispatch | -2.19% | -0.86% | -11.6 | +11.5 | False / False |
+| array/width8_len896/decode | -1.79% | -1.59% | -15.6 | -164.5 | False / False |
+| array/width8_len896/unpack | +0.91% | -0.49% | +504.1 | -52.5 | False / False |
+| array/width8_len896/pdecode | +0.89% | +1.25% | -145.3 | +332.6 | False / False |
+| rpc/width8_len896/dispatch | -3.27% | +0.46% | -1674.9 | +109.0 | True / False |
+| shape/zero32/unpack | -3.52% | +1.36% | -2.8 | +0.7 | False / False |
+| shape/ascii32/unpack | +0.06% | +0.15% | +1.0 | -0.0 | False / False |
+| shape/zero4096/unpack | +0.42% | +0.16% | +19.7 | +30.3 | False / True |
+| shape/ascii4096/unpack | -1.30% | +0.10% | -28.6 | +5.0 | True / True |
+| shape/zero65536/unpack | -4.59% | -0.02% | -2078.8 | +381.7 | True / True |
+| shape/ascii65536/unpack | +1.24% | -0.27% | +26.1 | -1.2 | True / False |
+| shape/nonzero1x256/unpack | -4.97% | -4.88% | -176.0 | +75.2 | False / False |
+| shape/nonzero2x256/unpack | -3.86% | -3.76% | -81.9 | -50.1 | False / False |
+| shape/nonzero3x256/unpack | -0.73% | -2.84% | -10.5 | -51.1 | False / False |
+| shape/nonzero4x256/unpack | -16.03% | -3.56% | -1885.6 | +14.9 | False / False |
+| shape/nonzero5x256/unpack | +2.27% | -3.68% | +278.0 | -76.0 | False / False |
+| shape/nonzero6x256/unpack | -3.52% | -2.89% | -100.4 | -118.9 | False / False |
+| shape/nonzero7x256/unpack | -0.91% | -2.19% | -260.4 | -52.1 | False / False |
+| shape/FF512-sparse4096/unpack | +26.89% | +27.51% | +858.4 | +1208.9 | False / False |
+| shape/zeroRun8x64/unpack | +0.93% | +0.71% | -18.5 | +27.4 | False / False |
+| shape/zeroRun16x64/unpack | -0.23% | -0.74% | +32.0 | -1276.2 | False / True |
+| shape/zeroRun64x64/unpack | +3.48% | +0.67% | +392.7 | +199.0 | False / True |
+| shape/random4096/unpack | -3.45% | -0.44% | -81.6 | -6.4 | False / False |
+| control/game_large/encode | -11.21% | -0.07% | +3049.9 | -2.6 | True / True |
+| control/game_large/pencode | +1.81% | +0.66% | -173.3 | +38.3 | False / False |
