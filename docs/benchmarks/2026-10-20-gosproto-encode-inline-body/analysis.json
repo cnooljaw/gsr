@@ -1,0 +1,4078 @@
+{
+  "scope": "Independent paired/cumulative recalculation of fixed19 Encode per-case processes;retain all failed controls,outliers and allocation tails;no subtraction or minimum gain threshold",
+  "counts": {
+    "processes": 76,
+    "blocks": 7296,
+    "quartets": 1824,
+    "rounds": 456,
+    "snapshots": 304
+  },
+  "relativeTolerance": 1e-12,
+  "modes": {
+    "self": {
+      "controlAccepted": 13,
+      "sameAllocation": 18,
+      "initialLimiterNonzero": 0,
+      "anyLimiterChange": 0,
+      "largestSampledHeap": 4082640,
+      "unequalAllocations": [
+        "zeros4k/frame"
+      ],
+      "failedControls": [
+        "addressbook/sproto_encode",
+        "game_small/sproto_pencode",
+        "echo_ascii4k/sproto_encode",
+        "echo_ascii4k/sproto_pack",
+        "ascii32/frame",
+        "zeros4k/frame"
+      ]
+    },
+    "clone": {
+      "controlAccepted": 15,
+      "sameAllocation": 18,
+      "initialLimiterNonzero": 0,
+      "anyLimiterChange": 0,
+      "largestSampledHeap": 4053632,
+      "unequalAllocations": [
+        "zeros4k/frame"
+      ],
+      "failedControls": [
+        "game_large/sproto_pack",
+        "int32_edges/sproto_encode",
+        "echo_ascii4k/sproto_pencode",
+        "zeros4k/frame"
+      ]
+    },
+    "pass1": {
+      "controlAccepted": null,
+      "sameAllocation": 19,
+      "initialLimiterNonzero": 0,
+      "anyLimiterChange": 0,
+      "largestSampledHeap": 4101360,
+      "unequalAllocations": [],
+      "failedControls": null
+    },
+    "pass2": {
+      "controlAccepted": null,
+      "sameAllocation": 18,
+      "initialLimiterNonzero": 0,
+      "anyLimiterChange": 0,
+      "largestSampledHeap": 4059904,
+      "unequalAllocations": [
+        "zeros4k/frame"
+      ],
+      "failedControls": null
+    }
+  },
+  "results": [
+    {
+      "name": "addressbook/sproto_encode",
+      "self": {
+        "name": "addressbook/sproto_encode",
+        "medianRatio": 0.9912792500609517,
+        "ratioIQR": 0.04046090210755571,
+        "roundsWithin5Pct": 4,
+        "allocationMedian": {
+          "A": {
+            "bytes": 144.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 144.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": false,
+        "controlAccepted": false,
+        "roundRatios": [
+          0.8801059235961253,
+          0.9668916069978296,
+          0.9918022931107677,
+          1.0204907811080266,
+          0.9907562070111358,
+          1.1201074825706607
+        ],
+        "leftNsPerOp": 716.2030118728165,
+        "rightNsPerOp": 643.5501788938957,
+        "cumulativeDeltaNs": -72.65283297892086,
+        "cumulativeRatio": 0.8985583252590084,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 247552,
+        "largestSampledHeap": 2840392,
+        "initialScanHeap": 190392,
+        "blockGCMinMax": [
+          0,
+          2
+        ],
+        "zeroCompletedGCBlocks": 5,
+        "roundGeometricDeltaNs": [
+          -93.11365622094058,
+          -19.756820560786878,
+          -4.390721419562283,
+          10.332341751870501,
+          -4.8405917513536,
+          87.87583263476438
+        ],
+        "medianRoundGeometricDeltaNs": -4.615656585457941
+      },
+      "clone": {
+        "name": "addressbook/sproto_encode",
+        "medianRatio": 0.998876596894085,
+        "ratioIQR": 0.026944565200935244,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 144.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 144.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          1.0187516540047383,
+          0.9934996058653975,
+          1.0042535879227725,
+          1.0341507107669663,
+          0.9864102277559494,
+          0.985238708409985
+        ],
+        "leftNsPerOp": 537.240669652378,
+        "rightNsPerOp": 538.9569737683942,
+        "cumulativeDeltaNs": 1.7163041160162038,
+        "cumulativeRatio": 1.0031946652831156,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 247912,
+        "largestSampledHeap": 3735056,
+        "initialScanHeap": 190616,
+        "blockGCMinMax": [
+          0,
+          2
+        ],
+        "zeroCompletedGCBlocks": 10,
+        "roundGeometricDeltaNs": [
+          9.958950696086617,
+          -3.508801835885606,
+          2.290438824658281,
+          17.69961406664288,
+          -7.282342521421242,
+          -8.220096051766518
+        ],
+        "medianRoundGeometricDeltaNs": -0.6091815056136625
+      },
+      "pass1": {
+        "name": "addressbook/sproto_encode",
+        "medianRatio": 1.0037088809750725,
+        "ratioIQR": 0.007411198980276312,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 144.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 144.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          1.0799096536129098,
+          1.0036199199382971,
+          0.9936655863797796,
+          1.0037978420118479,
+          1.0055606502722765,
+          0.9957383589897583
+        ],
+        "leftNsPerOp": 545.1818541409148,
+        "rightNsPerOp": 563.9931355583025,
+        "cumulativeDeltaNs": 18.811281417387704,
+        "cumulativeRatio": 1.0345045992901398,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 247496,
+        "largestSampledHeap": 4041072,
+        "initialScanHeap": 190160,
+        "blockGCMinMax": [
+          0,
+          2
+        ],
+        "zeroCompletedGCBlocks": 6,
+        "roundGeometricDeltaNs": [
+          47.14163395429421,
+          1.9501556672844345,
+          -3.390477852729532,
+          2.114333694578818,
+          2.805643865389868,
+          -2.233624095553523
+        ],
+        "medianRoundGeometricDeltaNs": 2.032244680931626
+      },
+      "pass2": {
+        "name": "addressbook/sproto_encode",
+        "medianRatio": 0.9960885472205876,
+        "ratioIQR": 0.014423470788156978,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 144.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 144.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9655977335662739,
+          1.0007796431602194,
+          0.9973467259347589,
+          1.0049745369195568,
+          0.9823871345854576,
+          0.9948303685064163
+        ],
+        "leftNsPerOp": 480.81562224258465,
+        "rightNsPerOp": 473.7283818638431,
+        "cumulativeDeltaNs": -7.087240378741569,
+        "cumulativeRatio": 0.9852599623413112,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 247976,
+        "largestSampledHeap": 2904528,
+        "initialScanHeap": 190616,
+        "blockGCMinMax": [
+          0,
+          1
+        ],
+        "zeroCompletedGCBlocks": 73,
+        "roundGeometricDeltaNs": [
+          -17.901677521963904,
+          0.35456443484042666,
+          -1.2022852207125538,
+          2.2652303807582257,
+          -8.11259999794379,
+          -2.6316669485971147
+        ],
+        "medianRoundGeometricDeltaNs": -1.9169760846548343
+      }
+    },
+    {
+      "name": "addressbook/sproto_pack",
+      "self": {
+        "name": "addressbook/sproto_pack",
+        "medianRatio": 0.9991124213039055,
+        "ratioIQR": 0.013242371156323873,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 144.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 144.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          1.0126767401835428,
+          0.9871201234571869,
+          1.0008991245889622,
+          1.0035854828089144,
+          0.997325718018849,
+          0.9059173852991815
+        ],
+        "leftNsPerOp": 107.09657788087239,
+        "rightNsPerOp": 104.94677384951741,
+        "cumulativeDeltaNs": -2.149804031354975,
+        "cumulativeRatio": 0.9799264918273459,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 247168,
+        "largestSampledHeap": 3825912,
+        "initialScanHeap": 190032,
+        "blockGCMinMax": [
+          4,
+          5
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          1.342249972586643,
+          -1.3635929960276627,
+          0.09516257712834886,
+          0.37793749411332556,
+          -0.2784330595660265,
+          -10.61012855040822
+        ],
+        "medianRoundGeometricDeltaNs": -0.09163524121883881
+      },
+      "clone": {
+        "name": "addressbook/sproto_pack",
+        "medianRatio": 1.0068265979962232,
+        "ratioIQR": 0.021413895690024054,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 144.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 144.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          1.005757731866382,
+          0.9953623237401512,
+          1.0078954641260645,
+          1.0272513140912398,
+          0.9849752945696862,
+          1.0232016072402892
+        ],
+        "leftNsPerOp": 106.23296512156806,
+        "rightNsPerOp": 109.02097766149885,
+        "cumulativeDeltaNs": 2.78801253993079,
+        "cumulativeRatio": 1.0262443257301566,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 247136,
+        "largestSampledHeap": 2847976,
+        "initialScanHeap": 189896,
+        "blockGCMinMax": [
+          4,
+          5
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          0.5996027356960099,
+          -0.47162596043989424,
+          0.8257108182819337,
+          3.153620624592321,
+          -1.5190184813067162,
+          2.4007814699580337
+        ],
+        "medianRoundGeometricDeltaNs": 0.7126567769889718
+      },
+      "pass1": {
+        "name": "addressbook/sproto_pack",
+        "medianRatio": 1.0059983154832648,
+        "ratioIQR": 0.013441771295825689,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 144.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 144.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          1.0481914024042631,
+          1.0074616751518497,
+          1.0021684947363685,
+          1.00453495581468,
+          1.0191152833517465,
+          0.9652384813754761
+        ],
+        "leftNsPerOp": 104.86177055562608,
+        "rightNsPerOp": 105.62540113269293,
+        "cumulativeDeltaNs": 0.7636305770668486,
+        "cumulativeRatio": 1.0072822590446513,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 247984,
+        "largestSampledHeap": 2271528,
+        "initialScanHeap": 190656,
+        "blockGCMinMax": [
+          4,
+          5
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          5.023062857111952,
+          0.7792430339603129,
+          0.22792239647574775,
+          0.470099889105029,
+          2.0153497955867294,
+          -3.653299769747406
+        ],
+        "medianRoundGeometricDeltaNs": 0.624671461532671
+      },
+      "pass2": {
+        "name": "addressbook/sproto_pack",
+        "medianRatio": 0.9926065804156097,
+        "ratioIQR": 0.02264144171748328,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 144.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 144.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          1.0144335144367251,
+          1.014116177732612,
+          0.9948663924404424,
+          0.9903467683907768,
+          0.9854341301258559,
+          0.9087774221288011
+        ],
+        "leftNsPerOp": 100.3622199060441,
+        "rightNsPerOp": 97.89595280162838,
+        "cumulativeDeltaNs": -2.4662671044157207,
+        "cumulativeRatio": 0.9754263396452912,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 246960,
+        "largestSampledHeap": 3177400,
+        "initialScanHeap": 189744,
+        "blockGCMinMax": [
+          4,
+          5
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          1.3117607866521155,
+          1.3440580975054104,
+          -0.5387058721317004,
+          -0.9019774414482384,
+          -1.4978994338518419,
+          -9.945396644650089
+        ],
+        "medianRoundGeometricDeltaNs": -0.7203416567899694
+      }
+    },
+    {
+      "name": "addressbook/sproto_pencode",
+      "self": {
+        "name": "addressbook/sproto_pencode",
+        "medianRatio": 0.9905839583668653,
+        "ratioIQR": 0.016317473672350924,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 144.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 144.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          0.9853366953442488,
+          1.0090708932032284,
+          0.9955690385346057,
+          1.0037699401288898,
+          0.985598878199125,
+          0.9610154573039493
+        ],
+        "leftNsPerOp": 621.1978929440389,
+        "rightNsPerOp": 612.9417068126521,
+        "cumulativeDeltaNs": -8.256186131386812,
+        "cumulativeRatio": 0.9867092496205061,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 247680,
+        "largestSampledHeap": 3025192,
+        "initialScanHeap": 190544,
+        "blockGCMinMax": [
+          0,
+          1
+        ],
+        "zeroCompletedGCBlocks": 16,
+        "roundGeometricDeltaNs": [
+          -8.996422553924162,
+          5.480095910291311,
+          -2.7097297984536226,
+          2.2905643564752154,
+          -8.844858652191647,
+          -25.79562624618916
+        ],
+        "medianRoundGeometricDeltaNs": -5.777294225322635
+      },
+      "clone": {
+        "name": "addressbook/sproto_pencode",
+        "medianRatio": 1.0060582314094728,
+        "ratioIQR": 0.009795661318729776,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 144.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 144.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          0.9668319332867024,
+          1.005582691818057,
+          1.004848297374322,
+          1.0304035474322504,
+          1.0065337710008888,
+          1.0175921527383511
+        ],
+        "leftNsPerOp": 616.1327557849365,
+        "rightNsPerOp": 619.6589368761342,
+        "cumulativeDeltaNs": 3.5261810911977136,
+        "cumulativeRatio": 1.0057230865557625,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 247432,
+        "largestSampledHeap": 3217440,
+        "initialScanHeap": 190160,
+        "blockGCMinMax": [
+          0,
+          1
+        ],
+        "zeroCompletedGCBlocks": 13,
+        "roundGeometricDeltaNs": [
+          -20.312119451822014,
+          3.4444270358535505,
+          2.983175869856268,
+          18.637389598221716,
+          4.072788254559214,
+          10.809114900979921
+        ],
+        "medianRoundGeometricDeltaNs": 3.758607645206382
+      },
+      "pass1": {
+        "name": "addressbook/sproto_pencode",
+        "medianRatio": 0.999417190377281,
+        "ratioIQR": 0.0022740067857,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 144.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 144.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          1.0145489837093475,
+          0.9998407680082196,
+          0.9823617056051565,
+          0.9989936127463425,
+          1.0016774850751229,
+          0.9989278611148151
+        ],
+        "leftNsPerOp": 612.5904918990775,
+        "rightNsPerOp": 611.8318612493978,
+        "cumulativeDeltaNs": -0.7586306496797306,
+        "cumulativeRatio": 0.9987616023106596,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 247640,
+        "largestSampledHeap": 3445920,
+        "initialScanHeap": 190312,
+        "blockGCMinMax": [
+          0,
+          2
+        ],
+        "zeroCompletedGCBlocks": 10,
+        "roundGeometricDeltaNs": [
+          8.758729262350471,
+          -0.09801907632618168,
+          -10.884609109232656,
+          -0.6109395333264729,
+          1.0256323087103283,
+          -0.6640927624144979
+        ],
+        "medianRoundGeometricDeltaNs": -0.3544793048263273
+      },
+      "pass2": {
+        "name": "addressbook/sproto_pencode",
+        "medianRatio": 0.9789397238456643,
+        "ratioIQR": 0.01593231385842475,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 144.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 144.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9497998610083661,
+          0.9900250068251562,
+          0.9836261628119818,
+          0.9719062143248014,
+          0.9742532848793469,
+          1.0083785518305848
+        ],
+        "leftNsPerOp": 621.371710856306,
+        "rightNsPerOp": 604.2068448798202,
+        "cumulativeDeltaNs": -17.16486597648577,
+        "cumulativeRatio": 0.9723758489860586,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 247976,
+        "largestSampledHeap": 3951728,
+        "initialScanHeap": 190616,
+        "blockGCMinMax": [
+          0,
+          1
+        ],
+        "zeroCompletedGCBlocks": 18,
+        "roundGeometricDeltaNs": [
+          -31.076147994181724,
+          -5.7853493551725705,
+          -9.855198303372504,
+          -16.79597639995427,
+          -17.699694743944747,
+          5.0080284638142984
+        ],
+        "medianRoundGeometricDeltaNs": -13.325587351663387
+      }
+    },
+    {
+      "name": "game_small/sproto_encode",
+      "self": {
+        "name": "game_small/sproto_encode",
+        "medianRatio": 1.0048007844301305,
+        "ratioIQR": 0.01335344246779413,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 352.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 352.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          1.00860134286948,
+          0.9902158280185116,
+          1.0010002259907809,
+          0.9979478435580634,
+          1.0132187278888893,
+          1.1408103909831822
+        ],
+        "leftNsPerOp": 678.4395108553492,
+        "rightNsPerOp": 707.3938687985003,
+        "cumulativeDeltaNs": 28.95435794315108,
+        "cumulativeRatio": 1.042677876921771,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 247656,
+        "largestSampledHeap": 4058144,
+        "initialScanHeap": 190192,
+        "blockGCMinMax": [
+          1,
+          2
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          5.556727747956643,
+          -6.429243093756099,
+          0.6683972290044267,
+          -1.3716673297816442,
+          8.810912619742794,
+          102.56962338387677
+        ],
+        "medianRoundGeometricDeltaNs": 3.1125624884805347
+      },
+      "clone": {
+        "name": "game_small/sproto_encode",
+        "medianRatio": 1.0102614175505216,
+        "ratioIQR": 0.018697388090961775,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 352.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 352.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          1.0180912195770626,
+          0.9953890728753291,
+          1.0775043038484684,
+          0.9863627492013448,
+          1.0069198614211985,
+          1.0136029736798446
+        ],
+        "leftNsPerOp": 685.9178917483388,
+        "rightNsPerOp": 694.9568026757339,
+        "cumulativeDeltaNs": 9.038910927395136,
+        "cumulativeRatio": 1.0131778322684597,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 248704,
+        "largestSampledHeap": 2716040,
+        "initialScanHeap": 190824,
+        "blockGCMinMax": [
+          1,
+          2
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          12.083653807183168,
+          -3.066862701355035,
+          55.86505447092293,
+          -9.217052274799812,
+          4.605827726477855,
+          9.11361007049004
+        ],
+        "medianRoundGeometricDeltaNs": 6.859718898483948
+      },
+      "pass1": {
+        "name": "game_small/sproto_encode",
+        "medianRatio": 1.0049629242968254,
+        "ratioIQR": 0.023165391020103288,
+        "roundsWithin5Pct": 4,
+        "allocationMedian": {
+          "A": {
+            "bytes": 352.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 352.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.8625520543570321,
+          0.9753103907240043,
+          1.0050047113290161,
+          1.0049211372646347,
+          1.1852622147601521,
+          1.0061697207293483
+        ],
+        "leftNsPerOp": 802.8487058284852,
+        "rightNsPerOp": 834.3434079400992,
+        "cumulativeDeltaNs": 31.494702111613947,
+        "cumulativeRatio": 1.0392286888961395,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 248928,
+        "largestSampledHeap": 3930664,
+        "initialScanHeap": 190976,
+        "blockGCMinMax": [
+          1,
+          2
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -128.9761272159658,
+          -16.995980219071157,
+          3.3316891083093196,
+          3.2337823376632286,
+          143.64508417731815,
+          3.8675263705978296
+        ],
+        "medianRoundGeometricDeltaNs": 3.282735722986274
+      },
+      "pass2": {
+        "name": "game_small/sproto_encode",
+        "medianRatio": 0.9960212979956353,
+        "ratioIQR": 0.016183890802702994,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 352.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 352.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9832038807418539,
+          1.0270575616745345,
+          0.9979433551766791,
+          1.0094464888974708,
+          0.9940992408145914,
+          0.9891493392812294
+        ],
+        "leftNsPerOp": 636.5165968137255,
+        "rightNsPerOp": 636.8569252450981,
+        "cumulativeDeltaNs": 0.34032843137254076,
+        "cumulativeRatio": 1.0005346733032197,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 247904,
+        "largestSampledHeap": 2844696,
+        "initialScanHeap": 190064,
+        "blockGCMinMax": [
+          1,
+          3
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -10.23846448363463,
+          17.379180544269275,
+          -1.3604938934122401,
+          5.858949493265982,
+          -3.8490292913618305,
+          -6.82740548357458
+        ],
+        "medianRoundGeometricDeltaNs": -2.6047615923870353
+      }
+    },
+    {
+      "name": "game_small/sproto_pack",
+      "self": {
+        "name": "game_small/sproto_pack",
+        "medianRatio": 0.9941769804119263,
+        "ratioIQR": 0.006584116332283174,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 352.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 352.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          0.999114035852003,
+          0.9946764564853985,
+          0.9936775043384541,
+          1.016010919671119,
+          0.9906681981246069,
+          0.9875926507971329
+        ],
+        "leftNsPerOp": 223.8685726204845,
+        "rightNsPerOp": 223.15442982976842,
+        "cumulativeDeltaNs": -0.714142790716096,
+        "cumulativeRatio": 0.9968099908693895,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 247376,
+        "largestSampledHeap": 3516840,
+        "initialScanHeap": 190032,
+        "blockGCMinMax": [
+          5,
+          6
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -0.19889718435007353,
+          -1.177550943942208,
+          -1.401692309493086,
+          3.5636227124063566,
+          -2.11880319600499,
+          -2.7979740099419246
+        ],
+        "medianRoundGeometricDeltaNs": -1.289621626717647
+      },
+      "clone": {
+        "name": "game_small/sproto_pack",
+        "medianRatio": 0.996612242514407,
+        "ratioIQR": 0.009158445384579883,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 352.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 352.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          0.9916013269411005,
+          1.0031267744652665,
+          1.0108327889954587,
+          0.9955835230314962,
+          0.9976409619973178,
+          0.9896334893397641
+        ],
+        "leftNsPerOp": 217.18589971550497,
+        "rightNsPerOp": 216.70915817132922,
+        "cumulativeDeltaNs": -0.4767415441757521,
+        "cumulativeRatio": 0.9978049148457601,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 247808,
+        "largestSampledHeap": 3554584,
+        "initialScanHeap": 190200,
+        "blockGCMinMax": [
+          5,
+          6
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -1.882312859263152,
+          0.6846674997500202,
+          2.2714740653345586,
+          -0.9262909923556606,
+          -0.5093773662565582,
+          -2.3188398454986725
+        ],
+        "medianRoundGeometricDeltaNs": -0.7178341793061094
+      },
+      "pass1": {
+        "name": "game_small/sproto_pack",
+        "medianRatio": 0.9961888930385728,
+        "ratioIQR": 0.006760288207645071,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 352.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 352.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9950670876646532,
+          1.012296300172502,
+          1.0007179914571445,
+          0.9973106984124924,
+          0.9924521440962307,
+          0.9799846662200116
+        ],
+        "leftNsPerOp": 224.06320741527793,
+        "rightNsPerOp": 223.19911316780374,
+        "cumulativeDeltaNs": -0.8640942474741848,
+        "cumulativeRatio": 0.9961435245998569,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 247920,
+        "largestSampledHeap": 4066584,
+        "initialScanHeap": 190200,
+        "blockGCMinMax": [
+          5,
+          6
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -1.1030348338076976,
+          2.7073501641678206,
+          0.16053130604385046,
+          -0.6000574400143535,
+          -1.6922088208487764,
+          -4.589111937657265
+        ],
+        "medianRoundGeometricDeltaNs": -0.8515461369110255
+      },
+      "pass2": {
+        "name": "game_small/sproto_pack",
+        "medianRatio": 0.9948394093068951,
+        "ratioIQR": 0.008385223436312761,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 352.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 352.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9960693828306104,
+          0.9936094357831796,
+          1.00264787814204,
+          0.9700939769103513,
+          1.0246002614762955,
+          0.9922875625761001
+        ],
+        "leftNsPerOp": 229.2278822384048,
+        "rightNsPerOp": 228.36620399326884,
+        "cumulativeDeltaNs": -0.8616782451359484,
+        "cumulativeRatio": 0.9962409536016227,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 247328,
+        "largestSampledHeap": 3709768,
+        "initialScanHeap": 189744,
+        "blockGCMinMax": [
+          5,
+          6
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -0.8610109467408904,
+          -1.3860765362786083,
+          0.5746928745315927,
+          -6.47285191065896,
+          6.41844971503275,
+          -1.6214605759776646
+        ],
+        "medianRoundGeometricDeltaNs": -1.1235437415097493
+      }
+    },
+    {
+      "name": "game_small/sproto_pencode",
+      "self": {
+        "name": "game_small/sproto_pencode",
+        "medianRatio": 1.0022845977229338,
+        "ratioIQR": 0.011669656239586823,
+        "roundsWithin5Pct": 4,
+        "allocationMedian": {
+          "A": {
+            "bytes": 352.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 352.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": false,
+        "controlAccepted": false,
+        "roundRatios": [
+          0.9973732756498775,
+          1.0076904823964254,
+          0.9388286611300137,
+          0.9954051554590138,
+          1.126191958682552,
+          1.00719591979599
+        ],
+        "leftNsPerOp": 838.2963545843357,
+        "rightNsPerOp": 876.3691242314889,
+        "cumulativeDeltaNs": 38.07276964715311,
+        "cumulativeRatio": 1.0454168378986108,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 248032,
+        "largestSampledHeap": 4018840,
+        "initialScanHeap": 190496,
+        "blockGCMinMax": [
+          1,
+          2
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -2.164685322528044,
+          6.11884148581737,
+          -53.77357469139622,
+          -3.7149002956158483,
+          110.46401500218133,
+          5.94657765949853
+        ],
+        "medianRoundGeometricDeltaNs": 1.890946168485243
+      },
+      "clone": {
+        "name": "game_small/sproto_pencode",
+        "medianRatio": 0.9928851568124235,
+        "ratioIQR": 0.020839536842826134,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 352.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 352.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          0.9914651070606076,
+          0.9943052065642393,
+          1.3272712864387073,
+          0.9517142874612781,
+          0.9816073536466854,
+          1.0084467029359097
+        ],
+        "leftNsPerOp": 832.2808697686856,
+        "rightNsPerOp": 901.0120704639658,
+        "cumulativeDeltaNs": 68.73120069528011,
+        "cumulativeRatio": 1.0825817379587044,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 249128,
+        "largestSampledHeap": 4053632,
+        "initialScanHeap": 191128,
+        "blockGCMinMax": [
+          1,
+          2
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -7.064355829395254,
+          -4.696401651194492,
+          266.8921047850274,
+          -43.79230227106382,
+          -15.098704769718438,
+          6.622378165543978
+        ],
+        "medianRoundGeometricDeltaNs": -5.880378740294873
+      },
+      "pass1": {
+        "name": "game_small/sproto_pencode",
+        "medianRatio": 0.97967423984029,
+        "ratioIQR": 0.030462893245368217,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 352.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 352.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9948967908449605,
+          1.0209306653762225,
+          0.9799762098719057,
+          0.9196447190383985,
+          0.9793722698086744,
+          0.9544809132055466
+        ],
+        "leftNsPerOp": 890.2095416991933,
+        "rightNsPerOp": 866.0295488550612,
+        "cumulativeDeltaNs": -24.17999284413213,
+        "cumulativeRatio": 0.9728378637708394,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 248552,
+        "largestSampledHeap": 3371664,
+        "initialScanHeap": 190672,
+        "blockGCMinMax": [
+          1,
+          2
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -4.197546203766365,
+          17.153951772336654,
+          -16.371305617448797,
+          -85.41256862258695,
+          -17.157213877322533,
+          -39.47551474071156
+        ],
+        "medianRoundGeometricDeltaNs": -16.764259747385665
+      },
+      "pass2": {
+        "name": "game_small/sproto_pencode",
+        "medianRatio": 1.0064192317832439,
+        "ratioIQR": 0.013264176539775296,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 352.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 352.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          1.0904972100962265,
+          0.9947054880098463,
+          1.0030083276333817,
+          1.009830135933106,
+          0.9807734323178005,
+          1.0101171206296384
+        ],
+        "leftNsPerOp": 811.6151585684222,
+        "rightNsPerOp": 830.1586500039958,
+        "cumulativeDeltaNs": 18.543491435573628,
+        "cumulativeRatio": 1.0228476405840938,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 248280,
+        "largestSampledHeap": 3477264,
+        "initialScanHeap": 190368,
+        "blockGCMinMax": [
+          1,
+          2
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          73.2871041100849,
+          -4.3760328703546065,
+          2.493446463162968,
+          7.624419669494955,
+          -15.68920886114472,
+          8.124143011448496
+        ],
+        "medianRoundGeometricDeltaNs": 5.058933066328962
+      }
+    },
+    {
+      "name": "game_large/sproto_encode",
+      "self": {
+        "name": "game_large/sproto_encode",
+        "medianRatio": 0.9943226967518036,
+        "ratioIQR": 0.009186328047434467,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 3968.0,
+            "mallocs": 2.0
+          },
+          "B": {
+            "bytes": 3968.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          0.8963543224012741,
+          0.9913938856473539,
+          1.0205187791040098,
+          0.9884384816528015,
+          0.9972515078562534,
+          0.9987343783130809
+        ],
+        "leftNsPerOp": 5514.440729384133,
+        "rightNsPerOp": 5359.178844815588,
+        "cumulativeDeltaNs": -155.2618845685456,
+        "cumulativeRatio": 0.971844491184533,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 257320,
+        "largestSampledHeap": 2421776,
+        "initialScanHeap": 194616,
+        "blockGCMinMax": [
+          2,
+          3
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -626.8621052284097,
+          -46.278026676768604,
+          108.56252889895677,
+          -62.76565300092352,
+          -14.638737055342972,
+          -6.736359028735933
+        ],
+        "medianRoundGeometricDeltaNs": -30.458381866055788
+      },
+      "clone": {
+        "name": "game_large/sproto_encode",
+        "medianRatio": 1.0065527861886232,
+        "ratioIQR": 0.020876252802748296,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 3968.0,
+            "mallocs": 2.0
+          },
+          "B": {
+            "bytes": 3968.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          1.0082270975939418,
+          1.179734326468753,
+          0.9825651831957,
+          1.009283979329152,
+          1.0048784747833044,
+          0.9653077410123829
+        ],
+        "leftNsPerOp": 5364.171005631199,
+        "rightNsPerOp": 5538.2154143553535,
+        "cumulativeDeltaNs": 174.0444087241549,
+        "cumulativeRatio": 1.0324457234009592,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 266880,
+        "largestSampledHeap": 3343864,
+        "initialScanHeap": 198456,
+        "blockGCMinMax": [
+          2,
+          3
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          40.35454729405137,
+          940.8717060136678,
+          -97.38687817285154,
+          46.59665181603668,
+          27.317617347231135,
+          -194.09352472878527
+        ],
+        "medianRoundGeometricDeltaNs": 33.83608232064125
+      },
+      "pass1": {
+        "name": "game_large/sproto_encode",
+        "medianRatio": 0.9964062402352866,
+        "ratioIQR": 0.06571626099130667,
+        "roundsWithin5Pct": 3,
+        "allocationMedian": {
+          "A": {
+            "bytes": 3968.0,
+            "mallocs": 2.0
+          },
+          "B": {
+            "bytes": 3968.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9918201894249152,
+          1.000992291045658,
+          0.9220127962805926,
+          1.0591739168543999,
+          0.9746096027395718,
+          1.159588695908497
+        ],
+        "leftNsPerOp": 5668.141475340136,
+        "rightNsPerOp": 5883.085140306122,
+        "cumulativeDeltaNs": 214.9436649659865,
+        "cumulativeRatio": 1.0379213655659658,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 267152,
+        "largestSampledHeap": 3718184,
+        "initialScanHeap": 198760,
+        "blockGCMinMax": [
+          2,
+          3
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -45.6794325606661,
+          5.285215543065533,
+          -465.25073028600855,
+          322.1461419819989,
+          -147.0889010333376,
+          928.2432245169748
+        ],
+        "medianRoundGeometricDeltaNs": -20.197108508800284
+      },
+      "pass2": {
+        "name": "game_large/sproto_encode",
+        "medianRatio": 0.9863871196467915,
+        "ratioIQR": 0.007462256953750135,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 3968.0,
+            "mallocs": 2.0
+          },
+          "B": {
+            "bytes": 3968.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          1.040120119854654,
+          0.9866999004392795,
+          0.9939197430280122,
+          0.9440863992378781,
+          0.9860743388543034,
+          0.9841785876180039
+        ],
+        "leftNsPerOp": 5601.368628747796,
+        "rightNsPerOp": 5544.31860670194,
+        "cumulativeDeltaNs": -57.05002204585617,
+        "cumulativeRatio": 0.9898149852603774,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 267424,
+        "largestSampledHeap": 3813688,
+        "initialScanHeap": 198912,
+        "blockGCMinMax": [
+          2,
+          3
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          211.06319745800465,
+          -71.33996973218291,
+          -30.575392782893687,
+          -367.35084309450394,
+          -75.86517398826345,
+          -85.29836724427423
+        ],
+        "medianRoundGeometricDeltaNs": -73.60257186022318
+      }
+    },
+    {
+      "name": "game_large/sproto_pack",
+      "self": {
+        "name": "game_large/sproto_pack",
+        "medianRatio": 1.0154561703667857,
+        "ratioIQR": 0.028775473696876608,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 3456.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 3456.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          1.0241295893221698,
+          1.0287412879429454,
+          0.9961562689840328,
+          1.0949392262263329,
+          0.9910432709957385,
+          1.0067827514114016
+        ],
+        "leftNsPerOp": 2019.188334102091,
+        "rightNsPerOp": 2123.1580450492006,
+        "cumulativeDeltaNs": 103.96971094710966,
+        "cumulativeRatio": 1.0514908437173314,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 250848,
+        "largestSampledHeap": 3229704,
+        "initialScanHeap": 190488,
+        "blockGCMinMax": [
+          6,
+          7
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          46.157504523818716,
+          56.40550492754551,
+          -7.634349204505497,
+          210.58545134054475,
+          -17.747557877934696,
+          13.347458001899213
+        ],
+        "medianRoundGeometricDeltaNs": 29.752481262858964
+      },
+      "clone": {
+        "name": "game_large/sproto_pack",
+        "medianRatio": 1.0158485241955786,
+        "ratioIQR": 0.06032317022553113,
+        "roundsWithin5Pct": 3,
+        "allocationMedian": {
+          "A": {
+            "bytes": 3456.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 3456.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": false,
+        "controlAccepted": false,
+        "roundRatios": [
+          1.0643642164946494,
+          1.1192398666927579,
+          1.022604822352658,
+          0.8775375291849417,
+          1.0090922260384991,
+          0.9884375216319943
+        ],
+        "leftNsPerOp": 2426.1004670377083,
+        "rightNsPerOp": 2894.448668996462,
+        "cumulativeDeltaNs": 468.34820195875363,
+        "cumulativeRatio": 1.1930456748687788,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 253424,
+        "largestSampledHeap": 4002968,
+        "initialScanHeap": 189592,
+        "blockGCMinMax": [
+          4,
+          5
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          123.789682428486,
+          327.2487007096761,
+          46.57265192557861,
+          -321.36281717838983,
+          17.858416626728285,
+          -22.711423468762632
+        ],
+        "medianRoundGeometricDeltaNs": 32.21553427615345
+      },
+      "pass1": {
+        "name": "game_large/sproto_pack",
+        "medianRatio": 0.9883840826397488,
+        "ratioIQR": 0.013748597969727383,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 3456.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 3456.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9809193689291675,
+          0.9896514036588593,
+          0.8438053973182358,
+          0.9984059522093969,
+          0.9871167616206382,
+          1.0161447232634369
+        ],
+        "leftNsPerOp": 2324.804432659596,
+        "rightNsPerOp": 2237.447506003602,
+        "cumulativeDeltaNs": -87.3569266559939,
+        "cumulativeRatio": 0.9624239676125975,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 253856,
+        "largestSampledHeap": 3350216,
+        "initialScanHeap": 190048,
+        "blockGCMinMax": [
+          5,
+          6
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -50.021831851899606,
+          -21.87121473933439,
+          -433.94915193495126,
+          -3.1741666609236745,
+          -26.493458865101047,
+          32.24628006745775
+        ],
+        "medianRoundGeometricDeltaNs": -24.18233680221772
+      },
+      "pass2": {
+        "name": "game_large/sproto_pack",
+        "medianRatio": 1.0022411787134615,
+        "ratioIQR": 0.017578210051394816,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 3456.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 3456.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          1.0000511172248052,
+          1.010773471105263,
+          0.9825158587488138,
+          0.9501046899611567,
+          1.004493431158236,
+          1.004431240202118
+        ],
+        "leftNsPerOp": 2052.5538538195124,
+        "rightNsPerOp": 2007.4131052734758,
+        "cumulativeDeltaNs": -45.14074854603655,
+        "cumulativeRatio": 0.9780075205032813,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 254176,
+        "largestSampledHeap": 4035304,
+        "initialScanHeap": 190200,
+        "blockGCMinMax": [
+          5,
+          6
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          0.10012243775372554,
+          20.994892492496547,
+          -32.61067712997351,
+          -112.75672697620621,
+          9.148529118440365,
+          8.656588843757163
+        ],
+        "medianRoundGeometricDeltaNs": 4.378355640755444
+      }
+    },
+    {
+      "name": "game_large/sproto_pencode",
+      "self": {
+        "name": "game_large/sproto_pencode",
+        "medianRatio": 0.9927300817898126,
+        "ratioIQR": 0.01798097081514549,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 3968.0,
+            "mallocs": 2.0
+          },
+          "B": {
+            "bytes": 3968.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          0.9788669893324177,
+          0.9917904735484524,
+          0.9936696900311727,
+          0.9779092134442388,
+          1.002215211591705,
+          1.1093843621937731
+        ],
+        "leftNsPerOp": 7054.749588442325,
+        "rightNsPerOp": 7263.447703792007,
+        "cumulativeDeltaNs": 208.69811534968176,
+        "cumulativeRatio": 1.0295826397143264,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 256832,
+        "largestSampledHeap": 3447464,
+        "initialScanHeap": 194160,
+        "blockGCMinMax": [
+          1,
+          2
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -144.68311968200396,
+          -56.32947668987072,
+          -43.06737669062295,
+          -153.8381464810809,
+          15.020173238451207,
+          859.5226973854587
+        ],
+        "medianRoundGeometricDeltaNs": -49.69842669024683
+      },
+      "clone": {
+        "name": "game_large/sproto_pencode",
+        "medianRatio": 1.0020557230945855,
+        "ratioIQR": 0.013402458248274685,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 3968.0,
+            "mallocs": 2.0
+          },
+          "B": {
+            "bytes": 3968.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          0.9905521326625459,
+          0.987941716889761,
+          1.0081457364208435,
+          1.0016412122354823,
+          1.022120689335861,
+          1.0024702339536886
+        ],
+        "leftNsPerOp": 6808.607063279857,
+        "rightNsPerOp": 6821.48749442959,
+        "cumulativeDeltaNs": 12.88043114973243,
+        "cumulativeRatio": 1.001891786532843,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 267800,
+        "largestSampledHeap": 3546880,
+        "initialScanHeap": 199216,
+        "blockGCMinMax": [
+          1,
+          3
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -65.35932137233704,
+          -84.05533240966543,
+          55.8493206813564,
+          11.262993192692193,
+          147.60214011730295,
+          16.180541547185385
+        ],
+        "medianRoundGeometricDeltaNs": 13.721767369938789
+      },
+      "pass1": {
+        "name": "game_large/sproto_pencode",
+        "medianRatio": 1.0223254909173636,
+        "ratioIQR": 0.023178202648297397,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 3968.0,
+            "mallocs": 2.0
+          },
+          "B": {
+            "bytes": 3968.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          1.0116323225252595,
+          1.0461420924373366,
+          1.0356861830873711,
+          1.012049876463936,
+          1.032601105370791,
+          0.9779160861443615
+        ],
+        "leftNsPerOp": 6856.5108014135885,
+        "rightNsPerOp": 6995.147315321477,
+        "cumulativeDeltaNs": 138.6365139078889,
+        "cumulativeRatio": 1.0202196886905373,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 267208,
+        "largestSampledHeap": 4006032,
+        "initialScanHeap": 198760,
+        "blockGCMinMax": [
+          1,
+          2
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          79.5264643226974,
+          310.19862048440336,
+          253.84924438400412,
+          82.35881781094213,
+          220.59164899064854,
+          -151.3518304003719
+        ],
+        "medianRoundGeometricDeltaNs": 151.47523340079533
+      },
+      "pass2": {
+        "name": "game_large/sproto_pencode",
+        "medianRatio": 0.9932701317302225,
+        "ratioIQR": 0.009476982141926826,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 3968.0,
+            "mallocs": 2.0
+          },
+          "B": {
+            "bytes": 3968.0,
+            "mallocs": 2.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.993461351139372,
+          0.993078912321073,
+          0.9575030680397375,
+          1.0409974484948201,
+          0.9990234231234869,
+          0.9865149265403508
+        ],
+        "leftNsPerOp": 7067.760313786008,
+        "rightNsPerOp": 6974.417502572016,
+        "cumulativeDeltaNs": -93.34281121399181,
+        "cumulativeRatio": 0.9867931555302006,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 267624,
+        "largestSampledHeap": 2392976,
+        "initialScanHeap": 199064,
+        "blockGCMinMax": [
+          2,
+          3
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -42.12777979288421,
+          -47.4339211459328,
+          -362.9749465638779,
+          271.0290642534601,
+          -6.242216808253943,
+          -91.59766623053383
+        ],
+        "medianRoundGeometricDeltaNs": -44.780850469408506
+      }
+    },
+    {
+      "name": "int32_edges/sproto_encode",
+      "self": {
+        "name": "int32_edges/sproto_encode",
+        "medianRatio": 1.0024354339247232,
+        "ratioIQR": 0.015831451635182958,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 4096.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 4096.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          0.9862514145828075,
+          1.0164357043827525,
+          1.1805635193152237,
+          0.9978104971094569,
+          0.9987103415643009,
+          1.0061605262851454
+        ],
+        "leftNsPerOp": 1636.0634465087348,
+        "rightNsPerOp": 1756.3240000811293,
+        "cumulativeDeltaNs": 120.26055357239443,
+        "cumulativeRatio": 1.073506045153092,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 256536,
+        "largestSampledHeap": 2909248,
+        "initialScanHeap": 189440,
+        "blockGCMinMax": [
+          8,
+          9
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -22.36602986769458,
+          27.940924238247135,
+          302.90153738892263,
+          -3.5136036111750855,
+          -2.0815193466896744,
+          9.664161680611869
+        ],
+        "medianRoundGeometricDeltaNs": 3.7913211669610973
+      },
+      "clone": {
+        "name": "int32_edges/sproto_encode",
+        "medianRatio": 1.0052003131636673,
+        "ratioIQR": 0.014112964574310993,
+        "roundsWithin5Pct": 4,
+        "allocationMedian": {
+          "A": {
+            "bytes": 4096.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 4096.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": false,
+        "controlAccepted": false,
+        "roundRatios": [
+          1.0140265105105577,
+          0.9218170406219511,
+          1.0034843368952535,
+          1.1496343007469643,
+          1.0069162894320813,
+          0.9963532085904191
+        ],
+        "leftNsPerOp": 1711.5778618174015,
+        "rightNsPerOp": 1751.3263967117261,
+        "cumulativeDeltaNs": 39.74853489432462,
+        "cumulativeRatio": 1.0232233284742995,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 267624,
+        "largestSampledHeap": 3666944,
+        "initialScanHeap": 190232,
+        "blockGCMinMax": [
+          5,
+          9
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          23.125894533026212,
+          -152.6424965885883,
+          5.694303874043726,
+          244.85339813928158,
+          11.258596361305536,
+          -5.90611691506092
+        ],
+        "medianRoundGeometricDeltaNs": 8.47645011767463
+      },
+      "pass1": {
+        "name": "int32_edges/sproto_encode",
+        "medianRatio": 0.9996443721200435,
+        "ratioIQR": 0.05880628449623715,
+        "roundsWithin5Pct": 4,
+        "allocationMedian": {
+          "A": {
+            "bytes": 4096.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 4096.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9892645591160243,
+          1.0672621472257997,
+          1.2797664886912299,
+          0.9932576261336652,
+          0.9931115985550689,
+          1.0060311181064219
+        ],
+        "leftNsPerOp": 1622.8613584755965,
+        "rightNsPerOp": 1771.3554114685926,
+        "cumulativeDeltaNs": 148.4940529929961,
+        "cumulativeRatio": 1.091501379472416,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 267096,
+        "largestSampledHeap": 4006384,
+        "initialScanHeap": 189624,
+        "blockGCMinMax": [
+          8,
+          9
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -17.51148938430947,
+          109.65474546303449,
+          452.1919207588437,
+          -11.03876477603194,
+          -11.08699111719693,
+          9.708954441579408
+        ],
+        "medianRoundGeometricDeltaNs": -0.6649051672262658
+      },
+      "pass2": {
+        "name": "int32_edges/sproto_encode",
+        "medianRatio": 0.9962925439382824,
+        "ratioIQR": 0.010131917542621549,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 4096.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 4096.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9959766759897206,
+          1.0059237704865767,
+          1.0172747550936292,
+          0.9966084118868441,
+          0.9868655288116032,
+          0.9926251257287888
+        ],
+        "leftNsPerOp": 1584.2128753051788,
+        "rightNsPerOp": 1582.890323879279,
+        "cumulativeDeltaNs": -1.3225514258997464,
+        "cumulativeRatio": 0.9991651681118644,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 267368,
+        "largestSampledHeap": 4059904,
+        "initialScanHeap": 189928,
+        "blockGCMinMax": [
+          8,
+          9
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -6.39484417948529,
+          9.364452971767378,
+          26.819387484848676,
+          -5.383279402903554,
+          -20.549071801223363,
+          -11.970158708800682
+        ],
+        "medianRoundGeometricDeltaNs": -5.889061791194422
+      }
+    },
+    {
+      "name": "int32_edges/sproto_pack",
+      "self": {
+        "name": "int32_edges/sproto_pack",
+        "medianRatio": 1.00579264842602,
+        "ratioIQR": 0.005908724400620402,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 4096.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 4096.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          1.0095102762759272,
+          1.0039975114638053,
+          1.0075877853882347,
+          1.0014812670492004,
+          1.010566071356601,
+          1.0028287350499097
+        ],
+        "leftNsPerOp": 1912.7809535029846,
+        "rightNsPerOp": 1924.0872918630223,
+        "cumulativeDeltaNs": 11.306338360037671,
+        "cumulativeRatio": 1.0059109425673294,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 251056,
+        "largestSampledHeap": 3407576,
+        "initialScanHeap": 190032,
+        "blockGCMinMax": [
+          7,
+          8
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          18.149470628328572,
+          7.592033650393432,
+          14.39079277888095,
+          2.84543375331873,
+          20.241344166803856,
+          5.468307235975999
+        ],
+        "medianRoundGeometricDeltaNs": 10.991413214637191
+      },
+      "clone": {
+        "name": "int32_edges/sproto_pack",
+        "medianRatio": 0.9964093310794409,
+        "ratioIQR": 0.015271237649239877,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 4096.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 4096.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          0.978273679440617,
+          1.0025940384948868,
+          0.9974494493025883,
+          0.9829258004446653,
+          1.0061205973732454,
+          0.9953692128562934
+        ],
+        "leftNsPerOp": 1972.751481981982,
+        "rightNsPerOp": 1958.9316666666666,
+        "cumulativeDeltaNs": -13.819815315315282,
+        "cumulativeRatio": 0.9929946496345141,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 255088,
+        "largestSampledHeap": 3514984,
+        "initialScanHeap": 189896,
+        "blockGCMinMax": [
+          6,
+          7
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -45.480039133359924,
+          5.041460481460035,
+          -4.916870472450682,
+          -33.347862086121495,
+          11.772585140303363,
+          -9.151578971001527
+        ],
+        "medianRoundGeometricDeltaNs": -7.034224721726105
+      },
+      "pass1": {
+        "name": "int32_edges/sproto_pack",
+        "medianRatio": 0.9982946017181947,
+        "ratioIQR": 0.01415630608597973,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 4096.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 4096.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9732886932135058,
+          0.9895620320016065,
+          1.0029567640329544,
+          1.0261731004795465,
+          1.005328998573073,
+          0.993632439403435
+        ],
+        "leftNsPerOp": 1940.1967181292885,
+        "rightNsPerOp": 1936.788610509209,
+        "cumulativeDeltaNs": -3.408107620079363,
+        "cumulativeRatio": 0.9982434216137808,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 255248,
+        "largestSampledHeap": 3891000,
+        "initialScanHeap": 190048,
+        "blockGCMinMax": [
+          6,
+          7
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -54.29292070422548,
+          -19.949729391532628,
+          5.7252091451262,
+          49.85177208154528,
+          10.206639175872624,
+          -12.326923927015969
+        ],
+        "medianRoundGeometricDeltaNs": -3.300857390944884
+      },
+      "pass2": {
+        "name": "int32_edges/sproto_pack",
+        "medianRatio": 1.0205352487447832,
+        "ratioIQR": 0.036476443245619494,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 4096.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 4096.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          1.0443383606765584,
+          1.012161271705417,
+          0.999078041386819,
+          1.0289092257841497,
+          0.987882774585139,
+          1.0421306476880672
+        ],
+        "leftNsPerOp": 1877.3043509754684,
+        "rightNsPerOp": 1914.6872665958406,
+        "cumulativeDeltaNs": 37.38291562037216,
+        "cumulativeRatio": 1.01991308207481,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 255072,
+        "largestSampledHeap": 3236280,
+        "initialScanHeap": 189896,
+        "blockGCMinMax": [
+          7,
+          8
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          78.1429571642318,
+          20.651235978398518,
+          -2.030283002860415,
+          51.64054660638135,
+          -22.447417046864302,
+          75.86899430064909
+        ],
+        "medianRoundGeometricDeltaNs": 36.14589129238993
+      }
+    },
+    {
+      "name": "int32_edges/sproto_pencode",
+      "self": {
+        "name": "int32_edges/sproto_pencode",
+        "medianRatio": 0.9998388705563259,
+        "ratioIQR": 0.007558539632537942,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 4096.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 4096.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          0.9997894956633884,
+          1.0585834588503067,
+          0.9998882454492634,
+          1.005040179333876,
+          0.9871644306732326,
+          0.9949950430857835
+        ],
+        "leftNsPerOp": 3230.1468814699792,
+        "rightNsPerOp": 3357.009155020704,
+        "cumulativeDeltaNs": 126.8622735507247,
+        "cumulativeRatio": 1.0392744597090866,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 257336,
+        "largestSampledHeap": 4082640,
+        "initialScanHeap": 190048,
+        "blockGCMinMax": [
+          4,
+          5
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -0.652538916393496,
+          208.22967345574762,
+          -0.3525803923826061,
+          15.663996659196528,
+          -40.26769084487205,
+          -15.396954365548936
+        ],
+        "medianRoundGeometricDeltaNs": -0.5025596543880511
+      },
+      "clone": {
+        "name": "int32_edges/sproto_pencode",
+        "medianRatio": 1.0089840061174549,
+        "ratioIQR": 0.01295450292050937,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 4096.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 4096.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          1.0038419801691352,
+          0.9146122272804403,
+          1.0020207329680677,
+          1.0158653862298672,
+          1.023549713685094,
+          1.0141260320657743
+        ],
+        "leftNsPerOp": 3314.7953086324255,
+        "rightNsPerOp": 3228.9117935231025,
+        "cumulativeDeltaNs": -85.88351510932307,
+        "cumulativeRatio": 0.9740908541514873,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 266872,
+        "largestSampledHeap": 3133536,
+        "initialScanHeap": 189472,
+        "blockGCMinMax": [
+          4,
+          5
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          11.940178502437902,
+          -335.44010707829875,
+          6.304342392963463,
+          48.75332175359563,
+          70.92461024026579,
+          40.79517302592376
+        ],
+        "medianRoundGeometricDeltaNs": 26.36767576418083
+      },
+      "pass1": {
+        "name": "int32_edges/sproto_pencode",
+        "medianRatio": 1.0084141354657445,
+        "ratioIQR": 0.01990628355049906,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 4096.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 4096.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          1.0167342315632706,
+          0.9940379870799344,
+          1.3716291527673736,
+          0.9837922002858371,
+          1.0141823358417386,
+          1.0026459350897508
+        ],
+        "leftNsPerOp": 3114.403302518757,
+        "rightNsPerOp": 3485.682100750268,
+        "cumulativeDeltaNs": 371.27879823151125,
+        "cumulativeRatio": 1.119213461510024,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 268040,
+        "largestSampledHeap": 4101360,
+        "initialScanHeap": 190536,
+        "blockGCMinMax": [
+          4,
+          5
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          51.81314076145554,
+          -18.689666756615225,
+          1138.3876605705768,
+          -51.00789468198127,
+          44.146963641742786,
+          8.257755961026305
+        ],
+        "medianRoundGeometricDeltaNs": 26.202359801384546
+      },
+      "pass2": {
+        "name": "int32_edges/sproto_pencode",
+        "medianRatio": 1.0000321657526872,
+        "ratioIQR": 0.021080874813907302,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 4096.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 4096.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.985940580127817,
+          0.9965618496216686,
+          0.9907767721028589,
+          1.0165710611007228,
+          1.0886434099190878,
+          1.003502481883706
+        ],
+        "leftNsPerOp": 3002.3515758627627,
+        "rightNsPerOp": 3074.0962810644933,
+        "cumulativeDeltaNs": 71.74470520173054,
+        "cumulativeRatio": 1.0238961705146452,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 267464,
+        "largestSampledHeap": 3583728,
+        "initialScanHeap": 190080,
+        "blockGCMinMax": [
+          4,
+          5
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -43.38048446718267,
+          -10.632799898179655,
+          -25.4935916397626,
+          49.170252820870246,
+          277.75859710235454,
+          10.366578625368675
+        ],
+        "medianRoundGeometricDeltaNs": -0.13311063640549037
+      }
+    },
+    {
+      "name": "echo_ascii4k/sproto_encode",
+      "self": {
+        "name": "echo_ascii4k/sproto_encode",
+        "medianRatio": 0.997352847768778,
+        "ratioIQR": 0.03024973303587908,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 4864.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 4864.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": false,
+        "controlAccepted": false,
+        "roundRatios": [
+          0.9928215061028753,
+          1.0134405908533402,
+          1.0063914793464295,
+          0.9015280976000357,
+          0.9690793964091924,
+          1.0018841894346806
+        ],
+        "leftNsPerOp": 634.471770680372,
+        "rightNsPerOp": 613.4305702398434,
+        "cumulativeDeltaNs": -21.04120044052854,
+        "cumulativeRatio": 0.9668366641151502,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 250776,
+        "largestSampledHeap": 2949760,
+        "initialScanHeap": 189752,
+        "blockGCMinMax": [
+          26,
+          28
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -4.3285745802922975,
+          8.213568969877883,
+          3.823993845796622,
+          -67.09600663826438,
+          -20.092688800007522,
+          1.1527333154172084
+        ],
+        "medianRoundGeometricDeltaNs": -1.5879206324375446
+      },
+      "clone": {
+        "name": "echo_ascii4k/sproto_encode",
+        "medianRatio": 1.0023474542814244,
+        "ratioIQR": 0.010685750139708072,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 4864.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 4864.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          0.996190612966774,
+          0.9976545188375997,
+          1.0070403897252491,
+          1.0073096561905017,
+          0.9937867080899736,
+          1.011583562030975
+        ],
+        "leftNsPerOp": 610.2550670231836,
+        "rightNsPerOp": 611.6649734626462,
+        "cumulativeDeltaNs": 1.4099064394625884,
+        "cumulativeRatio": 1.0023103559735114,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 255080,
+        "largestSampledHeap": 3739536,
+        "initialScanHeap": 189944,
+        "blockGCMinMax": [
+          25,
+          28
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -2.346382771729509,
+          -1.410825477336516,
+          4.2940190766966,
+          4.475396944979707,
+          -3.7356043170916564,
+          7.17765202494104
+        ],
+        "medianRoundGeometricDeltaNs": 1.4415967996800418
+      },
+      "pass1": {
+        "name": "echo_ascii4k/sproto_encode",
+        "medianRatio": 1.011690065561194,
+        "ratioIQR": 0.01921563437616225,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 4864.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 4864.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          1.0026077879664401,
+          1.0128870032596335,
+          1.0104931278627547,
+          0.9216939483281914,
+          1.027430675335697,
+          1.0452789519060621
+        ],
+        "leftNsPerOp": 959.9039572501445,
+        "rightNsPerOp": 780.8121563676567,
+        "cumulativeDeltaNs": -179.09180088248775,
+        "cumulativeRatio": 0.8134273751766421,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 254808,
+        "largestSampledHeap": 4048192,
+        "initialScanHeap": 189640,
+        "blockGCMinMax": [
+          24,
+          28
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          1.5555752965341298,
+          7.798497416819487,
+          6.250656445160985,
+          -92.31466777074797,
+          17.46967459972234,
+          30.93494283534085
+        ],
+        "medianRoundGeometricDeltaNs": 7.024576930990236
+      },
+      "pass2": {
+        "name": "echo_ascii4k/sproto_encode",
+        "medianRatio": 1.003675969944587,
+        "ratioIQR": 0.016668417678225467,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 4864.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 4864.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          1.0179673425090994,
+          1.1021364409469518,
+          0.9972682975571631,
+          1.0059642378731335,
+          0.9800213559374154,
+          1.0013877020160404
+        ],
+        "leftNsPerOp": 628.2977195737105,
+        "rightNsPerOp": 668.3214243031172,
+        "cumulativeDeltaNs": 40.02370472940663,
+        "cumulativeRatio": 1.063701814414609,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 255240,
+        "largestSampledHeap": 4032016,
+        "initialScanHeap": 190096,
+        "blockGCMinMax": [
+          32,
+          34
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          10.53661673700185,
+          71.18096900729483,
+          -1.7102598783965277,
+          3.72442807003938,
+          -12.261300736412522,
+          0.8163717190668649
+        ],
+        "medianRoundGeometricDeltaNs": 2.2703998945531225
+      }
+    },
+    {
+      "name": "echo_ascii4k/sproto_pack",
+      "self": {
+        "name": "echo_ascii4k/sproto_pack",
+        "medianRatio": 0.9974318729694791,
+        "ratioIQR": 0.04221519092983128,
+        "roundsWithin5Pct": 4,
+        "allocationMedian": {
+          "A": {
+            "bytes": 4864.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 4864.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": false,
+        "controlAccepted": false,
+        "roundRatios": [
+          0.9476353527746406,
+          0.8970964221825544,
+          1.0029349725032695,
+          1.0034645622946672,
+          0.9989128252361987,
+          0.9959509207027596
+        ],
+        "leftNsPerOp": 614.1122169950015,
+        "rightNsPerOp": 589.6693950308733,
+        "cumulativeDeltaNs": -24.442821964128257,
+        "cumulativeRatio": 0.9601981180512369,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 256592,
+        "largestSampledHeap": 3510072,
+        "initialScanHeap": 192408,
+        "blockGCMinMax": [
+          27,
+          28
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -31.113291071210597,
+          -77.07266262830535,
+          1.6599671131925788,
+          1.9200417337201543,
+          -0.6154702862194199,
+          -2.275139757932834
+        ],
+        "medianRoundGeometricDeltaNs": -1.445305022076127
+      },
+      "clone": {
+        "name": "echo_ascii4k/sproto_pack",
+        "medianRatio": 0.9922630024153734,
+        "ratioIQR": 0.026987334364738214,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 4864.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 4864.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          0.9952621227694622,
+          0.9892638820612846,
+          0.9635064179060449,
+          0.8803303958605002,
+          1.0016715152119295,
+          0.99749011682297
+        ],
+        "leftNsPerOp": 699.9461805555555,
+        "rightNsPerOp": 663.557754889138,
+        "cumulativeDeltaNs": -36.38842566641756,
+        "cumulativeRatio": 0.9480125377103484,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 256992,
+        "largestSampledHeap": 3894728,
+        "initialScanHeap": 190352,
+        "blockGCMinMax": [
+          6,
+          9
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -3.025673575671476,
+          -6.489707506188665,
+          -21.374481125870375,
+          -108.45072068519562,
+          0.9809022571557762,
+          -1.4399286817896382
+        ],
+        "medianRoundGeometricDeltaNs": -4.757690540930071
+      },
+      "pass1": {
+        "name": "echo_ascii4k/sproto_pack",
+        "medianRatio": 0.9976213873772592,
+        "ratioIQR": 0.019725377347394102,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 4864.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 4864.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.950860958664093,
+          1.0324233273424457,
+          1.0081393556823075,
+          0.9987612073714138,
+          0.9964815673831048,
+          0.9825987325485517
+        ],
+        "leftNsPerOp": 652.1362267609322,
+        "rightNsPerOp": 646.688094614646,
+        "cumulativeDeltaNs": -5.448132146286184,
+        "cumulativeRatio": 0.9916457146180234,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 255968,
+        "largestSampledHeap": 3760696,
+        "initialScanHeap": 189288,
+        "blockGCMinMax": [
+          12,
+          13
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -38.83469622854591,
+          20.31727232221499,
+          4.648133033521503,
+          -0.6995930473179897,
+          -2.041321403961888,
+          -10.143900633891121
+        ],
+        "medianRoundGeometricDeltaNs": -1.3704572256399388
+      },
+      "pass2": {
+        "name": "echo_ascii4k/sproto_pack",
+        "medianRatio": 0.9998919058112674,
+        "ratioIQR": 0.017136393529143312,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 4864.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 4864.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          1.036850088997078,
+          0.9981064550695552,
+          0.9913903362962209,
+          1.0130485605072703,
+          0.9902612507912039,
+          1.0016773565529795
+        ],
+        "leftNsPerOp": 554.2244438221688,
+        "rightNsPerOp": 557.0690805649656,
+        "cumulativeDeltaNs": 2.8446367427967516,
+        "cumulativeRatio": 1.005132643957706,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 256304,
+        "largestSampledHeap": 3960456,
+        "initialScanHeap": 189592,
+        "blockGCMinMax": [
+          29,
+          30
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          20.19069586812384,
+          -1.0291964625706669,
+          -4.8674520420942144,
+          7.285320328585726,
+          -5.299921242833534,
+          0.9413243031586944
+        ],
+        "medianRoundGeometricDeltaNs": -0.04393607970598623
+      }
+    },
+    {
+      "name": "echo_ascii4k/sproto_pencode",
+      "self": {
+        "name": "echo_ascii4k/sproto_pencode",
+        "medianRatio": 1.001198975168689,
+        "ratioIQR": 0.016572147284748318,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 4864.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 4864.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          0.9910092377892871,
+          1.0121917647222878,
+          0.9998284709986933,
+          1.0025694793386848,
+          1.016939647719219,
+          0.9802231240859057
+        ],
+        "leftNsPerOp": 727.6782023028563,
+        "rightNsPerOp": 728.3343825452143,
+        "cumulativeDeltaNs": 0.6561802423580048,
+        "cumulativeRatio": 1.0009017450849584,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 251400,
+        "largestSampledHeap": 4052496,
+        "initialScanHeap": 190360,
+        "blockGCMinMax": [
+          23,
+          24
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -6.478022545486283,
+          8.682459337826344,
+          -0.12127496737878118,
+          1.847036511929673,
+          12.768429219395898,
+          -14.879124042012563
+        ],
+        "medianRoundGeometricDeltaNs": 0.8628807722754459
+      },
+      "clone": {
+        "name": "echo_ascii4k/sproto_pencode",
+        "medianRatio": 1.012361353329187,
+        "ratioIQR": 0.030760023639611167,
+        "roundsWithin5Pct": 4,
+        "allocationMedian": {
+          "A": {
+            "bytes": 4864.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 4864.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": false,
+        "controlAccepted": false,
+        "roundRatios": [
+          1.0836905492104836,
+          0.9384385340643113,
+          1.0220797358477594,
+          1.0038172615021992,
+          1.0209054451561748,
+          0.9867624322129364
+        ],
+        "leftNsPerOp": 745.305270670332,
+        "rightNsPerOp": 748.8357357674867,
+        "cumulativeDeltaNs": 3.5304650971546607,
+        "cumulativeRatio": 1.0047369383205613,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 255336,
+        "largestSampledHeap": 3254160,
+        "initialScanHeap": 190248,
+        "blockGCMinMax": [
+          22,
+          24
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          59.469872275928196,
+          -47.292156220440006,
+          16.816280001601285,
+          2.8314440098863543,
+          15.058555412608257,
+          -9.881848906694245
+        ],
+        "medianRoundGeometricDeltaNs": 8.944999711247306
+      },
+      "pass1": {
+        "name": "echo_ascii4k/sproto_pencode",
+        "medianRatio": 0.9941942000862134,
+        "ratioIQR": 0.0063830090702523545,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 4864.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 4864.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9753024903593033,
+          0.9920549051702994,
+          1.0038326105676514,
+          0.9913211358814932,
+          0.9963334950021274,
+          0.9984056180312202
+        ],
+        "leftNsPerOp": 730.9997551012864,
+        "rightNsPerOp": 725.6667205751885,
+        "cumulativeDeltaNs": -5.33303452609789,
+        "cumulativeRatio": 0.9927044646884199,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 255544,
+        "largestSampledHeap": 4048928,
+        "initialScanHeap": 190400,
+        "blockGCMinMax": [
+          22,
+          23
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -18.62717566258209,
+          -5.896623080317909,
+          2.759867957744632,
+          -6.359831473274198,
+          -2.7153691815741468,
+          -1.1049797987869852
+        ],
+        "medianRoundGeometricDeltaNs": -4.305996130946028
+      },
+      "pass2": {
+        "name": "echo_ascii4k/sproto_pencode",
+        "medianRatio": 1.0024046764473808,
+        "ratioIQR": 0.04551512634440469,
+        "roundsWithin5Pct": 4,
+        "allocationMedian": {
+          "A": {
+            "bytes": 4864.0,
+            "mallocs": 1.0
+          },
+          "B": {
+            "bytes": 4864.0,
+            "mallocs": 1.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          1.1421940664724664,
+          0.9566470504235071,
+          1.0083020633549826,
+          0.9965072895397792,
+          1.0134022942776457,
+          0.8703837763133315
+        ],
+        "leftNsPerOp": 746.791684023833,
+        "rightNsPerOp": 764.6335302582746,
+        "cumulativeDeltaNs": 17.84184623444162,
+        "cumulativeRatio": 1.0238913295583407,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 254744,
+        "largestSampledHeap": 4048144,
+        "initialScanHeap": 189640,
+        "blockGCMinMax": [
+          19,
+          22
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          110.82461013554689,
+          -30.206859653564493,
+          5.791716364966533,
+          -2.4496526901418747,
+          8.984304399724238,
+          -109.64852895446575
+        ],
+        "medianRoundGeometricDeltaNs": 1.671031837412329
+      }
+    },
+    {
+      "name": "ascii32/frame",
+      "self": {
+        "name": "ascii32/frame",
+        "medianRatio": 0.99945217692549,
+        "ratioIQR": 0.0533061867520479,
+        "roundsWithin5Pct": 4,
+        "allocationMedian": {
+          "A": {
+            "bytes": 184.0,
+            "mallocs": 5.0
+          },
+          "B": {
+            "bytes": 184.0,
+            "mallocs": 5.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": false,
+        "controlAccepted": false,
+        "roundRatios": [
+          1.1201695104078722,
+          0.9881495912840194,
+          0.9960520563192763,
+          0.9862680782791422,
+          1.0028522975317038,
+          1.0569577598826072
+        ],
+        "leftNsPerOp": 288.9304388455169,
+        "rightNsPerOp": 302.5126661935179,
+        "cumulativeDeltaNs": 13.58222734800097,
+        "cumulativeRatio": 1.0470086412572923,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 247328,
+        "largestSampledHeap": 3096760,
+        "initialScanHeap": 190408,
+        "blockGCMinMax": [
+          2,
+          3
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          36.90912274190555,
+          -3.337008953711859,
+          -1.1067846723674393,
+          -3.9007447233184394,
+          0.8011547189396424,
+          16.538635054372037
+        ],
+        "medianRoundGeometricDeltaNs": -0.15281497671389843
+      },
+      "clone": {
+        "name": "ascii32/frame",
+        "medianRatio": 0.9984005941015454,
+        "ratioIQR": 0.009549976257021697,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 184.0,
+            "mallocs": 5.0
+          },
+          "B": {
+            "bytes": 184.0,
+            "mallocs": 5.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          1.0033742799625909,
+          1.007078057701053,
+          0.994611085393033,
+          0.9931673174255702,
+          0.97296133105775,
+          1.0021901028100577
+        ],
+        "leftNsPerOp": 296.4530619051456,
+        "rightNsPerOp": 296.1288920151853,
+        "cumulativeDeltaNs": -0.3241698899603307,
+        "cumulativeRatio": 0.9989065051719248,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 246920,
+        "largestSampledHeap": 3447840,
+        "initialScanHeap": 189888,
+        "blockGCMinMax": [
+          2,
+          3
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          0.9342938053914054,
+          1.962349224359457,
+          -1.515602207042491,
+          -1.9088721100482644,
+          -9.363119663808732,
+          0.6187494906834559
+        ],
+        "medianRoundGeometricDeltaNs": -0.4484263581795176
+      },
+      "pass1": {
+        "name": "ascii32/frame",
+        "medianRatio": 0.9925580535191842,
+        "ratioIQR": 0.010623566266535267,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 184.0,
+            "mallocs": 5.0
+          },
+          "B": {
+            "bytes": 184.0,
+            "mallocs": 5.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9999518176971908,
+          0.9909466159827498,
+          0.8792178501187622,
+          0.9988979261289885,
+          0.9858074627978978,
+          0.9941694910556186
+        ],
+        "leftNsPerOp": 296.96997170423975,
+        "rightNsPerOp": 284.591493876983,
+        "cumulativeDeltaNs": -12.378477827256745,
+        "cumulativeRatio": 0.9583174091433567,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 247336,
+        "largestSampledHeap": 4047360,
+        "initialScanHeap": 190344,
+        "blockGCMinMax": [
+          2,
+          3
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -0.013356422202491558,
+          -2.5423577331218894,
+          -42.09580476907189,
+          -0.3043610339962015,
+          -3.96864340457131,
+          -1.604721723909961
+        ],
+        "medianRoundGeometricDeltaNs": -2.073539728515925
+      },
+      "pass2": {
+        "name": "ascii32/frame",
+        "medianRatio": 0.9775090443147484,
+        "ratioIQR": 0.03236626072003623,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 184.0,
+            "mallocs": 5.0
+          },
+          "B": {
+            "bytes": 184.0,
+            "mallocs": 5.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          1.0030291656540025,
+          0.9670144876305435,
+          0.954753891118687,
+          0.9880036009989532,
+          0.9909125342892653,
+          0.9397706655862423
+        ],
+        "leftNsPerOp": 274.57604530623496,
+        "rightNsPerOp": 267.1821428888948,
+        "cumulativeDeltaNs": -7.3939024173401435,
+        "cumulativeRatio": 0.9730715678088607,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 247672,
+        "largestSampledHeap": 3741888,
+        "initialScanHeap": 190648,
+        "blockGCMinMax": [
+          2,
+          3
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          0.8300159654676804,
+          -8.81049352087257,
+          -12.365984219463314,
+          -3.2559216836615974,
+          -2.4852713437263105,
+          -17.24278736070704
+        ],
+        "medianRoundGeometricDeltaNs": -6.033207602267083
+      }
+    },
+    {
+      "name": "utf8_1k/frame",
+      "self": {
+        "name": "utf8_1k/frame",
+        "medianRatio": 1.0074924229349973,
+        "ratioIQR": 0.015740896329409892,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 3096.0,
+            "mallocs": 5.0
+          },
+          "B": {
+            "bytes": 3096.0,
+            "mallocs": 5.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          0.9975730069180075,
+          1.0136021792453802,
+          1.2087094579989939,
+          1.0144876978169655,
+          1.0013826666246146,
+          0.9504251705721616
+        ],
+        "leftNsPerOp": 649.5557604765287,
+        "rightNsPerOp": 694.9480572415574,
+        "cumulativeDeltaNs": 45.39229676502873,
+        "cumulativeRatio": 1.0698820632915762,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 248256,
+        "largestSampledHeap": 3963112,
+        "initialScanHeap": 190256,
+        "blockGCMinMax": [
+          15,
+          16
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -1.5532920306452525,
+          8.723962972996446,
+          134.0141632755226,
+          9.308158527818136,
+          0.8897074953192714,
+          -33.887441932446336
+        ],
+        "medianRoundGeometricDeltaNs": 4.806835234157859
+      },
+      "clone": {
+        "name": "utf8_1k/frame",
+        "medianRatio": 0.9984236986551407,
+        "ratioIQR": 0.007853588176125248,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 3096.0,
+            "mallocs": 5.0
+          },
+          "B": {
+            "bytes": 3096.0,
+            "mallocs": 5.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          0.9980214255098742,
+          0.9923438459541909,
+          0.9846837178532709,
+          0.9988259718004073,
+          1.1120097290785353,
+          1.0025471147588467
+        ],
+        "leftNsPerOp": 656.7670307443366,
+        "rightNsPerOp": 672.985191863153,
+        "cumulativeDeltaNs": 16.218161118816397,
+        "cumulativeRatio": 1.02469393309898,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 247864,
+        "largestSampledHeap": 2979728,
+        "initialScanHeap": 189888,
+        "blockGCMinMax": [
+          18,
+          19
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -1.2650635830265173,
+          -5.005274900068571,
+          -10.09465403011302,
+          -0.7548650398828158,
+          76.28171627613835,
+          1.6803148069928966
+        ],
+        "medianRoundGeometricDeltaNs": -1.0099643114546666
+      },
+      "pass1": {
+        "name": "utf8_1k/frame",
+        "medianRatio": 0.9766642182550235,
+        "ratioIQR": 0.019400177866342516,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 3096.0,
+            "mallocs": 5.0
+          },
+          "B": {
+            "bytes": 3096.0,
+            "mallocs": 5.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9699596140469471,
+          0.9509515635483392,
+          0.9833688224630999,
+          0.9682476017106938,
+          0.9896447693937662,
+          0.9942148140704327
+        ],
+        "leftNsPerOp": 1045.5731160420191,
+        "rightNsPerOp": 1020.658606338467,
+        "cumulativeDeltaNs": -24.914509703552085,
+        "cumulativeRatio": 0.9761714323739835,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 248488,
+        "largestSampledHeap": 4009312,
+        "initialScanHeap": 190496,
+        "blockGCMinMax": [
+          11,
+          12
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -45.85774752073098,
+          -65.56105546449157,
+          -14.929212026173673,
+          -25.77663416787368,
+          -6.865982496513993,
+          -5.037569832803797
+        ],
+        "medianRoundGeometricDeltaNs": -20.352923097023677
+      },
+      "pass2": {
+        "name": "utf8_1k/frame",
+        "medianRatio": 0.9867548747530676,
+        "ratioIQR": 0.013335814082737096,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 3096.0,
+            "mallocs": 5.0
+          },
+          "B": {
+            "bytes": 3096.0,
+            "mallocs": 5.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9995848697997765,
+          0.9824683944028624,
+          0.9857579596829642,
+          0.9729503610969779,
+          0.9877517898231709,
+          1.0401402629244434
+        ],
+        "leftNsPerOp": 737.052987482675,
+        "rightNsPerOp": 700.6499250151594,
+        "cumulativeDeltaNs": -36.40306246751561,
+        "cumulativeRatio": 0.950609979084616,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 248168,
+        "largestSampledHeap": 4022784,
+        "initialScanHeap": 190192,
+        "blockGCMinMax": [
+          15,
+          16
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -0.3604379800000288,
+          -11.313230683993197,
+          -9.297104867615303,
+          -17.650475823145143,
+          -7.967658910321006,
+          28.573468757198953
+        ],
+        "medianRoundGeometricDeltaNs": -8.632381888968155
+      }
+    },
+    {
+      "name": "ascii4k/frame",
+      "self": {
+        "name": "ascii4k/frame",
+        "medianRatio": 0.9815924462474548,
+        "ratioIQR": 0.023201586765155602,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 14616.0,
+            "mallocs": 5.0
+          },
+          "B": {
+            "bytes": 14616.0,
+            "mallocs": 5.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          0.8980109423030835,
+          1.0030863455105075,
+          0.9729940313393043,
+          0.9866232147899687,
+          1.0005756346645025,
+          0.976561677704941
+        ],
+        "leftNsPerOp": 1897.4016853932585,
+        "rightNsPerOp": 1776.9278774128493,
+        "cumulativeDeltaNs": -120.47380798040922,
+        "cumulativeRatio": 0.9365059023042663,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 251392,
+        "largestSampledHeap": 3008984,
+        "initialScanHeap": 190408,
+        "blockGCMinMax": [
+          26,
+          29
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -216.7990230918374,
+          5.34028095217036,
+          -47.46679053483763,
+          -22.98697606601877,
+          1.0200865545918987,
+          -41.926863987109755
+        ],
+        "medianRoundGeometricDeltaNs": -32.45692002656426
+      },
+      "clone": {
+        "name": "ascii4k/frame",
+        "medianRatio": 0.9937706479053239,
+        "ratioIQR": 0.02674437288057052,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 14616.0,
+            "mallocs": 5.0
+          },
+          "B": {
+            "bytes": 14616.0,
+            "mallocs": 5.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": true,
+        "controlAccepted": true,
+        "roundRatios": [
+          1.0210860135753779,
+          0.9888706808114567,
+          1.1795153042559157,
+          0.9886934944638621,
+          0.963707269975348,
+          0.9986706149991912
+        ],
+        "leftNsPerOp": 1803.5579351946142,
+        "rightNsPerOp": 1939.7552790506902,
+        "cumulativeDeltaNs": 136.19734385607603,
+        "cumulativeRatio": 1.0755159239402972,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 250760,
+        "largestSampledHeap": 3218672,
+        "initialScanHeap": 189736,
+        "blockGCMinMax": [
+          25,
+          30
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          36.43721544266623,
+          -19.39548536157099,
+          327.89430079553154,
+          -20.42457181160421,
+          -67.37993058833285,
+          -2.436766758567728
+        ],
+        "medianRoundGeometricDeltaNs": -10.91612606006936
+      },
+      "pass1": {
+        "name": "ascii4k/frame",
+        "medianRatio": 1.0028460828263648,
+        "ratioIQR": 0.016697936006385028,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 14616.0,
+            "mallocs": 5.0
+          },
+          "B": {
+            "bytes": 14616.0,
+            "mallocs": 5.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9868091206000955,
+          0.9207162150832416,
+          1.0089968192445555,
+          1.0027317587802846,
+          1.0181401859029904,
+          1.0029604068724447
+        ],
+        "leftNsPerOp": 1922.78787414966,
+        "rightNsPerOp": 1836.1667219387755,
+        "cumulativeDeltaNs": -86.62115221088447,
+        "cumulativeRatio": 0.9549502296246839,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 251160,
+        "largestSampledHeap": 3705472,
+        "initialScanHeap": 190040,
+        "blockGCMinMax": [
+          23,
+          25
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -24.807538120484878,
+          -178.78463350010725,
+          15.574435527380729,
+          4.7215793654925164,
+          30.23669597510434,
+          5.1970006199101135
+        ],
+        "medianRoundGeometricDeltaNs": 4.959289992701315
+      },
+      "pass2": {
+        "name": "ascii4k/frame",
+        "medianRatio": 0.9810988543546852,
+        "ratioIQR": 0.038938045509819275,
+        "roundsWithin5Pct": 4,
+        "allocationMedian": {
+          "A": {
+            "bytes": 14616.0,
+            "mallocs": 5.0
+          },
+          "B": {
+            "bytes": 14616.0,
+            "mallocs": 5.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9336540840655244,
+          0.9879099219143733,
+          0.9838209200542396,
+          0.9837246913912511,
+          0.9784730173181195,
+          0.8897058059583123
+        ],
+        "leftNsPerOp": 1889.6597112809202,
+        "rightNsPerOp": 1801.1115979990548,
+        "cumulativeDeltaNs": -88.54811328186543,
+        "cumulativeRatio": 0.953140709539792,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 251256,
+        "largestSampledHeap": 4028944,
+        "initialScanHeap": 190192,
+        "blockGCMinMax": [
+          31,
+          32
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -121.20435332445186,
+          -21.123292066111162,
+          -28.834681621154914,
+          -28.076759157561582,
+          -38.55567056798054,
+          -246.63047382811328
+        ],
+        "medianRoundGeometricDeltaNs": -33.69517609456773
+      }
+    },
+    {
+      "name": "zeros4k/frame",
+      "self": {
+        "name": "zeros4k/frame",
+        "medianRatio": 1.0050985030401942,
+        "ratioIQR": 0.0454578063442167,
+        "roundsWithin5Pct": 4,
+        "allocationMedian": {
+          "A": {
+            "bytes": 14616.0,
+            "mallocs": 5.0
+          },
+          "B": {
+            "bytes": 14616.125,
+            "mallocs": 5.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": false,
+        "controlAccepted": false,
+        "roundRatios": [
+          0.9941305974266036,
+          1.028322549476,
+          1.0824247913885952,
+          1.016066408653785,
+          0.9750240780927716,
+          0.82671070754219
+        ],
+        "leftNsPerOp": 3087.9001082685954,
+        "rightNsPerOp": 2989.78540494687,
+        "cumulativeDeltaNs": -98.1147033217253,
+        "cumulativeRatio": 0.9682260760123038,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 250864,
+        "largestSampledHeap": 2756680,
+        "initialScanHeap": 189800,
+        "blockGCMinMax": [
+          18,
+          19
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -16.30317656664647,
+          80.44398981520862,
+          260.029330447383,
+          46.11064504539581,
+          -73.6444434012451,
+          -613.8014677037368
+        ],
+        "medianRoundGeometricDeltaNs": 14.903734239374671
+      },
+      "clone": {
+        "name": "zeros4k/frame",
+        "medianRatio": 0.9950492153943328,
+        "ratioIQR": 0.015687183742365773,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 14616.0,
+            "mallocs": 5.0
+          },
+          "B": {
+            "bytes": 14616.125,
+            "mallocs": 5.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": true,
+        "controlAccepted": false,
+        "roundRatios": [
+          0.9662371813039141,
+          0.9970679499012336,
+          1.0041144503318584,
+          0.993030480887432,
+          0.984544028346638,
+          1.00838122920145
+        ],
+        "leftNsPerOp": 2797.6191570188134,
+        "rightNsPerOp": 2776.0175530631936,
+        "cumulativeDeltaNs": -21.601603955619794,
+        "cumulativeRatio": 0.9922785759092961,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 250872,
+        "largestSampledHeap": 3251552,
+        "initialScanHeap": 189736,
+        "blockGCMinMax": [
+          17,
+          18
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -97.44171603967789,
+          -8.235006232696378,
+          11.285009959222407,
+          -18.98314528423316,
+          -44.10795538508819,
+          23.188545152762345
+        ],
+        "medianRoundGeometricDeltaNs": -13.609075758464769
+      },
+      "pass1": {
+        "name": "zeros4k/frame",
+        "medianRatio": 1.004603016367966,
+        "ratioIQR": 0.010841361675006489,
+        "roundsWithin5Pct": 6,
+        "allocationMedian": {
+          "A": {
+            "bytes": 14616.0,
+            "mallocs": 5.0
+          },
+          "B": {
+            "bytes": 14616.0,
+            "mallocs": 5.0
+          }
+        },
+        "sameAllocation": true,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9975989093124397,
+          1.002773556938194,
+          1.0064324757977383,
+          1.011227161262023,
+          0.9979916519818623,
+          1.0166450045916726
+        ],
+        "leftNsPerOp": 2723.0324074074074,
+        "rightNsPerOp": 2738.2706994645246,
+        "cumulativeDeltaNs": 15.238292057117178,
+        "cumulativeRatio": 1.0055960744410037,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 251144,
+        "largestSampledHeap": 3024480,
+        "initialScanHeap": 190040,
+        "blockGCMinMax": [
+          18,
+          19
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -6.6249277242823155,
+          7.591815090881028,
+          17.169624449821185,
+          30.634264577955037,
+          -5.521810827738136,
+          44.763287937796576
+        ],
+        "medianRoundGeometricDeltaNs": 12.380719770351106
+      },
+      "pass2": {
+        "name": "zeros4k/frame",
+        "medianRatio": 0.9963596931121556,
+        "ratioIQR": 0.021175149178302766,
+        "roundsWithin5Pct": 5,
+        "allocationMedian": {
+          "A": {
+            "bytes": 14616.125,
+            "mallocs": 5.0
+          },
+          "B": {
+            "bytes": 14616.0,
+            "mallocs": 5.0
+          }
+        },
+        "sameAllocation": false,
+        "timingAccepted": null,
+        "controlAccepted": null,
+        "roundRatios": [
+          0.9962780835974583,
+          1.0546707710873398,
+          1.0165862765574922,
+          0.9752071865089526,
+          0.9964413026268528,
+          0.9884071506628868
+        ],
+        "leftNsPerOp": 2731.9956896551726,
+        "rightNsPerOp": 2747.6802991220925,
+        "cumulativeDeltaNs": 15.684609466919937,
+        "cumulativeRatio": 1.005741081337101,
+        "initialLimiter": 0,
+        "finalLimiter": 0,
+        "limiterEnabledDuringMeasuredInterval": false,
+        "limiterChangeIntervals": [],
+        "initialHeap": 251256,
+        "largestSampledHeap": 3389392,
+        "initialScanHeap": 190192,
+        "blockGCMinMax": [
+          18,
+          19
+        ],
+        "zeroCompletedGCBlocks": 0,
+        "roundGeometricDeltaNs": [
+          -10.317801573536599,
+          142.63994513657462,
+          43.741690311045204,
+          -73.46880974941905,
+          -9.488059842149141,
+          -31.619704884354178
+        ],
+        "medianRoundGeometricDeltaNs": -9.90293070784287
+      }
+    }
+  ]
+}

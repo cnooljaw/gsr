@@ -1,0 +1,52 @@
+[
+  {
+    "args": [
+      "python3",
+      "-B",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/examples/websocket-gate/benchmarks/tools/go-pairs/run.py",
+      "--library",
+      "/private/tmp/gsr-gosproto-fork",
+      "--baseline",
+      "e43df35b33a3b3903cead8641f07411629ae4cdd",
+      "--output",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-encode-inline-body/self",
+      "--prepare-only",
+      "--mode",
+      "self"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {},
+    "elapsedSeconds": 0.26178070716559887,
+    "exitCode": 0,
+    "output": ""
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "sampler_test.go",
+      "telemetry_probe_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-encode-inline-body/self/harness",
+    "env": {},
+    "elapsedSeconds": 0.004613293334841728,
+    "exitCode": 0,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-run",
+      "^(TestPairStatistics|TestPairSelection|TestPairGCCounter|TestRepresentativeFixtures|TestIsolatedMetrics)$",
+      ".",
+      "-timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-encode-inline-body/self/harness",
+    "env": {},
+    "elapsedSeconds": 0.13757554069161415,
+    "exitCode": 1,
+    "output": "FAIL\tcodecpairstool [setup failed]\nFAIL\n# codecpairstool\nprotocol_benchmark_test.go:11:2: open /Users/lijiawang/Library/Caches/go-build/59/59a10398c9bcfed6c10eb399a01a3bfc44876b0c9af1b562e0cfbfd799104274-d: operation not permitted\n"
+  }
+]

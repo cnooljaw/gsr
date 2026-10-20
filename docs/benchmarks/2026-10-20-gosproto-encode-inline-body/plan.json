@@ -1,0 +1,38 @@
+{
+  "baselineCommit": "e43df35b33a3b3903cead8641f07411629ae4cdd",
+  "gsrCommit": "7e48d4c03310b8c128c81da614897224394ecf20",
+  "scope": "Only defer native integer body slice until non-inline in encodeMessageInto; preflight, values, ownership, Packing algorithm unchanged. Fixed original 19 Encode/Pack/PEncode/manual frame entries; no PB/TS new ranking.",
+  "modes": [
+    "self",
+    "clone",
+    "pass1",
+    "pass2"
+  ],
+  "cases": [
+    "addressbook/sproto_encode",
+    "addressbook/sproto_pack",
+    "addressbook/sproto_pencode",
+    "game_small/sproto_encode",
+    "game_small/sproto_pack",
+    "game_small/sproto_pencode",
+    "game_large/sproto_encode",
+    "game_large/sproto_pack",
+    "game_large/sproto_pencode",
+    "int32_edges/sproto_encode",
+    "int32_edges/sproto_pack",
+    "int32_edges/sproto_pencode",
+    "echo_ascii4k/sproto_encode",
+    "echo_ascii4k/sproto_pack",
+    "echo_ascii4k/sproto_pencode",
+    "ascii32/frame",
+    "utf8_1k/frame",
+    "ascii4k/frame",
+    "zeros4k/frame"
+  ],
+  "telemetry": [
+    "after_gc_before_warmup",
+    "after_calibration",
+    "after_timing",
+    "after_allocation"
+  ]
+}

@@ -1,5 +1,7 @@
 # gosproto 后续性能优化方案
 
+当前Body实验（2026-10-20）：[通用Encode延迟内容切片](benchmarks/2026-10-20-gosproto-encode-inline-body/RESULTS.md)完成固定原19项、76进程两轮比较。大型Encode中位−0.36%/−1.36%，首轮累计反慢214.9ns；大型PEncode+2.23%/−0.67%方向翻转。UTF8手工帧−2.33%/−1.32%、AddressBook PEncode−0.06%/−2.11%等小收益完整保留；候选待确认、不应用生产，不设收益比例门槛。102条流程命令、既有契约/夹具wire/来源与逐块复算通过；self13/19、clone15/19，17项累计反向及3项分配尾差保留。参考文档已提交7e48d4c，生产库e43df35、正式依赖及原6项删除不变；新报告未提交，双主线继续。
+
 当前目标（2026-10-20，用户裁决）：同时推进Body Encode/Decode与Pack/Unpack，最终相对各自PB的领先幅度向TS结果靠近。已小幅领先不等于Body完成；Unpack组合缺口也不构成冻结正文的理由。Go/TS逐入口参考、边界与执行规则见[双主线目标](GOSPROTO-DUAL-TRACK.md)。
 
 当前Body实现（2026-10-20）：[结构数组受控指针槽](benchmarks/2026-10-20-gosproto-decode-struct-slots/RESULTS.md)已保留并提交独立库 e43df35。相同对象构造下大型Decode−3.50%/−3.63%、Dispatch−5.80%/−3.04%，长结构重复改善、对象数中位不变；AddressBook PDecode+2.56%/+2.07%及全部控制/累计反向保留。新低GOGC/命名类型/元数据回退/异构指针拒绝回归、全库/官方/race/checkptr/vet/有限fuzz/GSR三包/GoTS7of7通过。新增unsafe仅同步借用已核对类型的新切片槽，GC屏障与反射回退保留。前轮成本诊断已提交06adf22，正式依赖v0.4.0不变，原库6项已有删除不动；Body与Packing继续。
@@ -762,4 +764,14 @@ Encode中整数记录预检/写出仍有明显样本，不能以已领先PB而�
 
 self39/70、clone37/70，所有对象数中位相同，29字节尾差/21入口累计翻转与全部异常保留。新低GOGC/命名类型/独占/坏尾部与形状回退先经race/checkptr，永久回归补异构描述不可静默写不兼容指针，先在未改基线通过；既有契约/109形态525差分/70入口、fresh/源码/原采样函数/机器码/二进制/raw通过。7条收尾全库＋固定官方oracle/race/严格checkptr/vet、Codec/Decode有限fuzz472819/9614次、GSR三包、GoTS7/7零skip通过。Decode fuzz3秒后计数停止，有限退出原文保留，不重试。
 
-精确被测运行时代码及新增安全测试落到独立库，运行时与完整验收快照一致；GoTS来源验证在临时replace上，正式依赖不变。原库6项用户删除不恢复/提交，本轮只改decode.go、CHANGES.md和新增decode_struct_slots_test.go，均未提交。见[报告](benchmarks/2026-10-20-gosproto-decode-struct-slots/RESULTS.md)及安全评审。GSR前轮06adf22已提交，本轮库/报告留审查，不升级依赖/发布/PBTS新排名；双主线继续。
+精确被测运行时代码及新增安全测试落到独立库，运行时与完整验收快照一致；GoTS来源验证在临时replace上，正式依赖不变。原库6项用户删除不恢复/提交，该轮只改decode.go、CHANGES.md和新增decode_struct_slots_test.go，已提交库e43df35。见[报告](benchmarks/2026-10-20-gosproto-decode-struct-slots/RESULTS.md)及安全评审。库e43df35与报告GSRa8b9fa3已提交，不升级依赖/发布/PBTS新排名；双主线继续。
+
+## 74. Body通用Encode延迟内容视图（待确认）
+
+继[优化参考](GOSPROTO-OPTIMIZATION-REFERENCES.md)后，仅将原生整数的内容切片构造移到非inline分支；与整数记录专用路径一致，不缓存值，不改预检/布局/错误/所有权。机器码证实分支顺序改变，总指令544、栈224B、panicSlice静态数8均不变，不据此预测速度。
+
+固定原19项（Encode/Pack/PEncode与manual帧），独立进程self/clone/pass1/pass2，共76进程7296块。大型Encode−0.36%/−1.36%，首轮累计却慢214.9ns；大型PEncode+2.23%/−0.67%，小型组合亦翻转。UTF8手工帧−2.33%/−1.32%且累计/两控制支持，AddressBook PEncode−0.06%/−2.11%亦保留。小收益不按固定门槛丢弃，主要路径净收益待确认，不应用生产。
+
+self13/19、clone15/19通过；全部limiter为0，最大堆快照4101360B（不是峰值），17项累计反向/3项分配尾差完整保留。102条流程命令包含两侧相关编码/预算/元信息/RpcFrame契约、四模式夹具/统计/telemetry、harness vet/构建、fresh/生成源/原采样函数/二进制/逐项raw核对，全部通过。最初沙箱缓存访问失败在计时前，获沙箱权限后新目录重建，记录保留、缓存未清理，不是按结果重试。未采用，未重复生产全验收，不声称覆盖Decode、增长形态、融合Rpc或新PB/TS排名。
+
+下一步隔离纯inline/混合/非inline原生字段的实际执行与内容区边界成本，并继续尺寸计算/写出重复工作；不盲目重采控制、不叠加另一个候选。Packing保持独立主线。见[完整报告](benchmarks/2026-10-20-gosproto-encode-inline-body/RESULTS.md)。生产库e43df35及原6项删除保持，参考文档GSR7e48d4c已提交，新实验未提交。
