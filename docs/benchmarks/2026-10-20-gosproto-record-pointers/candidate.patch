@@ -1,0 +1,79 @@
+--- a/encode.go
++++ b/encode.go
+@@ -4,6 +4,7 @@
+ 	"encoding/binary"
+ 	"math"
+ 	"reflect"
++	"unsafe"
+ )
+ 
+ const (
+@@ -225,10 +226,19 @@
+ 		case WireStructName:
+ 			childBinding := bindEncodeChild(field, value, trusted)
+ 			integers := childBinding.native && field.st.int64Record && field.st.nativeIntegerFields()
++			var pointers []unsafe.Pointer
++			if integers {
++				pointers = integerRecordPointers(field.st, value)
++			}
+ 			for index := 0; index < value.Len(); index++ {
+ 				var length int
+ 				if integers {
+-					pointer := messageEncodePointer(value.Index(index), childBinding)
++					var pointer encodePointer
++					if pointers != nil {
++						pointer = encodePointer{value: pointers[index]}
++					} else {
++						pointer = messageEncodePointer(value.Index(index), childBinding)
++					}
+ 					length = encodeIntegerRecordInto(field.st, pointer, output[offset+4:], layout)
+ 				} else {
+ 					length = encodeMessageInto(field.st, value.Index(index), output[offset+4:], layout, childBinding)
+--- a/limits.go
++++ b/limits.go
+@@ -6,6 +6,7 @@
+ 	"math"
+ 	"reflect"
+ 	"runtime"
++	"unsafe"
+ )
+ 
+ // Limits 是编解码的本地资源预算；零值使用有限默认值，不改变 wire 格式。
+@@ -239,11 +240,20 @@
+ 
+ 			}
+ 			integers := childBinding.native && field.st.int64Record && field.st.nativeIntegerFields()
++			var pointers []unsafe.Pointer
++			if integers {
++				pointers = integerRecordPointers(field.st, value)
++			}
+ 			for i := 0; i < value.Len(); i++ {
+ 				var part int
+ 				var err error
+ 				if integers {
+-					pointer := messageEncodePointer(value.Index(i), childBinding)
++					var pointer encodePointer
++					if pointers != nil {
++						pointer = encodePointer{value: pointers[i]}
++					} else {
++						pointer = messageEncodePointer(value.Index(i), childBinding)
++					}
+ 					part, err = encodedIntegerRecordSize(field.st, pointer, budget, depth+1, layout)
+ 				} else {
+ 					part, err = encodedSize(field.st, value.Index(i), budget, depth+1, layout, childBinding)
+--- a/encode_pointer.go
++++ b/encode_pointer.go
+@@ -74,3 +74,13 @@
+ 	}
+ 	return uint64(*value), true
+ }
++
++// integerRecordPointers 只在当前数组入口完成整数记录字段证明后借用已有指针槽。
++// 实际元素须恰为私有子schema的指针类型；命名指针仍按原反射路径读取。
++// 不复制或缓存消息地址，保持每个元素的nil语义及当前值读取。
++func integerRecordPointers(schema *SprotoType, value reflect.Value) []unsafe.Pointer {
++	if value.Len() == 0 || value.Type().Elem() != reflect.PointerTo(schema.typ) {
++		return nil
++	}
++	return unsafe.Slice((*unsafe.Pointer)(value.UnsafePointer()), value.Len())
++}

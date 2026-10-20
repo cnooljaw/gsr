@@ -1,5 +1,7 @@
 # gosproto 后续性能优化方案
 
+当前Body实现（2026-10-20）：[整数记录数组受控指针读取](benchmarks/2026-10-20-gosproto-record-pointers/RESULTS.md)仅在当前字段证明及实际元素指针类型核对后，同步读切片指针槽，减少两阶段逐元素反射，命名指针回退。固定37项两轮，大型Encode−18.63%/−19.05%、PEncode−15.87%/−14.34%；AddressBook PEncode+6.43%/+0.43%、数值Encode+1.61%/+2.01%及31项累计反向保留。178条测量流程、基线新回归及7条全库/oracle/race/checkptr/vet/有限fuzz/GSR三包/GoTS7of7通过，候选和永久回归已提交独立库a93bb0d。前轮库7b05b78/GSR2c5c653已提交，正式依赖及原6项删除不动，Body与Packing继续。
+
 当前Body实现（2026-10-20）：[原生字段分布诊断](benchmarks/2026-10-20-gosproto-inline-shapes/RESULTS.md)沿用同一延迟内容切片候选，固定8/64字段×8分布的Encode/PEncode共32项、128进程两轮。8字段混合Encode−0.57%/−0.77%、64字段半缺失PEncode−2.15%/−2.58%；64字段负数PEncode+1.40%/+0.50%及29项累计反向全部保留。决定保留小改动、接受局部代价，不宣称业务全面提速；158条测量流程及7条全库/oracle/race/checkptr/vet/有限fuzz/GSR三包/GoTS7of7验收通过，精确源码已提交独立库7b05b78。前轮19项报告已提交ffc591f，正式依赖v0.4.0及用户原6项删除不动，Body与Packing继续。
 
 当前Body实验（2026-10-20）：[通用Encode延迟内容切片](benchmarks/2026-10-20-gosproto-encode-inline-body/RESULTS.md)完成固定原19项、76进程两轮比较。大型Encode中位−0.36%/−1.36%，首轮累计反慢214.9ns；大型PEncode+2.23%/−0.67%方向翻转。UTF8手工帧−2.33%/−1.32%、AddressBook PEncode−0.06%/−2.11%等小收益完整保留；候选待确认、不应用生产，不设收益比例门槛。102条流程命令、既有契约/夹具wire/来源与逐块复算通过；self13/19、clone15/19，17项累计反向及3项分配尾差保留。参考文档已提交7e48d4c，生产库e43df35、正式依赖及原6项删除不变；新报告未提交，双主线继续。
@@ -787,3 +789,13 @@ self13/19、clone15/19通过；全部limiter为0，最大堆快照4101360B（不
 决定保留简单局部改动并接受披露代价，不按最低百分比丢弃小收益。未新增unsafe/分配/缓存，不改当前值读取、元信息证明、预检/预算或所有权。158条测量流程与来源核对、self22/32与clone23/32、全部分配中位相同，29项累计反向完整保留，limiter全0，4144336B为最大快照而非峰值。
 
 7条顺序完整验收全部通过：库全测/官方固定oracle、race/checkptr、vet、有限fuzz472494/32060次、GSR三包与GoTS7/7零skip，实际二进制来源已核对；Decode fuzz3秒后计数停止、11秒正常退出原文保留不重试。精确候选encode.go与CHANGES已提交独立库7b05b78，原6项删除不动，正式依赖仍v0.4.0。前轮GSRffc591f已提交，新[报告](benchmarks/2026-10-20-gosproto-inline-shapes/RESULTS.md)留审查。后续回到尺寸计算与字段执行的高占比重复工作，Packing也继续，不再围绕此小分支反复排列。
+
+## 76. 整数记录数组两阶段指针取得（已保留）
+
+原生整数记录数组在预检与写出均逐元素反射Index/UnsafePointer。单一候选在原有child binding/nativeIntegerFields证明后，每个数组入口核对实际元素恰为私有子schema的*T，同步借用[]unsafe.Pointer读槽；命名切片可用，命名指针仍回退。每个元素指针、nil与标量当前值逐次读取，不缓存地址、不跨调用借用、不改预算/布局/错误/输出独占。既有KeepAlive保留。具体安全证明与有限平台限制随报告保存。
+
+原19项加18增长入口，148进程14208块两轮：大型Encode−18.63%/−19.05%、PEncode−15.87%/−14.34%，累计亦两轮快；小型Encode−7.02%/−4.90%、PEncode−5.97%/−3.92%。4096完整记录Encode−16.33%/−15.35%、nil记录−37.60%/−37.86%，nested32x128约快14%。AddressBook PEncode+6.43%/+0.43%、数值Encode+1.61%/+2.01%及manual小回退保留，不把非目标全部变化归因于指针槽。无新PB/TS排名或跨轮比例相乘。
+
+self22/37、clone24/37，比较分配中位全相同；两项clone字节尾差与31项累计反向、全部异常保留，不扣噪声或按最低收益比例筛选。最大堆快照4195232B、limiter全0。fieldSize指令956→996/栈240→256B、encodeFieldInto864→912/208→224B、helper120/96B；不消除fallback反射，不据静态条数预告速度。
+
+178条测量流程含109形态525差分、既有编码/元信息/预算契约、harness/vet/构建/fresh/生成输入/夹具/二进制/逐项raw核对。新增切片形状、nil/改值/GC/预算/独占回归先在未改基线通过race/checkptr，再执行7条完整验收：库全测/固定官方oracle/race/checkptr/vet/有限fuzz463887/10154、GSR三包与GoTS7/7零skip通过；Decode fuzz3秒后计数停止、11秒正常退出原文保留。精确候选3个运行时文件和永久测试已提交独立库a93bb0d，旧6项删除不动，正式依赖v0.4.0不变。前轮7b05b78/2c5c653已提交，新[报告](benchmarks/2026-10-20-gosproto-record-pointers/RESULTS.md)留审查。后续重新定位Body高占比重复工作，Packing主线继续。

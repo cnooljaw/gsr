@@ -1,0 +1,188 @@
+{
+  "baselineCommit": "7b05b78107962fdeabc43ff5440c460301b48a15",
+  "gsrCommit": "2c5c6534817d9edf7515168a83aed2dfdc184563",
+  "counts": {
+    "processes": 148,
+    "blocks": 14208,
+    "quartets": 3552,
+    "rounds": 888,
+    "snapshots": 592
+  },
+  "successfulCommands": 178,
+  "measurementPreparationAndRawVerified": [
+    {
+      "mode": "self",
+      "changedGoFiles": [],
+      "allInputsAndRawVerified": true
+    },
+    {
+      "mode": "clone",
+      "changedGoFiles": [],
+      "allInputsAndRawVerified": true
+    },
+    {
+      "mode": "pass1",
+      "changedGoFiles": [
+        "encode.go",
+        "encode_pointer.go",
+        "limits.go"
+      ],
+      "allInputsAndRawVerified": true
+    },
+    {
+      "mode": "pass2",
+      "changedGoFiles": [
+        "encode.go",
+        "encode_pointer.go",
+        "limits.go"
+      ],
+      "allInputsAndRawVerified": true
+    }
+  ],
+  "controlAndTelemetrySummary": {
+    "self": {
+      "controlAccepted": 22,
+      "sameAllocation": 37,
+      "initialLimiterNonzero": 0,
+      "anyLimiterChange": 0,
+      "largestSampledHeap": 4073376,
+      "unequalAllocations": [],
+      "failedControls": [
+        "addressbook/sproto_encode",
+        "addressbook/sproto_pencode",
+        "game_small/sproto_encode",
+        "game_small/sproto_pack",
+        "game_small/sproto_pencode",
+        "game_large/sproto_encode",
+        "game_large/sproto_pencode",
+        "echo_ascii4k/sproto_encode",
+        "flat/full/32/encode",
+        "flat/full/33/encode",
+        "flat/full/4096/pencode",
+        "flat/nil/4096/encode",
+        "nested/32x128/encode",
+        "nested/32x128/pencode",
+        "array_record/33/encode"
+      ]
+    },
+    "clone": {
+      "controlAccepted": 24,
+      "sameAllocation": 35,
+      "initialLimiterNonzero": 0,
+      "anyLimiterChange": 0,
+      "largestSampledHeap": 4195232,
+      "unequalAllocations": [
+        "ascii4k/frame",
+        "zeros4k/frame"
+      ],
+      "failedControls": [
+        "addressbook/sproto_encode",
+        "addressbook/sproto_pack",
+        "int32_edges/sproto_pencode",
+        "echo_ascii4k/sproto_encode",
+        "echo_ascii4k/sproto_pack",
+        "echo_ascii4k/sproto_pencode",
+        "ascii32/frame",
+        "utf8_1k/frame",
+        "ascii4k/frame",
+        "zeros4k/frame",
+        "flat/full/33/pencode",
+        "array_record/33/pencode",
+        "array_record/4096/pencode"
+      ]
+    },
+    "pass1": {
+      "controlAccepted": null,
+      "sameAllocation": 37,
+      "initialLimiterNonzero": 0,
+      "anyLimiterChange": 0,
+      "largestSampledHeap": 4164776,
+      "unequalAllocations": [],
+      "failedControls": null
+    },
+    "pass2": {
+      "controlAccepted": null,
+      "sameAllocation": 37,
+      "initialLimiterNonzero": 0,
+      "anyLimiterChange": 0,
+      "largestSampledHeap": 4101712,
+      "unequalAllocations": [],
+      "failedControls": null
+    }
+  },
+  "libraryStatus": " D .github/workflows/test.yml\n D LICENSE\n D examples/echo/echo.sproto\n D examples/echo/main.go\n D go.mod\n D testdata/fuzz/FuzzPackRoundTrip/4756e628ac53e8fe\n",
+  "runtimeSourceStillBaseline": false,
+  "cumulativeReversalCount": 31,
+  "allocationTailCount": 2,
+  "scope": "integer-record pointer extraction candidate, original19 plus18 growth cases; no production modification or new PB/TS ranking",
+  "artifactsSha256": {
+    ".gitattributes": "fb25a78a6381f5646d71aacea4486f6aeeeb03c4d71740227011024be0d20a8f",
+    "ALL-CASES.md": "d18f279440ee23310a6f6dbe2fcdec1ed6c9f6330624caee8110e6b25bfa8a62",
+    "RESULTS.md": "862c4f6e441fd2c77d631bdfc675ce14b9a82b085a48d0cb8a25312f53303046",
+    "accept.py": "7b7488575ac49a41f1a74c97ee07385cebb86a96d3f7dea91ab482a96419478f",
+    "acceptance.json": "e16e2d9b5a455df5f2005f5d6563ffd2a881692ed351f0533aba794a7cc4385f",
+    "allocation-tails.json": "6d999288c9f8467667e1b5a50a89fcd3eceaa1dbac2fedc95416c9a1a0803281",
+    "analysis.json": "4189e7d6512c322d4db2316e824229558d0b178430cc93d9bcc236bd7024edf4",
+    "analyze.py": "e714d8a1e11a7103694e535b6f755e48c97bf77a8d918dc3492bb95b29d8f063",
+    "assembly-summary.json": "d19019baadc6475483861983dd7d921be72253c3cc15993c25226671740481d8",
+    "baseline-regression.json": "89729d75dcbc7a5fa5efbbd6ebce976b114b80ee3fc25933cb3e7ac8f4c7f97e",
+    "before-compiler.txt": "9c740833db4ae879ce81605766ec5d40fca1de49bcb4d04b1e16cc4d4b4753bd",
+    "before-encode-assembly.txt": "e16a65f70671007d24fa25d8e8311dbf32ed396d896c933435936a9fd105ff17",
+    "candidate-compiler.txt": "80da1d4b9f76f3340836d9df4aebfc65ab5ea0d599304336b5234d0ee4be5ce2",
+    "candidate-encode-assembly.txt": "449a3824b5aa713b7090ea7da177a9da413075ac2b59a8a3e6eba5008479a2ba",
+    "candidate.patch": "05d7a923d9a47331564bed4e8a00de376df3a3f13663383cd96d547ed8dee286",
+    "clone/case-list.json": "d443c765146fad875b2ec9e08094255f8739f1fca17de3edd6d7b932bfe0e7a3",
+    "clone/inputs.json": "43156d6ab41a0945681535d0eeecdbdcd2b9db912c94a19751c18febcba573f9",
+    "clone/raw.json": "e2009186c8ce969c298e4dd6110492c43b6cf164ac3c7b5b3d928ad72ddc3377",
+    "clone/summary.json": "f2524f92437652a9249550aca98337a2f13ac05f6828fc614ca42cd4cbeb07b6",
+    "commands.json": "4f3b62da2ef0f8ec028f2d7d6f502b9dfb094cebfdfa397a4028a8adb62b8869",
+    "cumulative-reversals.json": "33ff13e5dbab38d388474867d3a767b371195aadf80b333c7afcd0d4ae5b40f2",
+    "growth-adapter.go.txt": "c45d5619bdc3341e4c102e4910c390fa029e20de0ad66f74359f0600fc73d4e3",
+    "integration-build-info.txt": "ad161fab4cdfa3d2a81d3e787097eff751c08795db78e92be9cc546385246c68",
+    "oracle-provenance.json": "454b89c988dfb0dad357bcef351ea82f5d9141ecb8b61ca5e53d7ccd73b6294e",
+    "pass1/case-list.json": "d443c765146fad875b2ec9e08094255f8739f1fca17de3edd6d7b932bfe0e7a3",
+    "pass1/inputs.json": "b6e0cc7295f60024268f0d8ed0d4f65fee1a7c74133424d3ced6b7de4e66582f",
+    "pass1/raw.json": "c86125583fb77d0406089eba9609b8f6fcc44132628c3e8eb57f95097ecf5731",
+    "pass1/summary.json": "35a5db3b1ff4283c703e18d142c8018ebd1d085799a84c7b8d8f6e95ba0bb63f",
+    "pass2/case-list.json": "d443c765146fad875b2ec9e08094255f8739f1fca17de3edd6d7b932bfe0e7a3",
+    "pass2/inputs.json": "59ed94d5573e9770bb869bca91966cf03dd7c28e91c849be65555fad03e0a936",
+    "pass2/raw.json": "fec11c7b37bd9d99ae776c2f66427a41e7f00e0c5e2e1742d0f95b314b677068",
+    "pass2/summary.json": "3bea97a85067aaa6a72825a471e6eaac566508c230249627a19a5a5ed9c8d012",
+    "plan.json": "4877322e0cf1b34069defc9a360523ba9c813faf05232ae22da3e12b0ee4ddca",
+    "record-pointers-test.go.txt": "a5b3cce54ae370a98bfbafaafca2fa45e673499226dee54c562e0f7cf960b961",
+    "reproduce.py": "4b34f83eff3f63921d166bad6767a455ad6a0aa20f095eaa5a1862d088b147c9",
+    "safety-review.json": "315493ea774e6be66355b1c590b8f3f5a2273e85e5df56991f5601f9df4cc7d3",
+    "self/case-list.json": "d443c765146fad875b2ec9e08094255f8739f1fca17de3edd6d7b932bfe0e7a3",
+    "self/inputs.json": "db2ad7f60142f1746fb4a36fa148ec79dc1e8ca7f28483f8c175aa8e7d820959",
+    "self/raw.json": "cb98e02669253cac53d52aa224a710ed608438c5dab32009ffdc503a8184fd7f",
+    "self/summary.json": "bf817d75bd1783ce9bbccd8bbd77ee81225ec265d78c2c82e1c1979627c49455"
+  },
+  "productionCandidateRetained": true,
+  "preAdoptionRuntimeSourceWasBaseline": true,
+  "acceptanceCommands": 7,
+  "acceptancePassed": true,
+  "finalLibraryGoSource": {
+    "decode.go": "b7c26ada4fc71524684ec05d4e744a7d43a33b53e85ea44ac41f97e3670811dd",
+    "decode_pointer.go": "4045dae3ebd404b13efea429fbcc1dd23f764bdfa51164464b92a3992826367f",
+    "decode_struct_slots_test.go": "5c8f1fe4dd8261af4df00f7524d92a5bff99816478f38677a0d1ed1005e073e2",
+    "encode.go": "b7ea1b48122b35ba3aad5418d9fb2f55a951b1bddf700eec0217f5065f30b36e",
+    "encode_integer_record.go": "0aaa3de8cde3571f70b857b51532cc332d116c6eb6293f62bed6e349b563aa60",
+    "encode_pointer.go": "9bb4abd440157c27e4c93228153fe073488cea2c3ff8fb5340cd9e12b27d3e1b",
+    "encode_record_pointers_test.go": "a5b3cce54ae370a98bfbafaafca2fa45e673499226dee54c562e0f7cf960b961",
+    "encode_test.go": "d28095ae5b5b820eb0d5aed634397bb86159361b5876c3126100d59e37d41099",
+    "fuzz_test.go": "10eb7cb2d2fcd8afe47b6880cd61f64121f17b0a3355a6073b41ceb87e8d435c",
+    "limits.go": "c7a68601f92d897c3339d33bd860eabee7bf4f2a6d18a782dc8a8d46227edc96",
+    "limits_test.go": "9612667b2dd51f286ee972d8303d1609a0c6bb274050f0056abe392447f29809",
+    "meta.go": "6badd4a5ac60d8a15caaa1f35634268101c436b275cf4a0fe120b91db417d217",
+    "official_compat_test.go": "fa413db0126e78205f7ee2d56f8f5d521bc29d82b723953385b79b0407412b60",
+    "pack.go": "54f2c365a99ae620f53bd02bf3ca4da84332c7f9102e871a88fb4ee05af00087",
+    "pack_test.go": "70e79e8fa5273d4a9f31fb6afc885efbb1f2f86ca9d68b1bba4c1c97e8deed56",
+    "rpc.go": "6a5d29737047ecdcc2286b68a35df3330affa9dd8948ffbd5fde09104eed7899",
+    "rpc_limits_test.go": "6c0361cbda2870b3d4abf578b7313acc44728ed78de0ea92336c8c1170ee39b1",
+    "rpc_test.go": "4db20f87186685ef4bd78bc0e021940a8afe718a28ae8bddd6b66bede3017468",
+    "sproto.go": "2d35ffddf1ec0492fe6425f3d1dd7ede5d4edb3794773f6971fc4f36ceb80f4d",
+    "sproto_test.go": "20a255950d0628f27a00cf5923448d524c729b05f16ed18df3a095d2c6449d9e"
+  },
+  "finalLibraryStatus": " D .github/workflows/test.yml\n M CHANGES.md\n D LICENSE\n M encode.go\n M encode_pointer.go\n D examples/echo/echo.sproto\n D examples/echo/main.go\n D go.mod\n M limits.go\n D testdata/fuzz/FuzzPackRoundTrip/4756e628ac53e8fe\n?? encode_record_pointers_test.go\n",
+  "committedLibrary": "a93bb0d"
+}

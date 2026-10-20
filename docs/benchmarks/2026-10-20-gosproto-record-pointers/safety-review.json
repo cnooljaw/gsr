@@ -1,0 +1,17 @@
+{
+  "scope": "Only synchronous native integer-record array pointer reads in size/write passes; no public API, wire, ownership or resource budget change.",
+  "proofs": [
+    "Caller is in WireStruct array branch; child binding is native, private int64Record holds and every current nonnegative-tag field passes nativeIntegerFields.",
+    "integerRecordPointers requires positive current slice length and actual element type exactly reflect.PointerTo(private child schema.typ); named pointer elements return nil and retain original reflect.Index/UnsafePointer path.",
+    "Actual elements are GC pointer slots with native pointer width/alignment; unsafe.Slice reads exactly current Len. Loop indexes stay within the same Len, no uintptr conversion, byte pointer copy or cached addresses.",
+    "Each pointer is read for the current element in each pass; nil children are handled by unchanged integer record functions; scalar values still read by unchanged field code.",
+    "Message and child graph remain borrowed synchronously and rooted through reflect values/typed pointers and existing runtime.KeepAlive in encodeBufferWithLimits, including preflight failure paths.",
+    "Output allocation follows full existing preflight. Same per-element and per-field budgets, depth/tag/byte error ordering, layout growth and final buffer len/cap/nil remain unchanged. No new result buffer, pool, object coalescing or shared mutable output."
+  ],
+  "costs": [
+    "One actual-type guard per specialized array per pass and one slot/fallback branch per element; helper and caller code/stack are larger.",
+    "Non-target paths can change due to code/register/layout effects; all regressions, controls and cumulative reversals are retained, without attributing all variation to the target branch."
+  ],
+  "tests": "Existing metadata replacement/field shape/nested contracts plus new plain/named slice/named pointer, nil child, current-value, output ownership, exact budget and low GOGC regression. New regression is verified on unmodified baseline first. Full candidate acceptance recorded separately.",
+  "limitation": "Finite Go1.24.13 darwin/arm64 testing is not a proof of arbitrary future runtime/platform safety. Future layout changes must preserve actual-type proof and synchronous lifetime."
+}
