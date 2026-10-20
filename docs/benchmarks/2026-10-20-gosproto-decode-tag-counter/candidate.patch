@@ -1,0 +1,25 @@
+--- a/decode.go
++++ b/decode.go
+@@ -299,11 +299,11 @@
+ 	record := value.Elem()
+ 	exactNative := schema.nativeInt64Pointer && record.Type() == schema.typ
+ 	pointer := messageDecodePointer(value, exactNative)
+-	tag := 0
++	tag := uint32(0)
+ 	for index := 0; index < count; index++ {
+ 		entry := int(readUint16(chunk[2+index*2 : 4+index*2 : 4+index*2]))
+ 		if entry%2 == 1 {
+-			tag += (entry + 1) / 2
++			tag += uint32((entry + 1) / 2)
+ 			continue
+ 		}
+ 		if tag > 65535 {
+@@ -320,7 +320,7 @@
+ 			total += used
+ 			content = data
+ 		}
+-		field := schema.FieldByTag(tag)
++		field := schema.FieldByTag(int(tag))
+ 		tag++
+ 		if field == nil {
+ 			continue
