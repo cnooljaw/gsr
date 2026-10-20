@@ -1,0 +1,49 @@
+package sproto
+
+import (
+ "bytes"
+ "errors"
+ "testing"
+)
+
+// 验证输出上界证明门槛两侧保持完整字节、预算、错误顺序及最大int预算安全。
+func TestUnpackBudgetProofBoundary(t *testing.T) {
+ check:=func(input,want []byte,limit int,wantErr error) {
+  before:=append([]byte(nil),input...)
+  got,err:=UnpackWithLimit(input,limit)
+  if !errors.Is(err,wantErr) || (wantErr!=nil && got!=nil) {t.Fatalf("input %x limit %d: %x %v want %v",input,limit,got,err,wantErr)}
+  if err==nil && (!bytes.Equal(got,want)||cap(got)!=len(want)) {t.Fatalf("bytes/cap %x != %x",got,want)}
+  if !bytes.Equal(input,before) {t.Fatal("input changed")}
+ }
+ maximum:=int(^uint(0)>>1)
+ for _,count:=range []int{1,2,7,8,9,255,256,257,4096} {
+  input:=make([]byte,count);want:=make([]byte,count*8)
+  check(input,nil,count*8-1,ErrLimit)
+  for _,limit:=range []int{count*8,count*8+1,maximum} {check(input,want,limit,nil)}
+ }
+ for mask:=1;mask<255;mask++ {
+  packed:=[]byte{byte(mask)};word:=make([]byte,8)
+  for i:=range word {if mask&(1<<i)!=0 {word[i]=byte(i+1);packed=append(packed,word[i])}}
+  input:=append(append([]byte(nil),packed...),packed...)
+  want:=append(append([]byte(nil),word...),word...)
+  for _,limit:=range []int{len(input)*8-1,len(input)*8,len(input)*8+1,maximum} {check(input,want,limit,nil)}
+  broken:=append(append([]byte(nil),input...),128)
+  for _,limit:=range []int{len(broken)*8-1,len(broken)*8,len(broken)*8+1,maximum} {check(broken,nil,limit,ErrUnpack)}
+  // 严格回退路径不能为看到后面的坏包而掩盖已经发生的预算失败。
+  check(broken,nil,7,ErrLimit)
+  check(packed[:len(packed)-1],nil,1,ErrUnpack)
+ }
+ for _,count:=range []byte{0,1,255} {
+  size:=(int(count)+1)*8
+  input:=append([]byte{255,count},bytes.Repeat([]byte{7},size)...)
+  want:=bytes.Repeat([]byte{7},size)
+  check(input,nil,size-1,ErrLimit)
+  for _,limit:=range []int{size,len(input)*8-1,len(input)*8,len(input)*8+1,maximum} {check(input,want,limit,nil)}
+  for _,cut:=range []int{1,2,len(input)-1} {
+   broken:=input[:cut]
+   for _,limit:=range []int{1,len(broken)*8-1,len(broken)*8,len(broken)*8+1,maximum} {check(broken,nil,limit,ErrUnpack)}
+  }
+ }
+ check(nil,nil,1,nil)
+ check(nil,nil,0,ErrInvalidLimits)
+}
