@@ -298,3 +298,5 @@ SPROTO_ORACLE_DIR=/path/to/pinned/sproto \
 [连续零 word Pack 筛选](../../../docs/benchmarks/2026-10-17-gosproto-zero-pack/RESULTS.md) 保存三个候选各 191 项三轮的全部原值，共 1719 样本。零块有收益，但其他路径代价不合适，全部撤回；只保留精确字节回归和记录，已本地提交为 gosproto `bba3326` / GSR `a27ec4e`，未推送/发布。新增 27 种零段/尾块 benchmark 控制及完整复现脚本，不作为新的协议总体性能基线。
 
 [稀疏 word 与 A/A 诊断](../../../docs/benchmarks/2026-10-17-gosproto-pack-sparse/RESULTS.md) 保存 191 项三轮候选筛选和 59 项三轮独立 A/A，共 750 个样本。候选组合回退未过门；同源码 A/A 也有明显差值，下一步应先校准测量，不能以约 6% 的纯 Pack 差值作为稳定收益。正式库未改，该轮诊断已本地提交为 GSR `8f0003f`，未推送。
+
+2026-10-20：已完成 [a93bb0d 单模块 Go/PB 当前基线](../../../docs/benchmarks/2026-10-20-go-sp-pb-current/RESULTS.md)，72 项 × 5 轮，夹具及源码/模块/二进制哈希核对通过。大型 Encode −41.6%、PEncode −21.8%，PDecode +10.9%；保留全部原始波动，正式依赖不变。
