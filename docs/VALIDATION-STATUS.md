@@ -804,3 +804,7 @@ TestRuntimePacedMultiServiceLoad 已补 8 个真实 Service 共享文件 Logger 
 ## countChunks Body实验（2026-10-20，收益待确认）
 
 当前Body实验（2026-10-20）：[countChunks直接计数](benchmarks/2026-10-20-gosproto-chunk-count/RESULTS.md)已完成固定70项两轮比较。大型Decode观察−0.72%/−0.10%，部分结构数组有小收益；self8/70、clone11/70，组合/累计多有翻转，收益尚不能可靠区分。候选保留待确认、未应用生产，不因低于比例门槛丢弃。既有契约/差分、fresh与来源核对通过；库原有删除保持，正式依赖不变。上一轮双主线目标/对照已提交386727c，新实验未提交，Body与Packing继续开放。
+
+## Packing局部word组装（2026-10-20，未采用）
+
+当前Packing实验（2026-10-20）：[普通Unpack局部word组装](benchmarks/2026-10-20-gosproto-unpack-word-store/RESULTS.md)固定70项两轮完成，正确性/159275差分及来源核对通过；大型Unpack慢8.51%/9.03%、4/8字节大数组慢约5.5%～7.6%、普通word密度普遍回退，候选未采用。短零段小收益、失败控制/累计翻转全部保留，不设固定收益门槛。前轮Body待确认报告已提交bf1203e，新实验未提交；原库已有删除未动，生产Go源仍af9169d，双主线保持。

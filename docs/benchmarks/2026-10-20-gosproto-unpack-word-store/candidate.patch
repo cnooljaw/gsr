@@ -1,0 +1,22 @@
+--- a/pack.go
++++ b/pack.go
+@@ -255,15 +255,18 @@
+ 		}
+ 		// 零 mask 已在上方消费，普通 mask 至少有一个有效字节。
+ 		used := 0
++		var word uint64
+ 		for mask := header; ; {
+ 			index := bits.TrailingZeros8(mask)
+-			unpacked[offset+index] = src[used]
++			// mask 非零，index 为 0..7；固定移位范围后一次写出完整 word。
++			word |= uint64(src[used]) << (uint(index&7) * 8)
+ 			used++
+ 			mask &= mask - 1
+ 			if mask == 0 {
+ 				break
+ 			}
+ 		}
++		binary.LittleEndian.PutUint64(unpacked[offset:offset+8], word)
+ 		src = src[used:]
+ 		offset += 8
+ 	}
