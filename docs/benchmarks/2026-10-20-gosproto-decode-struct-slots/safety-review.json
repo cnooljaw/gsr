@@ -1,0 +1,30 @@
+{
+  "skill": "/Users/lijiawang/.codex/skills/clean-coder-review/SKILL.md",
+  "scope": "Local slice borrow only, no API/owner/lifetime change",
+  "invariants": [
+    "countChunks validates all chunk boundaries and element budget before MakeSlice",
+    "fresh MakeSlice has exact count/cap and actual pointer element type",
+    "guard compares actual element to PointerTo(private child schema.typ); named pointer and shape mismatch use reflection",
+    "reflect.New remains per child, no pooled/grouped objects",
+    "unsafe.Slice length matches allocated pointer slots, no uintptr or pointer memcpy",
+    "each value is assigned via Go unsafe.Pointer store; generated gcWriteBarrier2 present",
+    "value.Set(result) only after all child decodes succeed, root failure atomicity unchanged",
+    "public descriptor mutation tests include incompatible actual element rejection"
+  ],
+  "verification": [
+    "lowGOGC and ownership tests",
+    "named-slice/pointer cases",
+    "race+checkptr before timing",
+    "full library oracle/race/checkptr/vet",
+    "Codec and Decode finite fuzz",
+    "GSR3packages and GoTS7of7"
+  ],
+  "compiler": "decodeStructSlice208to352instructions; addedguardsandfallback are real cost",
+  "integrationBuildInfoCuration": {
+    "rawSha256": "33e7fbbd39bbf2743a030ef3812b6bf5ad064cd13cd8b4a6c9fa12b8a38dd645",
+    "curatedSha256": "2fc7d9e9a20af73236a5d95efc237318e2d17c2e988c0bd41d4970b0c83af229",
+    "change": "rstrip line endings only"
+  },
+  "runtimeMatchesTimedAndAccepted": true,
+  "permanentTestsAddedAfterTiming": true
+}

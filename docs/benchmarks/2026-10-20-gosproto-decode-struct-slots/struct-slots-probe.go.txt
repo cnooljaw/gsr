@@ -1,0 +1,91 @@
+package benchmarks
+
+import (
+ "bytes"
+ "errors"
+ "reflect"
+ "runtime"
+ "runtime/debug"
+ "strconv"
+ "testing"
+ before "github.com/cnooljaw/gosproto-before"
+ sproto "github.com/cnooljaw/gosproto"
+)
+
+type slotChild struct {
+ Number *int64 `sproto:"integer,0"`
+ Text *string `sproto:"string,1"`
+}
+type namedSlotPointer *slotChild
+type namedSlotSlice []*slotChild
+type slotDocument struct {
+ Pad int64 `sproto:"integer,0"`
+ Children []*slotChild `sproto:"struct,1,array"`
+ Named namedSlotSlice `sproto:"struct,2,array"`
+ PointerAlias []namedSlotPointer `sproto:"struct,3,array"`
+ Tail string `sproto:"string,4"`
+}
+
+// TestStructSlotsOwnershipAndGC 保护不同切片形状的GC存活、元素与调用独占，以及坏尾部失败原子性。
+func TestStructSlotsOwnershipAndGC(t *testing.T) {
+ oldGC:=debug.SetGCPercent(1);defer debug.SetGCPercent(oldGC)
+ var retained []*slotDocument
+ for _,count:=range []int{0,1,3,64,128} {t.Run(strconv.Itoa(count),func(t *testing.T){
+  input:=&slotDocument{Pad:17,Tail:"tail",Children:make([]*slotChild,count),Named:make(namedSlotSlice,count),PointerAlias:make([]namedSlotPointer,count)}
+  for i:=0;i<count;i++ {
+   number:=int64(i)*(-1<<33);text:="child-"+strconv.Itoa(i)
+   child:=&slotChild{Number:&number,Text:&text}
+   input.Children[i],input.Named[i],input.PointerAlias[i]=child,child,namedSlotPointer(child)
+  }
+  leftWire,err:=before.Encode(input);if err!=nil {t.Fatal(err)}
+  wire,err:=sproto.Encode(input);if err!=nil||!bytes.Equal(leftWire,wire){t.Fatalf("wire: %v",err)}
+  var left,first,second slotDocument
+  ua,ea:=before.Decode(wire,&left);ub,eb:=sproto.Decode(wire,&first);uc,ec:=sproto.Decode(wire,&second)
+  if ea!=nil||eb!=nil||ec!=nil||ua!=len(wire)||ub!=ua||uc!=ua||!reflect.DeepEqual(left,first)||!reflect.DeepEqual(first,second){t.Fatalf("decode: %d/%d/%d %v/%v/%v",ua,ub,uc,ea,eb,ec)}
+  for _,v:=range []*slotDocument{&left,&first,&second} {
+   if len(v.Children)!=count||cap(v.Children)!=count||len(v.Named)!=count||cap(v.Named)!=count||len(v.PointerAlias)!=count||cap(v.PointerAlias)!=count{t.Fatal("length/capacity changed")}
+   for i:=0;i<count;i++ {
+    child,named,alias:=v.Children[i],v.Named[i],(*slotChild)(v.PointerAlias[i])
+    if child==named||child==alias||named==alias||child.Number==named.Number||child.Number==alias.Number||child.Text==named.Text {t.Fatal("independent fields share storage")}
+    if *child.Number!=int64(i)*(-1<<33)||*child.Text!="child-"+strconv.Itoa(i){t.Fatal("values changed")}
+    if i>0&&(child==v.Children[i-1]||child.Number==v.Children[i-1].Number){t.Fatal("independent elements share storage")}
+   }
+  }
+  if count>0 {
+   if first.Children[0]==second.Children[0]||first.Children[0].Number==second.Children[0].Number{t.Fatal("decode calls alias")}
+   *first.Children[0].Number=99
+   if *second.Children[0].Number!=0||*first.Named[0].Number!=0||*left.Children[0].Number!=0{t.Fatal("mutation escaped owner")}
+  }
+  retained=append(retained,&left,&first,&second)
+  // 前面的数组已恢复后才碰到坏尾部；公开Decode仍须保留调用方原对象。
+  sentinel:=&slotChild{};original:=slotDocument{Pad:99,Children:[]*slotChild{sentinel},Tail:"original"}
+  for _,decode:=range []func([]byte,*slotDocument)(int,error){func(w []byte,v *slotDocument)(int,error){return before.Decode(w,v)},func(w []byte,v *slotDocument)(int,error){return sproto.Decode(w,v)}} {
+   dst:=original;used,err:=decode(wire[:len(wire)-1],&dst)
+   if used!=0||err==nil||dst.Pad!=99||dst.Tail!="original"||len(dst.Children)!=1||dst.Children[0]!=sentinel{t.Fatal("failure mutated original")}
+  }
+  runtime.GC()
+ })}
+ runtime.GC()
+ for _,v:=range retained {for i,child:=range v.Named {if *child.Number!=int64(i)*(-1<<33)||*child.Text!="child-"+strconv.Itoa(i){t.Fatal("GC damaged retained child")}}}
+ runtime.KeepAlive(retained)
+}
+
+// TestStructSlotsDescriptorFallback 保护公开字段形状变化时仍执行原反射路径语义，并保留元素预算错误。
+func TestStructSlotsDescriptorFallback(t *testing.T) {
+ n:=int64(7);text:="fallback";input:=&slotDocument{Children:[]*slotChild{{Number:&n,Text:&text}},Tail:"kept"}
+ wire,err:=sproto.Encode(input);if err!=nil {t.Fatal(err)}
+ oldSchema,err:=before.GetSprotoType(reflect.TypeFor[slotDocument]());if err!=nil {t.Fatal(err)}
+ schema,err:=sproto.GetSprotoType(reflect.TypeFor[slotDocument]());if err!=nil {t.Fatal(err)}
+ a,b:=oldSchema.FieldByTag(1),schema.FieldByTag(1)
+ oldWire,oldArray,newWire,newArray:=a.Wire,a.Array,b.Wire,b.Array
+ defer func(){a.Wire,a.Array,b.Wire,b.Array=oldWire,oldArray,newWire,newArray}()
+ for _,which:=range []string{"array","wire"} {t.Run(which,func(t *testing.T){
+  a.Wire,a.Array,b.Wire,b.Array=oldWire,oldArray,newWire,newArray
+  if which=="array" {a.Array,b.Array=false,false} else {a.Wire,b.Wire=before.WireVarintName,sproto.WireVarintName}
+  var left,right slotDocument
+  ua,ea:=before.Decode(wire,&left);ub,eb:=sproto.Decode(wire,&right)
+  if ea!=nil||eb!=nil||ua!=len(wire)||ub!=ua||!reflect.DeepEqual(left,right)||!reflect.DeepEqual(&right,input){t.Fatalf("fallback: %v/%v",ea,eb)}
+  _,ea=before.DecodeWithLimits(wire,&left,before.Limits{MaxElements:1});_,eb=sproto.DecodeWithLimits(wire,&right,sproto.Limits{MaxElements:1})
+  if !errors.Is(ea,before.ErrLimit)||!errors.Is(eb,sproto.ErrLimit){t.Fatalf("budget: %v/%v",ea,eb)}
+ })}
+}

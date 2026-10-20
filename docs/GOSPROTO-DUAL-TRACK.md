@@ -39,3 +39,7 @@ TS为2026-10-15第五轮历史基线，Go为2026-10-20新五轮；共享代表�
 - 真实可解释的小收益也保留，不设固定最低比例；同时公开非目标退化、控制失败、分配、累计与中位数分歧，不用TS目标为不可靠结果背书。
 
 数据来源：[Go当前对照](benchmarks/2026-10-20-go-sp-pb/RESULTS.md)、[TS第五轮](benchmarks/2026-10-15-sproto-round5/RESULTS.md)、[迁移经验](SPROTO-OPTIMIZATION-LESSONS.md)。本文件只确认目标和对照，不代表新优化已实现，不修改历史实测数据。
+
+## 当前增量进展（2026-10-20）
+
+当前Body实现（2026-10-20）：[结构数组受控指针槽](benchmarks/2026-10-20-gosproto-decode-struct-slots/RESULTS.md)已保留并提交独立库 e43df35。相同对象构造下大型Decode−3.50%/−3.63%、Dispatch−5.80%/−3.04%，长结构重复改善、对象数中位不变；AddressBook PDecode+2.56%/+2.07%及全部控制/累计反向保留。新低GOGC/命名类型/元数据回退/异构指针拒绝回归、全库/官方/race/checkptr/vet/有限fuzz/GSR三包/GoTS7of7通过。新增unsafe仅同步借用已核对类型的新切片槽，GC屏障与反射回退保留。前轮成本诊断已提交06adf22，正式依赖v0.4.0不变，原库6项已有删除不动；Body与Packing继续。上方Go/PB比例仍是af9169d的同场实测，本轮仅相对该基线的增量配对；不将旧PB绝对值与新比例相乘伪造当前排名。

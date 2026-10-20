@@ -1,0 +1,37 @@
+--- a/decode.go
++++ b/decode.go
+@@ -4,6 +4,7 @@
+ 	"encoding/binary"
+ 	"math"
+ 	"reflect"
++	"unsafe"
+ )
+ 
+ type Tag struct {
+@@ -259,6 +260,12 @@
+ 		return err
+ 	}
+ 	result := reflect.MakeSlice(value.Type(), count, count)
++	var slots []unsafe.Pointer
++	if count > 0 && field.Array && field.Wire == WireStructName && field.st != nil &&
++		value.Type().Elem() == reflect.PointerTo(field.st.typ) {
++		// 同步借用新切片的指针槽；实际元素类型已核对，不缓存地址。
++		slots = unsafe.Slice((*unsafe.Pointer)(result.UnsafePointer()), count)
++	}
+ 	for index := 0; index < count; index++ {
+ 		used, content, err := readChunk(data)
+ 		if err != nil {
+@@ -272,7 +279,12 @@
+ 		if consumed != len(content) {
+ 			return ErrDecode
+ 		}
+-		result.Index(index).Set(current)
++		if slots != nil {
++			// Go 指针赋值保留 GC 写屏障，不能改成字节复制或 uintptr 存储。
++			slots[index] = current.UnsafePointer()
++		} else {
++			result.Index(index).Set(current)
++		}
+ 		data = data[used:]
+ 	}
+ 	value.Set(result)

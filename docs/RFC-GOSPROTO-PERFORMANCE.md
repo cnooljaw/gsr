@@ -2,6 +2,8 @@
 
 当前目标（2026-10-20，用户裁决）：同时推进Body Encode/Decode与Pack/Unpack，最终相对各自PB的领先幅度向TS结果靠近。已小幅领先不等于Body完成；Unpack组合缺口也不构成冻结正文的理由。Go/TS逐入口参考、边界与执行规则见[双主线目标](GOSPROTO-DUAL-TRACK.md)。
 
+当前Body实现（2026-10-20）：[结构数组受控指针槽](benchmarks/2026-10-20-gosproto-decode-struct-slots/RESULTS.md)已保留并提交独立库 e43df35。相同对象构造下大型Decode−3.50%/−3.63%、Dispatch−5.80%/−3.04%，长结构重复改善、对象数中位不变；AddressBook PDecode+2.56%/+2.07%及全部控制/累计反向保留。新低GOGC/命名类型/元数据回退/异构指针拒绝回归、全库/官方/race/checkptr/vet/有限fuzz/GSR三包/GoTS7of7通过。新增unsafe仅同步借用已核对类型的新切片槽，GC屏障与反射回退保留。前轮成本诊断已提交06adf22，正式依赖v0.4.0不变，原库6项已有删除不动；Body与Packing继续。
+
 当前Body诊断（2026-10-20）：[正文构造与执行成本](benchmarks/2026-10-20-gosproto-body-cost/RESULTS.md)完成PB/SP三消息的12CPU＋12allocation独立profile。大型SP Decode仍10416B/532次、PB13560B/537次，不能默认删对象；PB子消息数组也用reflect.New。下一项隔离同构造/同对象数量的结构数组目标槽写入，保留类型证明、GC屏障、错误/预算/ownership，不新建公共factory或池；原型本轮未实现。Encode的记录预检/写出继续跟踪，Packing不冻结。前轮tag报告已提交c4f06ee，新诊断未提交，生产源af9169d及用户已有删除保持。
 
 当前Body实验（2026-10-20）：[非负tag计数表示](benchmarks/2026-10-20-gosproto-decode-tag-counter/RESULTS.md)完成固定70项两轮，去掉查找负数检查但总指令仍660。大型Decode−0.08%/−4.51%，首轮累计却慢139.8ns；大型PDecode/Dispatch两轮略慢，小型Dispatch−0.83%/−0.17%及全部小收益保留。候选待确认、暂不应用，不设最低收益门槛。新增10组最大tag/跳跃链公共API对照及既有契约/差分/来源核对通过。前轮Packing报告已提交36f03f2，新报告未提交；生产Go源仍af9169d、用户原有删除不动，双主线继续。
@@ -751,3 +753,13 @@ self48/70、clone41/70，对象分配中位相同，28字节尾差/28入口累�
 Encode中整数记录预检/写出仍有明显样本，不能以已领先PB而停止；保留预算/当前值读取/元信息证明。下一Body候选仅隔离同对象构造的结构数组目标槽写入，不改parser/对象数量/生命周期；若借用底层指针槽，先证明实际元素类型/尺寸/长度、元信息变化回退和GC屏障，禁止uintptr缓存/指针memcpy。尚未实现或采用，不设收益比例门槛；Packing同步跟踪。
 
 104完整命令/fixture测试/vet/模块/24profile与摘要、fresh/18Go源/生成依赖/夹具/二进制/raw核对完成。首次PB源码提取正则无匹配失败及后续修正记录完整保留；未按性能择优。无生产改动，不重复全验收或GoTS/新TS排名。见[报告](benchmarks/2026-10-20-gosproto-body-cost/RESULTS.md)。c4f06ee已提交，新诊断未提交，原库删除未触碰，双主线不变。
+
+## 73. Body结构数组受控指针槽（已保留）
+
+仅decodeStructSlice元素写入：countChunks/MakeSlice/逐对象reflect.New/通用decodeMessage与全部预算、消费检查、最终value.Set不改。在当前字段Array/Wire为结构数组且实际元素恰为PointerTo(私有子schema.typ)时，局部unsafe.Slice借用新分配的count个指针槽，用Go指针赋值写入；命名指针或形状不符仍reflect.Index/Set。每个子对象仍独立，GC写屏障实际存在，不缓存uintptr/字段/地址，不用池/arena或指针memcpy。函数208→352条、栈224→256B，证明/回退有成本。
+
+固定70项280进程/26,880块，大型Decode−3.50%/−3.63%、Dispatch−5.80%/−3.04%，nil4096 Decode−8.77%/−8.74%、half4096−6.21%/−5.85%，长结构组合重复改善。AddressBook PDecode+2.56%/+2.07%（+45.3/36.6ns）为接受的局部代价；大型PDecode次轮中位快2.66%却累计慢994.4ns，非目标数值Dispatch成本亦保留。full4096组合首轮−0.01%仍记录，不设收益门槛。
+
+self39/70、clone37/70，所有对象数中位相同，29字节尾差/21入口累计翻转与全部异常保留。新低GOGC/命名类型/独占/坏尾部与形状回退先经race/checkptr，永久回归补异构描述不可静默写不兼容指针，先在未改基线通过；既有契约/109形态525差分/70入口、fresh/源码/原采样函数/机器码/二进制/raw通过。7条收尾全库＋固定官方oracle/race/严格checkptr/vet、Codec/Decode有限fuzz472819/9614次、GSR三包、GoTS7/7零skip通过。Decode fuzz3秒后计数停止，有限退出原文保留，不重试。
+
+精确被测运行时代码及新增安全测试落到独立库，运行时与完整验收快照一致；GoTS来源验证在临时replace上，正式依赖不变。原库6项用户删除不恢复/提交，本轮只改decode.go、CHANGES.md和新增decode_struct_slots_test.go，均未提交。见[报告](benchmarks/2026-10-20-gosproto-decode-struct-slots/RESULTS.md)及安全评审。GSR前轮06adf22已提交，本轮库/报告留审查，不升级依赖/发布/PBTS新排名；双主线继续。

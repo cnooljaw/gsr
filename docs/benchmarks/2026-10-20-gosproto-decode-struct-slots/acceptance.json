@@ -1,0 +1,121 @@
+[
+  {
+    "args": [
+      "go",
+      "test",
+      "./...",
+      "-timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-struct-slots-accept-source",
+    "env": {
+      "SPROTO_ORACLE_DIR": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-payload/oracle"
+    },
+    "exitCode": 0,
+    "elapsedSeconds": 2.862602708861232,
+    "output": "ok  \tgithub.com/cnooljaw/gosproto\t1.542s\n?   \tgithub.com/cnooljaw/gosproto/examples/echo\t[no test files]\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-gcflags=all=-d=checkptr=2",
+      "./...",
+      "-timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-struct-slots-accept-source",
+    "env": {
+      "SPROTO_ORACLE_DIR": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-payload/oracle",
+      "GOMAXPROCS": "2"
+    },
+    "exitCode": 0,
+    "elapsedSeconds": 4.06200041808188,
+    "output": "ok  \tgithub.com/cnooljaw/gosproto\t2.697s\n?   \tgithub.com/cnooljaw/gosproto/examples/echo\t[no test files]\n"
+  },
+  {
+    "args": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-struct-slots-accept-source",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 0.2680409997701645,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-run",
+      "^$",
+      "-fuzz",
+      "^FuzzCodecRoundTrip$",
+      "-fuzztime=10s",
+      "-parallel=2",
+      ".",
+      "-timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-struct-slots-accept-source",
+    "env": {
+      "GOMAXPROCS": "2"
+    },
+    "exitCode": 0,
+    "elapsedSeconds": 11.664414834231138,
+    "output": "fuzz: elapsed: 0s, gathering baseline coverage: 0/47 completed\nfuzz: elapsed: 0s, gathering baseline coverage: 47/47 completed, now fuzzing with 2 workers\nfuzz: elapsed: 3s, execs: 135017 (44990/sec), new interesting: 0 (total: 47)\nfuzz: elapsed: 6s, execs: 283799 (49610/sec), new interesting: 0 (total: 47)\nfuzz: elapsed: 9s, execs: 424192 (46796/sec), new interesting: 0 (total: 47)\nfuzz: elapsed: 10s, execs: 472819 (46958/sec), new interesting: 0 (total: 47)\nPASS\nok  \tgithub.com/cnooljaw/gosproto\t10.372s\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-run",
+      "^$",
+      "-fuzz",
+      "^FuzzDecode$",
+      "-fuzztime=10s",
+      "-parallel=2",
+      ".",
+      "-timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-struct-slots-accept-source",
+    "env": {
+      "GOMAXPROCS": "2"
+    },
+    "exitCode": 0,
+    "elapsedSeconds": 11.83995220810175,
+    "output": "fuzz: elapsed: 0s, gathering baseline coverage: 0/65 completed\nfuzz: elapsed: 0s, gathering baseline coverage: 65/65 completed, now fuzzing with 2 workers\nfuzz: elapsed: 3s, execs: 9614 (3205/sec), new interesting: 1 (total: 66)\nfuzz: elapsed: 6s, execs: 9614 (0/sec), new interesting: 1 (total: 66)\nfuzz: elapsed: 9s, execs: 9614 (0/sec), new interesting: 1 (total: 66)\nfuzz: elapsed: 11s, execs: 9614 (0/sec), new interesting: 1 (total: 66)\nPASS\nok  \tgithub.com/cnooljaw/gosproto\t11.217s\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-modfile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-struct-slots-acceptance/gsr.mod",
+      "./protocol/sproto",
+      "./examples/websocket-gate/cmd/debugserver",
+      "./examples/websocket-gate/benchmarks",
+      "-timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {},
+    "exitCode": 0,
+    "elapsedSeconds": 1.530593290925026,
+    "output": "ok  \tgithub.com/cnooljaw/gsr/protocol/sproto\t0.353s\nok  \tgithub.com/cnooljaw/gsr/examples/websocket-gate/cmd/debugserver\t0.473s\nok  \tgithub.com/cnooljaw/gsr/examples/websocket-gate/benchmarks\t0.784s\n"
+  },
+  {
+    "args": [
+      "npm",
+      "--prefix",
+      "examples/websocket-gate",
+      "run",
+      "test:sproto:integration"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {
+      "GOFLAGS": "-modfile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-struct-slots-acceptance/gsr.mod"
+    },
+    "exitCode": 0,
+    "elapsedSeconds": 2.564735582098365,
+    "output": "\n> test:sproto:integration\n> npm run build && go build -o ../../tmp/sproto-echo ./cmd/debugserver && GSR_SPROTO_SERVER_BIN=../../tmp/sproto-echo node --test client/dist/sproto_client.test.js\n\n\n> build\n> tsc --project tsconfig.json\n\n\u2714 official Sproto vectors and safe integer boundary (1.700458ms)\n\u2714 official Sproto boolean and mixed signed int64 arrays (122.799792ms)\n\u2714 Sproto decoded results and unpacked buffers stay independent (4.12125ms)\n\u2714 Sproto sessions stay independent and close clears pending (1.312917ms)\n\u2714 Sproto pending and packet limits (66.167708ms)\n\u2714 Go/TS Sproto Echo Plain (454.587167ms)\n\u2714 Go/TS Sproto Echo MAC (98.763125ms)\n\u2139 tests 7\n\u2139 suites 0\n\u2139 pass 7\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 800.820209\n"
+  }
+]
