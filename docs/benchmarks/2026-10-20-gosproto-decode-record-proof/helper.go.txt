@@ -1,0 +1,11 @@
+// canDecodeIntegerRecords 只证明当前Decoder路由可达的非nil描述；不依赖当前公开Tag。
+// 与Encode不同，负Tag、nil和短Fields不能被提前扫描改变语义，不能跨调用缓存此结果。
+func canDecodeIntegerRecords(schema *SprotoType) bool {
+ if !schema.int64Record {return false}
+ for _, index:=range schema.tagMap {
+  if uint(index)>=uint(len(schema.Fields)) {return false}
+  field:=schema.Fields[index]
+  if field!=nil && !field.nativeInteger(schema) {return false}
+ }
+ return true
+}

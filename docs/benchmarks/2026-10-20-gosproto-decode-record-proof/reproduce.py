@@ -1,0 +1,102 @@
+"""同模块同进程整数记录数组证明复用实验，保留完整首遍与独占输出，不修改生产库。"""
+import argparse,hashlib,io,json,os,platform,subprocess,tarfile,time
+from pathlib import Path
+p=argparse.ArgumentParser();p.add_argument('--library',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--minimum-records',type=int,default=0);p.add_argument('--extra-boundaries',action='store_true');a=p.parse_args();out=a.output.resolve();out.mkdir(exist_ok=False);here=Path(__file__).resolve().parent;root=here.parents[2];commands=[]
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def run(cmd,cwd,env=None,timeout=120):
+ start=time.monotonic();r=subprocess.run(cmd,cwd=cwd,env={**os.environ,**(env or {})},text=True,capture_output=True,timeout=timeout);commands.append(dict(args=cmd,cwd=str(cwd),env=env or {},exitCode=r.returncode,seconds=time.monotonic()-start,output=r.stdout+r.stderr));(out/'commands.json').write_text(json.dumps(commands,indent=2)+'\n')
+ if r.returncode:raise SystemExit(r.stdout+r.stderr)
+ return r.stdout+r.stderr
+lib=out/'gosproto';lib.mkdir();commit=run(['git','rev-parse','aef6876'],a.library).strip()
+with tarfile.open(fileobj=io.BytesIO(subprocess.check_output(['git','archive',commit],cwd=a.library))) as t:t.extractall(lib,filter='data')
+s=(lib/'decode.go').read_text();body=s[s.index('func decodeStructSlice('):s.index('func decodeMessage(')]
+clone=body.replace('func decodeStructSlice(','func experimentRecordClone(',1)
+candidate=body.replace('func decodeStructSlice(','func experimentRecordCandidate(',1)
+candidate=candidate.replace('\tvar slots []unsafe.Pointer','\tvar slots []unsafe.Pointer\n\tnativeRecords := false').replace('slots = unsafe.Slice((*unsafe.Pointer)(result.UnsafePointer()), count)','slots = unsafe.Slice((*unsafe.Pointer)(result.UnsafePointer()), count)\n\t\tnativeRecords = canDecodeIntegerRecords(field.st)')
+old='\t\tconsumed, err := decodeMessage(content, field.st, current, budget)'
+new='\t\tvar consumed int\n\t\tif nativeRecords {\n\t\t\tconsumed, err = decodeIntegerRecord(content, field.st, decodePointer{value: current.UnsafePointer()}, budget)\n\t\t} else {\n\t\t\tconsumed, err = decodeMessage(content, field.st, current, budget)\n\t\t}'
+assert candidate.count(old)==1;candidate=candidate.replace(old,new)
+if a.minimum_records:
+ candidate=candidate.replace('nativeRecords = canDecodeIntegerRecords(field.st)',f'nativeRecords = count >= {a.minimum_records} && canDecodeIntegerRecords(field.st)')
+fast=s[s.index('func decodeMessage('):s.index('// Decode 解码')]
+fast=fast.replace('func decodeMessage(chunk []byte, schema *SprotoType, value reflect.Value, budget *decodeBudget)','func decodeIntegerRecord(chunk []byte, schema *SprotoType, pointer decodePointer, budget *decodeBudget)',1)
+a1=fast.index('\trecord := value.Elem()');b1=fast.index('\ttag := 0',a1);fast=fast[:a1]+fast[b1:]
+a1=fast.index('\t\tif hasInline &&');b1=fast.rindex('\t}\n\treturn total')
+fast=fast[:a1]+"""		bits, err := scalarBits(inline, hasInline, content)
+		if err != nil {
+			return 0, err
+		}
+		result := new(int64)
+		*result = int64(bits)
+		// 数组入口已核对当前可达字段与实际子类型；Go指针写入保留屏障。
+		*(**int64)(unsafe.Add(pointer.value, field.encOffset)) = result
+"""+fast[b1:]
+fast='// decodeIntegerRecord只接收本次数组证明覆盖的字段与reflect.New(schema.typ)创建的独占对象。\n'+fast
+selector="""
+// ExperimentRecordSelector仅在实验归档内替换数组decoder，选择发生在计时外。
+func ExperimentRecordSelector(message any) func(string) {
+ schema,err:=GetSprotoType(reflect.TypeOf(message).Elem())
+ if err!=nil {panic(err)}
+ seen:=make(map[*SprotoType]bool)
+ fields:=[]*SprotoField{}
+ var visit func(*SprotoType)
+ visit=func(st *SprotoType) {
+  if st==nil || seen[st] {return}
+  seen[st]=true
+  for _,f:=range st.Fields {
+   if f==nil {continue}
+   if f.valueType!=nil && f.valueType.Kind()==reflect.Slice && f.valueType.Elem().Kind()==reflect.Ptr && f.valueType.Elem().Elem().Kind()==reflect.Struct {fields=append(fields,f)}
+   visit(f.st)
+  }
+ }
+ visit(schema)
+ return func(mode string) {
+  fn:=decoder(decodeStructSlice)
+  switch mode {
+  case "baseline":
+  case "clone":fn=experimentRecordClone
+  case "candidate":fn=experimentRecordCandidate
+  default:panic("invalid record experiment decoder")
+  }
+  for _,f:=range fields {f.dec=fn}
+ }
+}
+"""
+(lib/'record_experiment.go').write_text('package sproto\n\nimport ("reflect";"unsafe")\n\n'+clone+'\n'+candidate+'\n'+(here/'helper.go.txt').read_text()+'\n'+fast+selector)
+test=(here/'proof-test.go.txt').read_text().replace('func TestIntegerRecordDecodeProofOwnership(t *testing.T) {','func checkProofOwnership(t *testing.T, mode string) {').replace('func TestIntegerRecordDecodeProofMetadata(t *testing.T) {','func checkProofMetadata(t *testing.T, mode string) {')
+test=test.replace('  } {\n   data,err:=Encode(sample.value)','  } {\n   selectMode:=ExperimentRecordSelector(sample.value)\n   selectMode(mode)\n   defer selectMode("baseline")\n   data,err:=Encode(sample.value)')
+test=test.replace('func checkProofMetadata(t *testing.T, mode string) {','func checkProofMetadata(t *testing.T, mode string) {\n selectMode:=ExperimentRecordSelector(new(proofDocument))\n selectMode(mode)\n defer selectMode("baseline")')
+test+='\n// 验证三种数组decoder均保持所有权、预算及当前元信息语义。\nfunc TestRecordProofExperiment(t *testing.T) {for _,mode:=range []string{"baseline","clone","candidate"} {t.Run(mode,func(t *testing.T){checkProofOwnership(t,mode);checkProofMetadata(t,mode)})}}\n'
+(lib/'record_experiment_test.go').write_text(test)
+h=out/'harness';h.mkdir()
+for n in ['protocol_benchmark_test.go','representative_benchmark_test.go','cases.json','representative.json']:(h/n).write_bytes((root/'examples/websocket-gate/benchmarks'/n).read_bytes())
+(h/'experiment_test.go').write_bytes((here/'experiment.go.txt').read_bytes());(h/'go.sum').write_bytes((root/'go.sum').read_bytes())
+(h/'go.mod').write_text('module unpackinprocess\n\ngo 1.24.0\n\nrequire (\ngithub.com/cnooljaw/gsr v0.0.0\ngithub.com/cnooljaw/gosproto v0.4.0\ngoogle.golang.org/protobuf v1.36.1\n)\nreplace github.com/cnooljaw/gsr => '+str(root)+'\nreplace github.com/cnooljaw/gosproto => '+str(lib)+'\n')
+env={'GOMAXPROCS':'1','GOGC':'100','GOMEMLIMIT':'off','GOPROXY':'off'}
+run(['gofmt','-w','record_experiment.go','record_experiment_test.go'],lib)
+run(['gofmt','-w','experiment_test.go'],h)
+run(['go','test','-race','-gcflags=all=-d=checkptr=2','-run','^(TestRecordProofExperiment|TestDecodeIntegerRecordFieldsReplacement|TestNativePointerDecode|TestIntegerRecordArrayBudgetsAndTags|TestStructSliceDecode)','-timeout=2m','.'],lib,env)
+run(['go','test','-mod=mod','-run','^TestRepresentativeFixtures$','-timeout=30s','.'],h,env)
+run(['go','vet','-mod=mod','.'],h,env)
+binary=out/'experiment.test';run(['go','test','-mod=mod','-c','-o',str(binary),'.'],h,env)
+(out/'modules.txt').write_text(run(['go','list','-m','-json','github.com/cnooljaw/gosproto'],h,env))
+(out/'assembly.txt').write_text(run(['go','tool','objdump','-s',r'github.com/cnooljaw/gosproto\.(decodeStructSlice|experimentRecordClone|experimentRecordCandidate|canDecodeIntegerRecords|decodeIntegerRecord)',str(binary)],h))
+cases=[(n,op) for n in ['addressbook','game_small','game_large','int32_edges','echo_ascii4k'] for op in ['decode','pdecode']]+[(n,op) for n in ['records_0','records_1','records_2','records_16','records_128','records_512','outer128','pointer128','mixed128'] for op in ['decode','pdecode']]
+if a.extra_boundaries:
+ cases += [(f'records_{n}',op) for n in [3,4,7,8,9] for op in ['decode','pdecode']]
+for name,op in cases:
+ run([str(binary),'-test.run=^TestRecordProofInProcessExperiment$','-test.timeout=30s'],h,{**env,'GSR_CASE':name,'GSR_OP':op,'GSR_MODE':'pass1','GSR_PREFLIGHT':'1'},timeout=35)
+print(f'all{len(cases)} fixture baseline/candidate preflights passed',flush=True)
+
+plan=dict(minimumRecords=a.minimum_records,extraBoundaries=a.extra_boundaries,commit=commit,go=run(['go','version'],root).strip(),platform=platform.platform(),loadBefore=os.getloadavg(),cases=cases,modes=['self','clone','pass1','pass2'],rounds=6,quartetsPerRound=4,targetBlockMs=20,warmupMsPerArm=50,order='alternate ABBA/BAAB each quartet/round',sources={str(f.relative_to(out)):sha(f) for d in ['gosproto','harness'] for f in (out/d).glob('*.go')},fixtures={n:sha(h/n) for n in ['cases.json','representative.json']},generated={str(f.relative_to(root)):sha(f) for n in ['examples/websocket-gate/gen','examples/websocket-gate/benchmarks/gen','protocol/gen'] for f in (root/n).rglob('*.go')},binarySha256=sha(binary),formalDependency='unchanged v0.4.0; experiment adapters exist only in archive')
+(out/'plan.json').write_text(json.dumps(plan,indent=2)+'\n');print('three array decoders: proof/ownership/race/checkptr and fixture/vet/build passed',flush=True)
+for mode in plan['modes']:
+ for name,op in cases:
+  output=out/(mode+'-'+name+'-'+op+'.json')
+  run([str(binary),'-test.run=^TestRecordProofInProcessExperiment$','-test.timeout=1m'],h,{**env,'GSR_CASE':name,'GSR_OP':op,'GSR_MODE':mode,'GSR_OUTPUT':str(output)},timeout=65)
+  data=json.loads(output.read_text());assert (data['Name'],data['Operation'],data['Mode'])==(name,op,mode)
+  print(mode,name,op,'done',flush=True)
+for n,hsh in plan['sources'].items():assert sha(out/n)==hsh,n
+for n,hsh in plan['fixtures'].items():assert sha(h/n)==hsh,n
+for n,hsh in plan['generated'].items():assert sha(root/n)==hsh,n
+assert sha(binary)==plan['binarySha256'];plan['loadAfter']=os.getloadavg();(out/'plan.json').write_text(json.dumps(plan,indent=2)+'\n');print('all fingerprints unchanged',flush=True)

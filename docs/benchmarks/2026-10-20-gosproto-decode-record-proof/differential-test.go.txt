@@ -1,0 +1,61 @@
+type proofInteger int64
+
+type proofGenericRecord struct {
+ First *proofInteger `sproto:"integer,0"`
+ Last *proofInteger `sproto:"integer,1"`
+}
+
+type proofGenericDocument struct {
+ Items []*proofGenericRecord `sproto:"struct,0,array"`
+ Marker int
+}
+
+// 验证整数记录数组与命名整数通用路径对变异wire给出相同结果、错误及消费长度。
+func TestIntegerRecordDecodeProofWire(t *testing.T) {
+ wrap:=func(child []byte) []byte {
+  wire:=make([]byte,8+16*(4+len(child)))
+  wire[0]=1
+  binary.LittleEndian.PutUint32(wire[4:],uint32(len(wire)-8))
+  for i:=0;i<16;i++ {
+   start:=8+i*(4+len(child))
+   binary.LittleEndian.PutUint32(wire[start:],uint32(len(child)))
+   copy(wire[start+4:],child)
+  }
+  return wire
+ }
+ check:=func(child []byte) {
+  wire:=wrap(child)
+  for _,limits:=range []Limits{{MaxBytes:4096,MaxDepth:2,MaxElements:128},{MaxBytes:4096,MaxDepth:1,MaxElements:128},{MaxBytes:4096,MaxDepth:2,MaxElements:17}} {
+   native:=proofDocument{Marker:31}
+   generic:=proofGenericDocument{Marker:31}
+   used,err:=DecodeWithLimits(wire,&native,limits)
+   referenceUsed,referenceErr:=DecodeWithLimits(wire,&generic,limits)
+   if used!=referenceUsed || (err==nil)!=(referenceErr==nil) || (err!=nil && !errors.Is(err,referenceErr)) {
+    t.Fatalf("child %x: used %d/%d error %v/%v",child,used,referenceUsed,err,referenceErr)
+   }
+   if err!=nil {
+    if native.Marker!=31 || generic.Marker!=31 || native.Items!=nil || generic.Items!=nil {t.Fatal("failed decode changed caller")}
+    continue
+   }
+   encoded,encodeErr:=Encode(&native)
+   reference,referenceEncodeErr:=Encode(&generic)
+   if encodeErr!=nil || referenceEncodeErr!=nil || !reflect.DeepEqual(encoded,reference) {
+    t.Fatalf("decoded values diverged for %x: %x/%x errors %v/%v",child,encoded,reference,encodeErr,referenceEncodeErr)
+   }
+  }
+ }
+ seeds:=[][]byte{{0,0},{1,0,2,0},{2,0,2,0,254,255},{1,0,0,0,4,0,0,0,255,255,255,255},{1,0,0,0,8,0,0,0,0,0,0,0,0,0,0,128},
+  {3,0,255,255,253,255,16,0},{3,0,255,255,255,255,2,0},{2,0,3,0,0,0,3,0,0,0,1,2,3},{255,255},
+ }
+ for _,seed:=range seeds {
+  check(seed)
+  for n:=0;n<len(seed);n++ {check(seed[:n])}
+  for i:=range seed {
+   for bit:=uint(0);bit<8;bit++ {
+    changed:=append([]byte(nil),seed...)
+    changed[i]^=1<<bit
+    check(changed)
+   }
+  }
+ }
+}
