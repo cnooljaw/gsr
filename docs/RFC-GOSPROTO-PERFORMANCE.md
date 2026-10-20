@@ -847,3 +847,5 @@ self40/55、clone37/55，66项累计反向、2项分配尾差与全部异常保�
 原178条流程、109形态525差分及fresh/输入/二进制/raw核对；补充102条构建/worker命令与1e-12逐轮复算、原样复用描述替换回归的两侧race/checkptr均通过。没有新生产代码，不重复全库/oracle/fuzz/GoTS。后续关键候选增加单模块复核，历史结果不统一扣差或回填。下一步以a93bb0d单一SP实例重新对齐Go/PB公开API基线，再定位Body/Packing缺口，不冻结Decode。前轮440f436已提交，新[报告](benchmarks/2026-10-20-gosproto-record-tag/RESULTS.md)留审查；库和原6项删除、依赖v0.4.0保持。
 
 2026-10-20：[Decode/Unpack 独立进程诊断](benchmarks/2026-10-20-gosproto-decode-cost/RESULTS.md)完成18份profile和80条命令。大型Decode的对象构造、普通mask解包写出均为实测热点；下一Packing切片先测固定八字节目标视图，保留首遍预算/边界预检，Body字段/presence路径继续开放。尚无新候选实现或收益结论。
+
+2026-10-20：[Unpack 固定八字节视图实验](benchmarks/2026-10-20-gosproto-unpack-word/RESULTS.md)完成。960个单模块独立进程、self/clone及两轮比较全部保留；大型Unpack中位两轮约−3%，但控制同阶、整数数组反向和长尾使净收益未确认。静态目标检查未减少（指令384→392），候选暂不并入；全部mask/预算/独占结果两侧race/checkptr通过。下一步先解决索引范围证明，再在明确负载条件下测量，不设最小收益比例门槛。

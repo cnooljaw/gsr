@@ -1,0 +1,62 @@
+[
+  {
+    "side": "A",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-run",
+      "^TestUnpackWordViewBounds$",
+      "-timeout=2m",
+      "."
+    ],
+    "exitCode": 0,
+    "seconds": 3.8586911242455244,
+    "output": "ok  \tgithub.com/cnooljaw/gosproto\t1.797s\n"
+  },
+  {
+    "side": "A",
+    "args": [
+      "go",
+      "test",
+      "-gcflags=all=-d=checkptr=2",
+      "-run",
+      "^TestUnpackWordViewBounds$",
+      "-timeout=2m",
+      "."
+    ],
+    "exitCode": 0,
+    "seconds": 11.31448033452034,
+    "output": "ok  \tgithub.com/cnooljaw/gosproto\t0.351s\n"
+  },
+  {
+    "side": "B",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-run",
+      "^TestUnpackWordViewBounds$",
+      "-timeout=2m",
+      "."
+    ],
+    "exitCode": 0,
+    "seconds": 2.862384917214513,
+    "output": "ok  \tgithub.com/cnooljaw/gosproto\t1.740s\n"
+  },
+  {
+    "side": "B",
+    "args": [
+      "go",
+      "test",
+      "-gcflags=all=-d=checkptr=2",
+      "-run",
+      "^TestUnpackWordViewBounds$",
+      "-timeout=2m",
+      "."
+    ],
+    "exitCode": 0,
+    "seconds": 1.356145540252328,
+    "output": "ok  \tgithub.com/cnooljaw/gosproto\t0.358s\n"
+  }
+]

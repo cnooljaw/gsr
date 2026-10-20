@@ -61,3 +61,5 @@ TS为2026-10-15第五轮历史基线，Go为[2026-10-20 当前 a93bb0d 新五轮
 当前Body实现（2026-10-20）：[结构数组受控指针槽](benchmarks/2026-10-20-gosproto-decode-struct-slots/RESULTS.md)已保留并提交独立库 e43df35。相同对象构造下大型Decode−3.50%/−3.63%、Dispatch−5.80%/−3.04%，长结构重复改善、对象数中位不变；AddressBook PDecode+2.56%/+2.07%及全部控制/累计反向保留。新低GOGC/命名类型/元数据回退/异构指针拒绝回归、全库/官方/race/checkptr/vet/有限fuzz/GSR三包/GoTS7of7通过。新增unsafe仅同步借用已核对类型的新切片槽，GC屏障与反射回退保留。前轮成本诊断已提交06adf22，正式依赖v0.4.0不变，原库6项已有删除不动；Body与Packing继续。上方Go/PB比例已由 a93bb0d 单模块公开 API 同场总览更新；历史增量配对保留，不与旧 PB 绝对值相乘。
 
 2026-10-20：[Decode/Unpack 独立进程诊断](benchmarks/2026-10-20-gosproto-decode-cost/RESULTS.md)完成18份profile和80条命令。大型Decode的对象构造、普通mask解包写出均为实测热点；下一Packing切片先测固定八字节目标视图，保留首遍预算/边界预检，Body字段/presence路径继续开放。尚无新候选实现或收益结论。
+
+2026-10-20：[Unpack 固定八字节视图实验](benchmarks/2026-10-20-gosproto-unpack-word/RESULTS.md)完成。960个单模块独立进程、self/clone及两轮比较全部保留；大型Unpack中位两轮约−3%，但控制同阶、整数数组反向和长尾使净收益未确认。静态目标检查未减少（指令384→392），候选暂不并入；全部mask/预算/独占结果两侧race/checkptr通过。下一步先解决索引范围证明，再在明确负载条件下测量，不设最小收益比例门槛。
