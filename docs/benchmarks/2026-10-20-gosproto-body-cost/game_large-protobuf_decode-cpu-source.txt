@@ -1,0 +1,29 @@
+Total: 2.06s
+ROUTINE ======================== gosprotobodystudy.representativeOperations.func2 in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-body-cost-complete/harness/representative_benchmark_test.go
+         0      1.25s (flat, cum) 60.68% of Total
+         .          .    103:		{"protobuf_decode", func() error {
+         .          .    104:			message := newProtobuf()
+         .      1.25s    105:			err := proto.Unmarshal(protobufWire, message)
+         .          .    106:			representativeSink = message
+         .          .    107:			return err
+         .          .    108:		}},
+         .          .    109:		{"sproto_encode", func() error {
+         .          .    110:			wire, err := sproto.Encode(sprotoMessage)
+ROUTINE ======================== reflect.New in /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/reflect/value.go
+         0      200ms (flat, cum)  9.71% of Total
+         .          .   3011:func New(typ Type) Value {
+         .          .   3012:	if typ == nil {
+         .          .   3013:		panic("reflect: New(nil)")
+         .          .   3014:	}
+         .          .   3015:	t := &typ.(*rtype).t
+         .       30ms   3016:	pt := ptrTo(t)
+         .          .   3017:	if pt.IfaceIndir() {
+         .          .   3018:		// This is a pointer to a not-in-heap type.
+         .          .   3019:		panic("reflect: New of type that may not be allocated in heap (possibly undefined cgo C type)")
+         .          .   3020:	}
+         .      170ms   3021:	ptr := unsafe_New(t)
+         .          .   3022:	fl := flag(Pointer)
+         .          .   3023:	return Value{pt, ptr, fl}
+         .          .   3024:}
+         .          .   3025:
+         .          .   3026:// NewAt returns a Value representing a pointer to a value of the

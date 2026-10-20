@@ -2,6 +2,8 @@
 
 当前目标（2026-10-20，用户裁决）：同时推进Body Encode/Decode与Pack/Unpack，最终相对各自PB的领先幅度向TS结果靠近。已小幅领先不等于Body完成；Unpack组合缺口也不构成冻结正文的理由。Go/TS逐入口参考、边界与执行规则见[双主线目标](GOSPROTO-DUAL-TRACK.md)。
 
+当前Body诊断（2026-10-20）：[正文构造与执行成本](benchmarks/2026-10-20-gosproto-body-cost/RESULTS.md)完成PB/SP三消息的12CPU＋12allocation独立profile。大型SP Decode仍10416B/532次、PB13560B/537次，不能默认删对象；PB子消息数组也用reflect.New。下一项隔离同构造/同对象数量的结构数组目标槽写入，保留类型证明、GC屏障、错误/预算/ownership，不新建公共factory或池；原型本轮未实现。Encode的记录预检/写出继续跟踪，Packing不冻结。前轮tag报告已提交c4f06ee，新诊断未提交，生产源af9169d及用户已有删除保持。
+
 当前Body实验（2026-10-20）：[非负tag计数表示](benchmarks/2026-10-20-gosproto-decode-tag-counter/RESULTS.md)完成固定70项两轮，去掉查找负数检查但总指令仍660。大型Decode−0.08%/−4.51%，首轮累计却慢139.8ns；大型PDecode/Dispatch两轮略慢，小型Dispatch−0.83%/−0.17%及全部小收益保留。候选待确认、暂不应用，不设最低收益门槛。新增10组最大tag/跳跃链公共API对照及既有契约/差分/来源核对通过。前轮Packing报告已提交36f03f2，新报告未提交；生产Go源仍af9169d、用户原有删除不动，双主线继续。
 
 当前Packing实验（2026-10-20）：[普通Unpack局部word组装](benchmarks/2026-10-20-gosproto-unpack-word-store/RESULTS.md)固定70项两轮完成，正确性/159275差分及来源核对通过；大型Unpack慢8.51%/9.03%、4/8字节大数组慢约5.5%～7.6%、普通word密度普遍回退，候选未采用。短零段小收益、失败控制/累计翻转全部保留，不设固定收益门槛。前轮Body待确认报告已提交bf1203e，新实验未提交；原库已有删除未动，生产Go源仍af9169d，双主线保持。
@@ -739,3 +741,13 @@ self47/70、clone22/70，所有对象数中位相同、25字节尾差/24入口�
 固定70项280进程/26,880块，大型Decode−0.08%/−4.51%但首轮累计慢139.8ns；PDecode+1.07%/+0.30%、Dispatch+0.70%/+0.27%，累计亦两轮慢。小型Dispatch−0.83%/−0.17%、累计少16.1/38.9ns且两类控制通过，收益保留。主要Body幅度不稳定、组合有成本，候选待确认不应用；不是固定收益门槛或全面失败结论。
 
 self48/70、clone41/70，对象分配中位相同，28字节尾差/28入口累计翻转及所有异常保留；目标契约/109形态525差分/新增10边界、harness/vet/机器码/fresh/原采样函数/来源核对通过。未采用，不重复生产全验收。见[报告](benchmarks/2026-10-20-gosproto-decode-tag-counter/RESULTS.md)。后续扩大到结构构造与字段执行成本，不只排列单条件；Body和Packing双主线保持。36f03f2已提交，新报告未提交，原库删除保持、生产Go源af9169d不变。
+
+## 72. 当前Body构造/字段执行诊断
+
+三种代表消息、PB/SP纯Encode/Decode，12CPU＋12全量allocation进程；CPU约2秒、allocation5000次，初始化/预热包含在memory profile，loop分配ResetTimer-only，不用带profile的ns/op更新排名。完整分母保留运行时，父子累计不相加。
+
+大型SP Decode10416B/532次、PB13560B/537次，SP并不分配更多；SP生成数组[]int64与PB[]int32也有类型/size-class差异，不能全归因实现坏。SP CPU中reflect.New累计13.16%、Value.Set5.70%，但PB子消息数组也reflect.New（独立profile9.71%不能与SP作差计算速度），后续用pointer unmarshal/AppendPointerSlice。alloc_objects与MemStats逻辑tiny计数口径不同，不能把profile份额换算成532次中可删除对象。
+
+Encode中整数记录预检/写出仍有明显样本，不能以已领先PB而停止；保留预算/当前值读取/元信息证明。下一Body候选仅隔离同对象构造的结构数组目标槽写入，不改parser/对象数量/生命周期；若借用底层指针槽，先证明实际元素类型/尺寸/长度、元信息变化回退和GC屏障，禁止uintptr缓存/指针memcpy。尚未实现或采用，不设收益比例门槛；Packing同步跟踪。
+
+104完整命令/fixture测试/vet/模块/24profile与摘要、fresh/18Go源/生成依赖/夹具/二进制/raw核对完成。首次PB源码提取正则无匹配失败及后续修正记录完整保留；未按性能择优。无生产改动，不重复全验收或GoTS/新TS排名。见[报告](benchmarks/2026-10-20-gosproto-body-cost/RESULTS.md)。c4f06ee已提交，新诊断未提交，原库删除未触碰，双主线不变。

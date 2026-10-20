@@ -1,0 +1,48 @@
+File: body.test
+Type: cpu
+Time: 2026-10-20 10:23:38 CST
+Duration: 2.72s, Total samples = 2.26s (83.04%)
+Showing nodes accounting for 1.46s, 64.60% of 2.26s total
+Dropped 36 nodes (cum <= 0.01s)
+Showing top 40 nodes out of 85
+      flat  flat%   sum%        cum   cum%
+         0     0%     0%      1.62s 71.68%  gosprotobodystudy.BenchmarkBodyCost
+     0.01s  0.44%  0.44%      1.62s 71.68%  gosprotobodystudy.representativeOperations.func2
+         0     0%  0.44%      1.62s 71.68%  testing.(*B).run1.func1
+         0     0%  0.44%      1.62s 71.68%  testing.(*B).runN
+         0     0%  0.44%      1.55s 68.58%  google.golang.org/protobuf/proto.Unmarshal
+     0.01s  0.44%  0.88%      1.54s 68.14%  google.golang.org/protobuf/proto.UnmarshalOptions.unmarshal
+     0.01s  0.44%  1.33%      1.38s 61.06%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshal
+     0.01s  0.44%  1.77%      1.37s 60.62%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshalPointer
+     0.16s  7.08%  8.85%      1.37s 60.62%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshalPointerEager
+     0.01s  0.44%  9.29%      1.34s 59.29%  google.golang.org/protobuf/internal/impl.consumeMessageSliceInfo
+         0     0%  9.29%      0.80s 35.40%  runtime.systemstack
+     0.06s  2.65% 11.95%      0.75s 33.19%  runtime.mallocgc
+     0.62s 27.43% 39.38%      0.62s 27.43%  runtime.kevent
+         0     0% 39.38%      0.62s 27.43%  runtime.netpoll
+         0     0% 39.38%      0.62s 27.43%  runtime.startTheWorldWithSema
+     0.11s  4.87% 44.25%      0.45s 19.91%  runtime.mallocgcSmallScanNoHeader
+         0     0% 44.25%      0.33s 14.60%  runtime.gcStart.func4
+         0     0% 44.25%      0.31s 13.72%  reflect.New
+     0.01s  0.44% 44.69%      0.30s 13.27%  google.golang.org/protobuf/internal/impl.consumeStringPtr
+     0.02s  0.88% 45.58%      0.30s 13.27%  runtime.newobject
+         0     0% 45.58%      0.29s 12.83%  runtime.gcMarkTermination.func3
+     0.02s  0.88% 46.46%      0.25s 11.06%  google.golang.org/protobuf/internal/impl.pointer.AppendPointerSlice (inline)
+         0     0% 46.46%      0.25s 11.06%  reflect.unsafe_New
+     0.04s  1.77% 48.23%      0.20s  8.85%  google.golang.org/protobuf/internal/impl.consumeInt32Ptr
+     0.05s  2.21% 50.44%      0.20s  8.85%  runtime.growslice
+     0.06s  2.65% 53.10%      0.13s  5.75%  runtime.mallocgcTiny
+     0.01s  0.44% 53.54%      0.13s  5.75%  runtime.slicebytetostring
+     0.06s  2.65% 56.19%      0.11s  4.87%  runtime.(*mspan).writeHeapBitsSmall
+         0     0% 56.19%      0.11s  4.87%  runtime.heapSetTypeNoHeader (inline)
+     0.02s  0.88% 57.08%      0.09s  3.98%  runtime.deductAssistCredit
+     0.02s  0.88% 57.96%      0.08s  3.54%  reflect.(*rtype).ptrTo
+     0.08s  3.54% 61.50%      0.08s  3.54%  runtime.nextFreeFast (inline)
+         0     0% 61.50%      0.08s  3.54%  runtime.wbBufFlush
+         0     0% 61.50%      0.08s  3.54%  runtime.wbBufFlush.func1
+     0.01s  0.44% 61.95%      0.08s  3.54%  runtime.wbBufFlush1
+         0     0% 61.95%      0.07s  3.10%  github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks/gen/pb.(*AddressBook).Reset
+     0.06s  2.65% 64.60%      0.07s  3.10%  google.golang.org/protobuf/encoding/protowire.ConsumeBytes
+         0     0% 64.60%      0.07s  3.10%  google.golang.org/protobuf/proto.Reset
+         0     0% 64.60%      0.07s  3.10%  runtime.gcAssistAlloc
+         0     0% 64.60%      0.07s  3.10%  runtime.gcAssistAlloc.func2

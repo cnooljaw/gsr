@@ -1,0 +1,48 @@
+File: body.test
+Type: cpu
+Time: 2026-10-20 10:23:38 CST
+Duration: 2.72s, Total samples = 2.26s (83.04%)
+Showing nodes accounting for 2.02s, 89.38% of 2.26s total
+Dropped 36 nodes (cum <= 0.01s)
+Showing top 40 nodes out of 85
+      flat  flat%   sum%        cum   cum%
+     0.62s 27.43% 27.43%      0.62s 27.43%  runtime.kevent
+     0.16s  7.08% 34.51%      1.37s 60.62%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshalPointerEager
+     0.11s  4.87% 39.38%      0.45s 19.91%  runtime.mallocgcSmallScanNoHeader
+     0.08s  3.54% 42.92%      0.08s  3.54%  runtime.nextFreeFast (inline)
+     0.06s  2.65% 45.58%      0.07s  3.10%  google.golang.org/protobuf/encoding/protowire.ConsumeBytes
+     0.06s  2.65% 48.23%      0.11s  4.87%  runtime.(*mspan).writeHeapBitsSmall
+     0.06s  2.65% 50.88%      0.75s 33.19%  runtime.mallocgc
+     0.06s  2.65% 53.54%      0.13s  5.75%  runtime.mallocgcTiny
+     0.05s  2.21% 55.75%      0.06s  2.65%  reflect.valueInterface
+     0.05s  2.21% 57.96%      0.06s  2.65%  runtime.gcmarknewobject
+     0.05s  2.21% 60.18%      0.05s  2.21%  runtime.getGCMask (inline)
+     0.05s  2.21% 62.39%      0.05s  2.21%  runtime.getMCache (inline)
+     0.05s  2.21% 64.60%      0.20s  8.85%  runtime.growslice
+     0.04s  1.77% 66.37%      0.20s  8.85%  google.golang.org/protobuf/internal/impl.consumeInt32Ptr
+     0.04s  1.77% 68.14%      0.06s  2.65%  runtime.resolveTypeOff
+     0.04s  1.77% 69.91%      0.05s  2.21%  runtime.typePointers.next
+     0.03s  1.33% 71.24%      0.03s  1.33%  google.golang.org/protobuf/encoding/protowire.ConsumeFieldValue (inline)
+     0.03s  1.33% 72.57%      0.03s  1.33%  google.golang.org/protobuf/encoding/protowire.ConsumeVarint
+     0.03s  1.33% 73.89%      0.05s  2.21%  runtime.findObject
+     0.03s  1.33% 75.22%      0.03s  1.33%  runtime.markBits.isMarked (inline)
+     0.03s  1.33% 76.55%      0.03s  1.33%  runtime.memmove
+     0.03s  1.33% 77.88%      0.03s  1.33%  runtime.releasem (inline)
+     0.02s  0.88% 78.76%      0.25s 11.06%  google.golang.org/protobuf/internal/impl.pointer.AppendPointerSlice (inline)
+     0.02s  0.88% 79.65%      0.02s  0.88%  internal/abi.(*Type).Pointers (inline)
+     0.02s  0.88% 80.53%      0.08s  3.54%  reflect.(*rtype).ptrTo
+     0.02s  0.88% 81.42%      0.09s  3.98%  runtime.deductAssistCredit
+     0.02s  0.88% 82.30%      0.02s  0.88%  runtime.mapaccess1_fast32
+     0.02s  0.88% 83.19%      0.02s  0.88%  runtime.memclrNoHeapPointers
+     0.02s  0.88% 84.07%      0.30s 13.27%  runtime.newobject
+     0.02s  0.88% 84.96%      0.02s  0.88%  sync/atomic.StorePointer
+     0.01s  0.44% 85.40%      0.06s  2.65%  gcWriteBarrier
+     0.01s  0.44% 85.84%      1.38s 61.06%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshal
+     0.01s  0.44% 86.28%      1.37s 60.62%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshalPointer
+     0.01s  0.44% 86.73%      0.06s  2.65%  google.golang.org/protobuf/internal/impl.(*messageState).Interface
+     0.01s  0.44% 87.17%      0.03s  1.33%  google.golang.org/protobuf/internal/impl.(*messageState).StoreMessageInfo
+     0.01s  0.44% 87.61%      1.34s 59.29%  google.golang.org/protobuf/internal/impl.consumeMessageSliceInfo
+     0.01s  0.44% 88.05%      0.30s 13.27%  google.golang.org/protobuf/internal/impl.consumeStringPtr
+     0.01s  0.44% 88.50%      1.54s 68.14%  google.golang.org/protobuf/proto.UnmarshalOptions.unmarshal
+     0.01s  0.44% 88.94%      0.02s  0.88%  google.golang.org/protobuf/proto.protoMethods (inline)
+     0.01s  0.44% 89.38%      1.62s 71.68%  gosprotobodystudy.representativeOperations.func2

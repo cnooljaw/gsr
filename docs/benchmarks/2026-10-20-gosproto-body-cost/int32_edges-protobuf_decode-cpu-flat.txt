@@ -1,0 +1,48 @@
+File: body.test
+Type: cpu
+Time: 2026-10-20 10:24:09 CST
+Duration: 2.54s, Total samples = 2.25s (88.60%)
+Showing nodes accounting for 2.14s, 95.11% of 2.25s total
+Dropped 36 nodes (cum <= 0.01s)
+Showing top 40 nodes out of 43
+      flat  flat%   sum%        cum   cum%
+     0.97s 43.11% 43.11%      0.97s 43.11%  runtime.kevent
+     0.84s 37.33% 80.44%      1.21s 53.78%  google.golang.org/protobuf/internal/impl.consumeSint32Slice
+     0.23s 10.22% 90.67%      0.23s 10.22%  google.golang.org/protobuf/encoding/protowire.ConsumeVarint
+     0.02s  0.89% 91.56%      0.02s  0.89%  runtime.madvise
+     0.02s  0.89% 92.44%      0.02s  0.89%  runtime.memclrNoHeapPointers
+     0.02s  0.89% 93.33%      0.02s  0.89%  runtime.typePointers.next
+     0.01s  0.44% 93.78%      0.03s  1.33%  gosprotobodystudy.representativeMessages.func5
+     0.01s  0.44% 94.22%      0.09s  4.00%  runtime.mallocgcSmallNoscan
+     0.01s  0.44% 94.67%      0.02s  0.89%  runtime.mallocgcSmallScanNoHeader
+     0.01s  0.44% 95.11%      0.04s  1.78%  runtime.scanobject
+         0     0% 95.11%      1.21s 53.78%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshal
+         0     0% 95.11%      1.21s 53.78%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshalPointer
+         0     0% 95.11%      1.21s 53.78%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshalPointerEager
+         0     0% 95.11%      0.14s  6.22%  google.golang.org/protobuf/internal/impl.pointer.growInt32Slice (inline)
+         0     0% 95.11%      1.21s 53.78%  google.golang.org/protobuf/proto.Unmarshal
+         0     0% 95.11%      1.21s 53.78%  google.golang.org/protobuf/proto.UnmarshalOptions.unmarshal
+         0     0% 95.11%      1.25s 55.56%  gosprotobodystudy.BenchmarkBodyCost
+         0     0% 95.11%      1.25s 55.56%  gosprotobodystudy.representativeOperations.func2
+         0     0% 95.11%      0.04s  1.78%  runtime.(*mcache).nextFree
+         0     0% 95.11%      0.04s  1.78%  runtime.(*mcache).refill
+         0     0% 95.11%      0.04s  1.78%  runtime.(*mcentral).cacheSpan
+         0     0% 95.11%      0.03s  1.33%  runtime.(*mheap).alloc.func1
+         0     0% 95.11%      0.03s  1.33%  runtime.(*mheap).allocSpan
+         0     0% 95.11%      0.02s  0.89%  runtime.(*sweepLocked).sweep
+         0     0% 95.11%      0.05s  2.22%  runtime.deductAssistCredit
+         0     0% 95.11%      0.02s  0.89%  runtime.deductSweepCredit
+         0     0% 95.11%      0.05s  2.22%  runtime.gcAssistAlloc
+         0     0% 95.11%      0.05s  2.22%  runtime.gcAssistAlloc.func2
+         0     0% 95.11%      0.05s  2.22%  runtime.gcAssistAlloc1
+         0     0% 95.11%      0.05s  2.22%  runtime.gcDrainN
+         0     0% 95.11%      0.46s 20.44%  runtime.gcMarkTermination.func3
+         0     0% 95.11%      0.51s 22.67%  runtime.gcStart.func4
+         0     0% 95.11%      0.14s  6.22%  runtime.makeslice
+         0     0% 95.11%      0.16s  7.11%  runtime.mallocgc
+         0     0% 95.11%      0.97s 43.11%  runtime.netpoll
+         0     0% 95.11%      0.02s  0.89%  runtime.newobject
+         0     0% 95.11%      0.97s 43.11%  runtime.startTheWorldWithSema
+         0     0% 95.11%      0.02s  0.89%  runtime.sweepone
+         0     0% 95.11%      0.02s  0.89%  runtime.sysUsed (inline)
+         0     0% 95.11%      0.02s  0.89%  runtime.sysUsedOS (inline)

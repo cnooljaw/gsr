@@ -1,0 +1,48 @@
+File: body.test
+Type: cpu
+Time: 2026-10-20 10:24:12 CST
+Duration: 2.47s, Total samples = 2.23s (90.24%)
+Showing nodes accounting for 2.05s, 91.93% of 2.23s total
+Dropped 50 nodes (cum <= 0.01s)
+Showing top 40 nodes out of 55
+      flat  flat%   sum%        cum   cum%
+         0     0%     0%      1.66s 74.44%  runtime.systemstack
+         0     0%     0%      1.46s 65.47%  runtime.startTheWorldWithSema
+     1.45s 65.02% 65.02%      1.45s 65.02%  runtime.kevent
+         0     0% 65.02%      1.45s 65.02%  runtime.netpoll
+         0     0% 65.02%      0.89s 39.91%  runtime.gcStart.func4
+         0     0% 65.02%      0.72s 32.29%  github.com/cnooljaw/gosproto.Encode
+         0     0% 65.02%      0.72s 32.29%  github.com/cnooljaw/gosproto.EncodeWithLimits (inline)
+         0     0% 65.02%      0.72s 32.29%  github.com/cnooljaw/gosproto.encodeBufferWithLimits
+         0     0% 65.02%      0.72s 32.29%  github.com/cnooljaw/gosproto.encodeWithLimits
+         0     0% 65.02%      0.72s 32.29%  gosprotobodystudy.BenchmarkBodyCost
+         0     0% 65.02%      0.72s 32.29%  gosprotobodystudy.representativeOperations.func3
+         0     0% 65.02%      0.72s 32.29%  testing.(*B).run1.func1
+         0     0% 65.02%      0.72s 32.29%  testing.(*B).runN
+         0     0% 65.02%      0.57s 25.56%  runtime.gcMarkTermination.func3
+     0.01s  0.45% 65.47%      0.29s 13.00%  github.com/cnooljaw/gosproto.encodeMessageInto
+         0     0% 65.47%      0.28s 12.56%  github.com/cnooljaw/gosproto.encodeFieldInto
+     0.27s 12.11% 77.58%      0.27s 12.11%  github.com/cnooljaw/gosproto.encodeInt64Slice (inline)
+         0     0% 77.58%      0.21s  9.42%  github.com/cnooljaw/gosproto.encodedSize
+         0     0% 77.58%      0.21s  9.42%  runtime.makeslice
+         0     0% 77.58%      0.21s  9.42%  runtime.mallocgc
+     0.20s  8.97% 86.55%      0.20s  8.97%  github.com/cnooljaw/gosproto.fieldSize
+     0.03s  1.35% 87.89%      0.12s  5.38%  runtime.mallocgcSmallNoscan
+         0     0% 87.89%      0.09s  4.04%  runtime.deductAssistCredit
+         0     0% 87.89%      0.09s  4.04%  runtime.gcAssistAlloc
+         0     0% 87.89%      0.08s  3.59%  runtime.gcAssistAlloc.func2
+         0     0% 87.89%      0.08s  3.59%  runtime.gcAssistAlloc1
+     0.01s  0.45% 88.34%      0.08s  3.59%  runtime.gcDrainN
+         0     0% 88.34%      0.06s  2.69%  runtime.scanobject
+     0.04s  1.79% 90.13%      0.05s  2.24%  runtime.typePointers.next
+         0     0% 90.13%      0.04s  1.79%  runtime.(*mcache).nextFree
+         0     0% 90.13%      0.04s  1.79%  runtime.(*mcache).refill
+         0     0% 90.13%      0.04s  1.79%  runtime.(*mcentral).cacheSpan
+     0.01s  0.45% 90.58%      0.04s  1.79%  runtime.(*mheap).alloc.func1
+         0     0% 90.58%      0.03s  1.35%  runtime.(*mheap).allocSpan
+         0     0% 90.58%      0.03s  1.35%  runtime.(*unwinder).next
+         0     0% 90.58%      0.03s  1.35%  runtime.callers
+         0     0% 90.58%      0.03s  1.35%  runtime.callers.func1
+         0     0% 90.58%      0.03s  1.35%  runtime.mProf_Malloc
+     0.03s  1.35% 91.93%      0.03s  1.35%  runtime.madvise
+         0     0% 91.93%      0.03s  1.35%  runtime.markroot

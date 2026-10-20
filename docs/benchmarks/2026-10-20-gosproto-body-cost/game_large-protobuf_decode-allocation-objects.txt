@@ -1,0 +1,22 @@
+File: body.test
+Type: alloc_objects
+Time: 2026-10-20 10:23:56 CST
+Showing nodes accounting for 1236835, 99.39% of 1244475 total
+Dropped 335 nodes (cum <= 6222)
+      flat  flat%   sum%        cum   cum%
+    657244 52.81% 52.81%     657244 52.81%  reflect.New
+    333391 26.79% 79.60%     333391 26.79%  google.golang.org/protobuf/internal/impl.consumeUint32Ptr
+    169262 13.60% 93.20%     169262 13.60%  google.golang.org/protobuf/internal/impl.consumeSint32Ptr
+     41032  3.30% 96.50%      41032  3.30%  google.golang.org/protobuf/internal/impl.pointer.AppendPointerSlice (inline)
+     25645  2.06% 98.56%      25645  2.06%  google.golang.org/protobuf/internal/impl.consumeStringSlice
+     10258  0.82% 99.39%      10258  0.82%  google.golang.org/protobuf/internal/impl.pointer.growInt32Slice (inline)
+         2 0.00016% 99.39%    1244348   100%  testing.(*B).runN
+         1 8e-05% 99.39%    1244303   100%  gosprotobodystudy.BenchmarkBodyCost
+         0     0% 99.39%    1236100 99.33%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshal
+         0     0% 99.39%    1236100 99.33%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshalPointer
+         0     0% 99.39%    1236100 99.33%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshalPointerEager
+         0     0% 99.39%    1189939 95.62%  google.golang.org/protobuf/internal/impl.consumeMessageSliceInfo
+         0     0% 99.39%    1236102 99.33%  google.golang.org/protobuf/proto.Unmarshal
+         0     0% 99.39%    1236102 99.33%  google.golang.org/protobuf/proto.UnmarshalOptions.unmarshal
+         0     0% 99.39%    1240989 99.72%  gosprotobodystudy.representativeOperations.func2
+         0     0% 99.39%    1244309   100%  testing.(*B).run1.func1

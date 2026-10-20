@@ -1,0 +1,48 @@
+File: body.test
+Type: cpu
+Time: 2026-10-20 10:22:45 CST
+Duration: 2.47s, Total samples = 2.24s (90.78%)
+Showing nodes accounting for 2.12s, 94.64% of 2.24s total
+Dropped 18 nodes (cum <= 0.01s)
+Showing top 40 nodes out of 65
+      flat  flat%   sum%        cum   cum%
+     0.28s 12.50% 12.50%      0.28s 12.50%  google.golang.org/protobuf/encoding/protowire.AppendVarint
+     0.28s 12.50% 25.00%      0.52s 23.21%  google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointerSlow
+     0.23s 10.27% 35.27%      0.89s 39.73%  google.golang.org/protobuf/internal/impl.(*MessageInfo).marshalAppendPointer
+     0.18s  8.04% 43.30%      0.18s  8.04%  runtime.kevent
+     0.17s  7.59% 50.89%      0.26s 11.61%  google.golang.org/protobuf/internal/impl.(*MessageInfo).checkInitializedPointer
+     0.09s  4.02% 54.91%      0.09s  4.02%  google.golang.org/protobuf/internal/impl.(*MessageInfo).init (inline)
+     0.08s  3.57% 58.48%      0.60s 26.79%  google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointer
+     0.08s  3.57% 62.05%      0.08s  3.57%  google.golang.org/protobuf/internal/impl.offset.IsValid (inline)
+     0.07s  3.12% 65.18%      0.20s  8.93%  google.golang.org/protobuf/internal/impl.appendStringPtr
+     0.06s  2.68% 67.86%      0.06s  2.68%  google.golang.org/protobuf/internal/impl.pointer.Apply (inline)
+     0.06s  2.68% 70.54%      0.49s 21.88%  google.golang.org/protobuf/internal/impl.sizeMessageSliceInfo
+     0.06s  2.68% 73.21%      0.06s  2.68%  runtime.memmove
+     0.05s  2.23% 75.45%      0.16s  7.14%  google.golang.org/protobuf/internal/impl.appendInt32Ptr
+     0.05s  2.23% 77.68%      1.99s 88.84%  google.golang.org/protobuf/proto.MarshalOptions.marshal
+     0.04s  1.79% 79.46%      0.87s 38.84%  google.golang.org/protobuf/internal/impl.appendMessageSliceInfo
+     0.04s  1.79% 81.25%      0.04s  1.79%  google.golang.org/protobuf/internal/impl.pointer.Elem (inline)
+     0.04s  1.79% 83.04%      0.15s  6.70%  runtime.mallocgcSmallNoscan
+     0.03s  1.34% 84.38%      0.03s  1.34%  google.golang.org/protobuf/encoding/protowire.SizeBytes (inline)
+     0.03s  1.34% 85.71%      0.92s 41.07%  google.golang.org/protobuf/internal/impl.(*MessageInfo).marshal
+     0.03s  1.34% 87.05%      0.21s  9.38%  google.golang.org/protobuf/internal/impl.isInitMessageSliceInfo
+     0.03s  1.34% 88.39%      0.22s  9.82%  runtime.mallocgc
+     0.03s  1.34% 89.73%      0.03s  1.34%  runtime.memclrNoHeapPointers
+     0.02s  0.89% 90.62%      0.02s  0.89%  google.golang.org/protobuf/internal/impl.sizeInt32Ptr
+     0.02s  0.89% 91.52%      0.04s  1.79%  runtime.(*mheap).freeSpanLocked
+     0.02s  0.89% 92.41%      0.02s  0.89%  runtime.madvise
+     0.01s  0.45% 92.86%      0.03s  1.34%  gcWriteBarrier
+     0.01s  0.45% 93.30%      2.04s 91.07%  gosprotobodystudy.BenchmarkBodyCost
+     0.01s  0.45% 93.75%      0.07s  3.12%  runtime.(*mcache).nextFree
+     0.01s  0.45% 94.20%      0.03s  1.34%  runtime.findObject
+     0.01s  0.45% 94.64%      0.23s 10.27%  runtime.makeslice
+         0     0% 94.64%      0.08s  3.57%  google.golang.org/protobuf/encoding/protowire.AppendString (inline)
+         0     0% 94.64%      0.26s 11.61%  google.golang.org/protobuf/internal/impl.(*MessageInfo).checkInitialized
+         0     0% 94.64%      0.52s 23.21%  google.golang.org/protobuf/internal/impl.(*MessageInfo).size
+         0     0% 94.64%      0.02s  0.89%  google.golang.org/protobuf/internal/impl.sizeStringPtr
+         0     0% 94.64%      1.99s 88.84%  google.golang.org/protobuf/proto.Marshal
+         0     0% 94.64%      0.26s 11.61%  google.golang.org/protobuf/proto.checkInitialized
+         0     0% 94.64%      2.02s 90.18%  gosprotobodystudy.representativeOperations.func1
+         0     0% 94.64%      0.06s  2.68%  runtime.(*mcache).refill
+         0     0% 94.64%      0.06s  2.68%  runtime.(*mcentral).cacheSpan
+         0     0% 94.64%      0.02s  0.89%  runtime.(*mheap).alloc.func1

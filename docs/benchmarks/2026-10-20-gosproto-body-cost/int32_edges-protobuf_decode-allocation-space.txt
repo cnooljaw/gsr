@@ -1,0 +1,18 @@
+File: body.test
+Type: alloc_space
+Time: 2026-10-20 10:24:11 CST
+Showing nodes accounting for 50488.75kB, 99.36% of 50813.38kB total
+Dropped 279 nodes (cum <= 254.07kB)
+      flat  flat%   sum%        cum   cum%
+   49700kB 97.81% 97.81%    49700kB 97.81%  google.golang.org/protobuf/internal/impl.pointer.growInt32Slice (inline)
+  776.62kB  1.53% 99.34%   776.62kB  1.53%  gosprotobodystudy.representativeMessages.func5
+      12kB 0.024% 99.36% 50796.60kB   100%  gosprotobodystudy.BenchmarkBodyCost
+    0.12kB 0.00025% 99.36% 50801.09kB   100%  testing.(*B).runN
+         0     0% 99.36%    49700kB 97.81%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshal
+         0     0% 99.36%    49700kB 97.81%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshalPointer
+         0     0% 99.36%    49700kB 97.81%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshalPointerEager
+         0     0% 99.36%    49700kB 97.81%  google.golang.org/protobuf/internal/impl.consumeSint32Slice
+         0     0% 99.36% 49700.09kB 97.81%  google.golang.org/protobuf/proto.Unmarshal
+         0     0% 99.36% 49700.09kB 97.81%  google.golang.org/protobuf/proto.UnmarshalOptions.unmarshal
+         0     0% 99.36% 50472.59kB 99.33%  gosprotobodystudy.representativeOperations.func2
+         0     0% 99.36% 50797.66kB   100%  testing.(*B).run1.func1

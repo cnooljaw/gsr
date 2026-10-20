@@ -1,0 +1,48 @@
+File: body.test
+Type: cpu
+Time: 2026-10-20 10:24:09 CST
+Duration: 2.54s, Total samples = 2.25s (88.60%)
+Showing nodes accounting for 2.12s, 94.22% of 2.25s total
+Dropped 36 nodes (cum <= 0.01s)
+Showing top 40 nodes out of 43
+      flat  flat%   sum%        cum   cum%
+         0     0%     0%      1.25s 55.56%  gosprotobodystudy.BenchmarkBodyCost
+         0     0%     0%      1.25s 55.56%  gosprotobodystudy.representativeOperations.func2
+         0     0%     0%      1.25s 55.56%  testing.(*B).run1.func1
+         0     0%     0%      1.25s 55.56%  testing.(*B).runN
+         0     0%     0%      1.21s 53.78%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshal
+         0     0%     0%      1.21s 53.78%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshalPointer
+         0     0%     0%      1.21s 53.78%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshalPointerEager
+     0.84s 37.33% 37.33%      1.21s 53.78%  google.golang.org/protobuf/internal/impl.consumeSint32Slice
+         0     0% 37.33%      1.21s 53.78%  google.golang.org/protobuf/proto.Unmarshal
+         0     0% 37.33%      1.21s 53.78%  google.golang.org/protobuf/proto.UnmarshalOptions.unmarshal
+         0     0% 37.33%      1.07s 47.56%  runtime.systemstack
+     0.97s 43.11% 80.44%      0.97s 43.11%  runtime.kevent
+         0     0% 80.44%      0.97s 43.11%  runtime.netpoll
+         0     0% 80.44%      0.97s 43.11%  runtime.startTheWorldWithSema
+         0     0% 80.44%      0.51s 22.67%  runtime.gcStart.func4
+         0     0% 80.44%      0.46s 20.44%  runtime.gcMarkTermination.func3
+     0.23s 10.22% 90.67%      0.23s 10.22%  google.golang.org/protobuf/encoding/protowire.ConsumeVarint
+         0     0% 90.67%      0.16s  7.11%  runtime.mallocgc
+         0     0% 90.67%      0.14s  6.22%  google.golang.org/protobuf/internal/impl.pointer.growInt32Slice (inline)
+         0     0% 90.67%      0.14s  6.22%  runtime.makeslice
+     0.01s  0.44% 91.11%      0.09s  4.00%  runtime.mallocgcSmallNoscan
+         0     0% 91.11%      0.05s  2.22%  runtime.deductAssistCredit
+         0     0% 91.11%      0.05s  2.22%  runtime.gcAssistAlloc
+         0     0% 91.11%      0.05s  2.22%  runtime.gcAssistAlloc.func2
+         0     0% 91.11%      0.05s  2.22%  runtime.gcAssistAlloc1
+         0     0% 91.11%      0.05s  2.22%  runtime.gcDrainN
+         0     0% 91.11%      0.04s  1.78%  runtime.(*mcache).nextFree
+         0     0% 91.11%      0.04s  1.78%  runtime.(*mcache).refill
+         0     0% 91.11%      0.04s  1.78%  runtime.(*mcentral).cacheSpan
+     0.01s  0.44% 91.56%      0.04s  1.78%  runtime.scanobject
+     0.01s  0.44% 92.00%      0.03s  1.33%  gosprotobodystudy.representativeMessages.func5
+         0     0% 92.00%      0.03s  1.33%  runtime.(*mheap).alloc.func1
+         0     0% 92.00%      0.03s  1.33%  runtime.(*mheap).allocSpan
+         0     0% 92.00%      0.02s  0.89%  runtime.(*sweepLocked).sweep
+         0     0% 92.00%      0.02s  0.89%  runtime.deductSweepCredit
+     0.02s  0.89% 92.89%      0.02s  0.89%  runtime.madvise
+     0.01s  0.44% 93.33%      0.02s  0.89%  runtime.mallocgcSmallScanNoHeader
+     0.02s  0.89% 94.22%      0.02s  0.89%  runtime.memclrNoHeapPointers
+         0     0% 94.22%      0.02s  0.89%  runtime.newobject
+         0     0% 94.22%      0.02s  0.89%  runtime.sweepone

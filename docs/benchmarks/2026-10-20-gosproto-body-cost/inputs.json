@@ -1,0 +1,167 @@
+{
+  "date": "2026-10-20",
+  "gsrHead": "c4f06ee156893d91ee278b4956a8e16284e2811e",
+  "libraryCommit": "af9169ddb70972e942fb14747dc4369947db617c",
+  "go": "go version go1.24.13 darwin/arm64",
+  "platform": "macOS-14.4.1-arm64-arm-64bit",
+  "loadBefore": [
+    7.0283203125,
+    6.30126953125,
+    6.68408203125
+  ],
+  "cases": [
+    "addressbook",
+    "game_large",
+    "int32_edges"
+  ],
+  "ops": [
+    "protobuf_encode",
+    "protobuf_decode",
+    "sproto_encode",
+    "sproto_decode"
+  ],
+  "kinds": [
+    "cpu",
+    "allocation"
+  ],
+  "cpuTime": "2s",
+  "allocationCalls": 5000,
+  "allocationProfileRate": 1,
+  "gc": "GOMAXPROCS1/GOGC100/unlimitedGOMEMLIMIT",
+  "source": {
+    "limits.go": "223a9ec3a68c4fb4c5938332132692cec3658fee75aceea2e26076860fe94907",
+    "fuzz_test.go": "10eb7cb2d2fcd8afe47b6880cd61f64121f17b0a3355a6073b41ceb87e8d435c",
+    "sproto_test.go": "20a255950d0628f27a00cf5923448d524c729b05f16ed18df3a095d2c6449d9e",
+    "encode.go": "ee0fb24ed0bbc8755052d8de4fd77c38307b3ac64656176a5299d4e1069cdf3f",
+    "rpc_limits_test.go": "6c0361cbda2870b3d4abf578b7313acc44728ed78de0ea92336c8c1170ee39b1",
+    "pack.go": "54f2c365a99ae620f53bd02bf3ca4da84332c7f9102e871a88fb4ee05af00087",
+    "decode_pointer.go": "4045dae3ebd404b13efea429fbcc1dd23f764bdfa51164464b92a3992826367f",
+    "encode_integer_record.go": "0aaa3de8cde3571f70b857b51532cc332d116c6eb6293f62bed6e349b563aa60",
+    "encode_pointer.go": "e7a239568a0fc8788404de6f5bc0d5e2ac092fa559f0a6bfd4561fdc155f81c1",
+    "rpc_test.go": "4db20f87186685ef4bd78bc0e021940a8afe718a28ae8bddd6b66bede3017468",
+    "sproto.go": "2d35ffddf1ec0492fe6425f3d1dd7ede5d4edb3794773f6971fc4f36ceb80f4d",
+    "rpc.go": "6a5d29737047ecdcc2286b68a35df3330affa9dd8948ffbd5fde09104eed7899",
+    "meta.go": "6badd4a5ac60d8a15caaa1f35634268101c436b275cf4a0fe120b91db417d217",
+    "limits_test.go": "9612667b2dd51f286ee972d8303d1609a0c6bb274050f0056abe392447f29809",
+    "decode.go": "9b5206a43a017a69fb76e7f3cf901d8d5d568ad5825cb058c0b8b6b80b544868",
+    "pack_test.go": "70e79e8fa5273d4a9f31fb6afc885efbb1f2f86ca9d68b1bba4c1c97e8deed56",
+    "encode_test.go": "d28095ae5b5b820eb0d5aed634397bb86159361b5876c3126100d59e37d41099",
+    "official_compat_test.go": "fa413db0126e78205f7ee2d56f8f5d521bc29d82b723953385b79b0407412b60"
+  },
+  "harnessGo": {
+    "protocol_benchmark_test.go": "5da22792f620ff303e002c5c38fbc88f2c0205369f5f92914f134546c5d2f8e7",
+    "body_profile_test.go": "deb1f71ceb0753e97aed770954f0adf9f42b07fe205cb2417f8e29a961fe407e",
+    "representative_benchmark_test.go": "773830c5a7a2d06d35d371368a2596b5bd28e8f08a61e87b7ce634a2a8ad74c4"
+  },
+  "frozenInputs": {
+    "docs/benchmarks/2026-10-20-gosproto-body-cost/body-profile.go.txt": "97da4ba6dfc2cb2f0cbd1b0d47a321ba94c1bcb4161ebb3d2240a6e9a05c9bd4",
+    "docs/benchmarks/2026-10-20-gosproto-body-cost/reproduce.py": "4c14f8a987482f7b6f404851e3cbebf1bb6e08ca3067209891773016c017f973",
+    "examples/websocket-gate/benchmarks/gen/pb/representative.pb.go": "bde7cba1e55f7782c1572124de9aa86d85893ee80ed8e2ad5eab2b5d3db82450",
+    "examples/websocket-gate/benchmarks/gen/sproto/representative.go": "25f6aa66a2d35e5acaea7f90f8cd47f957772c96a30ab4e8ae34b4e2509bdbec"
+  },
+  "scope": "Independent CPU and allocation processes. Allocation profile includes initialization/warmup; loop B/op and allocs are ResetTimer-only. No timing ranking or simplified decoder.",
+  "binarySha256": "5e13d5066453898879482cb699d77f25573c182196cd78e30e4bc5dc5f766c5f",
+  "profiles": {
+    "addressbook-protobuf_encode-cpu": {
+      "rawSha256": "0cfd96472c5342ea5b568df374e3a9ba5da5e2e934a7265a7aadc1aab93e7570",
+      "metadataSha256": "d3e0efa030f880c9112b488b3d81913e917d557eb4fadca820301ddf8446e099"
+    },
+    "addressbook-protobuf_encode-allocation": {
+      "rawSha256": "b4b7831949fd4af5ac37be61a08d0449ecf3d38e7f8af0133ed03b3d3adf2e56",
+      "metadataSha256": "efd0dad203a7624b7bc6ae22053c94ce5c460693a577dd87cf8174d0b3a6c64e"
+    },
+    "addressbook-protobuf_decode-cpu": {
+      "rawSha256": "c45fc13878e207a3bcf989aa568fc9a031f396f80ad895ee16b1899d46439f6a",
+      "metadataSha256": "a3ff8b50931db761ac9b0e498add8d02b60cf6148ceebe0d923b287bc5f380ba"
+    },
+    "addressbook-protobuf_decode-allocation": {
+      "rawSha256": "eb4bac25cbfedd6ecaeb8d72f5d524dad27251db7e671f46a0a6661b028d79e0",
+      "metadataSha256": "63697e7b1a325e032c9e813437dd1bee243e814025319f33ac56e4c12c57e384"
+    },
+    "addressbook-sproto_encode-cpu": {
+      "rawSha256": "841896ff138726c198041767966e3c0c2353c76f1e214238dc7542cbba10b238",
+      "metadataSha256": "4b9ec18fff2c1509fb1df157a58d4a2508561e425cdce59e3f9be08bdb6e7e18"
+    },
+    "addressbook-sproto_encode-allocation": {
+      "rawSha256": "787957b2ce0291cf45735c488e310e1acd86abb8fc86c3af2f6a0b78aa53a714",
+      "metadataSha256": "b2ac07baf2700d0507287d8d7085c5f9f69c64e8c41b0309663e9e9a2ba0618f"
+    },
+    "addressbook-sproto_decode-cpu": {
+      "rawSha256": "4f7139fe8e5616605acbe96fa31cb8b59e6d1a0d1cd710467e7b81b37cf1edba",
+      "metadataSha256": "2e7ecd70eb8327a6c877806a96a631b72abfe83a324b6a37dd0c06a6c412c0a7"
+    },
+    "addressbook-sproto_decode-allocation": {
+      "rawSha256": "a99f542763d031dd08f087e4afadd62d5ac3470018bd505b1127571a00f49add",
+      "metadataSha256": "c466e7d37bff5ed1021132ea866415ec53402cce69af840af06f5cf2c38c99c0"
+    },
+    "game_large-protobuf_encode-cpu": {
+      "rawSha256": "2b7344c8fbbbc033993429b46213fb29bb39a74237daa2058483e618fb7364f7",
+      "metadataSha256": "fc92a6666fbc44470ec20397a8439d34b9b428bd43810abfe62daeca43be7b7a"
+    },
+    "game_large-protobuf_encode-allocation": {
+      "rawSha256": "72abfdd16e7a330911395c7157ec03aaf7a3c4b075f7fef6b7239e05758fab64",
+      "metadataSha256": "d8b4655765c5f38565844612477cf0b539c912c4f7ae146daebf1f3991e11df7"
+    },
+    "game_large-protobuf_decode-cpu": {
+      "rawSha256": "e1da8c75085cdd49de778ed0501d10cc8c5335d26d1821fa10df271272fa2092",
+      "metadataSha256": "2896de8a3fdfe8cd58d2ebe7a6795354d22bb9147ecddcdbb59789de43728d74"
+    },
+    "game_large-protobuf_decode-allocation": {
+      "rawSha256": "048d176a4329fe5e93ed8222ba84058dd2cd0ac19ed960a00d51751309cc3696",
+      "metadataSha256": "bff63fce094e8b80d7b8392362e059583b08d1e7ada45c0b57c7ec77904fc29f"
+    },
+    "game_large-sproto_encode-cpu": {
+      "rawSha256": "2b426539dcdf505a652f55fa073095ea9a9e05f7d0c6674d550c6f348ae6784c",
+      "metadataSha256": "3f015c7b1d9a3b39612e3b8769f470485512ea56dba656b19246b7684d6042f6"
+    },
+    "game_large-sproto_encode-allocation": {
+      "rawSha256": "07f12071912ec5c87ad6b2cedae25fb199fc0f7450bbcbb68f3d824195303a3e",
+      "metadataSha256": "7978e5016b1394eb383f17cbcf8b7e50bb5efadc5ef22fd0f26788affafb1613"
+    },
+    "game_large-sproto_decode-cpu": {
+      "rawSha256": "c2f5373afb0e9843a512f95e40d237319f0c122a1e64637c0761d3563960d9a4",
+      "metadataSha256": "d158c7ab18f376881421102bad4eda1d0c0874ed26e3ca688ce2ee99f2824fdc"
+    },
+    "game_large-sproto_decode-allocation": {
+      "rawSha256": "1c6430dbaf4b3d095a0931d85ea874d8018bc332e25fccd50976e66a882e068f",
+      "metadataSha256": "6001cff12dc40aa29ac61731f3b7449a400bda01c9c4703a53304f3ee901661d"
+    },
+    "int32_edges-protobuf_encode-cpu": {
+      "rawSha256": "39881003e8d3caa6e5550e193c8f1dbffa1fb0138290faebd65ec14ffc3e4ed4",
+      "metadataSha256": "04e383273ca2fa8c886a557bc90efad720a9dba33ebb23ab81e6b3b2a12b394e"
+    },
+    "int32_edges-protobuf_encode-allocation": {
+      "rawSha256": "26e3b157a51699b2a3bbbf825906a3059cdb392ee58b7750b6a0f50245f4f924",
+      "metadataSha256": "8e314b2a05eb501fc59fb0649a309e3f0ac9603c281bed02820b06a523c69da3"
+    },
+    "int32_edges-protobuf_decode-cpu": {
+      "rawSha256": "de63c49442ddf2e20bb5ea9ec490d936527f434d487d861d1da80a873d738ab4",
+      "metadataSha256": "c4c143fd26ba5b72b17e10c362e02110a962b33198171ea4b3d4f10943a70441"
+    },
+    "int32_edges-protobuf_decode-allocation": {
+      "rawSha256": "47487f515fc43661cad1ca80163c0daba8603594c51036834aeb33da534ec121",
+      "metadataSha256": "4dd40c44b297dae0901707f0be4fb27fe0c9cabe97ba217fc7049a4034f15b4a"
+    },
+    "int32_edges-sproto_encode-cpu": {
+      "rawSha256": "0345ece3feabd7b25939e40eb1055895a3f5f960d0aa564aff77e0e568ad9000",
+      "metadataSha256": "9c84fa233a60cc4dcb3e48e57045e7cf3e046b47f7a8e1d5b0f3729c8e58f2de"
+    },
+    "int32_edges-sproto_encode-allocation": {
+      "rawSha256": "e0f2751d88e9d4bf8c144674d82be4bf48ba4eda471d09ecbd7ffd3994ad2d84",
+      "metadataSha256": "16cbcd3615227bc9be8084d437724128257eb68f60b5ef25e70dba68e045d275"
+    },
+    "int32_edges-sproto_decode-cpu": {
+      "rawSha256": "b6d98ede8ea3dc7cff91077c6471c3855bf0255bb85acb482159a5d251d0d8d1",
+      "metadataSha256": "0d289dfb2ef24eb1bbd9a34a96da4c3878fb4ec863c317f96992c69061772b54"
+    },
+    "int32_edges-sproto_decode-allocation": {
+      "rawSha256": "329cc73ac3e4a7f5e698d5ab131ae9aa3d85db5c15266ea469e7151351964003",
+      "metadataSha256": "be9e99aad28ce6f485e77822630d8d679c8cee7712814fe20ca544e6c418f495"
+    }
+  },
+  "loadAfter": [
+    10.23095703125,
+    7.74169921875,
+    7.22509765625
+  ]
+}
