@@ -1,0 +1,235 @@
+Total: 101.72MB
+ROUTINE ======================== github.com/cnooljaw/gosproto.UnpackWithLimit in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-packing-refresh-20261020/gosproto/pack.go
+   33.54MB    33.54MB (flat, cum) 32.97% of Total
+         .          .    193:func UnpackWithLimit(src []byte, maxBytes int) ([]byte, error) {
+         .          .    194:	if maxBytes < 1 {
+         .          .    195:		return nil, ErrInvalidLimits
+         .          .    196:	}
+         .          .    197:	// 首次只扫描 tag/连续块长度，在分配前确认完整边界及有限的确切输出长度。
+         .          .    198:	size := 0
+         .          .    199:	for remaining := src; len(remaining) > 0; {
+         .          .    200:		header := remaining[0]
+         .          .    201:		consumed, produced := 1, 8
+         .          .    202:		if header == 0 {
+         .          .    203:			if len(remaining) >= 2 && remaining[1] == 0 {
+         .          .    204:				words := (maxBytes - size) / 8
+         .          .    205:				if words < 2 {
+         .          .    206:					return nil, ErrLimit
+         .          .    207:				}
+         .          .    208:				// 多检查一个零 mask 即可判定超额，不为小预算扫描整段大输入。
+         .          .    209:				end := min(len(remaining), words+1)
+         .          .    210:				run := 2 + zeroHeaderPrefix(remaining[2:end])
+         .          .    211:				if run > words {
+         .          .    212:					return nil, ErrLimit
+         .          .    213:				}
+         .          .    214:				consumed, produced = run, run*8
+         .          .    215:			}
+         .          .    216:		} else if header == 0xff {
+         .          .    217:			if len(remaining) < 2 {
+         .          .    218:				return nil, ErrUnpack
+         .          .    219:			}
+         .          .    220:			produced = (int(remaining[1]) + 1) * 8
+         .          .    221:			consumed = 2 + produced
+         .          .    222:		} else {
+         .          .    223:			consumed += bits.OnesCount8(header)
+         .          .    224:		}
+         .          .    225:		if consumed > len(remaining) {
+         .          .    226:			return nil, ErrUnpack
+         .          .    227:		}
+         .          .    228:		if produced > maxBytes-size {
+         .          .    229:			return nil, ErrLimit
+         .          .    230:		}
+         .          .    231:		size += produced
+         .          .    232:		remaining = remaining[consumed:]
+         .          .    233:	}
+   33.54MB    33.54MB    234:	unpacked := make([]byte, size)
+         .          .    235:	offset := 0
+         .          .    236:	for len(src) > 0 {
+         .          .    237:		header := src[0]
+         .          .    238:		if header == 0 {
+         .          .    239:			run := 1
+ROUTINE ======================== github.com/cnooljaw/gosproto.decodeMessage in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-packing-refresh-20261020/gosproto/decode.go
+         0    67.07MB (flat, cum) 65.94% of Total
+         .          .    310:func decodeMessage(chunk []byte, schema *SprotoType, value reflect.Value, budget *decodeBudget) (int, error) {
+         .          .    311:	budget.depth++
+         .          .    312:	defer func() { budget.depth-- }()
+         .          .    313:	if budget.depth > budget.limits.MaxDepth {
+         .          .    314:		return 0, ErrLimit
+         .          .    315:	}
+         .          .    316:	if len(chunk) < 2 {
+         .          .    317:		return 0, ErrDecode
+         .          .    318:	}
+         .          .    319:	count := int(readUint16(chunk))
+         .          .    320:	total := 2 + count*2
+         .          .    321:	if total > len(chunk) {
+         .          .    322:		return 0, ErrDecode
+         .          .    323:	}
+         .          .    324:	if err := budget.add(count); err != nil {
+         .          .    325:		return 0, err
+         .          .    326:	}
+         .          .    327:	record := value.Elem()
+         .          .    328:	exactNative := schema.nativeInt64Pointer && record.Type() == schema.typ
+         .          .    329:	pointer := messageDecodePointer(value, exactNative)
+         .          .    330:	tag := 0
+         .          .    331:	for index := 0; index < count; index++ {
+         .          .    332:		entry := int(readUint16(chunk[2+index*2 : 4+index*2 : 4+index*2]))
+         .          .    333:		if entry%2 == 1 {
+         .          .    334:			tag += (entry + 1) / 2
+         .          .    335:			continue
+         .          .    336:		}
+         .          .    337:		if tag > 65535 {
+         .          .    338:			return 0, ErrDecode
+         .          .    339:		}
+         .          .    340:		hasInline := entry != 0
+         .          .    341:		inline := uint16(entry/2 - 1)
+         .          .    342:		var content []byte
+         .          .    343:		if !hasInline {
+         .          .    344:			used, data, err := readChunk(chunk[total:])
+         .          .    345:			if err != nil {
+         .          .    346:				return 0, err
+         .          .    347:			}
+         .          .    348:			total += used
+         .          .    349:			content = data
+         .          .    350:		}
+         .          .    351:		field := schema.FieldByTag(tag)
+         .          .    352:		tag++
+         .          .    353:		if field == nil {
+         .          .    354:			continue
+         .          .    355:		}
+         .          .    356:		if hasInline && (field.Array || field.Wire == WireBytesName || field.Wire == WireStructName) {
+         .          .    357:			return 0, ErrDecode
+         .          .    358:		}
+         .          .    359:		if field.nativeInt64Pointer {
+         .          .    360:			bits, err := scalarBits(inline, hasInline, content)
+         .          .    361:			if err != nil {
+         .          .    362:				return 0, err
+         .          .    363:			}
+         .          .    364:			result := new(int64)
+         .          .    365:			*result = int64(bits)
+         .          .    366:			if !pointer.setInteger(schema, field, result) {
+         .          .    367:				record.Field(field.index[0]).Set(reflect.ValueOf(result))
+         .          .    368:			}
+         .          .    369:			continue
+         .          .    370:		}
+         .    67.07MB    371:		if err := field.dec(inline, hasInline, content, field, record.Field(field.index[0]), budget); err != nil {
+         .          .    372:			return 0, err
+         .          .    373:		}
+         .          .    374:	}
+         .          .    375:	return total, nil
+         .          .    376:}
+ROUTINE ======================== gosprotobodystudy.representativeOperations in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-packing-refresh-20261020/harness/representative_benchmark_test.go
+      872B   119.20kB (flat, cum)  0.11% of Total
+         .          .     61:func representativeOperations(tb testing.TB, sample representativeCase) ([]representativeOperation, map[string][]byte) {
+         .          .     62:	tb.Helper()
+         .          .     63:	newProtobuf, newSproto := representativeMessages(sample.Type)
+         .        64B     64:	protobufMessage := newProtobuf()
+         .    64.42kB     65:	if err := protojson.Unmarshal(sample.Data, protobufMessage); err != nil {
+         .          .     66:		tb.Fatal(err)
+         .          .     67:	}
+         .        24B     68:	sprotoMessage := newSproto()
+         .    26.17kB     69:	if err := json.Unmarshal(sample.Data, sprotoMessage); err != nil {
+         .          .     70:		tb.Fatal(err)
+         .          .     71:	}
+         .     2.62kB     72:	protobufWire, err := proto.Marshal(protobufMessage)
+         .          .     73:	if err != nil {
+         .          .     74:		tb.Fatal(err)
+         .          .     75:	}
+         .     4.79kB     76:	sprotoWire, err := sproto.Encode(sprotoMessage)
+         .          .     77:	if err != nil {
+         .          .     78:		tb.Fatal(err)
+         .          .     79:	}
+         .        4kB     80:	packed := sproto.Pack(sprotoWire)
+         .          .     81:	// 语义、消费长度及 padding 在计时外检查，避免测到未正确处理的消息。
+         .        64B     82:	protobufDecoded := newProtobuf()
+         .     4.09kB     83:	if err := proto.Unmarshal(protobufWire, protobufDecoded); err != nil || !proto.Equal(protobufMessage, protobufDecoded) {
+         .          .     84:		tb.Fatalf("%s protobuf round trip: %v", sample.Name, err)
+         .          .     85:	}
+         .        24B     86:	sprotoDecoded := newSproto()
+         .     8.07kB     87:	consumed, err := sproto.Decode(sprotoWire, sprotoDecoded)
+         .          .     88:	if err != nil || consumed != len(sprotoWire) || !reflect.DeepEqual(sprotoMessage, sprotoDecoded) {
+         .          .     89:		tb.Fatalf("%s sproto round trip: %v", sample.Name, err)
+         .          .     90:	}
+         .        4kB     91:	unpacked, err := sproto.Unpack(packed)
+         .          .     92:	if err != nil || len(unpacked) < len(sprotoWire) || len(unpacked)-len(sprotoWire) > 7 ||
+         .          .     93:		!bytes.Equal(unpacked[:len(sprotoWire)], sprotoWire) ||
+         .          .     94:		!bytes.Equal(unpacked[len(sprotoWire):], make([]byte, len(unpacked)-len(sprotoWire))) {
+         .          .     95:		tb.Fatalf("%s packing round trip: %v", sample.Name, err)
+         .          .     96:	}
+      192B       192B     97:	operations := []representativeOperation{
+       24B        24B     98:		{"protobuf_encode", func() error {
+         .          .     99:			wire, err := proto.Marshal(protobufMessage)
+         .          .    100:			encodedSink = wire
+         .          .    101:			return err
+         .          .    102:		}},
+       48B        48B    103:		{"protobuf_decode", func() error {
+         .          .    104:			message := newProtobuf()
+         .          .    105:			err := proto.Unmarshal(protobufWire, message)
+         .          .    106:			representativeSink = message
+         .          .    107:			return err
+         .          .    108:		}},
+       24B        24B    109:		{"sproto_encode", func() error {
+         .          .    110:			wire, err := sproto.Encode(sprotoMessage)
+         .          .    111:			encodedSink = wire
+         .          .    112:			return err
+         .          .    113:		}},
+       48B        48B    114:		{"sproto_decode", func() error {
+         .          .    115:			message := newSproto()
+         .          .    116:			_, err := sproto.Decode(sprotoWire, message)
+         .          .    117:			representativeSink = message
+         .          .    118:			return err
+         .          .    119:		}},
+       32B        32B    120:		{"sproto_pack", func() error {
+         .          .    121:			encodedSink = sproto.Pack(sprotoWire)
+         .          .    122:			return nil
+         .          .    123:		}},
+       32B        32B    124:		{"sproto_unpack", func() error {
+         .          .    125:			wire, err := sproto.Unpack(packed)
+         .          .    126:			encodedSink = wire
+         .          .    127:			return err
+         .          .    128:		}},
+       24B        24B    129:		{"sproto_pencode", func() error {
+         .          .    130:			wire, err := sproto.EncodePacked(sprotoMessage)
+         .          .    131:			encodedSink = wire
+         .          .    132:			return err
+         .          .    133:		}},
+       48B        48B    134:		{"sproto_pdecode", func() error {
+         .          .    135:			message := newSproto()
+         .          .    136:			err := sproto.DecodePacked(packed, message)
+         .          .    137:			representativeSink = message
+         .          .    138:			return err
+         .          .    139:		}},
+         .          .    140:	}
+      400B       400B    141:	return operations, map[string][]byte{
+         .          .    142:		"protobuf_encode": protobufWire, "sproto_encode": sprotoWire, "sproto_pack": packed,
+         .          .    143:	}
+         .          .    144:}
+         .          .    145:
+         .          .    146:func checkRepresentativeWire(tb testing.TB, sample representativeCase, wires map[string][]byte) {
+ROUTINE ======================== gosprotobodystudy.representativeOperations.func8 in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-packing-refresh-20261020/harness/representative_benchmark_test.go
+         0   101.38MB (flat, cum) 99.67% of Total
+         .          .    134:		{"sproto_pdecode", func() error {
+         .   201.19kB    135:			message := newSproto()
+         .   101.18MB    136:			err := sproto.DecodePacked(packed, message)
+         .          .    137:			representativeSink = message
+         .          .    138:			return err
+         .          .    139:		}},
+         .          .    140:	}
+         .          .    141:	return operations, map[string][]byte{
+ROUTINE ======================== reflect.New in /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/reflect/value.go
+  201.56kB   201.56kB (flat, cum)  0.19% of Total
+         .          .   3011:func New(typ Type) Value {
+         .          .   3012:	if typ == nil {
+         .          .   3013:		panic("reflect: New(nil)")
+         .          .   3014:	}
+         .          .   3015:	t := &typ.(*rtype).t
+         .          .   3016:	pt := ptrTo(t)
+         .          .   3017:	if pt.IfaceIndir() {
+         .          .   3018:		// This is a pointer to a not-in-heap type.
+         .          .   3019:		panic("reflect: New of type that may not be allocated in heap (possibly undefined cgo C type)")
+         .          .   3020:	}
+  201.56kB   201.56kB   3021:	ptr := unsafe_New(t)
+         .          .   3022:	fl := flag(Pointer)
+         .          .   3023:	return Value{pt, ptr, fl}
+         .          .   3024:}
+         .          .   3025:
+         .          .   3026:// NewAt returns a Value representing a pointer to a value of the

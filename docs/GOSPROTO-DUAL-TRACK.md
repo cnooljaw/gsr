@@ -74,3 +74,6 @@ TS为2026-10-15第五轮历史基线，Go为[2026-10-20 当前 a93bb0d 新五轮
 
 
 2026-10-20：[整数记录数组 Decode 证明复用](benchmarks/2026-10-20-gosproto-decode-record-proof/RESULTS.md)保留至少8项的短数组回退版。大型Decode两轮中位−9.40%/−9.50%、PDecode−7.76%/−6.22%，128/512项正文约快12%～13%；首版1/2项明显退化完整保留，第二版补3/4/7/8/9边界后消除该退化。当前可达字段/实际类型在本次数组入口核对，逐项wire/预算/独占对象与GC屏障保持，不跨调用缓存。两版150+200条命令、10752+14592块全部保留；新增回归先在基线通过，完整库/官方/race/checkptr/vet/有限fuzz/GSR三包/GoTS7of7通过，Decode fuzz2735次后停增如实记录。候选源码等于验收快照，独立库代码及永久回归已提交5360fe0，GSR报告同步提交；原6项删除和正式依赖v0.4.0不变。前轮GSR0c23252已提交；下一切片回到Packing成本诊断，Body继续开放，无新PB/TS排名。
+
+
+2026-10-20：[Decode优化后Packing成本更新](benchmarks/2026-10-20-gosproto-packing-refresh/RESULTS.md)基于已提交5360fe0完成三消息Unpack/PDecode共12份独立CPU/全量allocation profile，56条流程及1条实际wire审计通过。大型/整数数组普通写出源码行约占完整Unpack样本25.1%/14.0%，实际386/321个word为3～6非零字节；ASCII几乎全走FF，kevent/GC上下文保留，不重算分母或当网络瓶颈。下一单一候选为按有效字节数range连续源窗口，先核对popcount/检查/栈成本再测，完整首遍和ownership保持；本轮尚未实现。无新生产改动或PB/TS排名，库5360fe0与GSR b0b1c4c已提交，新报告留审查，原6项删除及正式依赖不变，Body继续开放。

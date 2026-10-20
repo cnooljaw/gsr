@@ -1,0 +1,48 @@
+File: body.test
+Type: cpu
+Time: 2026-10-20 15:35:43 CST
+Duration: 2.58s, Total samples = 2.31s (89.70%)
+Showing nodes accounting for 2.18s, 94.37% of 2.31s total
+Dropped 36 nodes (cum <= 0.01s)
+Showing top 40 nodes out of 56
+      flat  flat%   sum%        cum   cum%
+     1.21s 52.38% 52.38%      1.21s 52.38%  runtime.kevent
+     0.64s 27.71% 80.09%      0.73s 31.60%  github.com/cnooljaw/gosproto.UnpackWithLimit
+     0.14s  6.06% 86.15%      0.25s 10.82%  github.com/cnooljaw/gosproto.decodeIntSlice
+     0.06s  2.60% 88.74%      0.06s  2.60%  runtime.memclrNoHeapPointers
+     0.03s  1.30% 90.04%      0.03s  1.30%  runtime.madvise
+     0.02s  0.87% 90.91%      0.02s  0.87%  math/bits.OnesCount8 (inline)
+     0.02s  0.87% 91.77%      0.03s  1.30%  runtime.scanobject
+     0.01s  0.43% 92.21%      0.05s  2.16%  runtime.(*mheap).allocSpan
+     0.01s  0.43% 92.64%      0.02s  0.87%  runtime.(*mheap).freeSpanLocked
+     0.01s  0.43% 93.07%      0.02s  0.87%  runtime.findObject
+     0.01s  0.43% 93.51%      0.02s  0.87%  runtime.newMarkBits
+     0.01s  0.43% 93.94%      0.02s  0.87%  runtime.scanblock
+     0.01s  0.43% 94.37%      0.02s  0.87%  runtime.schedule
+         0     0% 94.37%      0.28s 12.12%  github.com/cnooljaw/gosproto.Decode (inline)
+         0     0% 94.37%      1.01s 43.72%  github.com/cnooljaw/gosproto.DecodePacked
+         0     0% 94.37%      0.28s 12.12%  github.com/cnooljaw/gosproto.DecodeWithLimits
+         0     0% 94.37%      0.73s 31.60%  github.com/cnooljaw/gosproto.Unpack (inline)
+         0     0% 94.37%      0.26s 11.26%  github.com/cnooljaw/gosproto.decodeMessage
+         0     0% 94.37%      1.05s 45.45%  gosprotobodystudy.BenchmarkBodyCost
+         0     0% 94.37%      0.04s  1.73%  gosprotobodystudy.representativeMessages.func6
+         0     0% 94.37%      1.05s 45.45%  gosprotobodystudy.representativeOperations.func8
+         0     0% 94.37%      0.06s  2.60%  runtime.(*mcache).nextFree
+         0     0% 94.37%      0.06s  2.60%  runtime.(*mcache).refill
+         0     0% 94.37%      0.06s  2.60%  runtime.(*mcentral).cacheSpan
+         0     0% 94.37%      0.02s  0.87%  runtime.(*mcentral).grow
+         0     0% 94.37%      0.02s  0.87%  runtime.(*mheap).alloc
+         0     0% 94.37%      0.05s  2.16%  runtime.(*mheap).alloc.func1
+         0     0% 94.37%      0.02s  0.87%  runtime.(*mheap).freeSpan (inline)
+         0     0% 94.37%      0.03s  1.30%  runtime.(*sweepLocked).sweep
+         0     0% 94.37%      0.02s  0.87%  runtime.(*sweepLocked).sweep.(*mheap).freeSpan.func2
+         0     0% 94.37%      0.07s  3.03%  runtime.deductAssistCredit
+         0     0% 94.37%      0.02s  0.87%  runtime.deductSweepCredit
+         0     0% 94.37%      0.07s  3.03%  runtime.gcAssistAlloc
+         0     0% 94.37%      0.07s  3.03%  runtime.gcAssistAlloc.func2
+         0     0% 94.37%      0.07s  3.03%  runtime.gcAssistAlloc1
+         0     0% 94.37%      0.07s  3.03%  runtime.gcDrainN
+         0     0% 94.37%      0.46s 19.91%  runtime.gcMarkTermination.func3
+         0     0% 94.37%      0.75s 32.47%  runtime.gcStart.func4
+         0     0% 94.37%      0.02s  0.87%  runtime.gopreempt_m
+         0     0% 94.37%      0.02s  0.87%  runtime.goschedImpl
