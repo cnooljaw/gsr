@@ -1,0 +1,47 @@
+File: body.test
+Type: cpu
+Time: 2026-10-20 11:45:58 CST
+Duration: 2.24s, Total samples = 1.97s (87.82%)
+Showing nodes accounting for 1.82s, 92.39% of 1.97s total
+Showing top 40 nodes out of 62
+      flat  flat%   sum%        cum   cum%
+         0     0%     0%      1.37s 69.54%  runtime.systemstack
+     1.12s 56.85% 56.85%      1.12s 56.85%  runtime.kevent
+         0     0% 56.85%      1.12s 56.85%  runtime.netpoll
+         0     0% 56.85%      1.12s 56.85%  runtime.startTheWorldWithSema
+         0     0% 56.85%      0.85s 43.15%  github.com/cnooljaw/gosproto.Pack (inline)
+         0     0% 56.85%      0.85s 43.15%  gosprotobodystudy.BenchmarkBodyCost
+         0     0% 56.85%      0.85s 43.15%  gosprotobodystudy.representativeOperations.func5
+         0     0% 56.85%      0.85s 43.15%  testing.(*B).run1.func1
+         0     0% 56.85%      0.85s 43.15%  testing.(*B).runN
+         0     0% 56.85%      0.66s 33.50%  runtime.gcStart.func4
+     0.56s 28.43% 85.28%      0.56s 28.43%  github.com/cnooljaw/gosproto.packInto
+         0     0% 85.28%      0.46s 23.35%  runtime.gcMarkTermination.func3
+         0     0% 85.28%      0.28s 14.21%  runtime.makeslice
+         0     0% 85.28%      0.28s 14.21%  runtime.mallocgc
+         0     0% 85.28%      0.18s  9.14%  runtime.deductAssistCredit
+         0     0% 85.28%      0.18s  9.14%  runtime.gcAssistAlloc
+         0     0% 85.28%      0.18s  9.14%  runtime.gcAssistAlloc.func2
+         0     0% 85.28%      0.18s  9.14%  runtime.gcAssistAlloc1
+         0     0% 85.28%      0.18s  9.14%  runtime.gcDrainN
+     0.04s  2.03% 87.31%      0.13s  6.60%  runtime.scanobject
+         0     0% 87.31%      0.10s  5.08%  runtime.(*mcache).nextFree
+         0     0% 87.31%      0.10s  5.08%  runtime.(*mcache).refill
+         0     0% 87.31%      0.10s  5.08%  runtime.(*mcentral).cacheSpan
+         0     0% 87.31%      0.10s  5.08%  runtime.mallocgcSmallNoscan
+         0     0% 87.31%      0.06s  3.05%  runtime.(*sweepLocked).sweep
+         0     0% 87.31%      0.06s  3.05%  runtime.deductSweepCredit
+         0     0% 87.31%      0.06s  3.05%  runtime.sweepone
+     0.06s  3.05% 90.36%      0.06s  3.05%  runtime.typePointers.next
+         0     0% 90.36%      0.05s  2.54%  runtime.markroot
+         0     0% 90.36%      0.04s  2.03%  runtime.(*mheap).freeSpan (inline)
+         0     0% 90.36%      0.04s  2.03%  runtime.(*mheap).freeSpanLocked
+         0     0% 90.36%      0.04s  2.03%  runtime.(*pageAlloc).update
+     0.03s  1.52% 91.88%      0.04s  2.03%  runtime.(*pallocBits).summarize
+         0     0% 91.88%      0.04s  2.03%  runtime.(*sweepLocked).sweep.(*mheap).freeSpan.func2
+         0     0% 91.88%      0.03s  1.52%  runtime.(*mcentral).grow
+         0     0% 91.88%      0.03s  1.52%  runtime.(*mheap).alloc
+         0     0% 91.88%      0.03s  1.52%  runtime.(*mheap).alloc.func1
+     0.01s  0.51% 92.39%      0.03s  1.52%  runtime.(*mheap).allocSpan
+         0     0% 92.39%      0.03s  1.52%  runtime.(*pageAlloc).free
+         0     0% 92.39%      0.03s  1.52%  runtime.markrootBlock

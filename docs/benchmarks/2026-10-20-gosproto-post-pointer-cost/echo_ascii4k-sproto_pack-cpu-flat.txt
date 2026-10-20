@@ -1,0 +1,48 @@
+File: body.test
+Type: cpu
+Time: 2026-10-20 11:46:06 CST
+Duration: 2.51s, Total samples = 2.04s (81.32%)
+Showing nodes accounting for 1.96s, 96.08% of 2.04s total
+Dropped 26 nodes (cum <= 0.01s)
+Showing top 40 nodes out of 47
+      flat  flat%   sum%        cum   cum%
+     1.49s 73.04% 73.04%      1.49s 73.04%  runtime.kevent
+     0.12s  5.88% 78.92%      0.13s  6.37%  runtime.typePointers.next
+     0.09s  4.41% 83.33%      0.09s  4.41%  indexbytebody
+     0.07s  3.43% 86.76%      0.23s 11.27%  runtime.scanobject
+     0.03s  1.47% 88.24%      0.03s  1.47%  runtime.memclrNoHeapPointers
+     0.03s  1.47% 89.71%      0.03s  1.47%  runtime.memmove
+     0.02s  0.98% 90.69%      0.02s  0.98%  runtime.madvise
+     0.02s  0.98% 91.67%      0.08s  3.92%  runtime.mallocgcSmallNoscan
+     0.02s  0.98% 92.65%      0.03s  1.47%  runtime.scanblock
+     0.02s  0.98% 93.63%      0.02s  0.98%  runtime.typePointers.nextFast (inline)
+     0.01s  0.49% 94.12%      0.14s  6.86%  github.com/cnooljaw/gosproto.packInto
+     0.01s  0.49% 94.61%      0.04s  1.96%  github.com/cnooljaw/gosproto.writeFF (inline)
+     0.01s  0.49% 95.10%      0.03s  1.47%  runtime.(*unwinder).resolveInternal
+     0.01s  0.49% 95.59%      0.30s 14.71%  runtime.gcDrainN
+     0.01s  0.49% 96.08%      0.02s  0.98%  runtime.pcvalue
+         0     0% 96.08%      0.09s  4.41%  bytes.IndexByte (inline)
+         0     0% 96.08%      0.52s 25.49%  github.com/cnooljaw/gosproto.Pack (inline)
+         0     0% 96.08%      0.09s  4.41%  github.com/cnooljaw/gosproto.ffRunBytes
+         0     0% 96.08%      0.09s  4.41%  github.com/cnooljaw/gosproto.followingFFWords
+         0     0% 96.08%      0.52s 25.49%  gosprotobodystudy.BenchmarkBodyCost
+         0     0% 96.08%      0.52s 25.49%  gosprotobodystudy.representativeOperations.func5
+         0     0% 96.08%      0.02s  0.98%  runtime.(*mcache).nextFree
+         0     0% 96.08%      0.02s  0.98%  runtime.(*mcache).refill
+         0     0% 96.08%      0.02s  0.98%  runtime.(*mcentral).cacheSpan
+         0     0% 96.08%      0.02s  0.98%  runtime.(*pageAlloc).scavenge.func1
+         0     0% 96.08%      0.02s  0.98%  runtime.(*pageAlloc).scavengeOne
+         0     0% 96.08%      0.03s  1.47%  runtime.(*unwinder).next
+         0     0% 96.08%      0.30s 14.71%  runtime.deductAssistCredit
+         0     0% 96.08%      0.02s  0.98%  runtime.funcspdelta (inline)
+         0     0% 96.08%      0.30s 14.71%  runtime.gcAssistAlloc
+         0     0% 96.08%      0.30s 14.71%  runtime.gcAssistAlloc.func2
+         0     0% 96.08%      0.30s 14.71%  runtime.gcAssistAlloc1
+         0     0% 96.08%      0.88s 43.14%  runtime.gcMarkTermination.func3
+         0     0% 96.08%      0.62s 30.39%  runtime.gcStart.func4
+         0     0% 96.08%      0.38s 18.63%  runtime.makeslice
+         0     0% 96.08%      0.38s 18.63%  runtime.mallocgc
+         0     0% 96.08%      0.06s  2.94%  runtime.markroot
+         0     0% 96.08%      0.02s  0.98%  runtime.markroot.func1
+         0     0% 96.08%      0.03s  1.47%  runtime.markrootBlock
+         0     0% 96.08%      1.49s 73.04%  runtime.netpoll

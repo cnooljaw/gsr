@@ -1,0 +1,47 @@
+File: body.test
+Type: cpu
+Time: 2026-10-20 11:45:46 CST
+Duration: 2.56s, Total samples = 2s (78.13%)
+Showing nodes accounting for 2s, 100% of 2s total
+Showing top 40 nodes out of 90
+      flat  flat%   sum%        cum   cum%
+     0.62s 31.00% 31.00%      0.62s 31.00%  runtime.kevent
+     0.28s 14.00% 45.00%      0.34s 17.00%  github.com/cnooljaw/gosproto.encodeIntegerRecordInto
+     0.23s 11.50% 56.50%      0.43s 21.50%  github.com/cnooljaw/gosproto.encodedIntegerRecordSize
+     0.11s  5.50% 62.00%      0.52s 26.00%  github.com/cnooljaw/gosproto.encodeFieldInto
+     0.11s  5.50% 67.50%      0.57s 28.50%  github.com/cnooljaw/gosproto.fieldSize
+     0.08s  4.00% 71.50%      0.11s  5.50%  github.com/cnooljaw/gosproto.(*encodeLayout).add (inline)
+     0.07s  3.50% 75.00%      0.07s  3.50%  github.com/cnooljaw/gosproto.encodePointer.integer (inline)
+     0.05s  2.50% 77.50%      0.05s  2.50%  github.com/cnooljaw/gosproto.(*decodeBudget).add (inline)
+     0.04s  2.00% 79.50%      0.04s  2.00%  github.com/cnooljaw/gosproto.encodeInt64Slice (inline)
+     0.04s  2.00% 81.50%      0.60s 30.00%  github.com/cnooljaw/gosproto.encodeMessageInto
+     0.04s  2.00% 83.50%      0.04s  2.00%  runtime.madvise
+     0.03s  1.50% 85.00%      0.04s  2.00%  runtime.typePointers.next
+     0.02s  1.00% 86.00%      0.02s  1.00%  github.com/cnooljaw/gosproto.(*SprotoField).nativeInteger (inline)
+     0.02s  1.00% 87.00%      0.02s  1.00%  github.com/cnooljaw/gosproto.(*encodeLayout).next (inline)
+     0.02s  1.00% 88.00%      0.03s  1.50%  reflect.resolveTypeOff
+     0.02s  1.00% 89.00%      0.02s  1.00%  reflect.valueInterface
+     0.02s  1.00% 90.00%      0.02s  1.00%  runtime.memmove
+     0.01s   0.5% 90.50%      0.01s   0.5%  github.com/cnooljaw/gosproto.(*encodeLayout).set (inline)
+     0.01s   0.5% 91.00%      1.33s 66.50%  github.com/cnooljaw/gosproto.Encode
+     0.01s   0.5% 91.50%      0.01s   0.5%  github.com/cnooljaw/gosproto.encodeIntegerInto (inline)
+     0.01s   0.5% 92.00%      1.32s 66.00%  github.com/cnooljaw/gosproto.encodeWithLimits
+     0.01s   0.5% 92.50%      0.01s   0.5%  internal/abi.(*SwissMapType).IndirectElem (inline)
+     0.01s   0.5% 93.00%      0.01s   0.5%  reflect.flag.kind (inline)
+     0.01s   0.5% 93.50%      0.01s   0.5%  runtime.(*gcControllerState).heapGoalInternal
+     0.01s   0.5% 94.00%      0.01s   0.5%  runtime.(*mcentral).grow
+     0.01s   0.5% 94.50%      0.01s   0.5%  runtime.(*mspan).countAlloc
+     0.01s   0.5% 95.00%      0.01s   0.5%  runtime.findObject
+     0.01s   0.5% 95.50%      0.10s  5.00%  runtime.gcDrainN
+     0.01s   0.5% 96.00%      0.01s   0.5%  runtime.greyobject
+     0.01s   0.5% 96.50%      0.16s  8.00%  runtime.mallocgc
+     0.01s   0.5% 97.00%      0.05s  2.50%  runtime.mallocgcSmallNoscan
+     0.01s   0.5% 97.50%      0.01s   0.5%  runtime.memclrNoHeapPointers
+     0.01s   0.5% 98.00%      0.01s   0.5%  runtime.nextFreeFast (inline)
+     0.01s   0.5% 98.50%      0.01s   0.5%  runtime.readUintptr (inline)
+     0.01s   0.5% 99.00%      0.01s   0.5%  runtime.resolveTypeOff
+     0.01s   0.5% 99.50%      0.01s   0.5%  runtime.step
+     0.01s   0.5%   100%      0.01s   0.5%  runtime.typePointers.nextFast (inline)
+         0     0%   100%      1.32s 66.00%  github.com/cnooljaw/gosproto.EncodeWithLimits (inline)
+         0     0%   100%      0.01s   0.5%  github.com/cnooljaw/gosproto.GetSprotoType
+         0     0%   100%      1.31s 65.50%  github.com/cnooljaw/gosproto.encodeBufferWithLimits

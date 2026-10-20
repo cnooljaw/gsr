@@ -1,5 +1,7 @@
 # gosproto 后续性能优化方案
 
+当前双主线诊断（2026-10-20）：[指针优化后成本](benchmarks/2026-10-20-gosproto-post-pointer-cost/RESULTS.md)基于已提交a93bb0d完成9CPU+9allocation及独立实际wire审计。大型Encode的整数记录预检/写出仍累计21.50%/17.00%；大型/数值数组分别386/417与321/449个word为3～7非零字节，下一Packing候选优先普通word目标视图与扫描，不误投FF。ASCII512个FF word另看扫描/分配。80条profile命令+1条审计、fresh/源码/输入/二进制/raw核对通过，无新生产改动或PB/TS排名。前轮库a93bb0d/GSR3f23e02已提交，新诊断未提交；正式依赖、用户原6项删除及两条主线保持。
+
 当前Body实现（2026-10-20）：[整数记录数组受控指针读取](benchmarks/2026-10-20-gosproto-record-pointers/RESULTS.md)仅在当前字段证明及实际元素指针类型核对后，同步读切片指针槽，减少两阶段逐元素反射，命名指针回退。固定37项两轮，大型Encode−18.63%/−19.05%、PEncode−15.87%/−14.34%；AddressBook PEncode+6.43%/+0.43%、数值Encode+1.61%/+2.01%及31项累计反向保留。178条测量流程、基线新回归及7条全库/oracle/race/checkptr/vet/有限fuzz/GSR三包/GoTS7of7通过，候选和永久回归已提交独立库a93bb0d。前轮库7b05b78/GSR2c5c653已提交，正式依赖及原6项删除不动，Body与Packing继续。
 
 当前Body实现（2026-10-20）：[原生字段分布诊断](benchmarks/2026-10-20-gosproto-inline-shapes/RESULTS.md)沿用同一延迟内容切片候选，固定8/64字段×8分布的Encode/PEncode共32项、128进程两轮。8字段混合Encode−0.57%/−0.77%、64字段半缺失PEncode−2.15%/−2.58%；64字段负数PEncode+1.40%/+0.50%及29项累计反向全部保留。决定保留小改动、接受局部代价，不宣称业务全面提速；158条测量流程及7条全库/oracle/race/checkptr/vet/有限fuzz/GSR三包/GoTS7of7验收通过，精确源码已提交独立库7b05b78。前轮19项报告已提交ffc591f，正式依赖v0.4.0及用户原6项删除不动，Body与Packing继续。
@@ -799,3 +801,13 @@ self13/19、clone15/19通过；全部limiter为0，最大堆快照4101360B（不
 self22/37、clone24/37，比较分配中位全相同；两项clone字节尾差与31项累计反向、全部异常保留，不扣噪声或按最低收益比例筛选。最大堆快照4195232B、limiter全0。fieldSize指令956→996/栈240→256B、encodeFieldInto864→912/208→224B、helper120/96B；不消除fallback反射，不据静态条数预告速度。
 
 178条测量流程含109形态525差分、既有编码/元信息/预算契约、harness/vet/构建/fresh/生成输入/夹具/二进制/逐项raw核对。新增切片形状、nil/改值/GC/预算/独占回归先在未改基线通过race/checkptr，再执行7条完整验收：库全测/固定官方oracle/race/checkptr/vet/有限fuzz463887/10154、GSR三包与GoTS7/7零skip通过；Decode fuzz3秒后计数停止、11秒正常退出原文保留。精确候选3个运行时文件和永久测试已提交独立库a93bb0d，旧6项删除不动，正式依赖v0.4.0不变。前轮7b05b78/2c5c653已提交，新[报告](benchmarks/2026-10-20-gosproto-record-pointers/RESULTS.md)留审查。后续重新定位Body高占比重复工作，Packing主线继续。
+
+## 77. 数组优化后双主线成本更新
+
+仅采已提交a93bb0d的9个CPU＋9个全量allocation进程：大型/整数数组/ASCII4KiB的Encode、Pack、PEncode。每CPU约2秒、每allocation5000次，GOMAXPROCS1/GOGC100，profile完整分母及GC/kevent均保留，不删运行时样本重算占比，不把带profile的ns/op当排名。80条流程命令与fresh/源码/生成输入/夹具/二进制/raw核对通过，无生产候选，不重复上轮完整验收。
+
+大型Encode的encodedSize28.50%（整数记录预检21.50%）、encodeMessageInto30.00%（整数记录写出17.00%）仍值得推进；父子不相加。大型PEncode的packInto17.39%，整数数组PEncode的packInto29.00%。下一Body候选仅考虑数组入口的当前字段引用局部计划，减少order→Fields重复索引，继续当前值读取/每次调用重绑定；先测拷贝/栈/分配代价，尚未实施。
+
+独立wire审计1条命令通过：大型417完整word中386个为3～7非零字节，整数数组449中321个同类、无FF；ASCII513中512个全非零、实际FF消费4096B。下一Packing候选隔离普通路径稀疏/密集固定目标视图是否可共享构造，先证明完整增长/重叠间隔，再测mask/长度/密度/小包；可能伤稀疏，不预设采用。FF与所有权/cap不改，ASCII另按FF扫描和分配看待。
+
+循环分配大型Encode/PEncode3968B/2次、Pack3456B/1次；整数数组各4096B/1次、ASCII各4864B/1次。allocation profile含初始化/预热，不把物理对象计数当loop逻辑次数；PEncode已有融合缓冲，不等于两操作分配相加。无新PB/TS对照，无性能比例拼接。见[完整诊断](benchmarks/2026-10-20-gosproto-post-pointer-cost/RESULTS.md)。原库Go源仍a93bb0d及6项原删除保持，前轮GSR3f23e02已提交，新报告留审查，依赖v0.4.0与双主线保持。
