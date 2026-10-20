@@ -1,0 +1,247 @@
+{
+  "baselineCommit": "a93bb0d66678c33e328c94d39036f8ff9772a5e9",
+  "gsrCommit": "440f436686cb149fa2d6dee71e0d3fe577d38577",
+  "counts": {
+    "processes": 148,
+    "blocks": 14208,
+    "quartets": 3552,
+    "rounds": 888,
+    "snapshots": 592
+  },
+  "successfulCommands": 178,
+  "measurementPreparationAndRawVerified": [
+    {
+      "mode": "self",
+      "changedGoFiles": [],
+      "allInputsAndRawVerified": true
+    },
+    {
+      "mode": "clone",
+      "changedGoFiles": [],
+      "allInputsAndRawVerified": true
+    },
+    {
+      "mode": "pass1",
+      "changedGoFiles": [
+        "encode_integer_record.go"
+      ],
+      "allInputsAndRawVerified": true
+    },
+    {
+      "mode": "pass2",
+      "changedGoFiles": [
+        "encode_integer_record.go"
+      ],
+      "allInputsAndRawVerified": true
+    }
+  ],
+  "controlAndTelemetrySummary": {
+    "self": {
+      "controlAccepted": 27,
+      "sameAllocation": 37,
+      "initialLimiterNonzero": 0,
+      "anyLimiterChange": 0,
+      "largestSampledHeap": 4186360,
+      "unequalAllocations": [],
+      "failedControls": [
+        "addressbook/sproto_encode",
+        "game_small/sproto_pack",
+        "game_large/sproto_pack",
+        "int32_edges/sproto_encode",
+        "echo_ascii4k/sproto_encode",
+        "echo_ascii4k/sproto_pencode",
+        "zeros4k/frame",
+        "flat/half/4096/encode",
+        "nested/32x128/encode",
+        "array_record/32/pencode"
+      ]
+    },
+    "clone": {
+      "controlAccepted": 19,
+      "sameAllocation": 37,
+      "initialLimiterNonzero": 0,
+      "anyLimiterChange": 0,
+      "largestSampledHeap": 4068336,
+      "unequalAllocations": [],
+      "failedControls": [
+        "game_small/sproto_encode",
+        "game_small/sproto_pencode",
+        "game_large/sproto_encode",
+        "game_large/sproto_pencode",
+        "echo_ascii4k/sproto_pencode",
+        "ascii32/frame",
+        "ascii4k/frame",
+        "flat/full/32/encode",
+        "flat/full/32/pencode",
+        "flat/full/33/encode",
+        "flat/full/33/pencode",
+        "flat/full/4096/encode",
+        "flat/full/4096/pencode",
+        "flat/half/4096/encode",
+        "flat/half/4096/pencode",
+        "nested/32x128/encode",
+        "nested/32x128/pencode",
+        "array_record/32/encode"
+      ]
+    },
+    "pass1": {
+      "controlAccepted": null,
+      "sameAllocation": 37,
+      "initialLimiterNonzero": 0,
+      "anyLimiterChange": 0,
+      "largestSampledHeap": 4079248,
+      "unequalAllocations": [],
+      "failedControls": null
+    },
+    "pass2": {
+      "controlAccepted": null,
+      "sameAllocation": 36,
+      "initialLimiterNonzero": 0,
+      "anyLimiterChange": 0,
+      "largestSampledHeap": 4194896,
+      "unequalAllocations": [
+        "zeros4k/frame"
+      ],
+      "failedControls": null
+    }
+  },
+  "libraryStatus": " D .github/workflows/test.yml\n D LICENSE\n D examples/echo/echo.sproto\n D examples/echo/main.go\n D go.mod\n D testdata/fuzz/FuzzPackRoundTrip/4756e628ac53e8fe\n",
+  "runtimeSourceStillBaseline": true,
+  "cumulativeReversalCount": 32,
+  "allocationTailCount": 1,
+  "scope": "integer-record per-field current Tag local candidate, original19 plus18 growth cases; no production modification or new PB/TS ranking",
+  "artifactsSha256": {
+    ".gitattributes": "fb25a78a6381f5646d71aacea4486f6aeeeb03c4d71740227011024be0d20a8f",
+    "ALL-CASES.md": "5adab62cbb024a2ad7310330f0c90215ecbace537bacaac15ef87e6f9f92ec7b",
+    "RESULTS.md": "890ba143016de4af409177774391549d157349c31c9076116b095ecd28eef21d",
+    "accept.py": "f407170a0684dc235cf95a4b00ca46ada33ab535106f758c61b817328fc6471d",
+    "allocation-tails.json": "209dad3a0e25bbd988a5a2cad2e87d639f7da949023272aad34395cd86938ad4",
+    "analysis.json": "ce5ba648b7e8ccddfb419456e5e0a4027b846d5f04cff409ba0300246959cd91",
+    "analyze.py": "e714d8a1e11a7103694e535b6f755e48c97bf77a8d918dc3492bb95b29d8f063",
+    "before-compiler.txt": "98d4503aabb4470c12da079e11536c4dfb855085bcdc395c3dd02a2ecf5fc105",
+    "before-encode-assembly.txt": "94bed28275a33cea866dae3c5723ba6d9e185536da41daa30edae100b9d73a48",
+    "candidate-compiler.txt": "844cec67c334b8f6fc592147e631a8f19a4ddba771d90d76514919acda573210",
+    "candidate-encode-assembly.txt": "6c4d069ba97e3475c9faea546e34c1dc2f647a1e1f0c003a67afcc1e242bc0f1",
+    "candidate.patch": "121c4acb30726e53862d68e7b70b4d5ce39df91ee0202716b180fce81590cdf3",
+    "clone/case-list.json": "d443c765146fad875b2ec9e08094255f8739f1fca17de3edd6d7b932bfe0e7a3",
+    "clone/inputs.json": "a58ed4b8c2e3eb7743fff0546540327a70440beb1cb42a5fe409a7fc2b96daf9",
+    "clone/raw.json": "15401148c336fb6a57fa873d142e3fa347c3e87c17fdc6fa0d18cb7634fb9a16",
+    "clone/summary.json": "c8c8fefa79c64b29ae95513943158c444a6edfd7bcec264fdda52518ae9779a5",
+    "commands.json": "1405c3cd28a29d2f125fc26e57a455acd416829dc91db3463033e4e3e827ba73",
+    "cumulative-reversals.json": "70a3d5eab23c0f3bd19ca800e081cf0c8bcc361b42f1aed63a81cecefd7fbca3",
+    "field-regression.json": "1ab1d547db867e25435fbe9272928a23b18abc9bf658e3fdbc7c1d027349f47e",
+    "fields-test.go.txt": "71898680ff0c85fa12fe34488a3622d04892da1a91955b28c696cb76d7700a7d",
+    "growth-adapter.go.txt": "c45d5619bdc3341e4c102e4910c390fa029e20de0ad66f74359f0600fc73d4e3",
+    "pass1/case-list.json": "d443c765146fad875b2ec9e08094255f8739f1fca17de3edd6d7b932bfe0e7a3",
+    "pass1/inputs.json": "bb22994a0e7c4121b486bda155108c1dfb7427352d1064ce98bed39822b052d0",
+    "pass1/raw.json": "e64ea449f4fc65871ef977f49e1adc8ca4c326096d6d47cf24d5f5d45ca87208",
+    "pass1/summary.json": "eaf82a0454582a8d951232e04c5cd47d70023a33dc2c0dae976f0eb1089841d9",
+    "pass2/case-list.json": "d443c765146fad875b2ec9e08094255f8739f1fca17de3edd6d7b932bfe0e7a3",
+    "pass2/inputs.json": "b6459bd62bb7f17ecca23d1258ea910c8018b08dd8e2bb0f51f5e2a4048b9656",
+    "pass2/raw.json": "eea47efba822935450b82e98bdded83b0c8927f1c947ed6cb17c57fcb1f96399",
+    "pass2/summary.json": "e2111d5a9155201dc035206e60d98d8eebdba66138ebf7f272519010d5f421cf",
+    "plan.json": "384b97d2a46ec5c8ba39bcbe9de6137cec4c1640b42801d4e2428cfaa12696ba",
+    "precheck-assembly.txt": "3079aacc6caed9aa5010b95f1c56d8f4683e9f258c265db9a947fe5de9b42e0d",
+    "precheck-inputs.json": "24309ac5510a60feab886637f1cfa49a83ec32c994dcbb874507b332c61831c1",
+    "precheck-summary.json": "9c86c3ea10f0334ea096920b86d9c1c0c7c288e8b5619fe55391fcdef2a467a7",
+    "precheck.json": "c19c992085748b1f2ab968c477a627a9052307409ed2f807b6cedee0ee8e69d3",
+    "reproduce.py": "241e18819cfc4d09f2b38dc36ae685fff56c7f9985343c680b52e955d8972ec0",
+    "self/case-list.json": "d443c765146fad875b2ec9e08094255f8739f1fca17de3edd6d7b932bfe0e7a3",
+    "self/inputs.json": "dca32b2a2e99f29283be2ab2a0bb36d3b1701c84ce1840ffc9ad7b1afcfe905b",
+    "self/raw.json": "73728b0a84c06c05a26809ff84976c93a40f43536288901789da6e0de1e560e7",
+    "self/summary.json": "1f8613f1953ce06b960577ee68ec864899673ef0aa24a6a18e6fcea38b7ef35b",
+    "single-module/A-assembly.txt": "84054b226cced8afb9c2f5a27b9786d346b3a7f7e1e29e93acfad90b478bc697",
+    "single-module/B-assembly.txt": "9274dc275685d7d993290cc46e6a5e15fc7cd9c582ee06ed5a8873797b568c9e",
+    "single-module/commands.json": "ca1ac4dbfe5f5d60a2666e4be4599a88258dd0b17d9521cfb2fc1f5647087ad7",
+    "single-module/plan.json": "5064341c29a37073df76c80eb679295784a0cb5c387dfd0d0be746263ca758de",
+    "single-module/results.json": "f590503a83e8958a494a58fb88916c471b34e2b4b438b175f08619ac37e35f95",
+    "single-module/validation.json": "5ac242878df5422cdafb74dc5f6148085339a47a005c9d52f03a26e70f01ef78",
+    "single-module.go.txt": "b925588bfc2644e7dfc880a90b77c8d8aaf13b808d0b64cab0ed196f5755641b",
+    "single-module.py": "2f247042fcf3d2cb3bedd8e995cf188d0cf26309d6cb2382c61dac9f23793edf"
+  },
+  "productionCandidateRetained": false,
+  "decision": "Net gain unconfirmed. Same-source dual-module control +6.66% near candidate; single-module supplemental Encode+1.95%, PEncode-0.86% with substantial control/spread; no subtraction or minimum gain floor",
+  "singleModule": {
+    "commands": 102,
+    "workerProcesses": 96,
+    "callsPerWorker": 100000,
+    "roundRatioRecalculationTolerance": 1e-12,
+    "sourcesAndBinaryVerified": true,
+    "fixturesCheckedAfterSampling": {
+      "representative.json": "5d4ead8bcf974f35e9ca9b7c4b41e946790ea5d68534fdf231813f6f7ff9ea33",
+      "cases.json": "aa77345f5b8560ae6a10beeb3b492bd5b2d722230da3df667d776eaa9b580d70"
+    },
+    "functionAddresses": {
+      "A": {
+        "github.com/cnooljaw/gosproto.encodedIntegerRecordSize": "0x1001522b0",
+        "github.com/cnooljaw/gosproto.encodeIntegerRecordInto": "0x1001526b0"
+      },
+      "B": {
+        "github.com/cnooljaw/gosproto.encodedIntegerRecordSize": "0x1001522b0",
+        "github.com/cnooljaw/gosproto.encodeIntegerRecordInto": "0x1001526b0"
+      }
+    },
+    "sameAddressObservation": "Both record functions at identical linked addresses in A/B standalone binaries; does not prove every machine/runtime state identical.",
+    "allocationValues": {
+      "control/sproto_encode": [
+        [
+          3968,
+          2
+        ]
+      ],
+      "control/sproto_pencode": [
+        [
+          3968,
+          2
+        ]
+      ],
+      "compare/sproto_encode": [
+        [
+          3968,
+          2
+        ]
+      ],
+      "compare/sproto_pencode": [
+        [
+          3968,
+          2
+        ]
+      ]
+    },
+    "scope": "Adaptive supplementary diagnosis after same-source dual-module control showed systematic difference. All fixed96 workers retained; not corrected prior result or new full benchmark."
+  },
+  "fieldRegression": [
+    {
+      "side": "before",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "-gcflags=all=-d=checkptr=2",
+        "-run",
+        "^TestEncodeRecordFieldProjection$",
+        ".",
+        "-timeout=1m"
+      ],
+      "seconds": 3.5793933738023043,
+      "exitCode": 0,
+      "output": "ok  \tgithub.com/cnooljaw/gosproto\t1.641s\n"
+    },
+    {
+      "side": "candidate",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "-gcflags=all=-d=checkptr=2",
+        "-run",
+        "^TestEncodeRecordFieldProjection$",
+        ".",
+        "-timeout=1m"
+      ],
+      "seconds": 2.239988625049591,
+      "exitCode": 0,
+      "output": "ok  \tgithub.com/cnooljaw/gosproto\t1.386s\n"
+    }
+  ]
+}

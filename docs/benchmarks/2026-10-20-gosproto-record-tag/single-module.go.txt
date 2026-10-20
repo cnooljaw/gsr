@@ -1,0 +1,27 @@
+package benchmarks
+import (
+ "os"
+ "runtime"
+ "testing"
+ "time"
+)
+
+// BenchmarkTagSingleModule 仅以单一模块实例诊断大型公开编码路径，避免同进程双模块元信息状态差异。
+func BenchmarkTagSingleModule(b *testing.B) {
+ if runtime.GOMAXPROCS(0)!=1 {b.Fatal("GOMAXPROCS1 required")}
+ name:=os.Getenv("GSR_TAG_OP")
+ var run func()error
+ for _,sample:=range representativeCases(b) {
+  if sample.Name!="game_large" {continue}
+  operations,_:=representativeOperations(b,sample)
+  for _,op:=range operations {if op.name==name {run=op.run}}
+ }
+ if run==nil {b.Fatal("unknown operation",name)}
+ encodedSink,representativeSink,decodedSink=nil,nil,""
+ runtime.GC()
+ start:=time.Now()
+ for time.Since(start)<50*time.Millisecond {for range 64 {if err:=run();err!=nil {b.Fatal(err)}}}
+ b.ReportAllocs();b.ResetTimer()
+ for b.Loop() {if err:=run();err!=nil {b.Fatal(err)}}
+ b.StopTimer();runtime.KeepAlive(run)
+}
