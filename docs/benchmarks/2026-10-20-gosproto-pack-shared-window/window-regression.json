@@ -1,0 +1,34 @@
+[
+  {
+    "side": "before",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-gcflags=all=-d=checkptr=2",
+      "-run",
+      "^TestPackOverlappingWindowBounds$",
+      ".",
+      "-timeout=1m"
+    ],
+    "seconds": 6.774867124855518,
+    "exitCode": 0,
+    "output": "ok  \tgithub.com/cnooljaw/gosproto\t5.250s\n"
+  },
+  {
+    "side": "candidate",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-gcflags=all=-d=checkptr=2",
+      "-run",
+      "^TestPackOverlappingWindowBounds$",
+      ".",
+      "-timeout=1m"
+    ],
+    "seconds": 5.628610249608755,
+    "exitCode": 0,
+    "output": "ok  \tgithub.com/cnooljaw/gosproto\t4.813s\n"
+  }
+]

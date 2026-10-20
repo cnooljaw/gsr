@@ -1,0 +1,61 @@
+package sproto
+
+import (
+	"bytes"
+	"testing"
+)
+
+// TestPackOverlappingWindowBounds 保护所有mask在FF边界与短尾的重叠缓冲、独占输出和精确容量边界。
+func TestPackOverlappingWindowBounds(t *testing.T) {
+	lengths := []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 16, 17, 31, 32, 33, 2046, 2047, 2048, 2049, 2050, 4094, 4095, 4096, 4097, 4098}
+	for mask := 0; mask < 256; mask++ {
+		for _, length := range lengths {
+			for _, prefix := range []int{0, 2048, 2056} {
+				raw := make([]byte, prefix+length)
+				for i := 0; i < prefix; i++ {
+					raw[i] = 0xa5
+				}
+				for i := 0; i < length; i++ {
+					if mask&(1<<uint(i%8)) != 0 {
+						raw[prefix+i] = byte(i%127) + 1
+					}
+				}
+				snapshot := bytes.Clone(raw)
+				want := Pack(raw)
+				if !bytes.Equal(raw, snapshot) {
+					t.Fatal("public Pack mutated input")
+				}
+				capacity := packedBufferSize(len(raw))
+				for _, overlap := range []bool{false, true} {
+					backing := bytes.Repeat([]byte{0xee}, capacity+6)
+					output := backing[3 : 3+capacity : 3+capacity]
+					source := raw
+					if overlap {
+						start := capacity - len(raw)
+						source = output[start : start+len(raw) : start+len(raw)]
+						copy(source, raw)
+					}
+					got := packInto(output, source)
+					if !bytes.Equal(got, want) || cap(got) != capacity {
+						t.Fatalf("mask=%x length=%d prefix=%d overlap=%t wire/cap", mask, length, prefix, overlap)
+					}
+					if !bytes.Equal(backing[:3], []byte{0xee, 0xee, 0xee}) || !bytes.Equal(backing[len(backing)-3:], []byte{0xee, 0xee, 0xee}) {
+						t.Fatal("wrote outside exact output buffer")
+					}
+					restored, err := Unpack(got)
+					if err != nil || len(restored) != (len(raw)+7)&^7 || !bytes.Equal(restored[:len(raw)], raw) {
+						t.Fatalf("restore mask=%x length=%d prefix=%d overlap=%t: %v", mask, length, prefix, overlap, err)
+					}
+					for _, v := range restored[len(raw):] {
+						if v != 0 {
+							t.Fatal("nonzero padding")
+						}
+					}
+					if !bytes.Equal(want, Pack(raw)) {
+						t.Fatal("later call overwrote owned public output")
+					}
+				}
+			}
+		}
+	}
+}

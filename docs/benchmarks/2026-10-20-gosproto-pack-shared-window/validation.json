@@ -1,0 +1,165 @@
+{
+  "baselineCommit": "a93bb0d66678c33e328c94d39036f8ff9772a5e9",
+  "gsrCommit": "125bc9128c6ef6d01de79a61cc142f9329b47c83",
+  "counts": {
+    "processes": 220,
+    "blocks": 21120,
+    "quartets": 5280,
+    "rounds": 1320,
+    "snapshots": 880
+  },
+  "successfulCommands": 250,
+  "measurementPreparationAndRawVerified": [
+    {
+      "mode": "self",
+      "changedGoFiles": [],
+      "allInputsAndRawVerified": true
+    },
+    {
+      "mode": "clone",
+      "changedGoFiles": [],
+      "allInputsAndRawVerified": true
+    },
+    {
+      "mode": "pass1",
+      "changedGoFiles": [
+        "pack.go"
+      ],
+      "allInputsAndRawVerified": true
+    },
+    {
+      "mode": "pass2",
+      "changedGoFiles": [
+        "pack.go"
+      ],
+      "allInputsAndRawVerified": true
+    }
+  ],
+  "controlAndTelemetrySummary": {
+    "self": {
+      "controlAccepted": 40,
+      "sameAllocation": 54,
+      "initialLimiterNonzero": 0,
+      "anyLimiterChange": 0,
+      "largestSampledHeap": 4155480,
+      "unequalAllocations": [
+        "ascii4k/frame"
+      ],
+      "failedControls": [
+        "addressbook/sproto_pencode",
+        "game_small/sproto_pencode",
+        "game_large/sproto_encode",
+        "echo_ascii4k/sproto_encode",
+        "ascii32/frame",
+        "ascii4k/frame",
+        "zeros4k/frame",
+        "flat/full/4096/pencode",
+        "flat/half/4096/encode",
+        "flat/half/4096/pencode",
+        "shape/zero4096/pack",
+        "shape/nonzero1x256/pack",
+        "shape/nonzero5x256/pack",
+        "shape/nonzero7x256/pack",
+        "shape/zeroRun16x64/pack"
+      ]
+    },
+    "clone": {
+      "controlAccepted": 37,
+      "sameAllocation": 55,
+      "initialLimiterNonzero": 0,
+      "anyLimiterChange": 0,
+      "largestSampledHeap": 18113688,
+      "unequalAllocations": [],
+      "failedControls": [
+        "game_small/sproto_pack",
+        "game_large/sproto_pack",
+        "int32_edges/sproto_pack",
+        "int32_edges/sproto_pencode",
+        "echo_ascii4k/sproto_pack",
+        "echo_ascii4k/sproto_pencode",
+        "ascii32/frame",
+        "utf8_1k/frame",
+        "flat/full/4096/encode",
+        "flat/nil/4096/pencode",
+        "nested/32x128/encode",
+        "array_record/32/encode",
+        "shape/zero32/pack",
+        "shape/ascii32/pack",
+        "shape/nonzero1x256/pack",
+        "shape/nonzero3x256/pack",
+        "shape/zeroRun16x64/pack",
+        "shape/zeroRun64x64/pack"
+      ]
+    },
+    "pass1": {
+      "controlAccepted": null,
+      "sameAllocation": 54,
+      "initialLimiterNonzero": 0,
+      "anyLimiterChange": 0,
+      "largestSampledHeap": 4100064,
+      "unequalAllocations": [
+        "zeros4k/frame"
+      ],
+      "failedControls": null
+    },
+    "pass2": {
+      "controlAccepted": null,
+      "sameAllocation": 55,
+      "initialLimiterNonzero": 0,
+      "anyLimiterChange": 0,
+      "largestSampledHeap": 4068592,
+      "unequalAllocations": [],
+      "failedControls": null
+    }
+  },
+  "libraryStatus": " D .github/workflows/test.yml\n D LICENSE\n D examples/echo/echo.sproto\n D examples/echo/main.go\n D go.mod\n D testdata/fuzz/FuzzPackRoundTrip/4756e628ac53e8fe\n",
+  "runtimeSourceStillBaseline": true,
+  "cumulativeReversalCount": 66,
+  "allocationTailCount": 2,
+  "scope": "ordinary Pack shared output window candidate, original37 plus18 shape cases; no production modification or new PB/TS ranking",
+  "artifactsSha256": {
+    ".gitattributes": "fb25a78a6381f5646d71aacea4486f6aeeeb03c4d71740227011024be0d20a8f",
+    "ALL-CASES.md": "e9f5248591dd943cb42eda3c5c82220e5c32613c4f3dcd0ed70a95715fdd11d7",
+    "RESULTS.md": "b15dbaa6ebf06a51916cef7d2b433e14c19046599490634146fe8ae5905d54cc",
+    "allocation-tails.json": "0dcfcd65a1b6e77e48b61d039150a559eacca8d142823754180cf1182909ee24",
+    "analysis.json": "ec8d80e7c266595851b8c3d0dee06de6aca117a4eed01276a0cd0b99aaa1dabf",
+    "analyze.py": "4431db68ada370b8872121118a7da20d869f8634251158b43e52b9945b0d002d",
+    "assembly-summary.json": "65e9d18804d6b7bd2934ffd114b3b4a6b9516a79a4c183eccee4b7609aa83ddf",
+    "before-compiler.txt": "98d4503aabb4470c12da079e11536c4dfb855085bcdc395c3dd02a2ecf5fc105",
+    "before-encode-assembly.txt": "d0e24f20becbfe96376a38e1152402699d7582a442248e94212319868c09087b",
+    "candidate-compiler.txt": "0b1c49a447524e8fc278f7cabfa8592a9eb601615241e72cef13d4063294b365",
+    "candidate-encode-assembly.txt": "38db9286cf4b82f92a7b70cb36fe32d3d533c78ada622931878fdce659b9ee80",
+    "candidate.patch": "a3af36b86ee9fce13e0a77d696cd733e587cd418135b3a625f12979758c647ff",
+    "clone/case-list.json": "0f8525a123cac0100dcd28a088931771238bfe01a30bb050c3b4ab9a12937727",
+    "clone/inputs.json": "cb61852882e9cf5e9dfb46d124d7258434dbd56948178d0f05e6740df541a721",
+    "clone/raw.json": "37a6affb9e275b3f7d028c84d07cd71af127988fb83c9facd2c7d533b00d7829",
+    "clone/summary.json": "2af2d8ebe54c58e12a868df5a3e9e75b8576d372178db28404ccdbbb774dc131",
+    "commands.json": "4f172d6fe60a2d8563b907b86523080c2c19c3b8f4d849af4b9155c4ad5dea27",
+    "cumulative-reversals.json": "b6b3b4da0e734eb6239bf3f7c5b47a1faf68560e984f7e7fce42c50e10dd214b",
+    "growth-adapter.go.txt": "d337406cc4fede40323aef4efaa1bcc582819a3b3456f599295ddf3587440055",
+    "pass1/case-list.json": "0f8525a123cac0100dcd28a088931771238bfe01a30bb050c3b4ab9a12937727",
+    "pass1/inputs.json": "142c43727f21ba75be07705e36aeff0d67283060838ab2ddec950fac1413f1b2",
+    "pass1/raw.json": "cc3e6e6646a32123db610ed69d270b77f0c1745a26cde7bb7f1ec36db137c538",
+    "pass1/summary.json": "02fa02dbcfdf77014797bd2fe9106ceb9d122f045c2b58738a08fd531f6d0e6f",
+    "pass2/case-list.json": "0f8525a123cac0100dcd28a088931771238bfe01a30bb050c3b4ab9a12937727",
+    "pass2/inputs.json": "d27cd60f7de6f80e9f1eeac99fec17fe0c1bf6fc106b760bb3223c5685ee0bd7",
+    "pass2/raw.json": "cb842f413261e3f08d2c4a44d6b3aae654a832bcf50b584f3fc81edcd03fc208",
+    "pass2/summary.json": "6adb3a490836b9374b524852745a4bff20c63af727658977b28a96b50410cd1f",
+    "plan.json": "31a804f50f067756f181dced4f0d5b113e031762f76fa9c40d9c3705f51620c8",
+    "reproduce.py": "a91000f3c1f3c34c816355eeb3d7389280bcf29b5b35cfdd59818feaaa80e1f7",
+    "self/case-list.json": "0f8525a123cac0100dcd28a088931771238bfe01a30bb050c3b4ab9a12937727",
+    "self/inputs.json": "c4a360fad24a91dd7159c6a178d6442b4e2f2ba741ecf56c7be89fab501903a1",
+    "self/raw.json": "4ea2f3b8b79cc587c7c418ef65ee233946db297735020dd9e1b581eb91ef5ef8",
+    "self/summary.json": "1ebc58bce8ed67e8c54bbe28b95094092c3f0489fdd0a3ac6d38c61c5e48dd1b",
+    "window-regression.json": "f1a1215b0de133a8fd85362fdc6a8f563c1742c3f60aa0c554c7e01d855877cf",
+    "window-test.go.txt": "a5174051a9a46a8f8a58062b5cdf8e050094d8280fe595e98d542813e18fc5a2"
+  },
+  "productionCandidateRetained": false,
+  "decision": "No general replacement: preserve small positive density results; repeated density5 cost and mixed primary path/cumulative direction; no minimum gain threshold",
+  "windowRegressionPassed": true,
+  "windowRegressionSides": [
+    "before",
+    "candidate"
+  ],
+  "windowRegressionPackCallsPerSide": 41472
+}
