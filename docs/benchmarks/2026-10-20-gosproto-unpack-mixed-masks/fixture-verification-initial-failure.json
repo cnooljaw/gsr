@@ -1,0 +1,8 @@
+{
+  "command": "python3 verify-fixtures.py --output tmp/gosproto-unpack-mixed-masks-20261020",
+  "exitCode": 1,
+  "error": "AssertionError: len(files)==20",
+  "cause": "glob fixture-*.json included the previously generated fixture-validation.json on repeat verification",
+  "scope": "post-measurement verification only; raw measurement files unchanged",
+  "fix": "enumerate exact fixture filenames from frozen plan cases"
+}
