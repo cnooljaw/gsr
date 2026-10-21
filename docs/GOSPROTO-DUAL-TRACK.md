@@ -123,3 +123,5 @@ TS为2026-10-15第五轮历史基线，Go为[2026-10-20 当前 a93bb0d 新五轮
 2026-10-21：[Pack 四次双字节写出](benchmarks/2026-10-21-gosproto-pack-pair-store/RESULTS.md)完成32进程3072块及3584组 wire/共享缓冲/race/checkptr。八次 byte store 合并为四次 PutUint16 后指令296→332；大型Pack两遍 +44.26%/+45.18%，整数数组Pack +41.20%/+40.98%，PEncode亦明显退化，八项中位/累计均退化，候选不应用。全部控制和长尾保留，不作逐指令成本归因；原位图候选仍独立保留。前轮5603f75已提交未推送，新报告留审查，生产代码、正式依赖和七项无关删除不变；下一轮回Body实际热点。
 
 2026-10-21：[整数记录 inline 直接继续](benchmarks/2026-10-21-gosproto-record-inline-flow/RESULTS.md)保留局部控制流简化，记录写出指令196→188。7项记录Encode两遍−1.92%/−2.57%，prefix31为−2.63%/−1.89%；大型Encode小幅改善，大型PEncode中位改善但累计+1.58%/+2.04%，反向全部保留。40进程3840块/60条实验流程与8条正常入口验收通过，官方oracle/race/checkptr/vet、两项fuzz及GoTS7/7；Decode fuzz156066次后停增并正常退出。前轮39f1d53已提交未推送；独立库源码/CHANGES已提交9048cfa，报告随本次提交归档，均未推送；正式依赖与七项删除保持。
+
+2026-10-21：[整数记录外置4/8字节直接分支](benchmarks/2026-10-21-gosproto-record-width-flow/RESULTS.md)基于9048cfa完成40进程3840块/60条流程。先确认编译器已消除重复inline判断，未为其另改代码；宽度分支候选记录指令仍188。大型Encode/PEncode双遍方向反转，prefix31 PEncode中位−0.29%/−1.84%、累计均改善，局部信号及全部控制/反向保留。因真实组合收益尚未确认且新增重复写出代码，暂不应用，非收益门槛否决。三模式契约/race/checkptr、wire/cap、正常分配parity及vet通过；生产库9048cfa、正式依赖和七项删除不变，新报告留审查。
