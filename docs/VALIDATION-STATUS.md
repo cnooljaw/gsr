@@ -906,3 +906,5 @@ TestRuntimePacedMultiServiceLoad 已补 8 个真实 Service 共享文件 Logger 
 2026-10-21：[Decode整数记录header游标](benchmarks/2026-10-21-gosproto-decode-header-cursor/RESULTS.md)完成40进程3840块/60条流程，三模式合法/错误/预算状态差分、race/checkptr及fixture/vet通过。记录parser指令388→384、栈176B保持；大型PDecode两遍中位−1.53%/−0.16%、累计均改善，大型Decode−0.72%/+1.44%反转。保留小收益候选但暂不应用，非目标Echo等全部波动和控制保留，不扣控制。实际库9048cfa、依赖和七项删除不变；前轮bfd65b7已提交未推送，新报告留审查。
 
 2026-10-21：[Decode游标实际摆放与延长块复核](benchmarks/2026-10-21-gosproto-decode-cursor-rotation/RESULTS.md)完成三布局24进程2304块、36准备/24测量/3分析。实际parser地址轮换已确认；Decode六次中位五次改善/累计三次，PDecode中位四次/累计两次，保留候选但不应用。40ms校准目标多数达到，整体块中位39.096ms，但192块低于20ms，限制明示；不删控制/长尾、不作扣减。驱动计时前KeyError修复并复用已验证二进制，零计时样本丢弃，记录完整。前轮b40dd25已提交未推送；生产9048cfa、依赖及七项删除保持，新报告留审查。
+
+2026-10-21：[Decode多批校准验证](benchmarks/2026-10-21-gosproto-decode-multibatch-calibration/RESULTS.md)以7批基线中位+3批pilot预定规则完成8进程768正式块、80校准批次。独立复算所有决策通过，正式块最短46.182ms/中位59.130ms，低于40ms为0；实际调整分支未触发，限制明示。Decode候选中位−0.30%/−0.36%但累计反向，PDecode+1.88%/−0.63%，控制波动仍在，保留候选但不落地。仅隔离harness方法验证，生产9048cfa、依赖及七项删除不变；前轮9ce5601已提交未推送，新报告留审查。
