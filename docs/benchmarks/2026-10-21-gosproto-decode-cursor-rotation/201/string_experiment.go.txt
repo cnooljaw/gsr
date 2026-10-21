@@ -1,0 +1,216 @@
+package sproto
+
+import "unsafe"
+
+func experimentStringCandidate(chunk []byte, schema *SprotoType, pointer decodePointer, budget *decodeBudget) (int, error) {
+	budget.depth++
+	defer func() { budget.depth-- }()
+	if budget.depth > budget.limits.MaxDepth {
+		return 0, ErrLimit
+	}
+	if len(chunk) < 2 {
+		return 0, ErrDecode
+	}
+	count := int(readUint16(chunk))
+	total := 2 + count*2
+	if total > len(chunk) {
+		return 0, ErrDecode
+	}
+	if err := budget.add(count); err != nil {
+		return 0, err
+	}
+	headers := chunk[2:total:total]
+	tag := 0
+	for len(headers) >= 2 {
+		entry := int(readUint16(headers))
+		headers = headers[2:]
+		if entry%2 == 1 {
+			tag += (entry + 1) / 2
+			continue
+		}
+		if tag > 65535 {
+			return 0, ErrDecode
+		}
+		field := schema.FieldByTag(tag)
+		tag++
+		var bits uint64
+		if entry != 0 {
+			if field == nil {
+				continue
+			}
+			bits = uint64(entry/2 - 1)
+		} else {
+			data := chunk[total:]
+			if len(data) < 4 {
+				return 0, ErrDecode
+			}
+			size := uint64(readUint32(data))
+			if size > uint64(len(data)-4) {
+				return 0, ErrDecode
+			}
+			total += 4 + int(size)
+			if field == nil {
+				continue
+			}
+			switch size {
+			case 4:
+				bits = uint64(int64(int32(readUint32(data[4:8]))))
+			case 8:
+				bits = readUint64(data[4:12])
+			default:
+				return 0, ErrDecode
+			}
+		}
+		result := new(int64)
+		*result = int64(bits)
+		// 数组入口已核对当前可达字段与实际子类型；Go指针写入保留屏障。
+		*(**int64)(unsafe.Add(pointer.value, field.encOffset)) = result
+	}
+	return total, nil
+}
+
+func experimentStringBaseline(chunk []byte, schema *SprotoType, pointer decodePointer, budget *decodeBudget) (int, error) {
+	budget.depth++
+	defer func() { budget.depth-- }()
+	if budget.depth > budget.limits.MaxDepth {
+		return 0, ErrLimit
+	}
+	if len(chunk) < 2 {
+		return 0, ErrDecode
+	}
+	count := int(readUint16(chunk))
+	total := 2 + count*2
+	if total > len(chunk) {
+		return 0, ErrDecode
+	}
+	if err := budget.add(count); err != nil {
+		return 0, err
+	}
+	tag := 0
+	for index := 0; index < count; index++ {
+		entry := int(readUint16(chunk[2+index*2 : 4+index*2 : 4+index*2]))
+		if entry%2 == 1 {
+			tag += (entry + 1) / 2
+			continue
+		}
+		if tag > 65535 {
+			return 0, ErrDecode
+		}
+		field := schema.FieldByTag(tag)
+		tag++
+		var bits uint64
+		if entry != 0 {
+			if field == nil {
+				continue
+			}
+			bits = uint64(entry/2 - 1)
+		} else {
+			data := chunk[total:]
+			if len(data) < 4 {
+				return 0, ErrDecode
+			}
+			size := uint64(readUint32(data))
+			if size > uint64(len(data)-4) {
+				return 0, ErrDecode
+			}
+			total += 4 + int(size)
+			if field == nil {
+				continue
+			}
+			switch size {
+			case 4:
+				bits = uint64(int64(int32(readUint32(data[4:8]))))
+			case 8:
+				bits = readUint64(data[4:12])
+			default:
+				return 0, ErrDecode
+			}
+		}
+		result := new(int64)
+		*result = int64(bits)
+		// 数组入口已核对当前可达字段与实际子类型；Go指针写入保留屏障。
+		*(**int64)(unsafe.Add(pointer.value, field.encOffset)) = result
+	}
+	return total, nil
+}
+
+func experimentStringClone(chunk []byte, schema *SprotoType, pointer decodePointer, budget *decodeBudget) (int, error) {
+	budget.depth++
+	defer func() { budget.depth-- }()
+	if budget.depth > budget.limits.MaxDepth {
+		return 0, ErrLimit
+	}
+	if len(chunk) < 2 {
+		return 0, ErrDecode
+	}
+	count := int(readUint16(chunk))
+	total := 2 + count*2
+	if total > len(chunk) {
+		return 0, ErrDecode
+	}
+	if err := budget.add(count); err != nil {
+		return 0, err
+	}
+	tag := 0
+	for index := 0; index < count; index++ {
+		entry := int(readUint16(chunk[2+index*2 : 4+index*2 : 4+index*2]))
+		if entry%2 == 1 {
+			tag += (entry + 1) / 2
+			continue
+		}
+		if tag > 65535 {
+			return 0, ErrDecode
+		}
+		field := schema.FieldByTag(tag)
+		tag++
+		var bits uint64
+		if entry != 0 {
+			if field == nil {
+				continue
+			}
+			bits = uint64(entry/2 - 1)
+		} else {
+			data := chunk[total:]
+			if len(data) < 4 {
+				return 0, ErrDecode
+			}
+			size := uint64(readUint32(data))
+			if size > uint64(len(data)-4) {
+				return 0, ErrDecode
+			}
+			total += 4 + int(size)
+			if field == nil {
+				continue
+			}
+			switch size {
+			case 4:
+				bits = uint64(int64(int32(readUint32(data[4:8]))))
+			case 8:
+				bits = readUint64(data[4:12])
+			default:
+				return 0, ErrDecode
+			}
+		}
+		result := new(int64)
+		*result = int64(bits)
+		// 数组入口已核对当前可达字段与实际子类型；Go指针写入保留屏障。
+		*(**int64)(unsafe.Add(pointer.value, field.encOffset)) = result
+	}
+	return total, nil
+}
+
+var experimentStringSelected = experimentStringBaseline
+
+// ExperimentStringMode 仅在实验快照中选择整数记录parser，计时外调用。
+func ExperimentStringMode(mode string) {
+	switch mode {
+	case "baseline":
+		experimentStringSelected = experimentStringBaseline
+	case "clone":
+		experimentStringSelected = experimentStringClone
+	case "candidate":
+		experimentStringSelected = experimentStringCandidate
+	default:
+		panic("invalid experiment mode")
+	}
+}

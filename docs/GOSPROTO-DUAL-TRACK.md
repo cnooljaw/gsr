@@ -127,3 +127,5 @@ TS为2026-10-15第五轮历史基线，Go为[2026-10-20 当前 a93bb0d 新五轮
 2026-10-21：[整数记录外置4/8字节直接分支](benchmarks/2026-10-21-gosproto-record-width-flow/RESULTS.md)基于9048cfa完成40进程3840块/60条流程。先确认编译器已消除重复inline判断，未为其另改代码；宽度分支候选记录指令仍188。大型Encode/PEncode双遍方向反转，prefix31 PEncode中位−0.29%/−1.84%、累计均改善，局部信号及全部控制/反向保留。因真实组合收益尚未确认且新增重复写出代码，暂不应用，非收益门槛否决。三模式契约/race/checkptr、wire/cap、正常分配parity及vet通过；生产库9048cfa、正式依赖和七项删除不变，新报告留审查。
 
 2026-10-21：[Decode整数记录header游标](benchmarks/2026-10-21-gosproto-decode-header-cursor/RESULTS.md)完成40进程3840块/60条流程，三模式合法/错误/预算状态差分、race/checkptr及fixture/vet通过。记录parser指令388→384、栈176B保持；大型PDecode两遍中位−1.53%/−0.16%、累计均改善，大型Decode−0.72%/+1.44%反转。保留小收益候选但暂不应用，非目标Echo等全部波动和控制保留，不扣控制。实际库9048cfa、依赖和七项删除不变；前轮bfd65b7已提交未推送，新报告留审查。
+
+2026-10-21：[Decode游标实际摆放与延长块复核](benchmarks/2026-10-21-gosproto-decode-cursor-rotation/RESULTS.md)完成三布局24进程2304块、36准备/24测量/3分析。实际parser地址轮换已确认；Decode六次中位五次改善/累计三次，PDecode中位四次/累计两次，保留候选但不应用。40ms校准目标多数达到，整体块中位39.096ms，但192块低于20ms，限制明示；不删控制/长尾、不作扣减。驱动计时前KeyError修复并复用已验证二进制，零计时样本丢弃，记录完整。前轮b40dd25已提交未推送；生产9048cfa、依赖及七项删除保持，新报告留审查。
