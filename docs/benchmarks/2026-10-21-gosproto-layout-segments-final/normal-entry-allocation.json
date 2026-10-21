@@ -1,0 +1,38 @@
+[
+  {
+    "args": [
+      "go",
+      "test",
+      "-modfile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-layout-segments-accept-20261021/baseline-alloc.mod",
+      "./examples/websocket-gate/benchmarks",
+      "-run",
+      "^$",
+      "-bench",
+      "^BenchmarkRepresentativeCodec$/(addressbook|game_large|int32_edges)$/sproto_(encode|pencode)$",
+      "-benchtime=5000x",
+      "-benchmem",
+      "-timeout=1m"
+    ],
+    "exitCode": 0,
+    "seconds": 2.1215085852891207,
+    "output": "goos: darwin\ngoarch: arm64\npkg: github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks\ncpu: Apple M2\nBenchmarkRepresentativeCodec/addressbook/sproto_encode         \t    5000\t       839.4 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/addressbook/sproto_pencode        \t    5000\t       645.8 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/game_large/sproto_encode          \t    5000\t      5703 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkRepresentativeCodec/game_large/sproto_pencode         \t    5000\t      5554 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkRepresentativeCodec/int32_edges/sproto_encode         \t    5000\t      1563 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/int32_edges/sproto_pencode        \t    5000\t      3086 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\nok  \tgithub.com/cnooljaw/gsr/examples/websocket-gate/benchmarks\t0.665s\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-modfile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-layout-segments-accept-20261021/candidate-alloc.mod",
+      "./examples/websocket-gate/benchmarks",
+      "-run",
+      "^$",
+      "-bench",
+      "^BenchmarkRepresentativeCodec$/(addressbook|game_large|int32_edges)$/sproto_(encode|pencode)$",
+      "-benchtime=5000x",
+      "-benchmem",
+      "-timeout=1m"
+    ],
+    "exitCode": 0,
+    "seconds": 0.7259237486869097,
+    "output": "goos: darwin\ngoarch: arm64\npkg: github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks\ncpu: Apple M2\nBenchmarkRepresentativeCodec/addressbook/sproto_encode         \t    5000\t       524.8 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/addressbook/sproto_pencode        \t    5000\t       596.4 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/game_large/sproto_encode          \t    5000\t      4281 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkRepresentativeCodec/game_large/sproto_pencode         \t    5000\t      5642 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkRepresentativeCodec/int32_edges/sproto_encode         \t    5000\t      1582 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/int32_edges/sproto_pencode        \t    5000\t      3049 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\nok  \tgithub.com/cnooljaw/gsr/examples/websocket-gate/benchmarks\t0.285s\n"
+  }
+]

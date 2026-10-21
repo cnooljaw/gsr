@@ -1,0 +1,84 @@
+[
+  {
+    "args": [
+      "git",
+      "rev-parse",
+      "2e1d44b"
+    ],
+    "cwd": "/private/tmp/gsr-gosproto-fork",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.02044045925140381,
+    "output": "2e1d44bdd19311006b135e8d62deb17539624d68\n"
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "encode.go",
+      "string_experiment.go",
+      "string_experiment_test.go",
+      "external_experiment_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-layout-segments-20261021-run2/gosproto",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.011799125000834465,
+    "output": ""
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "experiment_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-layout-segments-20261021-run2/harness",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.003708668053150177,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-gcflags=all=-d=checkptr=2",
+      "-run",
+      "^(TestLayoutSegments(External)?Contracts|TestUnknownField|TestLimits|TestNativePointerDecode|TestSchemaEvolution|TestIntegerRecordArrayBudgetsAndTags)",
+      "-timeout=2m",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-layout-segments-20261021-run2/gosproto",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 4.206489792093635,
+    "output": "ok  \tgithub.com/cnooljaw/gosproto\t2.063s\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-run",
+      "^TestRepresentativeFixtures$",
+      "-timeout=30s",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-layout-segments-20261021-run2/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 1,
+    "seconds": 0.45837645791471004,
+    "output": "FAIL\tunpackinprocess [build failed]\nFAIL\n# unpackinprocess [unpackinprocess.test]\n./experiment_test.go:8:2: \"reflect\" imported and not used\n"
+  }
+]

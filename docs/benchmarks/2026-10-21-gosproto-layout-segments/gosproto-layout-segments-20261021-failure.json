@@ -1,0 +1,63 @@
+[
+  {
+    "args": [
+      "git",
+      "rev-parse",
+      "2e1d44b"
+    ],
+    "cwd": "/private/tmp/gsr-gosproto-fork",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.019255125895142555,
+    "output": "2e1d44bdd19311006b135e8d62deb17539624d68\n"
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "encode.go",
+      "string_experiment.go",
+      "string_experiment_test.go",
+      "external_experiment_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-layout-segments-20261021/gosproto",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.04022258333861828,
+    "output": ""
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "experiment_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-layout-segments-20261021/harness",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.005959708243608475,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-gcflags=all=-d=checkptr=2",
+      "-run",
+      "^(TestLayoutSegments(External)?Contracts|TestUnknownField|TestLimits|TestNativePointerDecode|TestSchemaEvolution|TestIntegerRecordArrayBudgetsAndTags)",
+      "-timeout=2m",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-layout-segments-20261021/gosproto",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 1,
+    "seconds": 1.1520456671714783,
+    "output": "FAIL\tgithub.com/cnooljaw/gosproto [build failed]\nFAIL\n# github.com/cnooljaw/gosproto [github.com/cnooljaw/gosproto.test]\n./string_experiment.go:34:34: undefined: math\n./string_experiment.go:107:34: undefined: math\n./string_experiment.go:180:34: undefined: math\n./string_experiment.go:302:5: initialization cycle for experimentStringSelected\n\t./string_experiment.go:302:5: experimentStringSelected refers to experimentStringBaseline\n\t./string_experiment.go:8:6: experimentStringBaseline refers to encodeMessageInto\n\t./encode.go:124:6: encodeMessageInto refers to encodeFieldInto\n\t./encode.go:182:6: encodeFieldInto refers to experimentStringSelected\n./encode.go:7:2: \"unsafe\" imported and not used\n"
+  }
+]
