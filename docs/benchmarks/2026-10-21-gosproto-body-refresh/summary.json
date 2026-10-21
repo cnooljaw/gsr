@@ -1,0 +1,3458 @@
+[
+  {
+    "case": "addressbook",
+    "op": "sproto_encode",
+    "nodes": [
+      {
+        "flat": "0.55s",
+        "flatPercent": 25.23,
+        "cum": "0.55s",
+        "cumPercent": 25.23,
+        "function": "runtime.kevent"
+      },
+      {
+        "flat": "0.21s",
+        "flatPercent": 9.63,
+        "cum": "0.65s",
+        "cumPercent": 29.82,
+        "function": "github.com/cnooljaw/gosproto.encodeMessageInto"
+      },
+      {
+        "flat": "0.20s",
+        "flatPercent": 9.17,
+        "cum": "0.72s",
+        "cumPercent": 33.03,
+        "function": "github.com/cnooljaw/gosproto.encodedSize"
+      },
+      {
+        "flat": "0.18s",
+        "flatPercent": 8.26,
+        "cum": "0.64s",
+        "cumPercent": 29.36,
+        "function": "github.com/cnooljaw/gosproto.fieldSize"
+      },
+      {
+        "flat": "0.16s",
+        "flatPercent": 7.34,
+        "cum": "0.59s",
+        "cumPercent": 27.06,
+        "function": "github.com/cnooljaw/gosproto.encodeFieldInto"
+      },
+      {
+        "flat": "0.08s",
+        "flatPercent": 3.67,
+        "cum": "0.10s",
+        "cumPercent": 4.59,
+        "function": "reflect.Value.Field"
+      },
+      {
+        "flat": "0.06s",
+        "flatPercent": 2.75,
+        "cum": "0.06s",
+        "cumPercent": 2.75,
+        "function": "github.com/cnooljaw/gosproto.(*SprotoField).nativeInteger (inline)"
+      },
+      {
+        "flat": "0.06s",
+        "flatPercent": 2.75,
+        "cum": "0.06s",
+        "cumPercent": 2.75,
+        "function": "github.com/cnooljaw/gosproto.(*decodeBudget).add (inline)"
+      },
+      {
+        "flat": "0.06s",
+        "flatPercent": 2.75,
+        "cum": "0.08s",
+        "cumPercent": 3.67,
+        "function": "reflect.Value.Index"
+      },
+      {
+        "flat": "0.05s",
+        "flatPercent": 2.29,
+        "cum": "0.06s",
+        "cumPercent": 2.75,
+        "function": "reflect.Value.Elem"
+      },
+      {
+        "flat": "0.05s",
+        "flatPercent": 2.29,
+        "cum": "0.07s",
+        "cumPercent": 3.21,
+        "function": "reflect.Value.IsNil (inline)"
+      },
+      {
+        "flat": "0.04s",
+        "flatPercent": 1.83,
+        "cum": "0.04s",
+        "cumPercent": 1.83,
+        "function": "reflect.flag.kind (inline)"
+      },
+      {
+        "flat": "0.04s",
+        "flatPercent": 1.83,
+        "cum": "0.04s",
+        "cumPercent": 1.83,
+        "function": "runtime.memclrNoHeapPointers"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.38,
+        "cum": "0.03s",
+        "cumPercent": 1.38,
+        "function": "github.com/cnooljaw/gosproto.(*encodeLayout).add (inline)"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.38,
+        "cum": "0.03s",
+        "cumPercent": 1.38,
+        "function": "runtime.madvise"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.92,
+        "cum": "1.54s",
+        "cumPercent": 70.64,
+        "function": "github.com/cnooljaw/gosproto.encodeBufferWithLimits"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.92,
+        "cum": "0.02s",
+        "cumPercent": 0.92,
+        "function": "internal/abi.Name.IsExported (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.92,
+        "cum": "0.02s",
+        "cumPercent": 0.92,
+        "function": "internal/abi.TypeOf (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.92,
+        "cum": "0.03s",
+        "cumPercent": 1.38,
+        "function": "reflect.Value.Len (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.92,
+        "cum": "0.03s",
+        "cumPercent": 1.38,
+        "function": "reflect.Value.pointer (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.92,
+        "cum": "0.02s",
+        "cumPercent": 0.92,
+        "function": "reflect.flag.ro (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.92,
+        "cum": "0.02s",
+        "cumPercent": 0.92,
+        "function": "runtime.(*timer).unlockAndRun"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.92,
+        "cum": "0.02s",
+        "cumPercent": 0.92,
+        "function": "runtime.findObject"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.92,
+        "cum": "0.02s",
+        "cumPercent": 0.92,
+        "function": "runtime.memmove"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.92,
+        "cum": "0.02s",
+        "cumPercent": 0.92,
+        "function": "runtime.typePointers.next"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.46,
+        "cum": "0.04s",
+        "cumPercent": 1.83,
+        "function": "github.com/cnooljaw/gosproto.encodeScalarInto"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.46,
+        "cum": "1.55s",
+        "cumPercent": 71.1,
+        "function": "github.com/cnooljaw/gosproto.encodeWithLimits"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.46,
+        "cum": "0.03s",
+        "cumPercent": 1.38,
+        "function": "github.com/cnooljaw/gosproto.omittedField (inline)"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.46,
+        "cum": "0.05s",
+        "cumPercent": 2.29,
+        "function": "reflect.Value.UnsafePointer"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.46,
+        "cum": "0.08s",
+        "cumPercent": 3.67,
+        "function": "runtime.mallocgc"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.46,
+        "cum": "0.03s",
+        "cumPercent": 1.38,
+        "function": "runtime.mapaccess2"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.92,
+        "function": "gcWriteBarrier"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.55s",
+        "cumPercent": 71.1,
+        "function": "github.com/cnooljaw/gosproto.Encode"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.55s",
+        "cumPercent": 71.1,
+        "function": "github.com/cnooljaw/gosproto.EncodeWithLimits (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.38,
+        "function": "github.com/cnooljaw/gosproto.GetSprotoType"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.92,
+        "function": "github.com/cnooljaw/gosproto.getbase"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.05s",
+        "cumPercent": 2.29,
+        "function": "github.com/cnooljaw/gosproto.messageEncodePointer (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.57s",
+        "cumPercent": 72.02,
+        "function": "gosprotobodystudy.BenchmarkBodyCost"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.57s",
+        "cumPercent": 72.02,
+        "function": "gosprotobodystudy.representativeOperations.func3"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.92,
+        "function": "reflect.(*rtype).Elem"
+      }
+    ],
+    "loopBytes": 144,
+    "loopAllocs": 1
+  },
+  {
+    "case": "addressbook",
+    "op": "sproto_pencode",
+    "nodes": [
+      {
+        "flat": "0.41s",
+        "flatPercent": 20.4,
+        "cum": "0.41s",
+        "cumPercent": 20.4,
+        "function": "runtime.kevent"
+      },
+      {
+        "flat": "0.28s",
+        "flatPercent": 13.93,
+        "cum": "0.69s",
+        "cumPercent": 34.33,
+        "function": "github.com/cnooljaw/gosproto.encodeMessageInto"
+      },
+      {
+        "flat": "0.14s",
+        "flatPercent": 6.97,
+        "cum": "0.48s",
+        "cumPercent": 23.88,
+        "function": "github.com/cnooljaw/gosproto.fieldSize"
+      },
+      {
+        "flat": "0.12s",
+        "flatPercent": 5.97,
+        "cum": "0.48s",
+        "cumPercent": 23.88,
+        "function": "github.com/cnooljaw/gosproto.encodedSize"
+      },
+      {
+        "flat": "0.10s",
+        "flatPercent": 4.98,
+        "cum": "0.12s",
+        "cumPercent": 5.97,
+        "function": "reflect.Value.Field"
+      },
+      {
+        "flat": "0.09s",
+        "flatPercent": 4.48,
+        "cum": "0.10s",
+        "cumPercent": 4.98,
+        "function": "github.com/cnooljaw/gosproto.packInto"
+      },
+      {
+        "flat": "0.08s",
+        "flatPercent": 3.98,
+        "cum": "0.65s",
+        "cumPercent": 32.34,
+        "function": "github.com/cnooljaw/gosproto.encodeFieldInto"
+      },
+      {
+        "flat": "0.08s",
+        "flatPercent": 3.98,
+        "cum": "0.08s",
+        "cumPercent": 3.98,
+        "function": "reflect.flag.kind (inline)"
+      },
+      {
+        "flat": "0.07s",
+        "flatPercent": 3.48,
+        "cum": "0.07s",
+        "cumPercent": 3.48,
+        "function": "runtime.madvise"
+      },
+      {
+        "flat": "0.06s",
+        "flatPercent": 2.99,
+        "cum": "0.11s",
+        "cumPercent": 5.47,
+        "function": "reflect.Value.IsNil (inline)"
+      },
+      {
+        "flat": "0.04s",
+        "flatPercent": 1.99,
+        "cum": "0.04s",
+        "cumPercent": 1.99,
+        "function": "github.com/cnooljaw/gosproto.(*decodeBudget).add (inline)"
+      },
+      {
+        "flat": "0.04s",
+        "flatPercent": 1.99,
+        "cum": "0.04s",
+        "cumPercent": 1.99,
+        "function": "reflect.Value.Elem"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.49,
+        "cum": "0.03s",
+        "cumPercent": 1.49,
+        "function": "github.com/cnooljaw/gosproto.(*SprotoField).nativeInteger (inline)"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.49,
+        "cum": "0.06s",
+        "cumPercent": 2.99,
+        "function": "github.com/cnooljaw/gosproto.encodeScalarInto"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.49,
+        "cum": "0.04s",
+        "cumPercent": 1.99,
+        "function": "reflect.Value.UnsafePointer"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.49,
+        "cum": "0.08s",
+        "cumPercent": 3.98,
+        "function": "runtime.mallocgcSmallNoscan"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 1.0,
+        "cum": "1.40s",
+        "cumPercent": 69.65,
+        "function": "github.com/cnooljaw/gosproto.encodeBufferWithLimits"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 1.0,
+        "cum": "0.02s",
+        "cumPercent": 1.0,
+        "function": "internal/abi.Name.IsExported (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 1.0,
+        "cum": "0.02s",
+        "cumPercent": 1.0,
+        "function": "internal/sync.(*Mutex).Lock (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 1.0,
+        "cum": "0.05s",
+        "cumPercent": 2.49,
+        "function": "reflect.Value.Index"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 1.0,
+        "cum": "0.02s",
+        "cumPercent": 1.0,
+        "function": "reflect.flag.ro (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 1.0,
+        "cum": "0.02s",
+        "cumPercent": 1.0,
+        "function": "runtime.memclrNoHeapPointers"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 1.0,
+        "cum": "0.02s",
+        "cumPercent": 1.0,
+        "function": "runtime.memmove"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 1.0,
+        "cum": "0.06s",
+        "cumPercent": 2.99,
+        "function": "runtime.scanobject"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.5,
+        "cum": "0.05s",
+        "cumPercent": 2.49,
+        "function": "github.com/cnooljaw/gosproto.GetSprotoType"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.5,
+        "cum": "1.51s",
+        "cumPercent": 75.12,
+        "function": "github.com/cnooljaw/gosproto.encodeWithLimits"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.5,
+        "cum": "0.02s",
+        "cumPercent": 1.0,
+        "function": "github.com/cnooljaw/gosproto.getbase"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.5,
+        "cum": "0.07s",
+        "cumPercent": 3.48,
+        "function": "github.com/cnooljaw/gosproto.omittedField (inline)"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.5,
+        "cum": "0.03s",
+        "cumPercent": 1.49,
+        "function": "reflect.Value.lenNonSlice"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.5,
+        "cum": "0.08s",
+        "cumPercent": 3.98,
+        "function": "runtime.(*mheap).allocSpan"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.5,
+        "cum": "0.02s",
+        "cumPercent": 1.0,
+        "function": "runtime.typePointers.next"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.51s",
+        "cumPercent": 75.12,
+        "function": "github.com/cnooljaw/gosproto.EncodePacked (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.04s",
+        "cumPercent": 1.99,
+        "function": "github.com/cnooljaw/gosproto.messageEncodePointer (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.51s",
+        "cumPercent": 75.12,
+        "function": "gosprotobodystudy.BenchmarkBodyCost"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.51s",
+        "cumPercent": 75.12,
+        "function": "gosprotobodystudy.representativeOperations.func7"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.49,
+        "function": "reflect.Value.Len (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 1.0,
+        "function": "runtime.(*mcache).nextFree"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 1.0,
+        "function": "runtime.(*mcache).refill"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 1.0,
+        "function": "runtime.(*mcentral).cacheSpan"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.08s",
+        "cumPercent": 3.98,
+        "function": "runtime.(*mheap).alloc.func1"
+      }
+    ],
+    "loopBytes": 144,
+    "loopAllocs": 1
+  },
+  {
+    "case": "addressbook",
+    "op": "sproto_decode",
+    "nodes": [
+      {
+        "flat": "0.88s",
+        "flatPercent": 38.1,
+        "cum": "0.88s",
+        "cumPercent": 38.1,
+        "function": "runtime.kevent"
+      },
+      {
+        "flat": "0.15s",
+        "flatPercent": 6.49,
+        "cum": "0.45s",
+        "cumPercent": 19.48,
+        "function": "runtime.mallocgcSmallScanNoHeader"
+      },
+      {
+        "flat": "0.11s",
+        "flatPercent": 4.76,
+        "cum": "0.11s",
+        "cumPercent": 4.76,
+        "function": "runtime.memclrNoHeapPointers"
+      },
+      {
+        "flat": "0.10s",
+        "flatPercent": 4.33,
+        "cum": "0.73s",
+        "cumPercent": 31.6,
+        "function": "runtime.mallocgc"
+      },
+      {
+        "flat": "0.09s",
+        "flatPercent": 3.9,
+        "cum": "1.25s",
+        "cumPercent": 54.11,
+        "function": "github.com/cnooljaw/gosproto.decodeMessage"
+      },
+      {
+        "flat": "0.09s",
+        "flatPercent": 3.9,
+        "cum": "0.12s",
+        "cumPercent": 5.19,
+        "function": "runtime.mallocgcTiny"
+      },
+      {
+        "flat": "0.06s",
+        "flatPercent": 2.6,
+        "cum": "1.22s",
+        "cumPercent": 52.81,
+        "function": "github.com/cnooljaw/gosproto.decodeStructSlice"
+      },
+      {
+        "flat": "0.06s",
+        "flatPercent": 2.6,
+        "cum": "0.06s",
+        "cumPercent": 2.6,
+        "function": "runtime.nextFreeFast (inline)"
+      },
+      {
+        "flat": "0.04s",
+        "flatPercent": 1.73,
+        "cum": "0.08s",
+        "cumPercent": 3.46,
+        "function": "runtime.(*mspan).writeHeapBitsSmall"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.3,
+        "cum": "0.03s",
+        "cumPercent": 1.3,
+        "function": "github.com/cnooljaw/gosproto.(*SprotoField).nativeInteger (inline)"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.3,
+        "cum": "0.03s",
+        "cumPercent": 1.3,
+        "function": "github.com/cnooljaw/gosproto.(*decodeBudget).add (inline)"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.3,
+        "cum": "0.03s",
+        "cumPercent": 1.3,
+        "function": "reflect.Value.Elem"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.3,
+        "cum": "0.03s",
+        "cumPercent": 1.3,
+        "function": "runtime.getGCMask (inline)"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.3,
+        "cum": "0.03s",
+        "cumPercent": 1.3,
+        "function": "runtime.madvise"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.87,
+        "cum": "0.04s",
+        "cumPercent": 1.73,
+        "function": "github.com/cnooljaw/gosproto.messageDecodePointer (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.87,
+        "cum": "0.03s",
+        "cumPercent": 1.3,
+        "function": "internal/abi.(*Type).Elem (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.87,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "reflect.Value.Type (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.87,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "reflect.flag.ro (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.87,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "reflect.toType (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.87,
+        "cum": "0.19s",
+        "cumPercent": 8.23,
+        "function": "reflect.unsafe_New"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.87,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "runtime.getMCache (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.87,
+        "cum": "0.44s",
+        "cumPercent": 19.05,
+        "function": "runtime.newobject"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.87,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "runtime.scanblock"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "gcWriteBarrier"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.03s",
+        "cumPercent": 1.3,
+        "function": "github.com/cnooljaw/gosproto.countChunks"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "github.com/cnooljaw/gosproto.readUint16 (inline)"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.03s",
+        "cumPercent": 1.3,
+        "function": "reflect.(*rtype).ptrTo"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.23s",
+        "cumPercent": 9.96,
+        "function": "reflect.MakeSlice"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.22s",
+        "cumPercent": 9.52,
+        "function": "reflect.New"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "reflect.Value.Field"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.07s",
+        "cumPercent": 3.03,
+        "function": "reflect.Value.Set"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.03s",
+        "cumPercent": 1.3,
+        "function": "reflect.Value.UnsafePointer"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.03s",
+        "cumPercent": 1.3,
+        "function": "reflect.typedmemmove"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.03s",
+        "cumPercent": 1.3,
+        "function": "runtime.(*mcache).nextFree"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "runtime.bulkBarrierPreWrite"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.04s",
+        "cumPercent": 1.73,
+        "function": "runtime.deductAssistCredit"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "runtime.gcmarknewobject"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.09s",
+        "cumPercent": 3.9,
+        "function": "runtime.heapSetTypeNoHeader (inline)"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "runtime.resolveTypeOff"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.09s",
+        "cumPercent": 3.9,
+        "function": "runtime.slicebytetostring"
+      }
+    ],
+    "loopBytes": 528,
+    "loopAllocs": 29
+  },
+  {
+    "case": "addressbook",
+    "op": "sproto_pdecode",
+    "nodes": [
+      {
+        "flat": "0.83s",
+        "flatPercent": 38.79,
+        "cum": "0.83s",
+        "cumPercent": 38.79,
+        "function": "runtime.kevent"
+      },
+      {
+        "flat": "0.12s",
+        "flatPercent": 5.61,
+        "cum": "0.90s",
+        "cumPercent": 42.06,
+        "function": "github.com/cnooljaw/gosproto.decodeMessage"
+      },
+      {
+        "flat": "0.12s",
+        "flatPercent": 5.61,
+        "cum": "0.58s",
+        "cumPercent": 27.1,
+        "function": "runtime.mallocgc"
+      },
+      {
+        "flat": "0.10s",
+        "flatPercent": 4.67,
+        "cum": "0.21s",
+        "cumPercent": 9.81,
+        "function": "github.com/cnooljaw/gosproto.UnpackWithLimit"
+      },
+      {
+        "flat": "0.09s",
+        "flatPercent": 4.21,
+        "cum": "0.09s",
+        "cumPercent": 4.21,
+        "function": "runtime.memclrNoHeapPointers"
+      },
+      {
+        "flat": "0.08s",
+        "flatPercent": 3.74,
+        "cum": "0.08s",
+        "cumPercent": 3.74,
+        "function": "runtime.madvise"
+      },
+      {
+        "flat": "0.07s",
+        "flatPercent": 3.27,
+        "cum": "0.07s",
+        "cumPercent": 3.27,
+        "function": "runtime.nextFreeFast (inline)"
+      },
+      {
+        "flat": "0.06s",
+        "flatPercent": 2.8,
+        "cum": "0.06s",
+        "cumPercent": 2.8,
+        "function": "reflect.Value.Elem"
+      },
+      {
+        "flat": "0.06s",
+        "flatPercent": 2.8,
+        "cum": "0.21s",
+        "cumPercent": 9.81,
+        "function": "runtime.mallocgcSmallScanNoHeader"
+      },
+      {
+        "flat": "0.06s",
+        "flatPercent": 2.8,
+        "cum": "0.10s",
+        "cumPercent": 4.67,
+        "function": "runtime.mallocgcTiny"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.4,
+        "cum": "0.03s",
+        "cumPercent": 1.4,
+        "function": "github.com/cnooljaw/gosproto.(*SprotoField).nativeInteger (inline)"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.4,
+        "cum": "0.03s",
+        "cumPercent": 1.4,
+        "function": "github.com/cnooljaw/gosproto.countChunks"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.4,
+        "cum": "0.06s",
+        "cumPercent": 2.8,
+        "function": "github.com/cnooljaw/gosproto.decodePointer.setInteger (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.93,
+        "cum": "0.02s",
+        "cumPercent": 0.93,
+        "function": "github.com/cnooljaw/gosproto.(*SprotoType).FieldByTag (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.93,
+        "cum": "0.87s",
+        "cumPercent": 40.65,
+        "function": "github.com/cnooljaw/gosproto.decodeStructSlice"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.93,
+        "cum": "0.03s",
+        "cumPercent": 1.4,
+        "function": "reflect.(*rtype).ptrTo"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.93,
+        "cum": "0.02s",
+        "cumPercent": 0.93,
+        "function": "runtime.divRoundUp (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.93,
+        "cum": "0.02s",
+        "cumPercent": 0.93,
+        "function": "runtime.getGCMask (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.93,
+        "cum": "0.02s",
+        "cumPercent": 0.93,
+        "function": "runtime.getMCache (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.93,
+        "cum": "0.10s",
+        "cumPercent": 4.67,
+        "function": "runtime.mallocgcSmallNoscan"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.93,
+        "cum": "0.02s",
+        "cumPercent": 0.93,
+        "function": "runtime.memmove"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.93,
+        "cum": "0.05s",
+        "cumPercent": 2.34,
+        "function": "runtime.scanobject"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.47,
+        "cum": "0.98s",
+        "cumPercent": 45.79,
+        "function": "github.com/cnooljaw/gosproto.DecodeWithLimits"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.47,
+        "cum": "0.02s",
+        "cumPercent": 0.93,
+        "function": "reflect.Value.assignTo"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.47,
+        "cum": "0.02s",
+        "cumPercent": 0.93,
+        "function": "reflect.elem"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.47,
+        "cum": "0.02s",
+        "cumPercent": 0.93,
+        "function": "runtime.(*mspan).writeHeapBitsSmall"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.47,
+        "cum": "0.04s",
+        "cumPercent": 1.87,
+        "function": "runtime.newarray"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.47,
+        "cum": "0.27s",
+        "cumPercent": 12.62,
+        "function": "runtime.newobject"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.47,
+        "cum": "0.03s",
+        "cumPercent": 1.4,
+        "function": "runtime.typePointers.next"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.98s",
+        "cumPercent": 45.79,
+        "function": "github.com/cnooljaw/gosproto.Decode (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.19s",
+        "cumPercent": 55.61,
+        "function": "github.com/cnooljaw/gosproto.DecodePacked"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.21s",
+        "cumPercent": 9.81,
+        "function": "github.com/cnooljaw/gosproto.Unpack (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.23s",
+        "cumPercent": 57.48,
+        "function": "gosprotobodystudy.BenchmarkBodyCost"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.4,
+        "function": "gosprotobodystudy.representativeMessages.func2"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.22s",
+        "cumPercent": 57.01,
+        "function": "gosprotobodystudy.representativeOperations.func8"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.4,
+        "function": "reflect.(*rtype).Elem"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.12s",
+        "cumPercent": 5.61,
+        "function": "reflect.MakeSlice"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.14s",
+        "cumPercent": 6.54,
+        "function": "reflect.New"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.93,
+        "function": "reflect.PointerTo (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.4,
+        "function": "reflect.Value.Set"
+      }
+    ],
+    "loopBytes": 672,
+    "loopAllocs": 30
+  },
+  {
+    "case": "game_large",
+    "op": "sproto_encode",
+    "nodes": [
+      {
+        "flat": "1.27s",
+        "flatPercent": 54.27,
+        "cum": "1.27s",
+        "cumPercent": 54.27,
+        "function": "runtime.kevent"
+      },
+      {
+        "flat": "0.23s",
+        "flatPercent": 9.83,
+        "cum": "0.28s",
+        "cumPercent": 11.97,
+        "function": "github.com/cnooljaw/gosproto.encodeIntegerRecordInto"
+      },
+      {
+        "flat": "0.19s",
+        "flatPercent": 8.12,
+        "cum": "0.31s",
+        "cumPercent": 13.25,
+        "function": "github.com/cnooljaw/gosproto.encodedIntegerRecordSize"
+      },
+      {
+        "flat": "0.13s",
+        "flatPercent": 5.56,
+        "cum": "0.45s",
+        "cumPercent": 19.23,
+        "function": "github.com/cnooljaw/gosproto.fieldSize"
+      },
+      {
+        "flat": "0.05s",
+        "flatPercent": 2.14,
+        "cum": "0.07s",
+        "cumPercent": 2.99,
+        "function": "github.com/cnooljaw/gosproto.(*encodeLayout).add (inline)"
+      },
+      {
+        "flat": "0.05s",
+        "flatPercent": 2.14,
+        "cum": "0.05s",
+        "cumPercent": 2.14,
+        "function": "github.com/cnooljaw/gosproto.encodeInt64Slice (inline)"
+      },
+      {
+        "flat": "0.05s",
+        "flatPercent": 2.14,
+        "cum": "0.05s",
+        "cumPercent": 2.14,
+        "function": "github.com/cnooljaw/gosproto.encodePointer.integer (inline)"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.28,
+        "cum": "0.03s",
+        "cumPercent": 1.28,
+        "function": "encoding/binary.littleEndian.PutUint32 (inline)"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.28,
+        "cum": "0.37s",
+        "cumPercent": 15.81,
+        "function": "github.com/cnooljaw/gosproto.encodeIntegerRecordArrayInto"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.28,
+        "cum": "0.03s",
+        "cumPercent": 1.28,
+        "function": "github.com/cnooljaw/gosproto.messageEncodePointer (inline)"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.28,
+        "cum": "0.06s",
+        "cumPercent": 2.56,
+        "function": "runtime.scanobject"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.85,
+        "cum": "0.02s",
+        "cumPercent": 0.85,
+        "function": "github.com/cnooljaw/gosproto.(*encodeLayout).set (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.85,
+        "cum": "0.02s",
+        "cumPercent": 0.85,
+        "function": "github.com/cnooljaw/gosproto.encodeIntegerInto (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.85,
+        "cum": "0.49s",
+        "cumPercent": 20.94,
+        "function": "github.com/cnooljaw/gosproto.encodeMessageInto"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.85,
+        "cum": "0.02s",
+        "cumPercent": 0.85,
+        "function": "reflect.valueInterface"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.85,
+        "cum": "0.02s",
+        "cumPercent": 0.85,
+        "function": "runtime.(*pallocBits).summarize"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.85,
+        "cum": "0.02s",
+        "cumPercent": 0.85,
+        "function": "runtime.findObject"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.85,
+        "cum": "0.02s",
+        "cumPercent": 0.85,
+        "function": "runtime.memmove"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.85,
+        "cum": "0.02s",
+        "cumPercent": 0.85,
+        "function": "runtime.typePointers.next"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.46s",
+        "cumPercent": 19.66,
+        "function": "github.com/cnooljaw/gosproto.encodeFieldInto"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.47s",
+        "cumPercent": 20.09,
+        "function": "github.com/cnooljaw/gosproto.encodedSize"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.04s",
+        "cumPercent": 1.71,
+        "function": "runtime.(*mheap).freeSpanLocked"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.05s",
+        "cumPercent": 44.87,
+        "function": "github.com/cnooljaw/gosproto.Encode"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.05s",
+        "cumPercent": 44.87,
+        "function": "github.com/cnooljaw/gosproto.EncodeWithLimits (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.05s",
+        "cumPercent": 44.87,
+        "function": "github.com/cnooljaw/gosproto.encodeBufferWithLimits"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.05s",
+        "cumPercent": 44.87,
+        "function": "github.com/cnooljaw/gosproto.encodeWithLimits"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.28,
+        "function": "github.com/cnooljaw/gosproto.writeUint32 (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.05s",
+        "cumPercent": 44.87,
+        "function": "gosprotobodystudy.BenchmarkBodyCost"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.05s",
+        "cumPercent": 44.87,
+        "function": "gosprotobodystudy.representativeOperations.func3"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.85,
+        "function": "reflect.Value.Interface (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.28,
+        "function": "runtime.(*mcache).nextFree"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.28,
+        "function": "runtime.(*mcache).refill"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.28,
+        "function": "runtime.(*mcentral).cacheSpan"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.28,
+        "function": "runtime.(*mheap).freeSpan (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.28,
+        "function": "runtime.(*pageAlloc).free"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.85,
+        "function": "runtime.(*pageAlloc).update"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.28,
+        "function": "runtime.(*sweepLocked).sweep"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.28,
+        "function": "runtime.(*sweepLocked).sweep.(*mheap).freeSpan.func2"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.08s",
+        "cumPercent": 3.42,
+        "function": "runtime.deductAssistCredit"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.28,
+        "function": "runtime.deductSweepCredit"
+      }
+    ],
+    "loopBytes": 3968,
+    "loopAllocs": 2
+  },
+  {
+    "case": "game_large",
+    "op": "sproto_pencode",
+    "nodes": [
+      {
+        "flat": "1.01s",
+        "flatPercent": 44.89,
+        "cum": "1.01s",
+        "cumPercent": 44.89,
+        "function": "runtime.kevent"
+      },
+      {
+        "flat": "0.24s",
+        "flatPercent": 10.67,
+        "cum": "0.24s",
+        "cumPercent": 10.67,
+        "function": "github.com/cnooljaw/gosproto.packInto"
+      },
+      {
+        "flat": "0.21s",
+        "flatPercent": 9.33,
+        "cum": "0.22s",
+        "cumPercent": 9.78,
+        "function": "github.com/cnooljaw/gosproto.encodedIntegerRecordSize"
+      },
+      {
+        "flat": "0.10s",
+        "flatPercent": 4.44,
+        "cum": "0.22s",
+        "cumPercent": 9.78,
+        "function": "github.com/cnooljaw/gosproto.encodeIntegerRecordInto"
+      },
+      {
+        "flat": "0.08s",
+        "flatPercent": 3.56,
+        "cum": "0.32s",
+        "cumPercent": 14.22,
+        "function": "github.com/cnooljaw/gosproto.fieldSize"
+      },
+      {
+        "flat": "0.07s",
+        "flatPercent": 3.11,
+        "cum": "0.07s",
+        "cumPercent": 3.11,
+        "function": "runtime.madvise"
+      },
+      {
+        "flat": "0.06s",
+        "flatPercent": 2.67,
+        "cum": "0.06s",
+        "cumPercent": 2.67,
+        "function": "github.com/cnooljaw/gosproto.encodePointer.integer (inline)"
+      },
+      {
+        "flat": "0.04s",
+        "flatPercent": 1.78,
+        "cum": "0.04s",
+        "cumPercent": 1.78,
+        "function": "github.com/cnooljaw/gosproto.skipTag (inline)"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.33,
+        "cum": "0.39s",
+        "cumPercent": 17.33,
+        "function": "github.com/cnooljaw/gosproto.encodeFieldInto"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.33,
+        "cum": "0.04s",
+        "cumPercent": 1.78,
+        "function": "github.com/cnooljaw/gosproto.encodeInt64Slice (inline)"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.33,
+        "cum": "0.28s",
+        "cumPercent": 12.44,
+        "function": "github.com/cnooljaw/gosproto.encodeIntegerRecordArrayInto"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.33,
+        "cum": "0.03s",
+        "cumPercent": 1.33,
+        "function": "runtime.memclrNoHeapPointers"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.33,
+        "cum": "0.06s",
+        "cumPercent": 2.67,
+        "function": "runtime.typePointers.next"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.89,
+        "cum": "0.02s",
+        "cumPercent": 0.89,
+        "function": "encoding/binary.littleEndian.PutUint32 (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.89,
+        "cum": "0.02s",
+        "cumPercent": 0.89,
+        "function": "github.com/cnooljaw/gosproto.(*SprotoField).nativeInteger (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.89,
+        "cum": "0.02s",
+        "cumPercent": 0.89,
+        "function": "github.com/cnooljaw/gosproto.messageEncodePointer (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.89,
+        "cum": "0.02s",
+        "cumPercent": 0.89,
+        "function": "runtime.readUintptr (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.89,
+        "cum": "0.02s",
+        "cumPercent": 0.89,
+        "function": "runtime.resolveTypeOff"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.40s",
+        "cumPercent": 17.78,
+        "function": "github.com/cnooljaw/gosproto.encodeMessageInto"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.36s",
+        "cumPercent": 16.0,
+        "function": "github.com/cnooljaw/gosproto.encodedSize"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.02s",
+        "cumPercent": 0.89,
+        "function": "runtime.findObject"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.06s",
+        "cumPercent": 2.67,
+        "function": "runtime.mallocgcSmallNoscan"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.15s",
+        "cumPercent": 51.11,
+        "function": "github.com/cnooljaw/gosproto.EncodePacked (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.91s",
+        "cumPercent": 40.44,
+        "function": "github.com/cnooljaw/gosproto.encodeBufferWithLimits"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.15s",
+        "cumPercent": 51.11,
+        "function": "github.com/cnooljaw/gosproto.encodeWithLimits"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.89,
+        "function": "github.com/cnooljaw/gosproto.integerRecordPointers"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.89,
+        "function": "github.com/cnooljaw/gosproto.writeUint32 (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.15s",
+        "cumPercent": 51.11,
+        "function": "gosprotobodystudy.BenchmarkBodyCost"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.15s",
+        "cumPercent": 51.11,
+        "function": "gosprotobodystudy.representativeOperations.func7"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.89,
+        "function": "reflect.(*rtype).ptrTo"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.89,
+        "function": "reflect.(*rtype).typeOff (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.89,
+        "function": "reflect.resolveTypeOff"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.07s",
+        "cumPercent": 3.11,
+        "function": "runtime.(*mheap).alloc.func1"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.07s",
+        "cumPercent": 3.11,
+        "function": "runtime.(*mheap).allocSpan"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.89,
+        "function": "runtime.bgsweep"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.10s",
+        "cumPercent": 4.44,
+        "function": "runtime.deductAssistCredit"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.10s",
+        "cumPercent": 4.44,
+        "function": "runtime.gcAssistAlloc"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.10s",
+        "cumPercent": 4.44,
+        "function": "runtime.gcAssistAlloc.func2"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.10s",
+        "cumPercent": 4.44,
+        "function": "runtime.gcAssistAlloc1"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.10s",
+        "cumPercent": 4.44,
+        "function": "runtime.gcDrainN"
+      }
+    ],
+    "loopBytes": 3968,
+    "loopAllocs": 2
+  },
+  {
+    "case": "game_large",
+    "op": "sproto_decode",
+    "nodes": [
+      {
+        "flat": "1.56s",
+        "flatPercent": 67.53,
+        "cum": "1.56s",
+        "cumPercent": 67.53,
+        "function": "runtime.kevent"
+      },
+      {
+        "flat": "0.08s",
+        "flatPercent": 3.46,
+        "cum": "0.14s",
+        "cumPercent": 6.06,
+        "function": "runtime.mallocgcTiny"
+      },
+      {
+        "flat": "0.06s",
+        "flatPercent": 2.6,
+        "cum": "0.31s",
+        "cumPercent": 13.42,
+        "function": "github.com/cnooljaw/gosproto.decodeIntegerRecord"
+      },
+      {
+        "flat": "0.06s",
+        "flatPercent": 2.6,
+        "cum": "0.45s",
+        "cumPercent": 19.48,
+        "function": "runtime.mallocgc"
+      },
+      {
+        "flat": "0.05s",
+        "flatPercent": 2.16,
+        "cum": "0.05s",
+        "cumPercent": 2.16,
+        "function": "runtime.nextFreeFast (inline)"
+      },
+      {
+        "flat": "0.04s",
+        "flatPercent": 1.73,
+        "cum": "0.09s",
+        "cumPercent": 3.9,
+        "function": "runtime.scanobject"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.3,
+        "cum": "0.05s",
+        "cumPercent": 2.16,
+        "function": "github.com/cnooljaw/gosproto.countChunks"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.3,
+        "cum": "0.07s",
+        "cumPercent": 3.03,
+        "function": "github.com/cnooljaw/gosproto.decodeIntSlice"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.87,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "internal/runtime/atomic.(*UnsafePointer).Load (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.87,
+        "cum": "0.03s",
+        "cumPercent": 1.3,
+        "function": "runtime.(*mspan).writeHeapBitsSmall"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.87,
+        "cum": "0.04s",
+        "cumPercent": 1.73,
+        "function": "runtime.gcmarknewobject"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.87,
+        "cum": "0.13s",
+        "cumPercent": 5.63,
+        "function": "runtime.mallocgcSmallScanNoHeader"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.87,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "runtime.typePointers.next"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.03s",
+        "cumPercent": 1.3,
+        "function": "gcWriteBarrier"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "github.com/cnooljaw/gosproto.canDecodeIntegerRecords (inline)"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.71s",
+        "cumPercent": 30.74,
+        "function": "github.com/cnooljaw/gosproto.decodeMessage"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.63s",
+        "cumPercent": 27.27,
+        "function": "github.com/cnooljaw/gosproto.decodeStructSlice"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.03s",
+        "cumPercent": 1.3,
+        "function": "reflect.resolveTypeOff"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "runtime.(*mcache).nextFree"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.24s",
+        "cumPercent": 10.39,
+        "function": "runtime.newobject"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "runtime.resolveTypeOff"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "runtime.wbBufFlush1"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.74s",
+        "cumPercent": 32.03,
+        "function": "github.com/cnooljaw/gosproto.Decode (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.74s",
+        "cumPercent": 32.03,
+        "function": "github.com/cnooljaw/gosproto.DecodeWithLimits"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.74s",
+        "cumPercent": 32.03,
+        "function": "gosprotobodystudy.BenchmarkBodyCost"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.74s",
+        "cumPercent": 32.03,
+        "function": "gosprotobodystudy.representativeOperations.func4"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.3,
+        "function": "reflect.(*rtype).ptrTo"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.3,
+        "function": "reflect.(*rtype).typeOff (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "reflect.MakeSlice"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.19s",
+        "cumPercent": 8.23,
+        "function": "reflect.New"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "reflect.Value.UnsafePointer"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.3,
+        "function": "reflect.ptrTo (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.17s",
+        "cumPercent": 7.36,
+        "function": "reflect.unsafe_New"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "reflect.unsafe_NewArray"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "runtime.(*mheap).alloc.func1"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "runtime.(*mheap).allocSpan"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.09s",
+        "cumPercent": 3.9,
+        "function": "runtime.deductAssistCredit"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.09s",
+        "cumPercent": 3.9,
+        "function": "runtime.gcAssistAlloc"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.09s",
+        "cumPercent": 3.9,
+        "function": "runtime.gcAssistAlloc.func2"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.09s",
+        "cumPercent": 3.9,
+        "function": "runtime.gcAssistAlloc1"
+      }
+    ],
+    "loopBytes": 10416,
+    "loopAllocs": 532
+  },
+  {
+    "case": "game_large",
+    "op": "sproto_pdecode",
+    "nodes": [
+      {
+        "flat": "1.11s",
+        "flatPercent": 50.0,
+        "cum": "1.11s",
+        "cumPercent": 50.0,
+        "function": "runtime.kevent"
+      },
+      {
+        "flat": "0.20s",
+        "flatPercent": 9.01,
+        "cum": "0.27s",
+        "cumPercent": 12.16,
+        "function": "github.com/cnooljaw/gosproto.UnpackWithLimit"
+      },
+      {
+        "flat": "0.10s",
+        "flatPercent": 4.5,
+        "cum": "0.42s",
+        "cumPercent": 18.92,
+        "function": "github.com/cnooljaw/gosproto.decodeIntegerRecord"
+      },
+      {
+        "flat": "0.10s",
+        "flatPercent": 4.5,
+        "cum": "0.50s",
+        "cumPercent": 22.52,
+        "function": "runtime.mallocgc"
+      },
+      {
+        "flat": "0.08s",
+        "flatPercent": 3.6,
+        "cum": "0.16s",
+        "cumPercent": 7.21,
+        "function": "runtime.mallocgcTiny"
+      },
+      {
+        "flat": "0.04s",
+        "flatPercent": 1.8,
+        "cum": "0.04s",
+        "cumPercent": 1.8,
+        "function": "math/bits.OnesCount8 (inline)"
+      },
+      {
+        "flat": "0.04s",
+        "flatPercent": 1.8,
+        "cum": "0.04s",
+        "cumPercent": 1.8,
+        "function": "runtime.releasem (inline)"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.35,
+        "cum": "0.73s",
+        "cumPercent": 32.88,
+        "function": "github.com/cnooljaw/gosproto.decodeStructSlice"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.35,
+        "cum": "0.20s",
+        "cumPercent": 9.01,
+        "function": "reflect.New"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.35,
+        "cum": "0.03s",
+        "cumPercent": 1.35,
+        "function": "runtime.(*mspan).writeHeapBitsSmall"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.35,
+        "cum": "0.31s",
+        "cumPercent": 13.96,
+        "function": "runtime.newobject"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.35,
+        "cum": "0.03s",
+        "cumPercent": 1.35,
+        "function": "runtime.nextFreeFast (inline)"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.35,
+        "cum": "0.07s",
+        "cumPercent": 3.15,
+        "function": "runtime.scanobject"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.35,
+        "cum": "0.04s",
+        "cumPercent": 1.8,
+        "function": "runtime.wbBufFlush1"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.9,
+        "cum": "0.04s",
+        "cumPercent": 1.8,
+        "function": "github.com/cnooljaw/gosproto.countChunks"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.9,
+        "cum": "0.02s",
+        "cumPercent": 0.9,
+        "function": "reflect.(*rtype).ptrTo"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.9,
+        "cum": "0.02s",
+        "cumPercent": 0.9,
+        "function": "runtime.findObject"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.9,
+        "cum": "0.02s",
+        "cumPercent": 0.9,
+        "function": "runtime.madvise"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.9,
+        "cum": "0.05s",
+        "cumPercent": 2.25,
+        "function": "runtime.mallocgcSmallNoscan"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.9,
+        "cum": "0.03s",
+        "cumPercent": 1.35,
+        "function": "runtime.typePointers.next"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.45,
+        "cum": "0.02s",
+        "cumPercent": 0.9,
+        "function": "github.com/cnooljaw/gosproto.decodeStringSlice"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.45,
+        "cum": "0.02s",
+        "cumPercent": 0.9,
+        "function": "github.com/cnooljaw/gosproto.readChunk (inline)"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.45,
+        "cum": "0.15s",
+        "cumPercent": 6.76,
+        "function": "reflect.unsafe_New"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.45,
+        "cum": "0.11s",
+        "cumPercent": 4.95,
+        "function": "runtime.deductAssistCredit"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.45,
+        "cum": "0.08s",
+        "cumPercent": 3.6,
+        "function": "runtime.mallocgcSmallScanNoHeader"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.35,
+        "function": "gcWriteBarrier"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.79s",
+        "cumPercent": 35.59,
+        "function": "github.com/cnooljaw/gosproto.Decode (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.06s",
+        "cumPercent": 47.75,
+        "function": "github.com/cnooljaw/gosproto.DecodePacked"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.79s",
+        "cumPercent": 35.59,
+        "function": "github.com/cnooljaw/gosproto.DecodeWithLimits"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.27s",
+        "cumPercent": 12.16,
+        "function": "github.com/cnooljaw/gosproto.Unpack (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.04s",
+        "cumPercent": 1.8,
+        "function": "github.com/cnooljaw/gosproto.decodeIntSlice"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.79s",
+        "cumPercent": 35.59,
+        "function": "github.com/cnooljaw/gosproto.decodeMessage"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.07s",
+        "cumPercent": 48.2,
+        "function": "gosprotobodystudy.BenchmarkBodyCost"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.07s",
+        "cumPercent": 48.2,
+        "function": "gosprotobodystudy.representativeOperations.func8"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.9,
+        "function": "reflect.ptrTo (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.9,
+        "function": "runtime.(*mcache).nextFree"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.9,
+        "function": "runtime.(*mheap).alloc.func1"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.9,
+        "function": "runtime.(*mheap).allocSpan"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.10s",
+        "cumPercent": 4.5,
+        "function": "runtime.gcAssistAlloc"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.10s",
+        "cumPercent": 4.5,
+        "function": "runtime.gcAssistAlloc.func2"
+      }
+    ],
+    "loopBytes": 13872,
+    "loopAllocs": 533
+  },
+  {
+    "case": "int32_edges",
+    "op": "sproto_encode",
+    "nodes": [
+      {
+        "flat": "1.50s",
+        "flatPercent": 68.49,
+        "cum": "1.50s",
+        "cumPercent": 68.49,
+        "function": "runtime.kevent"
+      },
+      {
+        "flat": "0.30s",
+        "flatPercent": 13.7,
+        "cum": "0.32s",
+        "cumPercent": 14.61,
+        "function": "github.com/cnooljaw/gosproto.encodeInt64Slice (inline)"
+      },
+      {
+        "flat": "0.12s",
+        "flatPercent": 5.48,
+        "cum": "0.13s",
+        "cumPercent": 5.94,
+        "function": "github.com/cnooljaw/gosproto.fieldSize"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.37,
+        "cum": "0.03s",
+        "cumPercent": 1.37,
+        "function": "runtime.madvise"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.91,
+        "cum": "0.02s",
+        "cumPercent": 0.91,
+        "function": "encoding/binary.littleEndian.PutUint32 (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.91,
+        "cum": "0.37s",
+        "cumPercent": 16.89,
+        "function": "github.com/cnooljaw/gosproto.encodeFieldInto"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.91,
+        "cum": "0.07s",
+        "cumPercent": 3.2,
+        "function": "runtime.(*mcache).refill"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.46,
+        "cum": "0.02s",
+        "cumPercent": 0.91,
+        "function": "reflect.(*rtype).ptrTo"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.46,
+        "cum": "0.02s",
+        "cumPercent": 0.91,
+        "function": "reflect.valueInterface"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.46,
+        "cum": "0.02s",
+        "cumPercent": 0.91,
+        "function": "runtime.(*pageAlloc).free"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.46,
+        "cum": "0.06s",
+        "cumPercent": 2.74,
+        "function": "runtime.scanobject"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.46,
+        "cum": "0.02s",
+        "cumPercent": 0.91,
+        "function": "runtime.typePointers.next"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.66s",
+        "cumPercent": 30.14,
+        "function": "github.com/cnooljaw/gosproto.Encode"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.66s",
+        "cumPercent": 30.14,
+        "function": "github.com/cnooljaw/gosproto.EncodeWithLimits (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.66s",
+        "cumPercent": 30.14,
+        "function": "github.com/cnooljaw/gosproto.encodeBufferWithLimits"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.37s",
+        "cumPercent": 16.89,
+        "function": "github.com/cnooljaw/gosproto.encodeMessageInto"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.66s",
+        "cumPercent": 30.14,
+        "function": "github.com/cnooljaw/gosproto.encodeWithLimits"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.13s",
+        "cumPercent": 5.94,
+        "function": "github.com/cnooljaw/gosproto.encodedSize"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.91,
+        "function": "github.com/cnooljaw/gosproto.writeUint32 (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.66s",
+        "cumPercent": 30.14,
+        "function": "gosprotobodystudy.BenchmarkBodyCost"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.66s",
+        "cumPercent": 30.14,
+        "function": "gosprotobodystudy.representativeOperations.func3"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.91,
+        "function": "reflect.Value.Addr"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.91,
+        "function": "reflect.Value.Interface (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.91,
+        "function": "reflect.ptrTo (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.07s",
+        "cumPercent": 3.2,
+        "function": "runtime.(*mcache).nextFree"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.05s",
+        "cumPercent": 2.28,
+        "function": "runtime.(*mcentral).cacheSpan"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.04s",
+        "cumPercent": 1.83,
+        "function": "runtime.(*mheap).alloc.func1"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.04s",
+        "cumPercent": 1.83,
+        "function": "runtime.(*mheap).allocSpan"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.37,
+        "function": "runtime.(*mheap).freeSpan (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.37,
+        "function": "runtime.(*mheap).freeSpanLocked"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.04s",
+        "cumPercent": 1.83,
+        "function": "runtime.(*sweepLocked).sweep"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.37,
+        "function": "runtime.(*sweepLocked).sweep.(*mheap).freeSpan.func2"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.07s",
+        "cumPercent": 3.2,
+        "function": "runtime.deductAssistCredit"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.04s",
+        "cumPercent": 1.83,
+        "function": "runtime.deductSweepCredit"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.91,
+        "function": "runtime.findObject"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.07s",
+        "cumPercent": 3.2,
+        "function": "runtime.gcAssistAlloc"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.07s",
+        "cumPercent": 3.2,
+        "function": "runtime.gcAssistAlloc.func2"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.07s",
+        "cumPercent": 3.2,
+        "function": "runtime.gcAssistAlloc1"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.07s",
+        "cumPercent": 3.2,
+        "function": "runtime.gcDrainN"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.40s",
+        "cumPercent": 18.26,
+        "function": "runtime.gcMarkTermination.func3"
+      }
+    ],
+    "loopBytes": 4096,
+    "loopAllocs": 1
+  },
+  {
+    "case": "int32_edges",
+    "op": "sproto_pencode",
+    "nodes": [
+      {
+        "flat": "1.29s",
+        "flatPercent": 56.09,
+        "cum": "1.29s",
+        "cumPercent": 56.09,
+        "function": "runtime.kevent"
+      },
+      {
+        "flat": "0.49s",
+        "flatPercent": 21.3,
+        "cum": "0.49s",
+        "cumPercent": 21.3,
+        "function": "github.com/cnooljaw/gosproto.packInto"
+      },
+      {
+        "flat": "0.14s",
+        "flatPercent": 6.09,
+        "cum": "0.16s",
+        "cumPercent": 6.96,
+        "function": "github.com/cnooljaw/gosproto.encodeInt64Slice (inline)"
+      },
+      {
+        "flat": "0.14s",
+        "flatPercent": 6.09,
+        "cum": "0.16s",
+        "cumPercent": 6.96,
+        "function": "github.com/cnooljaw/gosproto.fieldSize"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.3,
+        "cum": "0.03s",
+        "cumPercent": 1.3,
+        "function": "runtime.madvise"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.3,
+        "cum": "0.05s",
+        "cumPercent": 2.17,
+        "function": "runtime.scanobject"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.87,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "encoding/binary.littleEndian.PutUint32 (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.87,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "github.com/cnooljaw/gosproto.(*decodeBudget).add (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.87,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "reflect.packEface"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.87,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "runtime.resolveTypeOff"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.87,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "runtime.typePointers.next"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.03s",
+        "cumPercent": 1.3,
+        "function": "reflect.Value.Addr"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.97s",
+        "cumPercent": 42.17,
+        "function": "github.com/cnooljaw/gosproto.EncodePacked (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.48s",
+        "cumPercent": 20.87,
+        "function": "github.com/cnooljaw/gosproto.encodeBufferWithLimits"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.19s",
+        "cumPercent": 8.26,
+        "function": "github.com/cnooljaw/gosproto.encodeFieldInto"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.19s",
+        "cumPercent": 8.26,
+        "function": "github.com/cnooljaw/gosproto.encodeMessageInto"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.97s",
+        "cumPercent": 42.17,
+        "function": "github.com/cnooljaw/gosproto.encodeWithLimits"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.18s",
+        "cumPercent": 7.83,
+        "function": "github.com/cnooljaw/gosproto.encodedSize"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "github.com/cnooljaw/gosproto.writeUint32 (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.97s",
+        "cumPercent": 42.17,
+        "function": "gosprotobodystudy.BenchmarkBodyCost"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.97s",
+        "cumPercent": 42.17,
+        "function": "gosprotobodystudy.representativeOperations.func7"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "reflect.(*rtype).ptrTo"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "reflect.(*rtype).typeOff (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "reflect.Value.Interface (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "reflect.ptrTo (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "reflect.resolveTypeOff"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87,
+        "function": "reflect.valueInterface"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.3,
+        "function": "runtime.(*mheap).alloc.func1"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.3,
+        "function": "runtime.(*mheap).allocSpan"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.07s",
+        "cumPercent": 3.04,
+        "function": "runtime.deductAssistCredit"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.07s",
+        "cumPercent": 3.04,
+        "function": "runtime.gcAssistAlloc"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.06s",
+        "cumPercent": 2.61,
+        "function": "runtime.gcAssistAlloc.func2"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.06s",
+        "cumPercent": 2.61,
+        "function": "runtime.gcAssistAlloc1"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.06s",
+        "cumPercent": 2.61,
+        "function": "runtime.gcDrainN"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.38s",
+        "cumPercent": 16.52,
+        "function": "runtime.gcMarkTermination.func3"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.91s",
+        "cumPercent": 39.57,
+        "function": "runtime.gcStart.func4"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.10s",
+        "cumPercent": 4.35,
+        "function": "runtime.makeslice"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.10s",
+        "cumPercent": 4.35,
+        "function": "runtime.mallocgc"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.3,
+        "function": "runtime.mallocgcSmallNoscan"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.29s",
+        "cumPercent": 56.09,
+        "function": "runtime.netpoll"
+      }
+    ],
+    "loopBytes": 4096,
+    "loopAllocs": 1
+  },
+  {
+    "case": "int32_edges",
+    "op": "sproto_decode",
+    "nodes": [
+      {
+        "flat": "1.76s",
+        "flatPercent": 78.92,
+        "cum": "1.76s",
+        "cumPercent": 78.92,
+        "function": "runtime.kevent"
+      },
+      {
+        "flat": "0.17s",
+        "flatPercent": 7.62,
+        "cum": "0.33s",
+        "cumPercent": 14.8,
+        "function": "github.com/cnooljaw/gosproto.decodeIntSlice"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.35,
+        "cum": "0.04s",
+        "cumPercent": 1.79,
+        "function": "runtime.pcvalue"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.35,
+        "cum": "0.09s",
+        "cumPercent": 4.04,
+        "function": "runtime.scanobject"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.35,
+        "cum": "0.03s",
+        "cumPercent": 1.35,
+        "function": "runtime.typePointers.next"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.9,
+        "cum": "0.02s",
+        "cumPercent": 0.9,
+        "function": "runtime.findObject"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.9,
+        "cum": "0.02s",
+        "cumPercent": 0.9,
+        "function": "runtime.memclrNoHeapPointers"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.9,
+        "cum": "0.03s",
+        "cumPercent": 1.35,
+        "function": "runtime.scanblock"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.45,
+        "cum": "0.34s",
+        "cumPercent": 15.25,
+        "function": "github.com/cnooljaw/gosproto.decodeMessage"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.45,
+        "cum": "0.17s",
+        "cumPercent": 7.62,
+        "function": "runtime.gcDrainN"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.45,
+        "cum": "0.06s",
+        "cumPercent": 2.69,
+        "function": "runtime.mallocgcSmallNoscan"
+      },
+      {
+        "flat": "0.01s",
+        "flatPercent": 0.45,
+        "cum": "1.96s",
+        "cumPercent": 87.89,
+        "function": "runtime.systemstack"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.38s",
+        "cumPercent": 17.04,
+        "function": "github.com/cnooljaw/gosproto.Decode (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.38s",
+        "cumPercent": 17.04,
+        "function": "github.com/cnooljaw/gosproto.DecodeWithLimits"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.44s",
+        "cumPercent": 19.73,
+        "function": "gosprotobodystudy.BenchmarkBodyCost"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.06s",
+        "cumPercent": 2.69,
+        "function": "gosprotobodystudy.representativeMessages.func6"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.44s",
+        "cumPercent": 19.73,
+        "function": "gosprotobodystudy.representativeOperations.func4"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.35,
+        "function": "reflect.New"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.35,
+        "function": "reflect.unsafe_New"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.35,
+        "function": "runtime.(*mcache).nextFree"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.35,
+        "function": "runtime.(*mcache).refill"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.35,
+        "function": "runtime.(*mcentral).cacheSpan"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.9,
+        "function": "runtime.(*sweepLocked).sweep"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.35,
+        "function": "runtime.(*unwinder).next"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.35,
+        "function": "runtime.(*unwinder).resolveInternal"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.17s",
+        "cumPercent": 7.62,
+        "function": "runtime.deductAssistCredit"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.9,
+        "function": "runtime.deductSweepCredit"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.35,
+        "function": "runtime.funcspdelta (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.17s",
+        "cumPercent": 7.62,
+        "function": "runtime.gcAssistAlloc"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.17s",
+        "cumPercent": 7.62,
+        "function": "runtime.gcAssistAlloc.func2"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.17s",
+        "cumPercent": 7.62,
+        "function": "runtime.gcAssistAlloc1"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.82s",
+        "cumPercent": 36.77,
+        "function": "runtime.gcMarkTermination.func3"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.94s",
+        "cumPercent": 42.15,
+        "function": "runtime.gcStart.func4"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.15s",
+        "cumPercent": 6.73,
+        "function": "runtime.makeslice"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.25s",
+        "cumPercent": 11.21,
+        "function": "runtime.mallocgc"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.9,
+        "function": "runtime.mallocgcSmallScanNoHeader"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.07s",
+        "cumPercent": 3.14,
+        "function": "runtime.markroot"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.04s",
+        "cumPercent": 1.79,
+        "function": "runtime.markroot.func1"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.35,
+        "function": "runtime.markrootBlock"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.76s",
+        "cumPercent": 78.92,
+        "function": "runtime.netpoll"
+      }
+    ],
+    "loopBytes": 8288,
+    "loopAllocs": 4
+  },
+  {
+    "case": "int32_edges",
+    "op": "sproto_pdecode",
+    "nodes": [
+      {
+        "flat": "1.47s",
+        "flatPercent": 65.33,
+        "cum": "1.47s",
+        "cumPercent": 65.33,
+        "function": "runtime.kevent"
+      },
+      {
+        "flat": "0.46s",
+        "flatPercent": 20.44,
+        "cum": "0.58s",
+        "cumPercent": 25.78,
+        "function": "github.com/cnooljaw/gosproto.UnpackWithLimit"
+      },
+      {
+        "flat": "0.04s",
+        "flatPercent": 1.78,
+        "cum": "0.04s",
+        "cumPercent": 1.78,
+        "function": "math/bits.OnesCount8 (inline)"
+      },
+      {
+        "flat": "0.04s",
+        "flatPercent": 1.78,
+        "cum": "0.06s",
+        "cumPercent": 2.67,
+        "function": "runtime.typePointers.next"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.33,
+        "cum": "0.12s",
+        "cumPercent": 5.33,
+        "function": "github.com/cnooljaw/gosproto.decodeIntSlice"
+      },
+      {
+        "flat": "0.03s",
+        "flatPercent": 1.33,
+        "cum": "0.03s",
+        "cumPercent": 1.33,
+        "function": "runtime.madvise"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.89,
+        "cum": "0.02s",
+        "cumPercent": 0.89,
+        "function": "runtime.nextFreeFast (inline)"
+      },
+      {
+        "flat": "0.02s",
+        "flatPercent": 0.89,
+        "cum": "0.09s",
+        "cumPercent": 4.0,
+        "function": "runtime.scanobject"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.13s",
+        "cumPercent": 5.78,
+        "function": "github.com/cnooljaw/gosproto.Decode (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.71s",
+        "cumPercent": 31.56,
+        "function": "github.com/cnooljaw/gosproto.DecodePacked"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.13s",
+        "cumPercent": 5.78,
+        "function": "github.com/cnooljaw/gosproto.DecodeWithLimits"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.58s",
+        "cumPercent": 25.78,
+        "function": "github.com/cnooljaw/gosproto.Unpack (inline)"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.12s",
+        "cumPercent": 5.33,
+        "function": "github.com/cnooljaw/gosproto.decodeMessage"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.74s",
+        "cumPercent": 32.89,
+        "function": "gosprotobodystudy.BenchmarkBodyCost"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.33,
+        "function": "gosprotobodystudy.representativeMessages.func6"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.74s",
+        "cumPercent": 32.89,
+        "function": "gosprotobodystudy.representativeOperations.func8"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.07s",
+        "cumPercent": 3.11,
+        "function": "runtime.(*mcache).nextFree"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.07s",
+        "cumPercent": 3.11,
+        "function": "runtime.(*mcache).refill"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.06s",
+        "cumPercent": 2.67,
+        "function": "runtime.(*mcentral).cacheSpan"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.89,
+        "function": "runtime.(*mcentral).grow"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.89,
+        "function": "runtime.(*mheap).alloc"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.05s",
+        "cumPercent": 2.22,
+        "function": "runtime.(*mheap).alloc.func1"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.05s",
+        "cumPercent": 2.22,
+        "function": "runtime.(*mheap).allocSpan"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.89,
+        "function": "runtime.(*mheap).initSpan"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.11s",
+        "cumPercent": 4.89,
+        "function": "runtime.deductAssistCredit"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.04s",
+        "cumPercent": 1.78,
+        "function": "runtime.deductSweepCredit"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.11s",
+        "cumPercent": 4.89,
+        "function": "runtime.gcAssistAlloc"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.10s",
+        "cumPercent": 4.44,
+        "function": "runtime.gcAssistAlloc.func2"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.10s",
+        "cumPercent": 4.44,
+        "function": "runtime.gcAssistAlloc1"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.10s",
+        "cumPercent": 4.44,
+        "function": "runtime.gcDrainN"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.71s",
+        "cumPercent": 31.56,
+        "function": "runtime.gcMarkTermination.func3"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.76s",
+        "cumPercent": 33.78,
+        "function": "runtime.gcStart.func4"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.17s",
+        "cumPercent": 7.56,
+        "function": "runtime.makeslice"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.21s",
+        "cumPercent": 9.33,
+        "function": "runtime.mallocgc"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.10s",
+        "cumPercent": 4.44,
+        "function": "runtime.mallocgcSmallNoscan"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.47s",
+        "cumPercent": 65.33,
+        "function": "runtime.netpoll"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.04s",
+        "cumPercent": 1.78,
+        "function": "runtime.newobject"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.47s",
+        "cumPercent": 65.33,
+        "function": "runtime.startTheWorldWithSema"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.33,
+        "function": "runtime.sweepone"
+      },
+      {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.33,
+        "function": "runtime.sysUsed (inline)"
+      }
+    ],
+    "loopBytes": 12384,
+    "loopAllocs": 5
+  }
+]

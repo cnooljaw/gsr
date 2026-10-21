@@ -1,0 +1,45 @@
+File: body.test
+Type: alloc_objects
+Time: 2026-10-21 15:43:23 CST
+Showing nodes accounting for 46370, 98.62% of 47017 total
+Dropped 260 nodes (cum <= 235)
+      flat  flat%   sum%        cum   cum%
+      8925 18.98% 18.98%       8925 18.98%  reflect.New
+      8906 18.94% 37.92%       8906 18.94%  gosprotobodystudy.representativeMessages.func6
+      8905 18.94% 56.86%      26715 56.82%  github.com/cnooljaw/gosproto.DecodeWithLimits
+      8905 18.94% 75.80%       8905 18.94%  github.com/cnooljaw/gosproto.UnpackWithLimit
+      8905 18.94% 94.74%       8905 18.94%  github.com/cnooljaw/gosproto.decodeIntSlice
+       896  1.91% 96.65%        906  1.93%  reflect.Value.extendSlice
+       511  1.09% 97.74%        511  1.09%  google.golang.org/protobuf/internal/encoding/json.normalizeToIntString
+       215  0.46% 98.19%        345  0.73%  encoding/json.typeFields
+       128  0.27% 98.47%        258  0.55%  google.golang.org/protobuf/internal/impl.(*int32Converter).GoValueOf
+        48   0.1% 98.57%        332  0.71%  encoding/json.typeEncoder
+        11 0.023% 98.59%       1861  3.96%  gosprotobodystudy.representativeOperations
+         6 0.013% 98.60%        352  0.75%  encoding/json.cachedTypeFields
+         4 0.0085% 98.61%        274  0.58%  encoding/json.newStructEncoder (inline)
+         2 0.0043% 98.62%      46890 99.73%  testing.(*B).runN
+         1 0.0021% 98.62%        281   0.6%  encoding/json.Marshal
+         1 0.0021% 98.62%        289  0.61%  encoding/json.MarshalIndent
+         1 0.0021% 98.62%      46846 99.64%  gosprotobodystudy.BenchmarkBodyCost
+         0     0% 98.62%        276  0.59%  encoding/json.(*encodeState).marshal
+         0     0% 98.62%        276  0.59%  encoding/json.(*encodeState).reflectValue
+         0     0% 98.62%        306  0.65%  encoding/json.newTypeEncoder
+         0     0% 98.62%        263  0.56%  encoding/json.valueEncoder
+         0     0% 98.62%      26715 56.82%  github.com/cnooljaw/gosproto.Decode (inline)
+         0     0% 98.62%      35616 75.75%  github.com/cnooljaw/gosproto.DecodePacked
+         0     0% 98.62%       8905 18.94%  github.com/cnooljaw/gosproto.Unpack (inline)
+         0     0% 98.62%       8905 18.94%  github.com/cnooljaw/gosproto.decodeMessage
+         0     0% 98.62%       1787  3.80%  google.golang.org/protobuf/encoding/protojson.Unmarshal (inline)
+         0     0% 98.62%       1787  3.80%  google.golang.org/protobuf/encoding/protojson.UnmarshalOptions.Unmarshal (inline)
+         0     0% 98.62%       1787  3.80%  google.golang.org/protobuf/encoding/protojson.UnmarshalOptions.unmarshal
+         0     0% 98.62%       1675  3.56%  google.golang.org/protobuf/encoding/protojson.decoder.unmarshalList
+         0     0% 98.62%       1786  3.80%  google.golang.org/protobuf/encoding/protojson.decoder.unmarshalMessage
+         0     0% 98.62%        511  1.09%  google.golang.org/protobuf/encoding/protojson.decoder.unmarshalScalar
+         0     0% 98.62%        511  1.09%  google.golang.org/protobuf/encoding/protojson.getInt
+         0     0% 98.62%        511  1.09%  google.golang.org/protobuf/encoding/protojson.unmarshalInt
+         0     0% 98.62%        511  1.09%  google.golang.org/protobuf/internal/encoding/json.Token.Int
+         0     0% 98.62%        511  1.09%  google.golang.org/protobuf/internal/encoding/json.Token.getIntStr
+         0     0% 98.62%       1164  2.48%  google.golang.org/protobuf/internal/impl.(*listReflect).Append
+         0     0% 98.62%      44520 94.69%  gosprotobodystudy.representativeOperations.func8
+         0     0% 98.62%        906  1.93%  reflect.Append
+         0     0% 98.62%      46852 99.65%  testing.(*B).run1.func1

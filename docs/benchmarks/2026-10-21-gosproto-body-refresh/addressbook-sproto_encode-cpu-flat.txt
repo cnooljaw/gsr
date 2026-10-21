@@ -1,0 +1,48 @@
+File: body.test
+Type: cpu
+Time: 2026-10-21 15:42:39 CST
+Duration: 2.58s, Total samples = 2.18s (84.57%)
+Showing nodes accounting for 2.06s, 94.50% of 2.18s total
+Dropped 19 nodes (cum <= 0.01s)
+Showing top 40 nodes out of 71
+      flat  flat%   sum%        cum   cum%
+     0.55s 25.23% 25.23%      0.55s 25.23%  runtime.kevent
+     0.21s  9.63% 34.86%      0.65s 29.82%  github.com/cnooljaw/gosproto.encodeMessageInto
+     0.20s  9.17% 44.04%      0.72s 33.03%  github.com/cnooljaw/gosproto.encodedSize
+     0.18s  8.26% 52.29%      0.64s 29.36%  github.com/cnooljaw/gosproto.fieldSize
+     0.16s  7.34% 59.63%      0.59s 27.06%  github.com/cnooljaw/gosproto.encodeFieldInto
+     0.08s  3.67% 63.30%      0.10s  4.59%  reflect.Value.Field
+     0.06s  2.75% 66.06%      0.06s  2.75%  github.com/cnooljaw/gosproto.(*SprotoField).nativeInteger (inline)
+     0.06s  2.75% 68.81%      0.06s  2.75%  github.com/cnooljaw/gosproto.(*decodeBudget).add (inline)
+     0.06s  2.75% 71.56%      0.08s  3.67%  reflect.Value.Index
+     0.05s  2.29% 73.85%      0.06s  2.75%  reflect.Value.Elem
+     0.05s  2.29% 76.15%      0.07s  3.21%  reflect.Value.IsNil (inline)
+     0.04s  1.83% 77.98%      0.04s  1.83%  reflect.flag.kind (inline)
+     0.04s  1.83% 79.82%      0.04s  1.83%  runtime.memclrNoHeapPointers
+     0.03s  1.38% 81.19%      0.03s  1.38%  github.com/cnooljaw/gosproto.(*encodeLayout).add (inline)
+     0.03s  1.38% 82.57%      0.03s  1.38%  runtime.madvise
+     0.02s  0.92% 83.49%      1.54s 70.64%  github.com/cnooljaw/gosproto.encodeBufferWithLimits
+     0.02s  0.92% 84.40%      0.02s  0.92%  internal/abi.Name.IsExported (inline)
+     0.02s  0.92% 85.32%      0.02s  0.92%  internal/abi.TypeOf (inline)
+     0.02s  0.92% 86.24%      0.03s  1.38%  reflect.Value.Len (inline)
+     0.02s  0.92% 87.16%      0.03s  1.38%  reflect.Value.pointer (inline)
+     0.02s  0.92% 88.07%      0.02s  0.92%  reflect.flag.ro (inline)
+     0.02s  0.92% 88.99%      0.02s  0.92%  runtime.(*timer).unlockAndRun
+     0.02s  0.92% 89.91%      0.02s  0.92%  runtime.findObject
+     0.02s  0.92% 90.83%      0.02s  0.92%  runtime.memmove
+     0.02s  0.92% 91.74%      0.02s  0.92%  runtime.typePointers.next
+     0.01s  0.46% 92.20%      0.04s  1.83%  github.com/cnooljaw/gosproto.encodeScalarInto
+     0.01s  0.46% 92.66%      1.55s 71.10%  github.com/cnooljaw/gosproto.encodeWithLimits
+     0.01s  0.46% 93.12%      0.03s  1.38%  github.com/cnooljaw/gosproto.omittedField (inline)
+     0.01s  0.46% 93.58%      0.05s  2.29%  reflect.Value.UnsafePointer
+     0.01s  0.46% 94.04%      0.08s  3.67%  runtime.mallocgc
+     0.01s  0.46% 94.50%      0.03s  1.38%  runtime.mapaccess2
+         0     0% 94.50%      0.02s  0.92%  gcWriteBarrier
+         0     0% 94.50%      1.55s 71.10%  github.com/cnooljaw/gosproto.Encode
+         0     0% 94.50%      1.55s 71.10%  github.com/cnooljaw/gosproto.EncodeWithLimits (inline)
+         0     0% 94.50%      0.03s  1.38%  github.com/cnooljaw/gosproto.GetSprotoType
+         0     0% 94.50%      0.02s  0.92%  github.com/cnooljaw/gosproto.getbase
+         0     0% 94.50%      0.05s  2.29%  github.com/cnooljaw/gosproto.messageEncodePointer (inline)
+         0     0% 94.50%      1.57s 72.02%  gosprotobodystudy.BenchmarkBodyCost
+         0     0% 94.50%      1.57s 72.02%  gosprotobodystudy.representativeOperations.func3
+         0     0% 94.50%      0.02s  0.92%  reflect.(*rtype).Elem

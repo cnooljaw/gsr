@@ -1,0 +1,19 @@
+File: body.test
+Type: alloc_space
+Time: 2026-10-21 15:42:55 CST
+Showing nodes accounting for 44935.85kB, 99.02% of 45381.84kB total
+Dropped 346 nodes (cum <= 226.91kB)
+      flat  flat%   sum%        cum   cum%
+39126.38kB 86.22% 86.22% 44927.30kB 99.00%  github.com/cnooljaw/gosproto.encodeBufferWithLimits
+ 5796.50kB 12.77% 98.99%  5796.50kB 12.77%  github.com/cnooljaw/gosproto.(*encodeLayout).add (inline)
+      12kB 0.026% 99.02% 45360.30kB   100%  gosprotobodystudy.BenchmarkBodyCost
+    0.85kB 0.0019% 99.02%   235.38kB  0.52%  gosprotobodystudy.representativeOperations
+    0.12kB 0.00028% 99.02% 45364.80kB   100%  testing.(*B).runN
+         0     0% 99.02% 44927.30kB 99.00%  github.com/cnooljaw/gosproto.Encode
+         0     0% 99.02% 44927.30kB 99.00%  github.com/cnooljaw/gosproto.EncodeWithLimits (inline)
+         0     0% 99.02% 44927.30kB 99.00%  github.com/cnooljaw/gosproto.encodeWithLimits
+         0     0% 99.02%  5796.50kB 12.77%  github.com/cnooljaw/gosproto.encodedIntegerRecordSize
+         0     0% 99.02%  5796.50kB 12.77%  github.com/cnooljaw/gosproto.encodedSize
+         0     0% 99.02%  5796.50kB 12.77%  github.com/cnooljaw/gosproto.fieldSize
+         0     0% 99.02%    44919kB 98.98%  gosprotobodystudy.representativeOperations.func3
+         0     0% 99.02% 45361.36kB   100%  testing.(*B).run1.func1

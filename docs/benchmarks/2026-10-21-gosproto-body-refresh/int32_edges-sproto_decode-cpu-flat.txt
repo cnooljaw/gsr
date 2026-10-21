@@ -1,0 +1,48 @@
+File: body.test
+Type: cpu
+Time: 2026-10-21 15:43:18 CST
+Duration: 2.56s, Total samples = 2.23s (87.17%)
+Showing nodes accounting for 2.12s, 95.07% of 2.23s total
+Dropped 38 nodes (cum <= 0.01s)
+Showing top 40 nodes out of 46
+      flat  flat%   sum%        cum   cum%
+     1.76s 78.92% 78.92%      1.76s 78.92%  runtime.kevent
+     0.17s  7.62% 86.55%      0.33s 14.80%  github.com/cnooljaw/gosproto.decodeIntSlice
+     0.03s  1.35% 87.89%      0.04s  1.79%  runtime.pcvalue
+     0.03s  1.35% 89.24%      0.09s  4.04%  runtime.scanobject
+     0.03s  1.35% 90.58%      0.03s  1.35%  runtime.typePointers.next
+     0.02s   0.9% 91.48%      0.02s   0.9%  runtime.findObject
+     0.02s   0.9% 92.38%      0.02s   0.9%  runtime.memclrNoHeapPointers
+     0.02s   0.9% 93.27%      0.03s  1.35%  runtime.scanblock
+     0.01s  0.45% 93.72%      0.34s 15.25%  github.com/cnooljaw/gosproto.decodeMessage
+     0.01s  0.45% 94.17%      0.17s  7.62%  runtime.gcDrainN
+     0.01s  0.45% 94.62%      0.06s  2.69%  runtime.mallocgcSmallNoscan
+     0.01s  0.45% 95.07%      1.96s 87.89%  runtime.systemstack
+         0     0% 95.07%      0.38s 17.04%  github.com/cnooljaw/gosproto.Decode (inline)
+         0     0% 95.07%      0.38s 17.04%  github.com/cnooljaw/gosproto.DecodeWithLimits
+         0     0% 95.07%      0.44s 19.73%  gosprotobodystudy.BenchmarkBodyCost
+         0     0% 95.07%      0.06s  2.69%  gosprotobodystudy.representativeMessages.func6
+         0     0% 95.07%      0.44s 19.73%  gosprotobodystudy.representativeOperations.func4
+         0     0% 95.07%      0.03s  1.35%  reflect.New
+         0     0% 95.07%      0.03s  1.35%  reflect.unsafe_New
+         0     0% 95.07%      0.03s  1.35%  runtime.(*mcache).nextFree
+         0     0% 95.07%      0.03s  1.35%  runtime.(*mcache).refill
+         0     0% 95.07%      0.03s  1.35%  runtime.(*mcentral).cacheSpan
+         0     0% 95.07%      0.02s   0.9%  runtime.(*sweepLocked).sweep
+         0     0% 95.07%      0.03s  1.35%  runtime.(*unwinder).next
+         0     0% 95.07%      0.03s  1.35%  runtime.(*unwinder).resolveInternal
+         0     0% 95.07%      0.17s  7.62%  runtime.deductAssistCredit
+         0     0% 95.07%      0.02s   0.9%  runtime.deductSweepCredit
+         0     0% 95.07%      0.03s  1.35%  runtime.funcspdelta (inline)
+         0     0% 95.07%      0.17s  7.62%  runtime.gcAssistAlloc
+         0     0% 95.07%      0.17s  7.62%  runtime.gcAssistAlloc.func2
+         0     0% 95.07%      0.17s  7.62%  runtime.gcAssistAlloc1
+         0     0% 95.07%      0.82s 36.77%  runtime.gcMarkTermination.func3
+         0     0% 95.07%      0.94s 42.15%  runtime.gcStart.func4
+         0     0% 95.07%      0.15s  6.73%  runtime.makeslice
+         0     0% 95.07%      0.25s 11.21%  runtime.mallocgc
+         0     0% 95.07%      0.02s   0.9%  runtime.mallocgcSmallScanNoHeader
+         0     0% 95.07%      0.07s  3.14%  runtime.markroot
+         0     0% 95.07%      0.04s  1.79%  runtime.markroot.func1
+         0     0% 95.07%      0.03s  1.35%  runtime.markrootBlock
+         0     0% 95.07%      1.76s 78.92%  runtime.netpoll

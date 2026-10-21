@@ -1,0 +1,110 @@
+Total: 2.23s
+ROUTINE ======================== github.com/cnooljaw/gosproto.decodeMessage in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-body-refresh-20261021/gosproto/decode.go
+      10ms      340ms (flat, cum) 15.25% of Total
+         .          .    311:func decodeMessage(chunk []byte, schema *SprotoType, value reflect.Value, budget *decodeBudget) (int, error) {
+         .          .    312:	budget.depth++
+         .          .    313:	defer func() { budget.depth-- }()
+         .          .    314:	if budget.depth > budget.limits.MaxDepth {
+         .          .    315:		return 0, ErrLimit
+         .          .    316:	}
+         .          .    317:	if len(chunk) < 2 {
+         .          .    318:		return 0, ErrDecode
+         .          .    319:	}
+         .          .    320:	count := int(readUint16(chunk))
+         .          .    321:	total := 2 + count*2
+         .          .    322:	if total > len(chunk) {
+         .          .    323:		return 0, ErrDecode
+         .          .    324:	}
+         .          .    325:	if err := budget.add(count); err != nil {
+         .          .    326:		return 0, err
+         .          .    327:	}
+         .          .    328:	record := value.Elem()
+         .          .    329:	exactNative := (schema.nativeInt64Pointer || schema.nativeStringPointer) && record.Type() == schema.typ
+         .          .    330:	pointer := messageDecodePointer(value, exactNative)
+         .          .    331:	tag := 0
+         .          .    332:	for index := 0; index < count; index++ {
+         .          .    333:		entry := int(readUint16(chunk[2+index*2 : 4+index*2 : 4+index*2]))
+         .          .    334:		if entry%2 == 1 {
+         .          .    335:			tag += (entry + 1) / 2
+         .          .    336:			continue
+         .          .    337:		}
+         .          .    338:		if tag > 65535 {
+         .          .    339:			return 0, ErrDecode
+         .          .    340:		}
+         .          .    341:		hasInline := entry != 0
+         .          .    342:		inline := uint16(entry/2 - 1)
+         .          .    343:		var content []byte
+         .          .    344:		if !hasInline {
+         .          .    345:			used, data, err := readChunk(chunk[total:])
+         .          .    346:			if err != nil {
+         .          .    347:				return 0, err
+         .          .    348:			}
+         .          .    349:			total += used
+         .          .    350:			content = data
+         .          .    351:		}
+         .          .    352:		field := schema.FieldByTag(tag)
+         .          .    353:		tag++
+         .          .    354:		if field == nil {
+         .          .    355:			continue
+         .          .    356:		}
+         .          .    357:		if hasInline && (field.Array || field.Wire == WireBytesName || field.Wire == WireStructName) {
+         .          .    358:			return 0, ErrDecode
+         .          .    359:		}
+         .          .    360:		if field.nativeInt64Pointer {
+         .          .    361:			bits, err := scalarBits(inline, hasInline, content)
+         .          .    362:			if err != nil {
+         .          .    363:				return 0, err
+         .          .    364:			}
+         .          .    365:			result := new(int64)
+         .          .    366:			*result = int64(bits)
+         .          .    367:			if !pointer.setInteger(schema, field, result) {
+         .          .    368:				record.Field(field.index[0]).Set(reflect.ValueOf(result))
+         .          .    369:			}
+         .          .    370:			continue
+         .          .    371:		}
+         .          .    372:		if field.nativeStringPointer {
+         .          .    373:			result := new(string)
+         .          .    374:			*result = string(content)
+         .          .    375:			if !pointer.setString(schema, field, result) {
+         .          .    376:				record.Field(field.index[0]).Set(reflect.ValueOf(result))
+         .          .    377:			}
+         .          .    378:			continue
+         .          .    379:		}
+         .      330ms    380:		if err := field.dec(inline, hasInline, content, field, record.Field(field.index[0]), budget); err != nil {
+         .          .    381:			return 0, err
+         .          .    382:		}
+         .          .    383:	}
+      10ms       10ms    384:	return total, nil
+         .          .    385:}
+         .          .    386:
+         .          .    387:// Decode 解码一个结构体，使用默认有限预算，返回已消费的字节数。
+         .          .    388:func Decode(data []byte, message interface{}) (int, error) {
+         .          .    389:	return DecodeWithLimits(data, message, Limits{})
+ROUTINE ======================== gosprotobodystudy.representativeOperations.func4 in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-body-refresh-20261021/harness/representative_benchmark_test.go
+         0      440ms (flat, cum) 19.73% of Total
+         .          .    114:		{"sproto_decode", func() error {
+         .       60ms    115:			message := newSproto()
+         .      380ms    116:			_, err := sproto.Decode(sprotoWire, message)
+         .          .    117:			representativeSink = message
+         .          .    118:			return err
+         .          .    119:		}},
+         .          .    120:		{"sproto_pack", func() error {
+         .          .    121:			encodedSink = sproto.Pack(sprotoWire)
+ROUTINE ======================== reflect.New in /Users/lijiawang/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.13.darwin-arm64/src/reflect/value.go
+         0       30ms (flat, cum)  1.35% of Total
+         .          .   3011:func New(typ Type) Value {
+         .          .   3012:	if typ == nil {
+         .          .   3013:		panic("reflect: New(nil)")
+         .          .   3014:	}
+         .          .   3015:	t := &typ.(*rtype).t
+         .          .   3016:	pt := ptrTo(t)
+         .          .   3017:	if pt.IfaceIndir() {
+         .          .   3018:		// This is a pointer to a not-in-heap type.
+         .          .   3019:		panic("reflect: New of type that may not be allocated in heap (possibly undefined cgo C type)")
+         .          .   3020:	}
+         .       30ms   3021:	ptr := unsafe_New(t)
+         .          .   3022:	fl := flag(Pointer)
+         .          .   3023:	return Value{pt, ptr, fl}
+         .          .   3024:}
+         .          .   3025:
+         .          .   3026:// NewAt returns a Value representing a pointer to a value of the

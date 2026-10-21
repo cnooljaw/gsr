@@ -1,0 +1,294 @@
+Total: 2.25s
+ROUTINE ======================== github.com/cnooljaw/gosproto.encodeIntegerRecordArrayInto in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-body-refresh-20261021/gosproto/encode_integer_record.go
+      30ms      280ms (flat, cum) 12.44% of Total
+         .          .     92:func encodeIntegerRecordArrayInto(field *SprotoField, value reflect.Value, output []byte, layout *encodeLayout, binding encodeBinding, pointers []unsafe.Pointer) int {
+         .          .     93:	count := value.Len()
+         .          .     94:	index, offset := 0, 0
+         .          .     95:	for index < count {
+         .          .     96:		cursor := layout.cursor
+         .          .     97:		var headers []uint32
+         .          .     98:		if cursor < len(layout.local) {
+         .          .     99:			end := min(len(layout.local), cursor+count-index)
+         .          .    100:			headers = layout.local[cursor:end:end]
+         .          .    101:		} else {
+         .          .    102:			start := cursor - len(layout.local)
+         .          .    103:			end := start + count - index
+         .          .    104:			headers = layout.extra[start:end:end]
+         .          .    105:		}
+         .          .    106:		layout.cursor += len(headers)
+      10ms       10ms    107:		for _, header := range headers {
+         .          .    108:			var pointer encodePointer
+         .          .    109:			if pointers != nil {
+         .          .    110:				pointer = encodePointer{value: pointers[index]}
+         .          .    111:			} else {
+         .       20ms    112:				pointer = messageEncodePointer(value.Index(index), binding)
+         .          .    113:			}
+      20ms      240ms    114:			length := encodeIntegerRecordInto(field.st, pointer, output[offset+4:], int(header))
+         .       10ms    115:			writeUint32(output[offset:], uint32(length))
+         .          .    116:			offset += 4 + length
+         .          .    117:			index++
+         .          .    118:		}
+         .          .    119:	}
+         .          .    120:	return offset
+ROUTINE ======================== github.com/cnooljaw/gosproto.encodeIntegerRecordInto in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-body-refresh-20261021/gosproto/encode_integer_record.go
+     100ms      220ms (flat, cum)  9.78% of Total
+         .          .     55:func encodeIntegerRecordInto(schema *SprotoType, pointer encodePointer, output []byte, count int) int {
+         .       10ms     56:	writeUint16(output, uint16(count))
+         .          .     57:	if pointer.value == nil {
+         .          .     58:		return 2
+         .          .     59:	}
+         .          .     60:	headerOffset, bodyOffset, previous := 2, 2+count*2, -1
+      10ms       10ms     61:	for _, index := range schema.order {
+      30ms       30ms     62:		field := schema.Fields[index]
+      10ms       10ms     63:		if field.Tag < 0 {
+         .          .     64:			continue
+         .          .     65:		}
+         .       60ms     66:		bits, present := pointer.integer(field.encOffset)
+         .          .     67:		if !present {
+         .          .     68:			continue
+         .          .     69:		}
+         .       40ms     70:		if skip := skipTag(previous, field.Tag); skip > 0 {
+         .          .     71:			writeUint16(output[headerOffset:headerOffset+2:headerOffset+2], skip)
+         .          .     72:			headerOffset += 2
+         .          .     73:		}
+      20ms       20ms     74:		previous = field.Tag
+         .          .     75:		// inline 路径写完头部后立即继续，外置路径独立完成内容长度与写出。
+         .          .     76:		if bits <= MaxEmbeddedInt {
+      20ms       20ms     77:			writeUint16(output[headerOffset:headerOffset+2:headerOffset+2], uint16((bits+1)*2))
+         .          .     78:			headerOffset += 2
+         .          .     79:			continue
+         .          .     80:		}
+         .          .     81:		body := output[bodyOffset:]
+         .       10ms     82:		_, length := encodeIntegerInto(bits, body)
+      10ms       10ms     83:		writeUint16(output[headerOffset:headerOffset+2:headerOffset+2], 0)
+         .          .     84:		writeUint32(body, uint32(length))
+         .          .     85:		headerOffset += 2
+         .          .     86:		bodyOffset += 4 + length
+         .          .     87:	}
+         .          .     88:	return bodyOffset
+ROUTINE ======================== github.com/cnooljaw/gosproto.encodedSize in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-body-refresh-20261021/gosproto/limits.go
+      10ms      360ms (flat, cum) 16.00% of Total
+         .          .    115:func encodedSize(schema *SprotoType, value reflect.Value, budget *decodeBudget, depth int, layout *encodeLayout, binding encodeBinding) (int, error) {
+         .          .    116:	if depth > budget.limits.MaxDepth {
+         .          .    117:		return 0, ErrLimit
+         .          .    118:	}
+         .          .    119:	size, lastTag := 2, -1
+         .          .    120:	if size > budget.limits.MaxBytes {
+         .          .    121:		return 0, ErrLimit
+         .          .    122:	}
+         .          .    123:	layoutIndex := layout.add(0)
+         .          .    124:	if value.IsNil() {
+         .          .    125:		return size, nil
+         .          .    126:	}
+         .          .    127:	record := value.Elem()
+         .          .    128:	pointer := messageEncodePointer(value, binding)
+         .          .    129:	headerCount := 0
+         .          .    130:	for _, index := range schema.order {
+         .          .    131:		field := schema.Fields[index]
+         .          .    132:		if field.Tag < 0 {
+         .          .    133:			continue
+         .          .    134:		}
+         .       20ms    135:		native := binding.native && field.nativeInteger(schema)
+         .          .    136:		var current reflect.Value
+         .          .    137:		var bits uint64
+         .          .    138:		if native {
+         .          .    139:			var present bool
+         .          .    140:			bits, present = pointer.integer(field.encOffset)
+         .          .    141:			if !present {
+         .          .    142:				continue
+         .          .    143:			}
+         .          .    144:		} else {
+         .          .    145:			current = record.Field(field.index[0])
+         .       10ms    146:			if omittedField(field, current) {
+         .          .    147:				continue
+         .          .    148:			}
+         .          .    149:		}
+         .          .    150:		if err := budget.add(1); err != nil {
+         .          .    151:			return 0, err
+         .          .    152:		}
+         .          .    153:		gap := field.Tag - lastTag - 1
+         .          .    154:		if gap > 32768 {
+         .          .    155:			return 0, fmt.Errorf("%w: tag gap", ErrEncode)
+         .          .    156:		}
+         .          .    157:		if gap > 0 {
+         .          .    158:			size += 2
+         .          .    159:			headerCount++
+         .          .    160:		}
+         .          .    161:		size += 2
+         .          .    162:		headerCount++
+         .          .    163:		lastTag = field.Tag
+         .          .    164:		var part int
+         .          .    165:		var inline bool
+         .          .    166:		var err error
+         .          .    167:		if native {
+         .          .    168:			part, inline = signedSize(bits)
+         .          .    169:		} else {
+         .      320ms    170:			part, inline, err = fieldSize(field, current, budget, depth, layout, binding.exact && field.encOwner == schema && field.Array != field.pointer)
+         .          .    171:		}
+      10ms       10ms    172:		if err != nil {
+         .          .    173:			return 0, err
+         .          .    174:		}
+         .          .    175:		if !inline {
+         .          .    176:			size += 4 + part
+         .          .    177:		}
+ROUTINE ======================== github.com/cnooljaw/gosproto.fieldSize in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-body-refresh-20261021/gosproto/limits.go
+      80ms      320ms (flat, cum) 14.22% of Total
+         .          .    186:func fieldSize(field *SprotoField, value reflect.Value, budget *decodeBudget, depth int, layout *encodeLayout, trusted bool) (int, bool, error) {
+         .          .    187:	if field.Array {
+         .          .    188:		if err := budget.add(value.Len()); err != nil {
+         .          .    189:			return 0, false, err
+         .          .    190:		}
+         .          .    191:		size := 0
+         .          .    192:		switch field.Wire {
+         .          .    193:		case WireVarintName:
+         .          .    194:			if field.int64Slice {
+         .          .    195:				values := *value.Addr().Interface().(*[]int64)
+         .          .    196:				width := 4
+      10ms       10ms    197:				for _, number := range values {
+      10ms       10ms    198:					if number < MinInt32 || number > MaxInt32 {
+         .          .    199:						width = 8
+         .          .    200:						break
+         .          .    201:					}
+         .          .    202:				}
+         .          .    203:				if len(values) > 0 {
+         .          .    204:					size = 1 + width*len(values)
+         .          .    205:					layout.add(width)
+         .          .    206:				}
+         .          .    207:				break
+         .          .    208:			}
+         .          .    209:			width := 4
+         .          .    210:			for i := 0; i < value.Len(); i++ {
+         .          .    211:				bits := integerBits(field, value.Index(i))
+         .          .    212:				if field.unsigned && bits > math.MaxInt64 {
+         .          .    213:					return 0, false, fmt.Errorf("%w: integer exceeds signed 64-bit range", ErrEncode)
+         .          .    214:				}
+         .          .    215:				if integerWidth(bits) > width {
+         .          .    216:					width = 8
+         .          .    217:				}
+         .          .    218:			}
+         .          .    219:			if value.Len() > 0 {
+         .          .    220:				size = 1 + width*value.Len()
+         .          .    221:				layout.add(width)
+         .          .    222:			}
+         .          .    223:		case WireDoubleName:
+         .          .    224:			if value.Len() > 0 {
+         .          .    225:				size = 1 + 8*value.Len()
+         .          .    226:			}
+         .          .    227:		case WireBooleanName:
+         .          .    228:			size = value.Len()
+         .          .    229:		case WireBytesName:
+         .          .    230:			for i := 0; i < value.Len(); i++ {
+         .          .    231:				size += 4 + value.Index(i).Len()
+         .          .    232:				if size > budget.limits.MaxBytes {
+         .          .    233:					return 0, false, ErrLimit
+         .          .    234:				}
+         .          .    235:			}
+         .          .    236:		case WireStructName:
+         .          .    237:			var childBinding encodeBinding
+         .          .    238:			if value.Len() > 0 {
+         .          .    239:				childBinding = bindEncodeChild(field, value, trusted)
+         .          .    240:
+         .          .    241:			}
+         .          .    242:			integers := childBinding.native && field.st.int64Record && field.st.nativeIntegerFields()
+         .          .    243:			var pointers []unsafe.Pointer
+         .          .    244:			if integers {
+         .       10ms    245:				pointers = integerRecordPointers(field.st, value)
+         .          .    246:			}
+      40ms       50ms    247:			for i := 0; i < value.Len(); i++ {
+         .          .    248:				var part int
+         .          .    249:				var err error
+         .          .    250:				if integers {
+         .          .    251:					var pointer encodePointer
+         .          .    252:					if pointers != nil {
+         .          .    253:						pointer = encodePointer{value: pointers[i]}
+         .          .    254:					} else {
+         .          .    255:						pointer = messageEncodePointer(value.Index(i), childBinding)
+         .          .    256:					}
+         .      220ms    257:					part, err = encodedIntegerRecordSize(field.st, pointer, budget, depth+1, layout)
+         .          .    258:				} else {
+         .          .    259:					part, err = encodedSize(field.st, value.Index(i), budget, depth+1, layout, childBinding)
+         .          .    260:				}
+      10ms       10ms    261:				if err != nil {
+         .          .    262:					return 0, false, err
+         .          .    263:				}
+         .          .    264:				size += 4 + part
+         .          .    265:				if size > budget.limits.MaxBytes {
+         .          .    266:					return 0, false, ErrLimit
+         .          .    267:				}
+         .          .    268:			}
+         .          .    269:		}
+         .          .    270:		if size > budget.limits.MaxBytes {
+         .          .    271:			return 0, false, ErrLimit
+         .          .    272:		}
+      10ms       10ms    273:		return size, false, nil
+         .          .    274:	}
+         .          .    275:	if field.Wire == WireStructName {
+         .          .    276:		size, err := encodedSize(field.st, value, budget, depth+1, layout, bindEncodeChild(field, value, trusted))
+         .          .    277:		return size, false, err
+         .          .    278:	}
+ROUTINE ======================== github.com/cnooljaw/gosproto.packInto in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-body-refresh-20261021/gosproto/pack.go
+     240ms      240ms (flat, cum) 10.67% of Total
+         .          .    109:func packInto(packed, src []byte) []byte {
+         .          .    110:	offset := 0
+      70ms       70ms    111:	for len(src) >= 8 {
+      20ms       20ms    112:		word := binary.LittleEndian.Uint64(src)
+         .          .    113:		nonzero := (((word & 0x7f7f7f7f7f7f7f7f) + 0x7f7f7f7f7f7f7f7f) | word) & 0x8080808080808080
+      30ms       30ms    114:		header := uint8(((nonzero >> 7) * 0x0102040810204080) >> 56)
+         .          .    115:		if header == 0xff {
+         .          .    116:			consumed := ffRunBytes(src)
+         .          .    117:			writeFF(packed[offset:], src, consumed)
+         .          .    118:			offset += 2 + ((consumed + 7) &^ 7)
+         .          .    119:			src = src[consumed:]
+         .          .    120:			continue
+         .          .    121:		}
+         .          .    122:		// 去掉至多两个置位后是否为零，比普通路径完整计数更直接。
+      50ms       50ms    123:		remaining := header & (header - 1)
+         .          .    124:		if remaining&(remaining-1) == 0 {
+         .          .    125:			// 长度与容量均固定且非空，避免每个 word 重算动态切片的指针掩码。
+      10ms       10ms    126:			dst := packed[offset : offset+3 : offset+3]
+         .          .    127:			// 已确认至多两个非零字节，直接写固定位置，避免通用循环和可变目标索引。
+         .          .    128:			_ = dst[2]
+         .          .    129:			dst[0] = header
+         .          .    130:			index := 1
+         .          .    131:			if header != 0 {
+         .          .    132:				shift := bits.TrailingZeros8(header) * 8
+      10ms       10ms    133:				dst[1] = byte(word >> shift)
+         .          .    134:				index = 2
+         .          .    135:				if remaining != 0 {
+         .          .    136:					shift = bits.TrailingZeros8(remaining) * 8
+         .          .    137:					dst[2] = byte(word >> shift)
+         .          .    138:					index = 3
+         .          .    139:				}
+         .          .    140:			}
+         .          .    141:			offset += index
+         .          .    142:		} else {
+      20ms       20ms    143:			dst := packed[offset : offset+9 : offset+9]
+         .          .    144:			// Pack 预留八字节尾空间，零字节暂写的位置会被下一个有效字节覆盖，不进入返回切片。
+         .          .    145:			_ = dst[8]
+         .          .    146:			// 固定八字节视图越过 mask，非零字节位置直接使用 0～7 的前缀计数。
+         .          .    147:			payload := dst[1:9]
+         .          .    148:			// 0/1 字节标志相乘得到前缀和，每个和至多为 8，不跨字节进位。
+         .          .    149:			// FF 已在前面处理；各目标位置只依赖对应前缀，不串行累加 index。
+         .          .    150:			ranks := (nonzero >> 7) * 0x0101010101010101
+         .          .    151:			payload[0] = byte(word)
+         .          .    152:			payload[int(ranks&7)] = byte(word >> 8)
+         .          .    153:			payload[int((ranks>>8)&7)] = byte(word >> 16)
+         .          .    154:			payload[int((ranks>>16)&7)] = byte(word >> 24)
+         .          .    155:			payload[int((ranks>>24)&7)] = byte(word >> 32)
+      10ms       10ms    156:			payload[int((ranks>>32)&7)] = byte(word >> 40)
+      10ms       10ms    157:			payload[int((ranks>>40)&7)] = byte(word >> 48)
+      10ms       10ms    158:			payload[int((ranks>>48)&7)] = byte(word >> 56)
+         .          .    159:			dst[0] = header
+         .          .    160:			offset += 1 + int(ranks>>56)
+         .          .    161:		}
+         .          .    162:		src = src[8:]
+         .          .    163:	}
+ROUTINE ======================== gosprotobodystudy.representativeOperations.func7 in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-body-refresh-20261021/harness/representative_benchmark_test.go
+         0      1.15s (flat, cum) 51.11% of Total
+         .          .    129:		{"sproto_pencode", func() error {
+         .      1.15s    130:			wire, err := sproto.EncodePacked(sprotoMessage)
+         .          .    131:			encodedSink = wire
+         .          .    132:			return err
+         .          .    133:		}},
+         .          .    134:		{"sproto_pdecode", func() error {
+         .          .    135:			message := newSproto()

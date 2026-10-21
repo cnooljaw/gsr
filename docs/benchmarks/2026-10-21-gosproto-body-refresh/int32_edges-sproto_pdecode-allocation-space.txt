@@ -1,0 +1,17 @@
+File: body.test
+Type: alloc_space
+Time: 2026-10-21 15:43:23 CST
+Showing nodes accounting for 107289.55kB, 99.32% of 108027.62kB total
+Dropped 288 nodes (cum <= 540.14kB)
+      flat  flat%   sum%        cum   cum%
+   71240kB 65.95% 65.95%    71240kB 65.95%  github.com/cnooljaw/gosproto.decodeIntSlice
+   35620kB 32.97% 98.92%    35620kB 32.97%  github.com/cnooljaw/gosproto.UnpackWithLimit
+  417.42kB  0.39% 99.31% 71866.13kB 66.53%  github.com/cnooljaw/gosproto.DecodeWithLimits
+      12kB 0.011% 99.32% 108009.09kB   100%  gosprotobodystudy.BenchmarkBodyCost
+    0.12kB 0.00012% 99.32% 108013.58kB   100%  testing.(*B).runN
+         0     0% 99.32% 71866.13kB 66.53%  github.com/cnooljaw/gosproto.Decode (inline)
+         0     0% 99.32% 107474.06kB 99.49%  github.com/cnooljaw/gosproto.DecodePacked
+         0     0% 99.32%    35620kB 32.97%  github.com/cnooljaw/gosproto.Unpack (inline)
+         0     0% 99.32%    71240kB 65.95%  github.com/cnooljaw/gosproto.decodeMessage
+         0     0% 99.32% 107682.75kB 99.68%  gosprotobodystudy.representativeOperations.func8
+         0     0% 99.32% 108010.14kB   100%  testing.(*B).run1.func1
