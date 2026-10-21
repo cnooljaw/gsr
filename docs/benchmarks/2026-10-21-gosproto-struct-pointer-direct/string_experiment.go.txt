@@ -1,0 +1,155 @@
+package sproto
+
+import (
+	"reflect"
+	"unsafe"
+)
+
+func experimentStringBaseline(_ uint16, _ bool, data []byte, field *SprotoField, value reflect.Value, budget *decodeBudget) error {
+	count, err := countChunks(data, budget)
+	if err != nil {
+		return err
+	}
+	result := reflect.MakeSlice(value.Type(), count, count)
+	var slots []unsafe.Pointer
+	nativeRecords := false
+	if count > 0 && field.Array && field.Wire == WireStructName && field.st != nil &&
+		value.Type().Elem() == reflect.PointerTo(field.st.typ) {
+		// 同步借用新切片的指针槽；实际元素类型已核对，不缓存地址。
+		slots = unsafe.Slice((*unsafe.Pointer)(result.UnsafePointer()), count)
+		nativeRecords = count >= 8 && canDecodeIntegerRecords(field.st)
+	}
+	for index := 0; index < count; index++ {
+		used, content, err := readChunk(data)
+		if err != nil {
+			return err
+		}
+		current := reflect.New(field.st.typ)
+		var consumed int
+		if nativeRecords {
+			consumed, err = decodeIntegerRecord(content, field.st, decodePointer{value: current.UnsafePointer()}, budget)
+		} else {
+			consumed, err = decodeMessage(content, field.st, current, budget)
+		}
+		if err != nil {
+			return err
+		}
+		if consumed != len(content) {
+			return ErrDecode
+		}
+		if slots != nil {
+			// Go 指针赋值保留 GC 写屏障，不能改成字节复制或 uintptr 存储。
+			slots[index] = current.UnsafePointer()
+		} else {
+			result.Index(index).Set(current)
+		}
+		data = data[used:]
+	}
+	value.Set(result)
+	return nil
+}
+
+func experimentStringClone(_ uint16, _ bool, data []byte, field *SprotoField, value reflect.Value, budget *decodeBudget) error {
+	count, err := countChunks(data, budget)
+	if err != nil {
+		return err
+	}
+	result := reflect.MakeSlice(value.Type(), count, count)
+	var slots []unsafe.Pointer
+	nativeRecords := false
+	if count > 0 && field.Array && field.Wire == WireStructName && field.st != nil &&
+		value.Type().Elem() == reflect.PointerTo(field.st.typ) {
+		// 同步借用新切片的指针槽；实际元素类型已核对，不缓存地址。
+		slots = unsafe.Slice((*unsafe.Pointer)(result.UnsafePointer()), count)
+		nativeRecords = count >= 8 && canDecodeIntegerRecords(field.st)
+	}
+	for index := 0; index < count; index++ {
+		used, content, err := readChunk(data)
+		if err != nil {
+			return err
+		}
+		current := reflect.New(field.st.typ)
+		var consumed int
+		if nativeRecords {
+			consumed, err = decodeIntegerRecord(content, field.st, decodePointer{value: current.UnsafePointer()}, budget)
+		} else {
+			consumed, err = decodeMessage(content, field.st, current, budget)
+		}
+		if err != nil {
+			return err
+		}
+		if consumed != len(content) {
+			return ErrDecode
+		}
+		if slots != nil {
+			// Go 指针赋值保留 GC 写屏障，不能改成字节复制或 uintptr 存储。
+			slots[index] = current.UnsafePointer()
+		} else {
+			result.Index(index).Set(current)
+		}
+		data = data[used:]
+	}
+	value.Set(result)
+	return nil
+}
+
+func experimentStringCandidate(_ uint16, _ bool, data []byte, field *SprotoField, value reflect.Value, budget *decodeBudget) error {
+	count, err := countChunks(data, budget)
+	if err != nil {
+		return err
+	}
+	result := reflect.MakeSlice(value.Type(), count, count)
+	var slots []unsafe.Pointer
+	nativeRecords := false
+	if count > 0 && field.Array && field.Wire == WireStructName && field.st != nil &&
+		value.Type().Elem() == reflect.PointerTo(field.st.typ) {
+		// 同步借用新切片的指针槽；实际元素类型已核对，不缓存地址。
+		slots = unsafe.Slice((*unsafe.Pointer)(result.UnsafePointer()), count)
+		nativeRecords = count >= 8 && canDecodeIntegerRecords(field.st)
+	}
+	for index := 0; index < count; index++ {
+		used, content, err := readChunk(data)
+		if err != nil {
+			return err
+		}
+		current := reflect.New(field.st.typ)
+		currentPointer := current.UnsafePointer()
+		var consumed int
+		if nativeRecords {
+			consumed, err = decodeIntegerRecord(content, field.st, decodePointer{value: currentPointer}, budget)
+		} else {
+			consumed, err = decodeMessage(content, field.st, current, budget)
+		}
+		if err != nil {
+			return err
+		}
+		if consumed != len(content) {
+			return ErrDecode
+		}
+		if slots != nil {
+			// Go 指针赋值保留 GC 写屏障，不能改成字节复制或 uintptr 存储。
+			slots[index] = currentPointer
+		} else {
+			result.Index(index).Set(current)
+		}
+		data = data[used:]
+	}
+	value.Set(result)
+	return nil
+}
+
+var experimentStringSelected = experimentStringBaseline
+
+// ExperimentStringMode 仅在快照中选择数组解码循环，计时外调用。
+func ExperimentStringMode(mode string) {
+	switch mode {
+	case "baseline":
+		experimentStringSelected = experimentStringBaseline
+	case "clone":
+		experimentStringSelected = experimentStringClone
+	case "candidate":
+		experimentStringSelected = experimentStringCandidate
+	default:
+		panic("invalid experiment mode")
+	}
+}

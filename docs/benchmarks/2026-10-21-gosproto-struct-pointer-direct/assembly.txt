@@ -1,0 +1,1333 @@
+TEXT github.com/cnooljaw/gosproto.experimentStringBaseline(SB) /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-struct-pointer-direct-20261021/gosproto/string_experiment.go
+  string_experiment.go:8	0x100157c40		f9400b90		MOVD 16(R28), R16
+  string_experiment.go:8	0x100157c44		d103c3f1		SUB $240, RSP, R17
+  string_experiment.go:8	0x100157c48		eb10023f		CMP R16, R17
+  string_experiment.go:8	0x100157c4c		54003509		BLS 424(PC)
+  string_experiment.go:8	0x100157c50		d105c3f4		SUB $368, RSP, R20
+  string_experiment.go:8	0x100157c54		a93ffa9d		STP (R29, R30), -8(R20)
+  string_experiment.go:8	0x100157c58		9100029f		MOVD R20, RSP
+  string_experiment.go:8	0x100157c5c		d10023fd		SUB $8, RSP, R29
+  string_experiment.go:8	0x100157c60		f900d3e6		MOVD R6, 416(RSP)
+  string_experiment.go:8	0x100157c64		f900d7e7		MOVD R7, 424(RSP)
+  string_experiment.go:10	0x100157c68		f900cfe5		MOVD R5, 408(RSP)
+  string_experiment.go:10	0x100157c6c		f900dfe9		MOVD R9, 440(RSP)
+  string_experiment.go:10	0x100157c70		f90057e8		MOVD R8, 168(RSP)
+  string_experiment.go:10	0x100157c74		f900b3e7		MOVD R7, 352(RSP)
+  string_experiment.go:10	0x100157c78		f900afe6		MOVD R6, 344(RSP)
+  string_experiment.go:10	0x100157c7c		f900cbe4		MOVD R4, 400(RSP)
+  string_experiment.go:10	0x100157c80		f900c7e3		MOVD R3, 392(RSP)
+  string_experiment.go:10	0x100157c84		f900c3e2		MOVD R2, 384(RSP)
+  string_experiment.go:9	0x100157c88		aa0203e0		MOVD R2, R0
+  string_experiment.go:9	0x100157c8c		aa0303e1		MOVD R3, R1
+  string_experiment.go:9	0x100157c90		aa0403e2		MOVD R4, R2
+  string_experiment.go:9	0x100157c94		aa0903e3		MOVD R9, R3
+  string_experiment.go:9	0x100157c98		97ffdc02		CALL github.com/cnooljaw/gosproto.countChunks(SB)
+  string_experiment.go:10	0x100157c9c		b50011c1		CBNZ R1, 142(PC)
+  string_experiment.go:9	0x100157ca0		f9003fe0		MOVD R0, 120(RSP)
+  value.go:2380			0x100157ca4		f94057e1		MOVD 168(RSP), R1
+  value.go:2380			0x100157ca8		b40000c1		CBZ R1, 6(PC)
+  value.go:2380			0x100157cac		374800a1		TBNZ $9, R1, 5(PC)
+  value.go:2380			0x100157cb0		b0000e02		ADRP 1839104(PC), R2
+  value.go:2380			0x100157cb4		913f4042		ADD $4048, R2, R2
+  string_experiment.go:13	0x100157cb8		f940afe3		MOVD 344(RSP), R3
+  string_experiment.go:13	0x100157cbc		14000008		JMP 8(PC)
+  value.go:2383			0x100157cc0		f940afe0		MOVD 344(RSP), R0
+  value.go:2383			0x100157cc4		aa0103e2		MOVD R1, R2
+  value.go:2383			0x100157cc8		f940b3e1		MOVD 352(RSP), R1
+  value.go:2383			0x100157ccc		97fdbd7d		CALL reflect.Value.typeSlow(SB)
+  string_experiment.go:13	0x100157cd0		aa0003e2		MOVD R0, R2
+  string_experiment.go:13	0x100157cd4		aa0103e3		MOVD R1, R3
+  string_experiment.go:13	0x100157cd8		f9403fe0		MOVD 120(RSP), R0
+  string_experiment.go:13	0x100157cdc		aa0303e1		MOVD R3, R1
+  string_experiment.go:13	0x100157ce0		aa0003e3		MOVD R0, R3
+  string_experiment.go:13	0x100157ce4		aa0203e0		MOVD R2, R0
+  string_experiment.go:13	0x100157ce8		aa0303e2		MOVD R3, R2
+  string_experiment.go:13	0x100157cec		97fdbf91		CALL reflect.MakeSlice(SB)
+  string_experiment.go:13	0x100157cf0		f900abe0		MOVD R0, 336(RSP)
+  string_experiment.go:13	0x100157cf4		f900a7e1		MOVD R1, 328(RSP)
+  string_experiment.go:13	0x100157cf8		f90053e2		MOVD R2, 160(RSP)
+  string_experiment.go:16	0x100157cfc		f9403fe4		MOVD 120(RSP), R4
+  string_experiment.go:16	0x100157d00		f100009f		CMP $0, R4
+  string_experiment.go:16	0x100157d04		5400094d		BLE 74(PC)
+  string_experiment.go:16	0x100157d08		f940cfe6		MOVD 408(RSP), R6
+  string_experiment.go:16	0x100157d0c		3940e0c7		MOVBU 56(R6), R7
+  string_experiment.go:16	0x100157d10		360008a7		TBZ $0, R7, 69(PC)
+  string_experiment.go:16	0x100157d14		f94014c7		MOVD 40(R6), R7
+  string_experiment.go:16	0x100157d18		f10018ff		CMP $6, R7
+  string_experiment.go:16	0x100157d1c		54000801		BNE 64(PC)
+  string_experiment.go:16	0x100157d20		f94010c7		MOVD 32(R6), R7
+  string_experiment.go:16	0x100157d24		b94000e8		MOVWU (R7), R8
+  string_experiment.go:16	0x100157d28		d28e8e69		MOVD $29811, R9
+  string_experiment.go:16	0x100157d2c		f2aeae49		MOVK $(30066<<16), R9
+  string_experiment.go:16	0x100157d30		6b09011f		CMPW R9, R8
+  string_experiment.go:16	0x100157d34		54000701		BNE 56(PC)
+  string_experiment.go:16	0x100157d38		794008e7		MOVHU 4(R7), R7
+  string_experiment.go:16	0x100157d3c		d28e8c68		MOVD $29795, R8
+  string_experiment.go:16	0x100157d40		6b0800ff		CMPW R8, R7
+  string_experiment.go:16	0x100157d44		54000641		BNE 50(PC)
+  string_experiment.go:16	0x100157d48		f94020c7		MOVD 64(R6), R7
+  string_experiment.go:16	0x100157d4c		b40005c7		CBZ R7, 46(PC)
+  value.go:2380			0x100157d50		f94057e3		MOVD 168(RSP), R3
+  value.go:2380			0x100157d54		b40000c3		CBZ R3, 6(PC)
+  value.go:2380			0x100157d58		374800a3		TBNZ $9, R3, 5(PC)
+  value.go:2380			0x100157d5c		b0000e05		ADRP 1839104(PC), R5
+  value.go:2380			0x100157d60		913f40a5		ADD $4048, R5, R5
+  string_experiment.go:17	0x100157d64		f940afe7		MOVD 344(RSP), R7
+  string_experiment.go:17	0x100157d68		14000007		JMP 7(PC)
+  value.go:2383			0x100157d6c		f940afe0		MOVD 344(RSP), R0
+  value.go:2383			0x100157d70		f940b3e1		MOVD 352(RSP), R1
+  value.go:2383			0x100157d74		aa0303e2		MOVD R3, R2
+  value.go:2383			0x100157d78		97fdbd52		CALL reflect.Value.typeSlow(SB)
+  string_experiment.go:17	0x100157d7c		aa0003e5		MOVD R0, R5
+  string_experiment.go:17	0x100157d80		aa0103e7		MOVD R1, R7
+  string_experiment.go:17	0x100157d84		f9402ca1		MOVD 88(R5), R1
+  string_experiment.go:17	0x100157d88		aa0703e0		MOVD R7, R0
+  string_experiment.go:17	0x100157d8c		d63f0020		CALL (R1)
+  string_experiment.go:17	0x100157d90		f940cfe2		MOVD 408(RSP), R2
+  string_experiment.go:17	0x100157d94		f9402043		MOVD 64(R2), R3
+  string_experiment.go:17	0x100157d98		f9400064		MOVD (R3), R4
+  type.go:1326			0x100157d9c		b0000e05		ADRP 1839104(PC), R5
+  type.go:1326			0x100157da0		913f40a5		ADD $4048, R5, R5
+  type.go:1326			0x100157da4		eb05009f		CMP R5, R4
+  type.go:1326			0x100157da8		54002941		BNE 330(PC)
+  string_experiment.go:17	0x100157dac		f900a3e1		MOVD R1, 320(RSP)
+  string_experiment.go:17	0x100157db0		f9004fe0		MOVD R0, 152(RSP)
+  string_experiment.go:17	0x100157db4		f9400460		MOVD 8(R3), R0
+  type.go:1326			0x100157db8		97fdd122		CALL reflect.(*rtype).ptrTo(SB)
+  string_experiment.go:17	0x100157dbc		f9404fe1		MOVD 152(RSP), R1
+  string_experiment.go:17	0x100157dc0		b0000e02		ADRP 1839104(PC), R2
+  string_experiment.go:17	0x100157dc4		913f4042		ADD $4048, R2, R2
+  string_experiment.go:17	0x100157dc8		eb02003f		CMP R2, R1
+  string_experiment.go:17	0x100157dcc		54000060		BEQ 3(PC)
+  string_experiment.go:17	0x100157dd0		aa1f03e0		MOVD ZR, R0
+  string_experiment.go:17	0x100157dd4		14000005		JMP 5(PC)
+  string_experiment.go:17	0x100157dd8		aa0003e2		MOVD R0, R2
+  string_experiment.go:17	0x100157ddc		aa0103e0		MOVD R1, R0
+  string_experiment.go:17	0x100157de0		f940a3e1		MOVD 320(RSP), R1
+  string_experiment.go:17	0x100157de4		97faca97		CALL runtime.ifaceeq(SB)
+  string_experiment.go:19	0x100157de8		f940a7e1		MOVD 328(RSP), R1
+  string_experiment.go:19	0x100157dec		f94053e2		MOVD 160(RSP), R2
+  string_experiment.go:22	0x100157df0		f9403fe4		MOVD 120(RSP), R4
+  string_experiment.go:27	0x100157df4		f940cfe6		MOVD 408(RSP), R6
+  string_experiment.go:16	0x100157df8		aa0003e3		MOVD R0, R3
+  string_experiment.go:19	0x100157dfc		f940abe0		MOVD 336(RSP), R0
+  string_experiment.go:17	0x100157e00		1400000d		JMP 13(PC)
+  string_experiment.go:17	0x100157e04		aa1f03e3		MOVD ZR, R3
+  string_experiment.go:16	0x100157e08		1400000b		JMP 11(PC)
+  string_experiment.go:16	0x100157e0c		aa1f03e3		MOVD ZR, R3
+  string_experiment.go:16	0x100157e10		14000009		JMP 9(PC)
+  string_experiment.go:16	0x100157e14		aa1f03e3		MOVD ZR, R3
+  string_experiment.go:16	0x100157e18		14000007		JMP 7(PC)
+  string_experiment.go:16	0x100157e1c		aa1f03e3		MOVD ZR, R3
+  string_experiment.go:16	0x100157e20		14000005		JMP 5(PC)
+  string_experiment.go:16	0x100157e24		aa1f03e3		MOVD ZR, R3
+  string_experiment.go:16	0x100157e28		14000003		JMP 3(PC)
+  string_experiment.go:27	0x100157e2c		f940cfe6		MOVD 408(RSP), R6
+  string_experiment.go:27	0x100157e30		aa1f03e3		MOVD ZR, R3
+  string_experiment.go:17	0x100157e34		370000a3		TBNZ $0, R3, 5(PC)
+  string_experiment.go:17	0x100157e38		aa1f03e3		MOVD ZR, R3
+  string_experiment.go:17	0x100157e3c		aa1f03e5		MOVD ZR, R5
+  string_experiment.go:17	0x100157e40		aa1f03e7		MOVD ZR, R7
+  string_experiment.go:17	0x100157e44		14000031		JMP 49(PC)
+  string_experiment.go:19	0x100157e48		97fdbd82		CALL reflect.Value.UnsafePointer(SB)
+  string_experiment.go:19	0x100157e4c		f9403fe1		MOVD 120(RSP), R1
+  string_experiment.go:19	0x100157e50		b7f823e1		TBNZ $63, R1, 287(PC)
+  string_experiment.go:19	0x100157e54		b27d03e6		ORR $8, ZR, R6
+  string_experiment.go:19	0x100157e58		9bc17cc6		UMULH R1, R6, R6
+  string_experiment.go:19	0x100157e5c		b5002346		CBNZ R6, 282(PC)
+  string_experiment.go:19	0x100157e60		aa0003e6		MOVD R0, R6
+  string_experiment.go:19	0x100157e64		cb0003e7		NEG R0, R7
+  string_experiment.go:19	0x100157e68		eb010cff		CMP R1<<3, R7
+  string_experiment.go:19	0x100157e6c		54002263		BCC 275(PC)
+  string_experiment.go:20	0x100157e70		f100203f		CMP $8, R1
+  string_experiment.go:20	0x100157e74		540002cb		BLT 22(PC)
+  string_experiment.go:20	0x100157e78		f940cfe7		MOVD 408(RSP), R7
+  string_experiment.go:20	0x100157e7c		f94020e8		MOVD 64(R7), R8
+  decode_integer_record.go:8	0x100157e80		3941c909		MOVBU 114(R8), R9
+  decode_integer_record.go:8	0x100157e84		37000069		TBNZ $0, R9, 3(PC)
+  decode_integer_record.go:8	0x100157e88		aa1f03e0		MOVD ZR, R0
+  string_experiment.go:20	0x100157e8c		14000017		JMP 23(PC)
+  string_experiment.go:19	0x100157e90		f9009fe6		MOVD R6, 312(RSP)
+  string_experiment.go:20	0x100157e94		f90063e8		MOVD R8, 192(RSP)
+  decode_integer_record.go:11	0x100157e98		f9401d01		MOVD 56(R8), R1
+  decode_integer_record.go:11	0x100157e9c		910343f4		ADD $208, RSP, R20
+  decode_integer_record.go:11	0x100157ea0		1000009b		ADR 16(PC), R27
+  decode_integer_record.go:11	0x100157ea4		a93eeffd		STP (R29, R27), -24(RSP)
+  decode_integer_record.go:11	0x100157ea8		d10063fd		SUB $24, RSP, R29
+  decode_integer_record.go:11	0x100157eac		97fc821f		CALL -228833(PC)
+  decode_integer_record.go:11	0x100157eb0		d10023fd		SUB $8, RSP, R29
+  decode_integer_record.go:11	0x100157eb4		90000b60		ADRP 1490944(PC), R0
+  decode_integer_record.go:11	0x100157eb8		910f0000		ADD $960, R0, R0
+  decode_integer_record.go:11	0x100157ebc		910343e2		ADD $208, RSP, R2
+  decode_integer_record.go:11	0x100157ec0		97faf150		CALL runtime.mapIterStart(SB)
+  decode_integer_record.go:11	0x100157ec4		f94063e3		MOVD 192(RSP), R3
+  decode_integer_record.go:11	0x100157ec8		140000cc		JMP 204(PC)
+  decode_integer_record.go:11	0x100157ecc		aa1f03e0		MOVD ZR, R0
+  string_experiment.go:20	0x100157ed0		14000006		JMP 6(PC)
+  string_experiment.go:11	0x100157ed4		aa0103e0		MOVD R1, R0
+  string_experiment.go:11	0x100157ed8		aa0203e1		MOVD R2, R1
+  string_experiment.go:11	0x100157edc		a97ffbfd		LDP -8(RSP), (R29, R30)
+  string_experiment.go:11	0x100157ee0		9105c3ff		ADD $368, RSP, RSP
+  string_experiment.go:11	0x100157ee4		d65f03c0		RET
+  string_experiment.go:48	0x100157ee8		f940a7e1		MOVD 328(RSP), R1
+  string_experiment.go:48	0x100157eec		f94053e2		MOVD 160(RSP), R2
+  string_experiment.go:22	0x100157ef0		f9403fe4		MOVD 120(RSP), R4
+  string_experiment.go:29	0x100157ef4		aa0003e3		MOVD R0, R3
+  string_experiment.go:40	0x100157ef8		aa0603e5		MOVD R6, R5
+  string_experiment.go:40	0x100157efc		aa0403e7		MOVD R4, R7
+  string_experiment.go:48	0x100157f00		f940abe0		MOVD 336(RSP), R0
+  string_experiment.go:27	0x100157f04		f940cfe6		MOVD 408(RSP), R6
+  string_experiment.go:40	0x100157f08		f90037e7		MOVD R7, 104(RSP)
+  string_experiment.go:40	0x100157f0c		f9005fe5		MOVD R5, 184(RSP)
+  string_experiment.go:29	0x100157f10		39013fe3		MOVB R3, 79(RSP)
+  string_experiment.go:29	0x100157f14		f940c3e8		MOVD 384(RSP), R8
+  string_experiment.go:29	0x100157f18		f940cbe9		MOVD 400(RSP), R9
+  string_experiment.go:29	0x100157f1c		f940c7ea		MOVD 392(RSP), R10
+  string_experiment.go:29	0x100157f20		aa1f03eb		MOVD ZR, R11
+  string_experiment.go:29	0x100157f24		14000012		JMP 18(PC)
+  string_experiment.go:46	0x100157f28		f94047ec		MOVD 136(RSP), R12
+  string_experiment.go:46	0x100157f2c		cb000189		SUB R0, R12, R9
+  string_experiment.go:46	0x100157f30		cb0903ec		NEG R9, R12
+  string_experiment.go:46	0x100157f34		8a8cfc0c		AND R12->63, R0, R12
+  string_experiment.go:22	0x100157f38		9100046b		ADD $1, R3, R11
+  string_experiment.go:46	0x100157f3c		cb0000ea		SUB R0, R7, R10
+  string_experiment.go:46	0x100157f40		f94067ed		MOVD 200(RSP), R13
+  string_experiment.go:46	0x100157f44		8b0d0188		ADD R13, R12, R8
+  string_experiment.go:22	0x100157f48		f9403fe4		MOVD 120(RSP), R4
+  string_experiment.go:22	0x100157f4c		f940cfec		MOVD 408(RSP), R12
+  string_experiment.go:48	0x100157f50		f940abe0		MOVD 336(RSP), R0
+  string_experiment.go:48	0x100157f54		f940a7e1		MOVD 328(RSP), R1
+  string_experiment.go:48	0x100157f58		f94053e2		MOVD 160(RSP), R2
+  string_experiment.go:29	0x100157f5c		39413fe3		MOVBU 79(RSP), R3
+  string_experiment.go:40	0x100157f60		aa0603e5		MOVD R6, R5
+  string_experiment.go:27	0x100157f64		aa0c03e6		MOVD R12, R6
+  string_experiment.go:42	0x100157f68		f94037e7		MOVD 104(RSP), R7
+  string_experiment.go:22	0x100157f6c		eb0b009f		CMP R11, R4
+  string_experiment.go:22	0x100157f70		5400116d		BLE 139(PC)
+  decode.go:28			0x100157f74		f100115f		CMP $4, R10
+  decode.go:28			0x100157f78		5400018a		BGE 12(PC)
+  string_experiment.go:23	0x100157f7c		f0001b7b		ADRP 3600384(PC), R27
+  string_experiment.go:23	0x100157f80		f9412b6c		MOVD 592(R27), R12
+  string_experiment.go:23	0x100157f84		f0001b7b		ADRP 3600384(PC), R27
+  string_experiment.go:23	0x100157f88		f9412f6d		MOVD 600(R27), R13
+  string_experiment.go:23	0x100157f8c		aa1f03ee		MOVD ZR, R14
+  string_experiment.go:23	0x100157f90		aa0c03f0		MOVD R12, R16
+  string_experiment.go:23	0x100157f94		aa1f03ef		MOVD ZR, R15
+  string_experiment.go:23	0x100157f98		aa0d03f1		MOVD R13, R17
+  string_experiment.go:23	0x100157f9c		aa1f03ec		MOVD ZR, R12
+  string_experiment.go:23	0x100157fa0		aa1f03ed		MOVD ZR, R13
+  string_experiment.go:23	0x100157fa4		1400001c		JMP 28(PC)
+  decode.go:32			0x100157fa8		d100114c		SUB $4, R10, R12
+  binary.go:92			0x100157fac		b940010d		MOVWU (R8), R13
+  decode.go:31			0x100157fb0		d503201f		NOOP
+  decode.go:20			0x100157fb4		d503201f		NOOP
+  decode.go:32			0x100157fb8		eb0c01bf		CMP R12, R13
+  decode.go:32			0x100157fbc		54000189		BLS 12(PC)
+  string_experiment.go:23	0x100157fc0		f0001b7b		ADRP 3600384(PC), R27
+  string_experiment.go:23	0x100157fc4		f9412b6c		MOVD 592(R27), R12
+  string_experiment.go:23	0x100157fc8		f0001b7b		ADRP 3600384(PC), R27
+  string_experiment.go:23	0x100157fcc		f9412f6d		MOVD 600(R27), R13
+  string_experiment.go:23	0x100157fd0		aa1f03ee		MOVD ZR, R14
+  string_experiment.go:23	0x100157fd4		aa0c03f0		MOVD R12, R16
+  string_experiment.go:23	0x100157fd8		aa1f03ef		MOVD ZR, R15
+  string_experiment.go:23	0x100157fdc		aa0d03f1		MOVD R13, R17
+  string_experiment.go:23	0x100157fe0		aa1f03ec		MOVD ZR, R12
+  string_experiment.go:23	0x100157fe4		aa1f03ed		MOVD ZR, R13
+  string_experiment.go:23	0x100157fe8		1400000b		JMP 11(PC)
+  decode.go:35			0x100157fec		910011ac		ADD $4, R13, R12
+  decode.go:36			0x100157ff0		eb0c013f		CMP R12, R9
+  decode.go:36			0x100157ff4		54000f43		BCC 122(PC)
+  decode.go:36			0x100157ff8		d100112e		SUB $4, R9, R14
+  decode.go:36			0x100157ffc		cb0e03ef		NEG R14, R15
+  decode.go:36			0x100158000		937ffdef		ASR $63, R15, R15
+  decode.go:36			0x100158004		927e01ef		AND $4, R15, R15
+  decode.go:36			0x100158008		8b0801ef		ADD R8, R15, R15
+  decode.go:36			0x10015800c		aa1f03f0		MOVD ZR, R16
+  decode.go:36			0x100158010		aa1f03f1		MOVD ZR, R17
+  string_experiment.go:24	0x100158014		b5000bb0		CBNZ R16, 93(PC)
+  string_experiment.go:23	0x100158018		f9002fee		MOVD R14, 88(RSP)
+  string_experiment.go:23	0x10015801c		f9002bed		MOVD R13, 80(RSP)
+  string_experiment.go:23	0x100158020		f90047e9		MOVD R9, 136(RSP)
+  string_experiment.go:23	0x100158024		f90043ea		MOVD R10, 128(RSP)
+  string_experiment.go:23	0x100158028		f9005bef		MOVD R15, 176(RSP)
+  string_experiment.go:23	0x10015802c		f90067e8		MOVD R8, 200(RSP)
+  string_experiment.go:22	0x100158030		f9003beb		MOVD R11, 112(RSP)
+  string_experiment.go:23	0x100158034		f90033ec		MOVD R12, 96(RSP)
+  string_experiment.go:27	0x100158038		f94020c2		MOVD 64(R6), R2
+  string_experiment.go:27	0x10015803c		f9400040		MOVD (R2), R0
+  string_experiment.go:27	0x100158040		f9400441		MOVD 8(R2), R1
+  string_experiment.go:27	0x100158044		97fdbf7f		CALL reflect.New(SB)
+  string_experiment.go:27	0x100158048		f9009be0		MOVD R0, 304(RSP)
+  string_experiment.go:27	0x10015804c		f9009fe1		MOVD R1, 312(RSP)
+  string_experiment.go:27	0x100158050		f9004be2		MOVD R2, 144(RSP)
+  string_experiment.go:29	0x100158054		39413fe3		MOVBU 79(RSP), R3
+  string_experiment.go:29	0x100158058		36000163		TBZ $0, R3, 11(PC)
+  string_experiment.go:30	0x10015805c		97fdbcfd		CALL reflect.Value.UnsafePointer(SB)
+  string_experiment.go:30	0x100158060		f940cfe3		MOVD 408(RSP), R3
+  string_experiment.go:30	0x100158064		f9402063		MOVD 64(R3), R3
+  string_experiment.go:30	0x100158068		f9402be1		MOVD 80(RSP), R1
+  string_experiment.go:30	0x10015806c		f9402fe2		MOVD 88(RSP), R2
+  string_experiment.go:30	0x100158070		aa0003e4		MOVD R0, R4
+  string_experiment.go:30	0x100158074		f940dfe5		MOVD 440(RSP), R5
+  string_experiment.go:30	0x100158078		f9405be0		MOVD 176(RSP), R0
+  string_experiment.go:30	0x10015807c		97ffe085		CALL github.com/cnooljaw/gosproto.decodeIntegerRecord(SB)
+  string_experiment.go:30	0x100158080		1400000b		JMP 11(PC)
+  string_experiment.go:32	0x100158084		f940cfe8		MOVD 408(RSP), R8
+  string_experiment.go:32	0x100158088		f9402103		MOVD 64(R8), R3
+  string_experiment.go:32	0x10015808c		aa0003e4		MOVD R0, R4
+  string_experiment.go:32	0x100158090		aa0103e5		MOVD R1, R5
+  string_experiment.go:32	0x100158094		aa0203e6		MOVD R2, R6
+  string_experiment.go:32	0x100158098		f940dfe7		MOVD 440(RSP), R7
+  string_experiment.go:32	0x10015809c		f9405be0		MOVD 176(RSP), R0
+  string_experiment.go:32	0x1001580a0		f9402be1		MOVD 80(RSP), R1
+  string_experiment.go:32	0x1001580a4		f9402fe2		MOVD 88(RSP), R2
+  string_experiment.go:32	0x1001580a8		97ffdcda		CALL github.com/cnooljaw/gosproto.decodeMessage(SB)
+  string_experiment.go:34	0x1001580ac		b5000641		CBNZ R1, 50(PC)
+  string_experiment.go:37	0x1001580b0		f9402be4		MOVD 80(RSP), R4
+  string_experiment.go:37	0x1001580b4		eb04001f		CMP R4, R0
+  string_experiment.go:37	0x1001580b8		54000501		BNE 40(PC)
+  string_experiment.go:40	0x1001580bc		f9405fe0		MOVD 184(RSP), R0
+  string_experiment.go:40	0x1001580c0		b40002a0		CBZ R0, 21(PC)
+  string_experiment.go:42	0x1001580c4		f9409be0		MOVD 304(RSP), R0
+  string_experiment.go:42	0x1001580c8		f9409fe1		MOVD 312(RSP), R1
+  string_experiment.go:42	0x1001580cc		f9404be2		MOVD 144(RSP), R2
+  string_experiment.go:42	0x1001580d0		97fdbce0		CALL reflect.Value.UnsafePointer(SB)
+  string_experiment.go:42	0x1001580d4		f94037e1		MOVD 104(RSP), R1
+  string_experiment.go:42	0x1001580d8		f9403be3		MOVD 112(RSP), R3
+  string_experiment.go:42	0x1001580dc		eb03003f		CMP R3, R1
+  string_experiment.go:42	0x1001580e0		540007a9		BLS 61(PC)
+  string_experiment.go:42	0x1001580e4		90001d3b		ADRP 3817472(PC), R27
+  string_experiment.go:42	0x1001580e8		b946f366		MOVWU 1776(R27), R6
+  string_experiment.go:42	0x1001580ec		35000066		CBNZW R6, 3(PC)
+  string_experiment.go:42	0x1001580f0		f9405fe6		MOVD 184(RSP), R6
+  string_experiment.go:42	0x1001580f4		14000006		JMP 6(PC)
+  string_experiment.go:42	0x1001580f8		97fc8066		CALL runtime.gcWriteBarrier2(SB)
+  string_experiment.go:42	0x1001580fc		f9000320		MOVD R0, (R25)
+  string_experiment.go:42	0x100158100		f9405fe6		MOVD 184(RSP), R6
+  string_experiment.go:42	0x100158104		f86378c7		MOVD (R6)(R3<<3), R7
+  string_experiment.go:42	0x100158108		f9000727		MOVD R7, 8(R25)
+  string_experiment.go:42	0x10015810c		f82378c0		MOVD R0, (R6)(R3<<3)
+  string_experiment.go:42	0x100158110		1400000d		JMP 13(PC)
+  string_experiment.go:44	0x100158114		f940abe0		MOVD 336(RSP), R0
+  string_experiment.go:44	0x100158118		f940a7e1		MOVD 328(RSP), R1
+  string_experiment.go:44	0x10015811c		f94053e2		MOVD 160(RSP), R2
+  string_experiment.go:44	0x100158120		f9403be3		MOVD 112(RSP), R3
+  string_experiment.go:44	0x100158124		97fdb277		CALL reflect.Value.Index(SB)
+  string_experiment.go:44	0x100158128		f9409be3		MOVD 304(RSP), R3
+  string_experiment.go:44	0x10015812c		f9409fe4		MOVD 312(RSP), R4
+  string_experiment.go:44	0x100158130		f9404be5		MOVD 144(RSP), R5
+  string_experiment.go:44	0x100158134		97fdb8bb		CALL reflect.Value.Set(SB)
+  string_experiment.go:42	0x100158138		f94037e1		MOVD 104(RSP), R1
+  string_experiment.go:22	0x10015813c		f9403be3		MOVD 112(RSP), R3
+  string_experiment.go:40	0x100158140		f9405fe6		MOVD 184(RSP), R6
+  string_experiment.go:46	0x100158144		f94033e0		MOVD 96(RSP), R0
+  string_experiment.go:46	0x100158148		f94043e7		MOVD 128(RSP), R7
+  string_experiment.go:46	0x10015814c		eb07001f		CMP R7, R0
+  string_experiment.go:46	0x100158150		54ffeec9		BLS -138(PC)
+  string_experiment.go:46	0x100158154		1400001e		JMP 30(PC)
+  string_experiment.go:38	0x100158158		d0001b7b		ADRP 3596288(PC), R27
+  string_experiment.go:38	0x10015815c		f9412b60		MOVD 592(R27), R0
+  string_experiment.go:38	0x100158160		d0001b7b		ADRP 3596288(PC), R27
+  string_experiment.go:38	0x100158164		f9412f61		MOVD 600(R27), R1
+  string_experiment.go:38	0x100158168		a97ffbfd		LDP -8(RSP), (R29, R30)
+  string_experiment.go:38	0x10015816c		9105c3ff		ADD $368, RSP, RSP
+  string_experiment.go:38	0x100158170		d65f03c0		RET
+  string_experiment.go:35	0x100158174		aa0103e0		MOVD R1, R0
+  string_experiment.go:35	0x100158178		aa0203e1		MOVD R2, R1
+  string_experiment.go:35	0x10015817c		a97ffbfd		LDP -8(RSP), (R29, R30)
+  string_experiment.go:35	0x100158180		9105c3ff		ADD $368, RSP, RSP
+  string_experiment.go:35	0x100158184		d65f03c0		RET
+  string_experiment.go:25	0x100158188		aa1003e0		MOVD R16, R0
+  string_experiment.go:25	0x10015818c		aa1103e1		MOVD R17, R1
+  string_experiment.go:25	0x100158190		a97ffbfd		LDP -8(RSP), (R29, R30)
+  string_experiment.go:25	0x100158194		9105c3ff		ADD $368, RSP, RSP
+  string_experiment.go:25	0x100158198		d65f03c0		RET
+  string_experiment.go:48	0x10015819c		aa0003e3		MOVD R0, R3
+  string_experiment.go:48	0x1001581a0		aa0103e4		MOVD R1, R4
+  string_experiment.go:48	0x1001581a4		aa0203e5		MOVD R2, R5
+  string_experiment.go:48	0x1001581a8		f940afe0		MOVD 344(RSP), R0
+  string_experiment.go:48	0x1001581ac		f940b3e1		MOVD 352(RSP), R1
+  string_experiment.go:48	0x1001581b0		f94057e2		MOVD 168(RSP), R2
+  string_experiment.go:48	0x1001581b4		97fdb89b		CALL reflect.Value.Set(SB)
+  string_experiment.go:49	0x1001581b8		aa1f03e0		MOVD ZR, R0
+  string_experiment.go:49	0x1001581bc		aa1f03e1		MOVD ZR, R1
+  string_experiment.go:49	0x1001581c0		a97ffbfd		LDP -8(RSP), (R29, R30)
+  string_experiment.go:49	0x1001581c4		9105c3ff		ADD $368, RSP, RSP
+  string_experiment.go:49	0x1001581c8		d65f03c0		RET
+  string_experiment.go:46	0x1001581cc		aa0703e1		MOVD R7, R1
+  string_experiment.go:46	0x1001581d0		97fc80fc		CALL runtime.panicSliceB(SB)
+  string_experiment.go:42	0x1001581d4		aa0303e0		MOVD R3, R0
+  string_experiment.go:42	0x1001581d8		97fc80e2		CALL runtime.panicIndex(SB)
+  decode.go:36			0x1001581dc		aa0c03e1		MOVD R12, R1
+  decode.go:36			0x1001581e0		aa0903e2		MOVD R9, R2
+  decode.go:36			0x1001581e4		97fc80ef		CALL runtime.panicSliceAcap(SB)
+  decode_integer_record.go:11	0x1001581e8		910343e0		ADD $208, RSP, R0
+  decode_integer_record.go:11	0x1001581ec		97faf0a1		CALL runtime.mapIterNext(SB)
+  decode_integer_record.go:11	0x1001581f0		f94063e1		MOVD 192(RSP), R1
+  decode_integer_record.go:12	0x1001581f4		aa0103e3		MOVD R1, R3
+  decode_integer_record.go:11	0x1001581f8		f9406be6		MOVD 208(RSP), R6
+  decode_integer_record.go:11	0x1001581fc		b4000546		CBZ R6, 42(PC)
+  decode_integer_record.go:11	0x100158200		f9406fe6		MOVD 216(RSP), R6
+  decode_integer_record.go:11	0x100158204		f94000c6		MOVD (R6), R6
+  decode_integer_record.go:12	0x100158208		f9401467		MOVD 40(R3), R7
+  decode_integer_record.go:12	0x10015820c		eb0600ff		CMP R6, R7
+  decode_integer_record.go:12	0x100158210		54000409		BLS 32(PC)
+  decode_integer_record.go:12	0x100158214		f9401067		MOVD 32(R3), R7
+  decode_integer_record.go:15	0x100158218		f86678e6		MOVD (R7)(R6<<3), R6
+  decode_integer_record.go:16	0x10015821c		b4fffe66		CBZ R6, -13(PC)
+  encode_pointer.go:66		0x100158220		394260c7		MOVBU 152(R6), R7
+  encode_pointer.go:66		0x100158224		360002c7		TBZ $0, R7, 22(PC)
+  encode_pointer.go:66		0x100158228		f94044c7		MOVD 136(R6), R7
+  encode_pointer.go:66		0x10015822c		eb0300ff		CMP R3, R7
+  encode_pointer.go:66		0x100158230		54000261		BNE 19(PC)
+  encode_pointer.go:67		0x100158234		f94014c7		MOVD 40(R6), R7
+  encode_pointer.go:67		0x100158238		f1001cff		CMP $7, R7
+  encode_pointer.go:67		0x10015823c		54000201		BNE 16(PC)
+  encode_pointer.go:67		0x100158240		f94010c7		MOVD 32(R6), R7
+  encode_pointer.go:67		0x100158244		b94000e8		MOVWU (R7), R8
+  encode_pointer.go:67		0x100158248		d28dcd29		MOVD $28265, R9
+  encode_pointer.go:67		0x10015824c		f2acae89		MOVK $(25972<<16), R9
+  encode_pointer.go:67		0x100158250		6b09011f		CMPW R9, R8
+  encode_pointer.go:67		0x100158254		54000141		BNE 10(PC)
+  encode_pointer.go:67		0x100158258		794008e8		MOVHU 4(R7), R8
+  encode_pointer.go:67		0x10015825c		d28cace9		MOVD $25959, R9
+  encode_pointer.go:67		0x100158260		6b09011f		CMPW R9, R8
+  encode_pointer.go:67		0x100158264		540000c1		BNE 6(PC)
+  encode_pointer.go:67		0x100158268		394018e7		MOVBU 6(R7), R7
+  encode_pointer.go:67		0x10015826c		7101c8ff		CMPW $114, R7
+  encode_pointer.go:67		0x100158270		54000061		BNE 3(PC)
+  encode_pointer.go:67		0x100158274		3940e0c6		MOVBU 56(R6), R6
+  decode_integer_record.go:16	0x100158278		3607fb86		TBZ $0, R6, -36(PC)
+  string_experiment.go:40	0x10015827c		f9403fe1		MOVD 120(RSP), R1
+  string_experiment.go:40	0x100158280		f9409fe6		MOVD 312(RSP), R6
+  string_experiment.go:27	0x100158284		f940cfe7		MOVD 408(RSP), R7
+  string_experiment.go:27	0x100158288		aa1f03e0		MOVD ZR, R0
+  string_experiment.go:20	0x10015828c		17ffff17		JMP -233(PC)
+  string_experiment.go:40	0x100158290		f9403fe1		MOVD 120(RSP), R1
+  string_experiment.go:40	0x100158294		f9409fe6		MOVD 312(RSP), R6
+  string_experiment.go:27	0x100158298		f940cfe7		MOVD 408(RSP), R7
+  string_experiment.go:27	0x10015829c		aa1f03e0		MOVD ZR, R0
+  string_experiment.go:20	0x1001582a0		17ffff12		JMP -238(PC)
+  string_experiment.go:40	0x1001582a4		f9403fe1		MOVD 120(RSP), R1
+  string_experiment.go:40	0x1001582a8		f9409fe6		MOVD 312(RSP), R6
+  string_experiment.go:27	0x1001582ac		f940cfe7		MOVD 408(RSP), R7
+  string_experiment.go:27	0x1001582b0		b24003e0		ORR $1, ZR, R0
+  string_experiment.go:20	0x1001582b4		17ffff0d		JMP -243(PC)
+  string_experiment.go:19	0x1001582b8		b4000046		CBZ R6, 2(PC)
+  string_experiment.go:19	0x1001582bc		97fc4c5d		CALL runtime.panicunsafeslicelen(SB)
+  string_experiment.go:19	0x1001582c0		97fc4c84		CALL runtime.panicunsafeslicenilptr(SB)
+  string_experiment.go:19	0x1001582c4		aa0003e6		MOVD R0, R6
+  string_experiment.go:19	0x1001582c8		17fffffc		JMP -4(PC)
+  string_experiment.go:19	0x1001582cc		97fc4c59		CALL runtime.panicunsafeslicelen(SB)
+  type.go:1326			0x1001582d0		aa0403e0		MOVD R4, R0
+  type.go:1326			0x1001582d4		b0000d81		ADRP 1773568(PC), R1
+  type.go:1326			0x1001582d8		91320021		ADD $3200, R1, R1
+  type.go:1326			0x1001582dc		90000d42		ADRP 1736704(PC), R2
+  type.go:1326			0x1001582e0		91048042		ADD $288, R2, R2
+  type.go:1326			0x1001582e4		97fadfa7		CALL runtime.panicdottypeI(SB)
+  type.go:1326			0x1001582e8		d503201f		NOOP
+  string_experiment.go:8	0x1001582ec		790013e0		MOVH R0, 8(RSP)
+  string_experiment.go:8	0x1001582f0		39002be1		MOVB R1, 10(RSP)
+  string_experiment.go:8	0x1001582f4		a9010fe2		STP (R2, R3), 16(RSP)
+  string_experiment.go:8	0x1001582f8		a90217e4		STP (R4, R5), 32(RSP)
+  string_experiment.go:8	0x1001582fc		a9031fe6		STP (R6, R7), 48(RSP)
+  string_experiment.go:8	0x100158300		a90427e8		STP (R8, R9), 64(RSP)
+  string_experiment.go:8	0x100158304		aa1e03e3		MOVD R30, R3
+  string_experiment.go:8	0x100158308		97fc773e		CALL runtime.morestack_noctxt.abi0(SB)
+  string_experiment.go:8	0x10015830c		794013e0		MOVHU 8(RSP), R0
+  string_experiment.go:8	0x100158310		39402be1		MOVBU 10(RSP), R1
+  string_experiment.go:8	0x100158314		a9410fe2		LDP 16(RSP), (R2, R3)
+  string_experiment.go:8	0x100158318		a94217e4		LDP 32(RSP), (R4, R5)
+  string_experiment.go:8	0x10015831c		a9431fe6		LDP 48(RSP), (R6, R7)
+  string_experiment.go:8	0x100158320		a94427e8		LDP 64(RSP), (R8, R9)
+  string_experiment.go:8	0x100158324		17fffe47		JMP github.com/cnooljaw/gosproto.experimentStringBaseline(SB)
+  string_experiment.go:8	0x100158328		00000000		?
+  string_experiment.go:8	0x10015832c		00000000		?
+
+TEXT github.com/cnooljaw/gosproto.experimentStringClone(SB) /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-struct-pointer-direct-20261021/gosproto/string_experiment.go
+  string_experiment.go:52	0x100158330		f9400b90		MOVD 16(R28), R16
+  string_experiment.go:52	0x100158334		d103c3f1		SUB $240, RSP, R17
+  string_experiment.go:52	0x100158338		eb10023f		CMP R16, R17
+  string_experiment.go:52	0x10015833c		54003509		BLS 424(PC)
+  string_experiment.go:52	0x100158340		d105c3f4		SUB $368, RSP, R20
+  string_experiment.go:52	0x100158344		a93ffa9d		STP (R29, R30), -8(R20)
+  string_experiment.go:52	0x100158348		9100029f		MOVD R20, RSP
+  string_experiment.go:52	0x10015834c		d10023fd		SUB $8, RSP, R29
+  string_experiment.go:52	0x100158350		f900d3e6		MOVD R6, 416(RSP)
+  string_experiment.go:52	0x100158354		f900d7e7		MOVD R7, 424(RSP)
+  string_experiment.go:54	0x100158358		f900cfe5		MOVD R5, 408(RSP)
+  string_experiment.go:54	0x10015835c		f900dfe9		MOVD R9, 440(RSP)
+  string_experiment.go:54	0x100158360		f90057e8		MOVD R8, 168(RSP)
+  string_experiment.go:54	0x100158364		f900b3e7		MOVD R7, 352(RSP)
+  string_experiment.go:54	0x100158368		f900afe6		MOVD R6, 344(RSP)
+  string_experiment.go:54	0x10015836c		f900cbe4		MOVD R4, 400(RSP)
+  string_experiment.go:54	0x100158370		f900c7e3		MOVD R3, 392(RSP)
+  string_experiment.go:54	0x100158374		f900c3e2		MOVD R2, 384(RSP)
+  string_experiment.go:53	0x100158378		aa0203e0		MOVD R2, R0
+  string_experiment.go:53	0x10015837c		aa0303e1		MOVD R3, R1
+  string_experiment.go:53	0x100158380		aa0403e2		MOVD R4, R2
+  string_experiment.go:53	0x100158384		aa0903e3		MOVD R9, R3
+  string_experiment.go:53	0x100158388		97ffda46		CALL github.com/cnooljaw/gosproto.countChunks(SB)
+  string_experiment.go:54	0x10015838c		b50011c1		CBNZ R1, 142(PC)
+  string_experiment.go:53	0x100158390		f9003fe0		MOVD R0, 120(RSP)
+  value.go:2380			0x100158394		f94057e1		MOVD 168(RSP), R1
+  value.go:2380			0x100158398		b40000c1		CBZ R1, 6(PC)
+  value.go:2380			0x10015839c		374800a1		TBNZ $9, R1, 5(PC)
+  value.go:2380			0x1001583a0		90000e02		ADRP 1835008(PC), R2
+  value.go:2380			0x1001583a4		913f4042		ADD $4048, R2, R2
+  string_experiment.go:57	0x1001583a8		f940afe3		MOVD 344(RSP), R3
+  string_experiment.go:57	0x1001583ac		14000008		JMP 8(PC)
+  value.go:2383			0x1001583b0		f940afe0		MOVD 344(RSP), R0
+  value.go:2383			0x1001583b4		aa0103e2		MOVD R1, R2
+  value.go:2383			0x1001583b8		f940b3e1		MOVD 352(RSP), R1
+  value.go:2383			0x1001583bc		97fdbbc1		CALL reflect.Value.typeSlow(SB)
+  string_experiment.go:57	0x1001583c0		aa0003e2		MOVD R0, R2
+  string_experiment.go:57	0x1001583c4		aa0103e3		MOVD R1, R3
+  string_experiment.go:57	0x1001583c8		f9403fe0		MOVD 120(RSP), R0
+  string_experiment.go:57	0x1001583cc		aa0303e1		MOVD R3, R1
+  string_experiment.go:57	0x1001583d0		aa0003e3		MOVD R0, R3
+  string_experiment.go:57	0x1001583d4		aa0203e0		MOVD R2, R0
+  string_experiment.go:57	0x1001583d8		aa0303e2		MOVD R3, R2
+  string_experiment.go:57	0x1001583dc		97fdbdd5		CALL reflect.MakeSlice(SB)
+  string_experiment.go:57	0x1001583e0		f900abe0		MOVD R0, 336(RSP)
+  string_experiment.go:57	0x1001583e4		f900a7e1		MOVD R1, 328(RSP)
+  string_experiment.go:57	0x1001583e8		f90053e2		MOVD R2, 160(RSP)
+  string_experiment.go:60	0x1001583ec		f9403fe4		MOVD 120(RSP), R4
+  string_experiment.go:60	0x1001583f0		f100009f		CMP $0, R4
+  string_experiment.go:60	0x1001583f4		5400094d		BLE 74(PC)
+  string_experiment.go:60	0x1001583f8		f940cfe6		MOVD 408(RSP), R6
+  string_experiment.go:60	0x1001583fc		3940e0c7		MOVBU 56(R6), R7
+  string_experiment.go:60	0x100158400		360008a7		TBZ $0, R7, 69(PC)
+  string_experiment.go:60	0x100158404		f94014c7		MOVD 40(R6), R7
+  string_experiment.go:60	0x100158408		f10018ff		CMP $6, R7
+  string_experiment.go:60	0x10015840c		54000801		BNE 64(PC)
+  string_experiment.go:60	0x100158410		f94010c7		MOVD 32(R6), R7
+  string_experiment.go:60	0x100158414		b94000e8		MOVWU (R7), R8
+  string_experiment.go:60	0x100158418		d28e8e69		MOVD $29811, R9
+  string_experiment.go:60	0x10015841c		f2aeae49		MOVK $(30066<<16), R9
+  string_experiment.go:60	0x100158420		6b09011f		CMPW R9, R8
+  string_experiment.go:60	0x100158424		54000701		BNE 56(PC)
+  string_experiment.go:60	0x100158428		794008e7		MOVHU 4(R7), R7
+  string_experiment.go:60	0x10015842c		d28e8c68		MOVD $29795, R8
+  string_experiment.go:60	0x100158430		6b0800ff		CMPW R8, R7
+  string_experiment.go:60	0x100158434		54000641		BNE 50(PC)
+  string_experiment.go:60	0x100158438		f94020c7		MOVD 64(R6), R7
+  string_experiment.go:60	0x10015843c		b40005c7		CBZ R7, 46(PC)
+  value.go:2380			0x100158440		f94057e3		MOVD 168(RSP), R3
+  value.go:2380			0x100158444		b40000c3		CBZ R3, 6(PC)
+  value.go:2380			0x100158448		374800a3		TBNZ $9, R3, 5(PC)
+  value.go:2380			0x10015844c		90000e05		ADRP 1835008(PC), R5
+  value.go:2380			0x100158450		913f40a5		ADD $4048, R5, R5
+  string_experiment.go:61	0x100158454		f940afe7		MOVD 344(RSP), R7
+  string_experiment.go:61	0x100158458		14000007		JMP 7(PC)
+  value.go:2383			0x10015845c		f940afe0		MOVD 344(RSP), R0
+  value.go:2383			0x100158460		f940b3e1		MOVD 352(RSP), R1
+  value.go:2383			0x100158464		aa0303e2		MOVD R3, R2
+  value.go:2383			0x100158468		97fdbb96		CALL reflect.Value.typeSlow(SB)
+  string_experiment.go:61	0x10015846c		aa0003e5		MOVD R0, R5
+  string_experiment.go:61	0x100158470		aa0103e7		MOVD R1, R7
+  string_experiment.go:61	0x100158474		f9402ca1		MOVD 88(R5), R1
+  string_experiment.go:61	0x100158478		aa0703e0		MOVD R7, R0
+  string_experiment.go:61	0x10015847c		d63f0020		CALL (R1)
+  string_experiment.go:61	0x100158480		f940cfe2		MOVD 408(RSP), R2
+  string_experiment.go:61	0x100158484		f9402043		MOVD 64(R2), R3
+  string_experiment.go:61	0x100158488		f9400064		MOVD (R3), R4
+  type.go:1326			0x10015848c		90000e05		ADRP 1835008(PC), R5
+  type.go:1326			0x100158490		913f40a5		ADD $4048, R5, R5
+  type.go:1326			0x100158494		eb05009f		CMP R5, R4
+  type.go:1326			0x100158498		54002941		BNE 330(PC)
+  string_experiment.go:61	0x10015849c		f900a3e1		MOVD R1, 320(RSP)
+  string_experiment.go:61	0x1001584a0		f9004fe0		MOVD R0, 152(RSP)
+  string_experiment.go:61	0x1001584a4		f9400460		MOVD 8(R3), R0
+  type.go:1326			0x1001584a8		97fdcf66		CALL reflect.(*rtype).ptrTo(SB)
+  string_experiment.go:61	0x1001584ac		f9404fe1		MOVD 152(RSP), R1
+  string_experiment.go:61	0x1001584b0		90000e02		ADRP 1835008(PC), R2
+  string_experiment.go:61	0x1001584b4		913f4042		ADD $4048, R2, R2
+  string_experiment.go:61	0x1001584b8		eb02003f		CMP R2, R1
+  string_experiment.go:61	0x1001584bc		54000060		BEQ 3(PC)
+  string_experiment.go:61	0x1001584c0		aa1f03e0		MOVD ZR, R0
+  string_experiment.go:61	0x1001584c4		14000005		JMP 5(PC)
+  string_experiment.go:61	0x1001584c8		aa0003e2		MOVD R0, R2
+  string_experiment.go:61	0x1001584cc		aa0103e0		MOVD R1, R0
+  string_experiment.go:61	0x1001584d0		f940a3e1		MOVD 320(RSP), R1
+  string_experiment.go:61	0x1001584d4		97fac8db		CALL runtime.ifaceeq(SB)
+  string_experiment.go:63	0x1001584d8		f940a7e1		MOVD 328(RSP), R1
+  string_experiment.go:63	0x1001584dc		f94053e2		MOVD 160(RSP), R2
+  string_experiment.go:66	0x1001584e0		f9403fe4		MOVD 120(RSP), R4
+  string_experiment.go:71	0x1001584e4		f940cfe6		MOVD 408(RSP), R6
+  string_experiment.go:60	0x1001584e8		aa0003e3		MOVD R0, R3
+  string_experiment.go:63	0x1001584ec		f940abe0		MOVD 336(RSP), R0
+  string_experiment.go:61	0x1001584f0		1400000d		JMP 13(PC)
+  string_experiment.go:61	0x1001584f4		aa1f03e3		MOVD ZR, R3
+  string_experiment.go:60	0x1001584f8		1400000b		JMP 11(PC)
+  string_experiment.go:60	0x1001584fc		aa1f03e3		MOVD ZR, R3
+  string_experiment.go:60	0x100158500		14000009		JMP 9(PC)
+  string_experiment.go:60	0x100158504		aa1f03e3		MOVD ZR, R3
+  string_experiment.go:60	0x100158508		14000007		JMP 7(PC)
+  string_experiment.go:60	0x10015850c		aa1f03e3		MOVD ZR, R3
+  string_experiment.go:60	0x100158510		14000005		JMP 5(PC)
+  string_experiment.go:60	0x100158514		aa1f03e3		MOVD ZR, R3
+  string_experiment.go:60	0x100158518		14000003		JMP 3(PC)
+  string_experiment.go:71	0x10015851c		f940cfe6		MOVD 408(RSP), R6
+  string_experiment.go:71	0x100158520		aa1f03e3		MOVD ZR, R3
+  string_experiment.go:61	0x100158524		370000a3		TBNZ $0, R3, 5(PC)
+  string_experiment.go:61	0x100158528		aa1f03e3		MOVD ZR, R3
+  string_experiment.go:61	0x10015852c		aa1f03e5		MOVD ZR, R5
+  string_experiment.go:61	0x100158530		aa1f03e7		MOVD ZR, R7
+  string_experiment.go:61	0x100158534		14000031		JMP 49(PC)
+  string_experiment.go:63	0x100158538		97fdbbc6		CALL reflect.Value.UnsafePointer(SB)
+  string_experiment.go:63	0x10015853c		f9403fe1		MOVD 120(RSP), R1
+  string_experiment.go:63	0x100158540		b7f823e1		TBNZ $63, R1, 287(PC)
+  string_experiment.go:63	0x100158544		b27d03e6		ORR $8, ZR, R6
+  string_experiment.go:63	0x100158548		9bc17cc6		UMULH R1, R6, R6
+  string_experiment.go:63	0x10015854c		b5002346		CBNZ R6, 282(PC)
+  string_experiment.go:63	0x100158550		aa0003e6		MOVD R0, R6
+  string_experiment.go:63	0x100158554		cb0003e7		NEG R0, R7
+  string_experiment.go:63	0x100158558		eb010cff		CMP R1<<3, R7
+  string_experiment.go:63	0x10015855c		54002263		BCC 275(PC)
+  string_experiment.go:64	0x100158560		f100203f		CMP $8, R1
+  string_experiment.go:64	0x100158564		540002cb		BLT 22(PC)
+  string_experiment.go:64	0x100158568		f940cfe7		MOVD 408(RSP), R7
+  string_experiment.go:64	0x10015856c		f94020e8		MOVD 64(R7), R8
+  decode_integer_record.go:8	0x100158570		3941c909		MOVBU 114(R8), R9
+  decode_integer_record.go:8	0x100158574		37000069		TBNZ $0, R9, 3(PC)
+  decode_integer_record.go:8	0x100158578		aa1f03e0		MOVD ZR, R0
+  string_experiment.go:64	0x10015857c		14000017		JMP 23(PC)
+  string_experiment.go:63	0x100158580		f9009fe6		MOVD R6, 312(RSP)
+  string_experiment.go:64	0x100158584		f90063e8		MOVD R8, 192(RSP)
+  decode_integer_record.go:11	0x100158588		f9401d01		MOVD 56(R8), R1
+  decode_integer_record.go:11	0x10015858c		910343f4		ADD $208, RSP, R20
+  decode_integer_record.go:11	0x100158590		1000009b		ADR 16(PC), R27
+  decode_integer_record.go:11	0x100158594		a93eeffd		STP (R29, R27), -24(RSP)
+  decode_integer_record.go:11	0x100158598		d10063fd		SUB $24, RSP, R29
+  decode_integer_record.go:11	0x10015859c		97fc8063		CALL -229277(PC)
+  decode_integer_record.go:11	0x1001585a0		d10023fd		SUB $8, RSP, R29
+  decode_integer_record.go:11	0x1001585a4		f0000b40		ADRP 1486848(PC), R0
+  decode_integer_record.go:11	0x1001585a8		910f0000		ADD $960, R0, R0
+  decode_integer_record.go:11	0x1001585ac		910343e2		ADD $208, RSP, R2
+  decode_integer_record.go:11	0x1001585b0		97faef94		CALL runtime.mapIterStart(SB)
+  decode_integer_record.go:11	0x1001585b4		f94063e3		MOVD 192(RSP), R3
+  decode_integer_record.go:11	0x1001585b8		140000cc		JMP 204(PC)
+  decode_integer_record.go:11	0x1001585bc		aa1f03e0		MOVD ZR, R0
+  string_experiment.go:64	0x1001585c0		14000006		JMP 6(PC)
+  string_experiment.go:55	0x1001585c4		aa0103e0		MOVD R1, R0
+  string_experiment.go:55	0x1001585c8		aa0203e1		MOVD R2, R1
+  string_experiment.go:55	0x1001585cc		a97ffbfd		LDP -8(RSP), (R29, R30)
+  string_experiment.go:55	0x1001585d0		9105c3ff		ADD $368, RSP, RSP
+  string_experiment.go:55	0x1001585d4		d65f03c0		RET
+  string_experiment.go:92	0x1001585d8		f940a7e1		MOVD 328(RSP), R1
+  string_experiment.go:92	0x1001585dc		f94053e2		MOVD 160(RSP), R2
+  string_experiment.go:66	0x1001585e0		f9403fe4		MOVD 120(RSP), R4
+  string_experiment.go:73	0x1001585e4		aa0003e3		MOVD R0, R3
+  string_experiment.go:84	0x1001585e8		aa0603e5		MOVD R6, R5
+  string_experiment.go:84	0x1001585ec		aa0403e7		MOVD R4, R7
+  string_experiment.go:92	0x1001585f0		f940abe0		MOVD 336(RSP), R0
+  string_experiment.go:71	0x1001585f4		f940cfe6		MOVD 408(RSP), R6
+  string_experiment.go:84	0x1001585f8		f90037e7		MOVD R7, 104(RSP)
+  string_experiment.go:84	0x1001585fc		f9005fe5		MOVD R5, 184(RSP)
+  string_experiment.go:73	0x100158600		39013fe3		MOVB R3, 79(RSP)
+  string_experiment.go:73	0x100158604		f940c3e8		MOVD 384(RSP), R8
+  string_experiment.go:73	0x100158608		f940cbe9		MOVD 400(RSP), R9
+  string_experiment.go:73	0x10015860c		f940c7ea		MOVD 392(RSP), R10
+  string_experiment.go:73	0x100158610		aa1f03eb		MOVD ZR, R11
+  string_experiment.go:73	0x100158614		14000012		JMP 18(PC)
+  string_experiment.go:90	0x100158618		f94047ec		MOVD 136(RSP), R12
+  string_experiment.go:90	0x10015861c		cb000189		SUB R0, R12, R9
+  string_experiment.go:90	0x100158620		cb0903ec		NEG R9, R12
+  string_experiment.go:90	0x100158624		8a8cfc0c		AND R12->63, R0, R12
+  string_experiment.go:66	0x100158628		9100046b		ADD $1, R3, R11
+  string_experiment.go:90	0x10015862c		cb0000ea		SUB R0, R7, R10
+  string_experiment.go:90	0x100158630		f94067ed		MOVD 200(RSP), R13
+  string_experiment.go:90	0x100158634		8b0d0188		ADD R13, R12, R8
+  string_experiment.go:66	0x100158638		f9403fe4		MOVD 120(RSP), R4
+  string_experiment.go:66	0x10015863c		f940cfec		MOVD 408(RSP), R12
+  string_experiment.go:92	0x100158640		f940abe0		MOVD 336(RSP), R0
+  string_experiment.go:92	0x100158644		f940a7e1		MOVD 328(RSP), R1
+  string_experiment.go:92	0x100158648		f94053e2		MOVD 160(RSP), R2
+  string_experiment.go:73	0x10015864c		39413fe3		MOVBU 79(RSP), R3
+  string_experiment.go:84	0x100158650		aa0603e5		MOVD R6, R5
+  string_experiment.go:71	0x100158654		aa0c03e6		MOVD R12, R6
+  string_experiment.go:86	0x100158658		f94037e7		MOVD 104(RSP), R7
+  string_experiment.go:66	0x10015865c		eb0b009f		CMP R11, R4
+  string_experiment.go:66	0x100158660		5400116d		BLE 139(PC)
+  decode.go:28			0x100158664		f100115f		CMP $4, R10
+  decode.go:28			0x100158668		5400018a		BGE 12(PC)
+  string_experiment.go:67	0x10015866c		d0001b7b		ADRP 3596288(PC), R27
+  string_experiment.go:67	0x100158670		f9412b6c		MOVD 592(R27), R12
+  string_experiment.go:67	0x100158674		d0001b7b		ADRP 3596288(PC), R27
+  string_experiment.go:67	0x100158678		f9412f6d		MOVD 600(R27), R13
+  string_experiment.go:67	0x10015867c		aa1f03ee		MOVD ZR, R14
+  string_experiment.go:67	0x100158680		aa0c03f0		MOVD R12, R16
+  string_experiment.go:67	0x100158684		aa1f03ef		MOVD ZR, R15
+  string_experiment.go:67	0x100158688		aa0d03f1		MOVD R13, R17
+  string_experiment.go:67	0x10015868c		aa1f03ec		MOVD ZR, R12
+  string_experiment.go:67	0x100158690		aa1f03ed		MOVD ZR, R13
+  string_experiment.go:67	0x100158694		1400001c		JMP 28(PC)
+  decode.go:32			0x100158698		d100114c		SUB $4, R10, R12
+  binary.go:92			0x10015869c		b940010d		MOVWU (R8), R13
+  decode.go:31			0x1001586a0		d503201f		NOOP
+  decode.go:20			0x1001586a4		d503201f		NOOP
+  decode.go:32			0x1001586a8		eb0c01bf		CMP R12, R13
+  decode.go:32			0x1001586ac		54000189		BLS 12(PC)
+  string_experiment.go:67	0x1001586b0		d0001b7b		ADRP 3596288(PC), R27
+  string_experiment.go:67	0x1001586b4		f9412b6c		MOVD 592(R27), R12
+  string_experiment.go:67	0x1001586b8		d0001b7b		ADRP 3596288(PC), R27
+  string_experiment.go:67	0x1001586bc		f9412f6d		MOVD 600(R27), R13
+  string_experiment.go:67	0x1001586c0		aa1f03ee		MOVD ZR, R14
+  string_experiment.go:67	0x1001586c4		aa0c03f0		MOVD R12, R16
+  string_experiment.go:67	0x1001586c8		aa1f03ef		MOVD ZR, R15
+  string_experiment.go:67	0x1001586cc		aa0d03f1		MOVD R13, R17
+  string_experiment.go:67	0x1001586d0		aa1f03ec		MOVD ZR, R12
+  string_experiment.go:67	0x1001586d4		aa1f03ed		MOVD ZR, R13
+  string_experiment.go:67	0x1001586d8		1400000b		JMP 11(PC)
+  decode.go:35			0x1001586dc		910011ac		ADD $4, R13, R12
+  decode.go:36			0x1001586e0		eb0c013f		CMP R12, R9
+  decode.go:36			0x1001586e4		54000f43		BCC 122(PC)
+  decode.go:36			0x1001586e8		d100112e		SUB $4, R9, R14
+  decode.go:36			0x1001586ec		cb0e03ef		NEG R14, R15
+  decode.go:36			0x1001586f0		937ffdef		ASR $63, R15, R15
+  decode.go:36			0x1001586f4		927e01ef		AND $4, R15, R15
+  decode.go:36			0x1001586f8		8b0801ef		ADD R8, R15, R15
+  decode.go:36			0x1001586fc		aa1f03f0		MOVD ZR, R16
+  decode.go:36			0x100158700		aa1f03f1		MOVD ZR, R17
+  string_experiment.go:68	0x100158704		b5000bb0		CBNZ R16, 93(PC)
+  string_experiment.go:67	0x100158708		f9002fee		MOVD R14, 88(RSP)
+  string_experiment.go:67	0x10015870c		f9002bed		MOVD R13, 80(RSP)
+  string_experiment.go:67	0x100158710		f90047e9		MOVD R9, 136(RSP)
+  string_experiment.go:67	0x100158714		f90043ea		MOVD R10, 128(RSP)
+  string_experiment.go:67	0x100158718		f9005bef		MOVD R15, 176(RSP)
+  string_experiment.go:67	0x10015871c		f90067e8		MOVD R8, 200(RSP)
+  string_experiment.go:66	0x100158720		f9003beb		MOVD R11, 112(RSP)
+  string_experiment.go:67	0x100158724		f90033ec		MOVD R12, 96(RSP)
+  string_experiment.go:71	0x100158728		f94020c2		MOVD 64(R6), R2
+  string_experiment.go:71	0x10015872c		f9400040		MOVD (R2), R0
+  string_experiment.go:71	0x100158730		f9400441		MOVD 8(R2), R1
+  string_experiment.go:71	0x100158734		97fdbdc3		CALL reflect.New(SB)
+  string_experiment.go:71	0x100158738		f9009be0		MOVD R0, 304(RSP)
+  string_experiment.go:71	0x10015873c		f9009fe1		MOVD R1, 312(RSP)
+  string_experiment.go:71	0x100158740		f9004be2		MOVD R2, 144(RSP)
+  string_experiment.go:73	0x100158744		39413fe3		MOVBU 79(RSP), R3
+  string_experiment.go:73	0x100158748		36000163		TBZ $0, R3, 11(PC)
+  string_experiment.go:74	0x10015874c		97fdbb41		CALL reflect.Value.UnsafePointer(SB)
+  string_experiment.go:74	0x100158750		f940cfe3		MOVD 408(RSP), R3
+  string_experiment.go:74	0x100158754		f9402063		MOVD 64(R3), R3
+  string_experiment.go:74	0x100158758		f9402be1		MOVD 80(RSP), R1
+  string_experiment.go:74	0x10015875c		f9402fe2		MOVD 88(RSP), R2
+  string_experiment.go:74	0x100158760		aa0003e4		MOVD R0, R4
+  string_experiment.go:74	0x100158764		f940dfe5		MOVD 440(RSP), R5
+  string_experiment.go:74	0x100158768		f9405be0		MOVD 176(RSP), R0
+  string_experiment.go:74	0x10015876c		97ffdec9		CALL github.com/cnooljaw/gosproto.decodeIntegerRecord(SB)
+  string_experiment.go:74	0x100158770		1400000b		JMP 11(PC)
+  string_experiment.go:76	0x100158774		f940cfe8		MOVD 408(RSP), R8
+  string_experiment.go:76	0x100158778		f9402103		MOVD 64(R8), R3
+  string_experiment.go:76	0x10015877c		aa0003e4		MOVD R0, R4
+  string_experiment.go:76	0x100158780		aa0103e5		MOVD R1, R5
+  string_experiment.go:76	0x100158784		aa0203e6		MOVD R2, R6
+  string_experiment.go:76	0x100158788		f940dfe7		MOVD 440(RSP), R7
+  string_experiment.go:76	0x10015878c		f9405be0		MOVD 176(RSP), R0
+  string_experiment.go:76	0x100158790		f9402be1		MOVD 80(RSP), R1
+  string_experiment.go:76	0x100158794		f9402fe2		MOVD 88(RSP), R2
+  string_experiment.go:76	0x100158798		97ffdb1e		CALL github.com/cnooljaw/gosproto.decodeMessage(SB)
+  string_experiment.go:78	0x10015879c		b5000641		CBNZ R1, 50(PC)
+  string_experiment.go:81	0x1001587a0		f9402be4		MOVD 80(RSP), R4
+  string_experiment.go:81	0x1001587a4		eb04001f		CMP R4, R0
+  string_experiment.go:81	0x1001587a8		54000501		BNE 40(PC)
+  string_experiment.go:84	0x1001587ac		f9405fe0		MOVD 184(RSP), R0
+  string_experiment.go:84	0x1001587b0		b40002a0		CBZ R0, 21(PC)
+  string_experiment.go:86	0x1001587b4		f9409be0		MOVD 304(RSP), R0
+  string_experiment.go:86	0x1001587b8		f9409fe1		MOVD 312(RSP), R1
+  string_experiment.go:86	0x1001587bc		f9404be2		MOVD 144(RSP), R2
+  string_experiment.go:86	0x1001587c0		97fdbb24		CALL reflect.Value.UnsafePointer(SB)
+  string_experiment.go:86	0x1001587c4		f94037e1		MOVD 104(RSP), R1
+  string_experiment.go:86	0x1001587c8		f9403be3		MOVD 112(RSP), R3
+  string_experiment.go:86	0x1001587cc		eb03003f		CMP R3, R1
+  string_experiment.go:86	0x1001587d0		540007a9		BLS 61(PC)
+  string_experiment.go:86	0x1001587d4		90001d3b		ADRP 3817472(PC), R27
+  string_experiment.go:86	0x1001587d8		b946f366		MOVWU 1776(R27), R6
+  string_experiment.go:86	0x1001587dc		35000066		CBNZW R6, 3(PC)
+  string_experiment.go:86	0x1001587e0		f9405fe6		MOVD 184(RSP), R6
+  string_experiment.go:86	0x1001587e4		14000006		JMP 6(PC)
+  string_experiment.go:86	0x1001587e8		97fc7eaa		CALL runtime.gcWriteBarrier2(SB)
+  string_experiment.go:86	0x1001587ec		f9000320		MOVD R0, (R25)
+  string_experiment.go:86	0x1001587f0		f9405fe6		MOVD 184(RSP), R6
+  string_experiment.go:86	0x1001587f4		f86378c7		MOVD (R6)(R3<<3), R7
+  string_experiment.go:86	0x1001587f8		f9000727		MOVD R7, 8(R25)
+  string_experiment.go:86	0x1001587fc		f82378c0		MOVD R0, (R6)(R3<<3)
+  string_experiment.go:86	0x100158800		1400000d		JMP 13(PC)
+  string_experiment.go:88	0x100158804		f940abe0		MOVD 336(RSP), R0
+  string_experiment.go:88	0x100158808		f940a7e1		MOVD 328(RSP), R1
+  string_experiment.go:88	0x10015880c		f94053e2		MOVD 160(RSP), R2
+  string_experiment.go:88	0x100158810		f9403be3		MOVD 112(RSP), R3
+  string_experiment.go:88	0x100158814		97fdb0bb		CALL reflect.Value.Index(SB)
+  string_experiment.go:88	0x100158818		f9409be3		MOVD 304(RSP), R3
+  string_experiment.go:88	0x10015881c		f9409fe4		MOVD 312(RSP), R4
+  string_experiment.go:88	0x100158820		f9404be5		MOVD 144(RSP), R5
+  string_experiment.go:88	0x100158824		97fdb6ff		CALL reflect.Value.Set(SB)
+  string_experiment.go:86	0x100158828		f94037e1		MOVD 104(RSP), R1
+  string_experiment.go:66	0x10015882c		f9403be3		MOVD 112(RSP), R3
+  string_experiment.go:84	0x100158830		f9405fe6		MOVD 184(RSP), R6
+  string_experiment.go:90	0x100158834		f94033e0		MOVD 96(RSP), R0
+  string_experiment.go:90	0x100158838		f94043e7		MOVD 128(RSP), R7
+  string_experiment.go:90	0x10015883c		eb07001f		CMP R7, R0
+  string_experiment.go:90	0x100158840		54ffeec9		BLS -138(PC)
+  string_experiment.go:90	0x100158844		1400001e		JMP 30(PC)
+  string_experiment.go:82	0x100158848		d0001b7b		ADRP 3596288(PC), R27
+  string_experiment.go:82	0x10015884c		f9412b60		MOVD 592(R27), R0
+  string_experiment.go:82	0x100158850		d0001b7b		ADRP 3596288(PC), R27
+  string_experiment.go:82	0x100158854		f9412f61		MOVD 600(R27), R1
+  string_experiment.go:82	0x100158858		a97ffbfd		LDP -8(RSP), (R29, R30)
+  string_experiment.go:82	0x10015885c		9105c3ff		ADD $368, RSP, RSP
+  string_experiment.go:82	0x100158860		d65f03c0		RET
+  string_experiment.go:79	0x100158864		aa0103e0		MOVD R1, R0
+  string_experiment.go:79	0x100158868		aa0203e1		MOVD R2, R1
+  string_experiment.go:79	0x10015886c		a97ffbfd		LDP -8(RSP), (R29, R30)
+  string_experiment.go:79	0x100158870		9105c3ff		ADD $368, RSP, RSP
+  string_experiment.go:79	0x100158874		d65f03c0		RET
+  string_experiment.go:69	0x100158878		aa1003e0		MOVD R16, R0
+  string_experiment.go:69	0x10015887c		aa1103e1		MOVD R17, R1
+  string_experiment.go:69	0x100158880		a97ffbfd		LDP -8(RSP), (R29, R30)
+  string_experiment.go:69	0x100158884		9105c3ff		ADD $368, RSP, RSP
+  string_experiment.go:69	0x100158888		d65f03c0		RET
+  string_experiment.go:92	0x10015888c		aa0003e3		MOVD R0, R3
+  string_experiment.go:92	0x100158890		aa0103e4		MOVD R1, R4
+  string_experiment.go:92	0x100158894		aa0203e5		MOVD R2, R5
+  string_experiment.go:92	0x100158898		f940afe0		MOVD 344(RSP), R0
+  string_experiment.go:92	0x10015889c		f940b3e1		MOVD 352(RSP), R1
+  string_experiment.go:92	0x1001588a0		f94057e2		MOVD 168(RSP), R2
+  string_experiment.go:92	0x1001588a4		97fdb6df		CALL reflect.Value.Set(SB)
+  string_experiment.go:93	0x1001588a8		aa1f03e0		MOVD ZR, R0
+  string_experiment.go:93	0x1001588ac		aa1f03e1		MOVD ZR, R1
+  string_experiment.go:93	0x1001588b0		a97ffbfd		LDP -8(RSP), (R29, R30)
+  string_experiment.go:93	0x1001588b4		9105c3ff		ADD $368, RSP, RSP
+  string_experiment.go:93	0x1001588b8		d65f03c0		RET
+  string_experiment.go:90	0x1001588bc		aa0703e1		MOVD R7, R1
+  string_experiment.go:90	0x1001588c0		97fc7f40		CALL runtime.panicSliceB(SB)
+  string_experiment.go:86	0x1001588c4		aa0303e0		MOVD R3, R0
+  string_experiment.go:86	0x1001588c8		97fc7f26		CALL runtime.panicIndex(SB)
+  decode.go:36			0x1001588cc		aa0c03e1		MOVD R12, R1
+  decode.go:36			0x1001588d0		aa0903e2		MOVD R9, R2
+  decode.go:36			0x1001588d4		97fc7f33		CALL runtime.panicSliceAcap(SB)
+  decode_integer_record.go:11	0x1001588d8		910343e0		ADD $208, RSP, R0
+  decode_integer_record.go:11	0x1001588dc		97faeee5		CALL runtime.mapIterNext(SB)
+  decode_integer_record.go:11	0x1001588e0		f94063e1		MOVD 192(RSP), R1
+  decode_integer_record.go:12	0x1001588e4		aa0103e3		MOVD R1, R3
+  decode_integer_record.go:11	0x1001588e8		f9406be6		MOVD 208(RSP), R6
+  decode_integer_record.go:11	0x1001588ec		b4000546		CBZ R6, 42(PC)
+  decode_integer_record.go:11	0x1001588f0		f9406fe6		MOVD 216(RSP), R6
+  decode_integer_record.go:11	0x1001588f4		f94000c6		MOVD (R6), R6
+  decode_integer_record.go:12	0x1001588f8		f9401467		MOVD 40(R3), R7
+  decode_integer_record.go:12	0x1001588fc		eb0600ff		CMP R6, R7
+  decode_integer_record.go:12	0x100158900		54000409		BLS 32(PC)
+  decode_integer_record.go:12	0x100158904		f9401067		MOVD 32(R3), R7
+  decode_integer_record.go:15	0x100158908		f86678e6		MOVD (R7)(R6<<3), R6
+  decode_integer_record.go:16	0x10015890c		b4fffe66		CBZ R6, -13(PC)
+  encode_pointer.go:66		0x100158910		394260c7		MOVBU 152(R6), R7
+  encode_pointer.go:66		0x100158914		360002c7		TBZ $0, R7, 22(PC)
+  encode_pointer.go:66		0x100158918		f94044c7		MOVD 136(R6), R7
+  encode_pointer.go:66		0x10015891c		eb0300ff		CMP R3, R7
+  encode_pointer.go:66		0x100158920		54000261		BNE 19(PC)
+  encode_pointer.go:67		0x100158924		f94014c7		MOVD 40(R6), R7
+  encode_pointer.go:67		0x100158928		f1001cff		CMP $7, R7
+  encode_pointer.go:67		0x10015892c		54000201		BNE 16(PC)
+  encode_pointer.go:67		0x100158930		f94010c7		MOVD 32(R6), R7
+  encode_pointer.go:67		0x100158934		b94000e8		MOVWU (R7), R8
+  encode_pointer.go:67		0x100158938		d28dcd29		MOVD $28265, R9
+  encode_pointer.go:67		0x10015893c		f2acae89		MOVK $(25972<<16), R9
+  encode_pointer.go:67		0x100158940		6b09011f		CMPW R9, R8
+  encode_pointer.go:67		0x100158944		54000141		BNE 10(PC)
+  encode_pointer.go:67		0x100158948		794008e8		MOVHU 4(R7), R8
+  encode_pointer.go:67		0x10015894c		d28cace9		MOVD $25959, R9
+  encode_pointer.go:67		0x100158950		6b09011f		CMPW R9, R8
+  encode_pointer.go:67		0x100158954		540000c1		BNE 6(PC)
+  encode_pointer.go:67		0x100158958		394018e7		MOVBU 6(R7), R7
+  encode_pointer.go:67		0x10015895c		7101c8ff		CMPW $114, R7
+  encode_pointer.go:67		0x100158960		54000061		BNE 3(PC)
+  encode_pointer.go:67		0x100158964		3940e0c6		MOVBU 56(R6), R6
+  decode_integer_record.go:16	0x100158968		3607fb86		TBZ $0, R6, -36(PC)
+  string_experiment.go:84	0x10015896c		f9403fe1		MOVD 120(RSP), R1
+  string_experiment.go:84	0x100158970		f9409fe6		MOVD 312(RSP), R6
+  string_experiment.go:71	0x100158974		f940cfe7		MOVD 408(RSP), R7
+  string_experiment.go:71	0x100158978		aa1f03e0		MOVD ZR, R0
+  string_experiment.go:64	0x10015897c		17ffff17		JMP -233(PC)
+  string_experiment.go:84	0x100158980		f9403fe1		MOVD 120(RSP), R1
+  string_experiment.go:84	0x100158984		f9409fe6		MOVD 312(RSP), R6
+  string_experiment.go:71	0x100158988		f940cfe7		MOVD 408(RSP), R7
+  string_experiment.go:71	0x10015898c		aa1f03e0		MOVD ZR, R0
+  string_experiment.go:64	0x100158990		17ffff12		JMP -238(PC)
+  string_experiment.go:84	0x100158994		f9403fe1		MOVD 120(RSP), R1
+  string_experiment.go:84	0x100158998		f9409fe6		MOVD 312(RSP), R6
+  string_experiment.go:71	0x10015899c		f940cfe7		MOVD 408(RSP), R7
+  string_experiment.go:71	0x1001589a0		b24003e0		ORR $1, ZR, R0
+  string_experiment.go:64	0x1001589a4		17ffff0d		JMP -243(PC)
+  string_experiment.go:63	0x1001589a8		b4000046		CBZ R6, 2(PC)
+  string_experiment.go:63	0x1001589ac		97fc4aa1		CALL runtime.panicunsafeslicelen(SB)
+  string_experiment.go:63	0x1001589b0		97fc4ac8		CALL runtime.panicunsafeslicenilptr(SB)
+  string_experiment.go:63	0x1001589b4		aa0003e6		MOVD R0, R6
+  string_experiment.go:63	0x1001589b8		17fffffc		JMP -4(PC)
+  string_experiment.go:63	0x1001589bc		97fc4a9d		CALL runtime.panicunsafeslicelen(SB)
+  type.go:1326			0x1001589c0		aa0403e0		MOVD R4, R0
+  type.go:1326			0x1001589c4		b0000d81		ADRP 1773568(PC), R1
+  type.go:1326			0x1001589c8		91320021		ADD $3200, R1, R1
+  type.go:1326			0x1001589cc		90000d42		ADRP 1736704(PC), R2
+  type.go:1326			0x1001589d0		91048042		ADD $288, R2, R2
+  type.go:1326			0x1001589d4		97faddeb		CALL runtime.panicdottypeI(SB)
+  type.go:1326			0x1001589d8		d503201f		NOOP
+  string_experiment.go:52	0x1001589dc		790013e0		MOVH R0, 8(RSP)
+  string_experiment.go:52	0x1001589e0		39002be1		MOVB R1, 10(RSP)
+  string_experiment.go:52	0x1001589e4		a9010fe2		STP (R2, R3), 16(RSP)
+  string_experiment.go:52	0x1001589e8		a90217e4		STP (R4, R5), 32(RSP)
+  string_experiment.go:52	0x1001589ec		a9031fe6		STP (R6, R7), 48(RSP)
+  string_experiment.go:52	0x1001589f0		a90427e8		STP (R8, R9), 64(RSP)
+  string_experiment.go:52	0x1001589f4		aa1e03e3		MOVD R30, R3
+  string_experiment.go:52	0x1001589f8		97fc7582		CALL runtime.morestack_noctxt.abi0(SB)
+  string_experiment.go:52	0x1001589fc		794013e0		MOVHU 8(RSP), R0
+  string_experiment.go:52	0x100158a00		39402be1		MOVBU 10(RSP), R1
+  string_experiment.go:52	0x100158a04		a9410fe2		LDP 16(RSP), (R2, R3)
+  string_experiment.go:52	0x100158a08		a94217e4		LDP 32(RSP), (R4, R5)
+  string_experiment.go:52	0x100158a0c		a9431fe6		LDP 48(RSP), (R6, R7)
+  string_experiment.go:52	0x100158a10		a94427e8		LDP 64(RSP), (R8, R9)
+  string_experiment.go:52	0x100158a14		17fffe47		JMP github.com/cnooljaw/gosproto.experimentStringClone(SB)
+  string_experiment.go:52	0x100158a18		00000000		?
+  string_experiment.go:52	0x100158a1c		00000000		?
+
+TEXT github.com/cnooljaw/gosproto.experimentStringCandidate(SB) /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-struct-pointer-direct-20261021/gosproto/string_experiment.go
+  string_experiment.go:96	0x100158a20		f9400b90		MOVD 16(R28), R16
+  string_experiment.go:96	0x100158a24		d10403f1		SUB $256, RSP, R17
+  string_experiment.go:96	0x100158a28		eb10023f		CMP R16, R17
+  string_experiment.go:96	0x100158a2c		540034a9		BLS 421(PC)
+  string_experiment.go:96	0x100158a30		d10603f4		SUB $384, RSP, R20
+  string_experiment.go:96	0x100158a34		a93ffa9d		STP (R29, R30), -8(R20)
+  string_experiment.go:96	0x100158a38		9100029f		MOVD R20, RSP
+  string_experiment.go:96	0x100158a3c		d10023fd		SUB $8, RSP, R29
+  string_experiment.go:96	0x100158a40		f900dbe6		MOVD R6, 432(RSP)
+  string_experiment.go:96	0x100158a44		f900dfe7		MOVD R7, 440(RSP)
+  string_experiment.go:98	0x100158a48		f900d7e5		MOVD R5, 424(RSP)
+  string_experiment.go:98	0x100158a4c		f900e7e9		MOVD R9, 456(RSP)
+  string_experiment.go:98	0x100158a50		f9005be8		MOVD R8, 176(RSP)
+  string_experiment.go:98	0x100158a54		f900bbe7		MOVD R7, 368(RSP)
+  string_experiment.go:98	0x100158a58		f900b7e6		MOVD R6, 360(RSP)
+  string_experiment.go:98	0x100158a5c		f900d3e4		MOVD R4, 416(RSP)
+  string_experiment.go:98	0x100158a60		f900cfe3		MOVD R3, 408(RSP)
+  string_experiment.go:98	0x100158a64		f900cbe2		MOVD R2, 400(RSP)
+  string_experiment.go:97	0x100158a68		aa0203e0		MOVD R2, R0
+  string_experiment.go:97	0x100158a6c		aa0303e1		MOVD R3, R1
+  string_experiment.go:97	0x100158a70		aa0403e2		MOVD R4, R2
+  string_experiment.go:97	0x100158a74		aa0903e3		MOVD R9, R3
+  string_experiment.go:97	0x100158a78		97ffd88a		CALL github.com/cnooljaw/gosproto.countChunks(SB)
+  string_experiment.go:98	0x100158a7c		b50011c1		CBNZ R1, 142(PC)
+  string_experiment.go:97	0x100158a80		f90043e0		MOVD R0, 128(RSP)
+  value.go:2380			0x100158a84		f9405be1		MOVD 176(RSP), R1
+  value.go:2380			0x100158a88		b40000c1		CBZ R1, 6(PC)
+  value.go:2380			0x100158a8c		374800a1		TBNZ $9, R1, 5(PC)
+  value.go:2380			0x100158a90		90000e02		ADRP 1835008(PC), R2
+  value.go:2380			0x100158a94		913f4042		ADD $4048, R2, R2
+  string_experiment.go:101	0x100158a98		f940b7e3		MOVD 360(RSP), R3
+  string_experiment.go:101	0x100158a9c		14000008		JMP 8(PC)
+  value.go:2383			0x100158aa0		f940b7e0		MOVD 360(RSP), R0
+  value.go:2383			0x100158aa4		aa0103e2		MOVD R1, R2
+  value.go:2383			0x100158aa8		f940bbe1		MOVD 368(RSP), R1
+  value.go:2383			0x100158aac		97fdba05		CALL reflect.Value.typeSlow(SB)
+  string_experiment.go:101	0x100158ab0		aa0003e2		MOVD R0, R2
+  string_experiment.go:101	0x100158ab4		aa0103e3		MOVD R1, R3
+  string_experiment.go:101	0x100158ab8		f94043e0		MOVD 128(RSP), R0
+  string_experiment.go:101	0x100158abc		aa0303e1		MOVD R3, R1
+  string_experiment.go:101	0x100158ac0		aa0003e3		MOVD R0, R3
+  string_experiment.go:101	0x100158ac4		aa0203e0		MOVD R2, R0
+  string_experiment.go:101	0x100158ac8		aa0303e2		MOVD R3, R2
+  string_experiment.go:101	0x100158acc		97fdbc19		CALL reflect.MakeSlice(SB)
+  string_experiment.go:101	0x100158ad0		f900b3e0		MOVD R0, 352(RSP)
+  string_experiment.go:101	0x100158ad4		f900afe1		MOVD R1, 344(RSP)
+  string_experiment.go:101	0x100158ad8		f90057e2		MOVD R2, 168(RSP)
+  string_experiment.go:104	0x100158adc		f94043e4		MOVD 128(RSP), R4
+  string_experiment.go:104	0x100158ae0		f100009f		CMP $0, R4
+  string_experiment.go:104	0x100158ae4		5400094d		BLE 74(PC)
+  string_experiment.go:104	0x100158ae8		f940d7e6		MOVD 424(RSP), R6
+  string_experiment.go:104	0x100158aec		3940e0c7		MOVBU 56(R6), R7
+  string_experiment.go:104	0x100158af0		360008a7		TBZ $0, R7, 69(PC)
+  string_experiment.go:104	0x100158af4		f94014c7		MOVD 40(R6), R7
+  string_experiment.go:104	0x100158af8		f10018ff		CMP $6, R7
+  string_experiment.go:104	0x100158afc		54000801		BNE 64(PC)
+  string_experiment.go:104	0x100158b00		f94010c7		MOVD 32(R6), R7
+  string_experiment.go:104	0x100158b04		b94000e8		MOVWU (R7), R8
+  string_experiment.go:104	0x100158b08		d28e8e69		MOVD $29811, R9
+  string_experiment.go:104	0x100158b0c		f2aeae49		MOVK $(30066<<16), R9
+  string_experiment.go:104	0x100158b10		6b09011f		CMPW R9, R8
+  string_experiment.go:104	0x100158b14		54000701		BNE 56(PC)
+  string_experiment.go:104	0x100158b18		794008e7		MOVHU 4(R7), R7
+  string_experiment.go:104	0x100158b1c		d28e8c68		MOVD $29795, R8
+  string_experiment.go:104	0x100158b20		6b0800ff		CMPW R8, R7
+  string_experiment.go:104	0x100158b24		54000641		BNE 50(PC)
+  string_experiment.go:104	0x100158b28		f94020c7		MOVD 64(R6), R7
+  string_experiment.go:104	0x100158b2c		b40005c7		CBZ R7, 46(PC)
+  value.go:2380			0x100158b30		f9405be3		MOVD 176(RSP), R3
+  value.go:2380			0x100158b34		b40000c3		CBZ R3, 6(PC)
+  value.go:2380			0x100158b38		374800a3		TBNZ $9, R3, 5(PC)
+  value.go:2380			0x100158b3c		90000e05		ADRP 1835008(PC), R5
+  value.go:2380			0x100158b40		913f40a5		ADD $4048, R5, R5
+  string_experiment.go:105	0x100158b44		f940b7e7		MOVD 360(RSP), R7
+  string_experiment.go:105	0x100158b48		14000007		JMP 7(PC)
+  value.go:2383			0x100158b4c		f940b7e0		MOVD 360(RSP), R0
+  value.go:2383			0x100158b50		f940bbe1		MOVD 368(RSP), R1
+  value.go:2383			0x100158b54		aa0303e2		MOVD R3, R2
+  value.go:2383			0x100158b58		97fdb9da		CALL reflect.Value.typeSlow(SB)
+  string_experiment.go:105	0x100158b5c		aa0003e5		MOVD R0, R5
+  string_experiment.go:105	0x100158b60		aa0103e7		MOVD R1, R7
+  string_experiment.go:105	0x100158b64		f9402ca1		MOVD 88(R5), R1
+  string_experiment.go:105	0x100158b68		aa0703e0		MOVD R7, R0
+  string_experiment.go:105	0x100158b6c		d63f0020		CALL (R1)
+  string_experiment.go:105	0x100158b70		f940d7e2		MOVD 424(RSP), R2
+  string_experiment.go:105	0x100158b74		f9402043		MOVD 64(R2), R3
+  string_experiment.go:105	0x100158b78		f9400064		MOVD (R3), R4
+  type.go:1326			0x100158b7c		90000e05		ADRP 1835008(PC), R5
+  type.go:1326			0x100158b80		913f40a5		ADD $4048, R5, R5
+  type.go:1326			0x100158b84		eb05009f		CMP R5, R4
+  type.go:1326			0x100158b88		540028e1		BNE 327(PC)
+  string_experiment.go:105	0x100158b8c		f900abe1		MOVD R1, 336(RSP)
+  string_experiment.go:105	0x100158b90		f90053e0		MOVD R0, 160(RSP)
+  string_experiment.go:105	0x100158b94		f9400460		MOVD 8(R3), R0
+  type.go:1326			0x100158b98		97fdcdaa		CALL reflect.(*rtype).ptrTo(SB)
+  string_experiment.go:105	0x100158b9c		f94053e1		MOVD 160(RSP), R1
+  string_experiment.go:105	0x100158ba0		90000e02		ADRP 1835008(PC), R2
+  string_experiment.go:105	0x100158ba4		913f4042		ADD $4048, R2, R2
+  string_experiment.go:105	0x100158ba8		eb02003f		CMP R2, R1
+  string_experiment.go:105	0x100158bac		54000060		BEQ 3(PC)
+  string_experiment.go:105	0x100158bb0		aa1f03e0		MOVD ZR, R0
+  string_experiment.go:105	0x100158bb4		14000005		JMP 5(PC)
+  string_experiment.go:105	0x100158bb8		aa0003e2		MOVD R0, R2
+  string_experiment.go:105	0x100158bbc		aa0103e0		MOVD R1, R0
+  string_experiment.go:105	0x100158bc0		f940abe1		MOVD 336(RSP), R1
+  string_experiment.go:105	0x100158bc4		97fac71f		CALL runtime.ifaceeq(SB)
+  string_experiment.go:107	0x100158bc8		f940afe1		MOVD 344(RSP), R1
+  string_experiment.go:107	0x100158bcc		f94057e2		MOVD 168(RSP), R2
+  string_experiment.go:110	0x100158bd0		f94043e4		MOVD 128(RSP), R4
+  string_experiment.go:115	0x100158bd4		f940d7e6		MOVD 424(RSP), R6
+  string_experiment.go:104	0x100158bd8		aa0003e3		MOVD R0, R3
+  string_experiment.go:107	0x100158bdc		f940b3e0		MOVD 352(RSP), R0
+  string_experiment.go:105	0x100158be0		1400000d		JMP 13(PC)
+  string_experiment.go:105	0x100158be4		aa1f03e3		MOVD ZR, R3
+  string_experiment.go:104	0x100158be8		1400000b		JMP 11(PC)
+  string_experiment.go:104	0x100158bec		aa1f03e3		MOVD ZR, R3
+  string_experiment.go:104	0x100158bf0		14000009		JMP 9(PC)
+  string_experiment.go:104	0x100158bf4		aa1f03e3		MOVD ZR, R3
+  string_experiment.go:104	0x100158bf8		14000007		JMP 7(PC)
+  string_experiment.go:104	0x100158bfc		aa1f03e3		MOVD ZR, R3
+  string_experiment.go:104	0x100158c00		14000005		JMP 5(PC)
+  string_experiment.go:104	0x100158c04		aa1f03e3		MOVD ZR, R3
+  string_experiment.go:104	0x100158c08		14000003		JMP 3(PC)
+  string_experiment.go:115	0x100158c0c		f940d7e6		MOVD 424(RSP), R6
+  string_experiment.go:115	0x100158c10		aa1f03e3		MOVD ZR, R3
+  string_experiment.go:105	0x100158c14		370000a3		TBNZ $0, R3, 5(PC)
+  string_experiment.go:105	0x100158c18		aa1f03e3		MOVD ZR, R3
+  string_experiment.go:105	0x100158c1c		aa1f03e5		MOVD ZR, R5
+  string_experiment.go:105	0x100158c20		aa1f03e7		MOVD ZR, R7
+  string_experiment.go:105	0x100158c24		14000031		JMP 49(PC)
+  string_experiment.go:107	0x100158c28		97fdba0a		CALL reflect.Value.UnsafePointer(SB)
+  string_experiment.go:107	0x100158c2c		f94043e1		MOVD 128(RSP), R1
+  string_experiment.go:107	0x100158c30		b7f82381		TBNZ $63, R1, 284(PC)
+  string_experiment.go:107	0x100158c34		b27d03e6		ORR $8, ZR, R6
+  string_experiment.go:107	0x100158c38		9bc17cc6		UMULH R1, R6, R6
+  string_experiment.go:107	0x100158c3c		b50022e6		CBNZ R6, 279(PC)
+  string_experiment.go:107	0x100158c40		aa0003e6		MOVD R0, R6
+  string_experiment.go:107	0x100158c44		cb0003e7		NEG R0, R7
+  string_experiment.go:107	0x100158c48		eb010cff		CMP R1<<3, R7
+  string_experiment.go:107	0x100158c4c		54002203		BCC 272(PC)
+  string_experiment.go:108	0x100158c50		f100203f		CMP $8, R1
+  string_experiment.go:108	0x100158c54		540002cb		BLT 22(PC)
+  string_experiment.go:108	0x100158c58		f940d7e7		MOVD 424(RSP), R7
+  string_experiment.go:108	0x100158c5c		f94020e8		MOVD 64(R7), R8
+  decode_integer_record.go:8	0x100158c60		3941c909		MOVBU 114(R8), R9
+  decode_integer_record.go:8	0x100158c64		37000069		TBNZ $0, R9, 3(PC)
+  decode_integer_record.go:8	0x100158c68		aa1f03e0		MOVD ZR, R0
+  string_experiment.go:108	0x100158c6c		14000017		JMP 23(PC)
+  string_experiment.go:107	0x100158c70		f900a7e6		MOVD R6, 328(RSP)
+  string_experiment.go:108	0x100158c74		f90067e8		MOVD R8, 200(RSP)
+  decode_integer_record.go:11	0x100158c78		f9401d01		MOVD 56(R8), R1
+  decode_integer_record.go:11	0x100158c7c		910383f4		ADD $224, RSP, R20
+  decode_integer_record.go:11	0x100158c80		1000009b		ADR 16(PC), R27
+  decode_integer_record.go:11	0x100158c84		a93eeffd		STP (R29, R27), -24(RSP)
+  decode_integer_record.go:11	0x100158c88		d10063fd		SUB $24, RSP, R29
+  decode_integer_record.go:11	0x100158c8c		97fc7ea7		CALL -229721(PC)
+  decode_integer_record.go:11	0x100158c90		d10023fd		SUB $8, RSP, R29
+  decode_integer_record.go:11	0x100158c94		f0000b40		ADRP 1486848(PC), R0
+  decode_integer_record.go:11	0x100158c98		910f0000		ADD $960, R0, R0
+  decode_integer_record.go:11	0x100158c9c		910383e2		ADD $224, RSP, R2
+  decode_integer_record.go:11	0x100158ca0		97faedd8		CALL runtime.mapIterStart(SB)
+  decode_integer_record.go:11	0x100158ca4		f94067e3		MOVD 200(RSP), R3
+  decode_integer_record.go:11	0x100158ca8		140000c9		JMP 201(PC)
+  decode_integer_record.go:11	0x100158cac		aa1f03e0		MOVD ZR, R0
+  string_experiment.go:108	0x100158cb0		14000006		JMP 6(PC)
+  string_experiment.go:99	0x100158cb4		aa0103e0		MOVD R1, R0
+  string_experiment.go:99	0x100158cb8		aa0203e1		MOVD R2, R1
+  string_experiment.go:99	0x100158cbc		a97ffbfd		LDP -8(RSP), (R29, R30)
+  string_experiment.go:99	0x100158cc0		910603ff		ADD $384, RSP, RSP
+  string_experiment.go:99	0x100158cc4		d65f03c0		RET
+  string_experiment.go:137	0x100158cc8		f940afe1		MOVD 344(RSP), R1
+  string_experiment.go:137	0x100158ccc		f94057e2		MOVD 168(RSP), R2
+  string_experiment.go:110	0x100158cd0		f94043e4		MOVD 128(RSP), R4
+  string_experiment.go:118	0x100158cd4		aa0003e3		MOVD R0, R3
+  string_experiment.go:129	0x100158cd8		aa0603e5		MOVD R6, R5
+  string_experiment.go:129	0x100158cdc		aa0403e7		MOVD R4, R7
+  string_experiment.go:137	0x100158ce0		f940b3e0		MOVD 352(RSP), R0
+  string_experiment.go:115	0x100158ce4		f940d7e6		MOVD 424(RSP), R6
+  string_experiment.go:129	0x100158ce8		f9003be7		MOVD R7, 112(RSP)
+  string_experiment.go:129	0x100158cec		f90063e5		MOVD R5, 192(RSP)
+  string_experiment.go:118	0x100158cf0		39015fe3		MOVB R3, 87(RSP)
+  string_experiment.go:118	0x100158cf4		f940cbe8		MOVD 400(RSP), R8
+  string_experiment.go:118	0x100158cf8		f940d3e9		MOVD 416(RSP), R9
+  string_experiment.go:118	0x100158cfc		f940cfea		MOVD 408(RSP), R10
+  string_experiment.go:118	0x100158d00		aa1f03eb		MOVD ZR, R11
+  string_experiment.go:118	0x100158d04		14000011		JMP 17(PC)
+  string_experiment.go:135	0x100158d08		f9404bec		MOVD 144(RSP), R12
+  string_experiment.go:135	0x100158d0c		cb070189		SUB R7, R12, R9
+  string_experiment.go:135	0x100158d10		cb0903ec		NEG R9, R12
+  string_experiment.go:135	0x100158d14		8a8cfcec		AND R12->63, R7, R12
+  string_experiment.go:110	0x100158d18		910004cb		ADD $1, R6, R11
+  string_experiment.go:135	0x100158d1c		cb07010a		SUB R7, R8, R10
+  string_experiment.go:135	0x100158d20		f9406fed		MOVD 216(RSP), R13
+  string_experiment.go:135	0x100158d24		8b0d0188		ADD R13, R12, R8
+  string_experiment.go:110	0x100158d28		f94043e4		MOVD 128(RSP), R4
+  string_experiment.go:110	0x100158d2c		f940d7e6		MOVD 424(RSP), R6
+  string_experiment.go:137	0x100158d30		f940b3e0		MOVD 352(RSP), R0
+  string_experiment.go:137	0x100158d34		f940afe1		MOVD 344(RSP), R1
+  string_experiment.go:137	0x100158d38		f94057e2		MOVD 168(RSP), R2
+  string_experiment.go:118	0x100158d3c		39415fe3		MOVBU 87(RSP), R3
+  string_experiment.go:129	0x100158d40		f94063e5		MOVD 192(RSP), R5
+  string_experiment.go:131	0x100158d44		f9403be7		MOVD 112(RSP), R7
+  string_experiment.go:110	0x100158d48		eb0b009f		CMP R11, R4
+  string_experiment.go:110	0x100158d4c		5400110d		BLE 136(PC)
+  decode.go:28			0x100158d50		f100115f		CMP $4, R10
+  decode.go:28			0x100158d54		5400018a		BGE 12(PC)
+  string_experiment.go:111	0x100158d58		d0001b7b		ADRP 3596288(PC), R27
+  string_experiment.go:111	0x100158d5c		f9412b6c		MOVD 592(R27), R12
+  string_experiment.go:111	0x100158d60		d0001b7b		ADRP 3596288(PC), R27
+  string_experiment.go:111	0x100158d64		f9412f6d		MOVD 600(R27), R13
+  string_experiment.go:111	0x100158d68		aa1f03ee		MOVD ZR, R14
+  string_experiment.go:111	0x100158d6c		aa0c03f0		MOVD R12, R16
+  string_experiment.go:111	0x100158d70		aa1f03ef		MOVD ZR, R15
+  string_experiment.go:111	0x100158d74		aa0d03f1		MOVD R13, R17
+  string_experiment.go:111	0x100158d78		aa1f03ec		MOVD ZR, R12
+  string_experiment.go:111	0x100158d7c		aa1f03ed		MOVD ZR, R13
+  string_experiment.go:111	0x100158d80		1400001c		JMP 28(PC)
+  decode.go:32			0x100158d84		d100114c		SUB $4, R10, R12
+  binary.go:92			0x100158d88		b940010d		MOVWU (R8), R13
+  decode.go:31			0x100158d8c		d503201f		NOOP
+  decode.go:20			0x100158d90		d503201f		NOOP
+  decode.go:32			0x100158d94		eb0c01bf		CMP R12, R13
+  decode.go:32			0x100158d98		54000189		BLS 12(PC)
+  string_experiment.go:111	0x100158d9c		d0001b7b		ADRP 3596288(PC), R27
+  string_experiment.go:111	0x100158da0		f9412b6c		MOVD 592(R27), R12
+  string_experiment.go:111	0x100158da4		d0001b7b		ADRP 3596288(PC), R27
+  string_experiment.go:111	0x100158da8		f9412f6d		MOVD 600(R27), R13
+  string_experiment.go:111	0x100158dac		aa1f03ee		MOVD ZR, R14
+  string_experiment.go:111	0x100158db0		aa0c03f0		MOVD R12, R16
+  string_experiment.go:111	0x100158db4		aa1f03ef		MOVD ZR, R15
+  string_experiment.go:111	0x100158db8		aa0d03f1		MOVD R13, R17
+  string_experiment.go:111	0x100158dbc		aa1f03ec		MOVD ZR, R12
+  string_experiment.go:111	0x100158dc0		aa1f03ed		MOVD ZR, R13
+  string_experiment.go:111	0x100158dc4		1400000b		JMP 11(PC)
+  decode.go:35			0x100158dc8		910011ac		ADD $4, R13, R12
+  decode.go:36			0x100158dcc		eb0c013f		CMP R12, R9
+  decode.go:36			0x100158dd0		54000f03		BCC 120(PC)
+  decode.go:36			0x100158dd4		d100112e		SUB $4, R9, R14
+  decode.go:36			0x100158dd8		cb0e03ef		NEG R14, R15
+  decode.go:36			0x100158ddc		937ffdef		ASR $63, R15, R15
+  decode.go:36			0x100158de0		927e01ef		AND $4, R15, R15
+  decode.go:36			0x100158de4		8b0801ef		ADD R8, R15, R15
+  decode.go:36			0x100158de8		aa1f03f0		MOVD ZR, R16
+  decode.go:36			0x100158dec		aa1f03f1		MOVD ZR, R17
+  string_experiment.go:112	0x100158df0		b5000b50		CBNZ R16, 90(PC)
+  string_experiment.go:111	0x100158df4		f9002fed		MOVD R13, 88(RSP)
+  string_experiment.go:111	0x100158df8		f9005fef		MOVD R15, 184(RSP)
+  string_experiment.go:111	0x100158dfc		f9004be9		MOVD R9, 144(RSP)
+  string_experiment.go:111	0x100158e00		f90033ee		MOVD R14, 96(RSP)
+  string_experiment.go:111	0x100158e04		f90047ea		MOVD R10, 136(RSP)
+  string_experiment.go:111	0x100158e08		f9006fe8		MOVD R8, 216(RSP)
+  string_experiment.go:110	0x100158e0c		f9003feb		MOVD R11, 120(RSP)
+  string_experiment.go:111	0x100158e10		f90037ec		MOVD R12, 104(RSP)
+  string_experiment.go:115	0x100158e14		f94020c2		MOVD 64(R6), R2
+  string_experiment.go:115	0x100158e18		f9400040		MOVD (R2), R0
+  string_experiment.go:115	0x100158e1c		f9400441		MOVD 8(R2), R1
+  string_experiment.go:115	0x100158e20		97fdbc08		CALL reflect.New(SB)
+  string_experiment.go:115	0x100158e24		f900a3e0		MOVD R0, 320(RSP)
+  string_experiment.go:115	0x100158e28		f900a7e1		MOVD R1, 328(RSP)
+  string_experiment.go:115	0x100158e2c		f9004fe2		MOVD R2, 152(RSP)
+  string_experiment.go:116	0x100158e30		97fdb988		CALL reflect.Value.UnsafePointer(SB)
+  string_experiment.go:116	0x100158e34		f9006be0		MOVD R0, 208(RSP)
+  string_experiment.go:118	0x100158e38		39415fe1		MOVBU 87(RSP), R1
+  string_experiment.go:118	0x100158e3c		36000141		TBZ $0, R1, 10(PC)
+  string_experiment.go:119	0x100158e40		f940d7e6		MOVD 424(RSP), R6
+  string_experiment.go:119	0x100158e44		f94020c3		MOVD 64(R6), R3
+  string_experiment.go:119	0x100158e48		f9402fe1		MOVD 88(RSP), R1
+  string_experiment.go:119	0x100158e4c		f94033e2		MOVD 96(RSP), R2
+  string_experiment.go:119	0x100158e50		aa0003e4		MOVD R0, R4
+  string_experiment.go:119	0x100158e54		f940e7e5		MOVD 456(RSP), R5
+  string_experiment.go:119	0x100158e58		f9405fe0		MOVD 184(RSP), R0
+  string_experiment.go:119	0x100158e5c		97ffdd0d		CALL github.com/cnooljaw/gosproto.decodeIntegerRecord(SB)
+  string_experiment.go:119	0x100158e60		1400000b		JMP 11(PC)
+  string_experiment.go:121	0x100158e64		f940d7e8		MOVD 424(RSP), R8
+  string_experiment.go:121	0x100158e68		f9402103		MOVD 64(R8), R3
+  string_experiment.go:121	0x100158e6c		f9405fe0		MOVD 184(RSP), R0
+  string_experiment.go:121	0x100158e70		f9402fe1		MOVD 88(RSP), R1
+  string_experiment.go:121	0x100158e74		f94033e2		MOVD 96(RSP), R2
+  string_experiment.go:121	0x100158e78		f940a3e4		MOVD 320(RSP), R4
+  string_experiment.go:121	0x100158e7c		f940a7e5		MOVD 328(RSP), R5
+  string_experiment.go:121	0x100158e80		f9404fe6		MOVD 152(RSP), R6
+  string_experiment.go:121	0x100158e84		f940e7e7		MOVD 456(RSP), R7
+  string_experiment.go:121	0x100158e88		97ffd962		CALL github.com/cnooljaw/gosproto.decodeMessage(SB)
+  string_experiment.go:123	0x100158e8c		b50005c1		CBNZ R1, 46(PC)
+  string_experiment.go:126	0x100158e90		f9402fe6		MOVD 88(RSP), R6
+  string_experiment.go:126	0x100158e94		eb06001f		CMP R6, R0
+  string_experiment.go:126	0x100158e98		54000481		BNE 36(PC)
+  string_experiment.go:129	0x100158e9c		f94063e0		MOVD 192(RSP), R0
+  string_experiment.go:129	0x100158ea0		b4000220		CBZ R0, 17(PC)
+  string_experiment.go:131	0x100158ea4		f9403be1		MOVD 112(RSP), R1
+  string_experiment.go:131	0x100158ea8		f9403fe6		MOVD 120(RSP), R6
+  string_experiment.go:131	0x100158eac		eb06003f		CMP R6, R1
+  string_experiment.go:131	0x100158eb0		540007c9		BLS 62(PC)
+  string_experiment.go:131	0x100158eb4		90001d3b		ADRP 3817472(PC), R27
+  string_experiment.go:131	0x100158eb8		b946f367		MOVWU 1776(R27), R7
+  string_experiment.go:131	0x100158ebc		35000067		CBNZW R7, 3(PC)
+  string_experiment.go:131	0x100158ec0		f9406be7		MOVD 208(RSP), R7
+  string_experiment.go:131	0x100158ec4		14000006		JMP 6(PC)
+  string_experiment.go:131	0x100158ec8		97fc7cf2		CALL runtime.gcWriteBarrier2(SB)
+  string_experiment.go:131	0x100158ecc		f9406be7		MOVD 208(RSP), R7
+  string_experiment.go:131	0x100158ed0		f9000327		MOVD R7, (R25)
+  string_experiment.go:131	0x100158ed4		f8667808		MOVD (R0)(R6<<3), R8
+  string_experiment.go:131	0x100158ed8		f9000728		MOVD R8, 8(R25)
+  string_experiment.go:131	0x100158edc		f8267807		MOVD R7, (R0)(R6<<3)
+  string_experiment.go:131	0x100158ee0		1400000d		JMP 13(PC)
+  string_experiment.go:133	0x100158ee4		f940b3e0		MOVD 352(RSP), R0
+  string_experiment.go:133	0x100158ee8		f940afe1		MOVD 344(RSP), R1
+  string_experiment.go:133	0x100158eec		f94057e2		MOVD 168(RSP), R2
+  string_experiment.go:133	0x100158ef0		f9403fe3		MOVD 120(RSP), R3
+  string_experiment.go:133	0x100158ef4		97fdaf03		CALL reflect.Value.Index(SB)
+  string_experiment.go:133	0x100158ef8		f940a3e3		MOVD 320(RSP), R3
+  string_experiment.go:133	0x100158efc		f940a7e4		MOVD 328(RSP), R4
+  string_experiment.go:133	0x100158f00		f9404fe5		MOVD 152(RSP), R5
+  string_experiment.go:133	0x100158f04		97fdb547		CALL reflect.Value.Set(SB)
+  string_experiment.go:129	0x100158f08		f94063e0		MOVD 192(RSP), R0
+  string_experiment.go:131	0x100158f0c		f9403be1		MOVD 112(RSP), R1
+  string_experiment.go:110	0x100158f10		f9403fe6		MOVD 120(RSP), R6
+  string_experiment.go:135	0x100158f14		f94037e7		MOVD 104(RSP), R7
+  string_experiment.go:135	0x100158f18		f94047e8		MOVD 136(RSP), R8
+  string_experiment.go:135	0x100158f1c		eb0800ff		CMP R8, R7
+  string_experiment.go:135	0x100158f20		54ffef49		BLS -134(PC)
+  string_experiment.go:135	0x100158f24		1400001e		JMP 30(PC)
+  string_experiment.go:127	0x100158f28		d0001b7b		ADRP 3596288(PC), R27
+  string_experiment.go:127	0x100158f2c		f9412b60		MOVD 592(R27), R0
+  string_experiment.go:127	0x100158f30		d0001b7b		ADRP 3596288(PC), R27
+  string_experiment.go:127	0x100158f34		f9412f61		MOVD 600(R27), R1
+  string_experiment.go:127	0x100158f38		a97ffbfd		LDP -8(RSP), (R29, R30)
+  string_experiment.go:127	0x100158f3c		910603ff		ADD $384, RSP, RSP
+  string_experiment.go:127	0x100158f40		d65f03c0		RET
+  string_experiment.go:124	0x100158f44		aa0103e0		MOVD R1, R0
+  string_experiment.go:124	0x100158f48		aa0203e1		MOVD R2, R1
+  string_experiment.go:124	0x100158f4c		a97ffbfd		LDP -8(RSP), (R29, R30)
+  string_experiment.go:124	0x100158f50		910603ff		ADD $384, RSP, RSP
+  string_experiment.go:124	0x100158f54		d65f03c0		RET
+  string_experiment.go:113	0x100158f58		aa1003e0		MOVD R16, R0
+  string_experiment.go:113	0x100158f5c		aa1103e1		MOVD R17, R1
+  string_experiment.go:113	0x100158f60		a97ffbfd		LDP -8(RSP), (R29, R30)
+  string_experiment.go:113	0x100158f64		910603ff		ADD $384, RSP, RSP
+  string_experiment.go:113	0x100158f68		d65f03c0		RET
+  string_experiment.go:137	0x100158f6c		aa0003e3		MOVD R0, R3
+  string_experiment.go:137	0x100158f70		aa0103e4		MOVD R1, R4
+  string_experiment.go:137	0x100158f74		aa0203e5		MOVD R2, R5
+  string_experiment.go:137	0x100158f78		f940b7e0		MOVD 360(RSP), R0
+  string_experiment.go:137	0x100158f7c		f940bbe1		MOVD 368(RSP), R1
+  string_experiment.go:137	0x100158f80		f9405be2		MOVD 176(RSP), R2
+  string_experiment.go:137	0x100158f84		97fdb527		CALL reflect.Value.Set(SB)
+  string_experiment.go:138	0x100158f88		aa1f03e0		MOVD ZR, R0
+  string_experiment.go:138	0x100158f8c		aa1f03e1		MOVD ZR, R1
+  string_experiment.go:138	0x100158f90		a97ffbfd		LDP -8(RSP), (R29, R30)
+  string_experiment.go:138	0x100158f94		910603ff		ADD $384, RSP, RSP
+  string_experiment.go:138	0x100158f98		d65f03c0		RET
+  string_experiment.go:135	0x100158f9c		aa0703e0		MOVD R7, R0
+  string_experiment.go:135	0x100158fa0		aa0803e1		MOVD R8, R1
+  string_experiment.go:135	0x100158fa4		97fc7d87		CALL runtime.panicSliceB(SB)
+  string_experiment.go:131	0x100158fa8		aa0603e0		MOVD R6, R0
+  string_experiment.go:131	0x100158fac		97fc7d6d		CALL runtime.panicIndex(SB)
+  decode.go:36			0x100158fb0		aa0c03e1		MOVD R12, R1
+  decode.go:36			0x100158fb4		aa0903e2		MOVD R9, R2
+  decode.go:36			0x100158fb8		97fc7d7a		CALL runtime.panicSliceAcap(SB)
+  decode_integer_record.go:11	0x100158fbc		910383e0		ADD $224, RSP, R0
+  decode_integer_record.go:11	0x100158fc0		97faed2c		CALL runtime.mapIterNext(SB)
+  decode_integer_record.go:11	0x100158fc4		f94067e1		MOVD 200(RSP), R1
+  decode_integer_record.go:12	0x100158fc8		aa0103e3		MOVD R1, R3
+  decode_integer_record.go:11	0x100158fcc		f94073e6		MOVD 224(RSP), R6
+  decode_integer_record.go:11	0x100158fd0		b4000546		CBZ R6, 42(PC)
+  decode_integer_record.go:11	0x100158fd4		f94077e6		MOVD 232(RSP), R6
+  decode_integer_record.go:11	0x100158fd8		f94000c6		MOVD (R6), R6
+  decode_integer_record.go:12	0x100158fdc		f9401467		MOVD 40(R3), R7
+  decode_integer_record.go:12	0x100158fe0		eb0600ff		CMP R6, R7
+  decode_integer_record.go:12	0x100158fe4		54000409		BLS 32(PC)
+  decode_integer_record.go:12	0x100158fe8		f9401067		MOVD 32(R3), R7
+  decode_integer_record.go:15	0x100158fec		f86678e6		MOVD (R7)(R6<<3), R6
+  decode_integer_record.go:16	0x100158ff0		b4fffe66		CBZ R6, -13(PC)
+  encode_pointer.go:66		0x100158ff4		394260c7		MOVBU 152(R6), R7
+  encode_pointer.go:66		0x100158ff8		360002c7		TBZ $0, R7, 22(PC)
+  encode_pointer.go:66		0x100158ffc		f94044c7		MOVD 136(R6), R7
+  encode_pointer.go:66		0x100159000		eb0300ff		CMP R3, R7
+  encode_pointer.go:66		0x100159004		54000261		BNE 19(PC)
+  encode_pointer.go:67		0x100159008		f94014c7		MOVD 40(R6), R7
+  encode_pointer.go:67		0x10015900c		f1001cff		CMP $7, R7
+  encode_pointer.go:67		0x100159010		54000201		BNE 16(PC)
+  encode_pointer.go:67		0x100159014		f94010c7		MOVD 32(R6), R7
+  encode_pointer.go:67		0x100159018		b94000e8		MOVWU (R7), R8
+  encode_pointer.go:67		0x10015901c		d28dcd29		MOVD $28265, R9
+  encode_pointer.go:67		0x100159020		f2acae89		MOVK $(25972<<16), R9
+  encode_pointer.go:67		0x100159024		6b09011f		CMPW R9, R8
+  encode_pointer.go:67		0x100159028		54000141		BNE 10(PC)
+  encode_pointer.go:67		0x10015902c		794008e8		MOVHU 4(R7), R8
+  encode_pointer.go:67		0x100159030		d28cace9		MOVD $25959, R9
+  encode_pointer.go:67		0x100159034		6b09011f		CMPW R9, R8
+  encode_pointer.go:67		0x100159038		540000c1		BNE 6(PC)
+  encode_pointer.go:67		0x10015903c		394018e7		MOVBU 6(R7), R7
+  encode_pointer.go:67		0x100159040		7101c8ff		CMPW $114, R7
+  encode_pointer.go:67		0x100159044		54000061		BNE 3(PC)
+  encode_pointer.go:67		0x100159048		3940e0c6		MOVBU 56(R6), R6
+  decode_integer_record.go:16	0x10015904c		3607fb86		TBZ $0, R6, -36(PC)
+  string_experiment.go:129	0x100159050		f94043e1		MOVD 128(RSP), R1
+  string_experiment.go:129	0x100159054		f940a7e6		MOVD 328(RSP), R6
+  string_experiment.go:115	0x100159058		f940d7e7		MOVD 424(RSP), R7
+  string_experiment.go:115	0x10015905c		aa1f03e0		MOVD ZR, R0
+  string_experiment.go:108	0x100159060		17ffff1a		JMP -230(PC)
+  string_experiment.go:129	0x100159064		f94043e1		MOVD 128(RSP), R1
+  string_experiment.go:129	0x100159068		f940a7e6		MOVD 328(RSP), R6
+  string_experiment.go:115	0x10015906c		f940d7e7		MOVD 424(RSP), R7
+  string_experiment.go:115	0x100159070		aa1f03e0		MOVD ZR, R0
+  string_experiment.go:108	0x100159074		17ffff15		JMP -235(PC)
+  string_experiment.go:129	0x100159078		f94043e1		MOVD 128(RSP), R1
+  string_experiment.go:129	0x10015907c		f940a7e6		MOVD 328(RSP), R6
+  string_experiment.go:115	0x100159080		f940d7e7		MOVD 424(RSP), R7
+  string_experiment.go:115	0x100159084		b24003e0		ORR $1, ZR, R0
+  string_experiment.go:108	0x100159088		17ffff10		JMP -240(PC)
+  string_experiment.go:107	0x10015908c		b4000046		CBZ R6, 2(PC)
+  string_experiment.go:107	0x100159090		97fc48e8		CALL runtime.panicunsafeslicelen(SB)
+  string_experiment.go:107	0x100159094		97fc490f		CALL runtime.panicunsafeslicenilptr(SB)
+  string_experiment.go:107	0x100159098		aa0003e6		MOVD R0, R6
+  string_experiment.go:107	0x10015909c		17fffffc		JMP -4(PC)
+  string_experiment.go:107	0x1001590a0		97fc48e4		CALL runtime.panicunsafeslicelen(SB)
+  type.go:1326			0x1001590a4		aa0403e0		MOVD R4, R0
+  type.go:1326			0x1001590a8		90000d81		ADRP 1769472(PC), R1
+  type.go:1326			0x1001590ac		91320021		ADD $3200, R1, R1
+  type.go:1326			0x1001590b0		f0000d22		ADRP 1732608(PC), R2
+  type.go:1326			0x1001590b4		91048042		ADD $288, R2, R2
+  type.go:1326			0x1001590b8		97fadc32		CALL runtime.panicdottypeI(SB)
+  type.go:1326			0x1001590bc		d503201f		NOOP
+  string_experiment.go:96	0x1001590c0		790013e0		MOVH R0, 8(RSP)
+  string_experiment.go:96	0x1001590c4		39002be1		MOVB R1, 10(RSP)
+  string_experiment.go:96	0x1001590c8		a9010fe2		STP (R2, R3), 16(RSP)
+  string_experiment.go:96	0x1001590cc		a90217e4		STP (R4, R5), 32(RSP)
+  string_experiment.go:96	0x1001590d0		a9031fe6		STP (R6, R7), 48(RSP)
+  string_experiment.go:96	0x1001590d4		a90427e8		STP (R8, R9), 64(RSP)
+  string_experiment.go:96	0x1001590d8		aa1e03e3		MOVD R30, R3
+  string_experiment.go:96	0x1001590dc		97fc73c9		CALL runtime.morestack_noctxt.abi0(SB)
+  string_experiment.go:96	0x1001590e0		794013e0		MOVHU 8(RSP), R0
+  string_experiment.go:96	0x1001590e4		39402be1		MOVBU 10(RSP), R1
+  string_experiment.go:96	0x1001590e8		a9410fe2		LDP 16(RSP), (R2, R3)
+  string_experiment.go:96	0x1001590ec		a94217e4		LDP 32(RSP), (R4, R5)
+  string_experiment.go:96	0x1001590f0		a9431fe6		LDP 48(RSP), (R6, R7)
+  string_experiment.go:96	0x1001590f4		a94427e8		LDP 64(RSP), (R8, R9)
+  string_experiment.go:96	0x1001590f8		17fffe4a		JMP github.com/cnooljaw/gosproto.experimentStringCandidate(SB)
+  string_experiment.go:96	0x1001590fc		00000000		?

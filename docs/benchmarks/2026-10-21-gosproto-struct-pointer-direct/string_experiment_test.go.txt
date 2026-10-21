@@ -1,0 +1,16 @@
+package sproto
+
+import "testing"
+
+// 验证三条读取路径均保持既有整数记录的ownership、GC、元信息回退和坏帧契约。
+func TestRecordScalarContracts(t *testing.T) {
+	defer ExperimentStringMode("baseline")
+	for _, mode := range []string{"baseline", "clone", "candidate"} {
+		ExperimentStringMode(mode)
+		t.Run(mode, func(t *testing.T) {
+			t.Run("ownership", TestIntegerRecordDecodeProofOwnership)
+			t.Run("metadata", TestIntegerRecordDecodeProofMetadata)
+			t.Run("wire", TestIntegerRecordDecodeProofWire)
+		})
+	}
+}
