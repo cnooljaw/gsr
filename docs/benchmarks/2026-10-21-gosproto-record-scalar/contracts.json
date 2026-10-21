@@ -1,0 +1,28 @@
+[
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "record_scalar_contract_test.go",
+      "record_scalar_external_contract_test.go"
+    ],
+    "seconds": 0.023131292313337326,
+    "exitCode": 0,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-gcflags=all=-d=checkptr=2",
+      "-run",
+      "^TestRecordScalar(External)?Contracts$",
+      "-timeout=2m",
+      "."
+    ],
+    "seconds": 3.6188118755817413,
+    "exitCode": 0,
+    "output": "ok  \tgithub.com/cnooljaw/gosproto\t1.741s\n"
+  }
+]
