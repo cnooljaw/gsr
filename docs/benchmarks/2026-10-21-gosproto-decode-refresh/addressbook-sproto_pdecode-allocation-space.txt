@@ -1,0 +1,47 @@
+File: body.test
+Type: alloc_space
+Time: 2026-10-21 10:05:33 CST
+Showing nodes accounting for 3977.42kB, 97.67% of 4072.12kB total
+Dropped 293 nodes (cum <= 20.36kB)
+Showing top 40 nodes out of 42
+      flat  flat%   sum%        cum   cum%
+  991.55kB 24.35% 24.35%  2433.80kB 59.77%  github.com/cnooljaw/gosproto.decodeMessage
+  947.97kB 23.28% 47.63%   947.97kB 23.28%  reflect.New
+  811.27kB 19.92% 67.55%   811.27kB 19.92%  github.com/cnooljaw/gosproto.UnpackWithLimit
+  405.63kB  9.96% 77.51%   630.98kB 15.50%  reflect.MakeSlice
+  270.42kB  6.64% 84.15%  2839.43kB 69.73%  github.com/cnooljaw/gosproto.DecodeWithLimits
+  225.35kB  5.53% 89.69%   225.35kB  5.53%  reflect.unsafe_NewArray
+  135.23kB  3.32% 93.01%   135.23kB  3.32%  gosprotobodystudy.representativeMessages.func2
+   46.62kB  1.14% 94.15%    46.62kB  1.14%  encoding/json.appendNewline (inline)
+      40kB  0.98% 95.14%    40.20kB  0.99%  os.readFileContents
+   36.62kB   0.9% 96.04%    36.62kB   0.9%  encoding/json.(*RawMessage).UnmarshalJSON
+   27.25kB  0.67% 96.70%    35.67kB  0.88%  encoding/json.typeFields
+      16kB  0.39% 97.10%   112.46kB  2.76%  encoding/json.MarshalIndent
+      12kB  0.29% 97.39%  4047.34kB 99.39%  gosprotobodystudy.BenchmarkBodyCost
+       8kB   0.2% 97.59%    49.57kB  1.22%  encoding/json.Marshal
+    1.08kB 0.026% 97.62%    34.11kB  0.84%  encoding/json.typeEncoder
+    0.85kB 0.021% 97.64%    50.34kB  1.24%  gosprotobodystudy.representativeOperations
+    0.48kB 0.012% 97.65%    52.55kB  1.29%  encoding/json.(*decodeState).object
+    0.38kB 0.0092% 97.66%    36.42kB  0.89%  encoding/json.cachedTypeFields
+    0.28kB 0.0069% 97.66%       54kB  1.33%  encoding/json.Unmarshal
+    0.28kB 0.0069% 97.67%    31.42kB  0.77%  encoding/json.newStructEncoder (inline)
+    0.12kB 0.0031% 97.67%  4051.83kB 99.50%  testing.(*B).runN
+    0.02kB 0.00058% 97.67%    87.05kB  2.14%  gosprotobodystudy.representativeCases
+         0     0% 97.67%    46.71kB  1.15%  encoding/json.(*decodeState).array
+         0     0% 97.67%    53.48kB  1.31%  encoding/json.(*decodeState).unmarshal
+         0     0% 97.67%    53.48kB  1.31%  encoding/json.(*decodeState).value
+         0     0% 97.67%    41.33kB  1.01%  encoding/json.(*encodeState).marshal
+         0     0% 97.67%    41.33kB  1.01%  encoding/json.(*encodeState).reflectValue
+         0     0% 97.67%    46.89kB  1.15%  encoding/json.appendIndent
+         0     0% 97.67%    33.25kB  0.82%  encoding/json.newTypeEncoder
+         0     0% 97.67%    25.33kB  0.62%  encoding/json.valueEncoder
+         0     0% 97.67%  2839.43kB 69.73%  github.com/cnooljaw/gosproto.Decode (inline)
+         0     0% 97.67%  3650.06kB 89.64%  github.com/cnooljaw/gosproto.DecodePacked
+         0     0% 97.67%   811.27kB 19.92%  github.com/cnooljaw/gosproto.Unpack (inline)
+         0     0% 97.67%  2433.80kB 59.77%  github.com/cnooljaw/gosproto.decodeStructSlice
+         0     0% 97.67%    35.15kB  0.86%  google.golang.org/protobuf/encoding/protojson.Unmarshal (inline)
+         0     0% 97.67%    35.15kB  0.86%  google.golang.org/protobuf/encoding/protojson.UnmarshalOptions.Unmarshal (inline)
+         0     0% 97.67%    35.15kB  0.86%  google.golang.org/protobuf/encoding/protojson.UnmarshalOptions.unmarshal
+         0     0% 97.67%    34.99kB  0.86%  google.golang.org/protobuf/encoding/protojson.decoder.unmarshalMessage
+         0     0% 97.67%  3785.25kB 92.96%  gosprotobodystudy.representativeOperations.func8
+         0     0% 97.67%    40.33kB  0.99%  os.ReadFile

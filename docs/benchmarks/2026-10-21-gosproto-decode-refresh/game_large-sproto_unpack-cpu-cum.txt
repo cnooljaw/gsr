@@ -1,0 +1,33 @@
+File: body.test
+Type: cpu
+Time: 2026-10-21 10:05:41 CST
+Duration: 2.65s, Total samples = 2.29s (86.52%)
+Showing nodes accounting for 2.24s, 97.82% of 2.29s total
+Dropped 23 nodes (cum <= 0.01s)
+      flat  flat%   sum%        cum   cum%
+         0     0%     0%      1.22s 53.28%  github.com/cnooljaw/gosproto.Unpack (inline)
+     1.08s 47.16% 47.16%      1.22s 53.28%  github.com/cnooljaw/gosproto.UnpackWithLimit
+         0     0% 47.16%      1.22s 53.28%  gosprotobodystudy.BenchmarkBodyCost
+         0     0% 47.16%      1.22s 53.28%  gosprotobodystudy.representativeOperations.func6
+         0     0% 47.16%      1.22s 53.28%  testing.(*B).run1.func1
+         0     0% 47.16%      1.22s 53.28%  testing.(*B).runN
+         0     0% 47.16%      1.11s 48.47%  runtime.systemstack
+     1.01s 44.10% 91.27%      1.01s 44.10%  runtime.kevent
+         0     0% 91.27%      1.01s 44.10%  runtime.netpoll
+         0     0% 91.27%      1.01s 44.10%  runtime.startTheWorldWithSema
+         0     0% 91.27%      0.51s 22.27%  runtime.gcStart.func4
+         0     0% 91.27%      0.50s 21.83%  runtime.gcMarkTermination.func3
+     0.08s  3.49% 94.76%      0.08s  3.49%  math/bits.OnesCount8 (inline)
+     0.05s  2.18% 96.94%      0.05s  2.18%  runtime.madvise
+         0     0% 96.94%      0.05s  2.18%  runtime.makeslice
+         0     0% 96.94%      0.05s  2.18%  runtime.mallocgc
+         0     0% 96.94%      0.04s  1.75%  runtime.(*mheap).alloc.func1
+         0     0% 96.94%      0.04s  1.75%  runtime.(*mheap).allocSpan
+         0     0% 96.94%      0.04s  1.75%  runtime.deductAssistCredit
+         0     0% 96.94%      0.04s  1.75%  runtime.gcAssistAlloc
+         0     0% 96.94%      0.04s  1.75%  runtime.gcAssistAlloc.func2
+         0     0% 96.94%      0.04s  1.75%  runtime.gcAssistAlloc1
+         0     0% 96.94%      0.04s  1.75%  runtime.gcDrainN
+         0     0% 96.94%      0.04s  1.75%  runtime.sysUsed (inline)
+         0     0% 96.94%      0.04s  1.75%  runtime.sysUsedOS (inline)
+     0.02s  0.87% 97.82%      0.03s  1.31%  runtime.scanobject
