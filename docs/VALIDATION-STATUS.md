@@ -910,3 +910,5 @@ TestRuntimePacedMultiServiceLoad 已补 8 个真实 Service 共享文件 Logger 
 2026-10-21：[Decode多批校准验证](benchmarks/2026-10-21-gosproto-decode-multibatch-calibration/RESULTS.md)以7批基线中位+3批pilot预定规则完成8进程768正式块、80校准批次。独立复算所有决策通过，正式块最短46.182ms/中位59.130ms，低于40ms为0；实际调整分支未触发，限制明示。Decode候选中位−0.30%/−0.36%但累计反向，PDecode+1.88%/−0.63%，控制波动仍在，保留候选但不落地。仅隔离harness方法验证，生产9048cfa、依赖及七项删除不变；前轮9ce5601已提交未推送，新报告留审查。
 
 2026-10-21：[Decode字段查找无符号范围](benchmarks/2026-10-21-gosproto-decode-lookup-range/RESULTS.md)完成16进程1536块/30条流程。新增dense空洞/负tag map回退/Fields变nil对照，原parser错误预算差分及race/checkptr通过；负数位检查消失但符号指令仍388。大型Decode中位+0.15%/−0.93%，PDecode+0.77%/+0.19%，组合收益未确认，保留局部信号但不应用。多批校准160批独立复算，全部正式块≥44.595ms；控制和长尾不扣减。前轮c532ad1已提交未推送，新报告留审查；生产9048cfa、依赖及七项删除不变。
+
+2026-10-21：[整数叶子局部深度检查](benchmarks/2026-10-21-gosproto-decode-leaf-depth/RESULTS.md)完成16进程1536块/30条流程，保留同位置depth+1检查但省共享depth写回/defer，私有叶子不递归且budget.add不读depth。扩展初始深度至边界的错误/预算状态差分和race/checkptr通过；符号388→292、栈176→128B，但大型Decode中位+5.63%/−1.71%，PDecode−0.79%/+1.61%，累计均慢，未应用。169校准批独立重算通过，正式152块低于40ms但无块低于20ms，限制与全部控制保留。前轮41b4769已提交未推送；生产9048cfa、依赖及七项删除不变，新报告留审查。
