@@ -1,0 +1,37 @@
+package sproto
+
+import (
+	"bytes"
+	"testing"
+)
+
+var headerSink []byte
+
+// 每种 mask、尾长及 FF 长度边界都必须保持 wire、输入快照和重叠写入结果。
+func TestGatherEquivalence(t *testing.T) {
+	for mask := 0; mask < 256; mask++ {
+		for _, n := range []int{0, 1, 7, 8, 9, 15, 16, 31, 255, 256, 2047, 2048, 2049, 4096} {
+			src := make([]byte, n)
+			for i := range src {
+				if mask&(1<<uint(i&7)) != 0 {
+					src[i] = byte(i%255 + 1)
+				}
+			}
+			snapshot := append([]byte(nil), src...)
+			want := Pack(src)
+			got := packGatherCandidate(make([]byte, packedBufferSize(n)), src)
+			if !bytes.Equal(got, want) || !bytes.Equal(src, snapshot) {
+				t.Fatalf("mask=%d n=%d", mask, n)
+			}
+			// 与 EncodePacked 相同，源位于输出预留区域的后端。
+			reserve := packedBufferSize(n)
+			buf := make([]byte, reserve)
+			start := reserve - n
+			copy(buf[start:], src)
+			got = packGatherCandidate(buf, buf[start:])
+			if !bytes.Equal(got, want) {
+				t.Fatalf("overlap mask=%d n=%d", mask, n)
+			}
+		}
+	}
+}
