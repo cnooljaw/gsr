@@ -1,0 +1,21 @@
+package sproto_test
+
+import (
+	sp "github.com/cnooljaw/gosproto"
+	"testing"
+)
+
+// 验证三条编码路径均保持当前值、schema演化、字段描述替换和资源预算契约。
+func TestLayoutSegmentsExternalContracts(t *testing.T) {
+	defer sp.ExperimentStringMode("baseline")
+	for _, mode := range []string{"baseline", "clone", "candidate"} {
+		sp.ExperimentStringMode(mode)
+		t.Run(mode, func(t *testing.T) {
+			t.Run("currentValues", TestEncodeTracksCurrentValues)
+			t.Run("budgets", TestCodecBudgetBoundaries)
+			t.Run("schema", TestSchemaEvolution)
+			t.Run("integerRecords", TestIntegerRecordArrayBudgetsAndTags)
+			t.Run("replacement", TestDecodeIntegerRecordFieldsReplacement)
+		})
+	}
+}

@@ -137,3 +137,5 @@ TS为2026-10-15第五轮历史基线，Go为[2026-10-20 当前 a93bb0d 新五轮
 2026-10-21：[整数叶子局部深度检查](benchmarks/2026-10-21-gosproto-decode-leaf-depth/RESULTS.md)完成16进程1536块/30条流程，保留同位置depth+1检查但省共享depth写回/defer，私有叶子不递归且budget.add不读depth。扩展初始深度至边界的错误/预算状态差分和race/checkptr通过；符号388→292、栈176→128B，但大型Decode中位+5.63%/−1.71%，PDecode−0.79%/+1.61%，累计均慢，未应用。169校准批独立重算通过，正式152块低于40ms但无块低于20ms，限制与全部控制保留。前轮41b4769已提交未推送；生产9048cfa、依赖及七项删除不变，新报告留审查。
 
 2026-10-21：[正式Body四入口热点复核](benchmarks/2026-10-21-gosproto-body-refresh/RESULTS.md)基于9048cfa采集24份CPU/分配profile，104条主流程+6条源码导出通过。大型Encode仍以整数记录预检/写出为业务热点；Decode分配对象视图中记录字段/reflect.New为57.21%/38.48%，保持独立所有权约束；数组组合仍受Pack/Unpack影响。正常分配未回退，kevent完整分母20.40%～78.92%保留，不把profile百分比变化当提速。下一轮先审查Encode布局产生/消费实际重复工作，不再无依据叠加header/tag/depth微改写。前轮ef7a471已提交未推送，本轮无生产改动，新诊断留审查，依赖和七项删除保持。
+
+2026-10-21：[整数叶子布局最终追加](benchmarks/2026-10-21-gosproto-layout-final-append/RESULTS.md)完成包含预检的静态调用树24进程2304块/40条流程，三模式wire/cap/预算失败/race/checkptr与正常分配parity通过。无子布局叶子改为成功后追加最终header，nil追加0，失败私有占位可更少；成功顺序/容量/预算不变。7项和prefix31 PEncode双遍改善，但大型Encode+0.86%/+0.79%、PEncode+4.28%/+7.88%，不采用，正面小收益保留。三个校准进程触顶65536未达40ms，全部块≥30.405ms，限制明示。前轮d6fc2e8已提交未推送，生产9048cfa/依赖/七项删除保持，新报告留审查。
