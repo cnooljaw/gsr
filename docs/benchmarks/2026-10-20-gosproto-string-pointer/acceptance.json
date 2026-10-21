@@ -1,0 +1,173 @@
+[
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "decode_string_pointer_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-pointer-accept-20261020/baseline",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.014794791117310524,
+    "output": ""
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "decode.go",
+      "decode_pointer.go",
+      "meta.go",
+      "fuzz_test.go",
+      "decode_string_pointer_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-pointer-accept-20261020/candidate",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.0035244170576334,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-run",
+      "^TestStringPointerOwnership$",
+      "-timeout=30s",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-pointer-accept-20261020/baseline",
+    "env": {
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 1.4887689165771008,
+    "output": "ok  \tgithub.com/cnooljaw/gosproto\t0.566s\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "./...",
+      "-timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-pointer-accept-20261020/candidate",
+    "env": {
+      "SPROTO_ORACLE_DIR": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-payload/oracle",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 1.7720800414681435,
+    "output": "ok  \tgithub.com/cnooljaw/gosproto\t1.267s\n?   \tgithub.com/cnooljaw/gosproto/examples/echo\t[no test files]\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-gcflags=all=-d=checkptr=2",
+      "./...",
+      "-timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-pointer-accept-20261020/candidate",
+    "env": {
+      "SPROTO_ORACLE_DIR": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-payload/oracle",
+      "GOPROXY": "off",
+      "GOMAXPROCS": "2"
+    },
+    "exitCode": 0,
+    "seconds": 3.8792887926101685,
+    "output": "ok  \tgithub.com/cnooljaw/gosproto\t2.666s\n?   \tgithub.com/cnooljaw/gosproto/examples/echo\t[no test files]\n"
+  },
+  {
+    "args": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-pointer-accept-20261020/candidate",
+    "env": {
+      "SPROTO_ORACLE_DIR": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-payload/oracle",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 0.2633755002170801,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-run",
+      "^$",
+      "-fuzz",
+      "^FuzzCodecRoundTrip$",
+      "-fuzztime=10s",
+      "-parallel=2",
+      ".",
+      "-timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-pointer-accept-20261020/candidate",
+    "env": {
+      "GOPROXY": "off",
+      "GOMAXPROCS": "2"
+    },
+    "exitCode": 0,
+    "seconds": 11.391377583146095,
+    "output": "fuzz: elapsed: 0s, gathering baseline coverage: 0/47 completed\nfuzz: elapsed: 0s, gathering baseline coverage: 47/47 completed, now fuzzing with 2 workers\nfuzz: elapsed: 3s, execs: 132523 (44145/sec), new interesting: 12 (total: 59)\nfuzz: elapsed: 6s, execs: 279944 (49161/sec), new interesting: 14 (total: 61)\nfuzz: elapsed: 9s, execs: 434764 (51618/sec), new interesting: 18 (total: 65)\nfuzz: elapsed: 10s, execs: 477124 (36458/sec), new interesting: 18 (total: 65)\nPASS\nok  \tgithub.com/cnooljaw/gosproto\t10.501s\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-run",
+      "^$",
+      "-fuzz",
+      "^FuzzDecode$",
+      "-fuzztime=10s",
+      "-parallel=2",
+      ".",
+      "-timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-pointer-accept-20261020/candidate",
+    "env": {
+      "GOPROXY": "off",
+      "GOMAXPROCS": "2"
+    },
+    "exitCode": 0,
+    "seconds": 11.445432916283607,
+    "output": "fuzz: elapsed: 0s, gathering baseline coverage: 0/67 completed\nfuzz: elapsed: 0s, gathering baseline coverage: 67/67 completed, now fuzzing with 2 workers\nfuzz: elapsed: 3s, execs: 10968 (3655/sec), new interesting: 0 (total: 67)\nfuzz: elapsed: 6s, execs: 10968 (0/sec), new interesting: 0 (total: 67)\nfuzz: elapsed: 9s, execs: 10968 (0/sec), new interesting: 0 (total: 67)\nfuzz: elapsed: 11s, execs: 10968 (0/sec), new interesting: 0 (total: 67)\nPASS\nok  \tgithub.com/cnooljaw/gosproto\t11.216s\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-modfile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-pointer-accept-20261020/integration.mod",
+      "./protocol/sproto",
+      "./examples/websocket-gate/cmd/debugserver",
+      "./examples/websocket-gate/benchmarks",
+      "-timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 1.5169501658529043,
+    "output": "ok  \tgithub.com/cnooljaw/gsr/protocol/sproto\t0.327s\nok  \tgithub.com/cnooljaw/gsr/examples/websocket-gate/cmd/debugserver\t0.819s\nok  \tgithub.com/cnooljaw/gsr/examples/websocket-gate/benchmarks\t0.495s\n"
+  },
+  {
+    "args": [
+      "npm",
+      "--prefix",
+      "examples/websocket-gate",
+      "run",
+      "test:sproto:integration"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {
+      "GOFLAGS": "-modfile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-string-pointer-accept-20261020/integration.mod"
+    },
+    "exitCode": 0,
+    "seconds": 2.351284084841609,
+    "output": "\n> test:sproto:integration\n> npm run build && go build -o ../../tmp/sproto-echo ./cmd/debugserver && GSR_SPROTO_SERVER_BIN=../../tmp/sproto-echo node --test client/dist/sproto_client.test.js\n\n\n> build\n> tsc --project tsconfig.json\n\n\u2714 official Sproto vectors and safe integer boundary (1.693459ms)\n\u2714 official Sproto boolean and mixed signed int64 arrays (121.023417ms)\n\u2714 Sproto decoded results and unpacked buffers stay independent (3.935375ms)\n\u2714 Sproto sessions stay independent and close clears pending (1.114416ms)\n\u2714 Sproto pending and packet limits (65.903875ms)\n\u2714 Go/TS Sproto Echo Plain (384.62925ms)\n\u2714 Go/TS Sproto Echo MAC (23.691917ms)\n\u2139 tests 7\n\u2139 suites 0\n\u2139 pass 7\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 650.980917\n"
+  }
+]

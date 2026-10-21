@@ -1,0 +1,7 @@
+// setString只在本次临时结果类型及字段原始布局仍匹配时写入，外来描述保持反射索引语义。
+func (pointer decodePointer) setString(schema *SprotoType, field *SprotoField, value *string) bool {
+ if pointer.value==nil || !field.nativeStringPointer || field.encOwner!=schema || field.Wire!=WireBytesName || field.Array {return false}
+ // 类型化Go指针赋值保留写屏障，字符串仍由调用点复制，不借用输入缓冲。
+ *(**string)(unsafe.Add(pointer.value,field.encOffset))=value
+ return true
+}
