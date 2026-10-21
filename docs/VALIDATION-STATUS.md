@@ -898,3 +898,5 @@ TestRuntimePacedMultiServiceLoad 已补 8 个真实 Service 共享文件 Logger 
 2026-10-21：[Pack 位图候选实际摆放轮换](benchmarks/2026-10-21-gosproto-pack-gather-rotation/RESULTS.md)确认三函数在0/1184/2368偏移轮换，48进程4608块、三布局正确性/race/checkptr/fixture/vet通过。整数数组Pack六次中位五次改善，PEncode中位/累计各三次改善；大型PEncode方向随布局变化，尚未形成稳定组合收益。保留候选源码但不应用，全部控制/长尾及大型Pack累计−40.38%保留并解释，不扣控制或设收益门槛。前轮67df7a1已提交未推送，新报告留审查；生产代码、v0.4.0依赖及七项无关删除不变。
 
 2026-10-21：[Pack 四次双字节写出](benchmarks/2026-10-21-gosproto-pack-pair-store/RESULTS.md)完成32进程3072块及3584组 wire/共享缓冲/race/checkptr。八次 byte store 合并为四次 PutUint16 后指令296→332；大型Pack两遍 +44.26%/+45.18%，整数数组Pack +41.20%/+40.98%，PEncode亦明显退化，八项中位/累计均退化，候选不应用。全部控制和长尾保留，不作逐指令成本归因；原位图候选仍独立保留。前轮5603f75已提交未推送，新报告留审查，生产代码、正式依赖和七项无关删除不变；下一轮回Body实际热点。
+
+2026-10-21：[整数记录 inline 直接继续](benchmarks/2026-10-21-gosproto-record-inline-flow/RESULTS.md)保留局部控制流简化，记录写出指令196→188。7项记录Encode两遍−1.92%/−2.57%，prefix31为−2.63%/−1.89%；大型Encode小幅改善，大型PEncode中位改善但累计+1.58%/+2.04%，反向全部保留。40进程3840块/60条实验流程与8条正常入口验收通过，官方oracle/race/checkptr/vet、两项fuzz及GoTS7/7；Decode fuzz156066次后停增并正常退出。前轮39f1d53已提交未推送；独立库源码/CHANGES已提交9048cfa，报告随本次提交归档，均未推送；正式依赖与七项删除保持。
