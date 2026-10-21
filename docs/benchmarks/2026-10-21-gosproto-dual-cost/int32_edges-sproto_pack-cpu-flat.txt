@@ -1,0 +1,47 @@
+File: body.test
+Type: cpu
+Time: 2026-10-21 10:36:21 CST
+Duration: 2.26s, Total samples = 2s (88.54%)
+Showing nodes accounting for 2s, 100% of 2s total
+Showing top 40 nodes out of 83
+      flat  flat%   sum%        cum   cum%
+     1.24s 62.00% 62.00%      1.24s 62.00%  runtime.kevent
+     0.49s 24.50% 86.50%      0.49s 24.50%  github.com/cnooljaw/gosproto.packInto
+     0.06s  3.00% 89.50%      0.12s  6.00%  runtime.scanobject
+     0.03s  1.50% 91.00%      0.04s  2.00%  runtime.typePointers.next
+     0.02s  1.00% 92.00%      0.02s  1.00%  runtime.memclrNoHeapPointers
+     0.02s  1.00% 93.00%      0.02s  1.00%  runtime.pageIndexOf (inline)
+     0.01s   0.5% 93.50%      0.01s   0.5%  internal/runtime/atomic.(*Uint32).Add (inline)
+     0.01s   0.5% 94.00%      0.01s   0.5%  internal/runtime/atomic.(*Uint64).Add (inline)
+     0.01s   0.5% 94.50%      0.01s   0.5%  runtime.(*gcControllerState).memoryLimitHeapGoal
+     0.01s   0.5% 95.00%      0.01s   0.5%  runtime.(*lfstack).pop (inline)
+     0.01s   0.5% 95.50%      0.01s   0.5%  runtime.(*moduledata).textAddr
+     0.01s   0.5% 96.00%      0.01s   0.5%  runtime.(*pallocBits).summarize
+     0.01s   0.5% 96.50%      0.01s   0.5%  runtime.acquirem (inline)
+     0.01s   0.5% 97.00%      0.01s   0.5%  runtime.findObject
+     0.01s   0.5% 97.50%      0.01s   0.5%  runtime.greyobject
+     0.01s   0.5% 98.00%      0.01s   0.5%  runtime.madvise
+     0.01s   0.5% 98.50%      0.03s  1.50%  runtime.pcvalue
+     0.01s   0.5% 99.00%      0.01s   0.5%  runtime.scanblock
+     0.01s   0.5% 99.50%      0.01s   0.5%  runtime.typePointers.nextFast (inline)
+     0.01s   0.5%   100%      0.01s   0.5%  runtime.walltime
+         0     0%   100%      0.74s 37.00%  github.com/cnooljaw/gosproto.Pack (inline)
+         0     0%   100%      0.74s 37.00%  gosprotobodystudy.BenchmarkBodyCost
+         0     0%   100%      0.74s 37.00%  gosprotobodystudy.representativeOperations.func5
+         0     0%   100%      0.01s   0.5%  runtime.(*gcControllerState).heapGoalInternal
+         0     0%   100%      0.01s   0.5%  runtime.(*gcControllerState).trigger
+         0     0%   100%      0.01s   0.5%  runtime.(*gcControllerState).update
+         0     0%   100%      0.01s   0.5%  runtime.(*inlineUnwinder).resolveInternal (inline)
+         0     0%   100%      0.06s  3.00%  runtime.(*mcache).nextFree
+         0     0%   100%      0.06s  3.00%  runtime.(*mcache).refill
+         0     0%   100%      0.05s  2.50%  runtime.(*mcentral).cacheSpan
+         0     0%   100%      0.01s   0.5%  runtime.(*mheap).alloc.func1
+         0     0%   100%      0.01s   0.5%  runtime.(*mheap).allocSpan
+         0     0%   100%      0.03s  1.50%  runtime.(*mheap).freeSpan (inline)
+         0     0%   100%      0.03s  1.50%  runtime.(*mheap).freeSpanLocked
+         0     0%   100%      0.01s   0.5%  runtime.(*pageAlloc).free
+         0     0%   100%      0.01s   0.5%  runtime.(*pageAlloc).update
+         0     0%   100%      0.01s   0.5%  runtime.(*spanSet).pop
+         0     0%   100%      0.01s   0.5%  runtime.(*spanSet).push
+         0     0%   100%      0.01s   0.5%  runtime.(*spanSetBlockAlloc).alloc
+         0     0%   100%      0.02s  1.00%  runtime.(*stkframe).getStackMap

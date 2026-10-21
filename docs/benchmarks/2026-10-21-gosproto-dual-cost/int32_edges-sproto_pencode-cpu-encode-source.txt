@@ -1,0 +1,153 @@
+Total: 2.28s
+ROUTINE ======================== github.com/cnooljaw/gosproto.encodeFieldInto in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-dual-cost-20261021/gosproto/encode.go
+         0      200ms (flat, cum)  8.77% of Total
+         .          .    182:func encodeFieldInto(field *SprotoField, value reflect.Value, output []byte, layout *encodeLayout, trusted bool) int {
+         .          .    183:	if field.Array {
+         .          .    184:		if value.Len() == 0 {
+         .          .    185:			return 0
+         .          .    186:		}
+         .          .    187:		offset := 0
+         .          .    188:		switch field.Wire {
+         .          .    189:		case WireVarintName:
+         .          .    190:			width := layout.next()
+         .          .    191:			if field.int64Slice {
+         .      200ms    192:				return encodeInt64Slice(*value.Addr().Interface().(*[]int64), width, output)
+         .          .    193:			}
+         .          .    194:			output[0] = byte(width)
+         .          .    195:			for index := 0; index < value.Len(); index++ {
+         .          .    196:				number := integerBits(field, value.Index(index))
+         .          .    197:				if width == 4 {
+ROUTINE ======================== github.com/cnooljaw/gosproto.encodeMessageInto in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-dual-cost-20261021/gosproto/encode.go
+      10ms      220ms (flat, cum)  9.65% of Total
+         .          .    124:func encodeMessageInto(schema *SprotoType, value reflect.Value, output []byte, layout *encodeLayout, binding encodeBinding) int {
+         .          .    125:	count := layout.next()
+         .          .    126:	writeUint16(output, uint16(count))
+         .          .    127:	if value.IsNil() {
+         .          .    128:		return 2
+         .          .    129:	}
+         .          .    130:	record := value.Elem()
+         .          .    131:	pointer := messageEncodePointer(value, binding)
+         .          .    132:	headerOffset, bodyOffset, previous := 2, 2+count*2, -1
+      10ms       10ms    133:	for _, index := range schema.order {
+         .          .    134:		field := schema.Fields[index]
+         .          .    135:		if field.Tag < 0 {
+         .          .    136:			continue
+         .          .    137:		}
+         .          .    138:		native := binding.native && field.nativeInteger(schema)
+         .          .    139:		var current reflect.Value
+         .          .    140:		var bits uint64
+         .          .    141:		if native {
+         .          .    142:			var present bool
+         .          .    143:			bits, present = pointer.integer(field.encOffset)
+         .          .    144:			if !present {
+         .          .    145:				continue
+         .          .    146:			}
+         .          .    147:		} else {
+         .       10ms    148:			current = record.Field(field.index[0])
+         .          .    149:			if omittedField(field, current) {
+         .          .    150:				continue
+         .          .    151:			}
+         .          .    152:		}
+         .          .    153:		if skip := skipTag(previous, field.Tag); skip > 0 {
+         .          .    154:			writeUint16(output[headerOffset:], skip)
+         .          .    155:			headerOffset += 2
+         .          .    156:		}
+         .          .    157:		var header uint16
+         .          .    158:		var length int
+         .          .    159:		if native {
+         .          .    160:			// 内联整数只占头部，非内联时才构造内容区切片。
+         .          .    161:			if bits <= MaxEmbeddedInt {
+         .          .    162:				header = uint16((bits + 1) * 2)
+         .          .    163:			} else {
+         .          .    164:				header, length = encodeIntegerInto(bits, output[bodyOffset:])
+         .          .    165:			}
+         .          .    166:		} else if field.Array || field.Wire == WireStructName {
+         .      200ms    167:			length = encodeFieldInto(field, current, output[bodyOffset+4:], layout, binding.exact && field.encOwner == schema && field.Array != field.pointer)
+         .          .    168:		} else {
+         .          .    169:			header, length = encodeScalarInto(field, current, output[bodyOffset:])
+         .          .    170:		}
+         .          .    171:		writeUint16(output[headerOffset:], header)
+         .          .    172:		headerOffset += 2
+ROUTINE ======================== github.com/cnooljaw/gosproto.encodedSize in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-dual-cost-20261021/gosproto/limits.go
+         0       60ms (flat, cum)  2.63% of Total
+         .          .    115:func encodedSize(schema *SprotoType, value reflect.Value, budget *decodeBudget, depth int, layout *encodeLayout, binding encodeBinding) (int, error) {
+         .          .    116:	if depth > budget.limits.MaxDepth {
+         .          .    117:		return 0, ErrLimit
+         .          .    118:	}
+         .          .    119:	size, lastTag := 2, -1
+         .          .    120:	if size > budget.limits.MaxBytes {
+         .          .    121:		return 0, ErrLimit
+         .          .    122:	}
+         .          .    123:	layoutIndex := layout.add(0)
+         .          .    124:	if value.IsNil() {
+         .          .    125:		return size, nil
+         .          .    126:	}
+         .          .    127:	record := value.Elem()
+         .          .    128:	pointer := messageEncodePointer(value, binding)
+         .          .    129:	headerCount := 0
+         .          .    130:	for _, index := range schema.order {
+         .          .    131:		field := schema.Fields[index]
+         .          .    132:		if field.Tag < 0 {
+         .          .    133:			continue
+         .          .    134:		}
+         .          .    135:		native := binding.native && field.nativeInteger(schema)
+         .          .    136:		var current reflect.Value
+         .          .    137:		var bits uint64
+         .          .    138:		if native {
+         .          .    139:			var present bool
+         .          .    140:			bits, present = pointer.integer(field.encOffset)
+         .          .    141:			if !present {
+         .          .    142:				continue
+         .          .    143:			}
+         .          .    144:		} else {
+         .          .    145:			current = record.Field(field.index[0])
+         .          .    146:			if omittedField(field, current) {
+         .          .    147:				continue
+         .          .    148:			}
+         .          .    149:		}
+         .          .    150:		if err := budget.add(1); err != nil {
+         .          .    151:			return 0, err
+         .          .    152:		}
+         .          .    153:		gap := field.Tag - lastTag - 1
+         .          .    154:		if gap > 32768 {
+         .          .    155:			return 0, fmt.Errorf("%w: tag gap", ErrEncode)
+         .          .    156:		}
+         .          .    157:		if gap > 0 {
+         .          .    158:			size += 2
+         .          .    159:			headerCount++
+         .          .    160:		}
+         .          .    161:		size += 2
+         .          .    162:		headerCount++
+         .          .    163:		lastTag = field.Tag
+         .          .    164:		var part int
+         .          .    165:		var inline bool
+         .          .    166:		var err error
+         .          .    167:		if native {
+         .          .    168:			part, inline = signedSize(bits)
+         .          .    169:		} else {
+         .       60ms    170:			part, inline, err = fieldSize(field, current, budget, depth, layout, binding.exact && field.encOwner == schema && field.Array != field.pointer)
+         .          .    171:		}
+         .          .    172:		if err != nil {
+         .          .    173:			return 0, err
+         .          .    174:		}
+         .          .    175:		if !inline {
+ROUTINE ======================== github.com/cnooljaw/gosproto.fieldSize in /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-dual-cost-20261021/gosproto/limits.go
+      60ms       60ms (flat, cum)  2.63% of Total
+         .          .    186:func fieldSize(field *SprotoField, value reflect.Value, budget *decodeBudget, depth int, layout *encodeLayout, trusted bool) (int, bool, error) {
+         .          .    187:	if field.Array {
+         .          .    188:		if err := budget.add(value.Len()); err != nil {
+         .          .    189:			return 0, false, err
+         .          .    190:		}
+         .          .    191:		size := 0
+         .          .    192:		switch field.Wire {
+         .          .    193:		case WireVarintName:
+         .          .    194:			if field.int64Slice {
+         .          .    195:				values := *value.Addr().Interface().(*[]int64)
+         .          .    196:				width := 4
+      50ms       50ms    197:				for _, number := range values {
+      10ms       10ms    198:					if number < MinInt32 || number > MaxInt32 {
+         .          .    199:						width = 8
+         .          .    200:						break
+         .          .    201:					}
+         .          .    202:				}
+         .          .    203:				if len(values) > 0 {

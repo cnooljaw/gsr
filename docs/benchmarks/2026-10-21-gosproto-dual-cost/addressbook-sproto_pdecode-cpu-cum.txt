@@ -1,0 +1,48 @@
+File: body.test
+Type: cpu
+Time: 2026-10-21 10:35:49 CST
+Duration: 2.46s, Total samples = 2.18s (88.79%)
+Showing nodes accounting for 1.62s, 74.31% of 2.18s total
+Dropped 36 nodes (cum <= 0.01s)
+Showing top 40 nodes out of 78
+      flat  flat%   sum%        cum   cum%
+         0     0%     0%      1.41s 64.68%  gosprotobodystudy.BenchmarkBodyCost
+         0     0%     0%      1.41s 64.68%  gosprotobodystudy.representativeOperations.func8
+         0     0%     0%      1.41s 64.68%  testing.(*B).run1.func1
+         0     0%     0%      1.41s 64.68%  testing.(*B).runN
+         0     0%     0%      1.37s 62.84%  github.com/cnooljaw/gosproto.DecodePacked
+         0     0%     0%      1.19s 54.59%  github.com/cnooljaw/gosproto.Decode (inline)
+     0.01s  0.46%  0.46%      1.19s 54.59%  github.com/cnooljaw/gosproto.DecodeWithLimits
+     0.15s  6.88%  7.34%      1.04s 47.71%  github.com/cnooljaw/gosproto.decodeMessage
+     0.07s  3.21% 10.55%      1.03s 47.25%  github.com/cnooljaw/gosproto.decodeStructSlice
+         0     0% 10.55%      0.84s 38.53%  runtime.systemstack
+     0.72s 33.03% 43.58%      0.72s 33.03%  runtime.kevent
+         0     0% 43.58%      0.72s 33.03%  runtime.netpoll
+         0     0% 43.58%      0.72s 33.03%  runtime.startTheWorldWithSema
+     0.07s  3.21% 46.79%      0.66s 30.28%  runtime.mallocgc
+         0     0% 46.79%      0.50s 22.94%  runtime.gcStart.func4
+     0.11s  5.05% 51.83%      0.35s 16.06%  runtime.mallocgcSmallScanNoHeader
+     0.01s  0.46% 52.29%      0.32s 14.68%  runtime.newobject
+         0     0% 52.29%      0.22s 10.09%  runtime.gcMarkTermination.func3
+     0.04s  1.83% 54.13%      0.19s  8.72%  reflect.MakeSlice
+     0.01s  0.46% 54.59%      0.19s  8.72%  reflect.New
+         0     0% 54.59%      0.18s  8.26%  github.com/cnooljaw/gosproto.Unpack (inline)
+     0.13s  5.96% 60.55%      0.18s  8.26%  github.com/cnooljaw/gosproto.UnpackWithLimit
+     0.02s  0.92% 61.47%      0.18s  8.26%  reflect.unsafe_New
+     0.06s  2.75% 64.22%      0.11s  5.05%  runtime.mallocgcTiny
+     0.01s  0.46% 64.68%      0.10s  4.59%  runtime.slicebytetostring
+     0.01s  0.46% 65.14%      0.09s  4.13%  runtime.heapSetTypeNoHeader (inline)
+     0.05s  2.29% 67.43%      0.08s  3.67%  runtime.(*mspan).writeHeapBitsSmall
+     0.02s  0.92% 68.35%      0.07s  3.21%  runtime.deductAssistCredit
+         0     0% 68.35%      0.06s  2.75%  reflect.unsafe_NewArray
+         0     0% 68.35%      0.06s  2.75%  runtime.newarray
+         0     0% 68.35%      0.05s  2.29%  runtime.gcAssistAlloc
+         0     0% 68.35%      0.05s  2.29%  runtime.gcAssistAlloc.func2
+         0     0% 68.35%      0.05s  2.29%  runtime.gcAssistAlloc1
+         0     0% 68.35%      0.05s  2.29%  runtime.gcDrainN
+     0.01s  0.46% 68.81%      0.05s  2.29%  runtime.mallocgcSmallNoscan
+     0.05s  2.29% 71.10%      0.05s  2.29%  runtime.memclrNoHeapPointers
+     0.04s  1.83% 72.94%      0.05s  2.29%  runtime.nextFreeFast (inline)
+     0.03s  1.38% 74.31%      0.05s  2.29%  runtime.scanobject
+         0     0% 74.31%      0.04s  1.83%  github.com/cnooljaw/gosproto.getbase
+         0     0% 74.31%      0.04s  1.83%  gosprotobodystudy.representativeMessages.func2

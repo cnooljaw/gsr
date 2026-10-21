@@ -1,0 +1,48 @@
+File: body.test
+Type: cpu
+Time: 2026-10-21 10:36:26 CST
+Duration: 2.55s, Total samples = 2.15s (84.34%)
+Showing nodes accounting for 2.04s, 94.88% of 2.15s total
+Dropped 31 nodes (cum <= 0.01s)
+Showing top 40 nodes out of 41
+      flat  flat%   sum%        cum   cum%
+     1.75s 81.40% 81.40%      1.75s 81.40%  runtime.kevent
+     0.17s  7.91% 89.30%      0.30s 13.95%  github.com/cnooljaw/gosproto.decodeIntSlice
+     0.03s  1.40% 90.70%      0.05s  2.33%  runtime.scanblock
+     0.03s  1.40% 92.09%      0.04s  1.86%  runtime.typePointers.next
+     0.02s  0.93% 93.02%      0.02s  0.93%  runtime.madvise
+     0.01s  0.47% 93.49%      0.03s  1.40%  runtime.(*mcache).refill
+     0.01s  0.47% 93.95%      0.02s  0.93%  runtime.findObject
+     0.01s  0.47% 94.42%      0.04s  1.86%  runtime.newobject
+     0.01s  0.47% 94.88%      0.07s  3.26%  runtime.scanobject
+         0     0% 94.88%      0.34s 15.81%  github.com/cnooljaw/gosproto.Decode (inline)
+         0     0% 94.88%      0.34s 15.81%  github.com/cnooljaw/gosproto.DecodeWithLimits
+         0     0% 94.88%      0.32s 14.88%  github.com/cnooljaw/gosproto.decodeMessage
+         0     0% 94.88%      0.37s 17.21%  gosprotobodystudy.BenchmarkBodyCost
+         0     0% 94.88%      0.03s  1.40%  gosprotobodystudy.representativeMessages.func6
+         0     0% 94.88%      0.37s 17.21%  gosprotobodystudy.representativeOperations.func4
+         0     0% 94.88%      0.03s  1.40%  runtime.(*mcache).nextFree
+         0     0% 94.88%      0.02s  0.93%  runtime.(*mcentral).cacheSpan
+         0     0% 94.88%      0.03s  1.40%  runtime.(*mheap).alloc.func1
+         0     0% 94.88%      0.03s  1.40%  runtime.(*mheap).allocSpan
+         0     0% 94.88%      0.12s  5.58%  runtime.deductAssistCredit
+         0     0% 94.88%      0.12s  5.58%  runtime.gcAssistAlloc
+         0     0% 94.88%      0.12s  5.58%  runtime.gcAssistAlloc.func2
+         0     0% 94.88%      0.12s  5.58%  runtime.gcAssistAlloc1
+         0     0% 94.88%      0.12s  5.58%  runtime.gcDrainN
+         0     0% 94.88%      0.86s 40.00%  runtime.gcMarkTermination.func3
+         0     0% 94.88%      0.90s 41.86%  runtime.gcStart.func4
+         0     0% 94.88%      0.12s  5.58%  runtime.makeslice
+         0     0% 94.88%      0.15s  6.98%  runtime.mallocgc
+         0     0% 94.88%      0.03s  1.40%  runtime.mallocgcSmallNoscan
+         0     0% 94.88%      0.05s  2.33%  runtime.markroot
+         0     0% 94.88%      0.02s  0.93%  runtime.markroot.func1
+         0     0% 94.88%      0.03s  1.40%  runtime.markrootBlock
+         0     0% 94.88%      1.75s 81.40%  runtime.netpoll
+         0     0% 94.88%      0.02s  0.93%  runtime.scanframeworker
+         0     0% 94.88%      0.02s  0.93%  runtime.scanstack
+         0     0% 94.88%      1.76s 81.86%  runtime.startTheWorldWithSema
+         0     0% 94.88%      0.02s  0.93%  runtime.sysUsed (inline)
+         0     0% 94.88%      0.02s  0.93%  runtime.sysUsedOS (inline)
+         0     0% 94.88%      1.92s 89.30%  runtime.systemstack
+         0     0% 94.88%      0.37s 17.21%  testing.(*B).run1.func1

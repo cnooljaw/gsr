@@ -1,0 +1,47 @@
+File: body.test
+Type: alloc_objects
+Time: 2026-10-21 10:36:00 CST
+Showing nodes accounting for 23167, 95.59% of 24236 total
+Dropped 282 nodes (cum <= 121)
+Showing top 40 nodes out of 68
+      flat  flat%   sum%        cum   cum%
+     10377 42.82% 42.82%      10377 42.82%  github.com/cnooljaw/gosproto.(*encodeLayout).add (inline)
+     10377 42.82% 85.63%      20801 85.83%  github.com/cnooljaw/gosproto.encodeBufferWithLimits
+       860  3.55% 89.18%        860  3.55%  reflect.New
+       451  1.86% 91.04%        475  1.96%  reflect.Value.extendSlice
+       266  1.10% 92.14%        447  1.84%  encoding/json.typeFields
+       192  0.79% 92.93%        192  0.79%  github.com/cnooljaw/gosproto.decodeIntegerRecord
+       186  0.77% 93.70%        186  0.77%  google.golang.org/protobuf/internal/encoding/json.(*Decoder).parseString
+       137  0.57% 94.26%        137  0.57%  reflect.makeInt
+       135  0.56% 94.82%        205  0.85%  google.golang.org/protobuf/internal/impl.(*int32Converter).GoValueOf
+        63  0.26% 95.08%        397  1.64%  encoding/json.typeEncoder
+        34  0.14% 95.22%        147  0.61%  google.golang.org/protobuf/internal/impl.(*MessageInfo).makeKnownFieldsFunc
+        27  0.11% 95.33%        223  0.92%  encoding/json.(*decodeState).literalStore
+        21 0.087% 95.42%        630  2.60%  encoding/json.(*decodeState).object
+        11 0.045% 95.47%       2843 11.73%  gosprotobodystudy.representativeOperations
+         7 0.029% 95.49%        455  1.88%  encoding/json.cachedTypeFields
+         5 0.021% 95.51%        300  1.24%  encoding/json.newStructEncoder (inline)
+         4 0.017% 95.53%        332  1.37%  github.com/cnooljaw/gosproto.decodeMessage
+         3 0.012% 95.54%        161  0.66%  testing.(*M).Run
+         2 0.0083% 95.55%        642  2.65%  encoding/json.Unmarshal
+         2 0.0083% 95.56%        155  0.64%  google.golang.org/protobuf/internal/impl.(*MessageInfo).makeReflectFuncs
+         2 0.0083% 95.57%      24110 99.48%  testing.(*B).runN
+         1 0.0041% 95.57%        287  1.18%  encoding/json.Marshal
+         1 0.0041% 95.58%        295  1.22%  encoding/json.MarshalIndent
+         1 0.0041% 95.58%        334  1.38%  github.com/cnooljaw/gosproto.DecodeWithLimits
+         1 0.0041% 95.59%      24066 99.30%  gosprotobodystudy.BenchmarkBodyCost
+         1 0.0041% 95.59%        172  0.71%  gosprotobodystudy.representativeCases
+         0     0% 95.59%        508  2.10%  encoding/json.(*decodeState).array
+         0     0% 95.59%        634  2.62%  encoding/json.(*decodeState).unmarshal
+         0     0% 95.59%        634  2.62%  encoding/json.(*decodeState).value
+         0     0% 95.59%        282  1.16%  encoding/json.(*encodeState).marshal
+         0     0% 95.59%        282  1.16%  encoding/json.(*encodeState).reflectValue
+         0     0% 95.59%        324  1.34%  encoding/json.indirect
+         0     0% 95.59%        352  1.45%  encoding/json.newTypeEncoder
+         0     0% 95.59%        270  1.11%  encoding/json.valueEncoder
+         0     0% 95.59%        334  1.38%  github.com/cnooljaw/gosproto.Decode (inline)
+         0     0% 95.59%      20752 85.62%  github.com/cnooljaw/gosproto.EncodePacked (inline)
+         0     0% 95.59%        322  1.33%  github.com/cnooljaw/gosproto.decodeStructSlice
+         0     0% 95.59%      20801 85.83%  github.com/cnooljaw/gosproto.encodeWithLimits
+         0     0% 95.59%      10377 42.82%  github.com/cnooljaw/gosproto.encodedIntegerRecordSize
+         0     0% 95.59%      10377 42.82%  github.com/cnooljaw/gosproto.encodedSize

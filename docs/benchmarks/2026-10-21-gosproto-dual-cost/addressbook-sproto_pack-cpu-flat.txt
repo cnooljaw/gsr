@@ -1,0 +1,48 @@
+File: body.test
+Type: cpu
+Time: 2026-10-21 10:35:37 CST
+Duration: 2.58s, Total samples = 2.34s (90.54%)
+Showing nodes accounting for 2.24s, 95.73% of 2.34s total
+Dropped 31 nodes (cum <= 0.01s)
+Showing top 40 nodes out of 57
+      flat  flat%   sum%        cum   cum%
+     1.09s 46.58% 46.58%      1.09s 46.58%  runtime.kevent
+     0.47s 20.09% 66.67%      0.61s 26.07%  github.com/cnooljaw/gosproto.packInto
+     0.19s  8.12% 74.79%      0.19s  8.12%  runtime.memclrNoHeapPointers
+     0.07s  2.99% 77.78%      0.08s  3.42%  github.com/cnooljaw/gosproto.ffRunBytes
+     0.06s  2.56% 80.34%      0.39s 16.67%  runtime.mallocgcSmallNoscan
+     0.05s  2.14% 82.48%      0.06s  2.56%  runtime.typePointers.next
+     0.03s  1.28% 83.76%      0.03s  1.28%  runtime.madvise
+     0.03s  1.28% 85.04%      0.56s 23.93%  runtime.mallocgc
+     0.03s  1.28% 86.32%      0.03s  1.28%  runtime.nextFreeFast (inline)
+     0.03s  1.28% 87.61%      0.11s  4.70%  runtime.scanobject
+     0.02s  0.85% 88.46%      0.02s  0.85%  github.com/cnooljaw/gosproto.packSegment (inline)
+     0.02s  0.85% 89.32%      0.04s  1.71%  github.com/cnooljaw/gosproto.writeFF (inline)
+     0.02s  0.85% 90.17%      0.02s  0.85%  runtime.(*consistentHeapStats).release
+     0.02s  0.85% 91.03%      0.02s  0.85%  runtime.(*pallocBits).summarize
+     0.02s  0.85% 91.88%      0.02s  0.85%  runtime.findObject
+     0.02s  0.85% 92.74%      0.02s  0.85%  runtime.memmove
+     0.02s  0.85% 93.59%      0.02s  0.85%  runtime.wbBufFlush1
+     0.01s  0.43% 94.02%      1.19s 50.85%  github.com/cnooljaw/gosproto.Pack (inline)
+     0.01s  0.43% 94.44%      1.22s 52.14%  gosprotobodystudy.representativeOperations.func5
+     0.01s  0.43% 94.87%      0.03s  1.28%  runtime.(*pageAlloc).free
+     0.01s  0.43% 95.30%      0.14s  5.98%  runtime.deductAssistCredit
+     0.01s  0.43% 95.73%      0.57s 24.36%  runtime.makeslice
+         0     0% 95.73%      0.02s  0.85%  gcWriteBarrier
+         0     0% 95.73%      1.22s 52.14%  gosprotobodystudy.BenchmarkBodyCost
+         0     0% 95.73%      0.07s  2.99%  runtime.(*mcache).nextFree
+         0     0% 95.73%      0.07s  2.99%  runtime.(*mcache).refill
+         0     0% 95.73%      0.07s  2.99%  runtime.(*mcentral).cacheSpan
+         0     0% 95.73%      0.02s  0.85%  runtime.(*mcentral).grow
+         0     0% 95.73%      0.02s  0.85%  runtime.(*mheap).alloc
+         0     0% 95.73%      0.04s  1.71%  runtime.(*mheap).alloc.func1
+         0     0% 95.73%      0.04s  1.71%  runtime.(*mheap).allocSpan
+         0     0% 95.73%      0.03s  1.28%  runtime.(*mheap).freeSpan (inline)
+         0     0% 95.73%      0.03s  1.28%  runtime.(*mheap).freeSpanLocked
+         0     0% 95.73%      0.02s  0.85%  runtime.(*pageAlloc).update
+         0     0% 95.73%      0.04s  1.71%  runtime.(*sweepLocked).sweep
+         0     0% 95.73%      0.03s  1.28%  runtime.(*sweepLocked).sweep.(*mheap).freeSpan.func2
+         0     0% 95.73%      0.02s  0.85%  runtime.callers
+         0     0% 95.73%      0.02s  0.85%  runtime.callers.func1
+         0     0% 95.73%      0.05s  2.14%  runtime.deductSweepCredit
+         0     0% 95.73%      0.13s  5.56%  runtime.gcAssistAlloc
