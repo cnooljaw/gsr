@@ -1,0 +1,819 @@
+[
+  {
+    "args": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "cwd": "/private/tmp/gsr-gosproto-fork",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.022885417565703392,
+    "output": "451998ea0dcf6262bdd4ca0ab6c686d0fb738fac\n"
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "pair_experiment.go",
+      "pair_experiment_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/gosproto",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.025539956986904144,
+    "output": ""
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "experiment_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/harness",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.004348292946815491,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-gcflags=all=-d=checkptr=2",
+      "-run",
+      "^(TestPairEquivalence|TestPack|TestUnpack)",
+      "-timeout=2m",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/gosproto",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 5.27943866699934,
+    "output": "ok  \tgithub.com/cnooljaw/gosproto\t2.302s\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-run",
+      "^TestRepresentativeFixtures$",
+      "-timeout=30s",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 1.4109794590622187,
+    "output": "ok  \tpackheader\t0.334s\n"
+  },
+  {
+    "args": [
+      "go",
+      "vet",
+      "-mod=mod",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 0.2864807080477476,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-c",
+      "-o",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/experiment.test",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 0.4147816672921181,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "objdump",
+      "-s",
+      "github.com/cnooljaw/gosproto\\.(packInto|packPairClone|packPairCandidate)",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/experiment.test"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/harness",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.035764167085289955,
+    "output": "TEXT github.com/cnooljaw/gosproto.packInto(SB) /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/gosproto/pack.go\n  pack.go:109\t\t0x100157d60\t\tf9400b90\t\tMOVD 16(R28), R16\t\t\t\t\t\n  pack.go:109\t\t0x100157d64\t\teb3063ff\t\tCMP R16, RSP\t\t\t\t\t\t\n  pack.go:109\t\t0x100157d68\t\t54002389\t\tBLS 284(PC)\t\t\t\t\t\t\n  pack.go:109\t\t0x100157d6c\t\tf8190ffe\t\tMOVD.W R30, -112(RSP)\t\t\t\t\t\n  pack.go:109\t\t0x100157d70\t\tf81f83fd\t\tMOVD R29, -8(RSP)\t\t\t\t\t\n  pack.go:109\t\t0x100157d74\t\td10023fd\t\tSUB $8, RSP, R29\t\t\t\t\t\n  pack.go:109\t\t0x100157d78\t\tf9004be3\t\tMOVD R3, 144(RSP)\t\t\t\t\t\n  pack.go:111\t\t0x100157d7c\t\tf90047e2\t\tMOVD R2, 136(RSP)\t\t\t\t\t\n  pack.go:111\t\t0x100157d80\t\tf90043e1\t\tMOVD R1, 128(RSP)\t\t\t\t\t\n  pack.go:111\t\t0x100157d84\t\tf9003fe0\t\tMOVD R0, 120(RSP)\t\t\t\t\t\n  pack.go:111\t\t0x100157d88\t\taa1f03e6\t\tMOVD ZR, R6\t\t\t\t\t\t\n  pack.go:111\t\t0x100157d8c\t\t14000002\t\tJMP 2(PC)\t\t\t\t\t\t\n  pack.go:111\t\t0x100157d90\t\taa0703e3\t\tMOVD R7, R3\t\t\t\t\t\t\n  pack.go:111\t\t0x100157d94\t\tf100209f\t\tCMP $8, R4\t\t\t\t\t\t\n  pack.go:111\t\t0x100157d98\t\t540016cb\t\tBLT 182(PC)\t\t\t\t\t\t\n  binary.go:117\t\t0x100157d9c\t\tf9400067\t\tMOVD (R3), R7\t\t\t\t\t\t\n  pack.go:113\t\t0x100157da0\t\t9200d8e8\t\tAND $9187201950435737471, R7, R8\t\t\t\n  pack.go:113\t\t0x100157da4\t\tb200dbe9\t\tMOVD $9187201950435737471, R9\t\t\t\t\n  pack.go:113\t\t0x100157da8\t\t8b090108\t\tADD R9, R8, R8\t\t\t\t\t\t\n  pack.go:113\t\t0x100157dac\t\taa070108\t\tORR R7, R8, R8\t\t\t\t\t\t\n  pack.go:113\t\t0x100157db0\t\t9201c108\t\tAND $-9187201950435737472, R8, R8\t\t\t\n  pack.go:114\t\t0x100157db4\t\td347fd08\t\tLSR $7, R8, R8\t\t\t\t\t\t\n  pack.go:114\t\t0x100157db8\t\td2881009\t\tMOVD $16512, R9\t\t\t\t\t\t\n  pack.go:114\t\t0x100157dbc\t\tf2a20409\t\tMOVK $(4128<<16), R9\t\t\t\t\t\n  pack.go:114\t\t0x100157dc0\t\tf2c08109\t\tMOVK $(1032<<32), R9\t\t\t\t\t\n  pack.go:114\t\t0x100157dc4\t\tf2e02049\t\tMOVK $(258<<48), R9\t\t\t\t\t\n  pack.go:114\t\t0x100157dc8\t\t9b087d2a\t\tMUL R8, R9, R10\t\t\t\t\t\t\n  pack.go:114\t\t0x100157dcc\t\td378fd4b\t\tLSR $56, R10, R11\t\t\t\t\t\n  pack.go:115\t\t0x100157dd0\t\td3401d6c\t\tUBFX $0, R11, $8, R12\t\t\t\t\t\n  pack.go:112\t\t0x100157dd4\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\n  pack.go:115\t\t0x100157dd8\t\t7103fd9f\t\tCMPW $255, R12\t\t\t\t\t\t\n  pack.go:115\t\t0x100157ddc\t\t54000960\t\tBEQ 75(PC)\t\t\t\t\t\t\n  pack.go:123\t\t0x100157de0\t\td100056d\t\tSUB $1, R11, R13\t\t\t\t\t\n  pack.go:123\t\t0x100157de4\t\t8a4ae1aa\t\tAND R10>>56, R13, R10\t\t\t\t\t\n  pack.go:124\t\t0x100157de8\t\td100054d\t\tSUB $1, R10, R13\t\t\t\t\t\n  pack.go:124\t\t0x100157dec\t\t8a0a01ad\t\tAND R10, R13, R13\t\t\t\t\t\n  pack.go:124\t\t0x100157df0\t\td3401dad\t\tUBFX $0, R13, $8, R13\t\t\t\t\t\n  pack.go:124\t\t0x100157df4\t\t3500038d\t\tCBNZW R13, 28(PC)\t\t\t\t\t\n  pack.go:126\t\t0x100157df8\t\t91000cc8\t\tADD $3, R6, R8\t\t\t\t\t\t\n  pack.go:126\t\t0x100157dfc\t\teb08005f\t\tCMP R8, R2\t\t\t\t\t\t\n  pack.go:126\t\t0x100157e00\t\t54001e43\t\tBCC 242(PC)\t\t\t\t\t\t\n  pack.go:126\t\t0x100157e04\t\teb0800df\t\tCMP R8, R6\t\t\t\t\t\t\n  pack.go:126\t\t0x100157e08\t\t54001da8\t\tBHI 237(PC)\t\t\t\t\t\t\n  pack.go:129\t\t0x100157e0c\t\t3826680b\t\tMOVB R11, (R0)(R6)\t\t\t\t\t\n  pack.go:126\t\t0x100157e10\t\t8b0000c8\t\tADD R0, R6, R8\t\t\t\t\t\t\n  pack.go:131\t\t0x100157e14\t\t3400022c\t\tCBZW R12, 17(PC)\t\t\t\t\t\n  pack.go:132\t\t0x100157e18\t\t5ac0016b\t\tRBITW R11, R11\t\t\t\t\t\t\n  pack.go:132\t\t0x100157e1c\t\t5ac0116b\t\tCLZW R11, R11\t\t\t\t\t\t\n  pack.go:132\t\t0x100157e20\t\td37df16b\t\tLSL $3, R11, R11\t\t\t\t\t\n  pack.go:133\t\t0x100157e24\t\t9acb24eb\t\tLSR R11, R7, R11\t\t\t\t\t\n  pack.go:133\t\t0x100157e28\t\t3900050b\t\tMOVB R11, 1(R8)\t\t\t\t\t\t\n  pack.go:135\t\t0x100157e2c\t\td3401d4b\t\tUBFX $0, R10, $8, R11\t\t\t\t\t\n  pack.go:135\t\t0x100157e30\t\t3400010b\t\tCBZW R11, 8(PC)\t\t\t\t\t\t\n  pack.go:136\t\t0x100157e34\t\t5ac0014a\t\tRBITW R10, R10\t\t\t\t\t\t\n  pack.go:136\t\t0x100157e38\t\t5ac0114a\t\tCLZW R10, R10\t\t\t\t\t\t\n  pack.go:136\t\t0x100157e3c\t\td37df14a\t\tLSL $3, R10, R10\t\t\t\t\t\n  pack.go:137\t\t0x100157e40\t\t9aca24e7\t\tLSR R10, R7, R7\t\t\t\t\t\t\n  pack.go:137\t\t0x100157e44\t\t39000907\t\tMOVB R7, 2(R8)\t\t\t\t\t\t\n  pack.go:137\t\t0x100157e48\t\tb24007e7\t\tORR $3, ZR, R7\t\t\t\t\t\t\n  pack.go:138\t\t0x100157e4c\t\t14000004\t\tJMP 4(PC)\t\t\t\t\t\t\n  pack.go:138\t\t0x100157e50\t\tb27f03e7\t\tORR $2, ZR, R7\t\t\t\t\t\t\n  pack.go:135\t\t0x100157e54\t\t14000002\t\tJMP 2(PC)\t\t\t\t\t\t\n  pack.go:135\t\t0x100157e58\t\tb24003e7\t\tORR $1, ZR, R7\t\t\t\t\t\t\n  pack.go:141\t\t0x100157e5c\t\t8b0600e6\t\tADD R6, R7, R6\t\t\t\t\t\t\n  pack.go:141\t\t0x100157e60\t\t14000023\t\tJMP 35(PC)\t\t\t\t\t\t\n  pack.go:143\t\t0x100157e64\t\t910024ca\t\tADD $9, R6, R10\t\t\t\t\t\t\n  pack.go:143\t\t0x100157e68\t\teb0a005f\t\tCMP R10, R2\t\t\t\t\t\t\n  pack.go:143\t\t0x100157e6c\t\t54001a23\t\tBCC 209(PC)\t\t\t\t\t\t\n  pack.go:143\t\t0x100157e70\t\teb0a00df\t\tCMP R10, R6\t\t\t\t\t\t\n  pack.go:143\t\t0x100157e74\t\t54001988\t\tBHI 204(PC)\t\t\t\t\t\t\n  pack.go:143\t\t0x100157e78\t\t8b0000ca\t\tADD R0, R6, R10\t\t\t\t\t\t\n  pack.go:151\t\t0x100157e7c\t\t39000547\t\tMOVB R7, 1(R10)\t\t\t\t\t\t\n  pack.go:147\t\t0x100157e80\t\t9100054a\t\tADD $1, R10, R10\t\t\t\t\t\n  pack.go:150\t\t0x100157e84\t\tb200c3ec\t\tMOVD $72340172838076673, R12\t\t\t\t\n  pack.go:150\t\t0x100157e88\t\t9b087d88\t\tMUL R8, R12, R8\t\t\t\t\t\t\n  pack.go:152\t\t0x100157e8c\t\t9240090d\t\tAND $7, R8, R13\t\t\t\t\t\t\n  pack.go:152\t\t0x100157e90\t\td348fcee\t\tLSR $8, R7, R14\t\t\t\t\t\t\n  pack.go:152\t\t0x100157e94\t\t382d694e\t\tMOVB R14, (R10)(R13)\t\t\t\t\t\n  pack.go:153\t\t0x100157e98\t\td348290d\t\tUBFX $8, R8, $3, R13\t\t\t\t\t\n  pack.go:153\t\t0x100157e9c\t\td350fcee\t\tLSR $16, R7, R14\t\t\t\t\t\n  pack.go:153\t\t0x100157ea0\t\t382d694e\t\tMOVB R14, (R10)(R13)\t\t\t\t\t\n  pack.go:154\t\t0x100157ea4\t\td350490d\t\tUBFX $16, R8, $3, R13\t\t\t\t\t\n  pack.go:154\t\t0x100157ea8\t\td358fcee\t\tLSR $24, R7, R14\t\t\t\t\t\n  pack.go:154\t\t0x100157eac\t\t382d694e\t\tMOVB R14, (R10)(R13)\t\t\t\t\t\n  pack.go:155\t\t0x100157eb0\t\td358690d\t\tUBFX $24, R8, $3, R13\t\t\t\t\t\n  pack.go:155\t\t0x100157eb4\t\td360fcee\t\tLSR $32, R7, R14\t\t\t\t\t\n  pack.go:155\t\t0x100157eb8\t\t382d694e\t\tMOVB R14, (R10)(R13)\t\t\t\t\t\n  pack.go:156\t\t0x100157ebc\t\td360890d\t\tUBFX $32, R8, $3, R13\t\t\t\t\t\n  pack.go:156\t\t0x100157ec0\t\td368fcee\t\tLSR $40, R7, R14\t\t\t\t\t\n  pack.go:156\t\t0x100157ec4\t\t382d694e\t\tMOVB R14, (R10)(R13)\t\t\t\t\t\n  pack.go:157\t\t0x100157ec8\t\td368a90d\t\tUBFX $40, R8, $3, R13\t\t\t\t\t\n  pack.go:157\t\t0x100157ecc\t\td370fcee\t\tLSR $48, R7, R14\t\t\t\t\t\n  pack.go:157\t\t0x100157ed0\t\t382d694e\t\tMOVB R14, (R10)(R13)\t\t\t\t\t\n  pack.go:158\t\t0x100157ed4\t\td370c90d\t\tUBFX $48, R8, $3, R13\t\t\t\t\t\n  pack.go:158\t\t0x100157ed8\t\td378fce7\t\tLSR $56, R7, R7\t\t\t\t\t\t\n  pack.go:158\t\t0x100157edc\t\t382d6947\t\tMOVB R7, (R10)(R13)\t\t\t\t\t\n  pack.go:159\t\t0x100157ee0\t\t3826680b\t\tMOVB R11, (R0)(R6)\t\t\t\t\t\n  pack.go:160\t\t0x100157ee4\t\t8b48e0c7\t\tADD R8>>56, R6, R7\t\t\t\t\t\n  pack.go:160\t\t0x100157ee8\t\t910004e6\t\tADD $1, R7, R6\t\t\t\t\t\t\n  pack.go:162\t\t0x100157eec\t\td10020a5\t\tSUB $8, R5, R5\t\t\t\t\t\t\n  pack.go:162\t\t0x100157ef0\t\tcb0503e7\t\tNEG R5, R7\t\t\t\t\t\t\n  pack.go:162\t\t0x100157ef4\t\t937ffce7\t\tASR $63, R7, R7\t\t\t\t\t\t\n  pack.go:162\t\t0x100157ef8\t\t927d00e7\t\tAND $8, R7, R7\t\t\t\t\t\t\n  pack.go:162\t\t0x100157efc\t\t8b0300e7\t\tADD R3, R7, R7\t\t\t\t\t\t\n  pack.go:162\t\t0x100157f00\t\td1002084\t\tSUB $8, R4, R4\t\t\t\t\t\t\n  pack.go:162\t\t0x100157f04\t\t17ffffa3\t\tJMP -93(PC)\t\t\t\t\t\t\n  pack.go:111\t\t0x100157f08\t\tf90027e5\t\tMOVD R5, 72(RSP)\t\t\t\t\t\n  pack.go:111\t\t0x100157f0c\t\tf90023e4\t\tMOVD R4, 64(RSP)\t\t\t\t\t\n  pack.go:111\t\t0x100157f10\t\tf90033e3\t\tMOVD R3, 96(RSP)\t\t\t\t\t\n  pack.go:165\t\t0x100157f14\t\tf90013e6\t\tMOVD R6, 32(RSP)\t\t\t\t\t\n  pack.go:116\t\t0x100157f18\t\taa0303e0\t\tMOVD R3, R0\t\t\t\t\t\t\n  pack.go:116\t\t0x100157f1c\t\taa0403e1\t\tMOVD R4, R1\t\t\t\t\t\t\n  pack.go:116\t\t0x100157f20\t\taa0503e2\t\tMOVD R5, R2\t\t\t\t\t\t\n  pack.go:116\t\t0x100157f24\t\t97ffff1b\t\tCALL github.com/cnooljaw/gosproto.ffRunBytes(SB)\t\n  pack.go:117\t\t0x100157f28\t\tf94043e1\t\tMOVD 128(RSP), R1\t\t\t\t\t\n  pack.go:117\t\t0x100157f2c\t\tf94013e3\t\tMOVD 32(RSP), R3\t\t\t\t\t\n  pack.go:117\t\t0x100157f30\t\teb03003f\t\tCMP R3, R1\t\t\t\t\t\t\n  pack.go:117\t\t0x100157f34\t\t54001343\t\tBCC 154(PC)\t\t\t\t\t\t\n  pack.go:117\t\t0x100157f38\t\tcb030024\t\tSUB R3, R1, R4\t\t\t\t\t\t\n  pack.go:117\t\t0x100157f3c\t\tf94047e2\t\tMOVD 136(RSP), R2\t\t\t\t\t\n  pack.go:117\t\t0x100157f40\t\tcb030045\t\tSUB R3, R2, R5\t\t\t\t\t\t\n  pack.go:117\t\t0x100157f44\t\tcb0503e6\t\tNEG R5, R6\t\t\t\t\t\t\n  pack.go:117\t\t0x100157f48\t\t8a86fc66\t\tAND R6->63, R3, R6\t\t\t\t\t\n  pack.go:117\t\t0x100157f4c\t\tf9403fe7\t\tMOVD 120(RSP), R7\t\t\t\t\t\n  pack.go:117\t\t0x100157f50\t\t8b0600e8\t\tADD R6, R7, R8\t\t\t\t\t\t\n  pack.go:37\t\t0x100157f54\t\tf94023e9\t\tMOVD 64(RSP), R9\t\t\t\t\t\n  pack.go:37\t\t0x100157f58\t\teb09001f\t\tCMP R9, R0\t\t\t\t\t\t\n  pack.go:37\t\t0x100157f5c\t\t9a80c12a\t\tCSEL GT, R9, R0, R10\t\t\t\t\t\n  pack.go:39\t\t0x100157f60\t\tf100009f\t\tCMP $0, R4\t\t\t\t\t\t\n  pack.go:37\t\t0x100157f64\t\t54001169\t\tBLS 139(PC)\t\t\t\t\t\t\n  pack.go:39\t\t0x100157f68\t\t9280000b\t\tMOVD $-1, R11\t\t\t\t\t\t\n  pack.go:39\t\t0x100157f6c\t\t382668eb\t\tMOVB R11, (R7)(R6)\t\t\t\t\t\n  pack.go:38\t\t0x100157f70\t\t91001d46\t\tADD $7, R10, R6\t\t\t\t\t\t\n  pack.go:38\t\t0x100157f74\t\t927df0c6\t\tAND $-8, R6, R6\t\t\t\t\t\t\n  pack.go:40\t\t0x100157f78\t\t937ffccc\t\tASR $63, R6, R12\t\t\t\t\t\n  pack.go:40\t\t0x100157f7c\t\t8b4cf4cc\t\tADD R12>>61, R6, R12\t\t\t\t\t\n  pack.go:40\t\t0x100157f80\t\tf100049f\t\tCMP $1, R4\t\t\t\t\t\t\n  pack.go:40\t\t0x100157f84\t\t54001009\t\tBLS 128(PC)\t\t\t\t\t\t\n  pack.go:40\t\t0x100157f88\t\t9343fd8c\t\tASR $3, R12, R12\t\t\t\t\t\n  pack.go:40\t\t0x100157f8c\t\td100058c\t\tSUB $1, R12, R12\t\t\t\t\t\n  pack.go:40\t\t0x100157f90\t\t3900050c\t\tMOVB R12, 1(R8)\t\t\t\t\t\t\n  pack.go:41\t\t0x100157f94\t\td10008a5\t\tSUB $2, R5, R5\t\t\t\t\t\t\n  pack.go:41\t\t0x100157f98\t\tcb0503e5\t\tNEG R5, R5\t\t\t\t\t\t\n  pack.go:41\t\t0x100157f9c\t\t937ffca5\t\tASR $63, R5, R5\t\t\t\t\t\t\n  pack.go:41\t\t0x100157fa0\t\t927f00a5\t\tAND $2, R5, R5\t\t\t\t\t\t\n  pack.go:41\t\t0x100157fa4\t\t8b0800a5\t\tADD R8, R5, R5\t\t\t\t\t\t\n  pack.go:41\t\t0x100157fa8\t\tf94027ec\t\tMOVD 72(RSP), R12\t\t\t\t\t\n  pack.go:41\t\t0x100157fac\t\teb0a019f\t\tCMP R10, R12\t\t\t\t\t\t\n  pack.go:41\t\t0x100157fb0\t\t54000e43\t\tBCC 114(PC)\t\t\t\t\t\t\n  pack.go:41\t\t0x100157fb4\t\td100088d\t\tSUB $2, R4, R13\t\t\t\t\t\t\n  pack.go:41\t\t0x100157fb8\t\teb0d015f\t\tCMP R13, R10\t\t\t\t\t\t\n  pack.go:41\t\t0x100157fbc\t\t9a8db14d\t\tCSEL LT, R10, R13, R13\t\t\t\t\t\n  pack.go:41\t\t0x100157fc0\t\tf94033ee\t\tMOVD 96(RSP), R14\t\t\t\t\t\n  pack.go:41\t\t0x100157fc4\t\teb0501df\t\tCMP R5, R14\t\t\t\t\t\t\n  pack.go:41\t\t0x100157fc8\t\t54000c20\t\tBEQ 97(PC)\t\t\t\t\t\t\n  pack.go:116\t\t0x100157fcc\t\tf9001fe0\t\tMOVD R0, 56(RSP)\t\t\t\t\t\n  pack.go:117\t\t0x100157fd0\t\tf9001be4\t\tMOVD R4, 48(RSP)\t\t\t\t\t\n  pack.go:117\t\t0x100157fd4\t\tf9002fe8\t\tMOVD R8, 88(RSP)\t\t\t\t\t\n  pack.go:37\t\t0x100157fd8\t\tf90017ea\t\tMOVD R10, 40(RSP)\t\t\t\t\t\n  pack.go:38\t\t0x100157fdc\t\tf9002be6\t\tMOVD R6, 80(RSP)\t\t\t\t\t\n  pack.go:41\t\t0x100157fe0\t\taa0503e0\t\tMOVD R5, R0\t\t\t\t\t\t\n  pack.go:41\t\t0x100157fe4\t\taa0e03e1\t\tMOVD R14, R1\t\t\t\t\t\t\n  pack.go:41\t\t0x100157fe8\t\taa0d03e2\t\tMOVD R13, R2\t\t\t\t\t\t\n  pack.go:41\t\t0x100157fec\t\t97fc82c9\t\tCALL runtime.memmove(SB)\t\t\t\t\n  pack.go:118\t\t0x100157ff0\t\tf9401fe0\t\tMOVD 56(RSP), R0\t\t\t\t\t\n  pack.go:165\t\t0x100157ff4\t\tf94043e1\t\tMOVD 128(RSP), R1\t\t\t\t\t\n  pack.go:126\t\t0x100157ff8\t\tf94047e2\t\tMOVD 136(RSP), R2\t\t\t\t\t\n  pack.go:118\t\t0x100157ffc\t\tf94013e3\t\tMOVD 32(RSP), R3\t\t\t\t\t\n  pack.go:43\t\t0x100158000\t\tf9401be4\t\tMOVD 48(RSP), R4\t\t\t\t\t\n  pack.go:42\t\t0x100158004\t\tf9402be6\t\tMOVD 80(RSP), R6\t\t\t\t\t\n  pack.go:129\t\t0x100158008\t\tf9403fe7\t\tMOVD 120(RSP), R7\t\t\t\t\t\n  pack.go:43\t\t0x10015800c\t\tf9402fe8\t\tMOVD 88(RSP), R8\t\t\t\t\t\n  pack.go:37\t\t0x100158010\t\tf94023e9\t\tMOVD 64(RSP), R9\t\t\t\t\t\n  pack.go:42\t\t0x100158014\t\tf94017ea\t\tMOVD 40(RSP), R10\t\t\t\t\t\n  pack.go:42\t\t0x100158018\t\t9280000b\t\tMOVD $-1, R11\t\t\t\t\t\t\n  pack.go:119\t\t0x10015801c\t\tf94027ec\t\tMOVD 72(RSP), R12\t\t\t\t\t\n  pack.go:119\t\t0x100158020\t\tf94033ee\t\tMOVD 96(RSP), R14\t\t\t\t\t\n  pack.go:41\t\t0x100158024\t\t1400004a\t\tJMP 74(PC)\t\t\t\t\t\t\n  pack.go:118\t\t0x100158028\t\t91001c04\t\tADD $7, R0, R4\t\t\t\t\t\t\n  pack.go:118\t\t0x10015802c\t\t927df084\t\tAND $-8, R4, R4\t\t\t\t\t\t\n  pack.go:118\t\t0x100158030\t\t8b030084\t\tADD R3, R4, R4\t\t\t\t\t\t\n  pack.go:37\t\t0x100158034\t\teb09001f\t\tCMP R9, R0\t\t\t\t\t\t\n  pack.go:119\t\t0x100158038\t\t54000968\t\tBHI 75(PC)\t\t\t\t\t\t\n  pack.go:119\t\t0x10015803c\t\tcb000185\t\tSUB R0, R12, R5\t\t\t\t\t\t\n  pack.go:119\t\t0x100158040\t\tcb0503e8\t\tNEG R5, R8\t\t\t\t\t\t\n  pack.go:119\t\t0x100158044\t\t8a88fc08\t\tAND R8->63, R0, R8\t\t\t\t\t\n  pack.go:118\t\t0x100158048\t\t91000886\t\tADD $2, R4, R6\t\t\t\t\t\t\n  pack.go:119\t\t0x10015804c\t\tcb000124\t\tSUB R0, R9, R4\t\t\t\t\t\t\n  pack.go:119\t\t0x100158050\t\t8b0801c8\t\tADD R8, R14, R8\t\t\t\t\t\t\n  pack.go:129\t\t0x100158054\t\taa0703e0\t\tMOVD R7, R0\t\t\t\t\t\t\n  pack.go:129\t\t0x100158058\t\td2881009\t\tMOVD $16512, R9\t\t\t\t\t\t\n  pack.go:129\t\t0x10015805c\t\tf2a20409\t\tMOVK $(4128<<16), R9\t\t\t\t\t\n  pack.go:129\t\t0x100158060\t\tf2c08109\t\tMOVK $(1032<<32), R9\t\t\t\t\t\n  pack.go:129\t\t0x100158064\t\tf2e02049\t\tMOVK $(258<<48), R9\t\t\t\t\t\n  pack.go:111\t\t0x100158068\t\taa0803e7\t\tMOVD R8, R7\t\t\t\t\t\t\n  pack.go:120\t\t0x10015806c\t\t17ffff49\t\tJMP -183(PC)\t\t\t\t\t\t\n  pack.go:164\t\t0x100158070\t\tb4000184\t\tCBZ R4, 12(PC)\t\t\t\t\t\t\n  pack.go:165\t\t0x100158074\t\teb06003f\t\tCMP R6, R1\t\t\t\t\t\t\n  pack.go:165\t\t0x100158078\t\t54000623\t\tBCC 49(PC)\t\t\t\t\t\t\n  pack.go:165\t\t0x10015807c\t\tcb060045\t\tSUB R6, R2, R5\t\t\t\t\t\t\n  pack.go:165\t\t0x100158080\t\tcb0503e5\t\tNEG R5, R5\t\t\t\t\t\t\n  pack.go:165\t\t0x100158084\t\t8a85fcc5\t\tAND R5->63, R6, R5\t\t\t\t\t\n  pack.go:165\t\t0x100158088\t\tcb060021\t\tSUB R6, R1, R1\t\t\t\t\t\t\n  pack.go:165\t\t0x10015808c\t\t8b050007\t\tADD R5, R0, R7\t\t\t\t\t\t\n  pack.go:165\t\t0x100158090\t\taa1f03e8\t\tMOVD ZR, R8\t\t\t\t\t\t\n  pack.go:165\t\t0x100158094\t\taa1f03e9\t\tMOVD ZR, R9\t\t\t\t\t\t\n  pack.go:165\t\t0x100158098\t\taa1f03ea\t\tMOVD ZR, R10\t\t\t\t\t\t\n  pack.go:13\t\t0x10015809c\t\t1400000a\t\tJMP 10(PC)\t\t\t\t\t\t\n  pack.go:167\t\t0x1001580a0\t\teb06005f\t\tCMP R6, R2\t\t\t\t\t\t\n  pack.go:167\t\t0x1001580a4\t\t540000a3\t\tBCC 5(PC)\t\t\t\t\t\t\n  pack.go:167\t\t0x1001580a8\t\taa0603e1\t\tMOVD R6, R1\t\t\t\t\t\t\n  pack.go:167\t\t0x1001580ac\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\n  pack.go:167\t\t0x1001580b0\t\tf84707fe\t\tMOVD.P 112(RSP), R30\t\t\t\t\t\n  pack.go:167\t\t0x1001580b4\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\n  pack.go:167\t\t0x1001580b8\t\taa0603e1\t\tMOVD R6, R1\t\t\t\t\t\t\n  pack.go:167\t\t0x1001580bc\t\t97fc8139\t\tCALL runtime.panicSliceAcap(SB)\t\t\t\t\n  pack.go:13\t\t0x1001580c0\t\t91000508\t\tADD $1, R8, R8\t\t\t\t\t\t\n  pack.go:13\t\t0x1001580c4\t\teb04011f\t\tCMP R4, R8\t\t\t\t\t\t\n  pack.go:13\t\t0x1001580c8\t\t540001ca\t\tBGE 14(PC)\t\t\t\t\t\t\n  pack.go:13\t\t0x1001580cc\t\t3868686b\t\tMOVBU (R3)(R8), R11\t\t\t\t\t\n  pack.go:14\t\t0x1001580d0\t\taa0b03ec\t\tMOVD R11, R12\t\t\t\t\t\t\n  pack.go:14\t\t0x1001580d4\t\t3400012c\t\tCBZW R12, 9(PC)\t\t\t\t\t\t\n  pack.go:15\t\t0x1001580d8\t\t91000529\t\tADD $1, R9, R9\t\t\t\t\t\t\n  pack.go:16\t\t0x1001580dc\t\tb24003ec\t\tORR $1, ZR, R12\t\t\t\t\t\t\n  pack.go:16\t\t0x1001580e0\t\t9ac8218d\t\tLSL R8, R12, R13\t\t\t\t\t\n  pack.go:16\t\t0x1001580e4\t\taa0d014a\t\tORR R13, R10, R10\t\t\t\t\t\n  pack.go:17\t\t0x1001580e8\t\teb09003f\t\tCMP R9, R1\t\t\t\t\t\t\n  pack.go:17\t\t0x1001580ec\t\t54000249\t\tBLS 18(PC)\t\t\t\t\t\t\n  pack.go:17\t\t0x1001580f0\t\t382968eb\t\tMOVB R11, (R7)(R9)\t\t\t\t\t\n  pack.go:17\t\t0x1001580f4\t\t17fffff3\t\tJMP -13(PC)\t\t\t\t\t\t\n  pack.go:17\t\t0x1001580f8\t\tb24003ec\t\tORR $1, ZR, R12\t\t\t\t\t\t\n  pack.go:14\t\t0x1001580fc\t\t17fffff1\t\tJMP -15(PC)\t\t\t\t\t\t\n  pack.go:27\t\t0x100158100\t\tf100213f\t\tCMP $8, R9\t\t\t\t\t\t\n  pack.go:27\t\t0x100158104\t\t54000061\t\tBNE 3(PC)\t\t\t\t\t\t\n  pack.go:27\t\t0x100158108\t\td2800143\t\tMOVD $10, R3\t\t\t\t\t\t\n  pack.go:165\t\t0x10015810c\t\t14000005\t\tJMP 5(PC)\t\t\t\t\t\t\n  pack.go:31\t\t0x100158110\t\tf100003f\t\tCMP $0, R1\t\t\t\t\t\t\n  pack.go:31\t\t0x100158114\t\t540000a9\t\tBLS 5(PC)\t\t\t\t\t\t\n  pack.go:31\t\t0x100158118\t\t3825680a\t\tMOVB R10, (R0)(R5)\t\t\t\t\t\n  pack.go:32\t\t0x10015811c\t\t91000523\t\tADD $1, R9, R3\t\t\t\t\t\t\n  pack.go:165\t\t0x100158120\t\t8b060066\t\tADD R6, R3, R6\t\t\t\t\t\t\n  pack.go:165\t\t0x100158124\t\t17ffffdf\t\tJMP -33(PC)\t\t\t\t\t\t\n  pack.go:31\t\t0x100158128\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\n  pack.go:31\t\t0x10015812c\t\taa0003e1\t\tMOVD R0, R1\t\t\t\t\t\t\n  pack.go:31\t\t0x100158130\t\t97fc810c\t\tCALL runtime.panicIndex(SB)\t\t\t\t\n  pack.go:17\t\t0x100158134\t\taa0903e0\t\tMOVD R9, R0\t\t\t\t\t\t\n  pack.go:17\t\t0x100158138\t\t97fc810a\t\tCALL runtime.panicIndex(SB)\t\t\t\t\n  pack.go:165\t\t0x10015813c\t\taa0603e0\t\tMOVD R6, R0\t\t\t\t\t\t\n  pack.go:165\t\t0x100158140\t\t97fc8120\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\n  pack.go:43\t\t0x100158144\t\t3825691f\t\tMOVB ZR, (R8)(R5)\t\t\t\t\t\n  pack.go:42\t\t0x100158148\t\t9100054a\t\tADD $1, R10, R10\t\t\t\t\t\n  pack.go:42\t\t0x10015814c\t\teb06015f\t\tCMP R6, R10\t\t\t\t\t\t\n  pack.go:42\t\t0x100158150\t\t54fff6ca\t\tBGE -74(PC)\t\t\t\t\t\t\n  pack.go:43\t\t0x100158154\t\t91000945\t\tADD $2, R10, R5\t\t\t\t\t\t\n  pack.go:43\t\t0x100158158\t\teb05009f\t\tCMP R5, R4\t\t\t\t\t\t\n  pack.go:43\t\t0x10015815c\t\t54ffff48\t\tBHI -6(PC)\t\t\t\t\t\t\n  pack.go:43\t\t0x100158160\t\t14000003\t\tJMP 3(PC)\t\t\t\t\t\t\n  pack.go:119\t\t0x100158164\t\taa0903e1\t\tMOVD R9, R1\t\t\t\t\t\t\n  pack.go:119\t\t0x100158168\t\t97fc8116\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\n  pack.go:43\t\t0x10015816c\t\taa0503e0\t\tMOVD R5, R0\t\t\t\t\t\t\n  pack.go:43\t\t0x100158170\t\taa0403e1\t\tMOVD R4, R1\t\t\t\t\t\t\n  pack.go:43\t\t0x100158174\t\t97fc80fb\t\tCALL runtime.panicIndex(SB)\t\t\t\t\n  pack.go:41\t\t0x100158178\t\taa0a03e1\t\tMOVD R10, R1\t\t\t\t\t\t\n  pack.go:41\t\t0x10015817c\t\taa0c03e2\t\tMOVD R12, R2\t\t\t\t\t\t\n  pack.go:41\t\t0x100158180\t\t97fc8108\t\tCALL runtime.panicSliceAcap(SB)\t\t\t\t\n  pack.go:40\t\t0x100158184\t\tb24003e0\t\tORR $1, ZR, R0\t\t\t\t\t\t\n  pack.go:40\t\t0x100158188\t\taa0003e1\t\tMOVD R0, R1\t\t\t\t\t\t\n  pack.go:40\t\t0x10015818c\t\t97fc80f5\t\tCALL runtime.panicIndex(SB)\t\t\t\t\n  pack.go:39\t\t0x100158190\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\n  pack.go:39\t\t0x100158194\t\taa0003e1\t\tMOVD R0, R1\t\t\t\t\t\t\n  pack.go:39\t\t0x100158198\t\t97fc80f2\t\tCALL runtime.panicIndex(SB)\t\t\t\t\n  pack.go:117\t\t0x10015819c\t\taa0303e0\t\tMOVD R3, R0\t\t\t\t\t\t\n  pack.go:117\t\t0x1001581a0\t\t97fc8108\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\n  pack.go:143\t\t0x1001581a4\t\taa0603e0\t\tMOVD R6, R0\t\t\t\t\t\t\n  pack.go:143\t\t0x1001581a8\t\taa0a03e1\t\tMOVD R10, R1\t\t\t\t\t\t\n  pack.go:143\t\t0x1001581ac\t\t97fc8119\t\tCALL runtime.panicSlice3C(SB)\t\t\t\t\n  pack.go:143\t\t0x1001581b0\t\taa0203e3\t\tMOVD R2, R3\t\t\t\t\t\t\n  pack.go:143\t\t0x1001581b4\t\taa0a03e2\t\tMOVD R10, R2\t\t\t\t\t\t\n  pack.go:143\t\t0x1001581b8\t\t97fc810e\t\tCALL runtime.panicSlice3Acap(SB)\t\t\t\n  pack.go:126\t\t0x1001581bc\t\taa0603e0\t\tMOVD R6, R0\t\t\t\t\t\t\n  pack.go:126\t\t0x1001581c0\t\taa0803e1\t\tMOVD R8, R1\t\t\t\t\t\t\n  pack.go:126\t\t0x1001581c4\t\t97fc8113\t\tCALL runtime.panicSlice3C(SB)\t\t\t\t\n  pack.go:126\t\t0x1001581c8\t\taa0203e3\t\tMOVD R2, R3\t\t\t\t\t\t\n  pack.go:126\t\t0x1001581cc\t\taa0803e2\t\tMOVD R8, R2\t\t\t\t\t\t\n  pack.go:126\t\t0x1001581d0\t\t97fc8108\t\tCALL runtime.panicSlice3Acap(SB)\t\t\t\n  pack.go:126\t\t0x1001581d4\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\n  pack.go:109\t\t0x1001581d8\t\ta90087e0\t\tSTP (R0, R1), 8(RSP)\t\t\t\t\t\n  pack.go:109\t\t0x1001581dc\t\ta9018fe2\t\tSTP (R2, R3), 24(RSP)\t\t\t\t\t\n  pack.go:109\t\t0x1001581e0\t\ta90297e4\t\tSTP (R4, R5), 40(RSP)\t\t\t\t\t\n  pack.go:109\t\t0x1001581e4\t\taa1e03e3\t\tMOVD R30, R3\t\t\t\t\t\t\n  pack.go:109\t\t0x1001581e8\t\t97fc7786\t\tCALL runtime.morestack_noctxt.abi0(SB)\t\t\t\n  pack.go:109\t\t0x1001581ec\t\ta94087e0\t\tLDP 8(RSP), (R0, R1)\t\t\t\t\t\n  pack.go:109\t\t0x1001581f0\t\ta9418fe2\t\tLDP 24(RSP), (R2, R3)\t\t\t\t\t\n  pack.go:109\t\t0x1001581f4\t\ta94297e4\t\tLDP 40(RSP), (R4, R5)\t\t\t\t\t\n  pack.go:109\t\t0x1001581f8\t\t17fffeda\t\tJMP github.com/cnooljaw/gosproto.packInto(SB)\t\t\n  pack.go:109\t\t0x1001581fc\t\t00000000\t\t?\t\t\t\t\t\t\t\n\nTEXT github.com/cnooljaw/gosproto.packPairClone(SB) /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/gosproto/pair_experiment.go\n  pair_experiment.go:8\t0x100158810\t\tf9400b90\t\tMOVD 16(R28), R16\t\t\t\t\t\n  pair_experiment.go:8\t0x100158814\t\teb3063ff\t\tCMP R16, RSP\t\t\t\t\t\t\n  pair_experiment.go:8\t0x100158818\t\t54002389\t\tBLS 284(PC)\t\t\t\t\t\t\n  pair_experiment.go:8\t0x10015881c\t\tf8190ffe\t\tMOVD.W R30, -112(RSP)\t\t\t\t\t\n  pair_experiment.go:8\t0x100158820\t\tf81f83fd\t\tMOVD R29, -8(RSP)\t\t\t\t\t\n  pair_experiment.go:8\t0x100158824\t\td10023fd\t\tSUB $8, RSP, R29\t\t\t\t\t\n  pair_experiment.go:8\t0x100158828\t\tf9004be3\t\tMOVD R3, 144(RSP)\t\t\t\t\t\n  pair_experiment.go:10\t0x10015882c\t\tf90047e2\t\tMOVD R2, 136(RSP)\t\t\t\t\t\n  pair_experiment.go:10\t0x100158830\t\tf90043e1\t\tMOVD R1, 128(RSP)\t\t\t\t\t\n  pair_experiment.go:10\t0x100158834\t\tf9003fe0\t\tMOVD R0, 120(RSP)\t\t\t\t\t\n  pair_experiment.go:10\t0x100158838\t\taa1f03e6\t\tMOVD ZR, R6\t\t\t\t\t\t\n  pair_experiment.go:10\t0x10015883c\t\t14000002\t\tJMP 2(PC)\t\t\t\t\t\t\n  pair_experiment.go:10\t0x100158840\t\taa0703e3\t\tMOVD R7, R3\t\t\t\t\t\t\n  pair_experiment.go:10\t0x100158844\t\tf100209f\t\tCMP $8, R4\t\t\t\t\t\t\n  pair_experiment.go:10\t0x100158848\t\t540016cb\t\tBLT 182(PC)\t\t\t\t\t\t\n  binary.go:117\t\t0x10015884c\t\tf9400067\t\tMOVD (R3), R7\t\t\t\t\t\t\n  pair_experiment.go:12\t0x100158850\t\t9200d8e8\t\tAND $9187201950435737471, R7, R8\t\t\t\n  pair_experiment.go:12\t0x100158854\t\tb200dbe9\t\tMOVD $9187201950435737471, R9\t\t\t\t\n  pair_experiment.go:12\t0x100158858\t\t8b090108\t\tADD R9, R8, R8\t\t\t\t\t\t\n  pair_experiment.go:12\t0x10015885c\t\taa070108\t\tORR R7, R8, R8\t\t\t\t\t\t\n  pair_experiment.go:12\t0x100158860\t\t9201c108\t\tAND $-9187201950435737472, R8, R8\t\t\t\n  pair_experiment.go:13\t0x100158864\t\td347fd08\t\tLSR $7, R8, R8\t\t\t\t\t\t\n  pair_experiment.go:13\t0x100158868\t\td2881009\t\tMOVD $16512, R9\t\t\t\t\t\t\n  pair_experiment.go:13\t0x10015886c\t\tf2a20409\t\tMOVK $(4128<<16), R9\t\t\t\t\t\n  pair_experiment.go:13\t0x100158870\t\tf2c08109\t\tMOVK $(1032<<32), R9\t\t\t\t\t\n  pair_experiment.go:13\t0x100158874\t\tf2e02049\t\tMOVK $(258<<48), R9\t\t\t\t\t\n  pair_experiment.go:13\t0x100158878\t\t9b087d2a\t\tMUL R8, R9, R10\t\t\t\t\t\t\n  pair_experiment.go:13\t0x10015887c\t\td378fd4b\t\tLSR $56, R10, R11\t\t\t\t\t\n  pair_experiment.go:14\t0x100158880\t\td3401d6c\t\tUBFX $0, R11, $8, R12\t\t\t\t\t\n  pair_experiment.go:11\t0x100158884\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\n  pair_experiment.go:14\t0x100158888\t\t7103fd9f\t\tCMPW $255, R12\t\t\t\t\t\t\n  pair_experiment.go:14\t0x10015888c\t\t54000960\t\tBEQ 75(PC)\t\t\t\t\t\t\n  pair_experiment.go:22\t0x100158890\t\td100056d\t\tSUB $1, R11, R13\t\t\t\t\t\n  pair_experiment.go:22\t0x100158894\t\t8a4ae1aa\t\tAND R10>>56, R13, R10\t\t\t\t\t\n  pair_experiment.go:23\t0x100158898\t\td100054d\t\tSUB $1, R10, R13\t\t\t\t\t\n  pair_experiment.go:23\t0x10015889c\t\t8a0a01ad\t\tAND R10, R13, R13\t\t\t\t\t\n  pair_experiment.go:23\t0x1001588a0\t\td3401dad\t\tUBFX $0, R13, $8, R13\t\t\t\t\t\n  pair_experiment.go:23\t0x1001588a4\t\t3500038d\t\tCBNZW R13, 28(PC)\t\t\t\t\t\n  pair_experiment.go:25\t0x1001588a8\t\t91000cc8\t\tADD $3, R6, R8\t\t\t\t\t\t\n  pair_experiment.go:25\t0x1001588ac\t\teb08005f\t\tCMP R8, R2\t\t\t\t\t\t\n  pair_experiment.go:25\t0x1001588b0\t\t54001e43\t\tBCC 242(PC)\t\t\t\t\t\t\n  pair_experiment.go:25\t0x1001588b4\t\teb0800df\t\tCMP R8, R6\t\t\t\t\t\t\n  pair_experiment.go:25\t0x1001588b8\t\t54001da8\t\tBHI 237(PC)\t\t\t\t\t\t\n  pair_experiment.go:28\t0x1001588bc\t\t3826680b\t\tMOVB R11, (R0)(R6)\t\t\t\t\t\n  pair_experiment.go:25\t0x1001588c0\t\t8b0000c8\t\tADD R0, R6, R8\t\t\t\t\t\t\n  pair_experiment.go:30\t0x1001588c4\t\t3400022c\t\tCBZW R12, 17(PC)\t\t\t\t\t\n  pair_experiment.go:31\t0x1001588c8\t\t5ac0016b\t\tRBITW R11, R11\t\t\t\t\t\t\n  pair_experiment.go:31\t0x1001588cc\t\t5ac0116b\t\tCLZW R11, R11\t\t\t\t\t\t\n  pair_experiment.go:31\t0x1001588d0\t\td37df16b\t\tLSL $3, R11, R11\t\t\t\t\t\n  pair_experiment.go:32\t0x1001588d4\t\t9acb24eb\t\tLSR R11, R7, R11\t\t\t\t\t\n  pair_experiment.go:32\t0x1001588d8\t\t3900050b\t\tMOVB R11, 1(R8)\t\t\t\t\t\t\n  pair_experiment.go:34\t0x1001588dc\t\td3401d4b\t\tUBFX $0, R10, $8, R11\t\t\t\t\t\n  pair_experiment.go:34\t0x1001588e0\t\t3400010b\t\tCBZW R11, 8(PC)\t\t\t\t\t\t\n  pair_experiment.go:35\t0x1001588e4\t\t5ac0014a\t\tRBITW R10, R10\t\t\t\t\t\t\n  pair_experiment.go:35\t0x1001588e8\t\t5ac0114a\t\tCLZW R10, R10\t\t\t\t\t\t\n  pair_experiment.go:35\t0x1001588ec\t\td37df14a\t\tLSL $3, R10, R10\t\t\t\t\t\n  pair_experiment.go:36\t0x1001588f0\t\t9aca24e7\t\tLSR R10, R7, R7\t\t\t\t\t\t\n  pair_experiment.go:36\t0x1001588f4\t\t39000907\t\tMOVB R7, 2(R8)\t\t\t\t\t\t\n  pair_experiment.go:36\t0x1001588f8\t\tb24007e7\t\tORR $3, ZR, R7\t\t\t\t\t\t\n  pair_experiment.go:37\t0x1001588fc\t\t14000004\t\tJMP 4(PC)\t\t\t\t\t\t\n  pair_experiment.go:37\t0x100158900\t\tb27f03e7\t\tORR $2, ZR, R7\t\t\t\t\t\t\n  pair_experiment.go:34\t0x100158904\t\t14000002\t\tJMP 2(PC)\t\t\t\t\t\t\n  pair_experiment.go:34\t0x100158908\t\tb24003e7\t\tORR $1, ZR, R7\t\t\t\t\t\t\n  pair_experiment.go:40\t0x10015890c\t\t8b0600e6\t\tADD R6, R7, R6\t\t\t\t\t\t\n  pair_experiment.go:40\t0x100158910\t\t14000023\t\tJMP 35(PC)\t\t\t\t\t\t\n  pair_experiment.go:42\t0x100158914\t\t910024ca\t\tADD $9, R6, R10\t\t\t\t\t\t\n  pair_experiment.go:42\t0x100158918\t\teb0a005f\t\tCMP R10, R2\t\t\t\t\t\t\n  pair_experiment.go:42\t0x10015891c\t\t54001a23\t\tBCC 209(PC)\t\t\t\t\t\t\n  pair_experiment.go:42\t0x100158920\t\teb0a00df\t\tCMP R10, R6\t\t\t\t\t\t\n  pair_experiment.go:42\t0x100158924\t\t54001988\t\tBHI 204(PC)\t\t\t\t\t\t\n  pair_experiment.go:42\t0x100158928\t\t8b0000ca\t\tADD R0, R6, R10\t\t\t\t\t\t\n  pair_experiment.go:50\t0x10015892c\t\t39000547\t\tMOVB R7, 1(R10)\t\t\t\t\t\t\n  pair_experiment.go:46\t0x100158930\t\t9100054a\t\tADD $1, R10, R10\t\t\t\t\t\n  pair_experiment.go:49\t0x100158934\t\tb200c3ec\t\tMOVD $72340172838076673, R12\t\t\t\t\n  pair_experiment.go:49\t0x100158938\t\t9b087d88\t\tMUL R8, R12, R8\t\t\t\t\t\t\n  pair_experiment.go:51\t0x10015893c\t\t9240090d\t\tAND $7, R8, R13\t\t\t\t\t\t\n  pair_experiment.go:51\t0x100158940\t\td348fcee\t\tLSR $8, R7, R14\t\t\t\t\t\t\n  pair_experiment.go:51\t0x100158944\t\t382d694e\t\tMOVB R14, (R10)(R13)\t\t\t\t\t\n  pair_experiment.go:52\t0x100158948\t\td348290d\t\tUBFX $8, R8, $3, R13\t\t\t\t\t\n  pair_experiment.go:52\t0x10015894c\t\td350fcee\t\tLSR $16, R7, R14\t\t\t\t\t\n  pair_experiment.go:52\t0x100158950\t\t382d694e\t\tMOVB R14, (R10)(R13)\t\t\t\t\t\n  pair_experiment.go:53\t0x100158954\t\td350490d\t\tUBFX $16, R8, $3, R13\t\t\t\t\t\n  pair_experiment.go:53\t0x100158958\t\td358fcee\t\tLSR $24, R7, R14\t\t\t\t\t\n  pair_experiment.go:53\t0x10015895c\t\t382d694e\t\tMOVB R14, (R10)(R13)\t\t\t\t\t\n  pair_experiment.go:54\t0x100158960\t\td358690d\t\tUBFX $24, R8, $3, R13\t\t\t\t\t\n  pair_experiment.go:54\t0x100158964\t\td360fcee\t\tLSR $32, R7, R14\t\t\t\t\t\n  pair_experiment.go:54\t0x100158968\t\t382d694e\t\tMOVB R14, (R10)(R13)\t\t\t\t\t\n  pair_experiment.go:55\t0x10015896c\t\td360890d\t\tUBFX $32, R8, $3, R13\t\t\t\t\t\n  pair_experiment.go:55\t0x100158970\t\td368fcee\t\tLSR $40, R7, R14\t\t\t\t\t\n  pair_experiment.go:55\t0x100158974\t\t382d694e\t\tMOVB R14, (R10)(R13)\t\t\t\t\t\n  pair_experiment.go:56\t0x100158978\t\td368a90d\t\tUBFX $40, R8, $3, R13\t\t\t\t\t\n  pair_experiment.go:56\t0x10015897c\t\td370fcee\t\tLSR $48, R7, R14\t\t\t\t\t\n  pair_experiment.go:56\t0x100158980\t\t382d694e\t\tMOVB R14, (R10)(R13)\t\t\t\t\t\n  pair_experiment.go:57\t0x100158984\t\td370c90d\t\tUBFX $48, R8, $3, R13\t\t\t\t\t\n  pair_experiment.go:57\t0x100158988\t\td378fce7\t\tLSR $56, R7, R7\t\t\t\t\t\t\n  pair_experiment.go:57\t0x10015898c\t\t382d6947\t\tMOVB R7, (R10)(R13)\t\t\t\t\t\n  pair_experiment.go:58\t0x100158990\t\t3826680b\t\tMOVB R11, (R0)(R6)\t\t\t\t\t\n  pair_experiment.go:59\t0x100158994\t\t8b48e0c7\t\tADD R8>>56, R6, R7\t\t\t\t\t\n  pair_experiment.go:59\t0x100158998\t\t910004e6\t\tADD $1, R7, R6\t\t\t\t\t\t\n  pair_experiment.go:61\t0x10015899c\t\td10020a5\t\tSUB $8, R5, R5\t\t\t\t\t\t\n  pair_experiment.go:61\t0x1001589a0\t\tcb0503e7\t\tNEG R5, R7\t\t\t\t\t\t\n  pair_experiment.go:61\t0x1001589a4\t\t937ffce7\t\tASR $63, R7, R7\t\t\t\t\t\t\n  pair_experiment.go:61\t0x1001589a8\t\t927d00e7\t\tAND $8, R7, R7\t\t\t\t\t\t\n  pair_experiment.go:61\t0x1001589ac\t\t8b0300e7\t\tADD R3, R7, R7\t\t\t\t\t\t\n  pair_experiment.go:61\t0x1001589b0\t\td1002084\t\tSUB $8, R4, R4\t\t\t\t\t\t\n  pair_experiment.go:61\t0x1001589b4\t\t17ffffa3\t\tJMP -93(PC)\t\t\t\t\t\t\n  pair_experiment.go:10\t0x1001589b8\t\tf90027e5\t\tMOVD R5, 72(RSP)\t\t\t\t\t\n  pair_experiment.go:10\t0x1001589bc\t\tf90023e4\t\tMOVD R4, 64(RSP)\t\t\t\t\t\n  pair_experiment.go:10\t0x1001589c0\t\tf90033e3\t\tMOVD R3, 96(RSP)\t\t\t\t\t\n  pair_experiment.go:64\t0x1001589c4\t\tf90013e6\t\tMOVD R6, 32(RSP)\t\t\t\t\t\n  pair_experiment.go:15\t0x1001589c8\t\taa0303e0\t\tMOVD R3, R0\t\t\t\t\t\t\n  pair_experiment.go:15\t0x1001589cc\t\taa0403e1\t\tMOVD R4, R1\t\t\t\t\t\t\n  pair_experiment.go:15\t0x1001589d0\t\taa0503e2\t\tMOVD R5, R2\t\t\t\t\t\t\n  pair_experiment.go:15\t0x1001589d4\t\t97fffc6f\t\tCALL github.com/cnooljaw/gosproto.ffRunBytes(SB)\t\n  pair_experiment.go:16\t0x1001589d8\t\tf94043e1\t\tMOVD 128(RSP), R1\t\t\t\t\t\n  pair_experiment.go:16\t0x1001589dc\t\tf94013e3\t\tMOVD 32(RSP), R3\t\t\t\t\t\n  pair_experiment.go:16\t0x1001589e0\t\teb03003f\t\tCMP R3, R1\t\t\t\t\t\t\n  pair_experiment.go:16\t0x1001589e4\t\t54001343\t\tBCC 154(PC)\t\t\t\t\t\t\n  pair_experiment.go:16\t0x1001589e8\t\tcb030024\t\tSUB R3, R1, R4\t\t\t\t\t\t\n  pair_experiment.go:16\t0x1001589ec\t\tf94047e2\t\tMOVD 136(RSP), R2\t\t\t\t\t\n  pair_experiment.go:16\t0x1001589f0\t\tcb030045\t\tSUB R3, R2, R5\t\t\t\t\t\t\n  pair_experiment.go:16\t0x1001589f4\t\tcb0503e6\t\tNEG R5, R6\t\t\t\t\t\t\n  pair_experiment.go:16\t0x1001589f8\t\t8a86fc66\t\tAND R6->63, R3, R6\t\t\t\t\t\n  pair_experiment.go:16\t0x1001589fc\t\tf9403fe7\t\tMOVD 120(RSP), R7\t\t\t\t\t\n  pair_experiment.go:16\t0x100158a00\t\t8b0600e8\t\tADD R6, R7, R8\t\t\t\t\t\t\n  pack.go:37\t\t0x100158a04\t\tf94023e9\t\tMOVD 64(RSP), R9\t\t\t\t\t\n  pack.go:37\t\t0x100158a08\t\teb09001f\t\tCMP R9, R0\t\t\t\t\t\t\n  pack.go:37\t\t0x100158a0c\t\t9a80c12a\t\tCSEL GT, R9, R0, R10\t\t\t\t\t\n  pack.go:39\t\t0x100158a10\t\tf100009f\t\tCMP $0, R4\t\t\t\t\t\t\n  pack.go:37\t\t0x100158a14\t\t54001169\t\tBLS 139(PC)\t\t\t\t\t\t\n  pack.go:39\t\t0x100158a18\t\t9280000b\t\tMOVD $-1, R11\t\t\t\t\t\t\n  pack.go:39\t\t0x100158a1c\t\t382668eb\t\tMOVB R11, (R7)(R6)\t\t\t\t\t\n  pack.go:38\t\t0x100158a20\t\t91001d46\t\tADD $7, R10, R6\t\t\t\t\t\t\n  pack.go:38\t\t0x100158a24\t\t927df0c6\t\tAND $-8, R6, R6\t\t\t\t\t\t\n  pack.go:40\t\t0x100158a28\t\t937ffccc\t\tASR $63, R6, R12\t\t\t\t\t\n  pack.go:40\t\t0x100158a2c\t\t8b4cf4cc\t\tADD R12>>61, R6, R12\t\t\t\t\t\n  pack.go:40\t\t0x100158a30\t\tf100049f\t\tCMP $1, R4\t\t\t\t\t\t\n  pack.go:40\t\t0x100158a34\t\t54001009\t\tBLS 128(PC)\t\t\t\t\t\t\n  pack.go:40\t\t0x100158a38\t\t9343fd8c\t\tASR $3, R12, R12\t\t\t\t\t\n  pack.go:40\t\t0x100158a3c\t\td100058c\t\tSUB $1, R12, R12\t\t\t\t\t\n  pack.go:40\t\t0x100158a40\t\t3900050c\t\tMOVB R12, 1(R8)\t\t\t\t\t\t\n  pack.go:41\t\t0x100158a44\t\td10008a5\t\tSUB $2, R5, R5\t\t\t\t\t\t\n  pack.go:41\t\t0x100158a48\t\tcb0503e5\t\tNEG R5, R5\t\t\t\t\t\t\n  pack.go:41\t\t0x100158a4c\t\t937ffca5\t\tASR $63, R5, R5\t\t\t\t\t\t\n  pack.go:41\t\t0x100158a50\t\t927f00a5\t\tAND $2, R5, R5\t\t\t\t\t\t\n  pack.go:41\t\t0x100158a54\t\t8b0800a5\t\tADD R8, R5, R5\t\t\t\t\t\t\n  pack.go:41\t\t0x100158a58\t\tf94027ec\t\tMOVD 72(RSP), R12\t\t\t\t\t\n  pack.go:41\t\t0x100158a5c\t\teb0a019f\t\tCMP R10, R12\t\t\t\t\t\t\n  pack.go:41\t\t0x100158a60\t\t54000e43\t\tBCC 114(PC)\t\t\t\t\t\t\n  pack.go:41\t\t0x100158a64\t\td100088d\t\tSUB $2, R4, R13\t\t\t\t\t\t\n  pack.go:41\t\t0x100158a68\t\teb0d015f\t\tCMP R13, R10\t\t\t\t\t\t\n  pack.go:41\t\t0x100158a6c\t\t9a8db14d\t\tCSEL LT, R10, R13, R13\t\t\t\t\t\n  pack.go:41\t\t0x100158a70\t\tf94033ee\t\tMOVD 96(RSP), R14\t\t\t\t\t\n  pack.go:41\t\t0x100158a74\t\teb0501df\t\tCMP R5, R14\t\t\t\t\t\t\n  pack.go:41\t\t0x100158a78\t\t54000c20\t\tBEQ 97(PC)\t\t\t\t\t\t\n  pair_experiment.go:15\t0x100158a7c\t\tf9001fe0\t\tMOVD R0, 56(RSP)\t\t\t\t\t\n  pair_experiment.go:16\t0x100158a80\t\tf9001be4\t\tMOVD R4, 48(RSP)\t\t\t\t\t\n  pair_experiment.go:16\t0x100158a84\t\tf9002fe8\t\tMOVD R8, 88(RSP)\t\t\t\t\t\n  pack.go:37\t\t0x100158a88\t\tf90017ea\t\tMOVD R10, 40(RSP)\t\t\t\t\t\n  pack.go:38\t\t0x100158a8c\t\tf9002be6\t\tMOVD R6, 80(RSP)\t\t\t\t\t\n  pack.go:41\t\t0x100158a90\t\taa0503e0\t\tMOVD R5, R0\t\t\t\t\t\t\n  pack.go:41\t\t0x100158a94\t\taa0e03e1\t\tMOVD R14, R1\t\t\t\t\t\t\n  pack.go:41\t\t0x100158a98\t\taa0d03e2\t\tMOVD R13, R2\t\t\t\t\t\t\n  pack.go:41\t\t0x100158a9c\t\t97fc801d\t\tCALL runtime.memmove(SB)\t\t\t\t\n  pair_experiment.go:17\t0x100158aa0\t\tf9401fe0\t\tMOVD 56(RSP), R0\t\t\t\t\t\n  pair_experiment.go:64\t0x100158aa4\t\tf94043e1\t\tMOVD 128(RSP), R1\t\t\t\t\t\n  pair_experiment.go:25\t0x100158aa8\t\tf94047e2\t\tMOVD 136(RSP), R2\t\t\t\t\t\n  pair_experiment.go:17\t0x100158aac\t\tf94013e3\t\tMOVD 32(RSP), R3\t\t\t\t\t\n  pack.go:43\t\t0x100158ab0\t\tf9401be4\t\tMOVD 48(RSP), R4\t\t\t\t\t\n  pack.go:42\t\t0x100158ab4\t\tf9402be6\t\tMOVD 80(RSP), R6\t\t\t\t\t\n  pair_experiment.go:28\t0x100158ab8\t\tf9403fe7\t\tMOVD 120(RSP), R7\t\t\t\t\t\n  pack.go:43\t\t0x100158abc\t\tf9402fe8\t\tMOVD 88(RSP), R8\t\t\t\t\t\n  pack.go:37\t\t0x100158ac0\t\tf94023e9\t\tMOVD 64(RSP), R9\t\t\t\t\t\n  pack.go:42\t\t0x100158ac4\t\tf94017ea\t\tMOVD 40(RSP), R10\t\t\t\t\t\n  pack.go:42\t\t0x100158ac8\t\t9280000b\t\tMOVD $-1, R11\t\t\t\t\t\t\n  pair_experiment.go:18\t0x100158acc\t\tf94027ec\t\tMOVD 72(RSP), R12\t\t\t\t\t\n  pair_experiment.go:18\t0x100158ad0\t\tf94033ee\t\tMOVD 96(RSP), R14\t\t\t\t\t\n  pack.go:41\t\t0x100158ad4\t\t1400004a\t\tJMP 74(PC)\t\t\t\t\t\t\n  pair_experiment.go:17\t0x100158ad8\t\t91001c04\t\tADD $7, R0, R4\t\t\t\t\t\t\n  pair_experiment.go:17\t0x100158adc\t\t927df084\t\tAND $-8, R4, R4\t\t\t\t\t\t\n  pair_experiment.go:17\t0x100158ae0\t\t8b030084\t\tADD R3, R4, R4\t\t\t\t\t\t\n  pack.go:37\t\t0x100158ae4\t\teb09001f\t\tCMP R9, R0\t\t\t\t\t\t\n  pair_experiment.go:18\t0x100158ae8\t\t54000968\t\tBHI 75(PC)\t\t\t\t\t\t\n  pair_experiment.go:18\t0x100158aec\t\tcb000185\t\tSUB R0, R12, R5\t\t\t\t\t\t\n  pair_experiment.go:18\t0x100158af0\t\tcb0503e8\t\tNEG R5, R8\t\t\t\t\t\t\n  pair_experiment.go:18\t0x100158af4\t\t8a88fc08\t\tAND R8->63, R0, R8\t\t\t\t\t\n  pair_experiment.go:17\t0x100158af8\t\t91000886\t\tADD $2, R4, R6\t\t\t\t\t\t\n  pair_experiment.go:18\t0x100158afc\t\tcb000124\t\tSUB R0, R9, R4\t\t\t\t\t\t\n  pair_experiment.go:18\t0x100158b00\t\t8b0801c8\t\tADD R8, R14, R8\t\t\t\t\t\t\n  pair_experiment.go:28\t0x100158b04\t\taa0703e0\t\tMOVD R7, R0\t\t\t\t\t\t\n  pair_experiment.go:28\t0x100158b08\t\td2881009\t\tMOVD $16512, R9\t\t\t\t\t\t\n  pair_experiment.go:28\t0x100158b0c\t\tf2a20409\t\tMOVK $(4128<<16), R9\t\t\t\t\t\n  pair_experiment.go:28\t0x100158b10\t\tf2c08109\t\tMOVK $(1032<<32), R9\t\t\t\t\t\n  pair_experiment.go:28\t0x100158b14\t\tf2e02049\t\tMOVK $(258<<48), R9\t\t\t\t\t\n  pair_experiment.go:10\t0x100158b18\t\taa0803e7\t\tMOVD R8, R7\t\t\t\t\t\t\n  pair_experiment.go:19\t0x100158b1c\t\t17ffff49\t\tJMP -183(PC)\t\t\t\t\t\t\n  pair_experiment.go:63\t0x100158b20\t\tb4000184\t\tCBZ R4, 12(PC)\t\t\t\t\t\t\n  pair_experiment.go:64\t0x100158b24\t\teb06003f\t\tCMP R6, R1\t\t\t\t\t\t\n  pair_experiment.go:64\t0x100158b28\t\t54000623\t\tBCC 49(PC)\t\t\t\t\t\t\n  pair_experiment.go:64\t0x100158b2c\t\tcb060045\t\tSUB R6, R2, R5\t\t\t\t\t\t\n  pair_experiment.go:64\t0x100158b30\t\tcb0503e5\t\tNEG R5, R5\t\t\t\t\t\t\n  pair_experiment.go:64\t0x100158b34\t\t8a85fcc5\t\tAND R5->63, R6, R5\t\t\t\t\t\n  pair_experiment.go:64\t0x100158b38\t\tcb060021\t\tSUB R6, R1, R1\t\t\t\t\t\t\n  pair_experiment.go:64\t0x100158b3c\t\t8b050007\t\tADD R5, R0, R7\t\t\t\t\t\t\n  pair_experiment.go:64\t0x100158b40\t\taa1f03e8\t\tMOVD ZR, R8\t\t\t\t\t\t\n  pair_experiment.go:64\t0x100158b44\t\taa1f03e9\t\tMOVD ZR, R9\t\t\t\t\t\t\n  pair_experiment.go:64\t0x100158b48\t\taa1f03ea\t\tMOVD ZR, R10\t\t\t\t\t\t\n  pack.go:13\t\t0x100158b4c\t\t1400000a\t\tJMP 10(PC)\t\t\t\t\t\t\n  pair_experiment.go:66\t0x100158b50\t\teb06005f\t\tCMP R6, R2\t\t\t\t\t\t\n  pair_experiment.go:66\t0x100158b54\t\t540000a3\t\tBCC 5(PC)\t\t\t\t\t\t\n  pair_experiment.go:66\t0x100158b58\t\taa0603e1\t\tMOVD R6, R1\t\t\t\t\t\t\n  pair_experiment.go:66\t0x100158b5c\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\n  pair_experiment.go:66\t0x100158b60\t\tf84707fe\t\tMOVD.P 112(RSP), R30\t\t\t\t\t\n  pair_experiment.go:66\t0x100158b64\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\n  pair_experiment.go:66\t0x100158b68\t\taa0603e1\t\tMOVD R6, R1\t\t\t\t\t\t\n  pair_experiment.go:66\t0x100158b6c\t\t97fc7e8d\t\tCALL runtime.panicSliceAcap(SB)\t\t\t\t\n  pack.go:13\t\t0x100158b70\t\t91000508\t\tADD $1, R8, R8\t\t\t\t\t\t\n  pack.go:13\t\t0x100158b74\t\teb04011f\t\tCMP R4, R8\t\t\t\t\t\t\n  pack.go:13\t\t0x100158b78\t\t540001ca\t\tBGE 14(PC)\t\t\t\t\t\t\n  pack.go:13\t\t0x100158b7c\t\t3868686b\t\tMOVBU (R3)(R8), R11\t\t\t\t\t\n  pack.go:14\t\t0x100158b80\t\taa0b03ec\t\tMOVD R11, R12\t\t\t\t\t\t\n  pack.go:14\t\t0x100158b84\t\t3400012c\t\tCBZW R12, 9(PC)\t\t\t\t\t\t\n  pack.go:15\t\t0x100158b88\t\t91000529\t\tADD $1, R9, R9\t\t\t\t\t\t\n  pack.go:16\t\t0x100158b8c\t\tb24003ec\t\tORR $1, ZR, R12\t\t\t\t\t\t\n  pack.go:16\t\t0x100158b90\t\t9ac8218d\t\tLSL R8, R12, R13\t\t\t\t\t\n  pack.go:16\t\t0x100158b94\t\taa0d014a\t\tORR R13, R10, R10\t\t\t\t\t\n  pack.go:17\t\t0x100158b98\t\teb09003f\t\tCMP R9, R1\t\t\t\t\t\t\n  pack.go:17\t\t0x100158b9c\t\t54000249\t\tBLS 18(PC)\t\t\t\t\t\t\n  pack.go:17\t\t0x100158ba0\t\t382968eb\t\tMOVB R11, (R7)(R9)\t\t\t\t\t\n  pack.go:17\t\t0x100158ba4\t\t17fffff3\t\tJMP -13(PC)\t\t\t\t\t\t\n  pack.go:17\t\t0x100158ba8\t\tb24003ec\t\tORR $1, ZR, R12\t\t\t\t\t\t\n  pack.go:14\t\t0x100158bac\t\t17fffff1\t\tJMP -15(PC)\t\t\t\t\t\t\n  pack.go:27\t\t0x100158bb0\t\tf100213f\t\tCMP $8, R9\t\t\t\t\t\t\n  pack.go:27\t\t0x100158bb4\t\t54000061\t\tBNE 3(PC)\t\t\t\t\t\t\n  pack.go:27\t\t0x100158bb8\t\td2800143\t\tMOVD $10, R3\t\t\t\t\t\t\n  pair_experiment.go:64\t0x100158bbc\t\t14000005\t\tJMP 5(PC)\t\t\t\t\t\t\n  pack.go:31\t\t0x100158bc0\t\tf100003f\t\tCMP $0, R1\t\t\t\t\t\t\n  pack.go:31\t\t0x100158bc4\t\t540000a9\t\tBLS 5(PC)\t\t\t\t\t\t\n  pack.go:31\t\t0x100158bc8\t\t3825680a\t\tMOVB R10, (R0)(R5)\t\t\t\t\t\n  pack.go:32\t\t0x100158bcc\t\t91000523\t\tADD $1, R9, R3\t\t\t\t\t\t\n  pair_experiment.go:64\t0x100158bd0\t\t8b060066\t\tADD R6, R3, R6\t\t\t\t\t\t\n  pair_experiment.go:64\t0x100158bd4\t\t17ffffdf\t\tJMP -33(PC)\t\t\t\t\t\t\n  pack.go:31\t\t0x100158bd8\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\n  pack.go:31\t\t0x100158bdc\t\taa0003e1\t\tMOVD R0, R1\t\t\t\t\t\t\n  pack.go:31\t\t0x100158be0\t\t97fc7e60\t\tCALL runtime.panicIndex(SB)\t\t\t\t\n  pack.go:17\t\t0x100158be4\t\taa0903e0\t\tMOVD R9, R0\t\t\t\t\t\t\n  pack.go:17\t\t0x100158be8\t\t97fc7e5e\t\tCALL runtime.panicIndex(SB)\t\t\t\t\n  pair_experiment.go:64\t0x100158bec\t\taa0603e0\t\tMOVD R6, R0\t\t\t\t\t\t\n  pair_experiment.go:64\t0x100158bf0\t\t97fc7e74\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\n  pack.go:43\t\t0x100158bf4\t\t3825691f\t\tMOVB ZR, (R8)(R5)\t\t\t\t\t\n  pack.go:42\t\t0x100158bf8\t\t9100054a\t\tADD $1, R10, R10\t\t\t\t\t\n  pack.go:42\t\t0x100158bfc\t\teb06015f\t\tCMP R6, R10\t\t\t\t\t\t\n  pack.go:42\t\t0x100158c00\t\t54fff6ca\t\tBGE -74(PC)\t\t\t\t\t\t\n  pack.go:43\t\t0x100158c04\t\t91000945\t\tADD $2, R10, R5\t\t\t\t\t\t\n  pack.go:43\t\t0x100158c08\t\teb05009f\t\tCMP R5, R4\t\t\t\t\t\t\n  pack.go:43\t\t0x100158c0c\t\t54ffff48\t\tBHI -6(PC)\t\t\t\t\t\t\n  pack.go:43\t\t0x100158c10\t\t14000003\t\tJMP 3(PC)\t\t\t\t\t\t\n  pair_experiment.go:18\t0x100158c14\t\taa0903e1\t\tMOVD R9, R1\t\t\t\t\t\t\n  pair_experiment.go:18\t0x100158c18\t\t97fc7e6a\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\n  pack.go:43\t\t0x100158c1c\t\taa0503e0\t\tMOVD R5, R0\t\t\t\t\t\t\n  pack.go:43\t\t0x100158c20\t\taa0403e1\t\tMOVD R4, R1\t\t\t\t\t\t\n  pack.go:43\t\t0x100158c24\t\t97fc7e4f\t\tCALL runtime.panicIndex(SB)\t\t\t\t\n  pack.go:41\t\t0x100158c28\t\taa0a03e1\t\tMOVD R10, R1\t\t\t\t\t\t\n  pack.go:41\t\t0x100158c2c\t\taa0c03e2\t\tMOVD R12, R2\t\t\t\t\t\t\n  pack.go:41\t\t0x100158c30\t\t97fc7e5c\t\tCALL runtime.panicSliceAcap(SB)\t\t\t\t\n  pack.go:40\t\t0x100158c34\t\tb24003e0\t\tORR $1, ZR, R0\t\t\t\t\t\t\n  pack.go:40\t\t0x100158c38\t\taa0003e1\t\tMOVD R0, R1\t\t\t\t\t\t\n  pack.go:40\t\t0x100158c3c\t\t97fc7e49\t\tCALL runtime.panicIndex(SB)\t\t\t\t\n  pack.go:39\t\t0x100158c40\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\n  pack.go:39\t\t0x100158c44\t\taa0003e1\t\tMOVD R0, R1\t\t\t\t\t\t\n  pack.go:39\t\t0x100158c48\t\t97fc7e46\t\tCALL runtime.panicIndex(SB)\t\t\t\t\n  pair_experiment.go:16\t0x100158c4c\t\taa0303e0\t\tMOVD R3, R0\t\t\t\t\t\t\n  pair_experiment.go:16\t0x100158c50\t\t97fc7e5c\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\n  pair_experiment.go:42\t0x100158c54\t\taa0603e0\t\tMOVD R6, R0\t\t\t\t\t\t\n  pair_experiment.go:42\t0x100158c58\t\taa0a03e1\t\tMOVD R10, R1\t\t\t\t\t\t\n  pair_experiment.go:42\t0x100158c5c\t\t97fc7e6d\t\tCALL runtime.panicSlice3C(SB)\t\t\t\t\n  pair_experiment.go:42\t0x100158c60\t\taa0203e3\t\tMOVD R2, R3\t\t\t\t\t\t\n  pair_experiment.go:42\t0x100158c64\t\taa0a03e2\t\tMOVD R10, R2\t\t\t\t\t\t\n  pair_experiment.go:42\t0x100158c68\t\t97fc7e62\t\tCALL runtime.panicSlice3Acap(SB)\t\t\t\n  pair_experiment.go:25\t0x100158c6c\t\taa0603e0\t\tMOVD R6, R0\t\t\t\t\t\t\n  pair_experiment.go:25\t0x100158c70\t\taa0803e1\t\tMOVD R8, R1\t\t\t\t\t\t\n  pair_experiment.go:25\t0x100158c74\t\t97fc7e67\t\tCALL runtime.panicSlice3C(SB)\t\t\t\t\n  pair_experiment.go:25\t0x100158c78\t\taa0203e3\t\tMOVD R2, R3\t\t\t\t\t\t\n  pair_experiment.go:25\t0x100158c7c\t\taa0803e2\t\tMOVD R8, R2\t\t\t\t\t\t\n  pair_experiment.go:25\t0x100158c80\t\t97fc7e5c\t\tCALL runtime.panicSlice3Acap(SB)\t\t\t\n  pair_experiment.go:25\t0x100158c84\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\n  pair_experiment.go:8\t0x100158c88\t\ta90087e0\t\tSTP (R0, R1), 8(RSP)\t\t\t\t\t\n  pair_experiment.go:8\t0x100158c8c\t\ta9018fe2\t\tSTP (R2, R3), 24(RSP)\t\t\t\t\t\n  pair_experiment.go:8\t0x100158c90\t\ta90297e4\t\tSTP (R4, R5), 40(RSP)\t\t\t\t\t\n  pair_experiment.go:8\t0x100158c94\t\taa1e03e3\t\tMOVD R30, R3\t\t\t\t\t\t\n  pair_experiment.go:8\t0x100158c98\t\t97fc74da\t\tCALL runtime.morestack_noctxt.abi0(SB)\t\t\t\n  pair_experiment.go:8\t0x100158c9c\t\ta94087e0\t\tLDP 8(RSP), (R0, R1)\t\t\t\t\t\n  pair_experiment.go:8\t0x100158ca0\t\ta9418fe2\t\tLDP 24(RSP), (R2, R3)\t\t\t\t\t\n  pair_experiment.go:8\t0x100158ca4\t\ta94297e4\t\tLDP 40(RSP), (R4, R5)\t\t\t\t\t\n  pair_experiment.go:8\t0x100158ca8\t\t17fffeda\t\tJMP github.com/cnooljaw/gosproto.packPairClone(SB)\t\n  pair_experiment.go:8\t0x100158cac\t\t00000000\t\t?\t\t\t\t\t\t\t\n\nTEXT github.com/cnooljaw/gosproto.packPairCandidate(SB) /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/gosproto/pair_experiment.go\n  pair_experiment.go:69\t\t0x100158cb0\t\tf9400b90\t\tMOVD 16(R28), R16\t\t\t\t\t\n  pair_experiment.go:69\t\t0x100158cb4\t\teb3063ff\t\tCMP R16, RSP\t\t\t\t\t\t\n  pair_experiment.go:69\t\t0x100158cb8\t\t54002809\t\tBLS 320(PC)\t\t\t\t\t\t\n  pair_experiment.go:69\t\t0x100158cbc\t\tf8190ffe\t\tMOVD.W R30, -112(RSP)\t\t\t\t\t\n  pair_experiment.go:69\t\t0x100158cc0\t\tf81f83fd\t\tMOVD R29, -8(RSP)\t\t\t\t\t\n  pair_experiment.go:69\t\t0x100158cc4\t\td10023fd\t\tSUB $8, RSP, R29\t\t\t\t\t\n  pair_experiment.go:69\t\t0x100158cc8\t\tf9004be3\t\tMOVD R3, 144(RSP)\t\t\t\t\t\n  pair_experiment.go:71\t\t0x100158ccc\t\tf90047e2\t\tMOVD R2, 136(RSP)\t\t\t\t\t\n  pair_experiment.go:71\t\t0x100158cd0\t\tf90043e1\t\tMOVD R1, 128(RSP)\t\t\t\t\t\n  pair_experiment.go:71\t\t0x100158cd4\t\tf9003fe0\t\tMOVD R0, 120(RSP)\t\t\t\t\t\n  pair_experiment.go:71\t\t0x100158cd8\t\taa1f03e6\t\tMOVD ZR, R6\t\t\t\t\t\t\n  pair_experiment.go:71\t\t0x100158cdc\t\t14000002\t\tJMP 2(PC)\t\t\t\t\t\t\n  pair_experiment.go:71\t\t0x100158ce0\t\taa0703e3\t\tMOVD R7, R3\t\t\t\t\t\t\n  pair_experiment.go:71\t\t0x100158ce4\t\tf100209f\t\tCMP $8, R4\t\t\t\t\t\t\n  pair_experiment.go:71\t\t0x100158ce8\t\t54001a2b\t\tBLT 209(PC)\t\t\t\t\t\t\n  binary.go:117\t\t\t0x100158cec\t\tf9400067\t\tMOVD (R3), R7\t\t\t\t\t\t\n  pair_experiment.go:73\t\t0x100158cf0\t\t9200d8e8\t\tAND $9187201950435737471, R7, R8\t\t\t\n  pair_experiment.go:73\t\t0x100158cf4\t\tb200dbe9\t\tMOVD $9187201950435737471, R9\t\t\t\t\n  pair_experiment.go:73\t\t0x100158cf8\t\t8b090108\t\tADD R9, R8, R8\t\t\t\t\t\t\n  pair_experiment.go:73\t\t0x100158cfc\t\taa070108\t\tORR R7, R8, R8\t\t\t\t\t\t\n  pair_experiment.go:73\t\t0x100158d00\t\t9201c108\t\tAND $-9187201950435737472, R8, R8\t\t\t\n  pair_experiment.go:74\t\t0x100158d04\t\td347fd09\t\tLSR $7, R8, R9\t\t\t\t\t\t\n  pair_experiment.go:74\t\t0x100158d08\t\td288100a\t\tMOVD $16512, R10\t\t\t\t\t\n  pair_experiment.go:74\t\t0x100158d0c\t\tf2a2040a\t\tMOVK $(4128<<16), R10\t\t\t\t\t\n  pair_experiment.go:74\t\t0x100158d10\t\tf2c0810a\t\tMOVK $(1032<<32), R10\t\t\t\t\t\n  pair_experiment.go:74\t\t0x100158d14\t\tf2e0204a\t\tMOVK $(258<<48), R10\t\t\t\t\t\n  pair_experiment.go:74\t\t0x100158d18\t\t9b097d4b\t\tMUL R9, R10, R11\t\t\t\t\t\n  pair_experiment.go:74\t\t0x100158d1c\t\td378fd6c\t\tLSR $56, R11, R12\t\t\t\t\t\n  pair_experiment.go:75\t\t0x100158d20\t\td3401d8d\t\tUBFX $0, R12, $8, R13\t\t\t\t\t\n  pair_experiment.go:72\t\t0x100158d24\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\n  pair_experiment.go:75\t\t0x100158d28\t\t7103fdbf\t\tCMPW $255, R13\t\t\t\t\t\t\n  pair_experiment.go:75\t\t0x100158d2c\t\t54000cc0\t\tBEQ 102(PC)\t\t\t\t\t\t\n  pair_experiment.go:83\t\t0x100158d30\t\td100058e\t\tSUB $1, R12, R14\t\t\t\t\t\n  pair_experiment.go:83\t\t0x100158d34\t\t8a4be1cb\t\tAND R11>>56, R14, R11\t\t\t\t\t\n  pair_experiment.go:84\t\t0x100158d38\t\td100056e\t\tSUB $1, R11, R14\t\t\t\t\t\n  pair_experiment.go:84\t\t0x100158d3c\t\t8a0b01ce\t\tAND R11, R14, R14\t\t\t\t\t\n  pair_experiment.go:84\t\t0x100158d40\t\td3401dce\t\tUBFX $0, R14, $8, R14\t\t\t\t\t\n  pair_experiment.go:84\t\t0x100158d44\t\t3500038e\t\tCBNZW R14, 28(PC)\t\t\t\t\t\n  pair_experiment.go:86\t\t0x100158d48\t\t91000cc8\t\tADD $3, R6, R8\t\t\t\t\t\t\n  pair_experiment.go:86\t\t0x100158d4c\t\teb08005f\t\tCMP R8, R2\t\t\t\t\t\t\n  pair_experiment.go:86\t\t0x100158d50\t\t540022c3\t\tBCC 278(PC)\t\t\t\t\t\t\n  pair_experiment.go:86\t\t0x100158d54\t\teb0800df\t\tCMP R8, R6\t\t\t\t\t\t\n  pair_experiment.go:86\t\t0x100158d58\t\t54002228\t\tBHI 273(PC)\t\t\t\t\t\t\n  pair_experiment.go:89\t\t0x100158d5c\t\t3826680c\t\tMOVB R12, (R0)(R6)\t\t\t\t\t\n  pair_experiment.go:86\t\t0x100158d60\t\t8b0000c8\t\tADD R0, R6, R8\t\t\t\t\t\t\n  pair_experiment.go:91\t\t0x100158d64\t\t3400022d\t\tCBZW R13, 17(PC)\t\t\t\t\t\n  pair_experiment.go:92\t\t0x100158d68\t\t5ac00189\t\tRBITW R12, R9\t\t\t\t\t\t\n  pair_experiment.go:92\t\t0x100158d6c\t\t5ac01129\t\tCLZW R9, R9\t\t\t\t\t\t\n  pair_experiment.go:92\t\t0x100158d70\t\td37df129\t\tLSL $3, R9, R9\t\t\t\t\t\t\n  pair_experiment.go:93\t\t0x100158d74\t\t9ac924e9\t\tLSR R9, R7, R9\t\t\t\t\t\t\n  pair_experiment.go:93\t\t0x100158d78\t\t39000509\t\tMOVB R9, 1(R8)\t\t\t\t\t\t\n  pair_experiment.go:95\t\t0x100158d7c\t\td3401d69\t\tUBFX $0, R11, $8, R9\t\t\t\t\t\n  pair_experiment.go:95\t\t0x100158d80\t\t34000109\t\tCBZW R9, 8(PC)\t\t\t\t\t\t\n  pair_experiment.go:96\t\t0x100158d84\t\t5ac00169\t\tRBITW R11, R9\t\t\t\t\t\t\n  pair_experiment.go:96\t\t0x100158d88\t\t5ac01129\t\tCLZW R9, R9\t\t\t\t\t\t\n  pair_experiment.go:96\t\t0x100158d8c\t\td37df129\t\tLSL $3, R9, R9\t\t\t\t\t\t\n  pair_experiment.go:97\t\t0x100158d90\t\t9ac924e7\t\tLSR R9, R7, R7\t\t\t\t\t\t\n  pair_experiment.go:97\t\t0x100158d94\t\t39000907\t\tMOVB R7, 2(R8)\t\t\t\t\t\t\n  pair_experiment.go:97\t\t0x100158d98\t\tb24007e7\t\tORR $3, ZR, R7\t\t\t\t\t\t\n  pair_experiment.go:98\t\t0x100158d9c\t\t14000004\t\tJMP 4(PC)\t\t\t\t\t\t\n  pair_experiment.go:98\t\t0x100158da0\t\tb27f03e7\t\tORR $2, ZR, R7\t\t\t\t\t\t\n  pair_experiment.go:95\t\t0x100158da4\t\t14000002\t\tJMP 2(PC)\t\t\t\t\t\t\n  pair_experiment.go:95\t\t0x100158da8\t\tb24003e7\t\tORR $1, ZR, R7\t\t\t\t\t\t\n  pair_experiment.go:101\t0x100158dac\t\t8b0600e6\t\tADD R6, R7, R6\t\t\t\t\t\t\n  pair_experiment.go:101\t0x100158db0\t\t1400003e\t\tJMP 62(PC)\t\t\t\t\t\t\n  pair_experiment.go:103\t0x100158db4\t\t910024cb\t\tADD $9, R6, R11\t\t\t\t\t\t\n  pair_experiment.go:103\t0x100158db8\t\teb0b005f\t\tCMP R11, R2\t\t\t\t\t\t\n  pair_experiment.go:103\t0x100158dbc\t\t54001ea3\t\tBCC 245(PC)\t\t\t\t\t\t\n  pair_experiment.go:103\t0x100158dc0\t\teb0b00df\t\tCMP R11, R6\t\t\t\t\t\t\n  pair_experiment.go:103\t0x100158dc4\t\t54001e08\t\tBHI 240(PC)\t\t\t\t\t\t\n  pair_experiment.go:103\t0x100158dc8\t\t8b0000cb\t\tADD R0, R6, R11\t\t\t\t\t\t\n  pair_experiment.go:110\t0x100158dcc\t\tb200c3ed\t\tMOVD $72340172838076673, R13\t\t\t\t\n  pair_experiment.go:110\t0x100158dd0\t\t9b097da9\t\tMUL R9, R13, R9\t\t\t\t\t\t\n  pair_experiment.go:111\t0x100158dd4\t\td344fd0e\t\tLSR $4, R8, R14\t\t\t\t\t\t\n  pair_experiment.go:111\t0x100158dd8\t\t927d01ce\t\tAND $8, R14, R14\t\t\t\t\t\n  pair_experiment.go:111\t0x100158ddc\t\tb27d03ef\t\tORR $8, ZR, R15\t\t\t\t\t\t\n  pair_experiment.go:111\t0x100158de0\t\tcb0e01ee\t\tSUB R14, R15, R14\t\t\t\t\t\n  pair_experiment.go:111\t0x100158de4\t\t9ace24ee\t\tLSR R14, R7, R14\t\t\t\t\t\n  pair_experiment.go:112\t0x100158de8\t\td3482930\t\tUBFX $8, R9, $3, R16\t\t\t\t\t\n  pair_experiment.go:112\t0x100158dec\t\tb27d03f1\t\tORR $8, ZR, R17\t\t\t\t\t\t\n  pair_experiment.go:112\t0x100158df0\t\tcb100230\t\tSUB R16, R17, R16\t\t\t\t\t\n  pair_experiment.go:112\t0x100158df4\t\tcb1003f3\t\tNEG R16, R19\t\t\t\t\t\t\n  pair_experiment.go:112\t0x100158df8\t\t937ffe73\t\tASR $63, R19, R19\t\t\t\t\t\n  pair_experiment.go:112\t0x100158dfc\t\td354fd14\t\tLSR $20, R8, R20\t\t\t\t\t\n  pair_experiment.go:112\t0x100158e00\t\t927d0294\t\tAND $8, R20, R20\t\t\t\t\t\n  pair_experiment.go:112\t0x100158e04\t\tb27d07f5\t\tORR $24, ZR, R21\t\t\t\t\t\n  pair_experiment.go:112\t0x100158e08\t\tcb1402b4\t\tSUB R20, R21, R20\t\t\t\t\t\n  binary.go:77\t\t\t0x100158e0c\t\t7800116e\t\tMOVH R14, 1(R11)\t\t\t\t\t\n  pair_experiment.go:112\t0x100158e10\t\t8a49226e\t\tAND R9>>8, R19, R14\t\t\t\t\t\n  pair_experiment.go:112\t0x100158e14\t\t9ad424f3\t\tLSR R20, R7, R19\t\t\t\t\t\n  binary.go:76\t\t\t0x100158e18\t\tf100061f\t\tCMP $1, R16\t\t\t\t\t\t\n  binary.go:76\t\t\t0x100158e1c\t\t54001ae9\t\tBLS 215(PC)\t\t\t\t\t\t\n  pair_experiment.go:107\t0x100158e20\t\t9100056b\t\tADD $1, R11, R11\t\t\t\t\t\n  pair_experiment.go:112\t0x100158e24\t\t924009ce\t\tAND $7, R14, R14\t\t\t\t\t\n  binary.go:77\t\t\t0x100158e28\t\t782e6973\t\tMOVH R19, (R11)(R14)\t\t\t\t\t\n  pair_experiment.go:113\t0x100158e2c\t\td358692e\t\tUBFX $24, R9, $3, R14\t\t\t\t\t\n  pair_experiment.go:113\t0x100158e30\t\tcb0e022e\t\tSUB R14, R17, R14\t\t\t\t\t\n  pair_experiment.go:113\t0x100158e34\t\tcb0e03f0\t\tNEG R14, R16\t\t\t\t\t\t\n  pair_experiment.go:113\t0x100158e38\t\t937ffe10\t\tASR $63, R16, R16\t\t\t\t\t\n  pair_experiment.go:113\t0x100158e3c\t\td364fd13\t\tLSR $36, R8, R19\t\t\t\t\t\n  pair_experiment.go:113\t0x100158e40\t\t927d0273\t\tAND $8, R19, R19\t\t\t\t\t\n  pair_experiment.go:113\t0x100158e44\t\td2800514\t\tMOVD $40, R20\t\t\t\t\t\t\n  pair_experiment.go:113\t0x100158e48\t\tcb130293\t\tSUB R19, R20, R19\t\t\t\t\t\n  pair_experiment.go:113\t0x100158e4c\t\t8a496210\t\tAND R9>>24, R16, R16\t\t\t\t\t\n  pair_experiment.go:113\t0x100158e50\t\t9ad324f3\t\tLSR R19, R7, R19\t\t\t\t\t\n  binary.go:76\t\t\t0x100158e54\t\tf10005df\t\tCMP $1, R14\t\t\t\t\t\t\n  binary.go:76\t\t\t0x100158e58\t\t540018a9\t\tBLS 197(PC)\t\t\t\t\t\t\n  pair_experiment.go:113\t0x100158e5c\t\t92400a0e\t\tAND $7, R16, R14\t\t\t\t\t\n  binary.go:77\t\t\t0x100158e60\t\t782e6973\t\tMOVH R19, (R11)(R14)\t\t\t\t\t\n  pair_experiment.go:114\t0x100158e64\t\td368a92e\t\tUBFX $40, R9, $3, R14\t\t\t\t\t\n  pair_experiment.go:114\t0x100158e68\t\tcb0e022e\t\tSUB R14, R17, R14\t\t\t\t\t\n  pair_experiment.go:114\t0x100158e6c\t\tcb0e03f0\t\tNEG R14, R16\t\t\t\t\t\t\n  pair_experiment.go:114\t0x100158e70\t\t937ffe10\t\tASR $63, R16, R16\t\t\t\t\t\n  pair_experiment.go:114\t0x100158e74\t\td374fd08\t\tLSR $52, R8, R8\t\t\t\t\t\t\n  pair_experiment.go:114\t0x100158e78\t\t927d0108\t\tAND $8, R8, R8\t\t\t\t\t\t\n  pair_experiment.go:114\t0x100158e7c\t\tb27d0bf3\t\tORR $56, ZR, R19\t\t\t\t\t\n  pair_experiment.go:114\t0x100158e80\t\tcb080268\t\tSUB R8, R19, R8\t\t\t\t\t\t\n  pair_experiment.go:114\t0x100158e84\t\t8a49a210\t\tAND R9>>40, R16, R16\t\t\t\t\t\n  pair_experiment.go:114\t0x100158e88\t\t9ac824e7\t\tLSR R8, R7, R7\t\t\t\t\t\t\n  binary.go:76\t\t\t0x100158e8c\t\tf10005df\t\tCMP $1, R14\t\t\t\t\t\t\n  binary.go:76\t\t\t0x100158e90\t\t54001689\t\tBLS 180(PC)\t\t\t\t\t\t\n  pair_experiment.go:114\t0x100158e94\t\t92400a08\t\tAND $7, R16, R8\t\t\t\t\t\t\n  binary.go:77\t\t\t0x100158e98\t\t78286967\t\tMOVH R7, (R11)(R8)\t\t\t\t\t\n  pair_experiment.go:115\t0x100158e9c\t\t3826680c\t\tMOVB R12, (R0)(R6)\t\t\t\t\t\n  pair_experiment.go:116\t0x100158ea0\t\t8b49e0c7\t\tADD R9>>56, R6, R7\t\t\t\t\t\n  pair_experiment.go:116\t0x100158ea4\t\t910004e6\t\tADD $1, R7, R6\t\t\t\t\t\t\n  pair_experiment.go:118\t0x100158ea8\t\td10020a5\t\tSUB $8, R5, R5\t\t\t\t\t\t\n  pair_experiment.go:118\t0x100158eac\t\tcb0503e7\t\tNEG R5, R7\t\t\t\t\t\t\n  pair_experiment.go:118\t0x100158eb0\t\t937ffce7\t\tASR $63, R7, R7\t\t\t\t\t\t\n  pair_experiment.go:118\t0x100158eb4\t\t927d00e7\t\tAND $8, R7, R7\t\t\t\t\t\t\n  pair_experiment.go:118\t0x100158eb8\t\t8b0300e7\t\tADD R3, R7, R7\t\t\t\t\t\t\n  pair_experiment.go:118\t0x100158ebc\t\td1002084\t\tSUB $8, R4, R4\t\t\t\t\t\t\n  pair_experiment.go:118\t0x100158ec0\t\t17ffff88\t\tJMP -120(PC)\t\t\t\t\t\t\n  pair_experiment.go:71\t\t0x100158ec4\t\tf90027e5\t\tMOVD R5, 72(RSP)\t\t\t\t\t\n  pair_experiment.go:71\t\t0x100158ec8\t\tf90023e4\t\tMOVD R4, 64(RSP)\t\t\t\t\t\n  pair_experiment.go:71\t\t0x100158ecc\t\tf90033e3\t\tMOVD R3, 96(RSP)\t\t\t\t\t\n  pair_experiment.go:121\t0x100158ed0\t\tf90013e6\t\tMOVD R6, 32(RSP)\t\t\t\t\t\n  pair_experiment.go:76\t\t0x100158ed4\t\taa0303e0\t\tMOVD R3, R0\t\t\t\t\t\t\n  pair_experiment.go:76\t\t0x100158ed8\t\taa0403e1\t\tMOVD R4, R1\t\t\t\t\t\t\n  pair_experiment.go:76\t\t0x100158edc\t\taa0503e2\t\tMOVD R5, R2\t\t\t\t\t\t\n  pair_experiment.go:76\t\t0x100158ee0\t\t97fffb2c\t\tCALL github.com/cnooljaw/gosproto.ffRunBytes(SB)\t\n  pair_experiment.go:77\t\t0x100158ee4\t\tf94043e1\t\tMOVD 128(RSP), R1\t\t\t\t\t\n  pair_experiment.go:77\t\t0x100158ee8\t\tf94013e3\t\tMOVD 32(RSP), R3\t\t\t\t\t\n  pair_experiment.go:77\t\t0x100158eec\t\teb03003f\t\tCMP R3, R1\t\t\t\t\t\t\n  pair_experiment.go:77\t\t0x100158ef0\t\t54001343\t\tBCC 154(PC)\t\t\t\t\t\t\n  pair_experiment.go:77\t\t0x100158ef4\t\tcb030024\t\tSUB R3, R1, R4\t\t\t\t\t\t\n  pair_experiment.go:77\t\t0x100158ef8\t\tf94047e2\t\tMOVD 136(RSP), R2\t\t\t\t\t\n  pair_experiment.go:77\t\t0x100158efc\t\tcb030045\t\tSUB R3, R2, R5\t\t\t\t\t\t\n  pair_experiment.go:77\t\t0x100158f00\t\tcb0503e6\t\tNEG R5, R6\t\t\t\t\t\t\n  pair_experiment.go:77\t\t0x100158f04\t\t8a86fc66\t\tAND R6->63, R3, R6\t\t\t\t\t\n  pair_experiment.go:77\t\t0x100158f08\t\tf9403fe7\t\tMOVD 120(RSP), R7\t\t\t\t\t\n  pair_experiment.go:77\t\t0x100158f0c\t\t8b0600e8\t\tADD R6, R7, R8\t\t\t\t\t\t\n  pack.go:37\t\t\t0x100158f10\t\tf94023e9\t\tMOVD 64(RSP), R9\t\t\t\t\t\n  pack.go:37\t\t\t0x100158f14\t\teb09001f\t\tCMP R9, R0\t\t\t\t\t\t\n  pack.go:37\t\t\t0x100158f18\t\t9a80c12a\t\tCSEL GT, R9, R0, R10\t\t\t\t\t\n  pack.go:39\t\t\t0x100158f1c\t\tf100009f\t\tCMP $0, R4\t\t\t\t\t\t\n  pack.go:37\t\t\t0x100158f20\t\t54001169\t\tBLS 139(PC)\t\t\t\t\t\t\n  pack.go:39\t\t\t0x100158f24\t\t9280000b\t\tMOVD $-1, R11\t\t\t\t\t\t\n  pack.go:39\t\t\t0x100158f28\t\t382668eb\t\tMOVB R11, (R7)(R6)\t\t\t\t\t\n  pack.go:38\t\t\t0x100158f2c\t\t91001d46\t\tADD $7, R10, R6\t\t\t\t\t\t\n  pack.go:38\t\t\t0x100158f30\t\t927df0c6\t\tAND $-8, R6, R6\t\t\t\t\t\t\n  pack.go:40\t\t\t0x100158f34\t\t937ffccc\t\tASR $63, R6, R12\t\t\t\t\t\n  pack.go:40\t\t\t0x100158f38\t\t8b4cf4cc\t\tADD R12>>61, R6, R12\t\t\t\t\t\n  pack.go:40\t\t\t0x100158f3c\t\tf100049f\t\tCMP $1, R4\t\t\t\t\t\t\n  pack.go:40\t\t\t0x100158f40\t\t54001009\t\tBLS 128(PC)\t\t\t\t\t\t\n  pack.go:40\t\t\t0x100158f44\t\t9343fd8c\t\tASR $3, R12, R12\t\t\t\t\t\n  pack.go:40\t\t\t0x100158f48\t\td100058c\t\tSUB $1, R12, R12\t\t\t\t\t\n  pack.go:40\t\t\t0x100158f4c\t\t3900050c\t\tMOVB R12, 1(R8)\t\t\t\t\t\t\n  pack.go:41\t\t\t0x100158f50\t\td10008a5\t\tSUB $2, R5, R5\t\t\t\t\t\t\n  pack.go:41\t\t\t0x100158f54\t\tcb0503e5\t\tNEG R5, R5\t\t\t\t\t\t\n  pack.go:41\t\t\t0x100158f58\t\t937ffca5\t\tASR $63, R5, R5\t\t\t\t\t\t\n  pack.go:41\t\t\t0x100158f5c\t\t927f00a5\t\tAND $2, R5, R5\t\t\t\t\t\t\n  pack.go:41\t\t\t0x100158f60\t\t8b0800a5\t\tADD R8, R5, R5\t\t\t\t\t\t\n  pack.go:41\t\t\t0x100158f64\t\tf94027ec\t\tMOVD 72(RSP), R12\t\t\t\t\t\n  pack.go:41\t\t\t0x100158f68\t\teb0a019f\t\tCMP R10, R12\t\t\t\t\t\t\n  pack.go:41\t\t\t0x100158f6c\t\t54000e43\t\tBCC 114(PC)\t\t\t\t\t\t\n  pack.go:41\t\t\t0x100158f70\t\td100088d\t\tSUB $2, R4, R13\t\t\t\t\t\t\n  pack.go:41\t\t\t0x100158f74\t\teb0d015f\t\tCMP R13, R10\t\t\t\t\t\t\n  pack.go:41\t\t\t0x100158f78\t\t9a8db14d\t\tCSEL LT, R10, R13, R13\t\t\t\t\t\n  pack.go:41\t\t\t0x100158f7c\t\tf94033ee\t\tMOVD 96(RSP), R14\t\t\t\t\t\n  pack.go:41\t\t\t0x100158f80\t\teb0501df\t\tCMP R5, R14\t\t\t\t\t\t\n  pack.go:41\t\t\t0x100158f84\t\t54000c20\t\tBEQ 97(PC)\t\t\t\t\t\t\n  pair_experiment.go:76\t\t0x100158f88\t\tf9001fe0\t\tMOVD R0, 56(RSP)\t\t\t\t\t\n  pair_experiment.go:77\t\t0x100158f8c\t\tf9001be4\t\tMOVD R4, 48(RSP)\t\t\t\t\t\n  pair_experiment.go:77\t\t0x100158f90\t\tf9002fe8\t\tMOVD R8, 88(RSP)\t\t\t\t\t\n  pack.go:37\t\t\t0x100158f94\t\tf90017ea\t\tMOVD R10, 40(RSP)\t\t\t\t\t\n  pack.go:38\t\t\t0x100158f98\t\tf9002be6\t\tMOVD R6, 80(RSP)\t\t\t\t\t\n  pack.go:41\t\t\t0x100158f9c\t\taa0503e0\t\tMOVD R5, R0\t\t\t\t\t\t\n  pack.go:41\t\t\t0x100158fa0\t\taa0e03e1\t\tMOVD R14, R1\t\t\t\t\t\t\n  pack.go:41\t\t\t0x100158fa4\t\taa0d03e2\t\tMOVD R13, R2\t\t\t\t\t\t\n  pack.go:41\t\t\t0x100158fa8\t\t97fc7eda\t\tCALL runtime.memmove(SB)\t\t\t\t\n  pair_experiment.go:78\t\t0x100158fac\t\tf9401fe0\t\tMOVD 56(RSP), R0\t\t\t\t\t\n  pair_experiment.go:121\t0x100158fb0\t\tf94043e1\t\tMOVD 128(RSP), R1\t\t\t\t\t\n  pair_experiment.go:86\t\t0x100158fb4\t\tf94047e2\t\tMOVD 136(RSP), R2\t\t\t\t\t\n  pair_experiment.go:78\t\t0x100158fb8\t\tf94013e3\t\tMOVD 32(RSP), R3\t\t\t\t\t\n  pack.go:43\t\t\t0x100158fbc\t\tf9401be4\t\tMOVD 48(RSP), R4\t\t\t\t\t\n  pack.go:42\t\t\t0x100158fc0\t\tf9402be6\t\tMOVD 80(RSP), R6\t\t\t\t\t\n  pair_experiment.go:89\t\t0x100158fc4\t\tf9403fe7\t\tMOVD 120(RSP), R7\t\t\t\t\t\n  pack.go:43\t\t\t0x100158fc8\t\tf9402fe8\t\tMOVD 88(RSP), R8\t\t\t\t\t\n  pack.go:37\t\t\t0x100158fcc\t\tf94023e9\t\tMOVD 64(RSP), R9\t\t\t\t\t\n  pack.go:42\t\t\t0x100158fd0\t\tf94017ea\t\tMOVD 40(RSP), R10\t\t\t\t\t\n  pack.go:42\t\t\t0x100158fd4\t\t9280000b\t\tMOVD $-1, R11\t\t\t\t\t\t\n  pair_experiment.go:79\t\t0x100158fd8\t\tf94027ec\t\tMOVD 72(RSP), R12\t\t\t\t\t\n  pair_experiment.go:79\t\t0x100158fdc\t\tf94033ee\t\tMOVD 96(RSP), R14\t\t\t\t\t\n  pack.go:41\t\t\t0x100158fe0\t\t1400004a\t\tJMP 74(PC)\t\t\t\t\t\t\n  pair_experiment.go:78\t\t0x100158fe4\t\t91001c04\t\tADD $7, R0, R4\t\t\t\t\t\t\n  pair_experiment.go:78\t\t0x100158fe8\t\t927df084\t\tAND $-8, R4, R4\t\t\t\t\t\t\n  pair_experiment.go:78\t\t0x100158fec\t\t8b030084\t\tADD R3, R4, R4\t\t\t\t\t\t\n  pack.go:37\t\t\t0x100158ff0\t\teb09001f\t\tCMP R9, R0\t\t\t\t\t\t\n  pair_experiment.go:79\t\t0x100158ff4\t\t54000968\t\tBHI 75(PC)\t\t\t\t\t\t\n  pair_experiment.go:79\t\t0x100158ff8\t\tcb000185\t\tSUB R0, R12, R5\t\t\t\t\t\t\n  pair_experiment.go:79\t\t0x100158ffc\t\tcb0503e8\t\tNEG R5, R8\t\t\t\t\t\t\n  pair_experiment.go:79\t\t0x100159000\t\t8a88fc08\t\tAND R8->63, R0, R8\t\t\t\t\t\n  pair_experiment.go:78\t\t0x100159004\t\t91000886\t\tADD $2, R4, R6\t\t\t\t\t\t\n  pair_experiment.go:79\t\t0x100159008\t\tcb000124\t\tSUB R0, R9, R4\t\t\t\t\t\t\n  pair_experiment.go:79\t\t0x10015900c\t\t8b0801c8\t\tADD R8, R14, R8\t\t\t\t\t\t\n  pair_experiment.go:89\t\t0x100159010\t\taa0703e0\t\tMOVD R7, R0\t\t\t\t\t\t\n  pair_experiment.go:89\t\t0x100159014\t\td288100a\t\tMOVD $16512, R10\t\t\t\t\t\n  pair_experiment.go:89\t\t0x100159018\t\tf2a2040a\t\tMOVK $(4128<<16), R10\t\t\t\t\t\n  pair_experiment.go:89\t\t0x10015901c\t\tf2c0810a\t\tMOVK $(1032<<32), R10\t\t\t\t\t\n  pair_experiment.go:89\t\t0x100159020\t\tf2e0204a\t\tMOVK $(258<<48), R10\t\t\t\t\t\n  pair_experiment.go:71\t\t0x100159024\t\taa0803e7\t\tMOVD R8, R7\t\t\t\t\t\t\n  pair_experiment.go:80\t\t0x100159028\t\t17ffff2e\t\tJMP -210(PC)\t\t\t\t\t\t\n  pair_experiment.go:120\t0x10015902c\t\tb4000184\t\tCBZ R4, 12(PC)\t\t\t\t\t\t\n  pair_experiment.go:121\t0x100159030\t\teb06003f\t\tCMP R6, R1\t\t\t\t\t\t\n  pair_experiment.go:121\t0x100159034\t\t54000623\t\tBCC 49(PC)\t\t\t\t\t\t\n  pair_experiment.go:121\t0x100159038\t\tcb060045\t\tSUB R6, R2, R5\t\t\t\t\t\t\n  pair_experiment.go:121\t0x10015903c\t\tcb0503e5\t\tNEG R5, R5\t\t\t\t\t\t\n  pair_experiment.go:121\t0x100159040\t\t8a85fcc5\t\tAND R5->63, R6, R5\t\t\t\t\t\n  pair_experiment.go:121\t0x100159044\t\tcb060021\t\tSUB R6, R1, R1\t\t\t\t\t\t\n  pair_experiment.go:121\t0x100159048\t\t8b050007\t\tADD R5, R0, R7\t\t\t\t\t\t\n  pair_experiment.go:121\t0x10015904c\t\taa1f03e8\t\tMOVD ZR, R8\t\t\t\t\t\t\n  pair_experiment.go:121\t0x100159050\t\taa1f03e9\t\tMOVD ZR, R9\t\t\t\t\t\t\n  pair_experiment.go:121\t0x100159054\t\taa1f03ea\t\tMOVD ZR, R10\t\t\t\t\t\t\n  pack.go:13\t\t\t0x100159058\t\t1400000a\t\tJMP 10(PC)\t\t\t\t\t\t\n  pair_experiment.go:123\t0x10015905c\t\teb06005f\t\tCMP R6, R2\t\t\t\t\t\t\n  pair_experiment.go:123\t0x100159060\t\t540000a3\t\tBCC 5(PC)\t\t\t\t\t\t\n  pair_experiment.go:123\t0x100159064\t\taa0603e1\t\tMOVD R6, R1\t\t\t\t\t\t\n  pair_experiment.go:123\t0x100159068\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\n  pair_experiment.go:123\t0x10015906c\t\tf84707fe\t\tMOVD.P 112(RSP), R30\t\t\t\t\t\n  pair_experiment.go:123\t0x100159070\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\n  pair_experiment.go:123\t0x100159074\t\taa0603e1\t\tMOVD R6, R1\t\t\t\t\t\t\n  pair_experiment.go:123\t0x100159078\t\t97fc7d4a\t\tCALL runtime.panicSliceAcap(SB)\t\t\t\t\n  pack.go:13\t\t\t0x10015907c\t\t91000508\t\tADD $1, R8, R8\t\t\t\t\t\t\n  pack.go:13\t\t\t0x100159080\t\teb04011f\t\tCMP R4, R8\t\t\t\t\t\t\n  pack.go:13\t\t\t0x100159084\t\t540001ca\t\tBGE 14(PC)\t\t\t\t\t\t\n  pack.go:13\t\t\t0x100159088\t\t3868686b\t\tMOVBU (R3)(R8), R11\t\t\t\t\t\n  pack.go:14\t\t\t0x10015908c\t\taa0b03ec\t\tMOVD R11, R12\t\t\t\t\t\t\n  pack.go:14\t\t\t0x100159090\t\t3400012c\t\tCBZW R12, 9(PC)\t\t\t\t\t\t\n  pack.go:15\t\t\t0x100159094\t\t91000529\t\tADD $1, R9, R9\t\t\t\t\t\t\n  pack.go:16\t\t\t0x100159098\t\tb24003ec\t\tORR $1, ZR, R12\t\t\t\t\t\t\n  pack.go:16\t\t\t0x10015909c\t\t9ac8218d\t\tLSL R8, R12, R13\t\t\t\t\t\n  pack.go:16\t\t\t0x1001590a0\t\taa0d014a\t\tORR R13, R10, R10\t\t\t\t\t\n  pack.go:17\t\t\t0x1001590a4\t\teb09003f\t\tCMP R9, R1\t\t\t\t\t\t\n  pack.go:17\t\t\t0x1001590a8\t\t54000249\t\tBLS 18(PC)\t\t\t\t\t\t\n  pack.go:17\t\t\t0x1001590ac\t\t382968eb\t\tMOVB R11, (R7)(R9)\t\t\t\t\t\n  pack.go:17\t\t\t0x1001590b0\t\t17fffff3\t\tJMP -13(PC)\t\t\t\t\t\t\n  pack.go:17\t\t\t0x1001590b4\t\tb24003ec\t\tORR $1, ZR, R12\t\t\t\t\t\t\n  pack.go:14\t\t\t0x1001590b8\t\t17fffff1\t\tJMP -15(PC)\t\t\t\t\t\t\n  pack.go:27\t\t\t0x1001590bc\t\tf100213f\t\tCMP $8, R9\t\t\t\t\t\t\n  pack.go:27\t\t\t0x1001590c0\t\t54000061\t\tBNE 3(PC)\t\t\t\t\t\t\n  pack.go:27\t\t\t0x1001590c4\t\td2800143\t\tMOVD $10, R3\t\t\t\t\t\t\n  pair_experiment.go:121\t0x1001590c8\t\t14000005\t\tJMP 5(PC)\t\t\t\t\t\t\n  pack.go:31\t\t\t0x1001590cc\t\tf100003f\t\tCMP $0, R1\t\t\t\t\t\t\n  pack.go:31\t\t\t0x1001590d0\t\t540000a9\t\tBLS 5(PC)\t\t\t\t\t\t\n  pack.go:31\t\t\t0x1001590d4\t\t3825680a\t\tMOVB R10, (R0)(R5)\t\t\t\t\t\n  pack.go:32\t\t\t0x1001590d8\t\t91000523\t\tADD $1, R9, R3\t\t\t\t\t\t\n  pair_experiment.go:121\t0x1001590dc\t\t8b060066\t\tADD R6, R3, R6\t\t\t\t\t\t\n  pair_experiment.go:121\t0x1001590e0\t\t17ffffdf\t\tJMP -33(PC)\t\t\t\t\t\t\n  pack.go:31\t\t\t0x1001590e4\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\n  pack.go:31\t\t\t0x1001590e8\t\taa0003e1\t\tMOVD R0, R1\t\t\t\t\t\t\n  pack.go:31\t\t\t0x1001590ec\t\t97fc7d1d\t\tCALL runtime.panicIndex(SB)\t\t\t\t\n  pack.go:17\t\t\t0x1001590f0\t\taa0903e0\t\tMOVD R9, R0\t\t\t\t\t\t\n  pack.go:17\t\t\t0x1001590f4\t\t97fc7d1b\t\tCALL runtime.panicIndex(SB)\t\t\t\t\n  pair_experiment.go:121\t0x1001590f8\t\taa0603e0\t\tMOVD R6, R0\t\t\t\t\t\t\n  pair_experiment.go:121\t0x1001590fc\t\t97fc7d31\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\n  pack.go:43\t\t\t0x100159100\t\t3825691f\t\tMOVB ZR, (R8)(R5)\t\t\t\t\t\n  pack.go:42\t\t\t0x100159104\t\t9100054a\t\tADD $1, R10, R10\t\t\t\t\t\n  pack.go:42\t\t\t0x100159108\t\teb06015f\t\tCMP R6, R10\t\t\t\t\t\t\n  pack.go:42\t\t\t0x10015910c\t\t54fff6ca\t\tBGE -74(PC)\t\t\t\t\t\t\n  pack.go:43\t\t\t0x100159110\t\t91000945\t\tADD $2, R10, R5\t\t\t\t\t\t\n  pack.go:43\t\t\t0x100159114\t\teb05009f\t\tCMP R5, R4\t\t\t\t\t\t\n  pack.go:43\t\t\t0x100159118\t\t54ffff48\t\tBHI -6(PC)\t\t\t\t\t\t\n  pack.go:43\t\t\t0x10015911c\t\t14000003\t\tJMP 3(PC)\t\t\t\t\t\t\n  pair_experiment.go:79\t\t0x100159120\t\taa0903e1\t\tMOVD R9, R1\t\t\t\t\t\t\n  pair_experiment.go:79\t\t0x100159124\t\t97fc7d27\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\n  pack.go:43\t\t\t0x100159128\t\taa0503e0\t\tMOVD R5, R0\t\t\t\t\t\t\n  pack.go:43\t\t\t0x10015912c\t\taa0403e1\t\tMOVD R4, R1\t\t\t\t\t\t\n  pack.go:43\t\t\t0x100159130\t\t97fc7d0c\t\tCALL runtime.panicIndex(SB)\t\t\t\t\n  pack.go:41\t\t\t0x100159134\t\taa0a03e1\t\tMOVD R10, R1\t\t\t\t\t\t\n  pack.go:41\t\t\t0x100159138\t\taa0c03e2\t\tMOVD R12, R2\t\t\t\t\t\t\n  pack.go:41\t\t\t0x10015913c\t\t97fc7d19\t\tCALL runtime.panicSliceAcap(SB)\t\t\t\t\n  pack.go:40\t\t\t0x100159140\t\tb24003e0\t\tORR $1, ZR, R0\t\t\t\t\t\t\n  pack.go:40\t\t\t0x100159144\t\taa0003e1\t\tMOVD R0, R1\t\t\t\t\t\t\n  pack.go:40\t\t\t0x100159148\t\t97fc7d06\t\tCALL runtime.panicIndex(SB)\t\t\t\t\n  pack.go:39\t\t\t0x10015914c\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\n  pack.go:39\t\t\t0x100159150\t\taa0003e1\t\tMOVD R0, R1\t\t\t\t\t\t\n  pack.go:39\t\t\t0x100159154\t\t97fc7d03\t\tCALL runtime.panicIndex(SB)\t\t\t\t\n  pair_experiment.go:77\t\t0x100159158\t\taa0303e0\t\tMOVD R3, R0\t\t\t\t\t\t\n  pair_experiment.go:77\t\t0x10015915c\t\t97fc7d19\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\n  binary.go:76\t\t\t0x100159160\t\tb24003e0\t\tORR $1, ZR, R0\t\t\t\t\t\t\n  binary.go:76\t\t\t0x100159164\t\taa0003e1\t\tMOVD R0, R1\t\t\t\t\t\t\n  binary.go:76\t\t\t0x100159168\t\t97fc7cfe\t\tCALL runtime.panicIndex(SB)\t\t\t\t\n  binary.go:76\t\t\t0x10015916c\t\tb24003e0\t\tORR $1, ZR, R0\t\t\t\t\t\t\n  binary.go:76\t\t\t0x100159170\t\taa0003e1\t\tMOVD R0, R1\t\t\t\t\t\t\n  binary.go:76\t\t\t0x100159174\t\t97fc7cfb\t\tCALL runtime.panicIndex(SB)\t\t\t\t\n  binary.go:76\t\t\t0x100159178\t\tb24003e0\t\tORR $1, ZR, R0\t\t\t\t\t\t\n  binary.go:76\t\t\t0x10015917c\t\taa0003e1\t\tMOVD R0, R1\t\t\t\t\t\t\n  binary.go:76\t\t\t0x100159180\t\t97fc7cf8\t\tCALL runtime.panicIndex(SB)\t\t\t\t\n  pair_experiment.go:103\t0x100159184\t\taa0603e0\t\tMOVD R6, R0\t\t\t\t\t\t\n  pair_experiment.go:103\t0x100159188\t\taa0b03e1\t\tMOVD R11, R1\t\t\t\t\t\t\n  pair_experiment.go:103\t0x10015918c\t\t97fc7d21\t\tCALL runtime.panicSlice3C(SB)\t\t\t\t\n  pair_experiment.go:103\t0x100159190\t\taa0203e3\t\tMOVD R2, R3\t\t\t\t\t\t\n  pair_experiment.go:103\t0x100159194\t\taa0b03e2\t\tMOVD R11, R2\t\t\t\t\t\t\n  pair_experiment.go:103\t0x100159198\t\t97fc7d16\t\tCALL runtime.panicSlice3Acap(SB)\t\t\t\n  pair_experiment.go:86\t\t0x10015919c\t\taa0603e0\t\tMOVD R6, R0\t\t\t\t\t\t\n  pair_experiment.go:86\t\t0x1001591a0\t\taa0803e1\t\tMOVD R8, R1\t\t\t\t\t\t\n  pair_experiment.go:86\t\t0x1001591a4\t\t97fc7d1b\t\tCALL runtime.panicSlice3C(SB)\t\t\t\t\n  pair_experiment.go:86\t\t0x1001591a8\t\taa0203e3\t\tMOVD R2, R3\t\t\t\t\t\t\n  pair_experiment.go:86\t\t0x1001591ac\t\taa0803e2\t\tMOVD R8, R2\t\t\t\t\t\t\n  pair_experiment.go:86\t\t0x1001591b0\t\t97fc7d10\t\tCALL runtime.panicSlice3Acap(SB)\t\t\t\n  pair_experiment.go:86\t\t0x1001591b4\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\n  pair_experiment.go:69\t\t0x1001591b8\t\ta90087e0\t\tSTP (R0, R1), 8(RSP)\t\t\t\t\t\n  pair_experiment.go:69\t\t0x1001591bc\t\ta9018fe2\t\tSTP (R2, R3), 24(RSP)\t\t\t\t\t\n  pair_experiment.go:69\t\t0x1001591c0\t\ta90297e4\t\tSTP (R4, R5), 40(RSP)\t\t\t\t\t\n  pair_experiment.go:69\t\t0x1001591c4\t\taa1e03e3\t\tMOVD R30, R3\t\t\t\t\t\t\n  pair_experiment.go:69\t\t0x1001591c8\t\t97fc738e\t\tCALL runtime.morestack_noctxt.abi0(SB)\t\t\t\n  pair_experiment.go:69\t\t0x1001591cc\t\ta94087e0\t\tLDP 8(RSP), (R0, R1)\t\t\t\t\t\n  pair_experiment.go:69\t\t0x1001591d0\t\ta9418fe2\t\tLDP 24(RSP), (R2, R3)\t\t\t\t\t\n  pair_experiment.go:69\t\t0x1001591d4\t\ta94297e4\t\tLDP 40(RSP), (R4, R5)\t\t\t\t\t\n  pair_experiment.go:69\t\t0x1001591d8\t\t17fffeb6\t\tJMP github.com/cnooljaw/gosproto.packPairCandidate(SB)\t\n  pair_experiment.go:69\t\t0x1001591dc\t\t00000000\t\t?\t\t\t\t\t\t\t\n"
+  },
+  {
+    "args": [
+      "go",
+      "version"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.013055624440312386,
+    "output": "go version go1.24.13 darwin/arm64\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_small",
+      "GSR_OP": "pack",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-21-gosproto-pack-pair-store/self-game_small-pack.json"
+    },
+    "exitCode": 0,
+    "seconds": 3.042862333357334,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_small",
+      "GSR_OP": "pencode",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-21-gosproto-pack-pair-store/self-game_small-pencode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.1328374594449997,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "pack",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-21-gosproto-pack-pair-store/self-game_large-pack.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.2066529989242554,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "pencode",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-21-gosproto-pack-pair-store/self-game_large-pencode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.351308250799775,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "pack",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-21-gosproto-pack-pair-store/self-int32_edges-pack.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.287559876218438,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "pencode",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-21-gosproto-pack-pair-store/self-int32_edges-pencode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.9327558353543282,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "density4",
+      "GSR_OP": "pack",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-21-gosproto-pack-pair-store/self-density4-pack.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.5916488338261843,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "density7",
+      "GSR_OP": "pack",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-21-gosproto-pack-pair-store/self-density7-pack.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.8383697494864464,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_small",
+      "GSR_OP": "pack",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-21-gosproto-pack-pair-store/clone-game_small-pack.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.449314918369055,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_small",
+      "GSR_OP": "pencode",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-21-gosproto-pack-pair-store/clone-game_small-pencode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.8499941658228636,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "pack",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-21-gosproto-pack-pair-store/clone-game_large-pack.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.3877396248281,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "pencode",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-21-gosproto-pack-pair-store/clone-game_large-pencode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.200698584318161,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "pack",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-21-gosproto-pack-pair-store/clone-int32_edges-pack.json"
+    },
+    "exitCode": 0,
+    "seconds": 0.6547514591366053,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "pencode",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-21-gosproto-pack-pair-store/clone-int32_edges-pencode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.3026293758302927,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "density4",
+      "GSR_OP": "pack",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-21-gosproto-pack-pair-store/clone-density4-pack.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.8789871260523796,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "density7",
+      "GSR_OP": "pack",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-21-gosproto-pack-pair-store/clone-density7-pack.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.2482515815645456,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_small",
+      "GSR_OP": "pack",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-21-gosproto-pack-pair-store/pass1-game_small-pack.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.1103181671351194,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_small",
+      "GSR_OP": "pencode",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-21-gosproto-pack-pair-store/pass1-game_small-pencode.json"
+    },
+    "exitCode": 0,
+    "seconds": 0.7587087508291006,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "pack",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-21-gosproto-pack-pair-store/pass1-game_large-pack.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.0596249159425497,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "pencode",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-21-gosproto-pack-pair-store/pass1-game_large-pencode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.20795170776546,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "pack",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-21-gosproto-pack-pair-store/pass1-int32_edges-pack.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.419964626431465,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "pencode",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-21-gosproto-pack-pair-store/pass1-int32_edges-pencode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.284228416159749,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "density4",
+      "GSR_OP": "pack",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-21-gosproto-pack-pair-store/pass1-density4-pack.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.816119458526373,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "density7",
+      "GSR_OP": "pack",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-21-gosproto-pack-pair-store/pass1-density7-pack.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.9255862906575203,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_small",
+      "GSR_OP": "pack",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-21-gosproto-pack-pair-store/pass2-game_small-pack.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.8372830413281918,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_small",
+      "GSR_OP": "pencode",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-21-gosproto-pack-pair-store/pass2-game_small-pencode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.8910252507776022,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "pack",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-21-gosproto-pack-pair-store/pass2-game_large-pack.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.5748336259275675,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "pencode",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-21-gosproto-pack-pair-store/pass2-game_large-pencode.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.7162491250783205,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "pack",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-21-gosproto-pack-pair-store/pass2-int32_edges-pack.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.6161139998584986,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "pencode",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-21-gosproto-pack-pair-store/pass2-int32_edges-pencode.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.8866589162498713,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "density4",
+      "GSR_OP": "pack",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-21-gosproto-pack-pair-store/pass2-density4-pack.json"
+    },
+    "exitCode": 0,
+    "seconds": 1.2139303740113974,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/experiment.test",
+      "-test.run=^TestUnpackInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-pair-store-20261021/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "density7",
+      "GSR_OP": "pack",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/docs/benchmarks/2026-10-21-gosproto-pack-pair-store/pass2-density7-pack.json"
+    },
+    "exitCode": 0,
+    "seconds": 2.6980253756046295,
+    "output": "PASS\n"
+  }
+]

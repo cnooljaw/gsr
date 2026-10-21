@@ -119,3 +119,5 @@ TS为2026-10-15第五轮历史基线，Go为[2026-10-20 当前 a93bb0d 新五轮
 2026-10-21：[Pack 位图直接收集](benchmarks/2026-10-21-gosproto-pack-direct-gather/RESULTS.md)完成32进程3072块、真实 Pack/PEncode 与 self/clone 对照。整数数组 Pack 两遍中位 −1.85%/−1.86%、累计均改善；小型 Pack/PEncode 同向改善，大型近持平，整数数组 PEncode 未同步改善。保留小收益候选待组合路径确认，尚未改生产；七字节累计 +25.34% 与控制偏差全部保留，不扣控制。3584组 wire/共享缓冲、race/checkptr、fixture/vet通过；前轮7676be6已提交未推送，依赖及七项无关删除保持。
 
 2026-10-21：[Pack 位图候选实际摆放轮换](benchmarks/2026-10-21-gosproto-pack-gather-rotation/RESULTS.md)确认三函数在0/1184/2368偏移轮换，48进程4608块、三布局正确性/race/checkptr/fixture/vet通过。整数数组Pack六次中位五次改善，PEncode中位/累计各三次改善；大型PEncode方向随布局变化，尚未形成稳定组合收益。保留候选源码但不应用，全部控制/长尾及大型Pack累计−40.38%保留并解释，不扣控制或设收益门槛。前轮67df7a1已提交未推送，新报告留审查；生产代码、v0.4.0依赖及七项无关删除不变。
+
+2026-10-21：[Pack 四次双字节写出](benchmarks/2026-10-21-gosproto-pack-pair-store/RESULTS.md)完成32进程3072块及3584组 wire/共享缓冲/race/checkptr。八次 byte store 合并为四次 PutUint16 后指令296→332；大型Pack两遍 +44.26%/+45.18%，整数数组Pack +41.20%/+40.98%，PEncode亦明显退化，八项中位/累计均退化，候选不应用。全部控制和长尾保留，不作逐指令成本归因；原位图候选仍独立保留。前轮5603f75已提交未推送，新报告留审查，生产代码、正式依赖和七项无关删除不变；下一轮回Body实际热点。
