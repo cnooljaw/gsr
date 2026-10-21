@@ -1,0 +1,738 @@
+package sproto
+
+import (
+	"math"
+	"reflect"
+	"runtime"
+	"unsafe"
+)
+
+func ExperimentStaticNormal(message interface{}, limits Limits, packResult bool, prefix []byte) ([]byte, error) {
+	output, encoded, err := encodeBufferWithLimits(message, limits, packResult, prefix)
+	if err != nil {
+		return nil, err
+	}
+	if packResult {
+		return packInto(output, encoded), nil
+	}
+	return output, nil
+}
+
+func ExperimentStaticBaseline(message interface{}, limits Limits, packResult bool, prefix []byte) ([]byte, error) {
+	output, encoded, err := experimentBaselineBuffer(message, limits, packResult, prefix)
+	if err != nil {
+		return nil, err
+	}
+	if packResult {
+		return packInto(output, encoded), nil
+	}
+	return output, nil
+}
+
+// experimentBaselineBuffer 完成独立 body 预检和写出，返回同一独占缓冲及其中的未压缩帧。
+// reservePack 预留原 Pack 容量与读写间隔；RPC 请求可先做 session admission，再执行 Pack。
+func experimentBaselineBuffer(message interface{}, limits Limits, reservePack bool, prefix []byte) ([]byte, []byte, error) {
+	limits, err := normalizeLimits(limits)
+	if err != nil {
+		return nil, nil, err
+	}
+	typ, value, err := getbase(message)
+	if err != nil {
+		return nil, nil, err
+	}
+	schema, err := GetSprotoType(typ.Elem())
+	if err != nil {
+		return nil, nil, err
+	}
+	budget := &decodeBudget{limits: limits}
+	var layout encodeLayout
+	binding := knownEncodeType(schema)
+	size, err := encodedSize(schema, value, budget, 1, &layout, binding)
+	runtime.KeepAlive(message)
+	if err != nil {
+		return nil, nil, err
+	}
+	totalSize := len(prefix) + size
+	capacity, start := totalSize, 0
+	if reservePack {
+		capacity = packedBufferSize(totalSize)
+		// FF 头的最坏增长和八字节余量隔开读写游标，避免覆盖尚未消费的编码字节。
+		start = capacity - totalSize
+	}
+	output := make([]byte, capacity)
+	encoded := output[start : start+totalSize]
+	if len(prefix) > 0 {
+		copy(encoded, prefix)
+	}
+	experimentBaselineMessage(schema, value, encoded[len(prefix):], &layout, binding)
+	runtime.KeepAlive(message)
+	return output, encoded, nil
+}
+
+func experimentBaselineMessage(schema *SprotoType, value reflect.Value, output []byte, layout *encodeLayout, binding encodeBinding) int {
+	count := layout.next()
+	writeUint16(output, uint16(count))
+	if value.IsNil() {
+		return 2
+	}
+	record := value.Elem()
+	pointer := messageEncodePointer(value, binding)
+	headerOffset, bodyOffset, previous := 2, 2+count*2, -1
+	for _, index := range schema.order {
+		field := schema.Fields[index]
+		if field.Tag < 0 {
+			continue
+		}
+		native := binding.native && field.nativeInteger(schema)
+		var current reflect.Value
+		var bits uint64
+		if native {
+			var present bool
+			bits, present = pointer.integer(field.encOffset)
+			if !present {
+				continue
+			}
+		} else {
+			current = record.Field(field.index[0])
+			if omittedField(field, current) {
+				continue
+			}
+		}
+		if skip := skipTag(previous, field.Tag); skip > 0 {
+			writeUint16(output[headerOffset:], skip)
+			headerOffset += 2
+		}
+		var header uint16
+		var length int
+		if native {
+			// 内联整数只占头部，非内联时才构造内容区切片。
+			if bits <= MaxEmbeddedInt {
+				header = uint16((bits + 1) * 2)
+			} else {
+				header, length = encodeIntegerInto(bits, output[bodyOffset:])
+			}
+		} else if field.Array || field.Wire == WireStructName {
+			length = experimentBaselineField(field, current, output[bodyOffset+4:], layout, binding.exact && field.encOwner == schema && field.Array != field.pointer)
+		} else {
+			header, length = encodeScalarInto(field, current, output[bodyOffset:])
+		}
+		writeUint16(output[headerOffset:], header)
+		headerOffset += 2
+		previous = field.Tag
+		if header == 0 {
+			writeUint32(output[bodyOffset:], uint32(length))
+			bodyOffset += 4 + length
+		}
+	}
+	return bodyOffset
+}
+
+func experimentBaselineField(field *SprotoField, value reflect.Value, output []byte, layout *encodeLayout, trusted bool) int {
+	if field.Array {
+		if value.Len() == 0 {
+			return 0
+		}
+		offset := 0
+		switch field.Wire {
+		case WireVarintName:
+			width := layout.next()
+			if field.int64Slice {
+				return encodeInt64Slice(*value.Addr().Interface().(*[]int64), width, output)
+			}
+			output[0] = byte(width)
+			for index := 0; index < value.Len(); index++ {
+				number := integerBits(field, value.Index(index))
+				if width == 4 {
+					writeUint32(output[1+index*4:], uint32(number))
+				} else {
+					writeUint64(output[1+index*8:], number)
+				}
+			}
+			offset = 1 + width*value.Len()
+		case WireDoubleName:
+			output[0] = 8
+			offset = 1
+			for index := 0; index < value.Len(); index++ {
+				writeUint64(output[offset:], math.Float64bits(value.Index(index).Float()))
+				offset += 8
+			}
+		case WireBooleanName:
+			for index := 0; index < value.Len(); index++ {
+				if value.Index(index).Bool() {
+					output[index] = 1
+				} else {
+					output[index] = 0
+				}
+			}
+			offset = value.Len()
+		case WireBytesName:
+			for index := 0; index < value.Len(); index++ {
+				text := value.Index(index).String()
+				writeUint32(output[offset:], uint32(len(text)))
+				offset += 4 + copy(output[offset+4:], text)
+			}
+		case WireStructName:
+			childBinding := bindEncodeChild(field, value, trusted)
+			integers := childBinding.native && field.st.int64Record && field.st.nativeIntegerFields()
+			var pointers []unsafe.Pointer
+			if integers {
+				pointers = integerRecordPointers(field.st, value)
+			}
+			for index := 0; index < value.Len(); index++ {
+				var length int
+				if integers {
+					var pointer encodePointer
+					if pointers != nil {
+						pointer = encodePointer{value: pointers[index]}
+					} else {
+						pointer = messageEncodePointer(value.Index(index), childBinding)
+					}
+					length = experimentBaselineRecord(field.st, pointer, output[offset+4:], layout)
+				} else {
+					length = experimentBaselineMessage(field.st, value.Index(index), output[offset+4:], layout, childBinding)
+				}
+				writeUint32(output[offset:], uint32(length))
+				offset += 4 + length
+			}
+		}
+		return offset
+	}
+	return experimentBaselineMessage(field.st, value, output, layout, bindEncodeChild(field, value, trusted))
+}
+
+func experimentBaselineRecord(schema *SprotoType, pointer encodePointer, output []byte, layout *encodeLayout) int {
+	count := layout.next()
+	writeUint16(output, uint16(count))
+	if pointer.value == nil {
+		return 2
+	}
+	headerOffset, bodyOffset, previous := 2, 2+count*2, -1
+	for _, index := range schema.order {
+		field := schema.Fields[index]
+		if field.Tag < 0 {
+			continue
+		}
+		bits, present := pointer.integer(field.encOffset)
+		if !present {
+			continue
+		}
+		if skip := skipTag(previous, field.Tag); skip > 0 {
+			writeUint16(output[headerOffset:headerOffset+2:headerOffset+2], skip)
+			headerOffset += 2
+		}
+		// inline 整数只写头部，避免提前构造未使用的内容切片。
+		var header uint16
+		var length int
+		var body []byte
+		if bits <= MaxEmbeddedInt {
+			header = uint16((bits + 1) * 2)
+		} else {
+			body = output[bodyOffset:]
+			header, length = encodeIntegerInto(bits, body)
+		}
+		writeUint16(output[headerOffset:headerOffset+2:headerOffset+2], header)
+		headerOffset += 2
+		previous = field.Tag
+		if header == 0 {
+			writeUint32(body, uint32(length))
+			bodyOffset += 4 + length
+		}
+	}
+	return bodyOffset
+}
+func ExperimentStaticClone(message interface{}, limits Limits, packResult bool, prefix []byte) ([]byte, error) {
+	output, encoded, err := experimentCloneBuffer(message, limits, packResult, prefix)
+	if err != nil {
+		return nil, err
+	}
+	if packResult {
+		return packInto(output, encoded), nil
+	}
+	return output, nil
+}
+
+// experimentCloneBuffer 完成独立 body 预检和写出，返回同一独占缓冲及其中的未压缩帧。
+// reservePack 预留原 Pack 容量与读写间隔；RPC 请求可先做 session admission，再执行 Pack。
+func experimentCloneBuffer(message interface{}, limits Limits, reservePack bool, prefix []byte) ([]byte, []byte, error) {
+	limits, err := normalizeLimits(limits)
+	if err != nil {
+		return nil, nil, err
+	}
+	typ, value, err := getbase(message)
+	if err != nil {
+		return nil, nil, err
+	}
+	schema, err := GetSprotoType(typ.Elem())
+	if err != nil {
+		return nil, nil, err
+	}
+	budget := &decodeBudget{limits: limits}
+	var layout encodeLayout
+	binding := knownEncodeType(schema)
+	size, err := encodedSize(schema, value, budget, 1, &layout, binding)
+	runtime.KeepAlive(message)
+	if err != nil {
+		return nil, nil, err
+	}
+	totalSize := len(prefix) + size
+	capacity, start := totalSize, 0
+	if reservePack {
+		capacity = packedBufferSize(totalSize)
+		// FF 头的最坏增长和八字节余量隔开读写游标，避免覆盖尚未消费的编码字节。
+		start = capacity - totalSize
+	}
+	output := make([]byte, capacity)
+	encoded := output[start : start+totalSize]
+	if len(prefix) > 0 {
+		copy(encoded, prefix)
+	}
+	experimentCloneMessage(schema, value, encoded[len(prefix):], &layout, binding)
+	runtime.KeepAlive(message)
+	return output, encoded, nil
+}
+
+func experimentCloneMessage(schema *SprotoType, value reflect.Value, output []byte, layout *encodeLayout, binding encodeBinding) int {
+	count := layout.next()
+	writeUint16(output, uint16(count))
+	if value.IsNil() {
+		return 2
+	}
+	record := value.Elem()
+	pointer := messageEncodePointer(value, binding)
+	headerOffset, bodyOffset, previous := 2, 2+count*2, -1
+	for _, index := range schema.order {
+		field := schema.Fields[index]
+		if field.Tag < 0 {
+			continue
+		}
+		native := binding.native && field.nativeInteger(schema)
+		var current reflect.Value
+		var bits uint64
+		if native {
+			var present bool
+			bits, present = pointer.integer(field.encOffset)
+			if !present {
+				continue
+			}
+		} else {
+			current = record.Field(field.index[0])
+			if omittedField(field, current) {
+				continue
+			}
+		}
+		if skip := skipTag(previous, field.Tag); skip > 0 {
+			writeUint16(output[headerOffset:], skip)
+			headerOffset += 2
+		}
+		var header uint16
+		var length int
+		if native {
+			// 内联整数只占头部，非内联时才构造内容区切片。
+			if bits <= MaxEmbeddedInt {
+				header = uint16((bits + 1) * 2)
+			} else {
+				header, length = encodeIntegerInto(bits, output[bodyOffset:])
+			}
+		} else if field.Array || field.Wire == WireStructName {
+			length = experimentCloneField(field, current, output[bodyOffset+4:], layout, binding.exact && field.encOwner == schema && field.Array != field.pointer)
+		} else {
+			header, length = encodeScalarInto(field, current, output[bodyOffset:])
+		}
+		writeUint16(output[headerOffset:], header)
+		headerOffset += 2
+		previous = field.Tag
+		if header == 0 {
+			writeUint32(output[bodyOffset:], uint32(length))
+			bodyOffset += 4 + length
+		}
+	}
+	return bodyOffset
+}
+
+func experimentCloneField(field *SprotoField, value reflect.Value, output []byte, layout *encodeLayout, trusted bool) int {
+	if field.Array {
+		if value.Len() == 0 {
+			return 0
+		}
+		offset := 0
+		switch field.Wire {
+		case WireVarintName:
+			width := layout.next()
+			if field.int64Slice {
+				return encodeInt64Slice(*value.Addr().Interface().(*[]int64), width, output)
+			}
+			output[0] = byte(width)
+			for index := 0; index < value.Len(); index++ {
+				number := integerBits(field, value.Index(index))
+				if width == 4 {
+					writeUint32(output[1+index*4:], uint32(number))
+				} else {
+					writeUint64(output[1+index*8:], number)
+				}
+			}
+			offset = 1 + width*value.Len()
+		case WireDoubleName:
+			output[0] = 8
+			offset = 1
+			for index := 0; index < value.Len(); index++ {
+				writeUint64(output[offset:], math.Float64bits(value.Index(index).Float()))
+				offset += 8
+			}
+		case WireBooleanName:
+			for index := 0; index < value.Len(); index++ {
+				if value.Index(index).Bool() {
+					output[index] = 1
+				} else {
+					output[index] = 0
+				}
+			}
+			offset = value.Len()
+		case WireBytesName:
+			for index := 0; index < value.Len(); index++ {
+				text := value.Index(index).String()
+				writeUint32(output[offset:], uint32(len(text)))
+				offset += 4 + copy(output[offset+4:], text)
+			}
+		case WireStructName:
+			childBinding := bindEncodeChild(field, value, trusted)
+			integers := childBinding.native && field.st.int64Record && field.st.nativeIntegerFields()
+			var pointers []unsafe.Pointer
+			if integers {
+				pointers = integerRecordPointers(field.st, value)
+			}
+			for index := 0; index < value.Len(); index++ {
+				var length int
+				if integers {
+					var pointer encodePointer
+					if pointers != nil {
+						pointer = encodePointer{value: pointers[index]}
+					} else {
+						pointer = messageEncodePointer(value.Index(index), childBinding)
+					}
+					length = experimentCloneRecord(field.st, pointer, output[offset+4:], layout)
+				} else {
+					length = experimentCloneMessage(field.st, value.Index(index), output[offset+4:], layout, childBinding)
+				}
+				writeUint32(output[offset:], uint32(length))
+				offset += 4 + length
+			}
+		}
+		return offset
+	}
+	return experimentCloneMessage(field.st, value, output, layout, bindEncodeChild(field, value, trusted))
+}
+
+func experimentCloneRecord(schema *SprotoType, pointer encodePointer, output []byte, layout *encodeLayout) int {
+	count := layout.next()
+	writeUint16(output, uint16(count))
+	if pointer.value == nil {
+		return 2
+	}
+	headerOffset, bodyOffset, previous := 2, 2+count*2, -1
+	for _, index := range schema.order {
+		field := schema.Fields[index]
+		if field.Tag < 0 {
+			continue
+		}
+		bits, present := pointer.integer(field.encOffset)
+		if !present {
+			continue
+		}
+		if skip := skipTag(previous, field.Tag); skip > 0 {
+			writeUint16(output[headerOffset:headerOffset+2:headerOffset+2], skip)
+			headerOffset += 2
+		}
+		// inline 整数只写头部，避免提前构造未使用的内容切片。
+		var header uint16
+		var length int
+		var body []byte
+		if bits <= MaxEmbeddedInt {
+			header = uint16((bits + 1) * 2)
+		} else {
+			body = output[bodyOffset:]
+			header, length = encodeIntegerInto(bits, body)
+		}
+		writeUint16(output[headerOffset:headerOffset+2:headerOffset+2], header)
+		headerOffset += 2
+		previous = field.Tag
+		if header == 0 {
+			writeUint32(body, uint32(length))
+			bodyOffset += 4 + length
+		}
+	}
+	return bodyOffset
+}
+func ExperimentStaticCandidate(message interface{}, limits Limits, packResult bool, prefix []byte) ([]byte, error) {
+	output, encoded, err := experimentCandidateBuffer(message, limits, packResult, prefix)
+	if err != nil {
+		return nil, err
+	}
+	if packResult {
+		return packInto(output, encoded), nil
+	}
+	return output, nil
+}
+
+// experimentCandidateBuffer 完成独立 body 预检和写出，返回同一独占缓冲及其中的未压缩帧。
+// reservePack 预留原 Pack 容量与读写间隔；RPC 请求可先做 session admission，再执行 Pack。
+func experimentCandidateBuffer(message interface{}, limits Limits, reservePack bool, prefix []byte) ([]byte, []byte, error) {
+	limits, err := normalizeLimits(limits)
+	if err != nil {
+		return nil, nil, err
+	}
+	typ, value, err := getbase(message)
+	if err != nil {
+		return nil, nil, err
+	}
+	schema, err := GetSprotoType(typ.Elem())
+	if err != nil {
+		return nil, nil, err
+	}
+	budget := &decodeBudget{limits: limits}
+	var layout encodeLayout
+	binding := knownEncodeType(schema)
+	size, err := encodedSize(schema, value, budget, 1, &layout, binding)
+	runtime.KeepAlive(message)
+	if err != nil {
+		return nil, nil, err
+	}
+	totalSize := len(prefix) + size
+	capacity, start := totalSize, 0
+	if reservePack {
+		capacity = packedBufferSize(totalSize)
+		// FF 头的最坏增长和八字节余量隔开读写游标，避免覆盖尚未消费的编码字节。
+		start = capacity - totalSize
+	}
+	output := make([]byte, capacity)
+	encoded := output[start : start+totalSize]
+	if len(prefix) > 0 {
+		copy(encoded, prefix)
+	}
+	experimentCandidateMessage(schema, value, encoded[len(prefix):], &layout, binding)
+	runtime.KeepAlive(message)
+	return output, encoded, nil
+}
+
+func experimentCandidateMessage(schema *SprotoType, value reflect.Value, output []byte, layout *encodeLayout, binding encodeBinding) int {
+	count := layout.next()
+	writeUint16(output, uint16(count))
+	if value.IsNil() {
+		return 2
+	}
+	record := value.Elem()
+	pointer := messageEncodePointer(value, binding)
+	headerOffset, bodyOffset, previous := 2, 2+count*2, -1
+	for _, index := range schema.order {
+		field := schema.Fields[index]
+		if field.Tag < 0 {
+			continue
+		}
+		native := binding.native && field.nativeInteger(schema)
+		var current reflect.Value
+		var bits uint64
+		if native {
+			var present bool
+			bits, present = pointer.integer(field.encOffset)
+			if !present {
+				continue
+			}
+		} else {
+			current = record.Field(field.index[0])
+			if omittedField(field, current) {
+				continue
+			}
+		}
+		if skip := skipTag(previous, field.Tag); skip > 0 {
+			writeUint16(output[headerOffset:], skip)
+			headerOffset += 2
+		}
+		var header uint16
+		var length int
+		if native {
+			// 内联整数只占头部，非内联时才构造内容区切片。
+			if bits <= MaxEmbeddedInt {
+				header = uint16((bits + 1) * 2)
+			} else {
+				header, length = encodeIntegerInto(bits, output[bodyOffset:])
+			}
+		} else if field.Array || field.Wire == WireStructName {
+			length = experimentCandidateField(field, current, output[bodyOffset+4:], layout, binding.exact && field.encOwner == schema && field.Array != field.pointer)
+		} else {
+			header, length = encodeScalarInto(field, current, output[bodyOffset:])
+		}
+		writeUint16(output[headerOffset:], header)
+		headerOffset += 2
+		previous = field.Tag
+		if header == 0 {
+			writeUint32(output[bodyOffset:], uint32(length))
+			bodyOffset += 4 + length
+		}
+	}
+	return bodyOffset
+}
+
+func experimentCandidateField(field *SprotoField, value reflect.Value, output []byte, layout *encodeLayout, trusted bool) int {
+	if field.Array {
+		if value.Len() == 0 {
+			return 0
+		}
+		offset := 0
+		switch field.Wire {
+		case WireVarintName:
+			width := layout.next()
+			if field.int64Slice {
+				return encodeInt64Slice(*value.Addr().Interface().(*[]int64), width, output)
+			}
+			output[0] = byte(width)
+			for index := 0; index < value.Len(); index++ {
+				number := integerBits(field, value.Index(index))
+				if width == 4 {
+					writeUint32(output[1+index*4:], uint32(number))
+				} else {
+					writeUint64(output[1+index*8:], number)
+				}
+			}
+			offset = 1 + width*value.Len()
+		case WireDoubleName:
+			output[0] = 8
+			offset = 1
+			for index := 0; index < value.Len(); index++ {
+				writeUint64(output[offset:], math.Float64bits(value.Index(index).Float()))
+				offset += 8
+			}
+		case WireBooleanName:
+			for index := 0; index < value.Len(); index++ {
+				if value.Index(index).Bool() {
+					output[index] = 1
+				} else {
+					output[index] = 0
+				}
+			}
+			offset = value.Len()
+		case WireBytesName:
+			for index := 0; index < value.Len(); index++ {
+				text := value.Index(index).String()
+				writeUint32(output[offset:], uint32(len(text)))
+				offset += 4 + copy(output[offset+4:], text)
+			}
+		case WireStructName:
+			childBinding := bindEncodeChild(field, value, trusted)
+			integers := childBinding.native && field.st.int64Record && field.st.nativeIntegerFields()
+			var pointers []unsafe.Pointer
+			if integers {
+				pointers = integerRecordPointers(field.st, value)
+			}
+			if integers && value.Len() >= 8 {
+				return experimentCandidateArray(field, value, output, layout, childBinding, pointers)
+			}
+			for index := 0; index < value.Len(); index++ {
+				var length int
+				if integers {
+					var pointer encodePointer
+					if pointers != nil {
+						pointer = encodePointer{value: pointers[index]}
+					} else {
+						pointer = messageEncodePointer(value.Index(index), childBinding)
+					}
+					length = experimentCandidateRecord(field.st, pointer, output[offset+4:], layout.next())
+				} else {
+					length = experimentCandidateMessage(field.st, value.Index(index), output[offset+4:], layout, childBinding)
+				}
+				writeUint32(output[offset:], uint32(length))
+				offset += 4 + length
+			}
+		}
+		return offset
+	}
+	return experimentCandidateMessage(field.st, value, output, layout, bindEncodeChild(field, value, trusted))
+}
+
+func experimentCandidateRecord(schema *SprotoType, pointer encodePointer, output []byte, count int) int {
+	writeUint16(output, uint16(count))
+	if pointer.value == nil {
+		return 2
+	}
+	headerOffset, bodyOffset, previous := 2, 2+count*2, -1
+	for _, index := range schema.order {
+		field := schema.Fields[index]
+		if field.Tag < 0 {
+			continue
+		}
+		bits, present := pointer.integer(field.encOffset)
+		if !present {
+			continue
+		}
+		if skip := skipTag(previous, field.Tag); skip > 0 {
+			writeUint16(output[headerOffset:headerOffset+2:headerOffset+2], skip)
+			headerOffset += 2
+		}
+		// inline 整数只写头部，避免提前构造未使用的内容切片。
+		var header uint16
+		var length int
+		var body []byte
+		if bits <= MaxEmbeddedInt {
+			header = uint16((bits + 1) * 2)
+		} else {
+			body = output[bodyOffset:]
+			header, length = encodeIntegerInto(bits, body)
+		}
+		writeUint16(output[headerOffset:headerOffset+2:headerOffset+2], header)
+		headerOffset += 2
+		previous = field.Tag
+		if header == 0 {
+			writeUint32(body, uint32(length))
+			bodyOffset += 4 + length
+		}
+	}
+	return bodyOffset
+}
+
+// experimentCandidateArray 只消费本次预检形成的连续整数记录布局，不包含嵌套布局项。
+func experimentCandidateArray(field *SprotoField, value reflect.Value, output []byte, layout *encodeLayout, binding encodeBinding, pointers []unsafe.Pointer) int {
+	count := value.Len()
+	index, offset := 0, 0
+	for index < count {
+		cursor := layout.cursor
+		var headers []uint32
+		if cursor < len(layout.local) {
+			end := min(len(layout.local), cursor+count-index)
+			headers = layout.local[cursor:end:end]
+		} else {
+			start := cursor - len(layout.local)
+			end := start + count - index
+			headers = layout.extra[start:end:end]
+		}
+		layout.cursor += len(headers)
+		for _, header := range headers {
+			var pointer encodePointer
+			if pointers != nil {
+				pointer = encodePointer{value: pointers[index]}
+			} else {
+				pointer = messageEncodePointer(value.Index(index), binding)
+			}
+			length := experimentCandidateRecord(field.st, pointer, output[offset+4:], int(header))
+			writeUint32(output[offset:], uint32(length))
+			offset += 4 + length
+			index++
+		}
+	}
+	return offset
+}
+
+var experimentStaticSelected func(interface{}, Limits, bool, []byte) ([]byte, error)
+
+func init() { experimentStaticSelected = ExperimentStaticBaseline }
+
+// ExperimentStringMode 只选择不接收layout指针的最外层入口，供既有契约逐模式验证。
+func ExperimentStringMode(mode string) {
+	switch mode {
+	case "baseline":
+		experimentStaticSelected = ExperimentStaticBaseline
+	case "clone":
+		experimentStaticSelected = ExperimentStaticClone
+	case "candidate":
+		experimentStaticSelected = ExperimentStaticCandidate
+	default:
+		panic("invalid mode")
+	}
+}

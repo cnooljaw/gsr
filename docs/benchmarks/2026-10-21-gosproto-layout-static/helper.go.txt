@@ -1,0 +1,27 @@
+// experimentIntegerArray 只消费本次预检形成的连续整数记录布局，不包含嵌套布局项。
+func experimentIntegerArray(field *SprotoField, value reflect.Value, output []byte, layout *encodeLayout, binding encodeBinding, pointers []unsafe.Pointer) int {
+ count:=value.Len()
+ index,offset:=0,0
+ for index<count {
+  cursor:=layout.cursor
+  var headers []uint32
+  if cursor<len(layout.local) {
+   end:=min(len(layout.local),cursor+count-index)
+   headers=layout.local[cursor:end:end]
+  }else {
+   start:=cursor-len(layout.local)
+   end:=start+count-index
+   headers=layout.extra[start:end:end]
+  }
+  layout.cursor+=len(headers)
+  for _,header:=range headers {
+   var pointer encodePointer
+   if pointers!=nil {pointer=encodePointer{value:pointers[index]}}else {pointer=messageEncodePointer(value.Index(index),binding)}
+   length:=experimentIntegerRecord(field.st,pointer,output[offset+4:],int(header))
+   writeUint32(output[offset:],uint32(length))
+   offset+=4+length
+   index++
+  }
+ }
+ return offset
+}
