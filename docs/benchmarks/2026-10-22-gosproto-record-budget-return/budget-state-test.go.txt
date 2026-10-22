@@ -1,0 +1,67 @@
+package sproto
+
+import (
+	"errors"
+	"reflect"
+	"testing"
+	"unsafe"
+)
+
+type experimentBudgetRecord struct {
+	First  *int64 `sproto:"integer,0"`
+	Middle *int64 `sproto:"integer,2"`
+	Last   *int64 `sproto:"integer,4"`
+}
+
+// 逐字段预算改为局部计数后，成功与每个错误出口须保留完整预算及布局状态。
+func TestRecordBudgetState(t *testing.T) {
+	schema, err := GetSprotoType(reflect.TypeFor[experimentBudgetRecord]())
+	if err != nil {
+		t.Fatal(err)
+	}
+	a, b, c := int64(0), int64(MaxEmbeddedInt+1), int64(-1<<63)
+	values := []*experimentBudgetRecord{nil, {}, {First: &a, Middle: &b, Last: &c}, {Middle: &b}}
+	originalTag := schema.Fields[1].Tag
+	defer func() { schema.Fields[1].Tag = originalTag }()
+	for _, tag := range []int{2, 40000, -1} {
+		schema.Fields[1].Tag = tag
+		for _, value := range values {
+			for _, depth := range []int{1, 65} {
+				for _, maxElements := range []int{0, 1, 2, 3, 4, 1000} {
+					for _, maxBytes := range []int{1, 2, 3, 8, 16, 64} {
+						for _, initial := range []int{0, 1, 3, int(^uint(0) >> 1)} {
+							for _, prefix := range []int{0, 31, 32} {
+								seed := decodeBudget{limits: Limits{MaxDepth: 64, MaxBytes: maxBytes, MaxElements: maxElements}, elements: initial}
+								left := seed
+								var oldLayout encodeLayout
+								for i := 0; i < prefix; i++ {
+									oldLayout.add(i)
+								}
+								size, wantErr := experimentBaselineRecordSize(schema, encodePointer{value: unsafe.Pointer(value)}, &left, depth, &oldLayout)
+								for _, fn := range []func(*SprotoType, encodePointer, *decodeBudget, int, *encodeLayout) (int, error){experimentCloneRecordSize, experimentCandidateRecordSizeCommit} {
+									right := seed
+									var layout encodeLayout
+									for i := 0; i < prefix; i++ {
+										layout.add(i)
+									}
+									got, gotErr := fn(schema, encodePointer{value: unsafe.Pointer(value)}, &right, depth, &layout)
+									sameErr := (wantErr == nil && gotErr == nil) || (wantErr != nil && gotErr != nil && wantErr.Error() == gotErr.Error() && errors.Is(wantErr, ErrLimit) == errors.Is(gotErr, ErrLimit) && errors.Is(wantErr, ErrEncode) == errors.Is(gotErr, ErrEncode))
+									if got != size || !sameErr || left != right || !reflect.DeepEqual(oldLayout, layout) {
+										t.Fatalf("tag=%d depth=%d limits=%d/%d initial=%d prefix=%d: size %d/%d error %v/%v budget %+v/%+v", tag, depth, maxElements, maxBytes, initial, prefix, size, got, wantErr, gotErr, left, right)
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+// 测试适配器采用与真实唯一调用点相同的一次提交，不进入生产写出路径。
+func experimentCandidateRecordSizeCommit(schema *SprotoType, pointer encodePointer, budget *decodeBudget, depth int, layout *encodeLayout) (int, error) {
+	size, elements, err := experimentCandidateRecordSize(schema, pointer, budget, depth, layout)
+	budget.elements = elements
+	return size, err
+}

@@ -1,0 +1,305 @@
+package sproto
+
+import (
+	"errors"
+	"fmt"
+	"math"
+	"reflect"
+	"runtime"
+	"unsafe"
+)
+
+// Limits 是编解码的本地资源预算；零值使用有限默认值，不改变 wire 格式。
+type Limits struct {
+	MaxBytes    int
+	MaxDepth    int
+	MaxElements int
+}
+
+var (
+	// ErrLimit 表示载荷、深度或集合超过接纳预算。
+	ErrLimit = errors.New("sproto: resource limit exceeded")
+	// ErrInvalidLimits 表示显式预算无效。
+	ErrInvalidLimits = errors.New("sproto: invalid limits")
+	// ErrEncode 表示输入值不能按当前 schema 安全编码。
+	ErrEncode = errors.New("sproto: invalid encode value")
+)
+
+func normalizeLimits(limits Limits) (Limits, error) {
+	if limits.MaxBytes == 0 {
+		limits.MaxBytes = 8 << 20
+	}
+	if limits.MaxDepth == 0 {
+		limits.MaxDepth = 64
+	}
+	if limits.MaxElements == 0 {
+		limits.MaxElements = 100000
+	}
+	if limits.MaxBytes < 1 || limits.MaxDepth < 1 || limits.MaxDepth > 128 || limits.MaxElements < 1 {
+		return Limits{}, ErrInvalidLimits
+	}
+	return limits, nil
+}
+
+type decodeBudget struct {
+	limits          Limits
+	depth, elements int
+}
+
+func (budget *decodeBudget) add(count int) error {
+	if count < 0 || count > budget.limits.MaxElements-budget.elements {
+		return ErrLimit
+	}
+	budget.elements += count
+	return nil
+}
+
+// EncodeWithLimits 在任何递归编码和大块分配前验证值、深度与预计输出大小。
+func EncodeWithLimits(message interface{}, limits Limits) ([]byte, error) {
+	return encodeWithLimits(message, limits, false, nil)
+}
+
+// prefix 只由内部组合路径传入；body 仍先完成独立预算预检，再与前缀写入同一独占缓冲。
+// prefix 只借用至本次调用返回，结果不与它共享存储；普通调用传 nil。
+func encodeWithLimits(message interface{}, limits Limits, packResult bool, prefix []byte) ([]byte, error) {
+	output, encoded, err := encodeBufferWithLimits(message, limits, packResult, prefix)
+	if err != nil {
+		return nil, err
+	}
+	if packResult {
+		return packInto(output, encoded), nil
+	}
+	return output, nil
+}
+
+// encodeBufferWithLimits 完成独立 body 预检和写出，返回同一独占缓冲及其中的未压缩帧。
+// reservePack 预留原 Pack 容量与读写间隔；RPC 请求可先做 session admission，再执行 Pack。
+func encodeBufferWithLimits(message interface{}, limits Limits, reservePack bool, prefix []byte) ([]byte, []byte, error) {
+	limits, err := normalizeLimits(limits)
+	if err != nil {
+		return nil, nil, err
+	}
+	typ, value, err := getbase(message)
+	if err != nil {
+		return nil, nil, err
+	}
+	schema, err := GetSprotoType(typ.Elem())
+	if err != nil {
+		return nil, nil, err
+	}
+	budget := &decodeBudget{limits: limits}
+	var layout encodeLayout
+	binding := knownEncodeType(schema)
+	size, err := encodedSize(schema, value, budget, 1, &layout, binding)
+	runtime.KeepAlive(message)
+	if err != nil {
+		return nil, nil, err
+	}
+	totalSize := len(prefix) + size
+	capacity, start := totalSize, 0
+	if reservePack {
+		capacity = packedBufferSize(totalSize)
+		// FF 头的最坏增长和八字节余量隔开读写游标，避免覆盖尚未消费的编码字节。
+		start = capacity - totalSize
+	}
+	output := make([]byte, capacity)
+	encoded := output[start : start+totalSize]
+	if len(prefix) > 0 {
+		copy(encoded, prefix)
+	}
+	encodeMessageInto(schema, value, encoded[len(prefix):], &layout, binding)
+	runtime.KeepAlive(message)
+	return output, encoded, nil
+}
+
+func encodedSize(schema *SprotoType, value reflect.Value, budget *decodeBudget, depth int, layout *encodeLayout, binding encodeBinding) (int, error) {
+	if depth > budget.limits.MaxDepth {
+		return 0, ErrLimit
+	}
+	size, lastTag := 2, -1
+	if size > budget.limits.MaxBytes {
+		return 0, ErrLimit
+	}
+	layoutIndex := layout.add(0)
+	if value.IsNil() {
+		return size, nil
+	}
+	record := value.Elem()
+	pointer := messageEncodePointer(value, binding)
+	headerCount := 0
+	for _, index := range schema.order {
+		field := schema.Fields[index]
+		if field.Tag < 0 {
+			continue
+		}
+		native := binding.native && field.nativeInteger(schema)
+		var current reflect.Value
+		var bits uint64
+		if native {
+			var present bool
+			bits, present = pointer.integer(field.encOffset)
+			if !present {
+				continue
+			}
+		} else {
+			current = record.Field(field.index[0])
+			if omittedField(field, current) {
+				continue
+			}
+		}
+		if err := budget.add(1); err != nil {
+			return 0, err
+		}
+		gap := field.Tag - lastTag - 1
+		if gap > 32768 {
+			return 0, fmt.Errorf("%w: tag gap", ErrEncode)
+		}
+		if gap > 0 {
+			size += 2
+			headerCount++
+		}
+		size += 2
+		headerCount++
+		lastTag = field.Tag
+		var part int
+		var inline bool
+		var err error
+		if native {
+			part, inline = signedSize(bits)
+		} else {
+			part, inline, err = fieldSize(field, current, budget, depth, layout, binding.exact && field.encOwner == schema && field.Array != field.pointer)
+		}
+		if err != nil {
+			return 0, err
+		}
+		if !inline {
+			size += 4 + part
+		}
+		if size > budget.limits.MaxBytes {
+			return 0, ErrLimit
+		}
+	}
+	layout.set(layoutIndex, headerCount)
+	return size, nil
+}
+
+func fieldSize(field *SprotoField, value reflect.Value, budget *decodeBudget, depth int, layout *encodeLayout, trusted bool) (int, bool, error) {
+	if field.Array {
+		if err := budget.add(value.Len()); err != nil {
+			return 0, false, err
+		}
+		size := 0
+		switch field.Wire {
+		case WireVarintName:
+			if field.int64Slice {
+				values := *value.Addr().Interface().(*[]int64)
+				width := 4
+				for _, number := range values {
+					if number < MinInt32 || number > MaxInt32 {
+						width = 8
+						break
+					}
+				}
+				if len(values) > 0 {
+					size = 1 + width*len(values)
+					layout.add(width)
+				}
+				break
+			}
+			width := 4
+			for i := 0; i < value.Len(); i++ {
+				bits := integerBits(field, value.Index(i))
+				if field.unsigned && bits > math.MaxInt64 {
+					return 0, false, fmt.Errorf("%w: integer exceeds signed 64-bit range", ErrEncode)
+				}
+				if integerWidth(bits) > width {
+					width = 8
+				}
+			}
+			if value.Len() > 0 {
+				size = 1 + width*value.Len()
+				layout.add(width)
+			}
+		case WireDoubleName:
+			if value.Len() > 0 {
+				size = 1 + 8*value.Len()
+			}
+		case WireBooleanName:
+			size = value.Len()
+		case WireBytesName:
+			for i := 0; i < value.Len(); i++ {
+				size += 4 + value.Index(i).Len()
+				if size > budget.limits.MaxBytes {
+					return 0, false, ErrLimit
+				}
+			}
+		case WireStructName:
+			var childBinding encodeBinding
+			if value.Len() > 0 {
+				childBinding = bindEncodeChild(field, value, trusted)
+
+			}
+			integers := childBinding.native && field.st.int64Record && field.st.nativeIntegerFields()
+			var pointers []unsafe.Pointer
+			if integers {
+				pointers = integerRecordPointers(field.st, value)
+			}
+			for i := 0; i < value.Len(); i++ {
+				var part int
+				var err error
+				if integers {
+					var pointer encodePointer
+					if pointers != nil {
+						pointer = encodePointer{value: pointers[i]}
+					} else {
+						pointer = messageEncodePointer(value.Index(i), childBinding)
+					}
+					var elements int
+					part, elements, err = encodedIntegerRecordSize(field.st, pointer, budget, depth+1, layout)
+					budget.elements = elements
+				} else {
+					part, err = encodedSize(field.st, value.Index(i), budget, depth+1, layout, childBinding)
+				}
+				if err != nil {
+					return 0, false, err
+				}
+				size += 4 + part
+				if size > budget.limits.MaxBytes {
+					return 0, false, ErrLimit
+				}
+			}
+		}
+		if size > budget.limits.MaxBytes {
+			return 0, false, ErrLimit
+		}
+		return size, false, nil
+	}
+	if field.Wire == WireStructName {
+		size, err := encodedSize(field.st, value, budget, depth+1, layout, bindEncodeChild(field, value, trusted))
+		return size, false, err
+	}
+	if field.pointer {
+		value = value.Elem()
+	}
+	switch field.Wire {
+	case WireVarintName:
+		bits := integerBits(field, value)
+		if field.unsigned && bits > math.MaxInt64 {
+			return 0, false, fmt.Errorf("%w: integer exceeds signed 64-bit range", ErrEncode)
+		}
+		return integerWidth(bits), bits <= MaxEmbeddedInt, nil
+	case WireDoubleName:
+		return 8, false, nil
+	case WireBooleanName:
+		return 0, true, nil
+	case WireBytesName:
+		return value.Len(), false, nil
+	}
+	return 0, false, ErrEncode
+}
+
+// Validate 检查显式预算；零值合法并在编解码时使用默认值。
+func (limits Limits) Validate() error {
+	_, err := normalizeLimits(limits)
+	return err
+}
