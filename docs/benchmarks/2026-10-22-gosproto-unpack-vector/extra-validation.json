@@ -1,0 +1,45 @@
+{
+  "commands": [
+    {
+      "args": [
+        "gofmt",
+        "-w",
+        "unpack_vector_test.go"
+      ],
+      "exitCode": 0,
+      "seconds": 0.03365037590265274,
+      "output": ""
+    },
+    {
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "-gcflags=all=-d=checkptr=2",
+        "-run",
+        "^TestUnpackVectorMixedWire$",
+        "-timeout=2m",
+        "."
+      ],
+      "exitCode": 0,
+      "seconds": 3.07553387619555,
+      "output": "ok  \tgithub.com/cnooljaw/gosproto\t1.694s\n"
+    },
+    {
+      "args": [
+        "go",
+        "test",
+        "-tags=purego",
+        "-run",
+        "^TestUnpackVectorMixedWire$",
+        "-timeout=2m",
+        "."
+      ],
+      "exitCode": 0,
+      "seconds": 1.2460915427654982,
+      "output": "ok  \tgithub.com/cnooljaw/gosproto\t0.361s\n"
+    }
+  ],
+  "extraTestSha256": "8b2ae2aff11fcf45ca4fb8d0f76b1b10db43e2b17f2f11563a57e2af29e9b854",
+  "scope": "Added after final performance capture; production source and prior tests unchanged"
+}

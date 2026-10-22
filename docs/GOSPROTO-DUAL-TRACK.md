@@ -1,5 +1,7 @@
 # Go Sproto双主线目标
 
+2026-10-22最新：[ARM64 Unpack向量恢复](benchmarks/2026-10-22-gosproto-unpack-vector/RESULTS.md)在完整预检后对128B～1MiB压缩输入启用VTBL及FF批量复制；其他架构/purego回退。M2同进程两遍整数数组Unpack约改善8.7%、PDecode约4.5%～5.4%，AddressBook与ASCII有局部代价。完整库、官方oracle、race/checkptr、purego、vet、有限fuzz、保护页及4096组混合wire、GoTS7/7通过。正式72项对照中数组PDecode仍慢PB约38.3%，未宣称全面胜出。前轮报告已提交76ffa2b；新源码与报告未提交，正式依赖v0.4.0及十项用户删除保持。
+
 2026-10-22阶段收尾：[Go Sproto最终优化与72项PB对照](benchmarks/2026-10-22-gosproto-final/RESULTS.md)。本轮保留至少32项的原生整数数组编码，以及长8字节数组正文解码；386/amd64/arm64启用，其他架构与短数组保留原循环。最终整数消息Encode/PEncode较9e47281起点降低16.75%/8.01%，全部40项代表消息分配不变；大型正文领先PB，数组PDecode仍慢51.2%，未宣称全面胜出。三个候选阶段108进程2448行、完整库/oracle/race/checkptr/vet、有限fuzz及GoTS7/7验收完成；32位旧测试常量溢出已在基线复现，仅声明生产编译通过。新源码及文档留审查未提交，前轮d6d4106已提交未推送；正式依赖v0.4.0、十项用户删除保持。
 
 当前Body与测量诊断（2026-10-20）：[字段Tag局部复用](benchmarks/2026-10-20-gosproto-record-tag/RESULTS.md)确认两记录函数Tag加载2→1、指令/栈不变，但净收益未确认，未采用。原37项大型Encode+6.22%/+7.18%，同源跨模块clone本身+6.66%，不能直接归因于候选。追加单模块独立二进制96worker，Encode+1.95%、PEncode−0.86%，控制/离散仍明显，全部小收益与反向保留，不扣控制差值。原178条流程＋补充102条及两侧描述替换race/checkptr通过；后续关键Go候选补单模块复核，旧数据不回填。前轮440f436已提交，库a93bb0d及原6项删除保持，新报告未提交，双主线继续。

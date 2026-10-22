@@ -1,0 +1,36 @@
+//go:build arm64 && !purego
+
+package sproto
+
+// 固定16字节：汇编按header左移4定位，indexes/count分别位于0/8偏移。
+type unpackVectorEntry struct {
+	indexes uint64
+	count   uint64
+}
+
+// 控制字节为有效输入序号或255；表在初始化后只读。
+var unpackVectorTable = func() [256]unpackVectorEntry {
+	var table [256]unpackVectorEntry
+	for header := range table {
+		var rank uint64
+		for position := 0; position < 8; position++ {
+			index := uint64(255)
+			if header&(1<<position) != 0 {
+				index = rank
+				rank++
+			}
+			table[header].indexes |= index << (position * 8)
+		}
+		table[header].count = rank
+	}
+	return table
+}()
+
+// unpackVector 只接受完整预检后的src及本次精确分配并清零的独占dst。
+func unpackVector(dst, src []byte) bool {
+	unpackVectorARM64(dst, src, &unpackVectorTable)
+	return true
+}
+
+//go:noescape
+func unpackVectorARM64(dst, src []byte, table *[256]unpackVectorEntry)
