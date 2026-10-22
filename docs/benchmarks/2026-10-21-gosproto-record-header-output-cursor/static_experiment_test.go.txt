@@ -1,0 +1,77 @@
+package sproto
+
+import (
+	"bytes"
+	"math"
+	"testing"
+)
+
+type segmentRecord struct {
+	First *int64 `sproto:"integer,0"`
+	Last  *int64 `sproto:"integer,3"`
+}
+type segmentChild struct {
+	Rows []*segmentRecord `sproto:"struct,0,array"`
+}
+type segmentDocument struct {
+	Before []*segmentRecord `sproto:"struct,0,array"`
+	Rows   []*segmentRecord `sproto:"struct,1,array"`
+	Nested *segmentChild    `sproto:"struct,2"`
+	After  []*segmentRecord `sproto:"struct,3,array"`
+	Tail   *int64           `sproto:"integer,4"`
+}
+
+func segmentItems(n int) []*segmentRecord {
+	rows := make([]*segmentRecord, n)
+	values := []int64{0, MaxEmbeddedInt, MaxEmbeddedInt + 1, -1, math.MinInt32, math.MaxInt32, math.MinInt64, math.MaxInt64}
+	for i := range rows {
+		if i%11 == 0 {
+			continue
+		}
+		a, b := values[i%len(values)], int64(i)
+		rows[i] = &segmentRecord{First: &a, Last: &b}
+		if i%3 == 0 {
+			rows[i].Last = nil
+		}
+	}
+	return rows
+}
+
+// 验证分段布局在32项边界、nil、相邻数组和嵌套兄弟之后仍产生相同wire与预算错误。
+func TestLayoutSegmentsContracts(t *testing.T) {
+	defer ExperimentStringMode("baseline")
+	for _, before := range []int{0, 1, 7, 30, 31, 32, 33} {
+		for _, n := range []int{0, 1, 7, 8, 9, 30, 31, 32, 33, 63, 64, 65, 128} {
+			tail := int64(-17)
+			message := &segmentDocument{Before: segmentItems(before), Rows: segmentItems(n), Nested: &segmentChild{Rows: segmentItems(9)}, After: segmentItems(33), Tail: &tail}
+			ExperimentStringMode("baseline")
+			want, err := Encode(message)
+			if err != nil {
+				t.Fatal(err)
+			}
+			packed := Pack(want)
+			for _, mode := range []string{"baseline", "clone", "candidate"} {
+				ExperimentStringMode(mode)
+				got, err := Encode(message)
+				if err != nil || !bytes.Equal(got, want) {
+					t.Fatal(before, n, mode, err)
+				}
+				frame, err := EncodePacked(message)
+				if err != nil || !bytes.Equal(frame, packed) {
+					t.Fatal("packed", before, n, mode, err)
+				}
+				// 预算仍由同一完整预检决定，写出优化不得推迟失败或返回部分输出。
+				for _, limit := range []Limits{{MaxBytes: len(want) - 1}, {MaxDepth: 1}, {MaxElements: 1}} {
+					output, err := EncodeWithLimits(message, limit)
+					if err != ErrLimit || output != nil {
+						t.Fatal("budget", before, n, mode, err)
+					}
+				}
+			}
+		}
+	}
+	for _, mode := range []string{"baseline", "clone", "candidate"} {
+		ExperimentStringMode(mode)
+		t.Run(mode, TestEncodeRecordPointerSlices)
+	}
+}
