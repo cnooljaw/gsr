@@ -16,5 +16,5 @@ for name in ['ExperimentUnpackOriginal','ExperimentUnpackClone','ExperimentDecod
  lines=[re.match(r'^\s+\S+\s+(0x[0-9a-f]+)\s+[0-9a-f]+\s+(\S+)',l) for l in text.splitlines()];lines=[m for m in lines if m];records[name]={'address':lines[0][1],'instructionCount':len(lines)};opcodes[name]=[m[2] for m in lines]
 assert len({v['address'] for v in records.values()})==len(records)
 assert opcodes['ExperimentUnpackOriginal']==opcodes['ExperimentUnpackClone'];assert opcodes['ExperimentDecodePacked']==opcodes['ExperimentDecodePackedClone']
-for n in ['pack.go','experiment.go','experiment_clone.go','experiment_public.go','experiment_public_clone.go']:(here/(n+'.txt')).write_bytes((lib/n).read_bytes())
+for n in ['pack.go','experiment.go','experiment_clone.go','experiment_public.go','experiment_public_clone.go']:(here/('baseline-experiment.go.txt' if n=='experiment.go' else n+'.txt')).write_bytes((lib/n).read_bytes())
 (here/'validation.json').write_text(json.dumps(dict(sourceAndBinaryVerifiedAfter=True,candidateMatchesPriorSnapshot=True,baselineCloneBodiesEqual=True,publicCloneBodiesEqual=True,cloneOpcodeSequencesEqual=True,symbols=records,commands=len(json.loads((here/'commands.json').read_text()))),indent=2)+'\n');print(records)

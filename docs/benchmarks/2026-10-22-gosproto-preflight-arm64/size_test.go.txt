@@ -1,0 +1,48 @@
+//go:build arm64 && !purego
+
+package sproto
+
+import (
+ "bytes"
+ "testing"
+)
+
+// TestUnpackSizeFastDifferential 保护原生预检与参考实现的尺寸、错误优先级和范围回退一致。
+func TestUnpackSizeFastDifferential(t *testing.T) {
+ check := func(input []byte, limit int) {
+  t.Helper()
+  before := append([]byte(nil), input...)
+  want, wantErr := ExperimentUnpackOriginal(input, limit)
+  size, status := unpackedSizeARM64(input, limit, &unpackVectorTable)
+  var gotErr error
+  if status == 1 { gotErr = ErrUnpack } else if status == 2 { gotErr = ErrLimit } else if status != 0 {t.Fatalf("unknown status %d", status)}
+  if gotErr != wantErr || (gotErr == nil && size != len(want)) || !bytes.Equal(input,before) {
+   t.Fatalf("input=%x limit=%d size=%d status=%d want=%d/%v",input,limit,size,status,len(want),wantErr)
+  }
+ }
+ if _,_,handled:=unpackSizeFast(make([]byte,128),1024);!handled {t.Fatal("128 byte input must use native preflight")}
+ for _,length:=range []int{0,1,127,(1<<20)+1} {
+  if _,_,handled:=unpackSizeFast(make([]byte,length),8<<20);handled {t.Fatal("range must fall back",length)}
+ }
+ for mask:=0;mask<256;mask++ {
+  raw:=make([]byte,64)
+  for i:=range raw {if mask&(1<<(i%8))!=0 {raw[i]=byte(128+i)}}
+  packed:=Pack(raw)
+  for cut:=0;cut<=len(packed);cut++ {
+   backing:=make([]byte,cut+37);copy(backing[3:],packed[:cut]);input:=backing[3:3+cut]
+   for _,limit:=range []int{1,7,8,9,15,16,63,64,65,int(^uint(0)>>1)} {check(input,limit)}
+  }
+ }
+ for count:=0;count<256;count++ {
+  input:=append([]byte{255,byte(count)},bytes.Repeat([]byte{0x81},(count+1)*8)...)
+  for _,cut:=range []int{1,2,len(input)-1,len(input)} {
+   for _,limit:=range []int{1,8,(count+1)*8-1,(count+1)*8,int(^uint(0)>>1)} {check(input[:cut],limit)}
+  }
+ }
+ state:=uint32(0x1729)
+ for round:=0;round<4096;round++ {
+  state=state*1664525+1013904223
+  wire:=make([]byte,int(state%1025));for i:=range wire {state=state*1664525+1013904223;wire[i]=byte(state>>24)}
+  for _,limit:=range []int{1,8,16,64,2048,8<<20} {check(wire,limit)}
+ }
+}

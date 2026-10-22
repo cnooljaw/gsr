@@ -910,3 +910,7 @@ self40/55、clone37/55，66项累计反向、2项分配尾差与全部异常保�
 ## 2026-10-22：ARM64向量Unpack恢复
 
 2026-10-22最新：[ARM64 Unpack向量恢复](benchmarks/2026-10-22-gosproto-unpack-vector/RESULTS.md)在完整预检后对128B～1MiB压缩输入启用VTBL及FF批量复制；其他架构/purego回退。M2同进程两遍整数数组Unpack约改善8.7%、PDecode约4.5%～5.4%，AddressBook与ASCII有局部代价。完整库、官方oracle、race/checkptr、purego、vet、有限fuzz、保护页及4096组混合wire、GoTS7/7通过。正式72项对照中数组PDecode仍慢PB约38.3%，未宣称全面胜出。前轮报告已提交76ffa2b；新源码与报告未提交，正式依赖v0.4.0及十项用户删除保持。
+
+## 2026-10-22：原生完整预检与紧凑计数表
+
+2026-10-22最新实现：[ARM64完整预检扫描](benchmarks/2026-10-22-gosproto-preflight-arm64/RESULTS.md)保留256B紧凑计数表版，完整边界/预算/错误顺序与预检后分配保持。公开整数DecodePacked两遍改善15.79%/10.33%，大型改善1.45%/5.87%，ASCII/小消息代价与clone波动全部保留。正式72项对照整数packed仍慢PB30.7%，大型快8.0%，40项分配不变；完整库官方oracle/purego/race/checkptr/vet、有限fuzz、跨架构编译及GoTS7/7通过。新源码与报告未提交，前轮91e6c01已提交未推送；正式依赖及十项用户删除保持。

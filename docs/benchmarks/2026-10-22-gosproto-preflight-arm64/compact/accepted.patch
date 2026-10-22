@@ -1,0 +1,418 @@
+diff --git a/CHANGES.md b/CHANGES.md
+index 3194e5b..09e93bc 100644
+--- a/CHANGES.md
++++ b/CHANGES.md
+@@ -2,0 +3,2 @@
++- ARM64非purego对128B～1MiB压缩输入使用只读原生预检，复用完整边界/预算及错误先后语义；固定256B计数表，预检成功后才精确分配，范围外和其他架构保留Go路径。新增原Go预检参考差分、FF/零段/截断与只读保护页回归。M2同源clone控制下整数DecodePacked两遍改善约15.8%/10.3%，大型消息约1.5%/5.9%；ASCII及小消息的局部代价见GSR完整报告，不宣称全场景或全平台提速。
++
+diff --git a/pack.go b/pack.go
+index 101d466..866ee8a 100644
+--- a/pack.go
++++ b/pack.go
+@@ -198,9 +198,21 @@ func UnpackWithLimit(src []byte, maxBytes int) ([]byte, error) {
+-	size := 0
+-	for remaining := src; len(remaining) > 0; {
+-		header := remaining[0]
+-		consumed, produced := 1, 8
+-		if header == 0 {
+-			if len(remaining) >= 2 && remaining[1] == 0 {
+-				words := (maxBytes - size) / 8
+-				if words < 2 {
+-					return nil, ErrLimit
++	size, err, handled := unpackSizeFast(src, maxBytes)
++	if err != nil {
++		return nil, err
++	}
++	if !handled {
++		for remaining := src; len(remaining) > 0; {
++			header := remaining[0]
++			consumed, produced := 1, 8
++			if header == 0 {
++				if len(remaining) >= 2 && remaining[1] == 0 {
++					words := (maxBytes - size) / 8
++					if words < 2 {
++						return nil, ErrLimit
++					}
++					// 多检查一个零 mask 即可判定超额，不为小预算扫描整段大输入。
++					end := min(len(remaining), words+1)
++					run := 2 + zeroHeaderPrefix(remaining[2:end])
++					if run > words {
++						return nil, ErrLimit
++					}
++					consumed, produced = run, run*8
+@@ -208,5 +220,3 @@ func UnpackWithLimit(src []byte, maxBytes int) ([]byte, error) {
+-				// 多检查一个零 mask 即可判定超额，不为小预算扫描整段大输入。
+-				end := min(len(remaining), words+1)
+-				run := 2 + zeroHeaderPrefix(remaining[2:end])
+-				if run > words {
+-					return nil, ErrLimit
++			} else if header == 0xff {
++				if len(remaining) < 2 {
++					return nil, ErrUnpack
+@@ -214 +224,4 @@ func UnpackWithLimit(src []byte, maxBytes int) ([]byte, error) {
+-				consumed, produced = run, run*8
++				produced = (int(remaining[1]) + 1) * 8
++				consumed = 2 + produced
++			} else {
++				consumed += bits.OnesCount8(header)
+@@ -216,2 +229 @@ func UnpackWithLimit(src []byte, maxBytes int) ([]byte, error) {
+-		} else if header == 0xff {
+-			if len(remaining) < 2 {
++			if consumed > len(remaining) {
+@@ -220,10 +232,5 @@ func UnpackWithLimit(src []byte, maxBytes int) ([]byte, error) {
+-			produced = (int(remaining[1]) + 1) * 8
+-			consumed = 2 + produced
+-		} else {
+-			consumed += bits.OnesCount8(header)
+-		}
+-		if consumed > len(remaining) {
+-			return nil, ErrUnpack
+-		}
+-		if produced > maxBytes-size {
+-			return nil, ErrLimit
++			if produced > maxBytes-size {
++				return nil, ErrLimit
++			}
++			size += produced
++			remaining = remaining[consumed:]
+@@ -231,2 +237,0 @@ func UnpackWithLimit(src []byte, maxBytes int) ([]byte, error) {
+-		size += produced
+-		remaining = remaining[consumed:]
+diff --git a/unpack_size_arm64.go b/unpack_size_arm64.go
+new file mode 100644
+index 0000000..e011130
+--- /dev/null
++++ b/unpack_size_arm64.go
+@@ -0,0 +1,34 @@
++//go:build arm64 && !purego
++
++package sproto
++
++import "math/bits"
++
++// 预检只需要字节数；固定256B表在初始化后只读，不携带恢复用的置换索引。
++var unpackSizeCounts = func() (counts [256]uint8) {
++	for header := range counts {
++		counts[header] = uint8(bits.OnesCount8(uint8(header)))
++	}
++	return counts
++}()
++
++// unpackSizeFast 限定叶函数单次扫描规模；更小、更大输入保留Go预检。
++func unpackSizeFast(src []byte, maxBytes int) (int, error, bool) {
++	if len(src) < 128 || len(src) > 1<<20 {
++		return 0, nil, false
++	}
++	size, status := unpackedSizeARM64(src, maxBytes, &unpackSizeCounts)
++	switch status {
++	case 1:
++		return 0, ErrUnpack, true
++	case 2:
++		return 0, ErrLimit, true
++	default:
++		return size, nil, true
++	}
++}
++
++// unpackedSizeARM64 只读src与表，要求maxBytes>0；status为0成功、1截断、2预算不足。
++//
++//go:noescape
++func unpackedSizeARM64(src []byte, maxBytes int, table *[256]uint8) (size int, status uint64)
+diff --git a/unpack_size_other.go b/unpack_size_other.go
+new file mode 100644
+index 0000000..d86b91f
+--- /dev/null
++++ b/unpack_size_other.go
+@@ -0,0 +1,7 @@
++//go:build !arm64 || purego
++
++package sproto
++
++func unpackSizeFast(_ []byte, _ int) (int, error, bool) {
++	return 0, nil, false
++}
+diff --git a/unpack_size_arm64.s b/unpack_size_arm64.s
+new file mode 100644
+index 0000000..9102b58
+--- /dev/null
++++ b/unpack_size_arm64.s
+@@ -0,0 +1,73 @@
++//go:build arm64 && !purego
++
++#include "textflag.h"
++
++// 只读预检；R0源游标、R1剩余输入、R2剩余预算、R3固定表。
++TEXT ·unpackedSizeARM64(SB), NOSPLIT, $0-56
++	MOVD src_base+0(FP), R0
++	MOVD src_len+8(FP), R1
++	MOVD maxBytes+24(FP), R2
++	MOVD table+32(FP), R3
++size_loop:
++	CBZ R1, size_done
++	MOVBU (R0), R5
++	CBZ R5, size_zero
++	CMP $255, R5
++	BEQ size_ff
++	MOVBU (R3)(R5), R6
++	ADD $1, R6
++	CMP R6, R1
++	BLO size_bad
++	CMP $8, R2
++	BLO size_limit
++	SUB $8, R2
++size_advance:
++	SUB R6, R1
++	ADD R6, R0
++	B size_loop
++size_ff:
++	CMP $2, R1
++	BLO size_bad
++	MOVBU 1(R0), R7
++	ADD $1, R7
++	LSL $3, R7
++	ADD $2, R7, R6
++	CMP R6, R1
++	BLO size_bad
++	CMP R7, R2
++	BLO size_limit
++	SUB R7, R2
++	B size_advance
++size_zero:
++	CMP $8, R2
++	BLO size_limit
++	CMP $8, R1
++	BLO size_zero_one
++	MOVD (R0), R8
++	CBNZ R8, size_zero_one
++	CMP $64, R2
++	BLO size_zero_one
++	SUB $64, R2
++	SUB $8, R1
++	ADD $8, R0
++	B size_loop
++size_zero_one:
++	SUB $8, R2
++	SUB $1, R1
++	ADD $1, R0
++	B size_loop
++size_done:
++	MOVD maxBytes+24(FP), R4
++	SUB R2, R4
++	MOVD R4, size+40(FP)
++	MOVD ZR, status+48(FP)
++	RET
++size_bad:
++	MOVD $1, R4
++	B size_error
++size_limit:
++	MOVD $2, R4
++size_error:
++	MOVD ZR, size+40(FP)
++	MOVD R4, status+48(FP)
++	RET
+diff --git a/unpack_size_arm64_test.go b/unpack_size_arm64_test.go
+new file mode 100644
+index 0000000..5e4488e
+--- /dev/null
++++ b/unpack_size_arm64_test.go
+@@ -0,0 +1,74 @@
++//go:build arm64 && !purego
++
++package sproto
++
++import (
++	"bytes"
++	"testing"
++)
++
++// TestUnpackSizeFastDifferential 保护原生预检与参考实现的尺寸、错误优先级和范围回退一致。
++func TestUnpackSizeFastDifferential(t *testing.T) {
++	check := func(input []byte, limit int) {
++		t.Helper()
++		before := append([]byte(nil), input...)
++		want, wantErr := referenceUnpackSize(input, limit)
++		size, status := unpackedSizeARM64(input, limit, &unpackSizeCounts)
++		var gotErr error
++		if status == 1 {
++			gotErr = ErrUnpack
++		} else if status == 2 {
++			gotErr = ErrLimit
++		} else if status != 0 {
++			t.Fatalf("unknown status %d", status)
++		}
++		if gotErr != wantErr || (gotErr == nil && size != want) || !bytes.Equal(input, before) {
++			t.Fatalf("input=%x limit=%d size=%d status=%d want=%d/%v", input, limit, size, status, want, wantErr)
++		}
++	}
++	if _, _, handled := unpackSizeFast(make([]byte, 128), 1024); !handled {
++		t.Fatal("128 byte input must use native preflight")
++	}
++	for _, length := range []int{0, 1, 127, (1 << 20) + 1} {
++		if _, _, handled := unpackSizeFast(make([]byte, length), 8<<20); handled {
++			t.Fatal("range must fall back", length)
++		}
++	}
++	for mask := 0; mask < 256; mask++ {
++		raw := make([]byte, 64)
++		for i := range raw {
++			if mask&(1<<(i%8)) != 0 {
++				raw[i] = byte(128 + i)
++			}
++		}
++		packed := Pack(raw)
++		for cut := 0; cut <= len(packed); cut++ {
++			backing := make([]byte, cut+37)
++			copy(backing[3:], packed[:cut])
++			input := backing[3 : 3+cut]
++			for _, limit := range []int{1, 7, 8, 9, 15, 16, 63, 64, 65, int(^uint(0) >> 1)} {
++				check(input, limit)
++			}
++		}
++	}
++	for count := 0; count < 256; count++ {
++		input := append([]byte{255, byte(count)}, bytes.Repeat([]byte{0x81}, (count+1)*8)...)
++		for _, cut := range []int{1, 2, len(input) - 1, len(input)} {
++			for _, limit := range []int{1, 8, (count+1)*8 - 1, (count + 1) * 8, int(^uint(0) >> 1)} {
++				check(input[:cut], limit)
++			}
++		}
++	}
++	state := uint32(0x1729)
++	for round := 0; round < 4096; round++ {
++		state = state*1664525 + 1013904223
++		wire := make([]byte, int(state%1025))
++		for i := range wire {
++			state = state*1664525 + 1013904223
++			wire[i] = byte(state >> 24)
++		}
++		for _, limit := range []int{1, 8, 16, 64, 2048, 8 << 20} {
++			check(wire, limit)
++		}
++	}
++}
+diff --git a/unpack_size_guard_arm64_test.go b/unpack_size_guard_arm64_test.go
+new file mode 100644
+index 0000000..c611a56
+--- /dev/null
++++ b/unpack_size_guard_arm64_test.go
+@@ -0,0 +1,64 @@
++//go:build arm64 && !purego && (darwin || linux)
++
++package sproto
++
++import (
++	"bytes"
++	"fmt"
++	"syscall"
++	"testing"
++)
++
++// TestUnpackSizeGuardPages 保护只读源的头尾边界，并核对错误优先级及公开入口接线。
++func TestUnpackSizeGuardPages(t *testing.T) {
++	check := func(t *testing.T, packed []byte) {
++		t.Helper()
++		input, page := guardedVectorBuffer(t, len(packed))
++		copy(input, packed)
++		if err := syscall.Mprotect(page, syscall.PROT_READ); err != nil {
++			t.Fatal(err)
++		}
++		for _, limit := range []int{1, 7, 8, 9, 15, 16, 63, 64, 2047, 2048, int(^uint(0) >> 1)} {
++			want, wantErr := referenceUnpackSize(input, limit)
++			size, status := unpackedSizeARM64(input, limit, &unpackSizeCounts)
++			var sizeErr error
++			if status == 1 {
++				sizeErr = ErrUnpack
++			} else if status == 2 {
++				sizeErr = ErrLimit
++			} else if status != 0 {
++				t.Fatalf("unknown status %d", status)
++			}
++			if sizeErr != wantErr || (sizeErr == nil && size != want) {
++				t.Fatalf("limit=%d size=%d/%v want=%d/%v", limit, size, sizeErr, want, wantErr)
++			}
++			got, err := UnpackWithLimit(input, limit)
++			if err != wantErr || (err == nil && (len(got) != want || cap(got) != len(got))) || !bytes.Equal(input, packed) {
++				t.Fatalf("public result limit=%d: %v", limit, err)
++			}
++		}
++	}
++	for mask := 0; mask < 256; mask++ {
++		wire := []byte{byte(mask)}
++		if mask == 255 {
++			wire = append(wire, 0)
++		}
++		for bit := 0; bit < 8; bit++ {
++			if mask&(1<<bit) != 0 {
++				wire = append(wire, byte(0x81+bit))
++			}
++		}
++		for cut := 0; cut <= len(wire); cut++ {
++			t.Run(fmt.Sprintf("mask%d-cut%d", mask, cut), func(t *testing.T) { check(t, wire[:cut]) })
++		}
++	}
++	for count := 0; count < 256; count++ {
++		wire := append([]byte{255, byte(count)}, bytes.Repeat([]byte{0x81}, (count+1)*8)...)
++		for _, cut := range []int{1, 2, len(wire) - 1, len(wire)} {
++			t.Run(fmt.Sprintf("ff%d-cut%d", count, cut), func(t *testing.T) { check(t, wire[:cut]) })
++		}
++	}
++	for _, size := range []int{7, 8, 9, 63, 64, 65, 127, 128, 129, 4096} {
++		t.Run(fmt.Sprintf("zero%d", size), func(t *testing.T) { check(t, make([]byte, size)) })
++	}
++}
+diff --git a/unpack_size_reference_arm64_test.go b/unpack_size_reference_arm64_test.go
+new file mode 100644
+index 0000000..4e6e0fa
+--- /dev/null
++++ b/unpack_size_reference_arm64_test.go
+@@ -0,0 +1,50 @@
++//go:build arm64 && !purego
++
++package sproto
++
++import "math/bits"
++
++// referenceUnpackSize 保留引入原生扫描前的完整Go预检，作为边界与错误顺序的独立参考。
++func referenceUnpackSize(src []byte, maxBytes int) (int, error) {
++	if maxBytes < 1 {
++		return 0, ErrInvalidLimits
++	}
++	// 首次只扫描 tag/连续块长度，在分配前确认完整边界及有限的确切输出长度。
++	size := 0
++	for remaining := src; len(remaining) > 0; {
++		header := remaining[0]
++		consumed, produced := 1, 8
++		if header == 0 {
++			if len(remaining) >= 2 && remaining[1] == 0 {
++				words := (maxBytes - size) / 8
++				if words < 2 {
++					return 0, ErrLimit
++				}
++				// 多检查一个零 mask 即可判定超额，不为小预算扫描整段大输入。
++				end := min(len(remaining), words+1)
++				run := 2 + zeroHeaderPrefix(remaining[2:end])
++				if run > words {
++					return 0, ErrLimit
++				}
++				consumed, produced = run, run*8
++			}
++		} else if header == 0xff {
++			if len(remaining) < 2 {
++				return 0, ErrUnpack
++			}
++			produced = (int(remaining[1]) + 1) * 8
++			consumed = 2 + produced
++		} else {
++			consumed += bits.OnesCount8(header)
++		}
++		if consumed > len(remaining) {
++			return 0, ErrUnpack
++		}
++		if produced > maxBytes-size {
++			return 0, ErrLimit
++		}
++		size += produced
++		remaining = remaining[consumed:]
++	}
++	return size, nil
++}

@@ -1,0 +1,61 @@
+TEXT github.com/cnooljaw/gosproto.unpackedSizeARM64.abi0(SB) /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/gosproto/unpack_size_arm64.s
+  unpack_size_arm64.s:7		0x100159cb0		f94007e0		MOVD 8(RSP), R0
+  unpack_size_arm64.s:8		0x100159cb4		f9400be1		MOVD 16(RSP), R1
+  unpack_size_arm64.s:9		0x100159cb8		f94013e2		MOVD 32(RSP), R2
+  unpack_size_arm64.s:10	0x100159cbc		f94017e3		MOVD 40(RSP), R3
+  unpack_size_arm64.s:12	0x100159cc0		b4000561		CBZ R1, 43(PC)
+  unpack_size_arm64.s:13	0x100159cc4		39400005		MOVBU (R0), R5
+  unpack_size_arm64.s:14	0x100159cc8		b4000325		CBZ R5, 25(PC)
+  unpack_size_arm64.s:15	0x100159ccc		f103fcbf		CMP $255, R5
+  unpack_size_arm64.s:16	0x100159cd0		54000160		BEQ 11(PC)
+  unpack_size_arm64.s:17	0x100159cd4		38656866		MOVBU (R3)(R5), R6
+  unpack_size_arm64.s:18	0x100159cd8		910004c6		ADD $1, R6, R6
+  unpack_size_arm64.s:19	0x100159cdc		eb06003f		CMP R6, R1
+  unpack_size_arm64.s:20	0x100159ce0		54000503		BCC 40(PC)
+  unpack_size_arm64.s:21	0x100159ce4		f100205f		CMP $8, R2
+  unpack_size_arm64.s:22	0x100159ce8		54000503		BCC 40(PC)
+  unpack_size_arm64.s:23	0x100159cec		d1002042		SUB $8, R2, R2
+  unpack_size_arm64.s:25	0x100159cf0		cb060021		SUB R6, R1, R1
+  unpack_size_arm64.s:26	0x100159cf4		8b060000		ADD R6, R0, R0
+  unpack_size_arm64.s:27	0x100159cf8		17fffff2		JMP -14(PC)
+  unpack_size_arm64.s:29	0x100159cfc		f100083f		CMP $2, R1
+  unpack_size_arm64.s:30	0x100159d00		54000403		BCC 32(PC)
+  unpack_size_arm64.s:31	0x100159d04		39400407		MOVBU 1(R0), R7
+  unpack_size_arm64.s:32	0x100159d08		910004e7		ADD $1, R7, R7
+  unpack_size_arm64.s:33	0x100159d0c		d37df0e7		LSL $3, R7, R7
+  unpack_size_arm64.s:34	0x100159d10		910008e6		ADD $2, R7, R6
+  unpack_size_arm64.s:35	0x100159d14		eb06003f		CMP R6, R1
+  unpack_size_arm64.s:36	0x100159d18		54000343		BCC 26(PC)
+  unpack_size_arm64.s:37	0x100159d1c		eb07005f		CMP R7, R2
+  unpack_size_arm64.s:38	0x100159d20		54000343		BCC 26(PC)
+  unpack_size_arm64.s:39	0x100159d24		cb070042		SUB R7, R2, R2
+  unpack_size_arm64.s:40	0x100159d28		17fffff2		JMP -14(PC)
+  unpack_size_arm64.s:42	0x100159d2c		f100205f		CMP $8, R2
+  unpack_size_arm64.s:43	0x100159d30		540002c3		BCC 22(PC)
+  unpack_size_arm64.s:44	0x100159d34		f100203f		CMP $8, R1
+  unpack_size_arm64.s:45	0x100159d38		54000123		BCC 9(PC)
+  unpack_size_arm64.s:46	0x100159d3c		f9400008		MOVD (R0), R8
+  unpack_size_arm64.s:47	0x100159d40		b50000e8		CBNZ R8, 7(PC)
+  unpack_size_arm64.s:48	0x100159d44		f101005f		CMP $64, R2
+  unpack_size_arm64.s:49	0x100159d48		540000a3		BCC 5(PC)
+  unpack_size_arm64.s:50	0x100159d4c		d1010042		SUB $64, R2, R2
+  unpack_size_arm64.s:51	0x100159d50		d1002021		SUB $8, R1, R1
+  unpack_size_arm64.s:52	0x100159d54		91002000		ADD $8, R0, R0
+  unpack_size_arm64.s:53	0x100159d58		17ffffda		JMP -38(PC)
+  unpack_size_arm64.s:55	0x100159d5c		d1002042		SUB $8, R2, R2
+  unpack_size_arm64.s:56	0x100159d60		d1000421		SUB $1, R1, R1
+  unpack_size_arm64.s:57	0x100159d64		91000400		ADD $1, R0, R0
+  unpack_size_arm64.s:58	0x100159d68		17ffffd6		JMP -42(PC)
+  unpack_size_arm64.s:60	0x100159d6c		f94013e4		MOVD 32(RSP), R4
+  unpack_size_arm64.s:61	0x100159d70		cb020084		SUB R2, R4, R4
+  unpack_size_arm64.s:62	0x100159d74		f9001be4		MOVD R4, 48(RSP)
+  unpack_size_arm64.s:63	0x100159d78		f9001fff		MOVD ZR, 56(RSP)
+  unpack_size_arm64.s:64	0x100159d7c		d65f03c0		RET
+  unpack_size_arm64.s:66	0x100159d80		b24003e4		ORR $1, ZR, R4
+  unpack_size_arm64.s:67	0x100159d84		14000002		JMP 2(PC)
+  unpack_size_arm64.s:69	0x100159d88		b27f03e4		ORR $2, ZR, R4
+  unpack_size_arm64.s:71	0x100159d8c		f9001bff		MOVD ZR, 48(RSP)
+  unpack_size_arm64.s:72	0x100159d90		f9001fe4		MOVD R4, 56(RSP)
+  unpack_size_arm64.s:73	0x100159d94		d65f03c0		RET
+  unpack_size_arm64.s:73	0x100159d98		00000000		?
+  unpack_size_arm64.s:73	0x100159d9c		00000000		?

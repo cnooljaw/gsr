@@ -1,0 +1,522 @@
+[
+  {
+    "args": [
+      "git",
+      "rev-parse",
+      "92a155a"
+    ],
+    "cwd": "/private/tmp/gsr-gosproto-fork",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.01861266791820526,
+    "output": "92a155a2d7b41b5806c2760dc8d858c34c92414f\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-gcflags=all=-d=checkptr=2",
+      "-run",
+      "^TestUnpackSize",
+      ".",
+      "-timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/gosproto",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 5.468995291739702,
+    "output": "ok  \tgithub.com/cnooljaw/gosproto\t2.151s\n"
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "pack.go",
+      "experiment.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/gosproto",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.01715695858001709,
+    "output": ""
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "experiment_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/harness",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.004920708015561104,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-run",
+      "^TestRepresentativeFixtures$",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 1.9652823749929667,
+    "output": "ok  \tspreadpairs\t0.360s\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-c",
+      "-o",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/pairs.test",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 0.8654925003647804,
+    "output": ""
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "public",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/self-int32_edges-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.248777374625206,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "public",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/self-game_large-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.386980041861534,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "addressbook",
+      "GSR_OP": "public",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/self-addressbook-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.470206458121538,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "echo_ascii4k",
+      "GSR_OP": "public",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/self-echo_ascii4k-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.029558125883341,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "public",
+      "GSR_MODE": "clone1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/clone1-int32_edges-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.188216082751751,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "public",
+      "GSR_MODE": "clone1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/clone1-game_large-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.227519707754254,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "addressbook",
+      "GSR_OP": "public",
+      "GSR_MODE": "clone1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/clone1-addressbook-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 5.3364288341254,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "echo_ascii4k",
+      "GSR_OP": "public",
+      "GSR_MODE": "clone1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/clone1-echo_ascii4k-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.474804291501641,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "public",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/pass1-int32_edges-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.023440750315785,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "public",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/pass1-game_large-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.332252960652113,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "addressbook",
+      "GSR_OP": "public",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/pass1-addressbook-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.977312041446567,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "echo_ascii4k",
+      "GSR_OP": "public",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/pass1-echo_ascii4k-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 4.829761417582631,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "public",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/pass2-int32_edges-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 5.926234874874353,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "public",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/pass2-game_large-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.5201917085796595,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "addressbook",
+      "GSR_OP": "public",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/pass2-addressbook-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.374855166301131,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "echo_ascii4k",
+      "GSR_OP": "public",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/pass2-echo_ascii4k-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.146675376221538,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "public",
+      "GSR_MODE": "clone2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/clone2-int32_edges-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.504957541823387,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "public",
+      "GSR_MODE": "clone2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/clone2-game_large-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.220116000622511,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "addressbook",
+      "GSR_OP": "public",
+      "GSR_MODE": "clone2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/clone2-addressbook-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.916576499119401,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "echo_ascii4k",
+      "GSR_OP": "public",
+      "GSR_MODE": "clone2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-preflight-arm64-compact-20261022/clone2-echo_ascii4k-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.8057533744722605,
+    "output": "PASS\n"
+  }
+]
