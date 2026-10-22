@@ -1,0 +1,32 @@
+File: profile.test
+Type: cpu
+Time: 2026-10-22 10:27:17 CST
+Duration: 2.18s, Total samples = 1.98s (90.98%)
+Showing nodes accounting for 1.98s, 100% of 1.98s total
+Showing top 25 nodes out of 63
+      flat  flat%   sum%        cum   cum%
+     0.88s 44.44% 44.44%      1.33s 67.17%  github.com/cnooljaw/gosproto.UnpackWithLimit
+     0.58s 29.29% 73.74%      0.58s 29.29%  runtime.kevent
+     0.13s  6.57% 80.30%      0.13s  6.57%  runtime.memclrNoHeapPointers
+     0.09s  4.55% 84.85%      0.27s 13.64%  runtime.mallocgcSmallNoscan
+     0.06s  3.03% 87.88%      0.38s 19.19%  runtime.mallocgc
+     0.05s  2.53% 90.40%      0.05s  2.53%  math/bits.OnesCount8 (inline)
+     0.04s  2.02% 92.42%      0.04s  2.02%  runtime.madvise
+     0.02s  1.01% 93.43%      0.03s  1.52%  runtime.findObject
+     0.01s  0.51% 93.94%      0.01s  0.51%  runtime.(*activeSweep).begin (inline)
+     0.01s  0.51% 94.44%      0.01s  0.51%  runtime.(*mspan).base (inline)
+     0.01s  0.51% 94.95%      0.01s  0.51%  runtime.(*mspan).countAlloc (inline)
+     0.01s  0.51% 95.45%      0.01s  0.51%  runtime.bool2int (inline)
+     0.01s  0.51% 95.96%      0.01s  0.51%  runtime.freeSomeWbufs
+     0.01s  0.51% 96.46%      0.39s 19.70%  runtime.makeslice
+     0.01s  0.51% 96.97%      0.01s  0.51%  runtime.memmove
+     0.01s  0.51% 97.47%      0.01s  0.51%  runtime.readvarint (inline)
+     0.01s  0.51% 97.98%      0.01s  0.51%  runtime.releasem (inline)
+     0.01s  0.51% 98.48%      0.01s  0.51%  runtime.spanOf (inline)
+     0.01s  0.51% 98.99%      0.01s  0.51%  runtime.typePointers.next
+     0.01s  0.51% 99.49%      0.01s  0.51%  testing.(*B).Loop (inline)
+     0.01s  0.51%   100%      1.35s 68.18%  unpackrefresh.BenchmarkBodyCost
+         0     0%   100%      1.33s 67.17%  github.com/cnooljaw/gosproto.Unpack (inline)
+         0     0%   100%      0.02s  1.01%  runtime.(*mcache).nextFree
+         0     0%   100%      0.02s  1.01%  runtime.(*mcache).refill
+         0     0%   100%      0.02s  1.01%  runtime.(*mcentral).cacheSpan

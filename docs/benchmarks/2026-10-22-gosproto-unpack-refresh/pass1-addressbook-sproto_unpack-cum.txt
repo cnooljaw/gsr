@@ -1,0 +1,33 @@
+File: profile.test
+Type: cpu
+Time: 2026-10-22 10:27:01 CST
+Duration: 2.56s, Total samples = 2200ms (85.84%)
+Showing nodes accounting for 1910ms, 86.82% of 2200ms total
+Dropped 42 nodes (cum <= 11ms)
+Showing top 25 nodes out of 43
+      flat  flat%   sum%        cum   cum%
+         0     0%     0%     1620ms 73.64%  testing.(*B).run1.func1
+         0     0%     0%     1620ms 73.64%  testing.(*B).runN
+         0     0%     0%     1620ms 73.64%  unpackrefresh.BenchmarkBodyCost
+         0     0%     0%     1620ms 73.64%  unpackrefresh.representativeOperations.func6
+         0     0%     0%     1610ms 73.18%  github.com/cnooljaw/gosproto.Unpack (inline)
+    1030ms 46.82% 46.82%     1610ms 73.18%  github.com/cnooljaw/gosproto.UnpackWithLimit
+         0     0% 46.82%      720ms 32.73%  runtime.systemstack
+     540ms 24.55% 71.36%      540ms 24.55%  runtime.kevent
+         0     0% 71.36%      540ms 24.55%  runtime.netpoll
+         0     0% 71.36%      540ms 24.55%  runtime.startTheWorldWithSema
+      30ms  1.36% 72.73%      500ms 22.73%  runtime.makeslice
+      30ms  1.36% 74.09%      470ms 21.36%  runtime.mallocgc
+      60ms  2.73% 76.82%      340ms 15.45%  runtime.mallocgcSmallNoscan
+         0     0% 76.82%      330ms 15.00%  runtime.gcMarkTermination.func3
+         0     0% 76.82%      210ms  9.55%  runtime.gcStart.func4
+     160ms  7.27% 84.09%      160ms  7.27%  runtime.memclrNoHeapPointers
+         0     0% 84.09%       90ms  4.09%  runtime.deductAssistCredit
+         0     0% 84.09%       90ms  4.09%  runtime.gcAssistAlloc
+         0     0% 84.09%       90ms  4.09%  runtime.gcAssistAlloc.func2
+         0     0% 84.09%       90ms  4.09%  runtime.gcAssistAlloc1
+         0     0% 84.09%       90ms  4.09%  runtime.gcDrainN
+         0     0% 84.09%       70ms  3.18%  runtime.(*mcache).nextFree
+         0     0% 84.09%       70ms  3.18%  runtime.(*mcache).refill
+         0     0% 84.09%       70ms  3.18%  runtime.(*mcentral).cacheSpan
+      60ms  2.73% 86.82%       60ms  2.73%  math/bits.OnesCount8 (inline)

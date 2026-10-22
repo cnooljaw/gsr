@@ -1,0 +1,33 @@
+File: profile.test
+Type: cpu
+Time: 2026-10-22 10:27:14 CST
+Duration: 2.60s, Total samples = 2.32s (89.37%)
+Showing nodes accounting for 2.12s, 91.38% of 2.32s total
+Dropped 39 nodes (cum <= 0.01s)
+Showing top 25 nodes out of 60
+      flat  flat%   sum%        cum   cum%
+     0.68s 29.31% 29.31%      0.68s 29.31%  runtime.kevent
+     0.45s 19.40% 48.71%      0.49s 21.12%  github.com/cnooljaw/gosproto.UnpackWithLimit
+     0.18s  7.76% 56.47%      0.59s 25.43%  github.com/cnooljaw/gosproto.decodeIntegerRecord
+     0.13s  5.60% 62.07%      0.21s  9.05%  runtime.mallocgcTiny
+     0.11s  4.74% 66.81%      0.52s 22.41%  runtime.mallocgc
+     0.07s  3.02% 69.83%      0.99s 42.67%  github.com/cnooljaw/gosproto.decodeStructSlice
+     0.05s  2.16% 71.98%      0.11s  4.74%  runtime.mallocgcSmallScanNoHeader
+     0.04s  1.72% 73.71%      0.06s  2.59%  github.com/cnooljaw/gosproto.countChunks
+     0.04s  1.72% 75.43%      0.04s  1.72%  runtime.memclrNoHeapPointers
+     0.04s  1.72% 77.16%      0.34s 14.66%  runtime.newobject
+     0.03s  1.29% 78.45%      0.03s  1.29%  github.com/cnooljaw/gosproto.(*SprotoType).FieldByTag (inline)
+     0.03s  1.29% 79.74%      0.03s  1.29%  math/bits.OnesCount8 (inline)
+     0.03s  1.29% 81.03%      0.04s  1.72%  reflect.Value.UnsafePointer
+     0.03s  1.29% 82.33%      0.05s  2.16%  runtime.findObject
+     0.03s  1.29% 83.62%      0.03s  1.29%  runtime.releasem (inline)
+     0.02s  0.86% 84.48%      0.07s  3.02%  gcWriteBarrier
+     0.02s  0.86% 85.34%      0.06s  2.59%  github.com/cnooljaw/gosproto.decodeIntSlice
+     0.02s  0.86% 86.21%      0.02s  0.86%  github.com/cnooljaw/gosproto.readChunk (inline)
+     0.02s  0.86% 87.07%      0.02s  0.86%  runtime.acquirem (inline)
+     0.02s  0.86% 87.93%      0.02s  0.86%  runtime.getGCMask (inline)
+     0.02s  0.86% 88.79%      0.02s  0.86%  runtime.mapaccess1_fast32
+     0.02s  0.86% 89.66%      0.02s  0.86%  runtime.nextFreeFast (inline)
+     0.02s  0.86% 90.52%      0.02s  0.86%  runtime.scanblock
+     0.01s  0.43% 90.95%      0.23s  9.91%  reflect.New
+     0.01s  0.43% 91.38%      0.19s  8.19%  reflect.unsafe_New

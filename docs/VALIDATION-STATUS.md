@@ -926,3 +926,5 @@ TestRuntimePacedMultiServiceLoad 已补 8 个真实 Service 共享文件 Logger 
 2026-10-22：[原生整数数组四项解码](benchmarks/2026-10-22-gosproto-int-array-block4/RESULTS.md)保留按四项共用固定输入/输出视图，余数与命名/窄整数回退不变。16进程1536块，896项Decode两遍中位−13.82%/−18.71%，PDecode−2.77%/−4.63%；大型Decode小幅改善，PDecode首遍近持平，全部控制/累计/长尾保留。预算/错误/独占差分、官方oracle、全库race/checkptr/vet、两项fuzz及GoTS7/7通过；Decode fuzz10981次后停增并正常退出。正常源码与5项边界增量留独立库审查未提交；前轮be8592f已提交未推送，正式依赖及十项用户删除保持。下一轮补短数组性能与正常入口复核。
 
 2026-10-22：[整数数组正常入口及短数组复核](benchmarks/2026-10-22-gosproto-array-normal-review/RESULTS.md)两个无选择器的正常Git归档完成24进程672行/35命令，896项Decode三轮中位−21.68%、PDecode−4.86%，分配不变；大型消息接近波动，不宣称稳定收益。针对首次三项短数组回退补400ms目标24进程72行复测，回退未复现；1项4字节+0.10%，8项8字节−1.40%，5项4字节−7.89%但self−18.49%，不能宣称全面短消息提速。全部数据/控制/轮次保留，不扣减控制。前轮库9e47281及GSR60e2fb6已提交未推送；本轮无生产改动，正式依赖/十项用户删除保持，新报告留审查。下一步检查数组组合Unpack热点。
+
+2026-10-22：[最新Unpack/PDecode热点复核](benchmarks/2026-10-22-gosproto-unpack-refresh/RESULTS.md)基于9e47281完成12份CPU profile/55条流程与wire直方图。896项数组450word全为普通mask，大型417word中415普通、无零mask；预检与普通字节写出为主要剩余成本，输出分配非两者首要采样热点，小型AddressBook不同。完整kevent分母15.91%～52.02%保留，profile不当新性能排名；正常分配未变。复核旧查表/源窗口/密度/预检候选，下一轮只试普通mask两有效字节循环，仍保留所有校验。前轮badfb74已提交未推送，本轮无生产修改，新诊断留审查，正式依赖/十项删除保持。

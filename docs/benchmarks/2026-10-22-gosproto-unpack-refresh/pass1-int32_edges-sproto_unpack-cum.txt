@@ -1,0 +1,33 @@
+File: profile.test
+Type: cpu
+Time: 2026-10-22 10:26:50 CST
+Duration: 2.69s, Total samples = 2300ms (85.56%)
+Showing nodes accounting for 2160ms, 93.91% of 2300ms total
+Dropped 34 nodes (cum <= 11.50ms)
+Showing top 25 nodes out of 36
+      flat  flat%   sum%        cum   cum%
+         0     0%     0%     1590ms 69.13%  github.com/cnooljaw/gosproto.Unpack (inline)
+    1310ms 56.96% 56.96%     1590ms 69.13%  github.com/cnooljaw/gosproto.UnpackWithLimit
+         0     0% 56.96%     1590ms 69.13%  testing.(*B).run1.func1
+         0     0% 56.96%     1590ms 69.13%  testing.(*B).runN
+         0     0% 56.96%     1590ms 69.13%  unpackrefresh.BenchmarkBodyCost
+         0     0% 56.96%     1590ms 69.13%  unpackrefresh.representativeOperations.func6
+         0     0% 56.96%      800ms 34.78%  runtime.systemstack
+     690ms 30.00% 86.96%      690ms 30.00%  runtime.kevent
+         0     0% 86.96%      690ms 30.00%  runtime.netpoll
+         0     0% 86.96%      690ms 30.00%  runtime.startTheWorldWithSema
+         0     0% 86.96%      390ms 16.96%  runtime.gcStart.func4
+         0     0% 86.96%      300ms 13.04%  runtime.gcMarkTermination.func3
+     160ms  6.96% 93.91%      160ms  6.96%  math/bits.OnesCount8 (inline)
+         0     0% 93.91%      120ms  5.22%  runtime.makeslice
+         0     0% 93.91%      120ms  5.22%  runtime.mallocgc
+         0     0% 93.91%       60ms  2.61%  runtime.deductAssistCredit
+         0     0% 93.91%       60ms  2.61%  runtime.gcAssistAlloc
+         0     0% 93.91%       60ms  2.61%  runtime.mallocgcSmallNoscan
+         0     0% 93.91%       50ms  2.17%  runtime.(*mcache).nextFree
+         0     0% 93.91%       50ms  2.17%  runtime.(*mcache).refill
+         0     0% 93.91%       50ms  2.17%  runtime.gcAssistAlloc.func2
+         0     0% 93.91%       50ms  2.17%  runtime.gcAssistAlloc1
+         0     0% 93.91%       50ms  2.17%  runtime.gcDrainN
+         0     0% 93.91%       40ms  1.74%  runtime.(*mcentral).cacheSpan
+         0     0% 93.91%       40ms  1.74%  runtime.(*mheap).alloc.func1

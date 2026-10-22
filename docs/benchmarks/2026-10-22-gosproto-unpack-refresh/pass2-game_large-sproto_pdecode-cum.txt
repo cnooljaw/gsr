@@ -1,0 +1,33 @@
+File: profile.test
+Type: cpu
+Time: 2026-10-22 10:27:14 CST
+Duration: 2.60s, Total samples = 2.32s (89.37%)
+Showing nodes accounting for 1.75s, 75.43% of 2.32s total
+Dropped 39 nodes (cum <= 0.01s)
+Showing top 25 nodes out of 60
+      flat  flat%   sum%        cum   cum%
+         0     0%     0%      1.63s 70.26%  testing.(*B).run1.func1
+         0     0%     0%      1.63s 70.26%  testing.(*B).runN
+         0     0%     0%      1.63s 70.26%  unpackrefresh.BenchmarkBodyCost
+         0     0%     0%      1.63s 70.26%  unpackrefresh.representativeOperations.func8
+         0     0%     0%      1.62s 69.83%  github.com/cnooljaw/gosproto.DecodePacked
+         0     0%     0%      1.13s 48.71%  github.com/cnooljaw/gosproto.Decode (inline)
+         0     0%     0%      1.13s 48.71%  github.com/cnooljaw/gosproto.DecodeWithLimits
+         0     0%     0%      1.09s 46.98%  github.com/cnooljaw/gosproto.decodeMessage
+     0.07s  3.02%  3.02%      0.99s 42.67%  github.com/cnooljaw/gosproto.decodeStructSlice
+         0     0%  3.02%      0.81s 34.91%  runtime.systemstack
+     0.68s 29.31% 32.33%      0.68s 29.31%  runtime.kevent
+         0     0% 32.33%      0.68s 29.31%  runtime.netpoll
+         0     0% 32.33%      0.68s 29.31%  runtime.startTheWorldWithSema
+     0.18s  7.76% 40.09%      0.59s 25.43%  github.com/cnooljaw/gosproto.decodeIntegerRecord
+     0.11s  4.74% 44.83%      0.52s 22.41%  runtime.mallocgc
+         0     0% 44.83%      0.49s 21.12%  github.com/cnooljaw/gosproto.Unpack (inline)
+     0.45s 19.40% 64.22%      0.49s 21.12%  github.com/cnooljaw/gosproto.UnpackWithLimit
+         0     0% 64.22%      0.44s 18.97%  runtime.gcStart.func4
+     0.04s  1.72% 65.95%      0.34s 14.66%  runtime.newobject
+         0     0% 65.95%      0.24s 10.34%  runtime.gcMarkTermination.func3
+     0.01s  0.43% 66.38%      0.23s  9.91%  reflect.New
+     0.13s  5.60% 71.98%      0.21s  9.05%  runtime.mallocgcTiny
+     0.01s  0.43% 72.41%      0.19s  8.19%  reflect.unsafe_New
+     0.05s  2.16% 74.57%      0.11s  4.74%  runtime.mallocgcSmallScanNoHeader
+     0.02s  0.86% 75.43%      0.07s  3.02%  gcWriteBarrier

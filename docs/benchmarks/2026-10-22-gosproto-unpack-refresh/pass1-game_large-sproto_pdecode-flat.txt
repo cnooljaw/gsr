@@ -1,0 +1,33 @@
+File: profile.test
+Type: cpu
+Time: 2026-10-22 10:26:58 CST
+Duration: 2.56s, Total samples = 2.31s (90.25%)
+Showing nodes accounting for 2.03s, 87.88% of 2.31s total
+Dropped 27 nodes (cum <= 0.01s)
+Showing top 25 nodes out of 73
+      flat  flat%   sum%        cum   cum%
+     0.59s 25.54% 25.54%      0.59s 25.54%  runtime.kevent
+     0.42s 18.18% 43.72%      0.47s 20.35%  github.com/cnooljaw/gosproto.UnpackWithLimit
+     0.14s  6.06% 49.78%      0.56s 24.24%  github.com/cnooljaw/gosproto.decodeIntegerRecord
+     0.14s  6.06% 55.84%      0.62s 26.84%  runtime.mallocgc
+     0.07s  3.03% 58.87%      1.14s 49.35%  github.com/cnooljaw/gosproto.decodeStructSlice
+     0.07s  3.03% 61.90%      0.08s  3.46%  runtime.resolveTypeOff
+     0.05s  2.16% 64.07%      0.05s  2.16%  runtime.gcmarknewobject
+     0.05s  2.16% 66.23%      0.22s  9.52%  runtime.mallocgcSmallScanNoHeader
+     0.05s  2.16% 68.40%      0.34s 14.72%  runtime.newobject
+     0.04s  1.73% 70.13%      0.09s  3.90%  gcWriteBarrier
+     0.04s  1.73% 71.86%      0.05s  2.16%  runtime.(*mspan).writeHeapBitsSmall
+     0.04s  1.73% 73.59%      0.04s  1.73%  runtime.acquirem (inline)
+     0.04s  1.73% 75.32%      0.05s  2.16%  runtime.findObject
+     0.04s  1.73% 77.06%      0.04s  1.73%  runtime.releasem (inline)
+     0.03s  1.30% 78.35%      0.03s  1.30%  github.com/cnooljaw/gosproto.(*decodeBudget).add (inline)
+     0.03s  1.30% 79.65%      0.03s  1.30%  math/bits.OnesCount8 (inline)
+     0.03s  1.30% 80.95%      0.04s  1.73%  runtime.nextFreeFast (inline)
+     0.02s  0.87% 81.82%      0.06s  2.60%  github.com/cnooljaw/gosproto.countChunks
+     0.02s  0.87% 82.68%      1.23s 53.25%  github.com/cnooljaw/gosproto.decodeMessage
+     0.02s  0.87% 83.55%      0.02s  0.87%  github.com/cnooljaw/gosproto.readChunk (inline)
+     0.02s  0.87% 84.42%      0.10s  4.33%  reflect.(*rtype).ptrTo
+     0.02s  0.87% 85.28%      0.03s  1.30%  reflect.Value.UnsafePointer
+     0.02s  0.87% 86.15%      0.02s  0.87%  runtime.(*mspan).base (inline)
+     0.02s  0.87% 87.01%      0.03s  1.30%  runtime.(*sweepLocked).sweep
+     0.02s  0.87% 87.88%      0.05s  2.16%  runtime.deductSweepCredit

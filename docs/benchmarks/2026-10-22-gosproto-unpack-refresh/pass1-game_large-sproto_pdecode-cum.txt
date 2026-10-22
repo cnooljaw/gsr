@@ -1,0 +1,33 @@
+File: profile.test
+Type: cpu
+Time: 2026-10-22 10:26:58 CST
+Duration: 2.56s, Total samples = 2.31s (90.25%)
+Showing nodes accounting for 1.53s, 66.23% of 2.31s total
+Dropped 27 nodes (cum <= 0.01s)
+Showing top 25 nodes out of 73
+      flat  flat%   sum%        cum   cum%
+         0     0%     0%      1.70s 73.59%  github.com/cnooljaw/gosproto.DecodePacked
+         0     0%     0%      1.70s 73.59%  testing.(*B).run1.func1
+         0     0%     0%      1.70s 73.59%  testing.(*B).runN
+         0     0%     0%      1.70s 73.59%  unpackrefresh.BenchmarkBodyCost
+         0     0%     0%      1.70s 73.59%  unpackrefresh.representativeOperations.func8
+         0     0%     0%      1.23s 53.25%  github.com/cnooljaw/gosproto.Decode (inline)
+         0     0%     0%      1.23s 53.25%  github.com/cnooljaw/gosproto.DecodeWithLimits
+     0.02s  0.87%  0.87%      1.23s 53.25%  github.com/cnooljaw/gosproto.decodeMessage
+     0.07s  3.03%  3.90%      1.14s 49.35%  github.com/cnooljaw/gosproto.decodeStructSlice
+         0     0%  3.90%      0.72s 31.17%  runtime.systemstack
+     0.14s  6.06%  9.96%      0.62s 26.84%  runtime.mallocgc
+     0.59s 25.54% 35.50%      0.59s 25.54%  runtime.kevent
+         0     0% 35.50%      0.59s 25.54%  runtime.netpoll
+         0     0% 35.50%      0.59s 25.54%  runtime.startTheWorldWithSema
+     0.14s  6.06% 41.56%      0.56s 24.24%  github.com/cnooljaw/gosproto.decodeIntegerRecord
+         0     0% 41.56%      0.47s 20.35%  github.com/cnooljaw/gosproto.Unpack (inline)
+     0.42s 18.18% 59.74%      0.47s 20.35%  github.com/cnooljaw/gosproto.UnpackWithLimit
+         0     0% 59.74%      0.37s 16.02%  reflect.New
+     0.05s  2.16% 61.90%      0.34s 14.72%  runtime.newobject
+         0     0% 61.90%      0.30s 12.99%  runtime.gcStart.func4
+         0     0% 61.90%      0.29s 12.55%  runtime.gcMarkTermination.func3
+     0.01s  0.43% 62.34%      0.27s 11.69%  reflect.unsafe_New
+     0.05s  2.16% 64.50%      0.22s  9.52%  runtime.mallocgcSmallScanNoHeader
+     0.02s  0.87% 65.37%      0.14s  6.06%  runtime.mallocgcTiny
+     0.02s  0.87% 66.23%      0.10s  4.33%  reflect.(*rtype).ptrTo

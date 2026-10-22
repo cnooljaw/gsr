@@ -1,0 +1,33 @@
+File: profile.test
+Type: cpu
+Time: 2026-10-22 10:26:53 CST
+Duration: 2.58s, Total samples = 2300ms (89.13%)
+Showing nodes accounting for 2030ms, 88.26% of 2300ms total
+Dropped 14 nodes (cum <= 11.50ms)
+Showing top 25 nodes out of 45
+      flat  flat%   sum%        cum   cum%
+         0     0%     0%     1270ms 55.22%  runtime.systemstack
+         0     0%     0%     1190ms 51.74%  testing.(*B).run1.func1
+         0     0%     0%     1190ms 51.74%  testing.(*B).runN
+         0     0%     0%     1190ms 51.74%  unpackrefresh.BenchmarkBodyCost
+         0     0%     0%     1190ms 51.74%  unpackrefresh.representativeOperations.func8
+         0     0%     0%     1160ms 50.43%  github.com/cnooljaw/gosproto.DecodePacked
+    1110ms 48.26% 48.26%     1110ms 48.26%  runtime.kevent
+         0     0% 48.26%     1110ms 48.26%  runtime.netpoll
+         0     0% 48.26%     1110ms 48.26%  runtime.startTheWorldWithSema
+         0     0% 48.26%      920ms 40.00%  github.com/cnooljaw/gosproto.Unpack (inline)
+     790ms 34.35% 82.61%      920ms 40.00%  github.com/cnooljaw/gosproto.UnpackWithLimit
+         0     0% 82.61%      560ms 24.35%  runtime.gcMarkTermination.func3
+         0     0% 82.61%      550ms 23.91%  runtime.gcStart.func4
+         0     0% 82.61%      240ms 10.43%  github.com/cnooljaw/gosproto.Decode (inline)
+         0     0% 82.61%      240ms 10.43%  github.com/cnooljaw/gosproto.DecodeWithLimits
+         0     0% 82.61%      240ms 10.43%  runtime.mallocgc
+      90ms  3.91% 86.52%      220ms  9.57%  github.com/cnooljaw/gosproto.decodeIntSlice
+         0     0% 86.52%      220ms  9.57%  github.com/cnooljaw/gosproto.decodeMessage
+         0     0% 86.52%      200ms  8.70%  runtime.makeslice
+         0     0% 86.52%      140ms  6.09%  runtime.deductAssistCredit
+         0     0% 86.52%      140ms  6.09%  runtime.gcAssistAlloc
+         0     0% 86.52%      140ms  6.09%  runtime.gcAssistAlloc.func2
+         0     0% 86.52%      140ms  6.09%  runtime.gcAssistAlloc1
+         0     0% 86.52%      140ms  6.09%  runtime.gcDrainN
+      40ms  1.74% 88.26%      110ms  4.78%  runtime.scanobject

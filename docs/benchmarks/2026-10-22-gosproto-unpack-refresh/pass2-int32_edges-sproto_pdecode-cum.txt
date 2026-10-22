@@ -1,0 +1,33 @@
+File: profile.test
+Type: cpu
+Time: 2026-10-22 10:27:09 CST
+Duration: 2.59s, Total samples = 2.23s (86.07%)
+Showing nodes accounting for 2.05s, 91.93% of 2.23s total
+Dropped 38 nodes (cum <= 0.01s)
+Showing top 25 nodes out of 40
+      flat  flat%   sum%        cum   cum%
+         0     0%     0%      1.25s 56.05%  runtime.systemstack
+     1.16s 52.02% 52.02%      1.16s 52.02%  runtime.kevent
+         0     0% 52.02%      1.16s 52.02%  runtime.netpoll
+         0     0% 52.02%      1.16s 52.02%  runtime.startTheWorldWithSema
+         0     0% 52.02%      1.06s 47.53%  github.com/cnooljaw/gosproto.DecodePacked
+         0     0% 52.02%      1.06s 47.53%  testing.(*B).run1.func1
+         0     0% 52.02%      1.06s 47.53%  testing.(*B).runN
+         0     0% 52.02%      1.06s 47.53%  unpackrefresh.BenchmarkBodyCost
+         0     0% 52.02%      1.06s 47.53%  unpackrefresh.representativeOperations.func8
+         0     0% 52.02%      0.81s 36.32%  github.com/cnooljaw/gosproto.Unpack (inline)
+     0.69s 30.94% 82.96%      0.81s 36.32%  github.com/cnooljaw/gosproto.UnpackWithLimit
+         0     0% 82.96%      0.60s 26.91%  runtime.gcStart.func4
+         0     0% 82.96%      0.56s 25.11%  runtime.gcMarkTermination.func3
+         0     0% 82.96%      0.25s 11.21%  github.com/cnooljaw/gosproto.Decode (inline)
+         0     0% 82.96%      0.25s 11.21%  github.com/cnooljaw/gosproto.DecodeWithLimits
+     0.01s  0.45% 83.41%      0.22s  9.87%  github.com/cnooljaw/gosproto.decodeMessage
+     0.10s  4.48% 87.89%      0.21s  9.42%  github.com/cnooljaw/gosproto.decodeIntSlice
+         0     0% 87.89%      0.15s  6.73%  runtime.mallocgc
+         0     0% 87.89%      0.13s  5.83%  runtime.makeslice
+     0.08s  3.59% 91.48%      0.08s  3.59%  math/bits.OnesCount8 (inline)
+         0     0% 91.48%      0.08s  3.59%  runtime.mallocgcSmallNoscan
+         0     0% 91.48%      0.06s  2.69%  runtime.(*mcache).nextFree
+     0.01s  0.45% 91.93%      0.06s  2.69%  runtime.(*mcache).refill
+         0     0% 91.93%      0.06s  2.69%  runtime.deductAssistCredit
+         0     0% 91.93%      0.06s  2.69%  runtime.gcAssistAlloc

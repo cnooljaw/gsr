@@ -1,0 +1,32 @@
+File: profile.test
+Type: cpu
+Time: 2026-10-22 10:27:20 CST
+Duration: 2.39s, Total samples = 1760ms (73.63%)
+Showing nodes accounting for 1470ms, 83.52% of 1760ms total
+Showing top 25 nodes out of 109
+      flat  flat%   sum%        cum   cum%
+     280ms 15.91% 15.91%      280ms 15.91%  runtime.kevent
+     110ms  6.25% 22.16%      160ms  9.09%  github.com/cnooljaw/gosproto.UnpackWithLimit
+     100ms  5.68% 27.84%      660ms 37.50%  runtime.mallocgc
+      90ms  5.11% 32.95%     1000ms 56.82%  github.com/cnooljaw/gosproto.decodeStructSlice
+      90ms  5.11% 38.07%      260ms 14.77%  runtime.mallocgcSmallScanNoHeader
+      90ms  5.11% 43.18%      130ms  7.39%  runtime.mallocgcTiny
+      80ms  4.55% 47.73%     1020ms 57.95%  github.com/cnooljaw/gosproto.decodeMessage
+      80ms  4.55% 52.27%       80ms  4.55%  runtime.(*mspan).writeHeapBitsSmall
+      70ms  3.98% 56.25%       70ms  3.98%  runtime.nextFreeFast (inline)
+      60ms  3.41% 59.66%       60ms  3.41%  runtime.madvise
+      60ms  3.41% 63.07%       60ms  3.41%  runtime.memmove
+      40ms  2.27% 65.34%       40ms  2.27%  runtime.memclrNoHeapPointers
+      40ms  2.27% 67.61%       40ms  2.27%  runtime.releasem (inline)
+      40ms  2.27% 69.89%       60ms  3.41%  runtime.resolveTypeOff
+      30ms  1.70% 71.59%       30ms  1.70%  runtime.getMCache (inline)
+      30ms  1.70% 73.30%       40ms  2.27%  runtime.typePointers.next
+      20ms  1.14% 74.43%       50ms  2.84%  gcWriteBarrier
+      20ms  1.14% 75.57%       20ms  1.14%  github.com/cnooljaw/gosproto.(*SprotoField).nativeInteger (inline)
+      20ms  1.14% 76.70%     1230ms 69.89%  github.com/cnooljaw/gosproto.DecodeWithLimits
+      20ms  1.14% 77.84%       40ms  2.27%  github.com/cnooljaw/gosproto.countChunks
+      20ms  1.14% 78.98%       90ms  5.11%  reflect.(*rtype).ptrTo
+      20ms  1.14% 80.11%       20ms  1.14%  reflect.Value.Elem
+      20ms  1.14% 81.25%       30ms  1.70%  runtime.findObject
+      20ms  1.14% 82.39%       20ms  1.14%  runtime.ifaceeq
+      20ms  1.14% 83.52%       20ms  1.14%  runtime.mapaccess1_fast32

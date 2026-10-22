@@ -1,0 +1,33 @@
+File: profile.test
+Type: cpu
+Time: 2026-10-22 10:26:53 CST
+Duration: 2.58s, Total samples = 2.30s (89.13%)
+Showing nodes accounting for 2.22s, 96.52% of 2.30s total
+Dropped 14 nodes (cum <= 0.01s)
+Showing top 25 nodes out of 45
+      flat  flat%   sum%        cum   cum%
+     1.11s 48.26% 48.26%      1.11s 48.26%  runtime.kevent
+     0.79s 34.35% 82.61%      0.92s 40.00%  github.com/cnooljaw/gosproto.UnpackWithLimit
+     0.09s  3.91% 86.52%      0.22s  9.57%  github.com/cnooljaw/gosproto.decodeIntSlice
+     0.05s  2.17% 88.70%      0.05s  2.17%  math/bits.OnesCount8 (inline)
+     0.05s  2.17% 90.87%      0.05s  2.17%  runtime.memclrNoHeapPointers
+     0.05s  2.17% 93.04%      0.06s  2.61%  runtime.typePointers.next
+     0.04s  1.74% 94.78%      0.11s  4.78%  runtime.scanobject
+     0.03s  1.30% 96.09%      0.03s  1.30%  runtime.scanblock
+     0.01s  0.43% 96.52%      0.02s  0.87%  runtime.(*pageAlloc).update
+         0     0% 96.52%      0.24s 10.43%  github.com/cnooljaw/gosproto.Decode (inline)
+         0     0% 96.52%      1.16s 50.43%  github.com/cnooljaw/gosproto.DecodePacked
+         0     0% 96.52%      0.24s 10.43%  github.com/cnooljaw/gosproto.DecodeWithLimits
+         0     0% 96.52%      0.92s 40.00%  github.com/cnooljaw/gosproto.Unpack (inline)
+         0     0% 96.52%      0.22s  9.57%  github.com/cnooljaw/gosproto.decodeMessage
+         0     0% 96.52%      0.04s  1.74%  runtime.(*mcache).nextFree
+         0     0% 96.52%      0.04s  1.74%  runtime.(*mcache).refill
+         0     0% 96.52%      0.03s  1.30%  runtime.(*mcentral).cacheSpan
+         0     0% 96.52%      0.02s  0.87%  runtime.(*mheap).freeSpan (inline)
+         0     0% 96.52%      0.02s  0.87%  runtime.(*mheap).freeSpanLocked
+         0     0% 96.52%      0.02s  0.87%  runtime.(*pageAlloc).free
+         0     0% 96.52%      0.02s  0.87%  runtime.(*sweepLocked).sweep
+         0     0% 96.52%      0.02s  0.87%  runtime.(*sweepLocked).sweep.(*mheap).freeSpan.func2
+         0     0% 96.52%      0.14s  6.09%  runtime.deductAssistCredit
+         0     0% 96.52%      0.03s  1.30%  runtime.deductSweepCredit
+         0     0% 96.52%      0.14s  6.09%  runtime.gcAssistAlloc
