@@ -1,0 +1,44 @@
+package benchmarks
+
+import (
+ "fmt"
+ "math"
+ "reflect"
+ "testing"
+ sproto "github.com/cnooljaw/gosproto"
+)
+
+type arrayReviewDocument struct { Values []int64 `sproto:"integer,0,array"` }
+
+// BenchmarkArrayNormalReview 比较正常公开入口的分块、余数和短数组成本。
+func BenchmarkArrayNormalReview(b *testing.B) {
+ for _,width:=range []int{4,8} {
+  for _,count:=range []int{1,3,4,5,8,33,896} {
+   input:=&arrayReviewDocument{Values:make([]int64,count)}
+   for i:=range input.Values { input.Values[i]=int64(i)*-129; if width==8 {input.Values[i]+=math.MaxInt32+1} }
+   raw,err:=sproto.Encode(input);if err!=nil{b.Fatal(err)}
+   packed,err:=sproto.EncodePacked(input);if err!=nil{b.Fatal(err)}
+   for _,op:=range []string{"decode","pdecode"} {
+    b.Run(fmt.Sprintf("w%d_n%d/%s",width,count,op),func(b *testing.B){
+     decode:=func() error {out:=new(arrayReviewDocument);var err error;if op=="decode" {_,err=sproto.Decode(raw,out)} else {err=sproto.DecodePacked(packed,out)};representativeSink=out;return err}
+     if err:=decode();err!=nil{b.Fatal(err)}
+     if !reflect.DeepEqual(representativeSink,input){b.Fatal("round trip")}
+     b.ReportAllocs();b.ResetTimer()
+     for range b.N {if err:=decode();err!=nil{b.Fatal(err)}}
+    })
+   }
+  }
+ }
+}
+
+// BenchmarkArrayRepresentativeReview 复用既有真实消息与wire校验，仅测正常解码入口。
+func BenchmarkArrayRepresentativeReview(b *testing.B) {
+ for _,sample:=range representativeCases(b) {
+  if sample.Name!="int32_edges" && sample.Name!="game_large" {continue}
+  operations,wires:=representativeOperations(b,sample);checkRepresentativeWire(b,sample,wires)
+  for _,op:=range operations {
+   if op.name!="sproto_decode" && op.name!="sproto_pdecode" {continue}
+   b.Run(sample.Name+"/"+op.name,func(b *testing.B){b.ReportAllocs();b.ResetTimer();for range b.N {if err:=op.run();err!=nil{b.Fatal(err)}}})
+  }
+ }
+}

@@ -1,0 +1,25 @@
+goos: darwin
+goarch: arm64
+pkg: arrayreview
+cpu: Apple M2
+BenchmarkArrayNormalReview/w4_n1/encode         	 2508195	       101.3 ns/op	      16 B/op	       1 allocs/op
+BenchmarkArrayNormalReview/w4_n1/pencode        	 2006978	       124.3 ns/op	      24 B/op	       1 allocs/op
+BenchmarkArrayNormalReview/w4_n4/encode         	 2172860	       107.5 ns/op	      32 B/op	       1 allocs/op
+BenchmarkArrayNormalReview/w4_n4/pencode        	 1826852	       131.9 ns/op	      48 B/op	       1 allocs/op
+BenchmarkArrayNormalReview/w4_n33/encode        	 1559563	       157.4 ns/op	     144 B/op	       1 allocs/op
+BenchmarkArrayNormalReview/w4_n33/pencode       	 1244359	       192.0 ns/op	     160 B/op	       1 allocs/op
+BenchmarkArrayNormalReview/w4_n896/encode       	  191444	      1582 ns/op	    4096 B/op	       1 allocs/op
+BenchmarkArrayNormalReview/w4_n896/pencode      	  143122	      2088 ns/op	    4096 B/op	       1 allocs/op
+BenchmarkArrayNormalReview/w8_n1/encode         	 2105574	       111.9 ns/op	      24 B/op	       1 allocs/op
+BenchmarkArrayNormalReview/w8_n1/pencode        	 1892482	       117.1 ns/op	      32 B/op	       1 allocs/op
+BenchmarkArrayNormalReview/w8_n4/encode         	 2261152	       110.5 ns/op	      48 B/op	       1 allocs/op
+BenchmarkArrayNormalReview/w8_n4/pencode        	 1796907	       134.0 ns/op	      64 B/op	       1 allocs/op
+BenchmarkArrayNormalReview/w8_n33/encode        	 1275247	       249.9 ns/op	     288 B/op	       1 allocs/op
+BenchmarkArrayNormalReview/w8_n33/pencode       	  849306	       303.9 ns/op	     288 B/op	       1 allocs/op
+BenchmarkArrayNormalReview/w8_n896/encode       	  150482	      1548 ns/op	    8192 B/op	       1 allocs/op
+BenchmarkArrayNormalReview/w8_n896/pencode      	   55784	      4328 ns/op	    8192 B/op	       1 allocs/op
+BenchmarkArrayRepresentativeReview/game_large/sproto_encode         	   60070	      3977 ns/op	    3968 B/op	       2 allocs/op
+BenchmarkArrayRepresentativeReview/game_large/sproto_pencode        	   39591	      6374 ns/op	    3968 B/op	       2 allocs/op
+BenchmarkArrayRepresentativeReview/int32_edges/sproto_encode        	  174856	      1349 ns/op	    4096 B/op	       1 allocs/op
+BenchmarkArrayRepresentativeReview/int32_edges/sproto_pencode       	   85384	      3345 ns/op	    4096 B/op	       1 allocs/op
+PASS

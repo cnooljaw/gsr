@@ -1,0 +1,21 @@
+goos: darwin
+goarch: arm64
+pkg: arrayreview
+cpu: Apple M2
+BenchmarkArrayNormalReview/w8_n1/decode         	 2362831	       147.8 ns/op	     104 B/op	       4 allocs/op
+BenchmarkArrayNormalReview/w8_n1/pdecode        	 1874422	       197.4 ns/op	     128 B/op	       5 allocs/op
+BenchmarkArrayNormalReview/w8_n8/decode         	 2214096	       163.1 ns/op	     160 B/op	       4 allocs/op
+BenchmarkArrayNormalReview/w8_n8/pdecode        	 1434292	       252.5 ns/op	     240 B/op	       5 allocs/op
+BenchmarkArrayNormalReview/w8_n31/decode        	 1941328	       186.6 ns/op	     352 B/op	       4 allocs/op
+BenchmarkArrayNormalReview/w8_n31/pdecode       	  667124	       558.0 ns/op	     640 B/op	       5 allocs/op
+BenchmarkArrayNormalReview/w8_n32/decode        	 1925236	       186.2 ns/op	     352 B/op	       4 allocs/op
+BenchmarkArrayNormalReview/w8_n32/pdecode       	  651705	       549.3 ns/op	     640 B/op	       5 allocs/op
+BenchmarkArrayNormalReview/w8_n33/decode        	 1830543	       197.3 ns/op	     384 B/op	       4 allocs/op
+BenchmarkArrayNormalReview/w8_n33/pdecode       	  639265	       578.2 ns/op	     672 B/op	       5 allocs/op
+BenchmarkArrayNormalReview/w8_n896/decode       	  323104	      1067 ns/op	    8288 B/op	       4 allocs/op
+BenchmarkArrayNormalReview/w8_n896/pdecode      	   42680	      8463 ns/op	   16480 B/op	       5 allocs/op
+BenchmarkArrayRepresentativeReview/game_large/sproto_decode         	   29592	     12147 ns/op	   10416 B/op	     532 allocs/op
+BenchmarkArrayRepresentativeReview/game_large/sproto_pdecode        	   21288	     16935 ns/op	   13872 B/op	     533 allocs/op
+BenchmarkArrayRepresentativeReview/int32_edges/sproto_decode        	  289438	      1294 ns/op	    8288 B/op	       4 allocs/op
+BenchmarkArrayRepresentativeReview/int32_edges/sproto_pdecode       	   58927	      6179 ns/op	   12384 B/op	       5 allocs/op
+PASS

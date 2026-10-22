@@ -1,0 +1,51 @@
+--- a/decode.go
++++ b/decode.go
+@@ -6,0 +7 @@
++	"runtime"
+@@ -156,0 +158,3 @@
++
++// nativeUnalignedLittleEndian 仅在支持非对齐读取的小端架构启用原生整数数组访问。
++const nativeUnalignedLittleEndian = runtime.GOARCH == "386" || runtime.GOARCH == "amd64" || runtime.GOARCH == "arm64"
+@@ -191,0 +196,3 @@
++		} else if nativeUnalignedLittleEndian && count >= 32 {
++			// 至少256B的无指针整数体在完整预检后复制；小数组保留原循环。
++			copy(unsafe.Slice((*byte)(unsafe.Pointer(&result[0])), len(data)), data)
+--- a/encode.go
++++ b/encode.go
+@@ -297 +297,12 @@
+-	if width == 4 {
++	if nativeUnalignedLittleEndian && len(values) >= 32 {
++		// 较长数组在完整预检后固定到输出区间，再同步写无指针整数视图；短数组保留原循环。
++		if width == 8 {
++			copy(remaining[:len(values)*8], unsafe.Slice((*byte)(unsafe.Pointer(&values[0])), len(values)*8))
++		} else {
++			body := remaining[:len(values)*4]
++			numbers := unsafe.Slice((*int32)(unsafe.Pointer(&body[0])), len(values))
++			for index, number := range values {
++				numbers[index] = int32(number)
++			}
++		}
++	} else if width == 4 {
+--- a/limits_test.go
++++ b/limits_test.go
+@@ -364,0 +365,14 @@
++			// 同一 wire 的起点偏移覆盖非对齐视图，解码不得借用源缓冲。
++			for start := 0; start < 8; start++ {
++				storage := make([]byte, start+len(encoded)+8)
++				copy(storage[start:], encoded)
++				var shifted document
++				used, err := sproto.Decode(storage[start:start+len(encoded)], &shifted)
++				if err != nil || used != len(encoded) || !reflect.DeepEqual(&shifted, input) {
++					t.Fatalf("unaligned decode start=%d width=%d length=%d err=%v", start, width, length, err)
++				}
++				shifted.Values[0] ^= 0x71
++				if !bytes.Equal(storage[start:start+len(encoded)], encoded) {
++					t.Fatal("unaligned result aliases input")
++				}
++			}
+--- a/CHANGES.md
++++ b/CHANGES.md
+@@ -1,0 +2,3 @@
++
++- 在386/amd64/arm64上，至少32项的原生整数数组编码使用受控整数视图写出4字节值或复制8字节值；其余架构与短数组沿用LittleEndian循环。预检、宽度、预算、独占输出及wire保持，896项整数消息最终Encode/PEncode较本轮起点约降低16.7%/8.0%，不宣称全场景提速。
++- 至少32项的8字节原生整数数组解码在上述小端架构中复制到新分配的[]int64；4字节和短数组保留既有循环。保留完整输入/预算校验与精确容量；长8字节数组正文Decode两遍约改善11.3%/7.9%，对应PDecode存在小幅代价，完整数据见GSR阶段收尾报告。既有wire/所有权用例扩展0～7字节起点偏移检查。

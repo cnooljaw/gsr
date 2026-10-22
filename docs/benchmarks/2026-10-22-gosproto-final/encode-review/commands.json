@@ -1,0 +1,1001 @@
+[
+  {
+    "args": [
+      "git",
+      "rev-parse",
+      "9e47281"
+    ],
+    "cwd": "/private/tmp/gsr-gosproto-fork",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.01046300120651722,
+    "output": "9e47281db9877dd1de203608c6cb89a6e387bc41\n"
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "decode.go",
+      "encode.go",
+      "limits_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.012741625308990479,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-gcflags=all=-d=checkptr=2",
+      "-run",
+      "^(TestNativeIntegerArrayWire|TestSignedIntegerArray|TestLimits|TestSchemaEvolution|TestInvalidSchemaAndIntegerRange)$",
+      "-timeout=2m",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A",
+    "env": {
+      "GOMAXPROCS": "2",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 3.5226029995828867,
+    "output": "ok  \tgithub.com/cnooljaw/gosproto\t1.664s\n"
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "review_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A-harness",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.004917291924357414,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-run",
+      "^TestRepresentativeFixtures$",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 1.3783494997769594,
+    "output": "ok  \tarrayreview\t0.329s\n"
+  },
+  {
+    "args": [
+      "go",
+      "vet",
+      "-mod=mod",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 0.30715141631662846,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-c",
+      "-o",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A.test",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 0.7405419573187828,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "objdump",
+      "-s",
+      "github.com/cnooljaw/gosproto.encodeInt64Slice",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A.test"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A-harness",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.03718999959528446,
+    "output": ""
+  },
+  {
+    "args": [
+      "git",
+      "rev-parse",
+      "9e47281"
+    ],
+    "cwd": "/private/tmp/gsr-gosproto-fork",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.01070883497595787,
+    "output": "9e47281db9877dd1de203608c6cb89a6e387bc41\n"
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "decode.go",
+      "encode.go",
+      "limits_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/B",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.0065527912229299545,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-gcflags=all=-d=checkptr=2",
+      "-run",
+      "^(TestNativeIntegerArrayWire|TestSignedIntegerArray|TestLimits|TestSchemaEvolution|TestInvalidSchemaAndIntegerRange)$",
+      "-timeout=2m",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/B",
+    "env": {
+      "GOMAXPROCS": "2",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 2.2410755418241024,
+    "output": "ok  \tgithub.com/cnooljaw/gosproto\t1.439s\n"
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "review_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/B-harness",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.006519749760627747,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-run",
+      "^TestRepresentativeFixtures$",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/B-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 0.9882797915488482,
+    "output": "ok  \tarrayreview\t0.347s\n"
+  },
+  {
+    "args": [
+      "go",
+      "vet",
+      "-mod=mod",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/B-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 0.19591420888900757,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-c",
+      "-o",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/B.test",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/B-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 0.5716292094439268,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "objdump",
+      "-s",
+      "github.com/cnooljaw/gosproto.encodeInt64Slice",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/B.test"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/B-harness",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.02900504134595394,
+    "output": "TEXT github.com/cnooljaw/gosproto.encodeInt64Slice(SB) /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/B/encode.go\n  encode.go:298\t\t0x100152b90\t\tf9400b90\t\tMOVD 16(R28), R16\t\t\t\t\t\n  encode.go:298\t\t0x100152b94\t\teb3063ff\t\tCMP R16, RSP\t\t\t\t\t\t\n  encode.go:298\t\t0x100152b98\t\t54000909\t\tBLS 72(PC)\t\t\t\t\t\t\n  encode.go:298\t\t0x100152b9c\t\tf81d0ffe\t\tMOVD.W R30, -48(RSP)\t\t\t\t\t\n  encode.go:298\t\t0x100152ba0\t\tf81f83fd\t\tMOVD R29, -8(RSP)\t\t\t\t\t\n  encode.go:298\t\t0x100152ba4\t\td10023fd\t\tSUB $8, RSP, R29\t\t\t\t\t\n  encode.go:298\t\t0x100152ba8\t\tf9001fe0\t\tMOVD R0, 56(RSP)\t\t\t\t\t\n  encode.go:298\t\t0x100152bac\t\tf9002fe4\t\tMOVD R4, 88(RSP)\t\t\t\t\t\n  encode.go:299\t\t0x100152bb0\t\tf10000bf\t\tCMP $0, R5\t\t\t\t\t\t\n  encode.go:299\t\t0x100152bb4\t\t540007a9\t\tBLS 61(PC)\t\t\t\t\t\t\n  encode.go:299\t\t0x100152bb8\t\t39000083\t\tMOVB R3, (R4)\t\t\t\t\t\t\n  encode.go:300\t\t0x100152bbc\t\td10004c2\t\tSUB $1, R6, R2\t\t\t\t\t\t\n  encode.go:300\t\t0x100152bc0\t\tcb0203e5\t\tNEG R2, R5\t\t\t\t\t\t\n  encode.go:300\t\t0x100152bc4\t\t937ffca5\t\tASR $63, R5, R5\t\t\t\t\t\t\n  encode.go:300\t\t0x100152bc8\t\t924000a5\t\tAND $1, R5, R5\t\t\t\t\t\t\n  encode.go:300\t\t0x100152bcc\t\t8b050084\t\tADD R5, R4, R4\t\t\t\t\t\t\n  encode.go:301\t\t0x100152bd0\t\tb4000441\t\tCBZ R1, 34(PC)\t\t\t\t\t\t\n  encode.go:303\t\t0x100152bd4\t\tf100207f\t\tCMP $8, R3\t\t\t\t\t\t\n  encode.go:303\t\t0x100152bd8\t\t540001e0\t\tBEQ 15(PC)\t\t\t\t\t\t\n  encode.go:306\t\t0x100152bdc\t\td37ef425\t\tLSL $2, R1, R5\t\t\t\t\t\t\n  encode.go:306\t\t0x100152be0\t\teb01085f\t\tCMP R1<<2, R2\t\t\t\t\t\t\n  encode.go:306\t\t0x100152be4\t\t540005e3\t\tBCC 47(PC)\t\t\t\t\t\t\n  encode.go:307\t\t0x100152be8\t\tf10000bf\t\tCMP $0, R5\t\t\t\t\t\t\n  encode.go:307\t\t0x100152bec\t\t54000549\t\tBLS 42(PC)\t\t\t\t\t\t\n  encode.go:307\t\t0x100152bf0\t\tb27e03e2\t\tORR $4, ZR, R2\t\t\t\t\t\t\n  encode.go:307\t\t0x100152bf4\t\t9bc17c42\t\tUMULH R1, R2, R2\t\t\t\t\t\n  encode.go:307\t\t0x100152bf8\t\tb50004c2\t\tCBNZ R2, 38(PC)\t\t\t\t\t\t\n  encode.go:307\t\t0x100152bfc\t\taa0403e2\t\tMOVD R4, R2\t\t\t\t\t\t\n  encode.go:307\t\t0x100152c00\t\tcb0403e4\t\tNEG R4, R4\t\t\t\t\t\t\n  encode.go:307\t\t0x100152c04\t\teb01089f\t\tCMP R1<<2, R4\t\t\t\t\t\t\n  encode.go:307\t\t0x100152c08\t\t54000443\t\tBCC 34(PC)\t\t\t\t\t\t\n  encode.go:307\t\t0x100152c0c\t\taa1f03e4\t\tMOVD ZR, R4\t\t\t\t\t\t\n  encode.go:308\t\t0x100152c10\t\t1400001d\t\tJMP 29(PC)\t\t\t\t\t\t\n  encode.go:304\t\t0x100152c14\t\td37df025\t\tLSL $3, R1, R5\t\t\t\t\t\t\n  encode.go:304\t\t0x100152c18\t\teb010c5f\t\tCMP R1<<3, R2\t\t\t\t\t\t\n  encode.go:304\t\t0x100152c1c\t\t540002a3\t\tBCC 21(PC)\t\t\t\t\t\t\n  encode.go:304\t\t0x100152c20\t\taa0003e6\t\tMOVD R0, R6\t\t\t\t\t\t\n  encode.go:304\t\t0x100152c24\t\tcb0003e7\t\tNEG R0, R7\t\t\t\t\t\t\n  encode.go:304\t\t0x100152c28\t\teb010cff\t\tCMP R1<<3, R7\t\t\t\t\t\t\n  encode.go:304\t\t0x100152c2c\t\t54000203\t\tBCC 16(PC)\t\t\t\t\t\t\n  encode.go:304\t\t0x100152c30\t\teb0400df\t\tCMP R4, R6\t\t\t\t\t\t\n  encode.go:304\t\t0x100152c34\t\t54000120\t\tBEQ 9(PC)\t\t\t\t\t\t\n  encode.go:299\t\t0x100152c38\t\tf9002be3\t\tMOVD R3, 80(RSP)\t\t\t\t\t\n  encode.go:299\t\t0x100152c3c\t\tf90023e1\t\tMOVD R1, 64(RSP)\t\t\t\t\t\n  encode.go:304\t\t0x100152c40\t\taa0403e0\t\tMOVD R4, R0\t\t\t\t\t\t\n  encode.go:304\t\t0x100152c44\t\taa0603e1\t\tMOVD R6, R1\t\t\t\t\t\t\n  encode.go:304\t\t0x100152c48\t\taa0503e2\t\tMOVD R5, R2\t\t\t\t\t\t\n  encode.go:304\t\t0x100152c4c\t\t97fc97b1\t\tCALL runtime.memmove(SB)\t\t\t\t\n  encode.go:323\t\t0x100152c50\t\tf94023e1\t\tMOVD 64(RSP), R1\t\t\t\t\t\n  encode.go:323\t\t0x100152c54\t\tf9402be3\t\tMOVD 80(RSP), R3\t\t\t\t\t\n  encode.go:323\t\t0x100152c58\t\t9b017c61\t\tMUL R1, R3, R1\t\t\t\t\t\t\n  encode.go:323\t\t0x100152c5c\t\t91000420\t\tADD $1, R1, R0\t\t\t\t\t\t\n  encode.go:323\t\t0x100152c60\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\n  encode.go:323\t\t0x100152c64\t\tf84307fe\t\tMOVD.P 48(RSP), R30\t\t\t\t\t\n  encode.go:323\t\t0x100152c68\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\n  encode.go:304\t\t0x100152c6c\t\t97fc61f1\t\tCALL runtime.panicunsafeslicelen(SB)\t\t\t\n  encode.go:304\t\t0x100152c70\t\taa0503e1\t\tMOVD R5, R1\t\t\t\t\t\t\n  encode.go:304\t\t0x100152c74\t\t97fc964b\t\tCALL runtime.panicSliceAcap(SB)\t\t\t\t\n  encode.go:308\t\t0x100152c78\t\tf8647805\t\tMOVD (R0)(R4<<3), R5\t\t\t\t\t\n  encode.go:309\t\t0x100152c7c\t\tb8247845\t\tMOVW R5, (R2)(R4<<2)\t\t\t\t\t\n  encode.go:308\t\t0x100152c80\t\t91000484\t\tADD $1, R4, R4\t\t\t\t\t\t\n  encode.go:308\t\t0x100152c84\t\teb04003f\t\tCMP R4, R1\t\t\t\t\t\t\n  encode.go:308\t\t0x100152c88\t\t54ffff8c\t\tBGT -4(PC)\t\t\t\t\t\t\n  encode.go:308\t\t0x100152c8c\t\t17fffff3\t\tJMP -13(PC)\t\t\t\t\t\t\n  encode.go:307\t\t0x100152c90\t\t97fc61e8\t\tCALL runtime.panicunsafeslicelen(SB)\t\t\t\n  encode.go:307\t\t0x100152c94\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\n  encode.go:307\t\t0x100152c98\t\taa0003e1\t\tMOVD R0, R1\t\t\t\t\t\t\n  encode.go:307\t\t0x100152c9c\t\t97fc9631\t\tCALL runtime.panicIndex(SB)\t\t\t\t\n  encode.go:306\t\t0x100152ca0\t\taa0503e1\t\tMOVD R5, R1\t\t\t\t\t\t\n  encode.go:306\t\t0x100152ca4\t\t97fc963f\t\tCALL runtime.panicSliceAcap(SB)\t\t\t\t\n  encode.go:299\t\t0x100152ca8\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\n  encode.go:299\t\t0x100152cac\t\taa0003e1\t\tMOVD R0, R1\t\t\t\t\t\t\n  encode.go:299\t\t0x100152cb0\t\t97fc962c\t\tCALL runtime.panicIndex(SB)\t\t\t\t\n  encode.go:299\t\t0x100152cb4\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\n  encode.go:298\t\t0x100152cb8\t\ta90087e0\t\tSTP (R0, R1), 8(RSP)\t\t\t\t\t\n  encode.go:298\t\t0x100152cbc\t\ta9018fe2\t\tSTP (R2, R3), 24(RSP)\t\t\t\t\t\n  encode.go:298\t\t0x100152cc0\t\ta90297e4\t\tSTP (R4, R5), 40(RSP)\t\t\t\t\t\n  encode.go:298\t\t0x100152cc4\t\tf9001fe6\t\tMOVD R6, 56(RSP)\t\t\t\t\t\n  encode.go:298\t\t0x100152cc8\t\taa1e03e3\t\tMOVD R30, R3\t\t\t\t\t\t\n  encode.go:298\t\t0x100152ccc\t\t97fc8ccd\t\tCALL runtime.morestack_noctxt.abi0(SB)\t\t\t\n  encode.go:298\t\t0x100152cd0\t\ta94087e0\t\tLDP 8(RSP), (R0, R1)\t\t\t\t\t\n  encode.go:298\t\t0x100152cd4\t\ta9418fe2\t\tLDP 24(RSP), (R2, R3)\t\t\t\t\t\n  encode.go:298\t\t0x100152cd8\t\ta94297e4\t\tLDP 40(RSP), (R4, R5)\t\t\t\t\t\n  encode.go:298\t\t0x100152cdc\t\tf9401fe6\t\tMOVD 56(RSP), R6\t\t\t\t\t\n  encode.go:298\t\t0x100152ce0\t\t17ffffac\t\tJMP github.com/cnooljaw/gosproto.encodeInt64Slice(SB)\t\n  encode.go:298\t\t0x100152ce4\t\t00000000\t\t?\t\t\t\t\t\t\t\n  encode.go:298\t\t0x100152ce8\t\t00000000\t\t?\t\t\t\t\t\t\t\n  encode.go:298\t\t0x100152cec\t\t00000000\t\t?\t\t\t\t\t\t\t\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkArray(Normal|Representative)Review$",
+      "-test.benchtime=200ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 7.29651958309114,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkArrayNormalReview/w4_n1/encode         \t 2376182\t       101.4 ns/op\t      16 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n1/pencode        \t 2006061\t       120.6 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/encode         \t 2156644\t       130.1 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/pencode        \t 1808665\t       130.8 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/encode        \t 1501704\t       152.5 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/pencode       \t 1222322\t       198.2 ns/op\t     160 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/encode       \t  152374\t      1559 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/pencode      \t  128569\t      1890 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/encode         \t 2138330\t       131.5 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/pencode        \t 2052172\t       124.9 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/encode         \t 2154607\t       108.8 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/pencode        \t 1784923\t       131.9 ns/op\t      64 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/encode        \t 1501332\t       158.7 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/pencode       \t  823951\t       335.1 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/encode       \t  166027\t      1839 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/pencode      \t   53077\t      4462 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_encode         \t   59937\t      4070 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_pencode        \t   43180\t      5494 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_encode        \t  147664\t      1623 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_pencode       \t   79000\t      3123 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkArray(Normal|Representative)Review$",
+      "-test.benchtime=200ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 6.686167165637016,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkArrayNormalReview/w4_n1/encode         \t 2395525\t       102.5 ns/op\t      16 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n1/pencode        \t 1989082\t       117.6 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/encode         \t 2175319\t       111.3 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/pencode        \t 1823184\t       130.7 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/encode        \t 1503577\t       182.0 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/pencode       \t 1240339\t       228.5 ns/op\t     160 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/encode       \t  151545\t      1553 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/pencode      \t  127132\t      2084 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/encode         \t 2072298\t       113.8 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/pencode        \t 2043210\t       115.5 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/encode         \t 2250822\t       109.0 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/pencode        \t 1786464\t       134.6 ns/op\t      64 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/encode        \t 1000000\t       221.7 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/pencode       \t  826185\t       301.6 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/encode       \t  160044\t      1429 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/pencode      \t   53775\t      4468 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_encode         \t   59407\t      4079 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_pencode        \t   43316\t      5568 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_encode        \t  149361\t      1606 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_pencode       \t   78660\t      3172 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkArray(Normal|Representative)Review$",
+      "-test.benchtime=200ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 6.256844624876976,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkArrayNormalReview/w4_n1/encode         \t 2186246\t       101.0 ns/op\t      16 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n1/pencode        \t 1955911\t       122.3 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/encode         \t 2172062\t       109.2 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/pencode        \t 1911050\t       142.2 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/encode        \t 1491190\t       158.3 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/pencode       \t 1000000\t       206.0 ns/op\t     160 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/encode       \t  150112\t      1617 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/pencode      \t  125299\t      1870 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/encode         \t 2143204\t       110.2 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/pencode        \t 2063600\t       116.8 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/encode         \t 2189247\t       108.9 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/pencode        \t 1762362\t       133.3 ns/op\t      64 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/encode        \t 1000000\t       203.3 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/pencode       \t  790698\t       301.9 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/encode       \t  165650\t      1459 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/pencode      \t   52617\t      4458 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_encode         \t   58302\t      4088 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_pencode        \t   42642\t      5601 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_encode        \t  147447\t      1622 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_pencode       \t   77802\t      3442 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkArray(Normal|Representative)Review$",
+      "-test.benchtime=200ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 6.905995583161712,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkArrayNormalReview/w4_n1/encode         \t 2341237\t       113.2 ns/op\t      16 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n1/pencode        \t 2006757\t       114.8 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/encode         \t 2308005\t       107.7 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/pencode        \t 1863390\t       125.0 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/encode        \t 1528676\t       153.1 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/pencode       \t 1000000\t       202.3 ns/op\t     160 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/encode       \t  134948\t      1543 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/pencode      \t  131202\t      1919 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/encode         \t 2205272\t       110.5 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/pencode        \t 2087376\t       114.3 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/encode         \t 2241015\t       108.4 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/pencode        \t 1802458\t       131.9 ns/op\t      64 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/encode        \t 1511655\t       159.4 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/pencode       \t  827276\t       292.9 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/encode       \t  163958\t      1469 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/pencode      \t   53295\t      5427 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_encode         \t   24056\t      8775 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_pencode        \t   37513\t      5816 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_encode        \t  128373\t      1671 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_pencode       \t   76827\t      3173 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkArray(Normal|Representative)Review$",
+      "-test.benchtime=200ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 6.805394833907485,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkArrayNormalReview/w4_n1/encode         \t 2375955\t       114.7 ns/op\t      16 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n1/pencode        \t 1929434\t       121.4 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/encode         \t 2187264\t       109.2 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/pencode        \t 1828167\t       160.3 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/encode        \t 1500292\t       157.2 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/pencode       \t 1224423\t       195.6 ns/op\t     160 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/encode       \t  154878\t      1572 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/pencode      \t  129750\t      1881 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/encode         \t 2190948\t       111.1 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/pencode        \t 1681413\t       137.9 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/encode         \t 2153269\t       108.3 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/pencode        \t 1800325\t       133.4 ns/op\t      64 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/encode        \t 1497428\t       158.9 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/pencode       \t  849118\t       297.5 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/encode       \t  163867\t      1451 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/pencode      \t   54044\t      4437 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_encode         \t   58220\t      4054 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_pencode        \t   43539\t      5575 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_encode        \t  151717\t      1585 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_pencode       \t   78717\t      3095 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkArray(Normal|Representative)Review$",
+      "-test.benchtime=200ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 6.830941375344992,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkArrayNormalReview/w4_n1/encode         \t 2478021\t       147.5 ns/op\t      16 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n1/pencode        \t 1953019\t       160.2 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/encode         \t 2535606\t        97.87 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/pencode        \t 1972990\t       128.8 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/encode        \t 1721920\t       138.5 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/pencode       \t 1370275\t       179.3 ns/op\t     160 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/encode       \t  189213\t      1403 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/pencode      \t  141042\t      2139 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/encode         \t 2224473\t       110.3 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/pencode        \t 2382166\t       107.6 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/encode         \t 2285976\t       104.3 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/pencode        \t 1879560\t       134.1 ns/op\t      64 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/encode        \t 1517824\t       161.1 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/pencode       \t  812204\t       386.3 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/encode       \t  146430\t      1454 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/pencode      \t   53728\t      4463 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_encode         \t   58478\t      4029 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_pencode        \t   43948\t      5466 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_encode        \t  147382\t      1806 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_pencode       \t   71707\t      3063 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkArray(Normal|Representative)Review$",
+      "-test.benchtime=200ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 6.498475790023804,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkArrayNormalReview/w4_n1/encode         \t 2458754\t       124.5 ns/op\t      16 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n1/pencode        \t 1955450\t       117.8 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/encode         \t 2243115\t       108.6 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/pencode        \t 1828112\t       128.2 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/encode        \t 1594299\t       153.7 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/pencode       \t 1260042\t       186.7 ns/op\t     160 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/encode       \t  167109\t      1969 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/pencode      \t  133293\t      1835 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/encode         \t 2178004\t       108.3 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/pencode        \t 2150162\t       114.3 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/encode         \t 2239466\t       106.2 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/pencode        \t 1791957\t       130.8 ns/op\t      64 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/encode        \t 1000000\t       204.3 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/pencode       \t  899508\t       326.7 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/encode       \t  164066\t      1464 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/pencode      \t   54519\t      4337 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_encode         \t   60018\t      4002 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_pencode        \t   43872\t      5361 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_encode        \t  154524\t      1560 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_pencode       \t   80554\t      3023 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkArray(Normal|Representative)Review$",
+      "-test.benchtime=200ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 6.9506095834076405,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkArrayNormalReview/w4_n1/encode         \t 2423300\t        99.47 ns/op\t      16 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n1/pencode        \t 2030208\t       117.6 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/encode         \t 2206876\t       106.5 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/pencode        \t 1877575\t       131.0 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/encode        \t 1527738\t       157.8 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/pencode       \t 1000000\t       226.1 ns/op\t     160 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/encode       \t  151946\t      1529 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/pencode      \t  130044\t      1860 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/encode         \t 2194101\t       108.6 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/pencode        \t 2101099\t       113.4 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/encode         \t 2248394\t       107.3 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/pencode        \t 1814204\t       158.4 ns/op\t      64 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/encode        \t 1525452\t       154.3 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/pencode       \t  885540\t       288.4 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/encode       \t  187875\t      1457 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/pencode      \t   52953\t      4458 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_encode         \t   61579\t      4007 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_pencode        \t   44022\t      5676 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_encode        \t  154140\t      1466 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_pencode       \t   78118\t      3090 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkArray(Normal|Representative)Review$",
+      "-test.benchtime=200ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 7.485028000548482,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkArrayNormalReview/w4_n1/encode         \t 2491414\t        99.70 ns/op\t      16 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n1/pencode        \t 1964163\t       119.6 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/encode         \t 2233039\t       103.2 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/pencode        \t 1652666\t       137.1 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/encode        \t 1537502\t       157.1 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/pencode       \t 1252182\t       189.7 ns/op\t     160 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/encode       \t  158809\t      1514 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/pencode      \t  124267\t      5114 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/encode         \t 2175492\t       109.5 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/pencode        \t 2126030\t       113.0 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/encode         \t 2248779\t       107.3 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/pencode        \t 1815144\t       131.8 ns/op\t      64 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/encode        \t 1498964\t       159.8 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/pencode       \t  862869\t       348.3 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/encode       \t  169827\t      1453 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/pencode      \t   53292\t      5207 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_encode         \t   59175\t      4049 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_pencode        \t   43620\t      5526 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_encode        \t  162880\t      1626 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_pencode       \t   77560\t      3067 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkArray(Normal|Representative)Review$",
+      "-test.benchtime=200ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 6.71089400164783,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkArrayNormalReview/w4_n1/encode         \t 2444671\t       113.6 ns/op\t      16 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n1/pencode        \t 1988038\t       115.8 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/encode         \t 2197090\t       108.6 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/pencode        \t 1790554\t       193.8 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/encode        \t 1479976\t       159.9 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/pencode       \t 1000000\t       200.2 ns/op\t     160 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/encode       \t  151201\t      1915 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/pencode      \t  124990\t      1898 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/encode         \t 2158952\t       110.2 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/pencode        \t 2096941\t       114.8 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/encode         \t 2198409\t       154.8 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/pencode        \t 1790643\t       133.4 ns/op\t      64 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/encode        \t 1000000\t       219.4 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/pencode       \t  800588\t       302.9 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/encode       \t  174208\t      2817 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/pencode      \t   49936\t      4952 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_encode         \t   58282\t      4080 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_pencode        \t   43279\t      5732 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_encode        \t  146752\t      1569 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_pencode       \t   70401\t      4121 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkArray(Normal|Representative)Review$",
+      "-test.benchtime=200ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 6.829222207888961,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkArrayNormalReview/w4_n1/encode         \t 2450809\t       100.0 ns/op\t      16 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n1/pencode        \t 2283507\t       119.2 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/encode         \t 2126986\t       109.6 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/pencode        \t 1788026\t       132.5 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/encode        \t 1518366\t       195.8 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/pencode       \t 1000000\t       235.2 ns/op\t     160 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/encode       \t  134174\t      1579 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/pencode      \t  127749\t      1990 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/encode         \t 2223780\t       116.2 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/pencode        \t 2091224\t       115.2 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/encode         \t 2184825\t       179.1 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/pencode        \t  974733\t       495.6 ns/op\t      64 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/encode        \t 1495939\t       170.2 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/pencode       \t  845392\t       320.6 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/encode       \t  157628\t      1471 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/pencode      \t   54028\t      4464 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_encode         \t   59278\t      4101 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_pencode        \t   41121\t      5586 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_encode        \t  157768\t      2029 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_pencode       \t   77841\t      3033 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkArray(Normal|Representative)Review$",
+      "-test.benchtime=200ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 6.901149375364184,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkArrayNormalReview/w4_n1/encode         \t 1867843\t       156.9 ns/op\t      16 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n1/pencode        \t 1840287\t       128.1 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/encode         \t 2085900\t       114.6 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/pencode        \t 1746972\t       135.7 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/encode        \t 1466344\t       163.4 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/pencode       \t 1212888\t       203.7 ns/op\t     160 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/encode       \t  146692\t      1598 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/pencode      \t  119306\t      1931 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/encode         \t 2159686\t       111.6 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/pencode        \t 2049836\t       138.1 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/encode         \t 2199878\t       110.3 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/pencode        \t 1796210\t       135.3 ns/op\t      64 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/encode        \t 1496179\t       156.0 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/pencode       \t  796041\t       334.0 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/encode       \t  166581\t      1461 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/pencode      \t   54153\t      5114 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_encode         \t   59256\t      4018 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_pencode        \t   43341\t      5507 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_encode        \t  153540\t      1590 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_pencode       \t   78544\t      2920 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkArray(Normal|Representative)Review$",
+      "-test.benchtime=200ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 6.6971459574997425,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkArrayNormalReview/w4_n1/encode         \t 2511054\t        94.51 ns/op\t      16 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n1/pencode        \t 2029968\t       119.2 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/encode         \t 2113370\t       132.0 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/pencode        \t 1794723\t       131.5 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/encode        \t 1513838\t       157.7 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/pencode       \t 1226337\t       197.4 ns/op\t     160 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/encode       \t  154636\t      1537 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/pencode      \t  128704\t      1932 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/encode         \t 2178118\t       140.7 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/pencode        \t 2022474\t       116.4 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/encode         \t 2163049\t       108.8 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/pencode        \t 1780608\t       134.4 ns/op\t      64 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/encode        \t 1529875\t       160.4 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/pencode       \t  801614\t       302.4 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/encode       \t  168684\t      1808 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/pencode      \t   53694\t      4480 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_encode         \t   58584\t      4045 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_pencode        \t   42918\t      5589 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_encode        \t  145846\t      1609 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_pencode       \t   78032\t      3067 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/B.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkArray(Normal|Representative)Review$",
+      "-test.benchtime=200ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/B-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 7.013218875974417,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkArrayNormalReview/w4_n1/encode         \t 2409273\t       101.6 ns/op\t      16 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n1/pencode        \t 2035228\t       119.6 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/encode         \t 2174200\t       121.2 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/pencode        \t 1847659\t       132.3 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/encode        \t 1604634\t       150.0 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/pencode       \t 1000000\t       227.3 ns/op\t     160 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/encode       \t  188814\t      1280 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/pencode      \t  146086\t      1606 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/encode         \t 2171374\t       110.9 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/pencode        \t 2075410\t       114.5 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/encode         \t 2237598\t       105.8 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/pencode        \t 1828956\t       157.9 ns/op\t      64 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/encode        \t 1703475\t       143.3 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/pencode       \t  853509\t       281.4 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/encode       \t  245167\t       994.6 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/pencode      \t   56928\t      4510 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_encode         \t   54288\t      4069 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_pencode        \t   43935\t      5434 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_encode        \t  182814\t      1703 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_pencode       \t   86331\t      2831 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/B.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkArray(Normal|Representative)Review$",
+      "-test.benchtime=200ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/B-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 6.63548987545073,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkArrayNormalReview/w4_n1/encode         \t 2445999\t        99.82 ns/op\t      16 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n1/pencode        \t 1989513\t       120.5 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/encode         \t 2217054\t       108.3 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/pencode        \t 1843154\t       129.6 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/encode        \t 1596964\t       171.7 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/pencode       \t 1272177\t       187.7 ns/op\t     160 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/encode       \t  197269\t      1294 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/pencode      \t  150832\t      1548 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/encode         \t 2087721\t       111.4 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/pencode        \t 2100109\t       119.8 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/encode         \t 2238374\t       126.4 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/pencode        \t 1656505\t       133.8 ns/op\t      64 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/encode        \t 1537311\t       182.1 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/pencode       \t  860432\t       285.2 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/encode       \t  224294\t      1012 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/pencode      \t   57261\t      4166 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_encode         \t   61230\t      3969 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_pencode        \t   40800\t      6704 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_encode        \t  183691\t      1323 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_pencode       \t   85938\t      2687 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkArray(Normal|Representative)Review$",
+      "-test.benchtime=200ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 6.59315837547183,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkArrayNormalReview/w4_n1/encode         \t 2477088\t       100.6 ns/op\t      16 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n1/pencode        \t 1951365\t       118.3 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/encode         \t 2089954\t       110.8 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/pencode        \t 1828429\t       177.8 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/encode        \t 1352319\t       168.6 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/pencode       \t 1000000\t       226.6 ns/op\t     160 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/encode       \t  116006\t      1783 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/pencode      \t  127206\t      2217 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/encode         \t 2085238\t       121.4 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/pencode        \t 1929822\t       139.4 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/encode         \t 2177900\t       110.2 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/pencode        \t 1743433\t       133.3 ns/op\t      64 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/encode        \t 1453146\t       158.8 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/pencode       \t  815090\t       293.9 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/encode       \t  160453\t      1457 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/pencode      \t   53772\t      4628 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_encode         \t   55586\t      4739 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_pencode        \t   40312\t      6582 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_encode        \t  155607\t      1683 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_pencode       \t   73821\t      3555 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/B.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkArray(Normal|Representative)Review$",
+      "-test.benchtime=200ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/B-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 6.917505707591772,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkArrayNormalReview/w4_n1/encode         \t 2200024\t       135.5 ns/op\t      16 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n1/pencode        \t 1774880\t       121.8 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/encode         \t 1877607\t       162.4 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/pencode        \t 1519064\t       141.1 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/encode        \t 1625473\t       150.7 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/pencode       \t 1293290\t       200.2 ns/op\t     160 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/encode       \t  193059\t      1275 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/pencode      \t  165673\t      1470 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/encode         \t 2358626\t       129.3 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/pencode        \t 2272795\t       103.1 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/encode         \t 2526752\t        95.30 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/pencode        \t 1966686\t       137.6 ns/op\t      64 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/encode        \t 1679072\t       145.9 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/pencode       \t  782551\t       337.0 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/encode       \t  233578\t       983.8 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/pencode      \t   55960\t      4178 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_encode         \t   60393\t      3957 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_pencode        \t   44446\t      5889 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_encode        \t  170805\t      1281 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_pencode       \t   87727\t      2777 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkArray(Normal|Representative)Review$",
+      "-test.benchtime=200ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 6.526393625885248,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkArrayNormalReview/w4_n1/encode         \t 2653779\t       118.3 ns/op\t      16 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n1/pencode        \t 2003880\t       117.2 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/encode         \t 2180713\t       108.5 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/pencode        \t 1861568\t       128.2 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/encode        \t 1516284\t       159.3 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/pencode       \t 1227018\t       195.9 ns/op\t     160 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/encode       \t  152475\t      1983 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/pencode      \t  126766\t      1883 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/encode         \t 2112640\t       105.7 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/pencode        \t 2180149\t       114.5 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/encode         \t 2238214\t       108.3 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/pencode        \t 1808160\t       132.9 ns/op\t      64 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/encode        \t 1000000\t       219.8 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/pencode       \t  943101\t       296.6 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/encode       \t  169918\t      1428 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/pencode      \t   54361\t      4470 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_encode         \t   61052\t      4026 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_pencode        \t   43772\t      5569 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_encode        \t  161349\t      1600 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_pencode       \t   78004\t      2950 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkArray(Normal|Representative)Review$",
+      "-test.benchtime=200ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 6.6256677489727736,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkArrayNormalReview/w4_n1/encode         \t 2389814\t        98.81 ns/op\t      16 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n1/pencode        \t 2088842\t       119.3 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/encode         \t 2217752\t       108.5 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/pencode        \t 1833285\t       128.9 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/encode        \t 1522124\t       158.4 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/pencode       \t 1000000\t       242.2 ns/op\t     160 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/encode       \t  154668\t      1545 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/pencode      \t  129626\t      1908 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/encode         \t 1807807\t       113.8 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/pencode        \t 2106699\t       115.0 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/encode         \t 2209862\t       108.9 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/pencode        \t 1807420\t       160.4 ns/op\t      64 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/encode        \t 1520821\t       157.1 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/pencode       \t  833550\t       302.0 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/encode       \t  167438\t      1451 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/pencode      \t   54568\t      4442 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_encode         \t   58645\t      4031 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_pencode        \t   42692\t      5533 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_encode        \t  150486\t      1821 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_pencode       \t   77672\t      3068 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/B.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkArray(Normal|Representative)Review$",
+      "-test.benchtime=200ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/B-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 6.645330291241407,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkArrayNormalReview/w4_n1/encode         \t 2480203\t        99.51 ns/op\t      16 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n1/pencode        \t 1971206\t       121.4 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/encode         \t 2221202\t       109.3 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/pencode        \t 1809732\t       145.6 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/encode        \t 1573161\t       176.9 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/pencode       \t 1268839\t       192.7 ns/op\t     160 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/encode       \t  191161\t      1261 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/pencode      \t  149780\t      1579 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/encode         \t 2148260\t       109.4 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/pencode        \t 2055901\t       117.3 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/encode         \t 2255124\t       125.7 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/pencode        \t 1823305\t       132.9 ns/op\t      64 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/encode        \t 1719144\t       141.0 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/pencode       \t  867116\t       284.4 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/encode       \t  250904\t       942.1 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/pencode      \t   57188\t      4177 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_encode         \t   61134\t      3950 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_pencode        \t   43291\t      6044 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_encode        \t  181444\t      1463 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_pencode       \t   84186\t      2783 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkArray(Normal|Representative)Review$",
+      "-test.benchtime=200ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 7.774403000250459,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkArrayNormalReview/w4_n1/encode         \t 2505063\t       106.0 ns/op\t      16 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n1/pencode        \t 1949355\t       120.6 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/encode         \t 2192343\t       107.7 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/pencode        \t 1838876\t       149.9 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/encode        \t 1506103\t       158.4 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/pencode       \t 1213266\t       198.4 ns/op\t     160 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/encode       \t  151371\t      1543 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/pencode      \t  130698\t      1907 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/encode         \t 2165832\t       111.5 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/pencode        \t 2054149\t       138.1 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/encode         \t 2125650\t       165.4 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/pencode        \t 1000000\t       399.3 ns/op\t      64 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/encode        \t 1000000\t       229.2 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/pencode       \t  856658\t       343.7 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/encode       \t  158461\t      1528 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/pencode      \t   54756\t     12646 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_encode         \t   57781\t      4128 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_pencode        \t   44151\t      5486 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_encode        \t  145922\t      1705 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_pencode       \t   77727\t      3727 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/B.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkArray(Normal|Representative)Review$",
+      "-test.benchtime=200ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/B-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 7.489991832524538,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkArrayNormalReview/w4_n1/encode         \t 2389476\t       100.6 ns/op\t      16 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n1/pencode        \t 1999825\t       114.7 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/encode         \t 2260821\t       149.2 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/pencode        \t 1359590\t       222.7 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/encode        \t 1566753\t       275.9 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/pencode       \t 1211661\t       192.0 ns/op\t     160 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/encode       \t  182676\t      1270 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/pencode      \t  164527\t      1929 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/encode         \t 1000000\t       704.1 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/pencode        \t 1000000\t       347.4 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/encode         \t 2175176\t       107.7 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/pencode        \t 1805760\t       140.2 ns/op\t      64 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/encode        \t 1689267\t       139.3 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/pencode       \t  872660\t       283.2 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/encode       \t  232460\t      1025 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/pencode      \t   48586\t      4219 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_encode         \t   62481\t      4515 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_pencode        \t   45002\t      5355 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_encode        \t  182768\t      1379 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_pencode       \t   80838\t      2840 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/B.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkArray(Normal|Representative)Review$",
+      "-test.benchtime=200ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/B-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 7.222679208964109,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkArrayNormalReview/w4_n1/encode         \t 2508195\t       101.3 ns/op\t      16 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n1/pencode        \t 2006978\t       124.3 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/encode         \t 2172860\t       107.5 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/pencode        \t 1826852\t       131.9 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/encode        \t 1559563\t       157.4 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/pencode       \t 1244359\t       192.0 ns/op\t     160 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/encode       \t  191444\t      1582 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/pencode      \t  143122\t      2088 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/encode         \t 2105574\t       111.9 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/pencode        \t 1892482\t       117.1 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/encode         \t 2261152\t       110.5 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/pencode        \t 1796907\t       134.0 ns/op\t      64 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/encode        \t 1275247\t       249.9 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/pencode       \t  849306\t       303.9 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/encode       \t  150482\t      1548 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/pencode      \t   55784\t      4328 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_encode         \t   60070\t      3977 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_pencode        \t   39591\t      6374 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_encode        \t  174856\t      1349 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_pencode       \t   85384\t      3345 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkArray(Normal|Representative)Review$",
+      "-test.benchtime=200ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 7.092147583141923,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkArrayNormalReview/w4_n1/encode         \t 2393947\t       101.7 ns/op\t      16 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n1/pencode        \t 1945209\t       123.6 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/encode         \t 2165109\t       112.7 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/pencode        \t 1789052\t       132.9 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/encode        \t 1515832\t       158.7 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/pencode       \t 1000000\t       225.9 ns/op\t     160 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/encode       \t  150279\t      1538 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/pencode      \t  131374\t      2090 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/encode         \t 2157206\t       115.2 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/pencode        \t 2135390\t       116.2 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/encode         \t 2204859\t       109.1 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/pencode        \t 1791746\t       154.7 ns/op\t      64 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/encode        \t 1392432\t       183.3 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/pencode       \t  804030\t       310.4 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/encode       \t  142188\t      1706 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/pencode      \t   50559\t      4916 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_encode         \t   50307\t      4082 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_pencode        \t   43442\t      5476 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_encode        \t  156240\t      1873 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_pencode       \t   75055\t      3106 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkArray(Normal|Representative)Review$",
+      "-test.benchtime=200ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 7.326024834066629,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkArrayNormalReview/w4_n1/encode         \t 2458464\t       108.1 ns/op\t      16 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n1/pencode        \t 1900455\t       121.7 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/encode         \t 2148663\t       109.6 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/pencode        \t 1802323\t       128.9 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/encode        \t 1480608\t       172.2 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/pencode       \t 1000000\t       203.8 ns/op\t     160 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/encode       \t  151275\t      1563 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/pencode      \t  125277\t      1894 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/encode         \t 2154528\t       110.0 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/pencode        \t 2034871\t       114.2 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/encode         \t 2140339\t       112.1 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/pencode        \t 1785582\t       139.2 ns/op\t      64 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/encode        \t 1522668\t       157.1 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/pencode       \t  942253\t       300.6 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/encode       \t  158688\t      1917 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/pencode      \t   48049\t      4555 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_encode         \t   58750\t      4050 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_pencode        \t   41781\t      6358 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_encode        \t  153484\t      2466 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_pencode       \t   77505\t      3082 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/B.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkArray(Normal|Representative)Review$",
+      "-test.benchtime=200ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/B-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 6.705895042046905,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkArrayNormalReview/w4_n1/encode         \t 2400751\t       101.3 ns/op\t      16 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n1/pencode        \t 2006041\t       119.6 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/encode         \t 2190360\t       108.8 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/pencode        \t 1808494\t       131.3 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/encode        \t 1582872\t       149.7 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/pencode       \t 1260084\t       236.9 ns/op\t     160 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/encode       \t  193479\t      1263 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/pencode      \t  155262\t      1582 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/encode         \t 1855339\t       117.5 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/pencode        \t 2067124\t       115.2 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/encode         \t 2246005\t       106.7 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/pencode        \t 1797042\t       154.4 ns/op\t      64 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/encode        \t 1772838\t       137.4 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/pencode       \t  881798\t       281.7 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/encode       \t  242080\t       976.2 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/pencode      \t   57585\t      4151 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_encode         \t   61447\t      3951 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_pencode        \t   43846\t      5428 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_encode        \t  183105\t      1547 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_pencode       \t   85148\t      2837 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/B.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkArray(Normal|Representative)Review$",
+      "-test.benchtime=200ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/B-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 6.780923707410693,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkArrayNormalReview/w4_n1/encode         \t 2478135\t        98.93 ns/op\t      16 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n1/pencode        \t 1964736\t       121.0 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/encode         \t 2178561\t       110.1 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/pencode        \t 1812063\t       144.4 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/encode        \t 1572174\t       169.5 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/pencode       \t 1256151\t       190.0 ns/op\t     160 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/encode       \t  188606\t      1259 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/pencode      \t  149116\t      1566 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/encode         \t 2283260\t       108.0 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/pencode        \t 2075073\t       114.5 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/encode         \t 2260470\t       128.4 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/pencode        \t 1826580\t       132.2 ns/op\t      64 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/encode        \t 1694719\t       140.2 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/pencode       \t  861798\t       285.5 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/encode       \t  258303\t       941.0 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/pencode      \t   56948\t      4255 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_encode         \t   60606\t      3911 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_pencode        \t   43803\t      5331 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_encode        \t  189550\t      1438 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_pencode       \t   85582\t      2808 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkArray(Normal|Representative)Review$",
+      "-test.benchtime=200ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 6.6643105410039425,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkArrayNormalReview/w4_n1/encode         \t 2501587\t        98.90 ns/op\t      16 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n1/pencode        \t 2041936\t       119.0 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/encode         \t 2161521\t       123.0 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/pencode        \t 1768314\t       131.0 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/encode        \t 1481085\t       160.2 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/pencode       \t 1210152\t       196.6 ns/op\t     160 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/encode       \t  153948\t      1543 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/pencode      \t  127316\t      1862 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/encode         \t 2155851\t       120.0 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/pencode        \t 2043037\t       116.0 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/encode         \t 2237737\t       108.4 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/pencode        \t 1784559\t       133.8 ns/op\t      64 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/encode        \t 1549089\t       174.1 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/pencode       \t  812090\t       294.7 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/encode       \t  165246\t      1696 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/pencode      \t   52476\t      4558 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_encode         \t   59670\t      4048 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_pencode        \t   44079\t      5562 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_encode        \t  145744\t      1716 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_pencode       \t   75484\t      3197 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/B.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkArray(Normal|Representative)Review$",
+      "-test.benchtime=200ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/B-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 6.956612041220069,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkArrayNormalReview/w4_n1/encode         \t 2407206\t       100.2 ns/op\t      16 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n1/pencode        \t 1932494\t       139.2 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/encode         \t 2175754\t       111.1 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/pencode        \t 1764730\t       138.4 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/encode        \t 1523553\t       161.1 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/pencode       \t 1230115\t       193.4 ns/op\t     160 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/encode       \t  189368\t      1266 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/pencode      \t  162334\t      2283 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/encode         \t 1813204\t       123.0 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/pencode        \t 1925074\t       119.9 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/encode         \t 2130145\t       108.4 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/pencode        \t 1797109\t       133.5 ns/op\t      64 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/encode        \t 1693764\t       224.4 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/pencode       \t  883461\t       293.6 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/encode       \t  202450\t      1003 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/pencode      \t   57465\t      4295 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_encode         \t   58868\t      4495 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_pencode        \t   38362\t      5843 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_encode        \t  176113\t      1328 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_pencode       \t   84612\t      4527 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkArray(Normal|Representative)Review$",
+      "-test.benchtime=200ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 7.082817543298006,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkArrayNormalReview/w4_n1/encode         \t 2394597\t       103.1 ns/op\t      16 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n1/pencode        \t 1990128\t       118.6 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/encode         \t 2191063\t       118.8 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/pencode        \t 1844541\t       195.4 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/encode        \t 1000000\t       323.8 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/pencode       \t  746529\t       936.5 ns/op\t     160 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/encode       \t  147711\t      1924 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/pencode      \t  130742\t      2208 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/encode         \t 2141286\t       152.5 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/pencode        \t 2076764\t       113.4 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/encode         \t 2250850\t       108.8 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/pencode        \t 1758498\t       149.4 ns/op\t      64 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/encode        \t 1558934\t       157.6 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/pencode       \t  816082\t       301.8 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/encode       \t  163239\t      1499 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/pencode      \t   53737\t      4488 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_encode         \t   59677\t      4089 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_pencode        \t   42787\t      5605 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_encode        \t  119263\t      1906 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_pencode       \t   77103\t      3102 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkArray(Normal|Representative)Review$",
+      "-test.benchtime=200ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 6.955756042152643,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkArrayNormalReview/w4_n1/encode         \t 2428574\t       101.9 ns/op\t      16 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n1/pencode        \t 2118306\t       124.2 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/encode         \t 2011711\t       121.1 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/pencode        \t 2027750\t       120.3 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/encode        \t 1678198\t       143.7 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/pencode       \t 1000000\t       204.6 ns/op\t     160 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/encode       \t  153057\t      1527 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/pencode      \t  140826\t      1883 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/encode         \t 2161614\t       112.0 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/pencode        \t 2050131\t       117.0 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/encode         \t 2198257\t       110.9 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/pencode        \t 1776289\t       136.8 ns/op\t      64 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/encode        \t 1596300\t       154.8 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/pencode       \t  802730\t       287.1 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/encode       \t  186938\t      1322 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/pencode      \t   57315\t      4519 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_encode         \t   58567\t      4105 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_pencode        \t   42456\t      5617 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_encode        \t  149461\t      1616 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_pencode       \t   76435\t      3128 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/B.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkArray(Normal|Representative)Review$",
+      "-test.benchtime=200ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/B-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 6.769938539713621,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkArrayNormalReview/w4_n1/encode         \t 2484964\t       100.6 ns/op\t      16 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n1/pencode        \t 2002216\t       121.3 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/encode         \t 2243016\t       106.0 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/pencode        \t 1885023\t       132.1 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/encode        \t 1594304\t       150.9 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/pencode       \t 1249186\t       191.7 ns/op\t     160 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/encode       \t  191742\t      1246 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/pencode      \t  154654\t      1800 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/encode         \t 2131634\t       113.0 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/pencode        \t 2072350\t       115.2 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/encode         \t 2264778\t       103.3 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/pencode        \t 1834207\t       130.5 ns/op\t      64 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/encode        \t 1688284\t       136.8 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/pencode       \t  875751\t       310.6 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/encode       \t  246855\t       954.7 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/pencode      \t   55580\t      4314 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_encode         \t   63555\t      3971 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_pencode        \t   43212\t      5334 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_encode        \t  201009\t      1266 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_pencode       \t   89232\t      2685 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkArray(Normal|Representative)Review$",
+      "-test.benchtime=200ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 6.900773834437132,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkArrayNormalReview/w4_n1/encode         \t 2494694\t       118.6 ns/op\t      16 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n1/pencode        \t 2061372\t       117.0 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/encode         \t 2177160\t       112.6 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/pencode        \t 1782025\t       130.5 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/encode        \t 1538772\t       160.7 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/pencode       \t 1210370\t       218.4 ns/op\t     160 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/encode       \t  153806\t      1554 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/pencode      \t  126074\t      1892 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/encode         \t 2103487\t       114.3 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/pencode        \t 2026126\t       118.5 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/encode         \t 2155557\t       111.0 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/pencode        \t 1751881\t       145.9 ns/op\t      64 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/encode        \t 1502772\t       159.8 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/pencode       \t  818704\t       305.4 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/encode       \t  166752\t      1464 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/pencode      \t   52821\t      4536 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_encode         \t   59155\t      4112 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_pencode        \t   42778\t      5646 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_encode        \t  150100\t      1778 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_pencode       \t   76366\t      3151 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/B.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkArray(Normal|Representative)Review$",
+      "-test.benchtime=200ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/B-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 6.877016708254814,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkArrayNormalReview/w4_n1/encode         \t 2440712\t       104.1 ns/op\t      16 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n1/pencode        \t 1911222\t       124.9 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/encode         \t 2142732\t       110.3 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/pencode        \t 1781916\t       134.7 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/encode        \t 1559643\t       166.0 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/pencode       \t 1287213\t       193.9 ns/op\t     160 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/encode       \t  190339\t      1273 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/pencode      \t  149190\t      1646 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/encode         \t 2124144\t       113.3 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/pencode        \t 2014026\t       118.4 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/encode         \t 2213089\t       123.4 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/pencode        \t 1777657\t       135.3 ns/op\t      64 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/encode        \t 1694684\t       140.9 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/pencode       \t  862869\t       357.6 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/encode       \t  259255\t       906.5 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/pencode      \t   55509\t      4292 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_encode         \t   58196\t      4518 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_pencode        \t   43202\t      5551 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_encode        \t  190684\t      1300 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_pencode       \t   85230\t      2805 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/B.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkArray(Normal|Representative)Review$",
+      "-test.benchtime=200ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/B-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 6.704259790480137,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkArrayNormalReview/w4_n1/encode         \t 2397572\t       100.8 ns/op\t      16 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n1/pencode        \t 1943073\t       120.7 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/encode         \t 2165523\t       120.1 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/pencode        \t 1778912\t       134.5 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/encode        \t 1584969\t       157.0 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/pencode       \t 1211739\t       192.4 ns/op\t     160 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/encode       \t  191508\t      1259 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/pencode      \t  151262\t      1584 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/encode         \t 2113357\t       119.1 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/pencode        \t 2035663\t       118.2 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/encode         \t 2231551\t       106.8 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/pencode        \t 1795899\t       131.9 ns/op\t      64 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/encode        \t 1717527\t       137.4 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/pencode       \t  803616\t       274.6 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/encode       \t  245058\t       968.0 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/pencode      \t   56030\t      4293 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_encode         \t   59611\t      4034 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_pencode        \t   43507\t      5504 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_encode        \t  206846\t      1354 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_pencode       \t   90602\t      2638 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkArray(Normal|Representative)Review$",
+      "-test.benchtime=200ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-final-native-encode-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 6.799606792628765,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkArrayNormalReview/w4_n1/encode         \t 2510492\t       100.5 ns/op\t      16 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n1/pencode        \t 2020092\t       127.6 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/encode         \t 2160357\t       107.7 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n4/pencode        \t 1906984\t       127.1 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/encode        \t 1500746\t       160.6 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n33/pencode       \t 1209840\t       195.8 ns/op\t     160 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/encode       \t  155707\t      1590 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w4_n896/pencode      \t  129184\t      1877 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/encode         \t 2143024\t       111.8 ns/op\t      24 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n1/pencode        \t 2082354\t       114.4 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/encode         \t 2271249\t       108.2 ns/op\t      48 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n4/pencode        \t 1779022\t       134.5 ns/op\t      64 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/encode        \t 1534784\t       172.1 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n33/pencode       \t  815990\t       300.4 ns/op\t     288 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/encode       \t  170436\t      1449 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayNormalReview/w8_n896/pencode      \t   53505\t      4495 ns/op\t    8192 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_encode         \t   61245\t      4083 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/game_large/sproto_pencode        \t   43543\t      5603 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_encode        \t  157551\t      1590 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkArrayRepresentativeReview/int32_edges/sproto_pencode       \t   77418\t      3348 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "go",
+      "version"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.07300270907580853,
+    "output": "go version go1.24.13 darwin/arm64\n"
+  }
+]

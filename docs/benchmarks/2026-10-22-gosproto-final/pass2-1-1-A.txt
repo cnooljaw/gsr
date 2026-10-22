@@ -1,0 +1,37 @@
+goos: darwin
+goarch: arm64
+pkg: arrayreview
+cpu: Apple M2
+BenchmarkArrayNormalReview/w4_n1/decode         	 1282833	       160.3 ns/op	     104 B/op	       4 allocs/op
+BenchmarkArrayNormalReview/w4_n1/pdecode        	 1000000	       219.4 ns/op	     120 B/op	       5 allocs/op
+BenchmarkArrayNormalReview/w4_n3/decode         	 1414179	       167.0 ns/op	     120 B/op	       4 allocs/op
+BenchmarkArrayNormalReview/w4_n3/pdecode        	 1234138	       297.7 ns/op	     144 B/op	       5 allocs/op
+BenchmarkArrayNormalReview/w4_n4/decode         	 1495870	       157.5 ns/op	     128 B/op	       4 allocs/op
+BenchmarkArrayNormalReview/w4_n4/pdecode        	 1000000	       201.9 ns/op	     160 B/op	       5 allocs/op
+BenchmarkArrayNormalReview/w4_n5/decode         	 1613444	       150.1 ns/op	     144 B/op	       4 allocs/op
+BenchmarkArrayNormalReview/w4_n5/pdecode        	 1000000	       203.1 ns/op	     176 B/op	       5 allocs/op
+BenchmarkArrayNormalReview/w4_n8/decode         	 1214716	       168.8 ns/op	     160 B/op	       4 allocs/op
+BenchmarkArrayNormalReview/w4_n8/pdecode        	 1000000	       207.8 ns/op	     208 B/op	       5 allocs/op
+BenchmarkArrayNormalReview/w4_n33/decode        	 1000000	       253.3 ns/op	     384 B/op	       4 allocs/op
+BenchmarkArrayNormalReview/w4_n33/pdecode       	  893743	       271.1 ns/op	     528 B/op	       5 allocs/op
+BenchmarkArrayNormalReview/w4_n896/decode       	  203001	      1208 ns/op	    8288 B/op	       4 allocs/op
+BenchmarkArrayNormalReview/w4_n896/pdecode      	  144937	      1647 ns/op	   12384 B/op	       5 allocs/op
+BenchmarkArrayNormalReview/w8_n1/decode         	 1532191	       152.0 ns/op	     104 B/op	       4 allocs/op
+BenchmarkArrayNormalReview/w8_n1/pdecode        	 1242964	       198.2 ns/op	     128 B/op	       5 allocs/op
+BenchmarkArrayNormalReview/w8_n3/decode         	 1475164	       208.0 ns/op	     120 B/op	       4 allocs/op
+BenchmarkArrayNormalReview/w8_n3/pdecode        	 1000000	       215.7 ns/op	     168 B/op	       5 allocs/op
+BenchmarkArrayNormalReview/w8_n4/decode         	 1448326	       158.7 ns/op	     128 B/op	       4 allocs/op
+BenchmarkArrayNormalReview/w8_n4/pdecode        	 1000000	       247.7 ns/op	     176 B/op	       5 allocs/op
+BenchmarkArrayNormalReview/w8_n5/decode         	 1535126	       157.6 ns/op	     144 B/op	       4 allocs/op
+BenchmarkArrayNormalReview/w8_n5/pdecode        	 1000000	       220.8 ns/op	     208 B/op	       5 allocs/op
+BenchmarkArrayNormalReview/w8_n8/decode         	 1478786	       166.1 ns/op	     160 B/op	       4 allocs/op
+BenchmarkArrayNormalReview/w8_n8/pdecode        	 1000000	       284.4 ns/op	     240 B/op	       5 allocs/op
+BenchmarkArrayNormalReview/w8_n33/decode        	 1000000	       200.0 ns/op	     384 B/op	       4 allocs/op
+BenchmarkArrayNormalReview/w8_n33/pdecode       	  424656	       560.2 ns/op	     672 B/op	       5 allocs/op
+BenchmarkArrayNormalReview/w8_n896/decode       	  208102	      1119 ns/op	    8288 B/op	       4 allocs/op
+BenchmarkArrayNormalReview/w8_n896/pdecode      	   31930	      8010 ns/op	   16480 B/op	       5 allocs/op
+BenchmarkArrayRepresentativeReview/game_large/sproto_decode         	   19474	     12078 ns/op	   10416 B/op	     532 allocs/op
+BenchmarkArrayRepresentativeReview/game_large/sproto_pdecode        	   14059	     17341 ns/op	   13872 B/op	     533 allocs/op
+BenchmarkArrayRepresentativeReview/int32_edges/sproto_decode        	  189579	      1336 ns/op	    8288 B/op	       4 allocs/op
+BenchmarkArrayRepresentativeReview/int32_edges/sproto_pdecode       	   37941	      6250 ns/op	   12384 B/op	       5 allocs/op
+PASS
