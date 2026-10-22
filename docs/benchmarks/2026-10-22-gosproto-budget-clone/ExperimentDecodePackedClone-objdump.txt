@@ -1,0 +1,41 @@
+TEXT github.com/cnooljaw/gosproto.ExperimentDecodePackedClone(SB) /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-budget-clone-20261022/gosproto/experiment_public_clone.go
+  experiment_public_clone.go:3	0x100154e20		f9400b90		MOVD 16(R28), R16
+  experiment_public_clone.go:3	0x100154e24		eb3063ff		CMP R16, RSP
+  experiment_public_clone.go:3	0x100154e28		54000369		BLS 27(PC)
+  experiment_public_clone.go:3	0x100154e2c		f81b0ffe		MOVD.W R30, -80(RSP)
+  experiment_public_clone.go:3	0x100154e30		f81f83fd		MOVD R29, -8(RSP)
+  experiment_public_clone.go:3	0x100154e34		d10023fd		SUB $8, RSP, R29
+  experiment_public_clone.go:3	0x100154e38		f9002fe0		MOVD R0, 88(RSP)
+  experiment_public_clone.go:5	0x100154e3c		f9003fe4		MOVD R4, 120(RSP)
+  experiment_public_clone.go:5	0x100154e40		f9003be3		MOVD R3, 112(RSP)
+  experiment_public_clone.go:4	0x100154e44		b26903e3		ORR $8388608, ZR, R3
+  experiment_public_clone.go:4	0x100154e48		97fffe2a		CALL github.com/cnooljaw/gosproto.ExperimentUnpackClone(SB)
+  experiment_public_clone.go:5	0x100154e4c		b40000c3		CBZ R3, 6(PC)
+  experiment_public_clone.go:5	0x100154e50		aa0303e0		MOVD R3, R0
+  experiment_public_clone.go:5	0x100154e54		aa0403e1		MOVD R4, R1
+  experiment_public_clone.go:5	0x100154e58		f85f83fd		MOVD -8(RSP), R29
+  experiment_public_clone.go:5	0x100154e5c		f84507fe		MOVD.P 80(RSP), R30
+  experiment_public_clone.go:5	0x100154e60		d65f03c0		RET
+  experiment_public_clone.go:6	0x100154e64		d503201f		NOOP
+  decode.go:414			0x100154e68		f9403be3		MOVD 112(RSP), R3
+  decode.go:414			0x100154e6c		f9403fe4		MOVD 120(RSP), R4
+  decode.go:414			0x100154e70		aa1f03e5		MOVD ZR, R5
+  decode.go:414			0x100154e74		aa0503e6		MOVD R5, R6
+  decode.go:414			0x100154e78		aa0503e7		MOVD R5, R7
+  decode.go:414			0x100154e7c		97ffef19		CALL github.com/cnooljaw/gosproto.DecodeWithLimits(SB)
+  experiment_public_clone.go:7	0x100154e80		aa0103e0		MOVD R1, R0
+  experiment_public_clone.go:7	0x100154e84		aa0203e1		MOVD R2, R1
+  experiment_public_clone.go:7	0x100154e88		f85f83fd		MOVD -8(RSP), R29
+  experiment_public_clone.go:7	0x100154e8c		f84507fe		MOVD.P 80(RSP), R30
+  experiment_public_clone.go:7	0x100154e90		d65f03c0		RET
+  experiment_public_clone.go:3	0x100154e94		a90087e0		STP (R0, R1), 8(RSP)
+  experiment_public_clone.go:3	0x100154e98		a9018fe2		STP (R2, R3), 24(RSP)
+  experiment_public_clone.go:3	0x100154e9c		f90017e4		MOVD R4, 40(RSP)
+  experiment_public_clone.go:3	0x100154ea0		aa1e03e3		MOVD R30, R3
+  experiment_public_clone.go:3	0x100154ea4		97fc8457		CALL runtime.morestack_noctxt.abi0(SB)
+  experiment_public_clone.go:3	0x100154ea8		a94087e0		LDP 8(RSP), (R0, R1)
+  experiment_public_clone.go:3	0x100154eac		a9418fe2		LDP 24(RSP), (R2, R3)
+  experiment_public_clone.go:3	0x100154eb0		f94017e4		MOVD 40(RSP), R4
+  experiment_public_clone.go:3	0x100154eb4		17ffffdb		JMP github.com/cnooljaw/gosproto.ExperimentDecodePackedClone(SB)
+  experiment_public_clone.go:3	0x100154eb8		00000000		?
+  experiment_public_clone.go:3	0x100154ebc		00000000		?

@@ -1,0 +1,39 @@
+"""递减预算公开入口：同一冻结二进制加入同源函数clone控制，不扣除控制值。"""
+from pathlib import Path
+import subprocess,io,tarfile,json,os,time,hashlib,sys
+here=Path(__file__).resolve().parent;root=here.parents[2];out=Path(sys.argv[1]).resolve();out.mkdir(exist_ok=False);commands=[];sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def run(args,cwd,env=None):
+ t=time.monotonic();r=subprocess.run(args,cwd=cwd,env={**os.environ,**(env or {})},capture_output=True,text=True,timeout=120);commands.append(dict(args=args,cwd=str(cwd),env=env or {},exitCode=r.returncode,seconds=time.monotonic()-t,output=r.stdout+r.stderr));(here/'commands.json').write_text(json.dumps(commands,indent=2)+'\n');assert r.returncode==0,r.stdout+r.stderr;return r.stdout+r.stderr
+plan={'commits':{},'binaries':{},'sources':{},'fixtures':{},'orders':[]};env={'GOMAXPROCS':'1','GOGC':'100','GOMEMLIMIT':'off','GOPROXY':'off'}
+lib=out/'gosproto';lib.mkdir();commit=run(['git','rev-parse','92a155a'],'/private/tmp/gsr-gosproto-fork').strip()
+with tarfile.open(fileobj=io.BytesIO(subprocess.check_output(['git','archive',commit],cwd='/private/tmp/gsr-gosproto-fork'))) as t:t.extractall(lib,filter='data')
+source=(lib/'pack.go').read_text();old=source[source.index('func UnpackWithLimit('):].replace('func UnpackWithLimit(','func ExperimentUnpackOriginal(',1)
+
+start=source.index('func UnpackWithLimit(')
+body=source[start:]
+body=body.replace('size := 0','budget := maxBytes',1).replace('maxBytes - size','budget').replace('maxBytes-size','budget').replace('size += produced','budget -= produced',1)
+body=body.replace('unpacked := make([]byte, size)','size := maxBytes - budget\n\tunpacked := make([]byte, size)',1)
+candidate=source[:start]+body
+assert candidate!=source
+(lib/'pack.go').write_text(candidate);(lib/'experiment.go').write_text('package sproto\nimport ("math/bits")\n'+old)
+(lib/'experiment_public.go').write_text('package sproto\n'+'// ExperimentDecodePacked 仅为隔离测量保留基线公开入口的调用层次。\nfunc ExperimentDecodePacked(data []byte, sp interface{}) error {\n unpacked, err := ExperimentUnpackOriginal(data, 8<<20)\n if err != nil { return err }\n _, err = Decode(unpacked, sp)\n return err\n}\n')
+clone=old.replace('func ExperimentUnpackOriginal(', 'func ExperimentUnpackClone(',1)
+(lib/'experiment_clone.go').write_text('package sproto\nimport "math/bits"\n'+clone)
+originalPublic=(lib/'experiment_public.go').read_text()
+(lib/'experiment_public_clone.go').write_text(originalPublic.replace('ExperimentDecodePacked','ExperimentDecodePackedClone').replace('ExperimentUnpackOriginal','ExperimentUnpackClone'))
+(lib/'preflight_cap_test.go').write_bytes((here/'comparison.go.txt').read_bytes())
+run(['go','test','-race','-gcflags=all=-d=checkptr=2','-run','^TestPreflightCapComparison$','.','-timeout=2m'],lib,env)
+h=out/'harness';h.mkdir()
+for n in ['protocol_benchmark_test.go','representative_benchmark_test.go','unpack_benchmark_test.go','cases.json','representative.json']:(h/n).write_bytes((root/'examples/websocket-gate/benchmarks'/n).read_bytes())
+(h/'experiment_test.go').write_bytes((here/'experiment.go.txt').read_bytes());(h/'go.sum').write_bytes((root/'go.sum').read_bytes())
+(h/'go.mod').write_text('module spreadpairs\n\ngo 1.24.0\n\nrequire (\ngithub.com/cnooljaw/gsr v0.0.0\ngithub.com/cnooljaw/gosproto v0.4.0\ngoogle.golang.org/protobuf v1.36.1\n)\nreplace github.com/cnooljaw/gsr => '+str(root)+'\nreplace github.com/cnooljaw/gosproto => '+str(lib)+'\n')
+run(['gofmt','-w','pack.go','experiment.go'],lib);run(['gofmt','-w','experiment_test.go'],h);run(['go','test','-mod=mod','-run','^TestRepresentativeFixtures$','.'],h,env);binary=out/'pairs.test';run(['go','test','-mod=mod','-c','-o',str(binary),'.'],h,env)
+plan=dict(commit=commit,binarySha256=sha(binary),sources={str(f.relative_to(out)):sha(f) for d in [lib,h] for f in [*d.glob('*.go'),*d.glob('*.s')]},cases=[('int32_edges','public'),('game_large','public'),('addressbook','public'),('echo_ascii4k','public')],modes=['self','clone1','pass1','pass2','clone2'])
+(here/'plan.json').write_text(json.dumps(plan,indent=2)+'\n')
+for mode in plan['modes']:
+ for name,op in plan['cases']:
+  output=out/f'{mode}-{name}-{op}.json'
+  run([str(binary),'-test.run=^TestStringInProcessExperiment$','-test.timeout=1m'],h,{**env,'GSR_CASE':name,'GSR_OP':op,'GSR_MODE':mode,'GSR_OUTPUT':str(output)})
+  (here/output.name).write_bytes(output.read_bytes());print(mode,name,op,'done',flush=True)
+for n,v in plan['sources'].items():assert sha(out/n)==v
+assert sha(binary)==plan['binarySha256'];plan['hashesVerifiedAfter']=True;(here/'plan.json').write_text(json.dumps(plan,indent=2)+'\n');print('all fingerprints verified',flush=True)
