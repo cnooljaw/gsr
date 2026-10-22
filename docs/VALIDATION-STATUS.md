@@ -1,5 +1,7 @@
 # 当前阶段验证清单
 
+2026-10-22最新实验：[递减剩余预算](benchmarks/2026-10-22-gosproto-preflight-budget/RESULTS.md)完成45进程4320块，保留候选待确认、未应用生产。整数Unpack两遍改善2.52%/1.07%，大型公开DecodePacked改善1.53%/1.71%；整数公开入口反转，高密度word有代价，栈帧144→160B。全部小收益、控制与尾差保留，下一步补同源clone控制，不设固定比例门槛。差分native/purego race/checkptr、完整库官方oracle及指纹复核通过。前轮已提交cad81b6，新报告未提交；库92a155a、正式依赖及十项用户删除保持。
+
 2026-10-22最新实验：[普通word独立预检](benchmarks/2026-10-22-gosproto-preflight-ordinary/RESULTS.md)完成45进程4320块，含真实DecodePacked复核。稀疏word改善约16%～18%，但混合整数Unpack慢约1.4%，公开整数PDecode中位慢0.57%/6.49%，未采用通用替换；全部小收益、累计反向与控制保留。native/purego差分race/checkptr、完整库官方oracle及来源核对通过。前轮报告已提交8438a42；新实验未提交，库92a155a、正式依赖及十项用户删除保持。
 
 2026-10-22最新实验：[Unpack预检收紧临时切片容量](benchmarks/2026-10-22-gosproto-preflight-cap/RESULTS.md)完成33进程3168交错块，未采用通用替换。稀疏word两遍改善12.37%/6.89%，但整数数组PDecode中位慢1.14%/0.95%，6/7非零word明显退化；全部小收益、累计反向、自对照及校准不足保留，不设百分比采纳门槛。native/purego差分race/checkptr、完整库官方oracle及来源核对通过。前轮诊断已提交2d95255，新报告未提交；库92a155a、正式依赖及十项用户删除保持。
