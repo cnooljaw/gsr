@@ -1,0 +1,48 @@
+File: body.test
+Type: cpu
+Time: 2026-10-22 15:53:55 CST
+Duration: 2.54s, Total samples = 2.31s (90.98%)
+Showing nodes accounting for 1.95s, 84.42% of 2.31s total
+Dropped 45 nodes (cum <= 0.01s)
+Showing top 40 nodes out of 61
+      flat  flat%   sum%        cum   cum%
+         0     0%     0%      1.21s 52.38%  github.com/cnooljaw/gosproto.DecodePacked
+         0     0%     0%      1.21s 52.38%  gosprotobodystudy.BenchmarkBodyCost
+         0     0%     0%      1.21s 52.38%  gosprotobodystudy.representativeOperations.func8
+         0     0%     0%      1.21s 52.38%  testing.(*B).run1.func1
+         0     0%     0%      1.21s 52.38%  testing.(*B).runN
+         0     0%     0%      1.16s 50.22%  runtime.systemstack
+     1.03s 44.59% 44.59%      1.03s 44.59%  runtime.kevent
+         0     0% 44.59%      1.03s 44.59%  runtime.netpoll
+         0     0% 44.59%      1.03s 44.59%  runtime.startTheWorldWithSema
+         0     0% 44.59%      0.92s 39.83%  github.com/cnooljaw/gosproto.Decode (inline)
+         0     0% 44.59%      0.92s 39.83%  github.com/cnooljaw/gosproto.DecodeWithLimits
+     0.01s  0.43% 45.02%      0.90s 38.96%  github.com/cnooljaw/gosproto.decodeMessage
+     0.03s  1.30% 46.32%      0.83s 35.93%  github.com/cnooljaw/gosproto.decodeStructSlice
+         0     0% 46.32%      0.58s 25.11%  runtime.gcStart.func4
+     0.17s  7.36% 53.68%      0.46s 19.91%  github.com/cnooljaw/gosproto.decodeIntegerRecord
+     0.16s  6.93% 60.61%      0.46s 19.91%  runtime.mallocgc
+         0     0% 60.61%      0.45s 19.48%  runtime.gcMarkTermination.func3
+         0     0% 60.61%      0.29s 12.55%  github.com/cnooljaw/gosproto.Unpack (inline)
+     0.11s  4.76% 65.37%      0.29s 12.55%  github.com/cnooljaw/gosproto.UnpackWithLimit
+         0     0% 65.37%      0.28s 12.12%  runtime.newobject
+     0.01s  0.43% 65.80%      0.24s 10.39%  reflect.New
+     0.03s  1.30% 67.10%      0.17s  7.36%  reflect.unsafe_New
+         0     0% 67.10%      0.15s  6.49%  github.com/cnooljaw/gosproto.unpackVector (inline)
+     0.15s  6.49% 73.59%      0.15s  6.49%  github.com/cnooljaw/gosproto.unpackVectorARM64
+     0.08s  3.46% 77.06%      0.13s  5.63%  runtime.mallocgcTiny
+     0.04s  1.73% 78.79%      0.09s  3.90%  runtime.mallocgcSmallScanNoHeader
+     0.01s  0.43% 79.22%      0.08s  3.46%  runtime.deductAssistCredit
+         0     0% 79.22%      0.07s  3.03%  runtime.gcAssistAlloc
+         0     0% 79.22%      0.07s  3.03%  runtime.gcAssistAlloc.func2
+         0     0% 79.22%      0.07s  3.03%  runtime.gcAssistAlloc1
+         0     0% 79.22%      0.07s  3.03%  runtime.gcDrainN
+     0.04s  1.73% 80.95%      0.06s  2.60%  reflect.(*rtype).ptrTo
+         0     0% 80.95%      0.06s  2.60%  reflect.ptrTo (inline)
+     0.01s  0.43% 81.39%      0.05s  2.16%  runtime.scanobject
+         0     0% 81.39%      0.04s  1.73%  runtime.(*mheap).alloc.func1
+         0     0% 81.39%      0.04s  1.73%  runtime.(*mheap).allocSpan
+     0.04s  1.73% 83.12%      0.04s  1.73%  runtime.madvise
+     0.03s  1.30% 84.42%      0.04s  1.73%  runtime.nextFreeFast (inline)
+         0     0% 84.42%      0.04s  1.73%  runtime.sysUsed (inline)
+         0     0% 84.42%      0.04s  1.73%  runtime.sysUsedOS (inline)

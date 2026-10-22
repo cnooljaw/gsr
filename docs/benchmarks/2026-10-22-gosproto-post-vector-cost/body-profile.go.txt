@@ -1,0 +1,45 @@
+package benchmarks
+
+import (
+ "encoding/json"
+ "os"
+ "runtime"
+ "runtime/pprof"
+ "testing"
+ "time"
+)
+
+// BenchmarkBodyCost 只采同一代表消息的一种公开正文操作，解码始终创建独占结果。
+func BenchmarkBodyCost(b *testing.B) {
+ name,operationName:=os.Getenv("GSR_BODY_CASE"),os.Getenv("GSR_BODY_OP")
+ kind,output:=os.Getenv("GSR_PROFILE_KIND"),os.Getenv("GSR_PROFILE_META")
+ if runtime.GOMAXPROCS(0)!=1||output==""||(kind!="cpu"&&kind!="allocation") {b.Fatal("explicit case/op/kind/meta and GOMAXPROCS1 required")}
+ var selected func()error
+ for _,sample:=range representativeCases(b) {
+  if sample.Name!=name {continue}
+  operations,_:=representativeOperations(b,sample)
+  for _,op:=range operations {if op.name==operationName {selected=op.run}}
+ }
+ if selected==nil {b.Fatal("unknown case/op",name,operationName)}
+ encodedSink,representativeSink,decodedSink=nil,nil,""
+ runtime.GC()
+ start:=time.Now()
+ for time.Since(start)<50*time.Millisecond {for range 64 {if err:=selected();err!=nil {b.Fatal(err)}}}
+ var before,after runtime.MemStats
+ runtime.ReadMemStats(&before)
+ var cpu *os.File
+ if kind=="cpu" {
+  var err error
+  cpu,err=os.Create(os.Getenv("GSR_PROFILE_CPU"));if err!=nil {b.Fatal(err)}
+  if err:=pprof.StartCPUProfile(cpu);err!=nil {b.Fatal(err)}
+ }
+ b.ReportAllocs();b.ResetTimer()
+ for b.Loop() {if err:=selected();err!=nil {b.Fatal(err)}}
+ b.StopTimer()
+ if cpu!=nil {pprof.StopCPUProfile();if err:=cpu.Close();err!=nil {b.Fatal(err)}}
+ runtime.ReadMemStats(&after)
+ runtime.KeepAlive(selected)
+ raw,err:=json.MarshalIndent(struct{Case,Operation,Kind string;Calls int;Before,After runtime.MemStats}{name,operationName,kind,b.N,before,after},"","  ")
+ if err!=nil {b.Fatal(err)}
+ if err:=os.WriteFile(output,append(raw,'\n'),0644);err!=nil {b.Fatal(err)}
+}

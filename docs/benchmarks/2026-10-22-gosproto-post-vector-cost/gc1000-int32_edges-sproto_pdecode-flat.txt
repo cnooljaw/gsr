@@ -1,0 +1,48 @@
+File: body.test
+Type: cpu
+Time: 2026-10-22 15:55:41 CST
+Duration: 2.47s, Total samples = 2.17s (87.79%)
+Showing nodes accounting for 2.10s, 96.77% of 2.17s total
+Dropped 27 nodes (cum <= 0.01s)
+Showing top 40 nodes out of 45
+      flat  flat%   sum%        cum   cum%
+     0.75s 34.56% 34.56%      1.63s 75.12%  github.com/cnooljaw/gosproto.UnpackWithLimit
+     0.53s 24.42% 58.99%      0.53s 24.42%  github.com/cnooljaw/gosproto.unpackVectorARM64
+     0.21s  9.68% 68.66%      0.21s  9.68%  runtime.madvise
+     0.15s  6.91% 75.58%      0.25s 11.52%  github.com/cnooljaw/gosproto.decodeIntSlice
+     0.15s  6.91% 82.49%      0.15s  6.91%  math/bits.OnesCount8 (inline)
+     0.14s  6.45% 88.94%      0.14s  6.45%  runtime.memclrNoHeapPointers
+     0.03s  1.38% 90.32%      0.03s  1.38%  runtime.kevent
+     0.02s  0.92% 91.24%      0.02s  0.92%  internal/runtime/atomic.(*Uint64).Add (inline)
+     0.02s  0.92% 92.17%      0.02s  0.92%  runtime.(*gcBits).bytep (inline)
+     0.02s  0.92% 93.09%      0.02s  0.92%  runtime.(*gcBitsArena).tryAlloc (inline)
+     0.02s  0.92% 94.01%      0.02s  0.92%  runtime.(*spanSet).pop
+     0.01s  0.46% 94.47%      0.10s  4.61%  runtime.(*mcache).refill
+     0.01s  0.46% 94.93%      0.02s  0.92%  runtime.gcTrigger.test
+     0.01s  0.46% 95.39%      0.29s 13.36%  runtime.makeslice
+     0.01s  0.46% 95.85%      0.29s 13.36%  runtime.mallocgc
+     0.01s  0.46% 96.31%      0.28s 12.90%  runtime.mallocgcSmallNoscan
+     0.01s  0.46% 96.77%      0.02s  0.92%  runtime.newstack
+         0     0% 96.77%      0.27s 12.44%  github.com/cnooljaw/gosproto.Decode (inline)
+         0     0% 96.77%      1.90s 87.56%  github.com/cnooljaw/gosproto.DecodePacked
+         0     0% 96.77%      0.27s 12.44%  github.com/cnooljaw/gosproto.DecodeWithLimits
+         0     0% 96.77%      1.63s 75.12%  github.com/cnooljaw/gosproto.Unpack (inline)
+         0     0% 96.77%      0.25s 11.52%  github.com/cnooljaw/gosproto.decodeMessage
+         0     0% 96.77%      0.53s 24.42%  github.com/cnooljaw/gosproto.unpackVector (inline)
+         0     0% 96.77%      1.90s 87.56%  gosprotobodystudy.BenchmarkBodyCost
+         0     0% 96.77%      1.90s 87.56%  gosprotobodystudy.representativeOperations.func8
+         0     0% 96.77%      0.10s  4.61%  runtime.(*mcache).nextFree
+         0     0% 96.77%      0.08s  3.69%  runtime.(*mcentral).cacheSpan
+         0     0% 96.77%      0.02s  0.92%  runtime.(*mcentral).grow
+         0     0% 96.77%      0.02s  0.92%  runtime.(*mheap).alloc
+         0     0% 96.77%      0.22s 10.14%  runtime.(*mheap).alloc.func1
+         0     0% 96.77%      0.22s 10.14%  runtime.(*mheap).allocSpan
+         0     0% 96.77%      0.02s  0.92%  runtime.(*mheap).initSpan
+         0     0% 96.77%      0.02s  0.92%  runtime.(*sweepLocked).sweep
+         0     0% 96.77%      0.02s  0.92%  runtime.deductSweepCredit
+         0     0% 96.77%      0.03s  1.38%  runtime.gcStart.func4
+         0     0% 96.77%      0.03s  1.38%  runtime.netpoll
+         0     0% 96.77%      0.02s  0.92%  runtime.newAllocBits (inline)
+         0     0% 96.77%      0.02s  0.92%  runtime.newMarkBits
+         0     0% 96.77%      0.03s  1.38%  runtime.startTheWorldWithSema
+         0     0% 96.77%      0.02s  0.92%  runtime.sweepone

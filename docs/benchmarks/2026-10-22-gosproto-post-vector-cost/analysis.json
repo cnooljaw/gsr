@@ -1,0 +1,6343 @@
+{
+  "scope": "18 independent profiles, no paired timings; percentages have each full profile denominator, parent-child not summed, allocation includes setup/warmup",
+  "loops": [
+    {
+      "case": "game_large",
+      "op": "sproto_decode",
+      "kind": "cpu",
+      "calls": 186639,
+      "profiledNsPerOp": 13088.0,
+      "loopBytes": 10416,
+      "loopAllocs": 532,
+      "gcCycles": 910
+    },
+    {
+      "case": "game_large",
+      "op": "sproto_decode",
+      "kind": "allocation",
+      "calls": 5000,
+      "profiledNsPerOp": 779994.0,
+      "loopBytes": 10416,
+      "loopAllocs": 532,
+      "gcCycles": 14
+    },
+    {
+      "case": "game_large",
+      "op": "sproto_unpack",
+      "kind": "cpu",
+      "calls": 560163,
+      "profiledNsPerOp": 4533.0,
+      "loopBytes": 3456,
+      "loopAllocs": 1,
+      "gcCycles": 870
+    },
+    {
+      "case": "game_large",
+      "op": "sproto_unpack",
+      "kind": "allocation",
+      "calls": 5000,
+      "profiledNsPerOp": 4907.0,
+      "loopBytes": 3456,
+      "loopAllocs": 1,
+      "gcCycles": 5
+    },
+    {
+      "case": "game_large",
+      "op": "sproto_pdecode",
+      "kind": "cpu",
+      "calls": 139359,
+      "profiledNsPerOp": 17566.0,
+      "loopBytes": 13872,
+      "loopAllocs": 533,
+      "gcCycles": 913
+    },
+    {
+      "case": "game_large",
+      "op": "sproto_pdecode",
+      "kind": "allocation",
+      "calls": 5000,
+      "profiledNsPerOp": 822456.0,
+      "loopBytes": 13872,
+      "loopAllocs": 533,
+      "gcCycles": 19
+    },
+    {
+      "case": "int32_edges",
+      "op": "sproto_decode",
+      "kind": "cpu",
+      "calls": 1450360,
+      "profiledNsPerOp": 1680.0,
+      "loopBytes": 8288,
+      "loopAllocs": 4,
+      "gcCycles": 5283
+    },
+    {
+      "case": "int32_edges",
+      "op": "sproto_decode",
+      "kind": "allocation",
+      "calls": 5000,
+      "profiledNsPerOp": 6942.0,
+      "loopBytes": 8288,
+      "loopAllocs": 4,
+      "gcCycles": 14
+    },
+    {
+      "case": "int32_edges",
+      "op": "sproto_unpack",
+      "kind": "cpu",
+      "calls": 511330,
+      "profiledNsPerOp": 4868.0,
+      "loopBytes": 4096,
+      "loopAllocs": 1,
+      "gcCycles": 919
+    },
+    {
+      "case": "int32_edges",
+      "op": "sproto_unpack",
+      "kind": "allocation",
+      "calls": 5000,
+      "profiledNsPerOp": 5690.0,
+      "loopBytes": 4096,
+      "loopAllocs": 1,
+      "gcCycles": 6
+    },
+    {
+      "case": "int32_edges",
+      "op": "sproto_pdecode",
+      "kind": "cpu",
+      "calls": 380608,
+      "profiledNsPerOp": 6472.0,
+      "loopBytes": 12384,
+      "loopAllocs": 5,
+      "gcCycles": 2073
+    },
+    {
+      "case": "int32_edges",
+      "op": "sproto_pdecode",
+      "kind": "allocation",
+      "calls": 5000,
+      "profiledNsPerOp": 15991.0,
+      "loopBytes": 12384,
+      "loopAllocs": 5,
+      "gcCycles": 20
+    },
+    {
+      "case": "echo_ascii4k",
+      "op": "sproto_decode",
+      "kind": "cpu",
+      "calls": 3204956,
+      "profiledNsPerOp": 779.5,
+      "loopBytes": 4176,
+      "loopAllocs": 5,
+      "gcCycles": 5892
+    },
+    {
+      "case": "echo_ascii4k",
+      "op": "sproto_decode",
+      "kind": "allocation",
+      "calls": 5000,
+      "profiledNsPerOp": 9380.0,
+      "loopBytes": 4176,
+      "loopAllocs": 5,
+      "gcCycles": 7
+    },
+    {
+      "case": "echo_ascii4k",
+      "op": "sproto_unpack",
+      "kind": "cpu",
+      "calls": 3368839,
+      "profiledNsPerOp": 733.2,
+      "loopBytes": 4864,
+      "loopAllocs": 1,
+      "gcCycles": 7277
+    },
+    {
+      "case": "echo_ascii4k",
+      "op": "sproto_unpack",
+      "kind": "allocation",
+      "calls": 5000,
+      "profiledNsPerOp": 1404.0,
+      "loopBytes": 4864,
+      "loopAllocs": 1,
+      "gcCycles": 8
+    },
+    {
+      "case": "echo_ascii4k",
+      "op": "sproto_pdecode",
+      "kind": "cpu",
+      "calls": 1593920,
+      "profiledNsPerOp": 1534.0,
+      "loopBytes": 9040,
+      "loopAllocs": 6,
+      "gcCycles": 6351
+    },
+    {
+      "case": "echo_ascii4k",
+      "op": "sproto_pdecode",
+      "kind": "allocation",
+      "calls": 5000,
+      "profiledNsPerOp": 11056.0,
+      "loopBytes": 9040,
+      "loopAllocs": 6,
+      "gcCycles": 15
+    }
+  ],
+  "symbols": {
+    "game_large-sproto_decode-cpu/flat": {
+      "runtime.kevent": {
+        "flat": "1.34s",
+        "flatPercent": 59.03,
+        "cum": "1.34s",
+        "cumPercent": 59.03
+      },
+      "github.com/cnooljaw/gosproto.decodeIntegerRecord": {
+        "flat": "0.12s",
+        "flatPercent": 5.29,
+        "cum": "0.43s",
+        "cumPercent": 18.94
+      },
+      "runtime.mallocgc": {
+        "flat": "0.12s",
+        "flatPercent": 5.29,
+        "cum": "0.47s",
+        "cumPercent": 20.7
+      },
+      "runtime.mallocgcTiny": {
+        "flat": "0.07s",
+        "flatPercent": 3.08,
+        "cum": "0.15s",
+        "cumPercent": 6.61
+      },
+      "github.com/cnooljaw/gosproto.decodeStructSlice": {
+        "flat": "0.04s",
+        "flatPercent": 1.76,
+        "cum": "0.80s",
+        "cumPercent": 35.24
+      },
+      "runtime.acquirem (inline)": {
+        "flat": "0.04s",
+        "flatPercent": 1.76,
+        "cum": "0.04s",
+        "cumPercent": 1.76
+      },
+      "runtime.mallocgcSmallScanNoHeader": {
+        "flat": "0.04s",
+        "flatPercent": 1.76,
+        "cum": "0.12s",
+        "cumPercent": 5.29
+      },
+      "runtime.memclrNoHeapPointers": {
+        "flat": "0.04s",
+        "flatPercent": 1.76,
+        "cum": "0.04s",
+        "cumPercent": 1.76
+      },
+      "gcWriteBarrier": {
+        "flat": "0.03s",
+        "flatPercent": 1.32,
+        "cum": "0.04s",
+        "cumPercent": 1.76
+      },
+      "github.com/cnooljaw/gosproto.countChunks": {
+        "flat": "0.03s",
+        "flatPercent": 1.32,
+        "cum": "0.06s",
+        "cumPercent": 2.64
+      },
+      "runtime.getMCache (inline)": {
+        "flat": "0.03s",
+        "flatPercent": 1.32,
+        "cum": "0.03s",
+        "cumPercent": 1.32
+      },
+      "runtime.newobject": {
+        "flat": "0.03s",
+        "flatPercent": 1.32,
+        "cum": "0.29s",
+        "cumPercent": 12.78
+      },
+      "runtime.typePointers.next": {
+        "flat": "0.03s",
+        "flatPercent": 1.32,
+        "cum": "0.03s",
+        "cumPercent": 1.32
+      },
+      "github.com/cnooljaw/gosproto.(*SprotoType).FieldByTag (inline)": {
+        "flat": "0.02s",
+        "flatPercent": 0.88,
+        "cum": "0.02s",
+        "cumPercent": 0.88
+      },
+      "github.com/cnooljaw/gosproto.(*decodeBudget).add (inline)": {
+        "flat": "0.02s",
+        "flatPercent": 0.88,
+        "cum": "0.02s",
+        "cumPercent": 0.88
+      },
+      "reflect.New": {
+        "flat": "0.02s",
+        "flatPercent": 0.88,
+        "cum": "0.20s",
+        "cumPercent": 8.81
+      },
+      "reflect.Value.UnsafePointer": {
+        "flat": "0.02s",
+        "flatPercent": 0.88,
+        "cum": "0.03s",
+        "cumPercent": 1.32
+      },
+      "runtime.nextFreeFast (inline)": {
+        "flat": "0.02s",
+        "flatPercent": 0.88,
+        "cum": "0.02s",
+        "cumPercent": 0.88
+      },
+      "github.com/cnooljaw/gosproto.decodeMessage": {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.88s",
+        "cumPercent": 38.77
+      },
+      "github.com/cnooljaw/gosproto.readChunk (inline)": {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.02s",
+        "cumPercent": 0.88
+      },
+      "reflect.unsafe_New": {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.17s",
+        "cumPercent": 7.49
+      },
+      "runtime.gcmarknewobject": {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.02s",
+        "cumPercent": 0.88
+      },
+      "runtime.newarray": {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.02s",
+        "cumPercent": 0.88
+      },
+      "runtime.scanobject": {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.05s",
+        "cumPercent": 2.2
+      },
+      "runtime.systemstack": {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "1.43s",
+        "cumPercent": 63.0
+      },
+      "github.com/cnooljaw/gosproto.Decode (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.89s",
+        "cumPercent": 39.21
+      },
+      "github.com/cnooljaw/gosproto.DecodeWithLimits": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.89s",
+        "cumPercent": 39.21
+      },
+      "github.com/cnooljaw/gosproto.decodeIntSlice": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.04s",
+        "cumPercent": 1.76
+      },
+      "gosprotobodystudy.BenchmarkBodyCost": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.90s",
+        "cumPercent": 39.65
+      },
+      "gosprotobodystudy.representativeOperations.func4": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.90s",
+        "cumPercent": 39.65
+      },
+      "reflect.MakeSlice": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.88
+      },
+      "reflect.unsafe_NewArray": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.88
+      },
+      "runtime.deductAssistCredit": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.06s",
+        "cumPercent": 2.64
+      },
+      "runtime.gcAssistAlloc": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.06s",
+        "cumPercent": 2.64
+      },
+      "runtime.gcAssistAlloc.func2": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.06s",
+        "cumPercent": 2.64
+      },
+      "runtime.gcAssistAlloc1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.06s",
+        "cumPercent": 2.64
+      },
+      "runtime.gcDrainN": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.06s",
+        "cumPercent": 2.64
+      },
+      "runtime.gcMarkTermination.func3": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.60s",
+        "cumPercent": 26.43
+      },
+      "runtime.gcStart.func4": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.74s",
+        "cumPercent": 32.6
+      },
+      "runtime.makeslice": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.04s",
+        "cumPercent": 1.76
+      }
+    },
+    "game_large-sproto_decode-cpu/cum": {
+      "runtime.systemstack": {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "1.43s",
+        "cumPercent": 63.0
+      },
+      "runtime.kevent": {
+        "flat": "1.34s",
+        "flatPercent": 59.03,
+        "cum": "1.34s",
+        "cumPercent": 59.03
+      },
+      "runtime.netpoll": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.34s",
+        "cumPercent": 59.03
+      },
+      "runtime.startTheWorldWithSema": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.34s",
+        "cumPercent": 59.03
+      },
+      "gosprotobodystudy.BenchmarkBodyCost": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.90s",
+        "cumPercent": 39.65
+      },
+      "gosprotobodystudy.representativeOperations.func4": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.90s",
+        "cumPercent": 39.65
+      },
+      "testing.(*B).run1.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.90s",
+        "cumPercent": 39.65
+      },
+      "testing.(*B).runN": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.90s",
+        "cumPercent": 39.65
+      },
+      "github.com/cnooljaw/gosproto.Decode (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.89s",
+        "cumPercent": 39.21
+      },
+      "github.com/cnooljaw/gosproto.DecodeWithLimits": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.89s",
+        "cumPercent": 39.21
+      },
+      "github.com/cnooljaw/gosproto.decodeMessage": {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.88s",
+        "cumPercent": 38.77
+      },
+      "github.com/cnooljaw/gosproto.decodeStructSlice": {
+        "flat": "0.04s",
+        "flatPercent": 1.76,
+        "cum": "0.80s",
+        "cumPercent": 35.24
+      },
+      "runtime.gcStart.func4": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.74s",
+        "cumPercent": 32.6
+      },
+      "runtime.gcMarkTermination.func3": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.60s",
+        "cumPercent": 26.43
+      },
+      "runtime.mallocgc": {
+        "flat": "0.12s",
+        "flatPercent": 5.29,
+        "cum": "0.47s",
+        "cumPercent": 20.7
+      },
+      "github.com/cnooljaw/gosproto.decodeIntegerRecord": {
+        "flat": "0.12s",
+        "flatPercent": 5.29,
+        "cum": "0.43s",
+        "cumPercent": 18.94
+      },
+      "runtime.newobject": {
+        "flat": "0.03s",
+        "flatPercent": 1.32,
+        "cum": "0.29s",
+        "cumPercent": 12.78
+      },
+      "reflect.New": {
+        "flat": "0.02s",
+        "flatPercent": 0.88,
+        "cum": "0.20s",
+        "cumPercent": 8.81
+      },
+      "reflect.unsafe_New": {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.17s",
+        "cumPercent": 7.49
+      },
+      "runtime.mallocgcTiny": {
+        "flat": "0.07s",
+        "flatPercent": 3.08,
+        "cum": "0.15s",
+        "cumPercent": 6.61
+      },
+      "runtime.mallocgcSmallScanNoHeader": {
+        "flat": "0.04s",
+        "flatPercent": 1.76,
+        "cum": "0.12s",
+        "cumPercent": 5.29
+      },
+      "github.com/cnooljaw/gosproto.countChunks": {
+        "flat": "0.03s",
+        "flatPercent": 1.32,
+        "cum": "0.06s",
+        "cumPercent": 2.64
+      },
+      "runtime.deductAssistCredit": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.06s",
+        "cumPercent": 2.64
+      },
+      "runtime.gcAssistAlloc": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.06s",
+        "cumPercent": 2.64
+      },
+      "runtime.gcAssistAlloc.func2": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.06s",
+        "cumPercent": 2.64
+      },
+      "runtime.gcAssistAlloc1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.06s",
+        "cumPercent": 2.64
+      },
+      "runtime.gcDrainN": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.06s",
+        "cumPercent": 2.64
+      },
+      "runtime.scanobject": {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.05s",
+        "cumPercent": 2.2
+      },
+      "gcWriteBarrier": {
+        "flat": "0.03s",
+        "flatPercent": 1.32,
+        "cum": "0.04s",
+        "cumPercent": 1.76
+      },
+      "github.com/cnooljaw/gosproto.decodeIntSlice": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.04s",
+        "cumPercent": 1.76
+      },
+      "runtime.acquirem (inline)": {
+        "flat": "0.04s",
+        "flatPercent": 1.76,
+        "cum": "0.04s",
+        "cumPercent": 1.76
+      },
+      "runtime.makeslice": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.04s",
+        "cumPercent": 1.76
+      },
+      "runtime.memclrNoHeapPointers": {
+        "flat": "0.04s",
+        "flatPercent": 1.76,
+        "cum": "0.04s",
+        "cumPercent": 1.76
+      },
+      "reflect.Value.UnsafePointer": {
+        "flat": "0.02s",
+        "flatPercent": 0.88,
+        "cum": "0.03s",
+        "cumPercent": 1.32
+      },
+      "runtime.getMCache (inline)": {
+        "flat": "0.03s",
+        "flatPercent": 1.32,
+        "cum": "0.03s",
+        "cumPercent": 1.32
+      },
+      "runtime.typePointers.next": {
+        "flat": "0.03s",
+        "flatPercent": 1.32,
+        "cum": "0.03s",
+        "cumPercent": 1.32
+      },
+      "github.com/cnooljaw/gosproto.(*SprotoType).FieldByTag (inline)": {
+        "flat": "0.02s",
+        "flatPercent": 0.88,
+        "cum": "0.02s",
+        "cumPercent": 0.88
+      },
+      "github.com/cnooljaw/gosproto.(*decodeBudget).add (inline)": {
+        "flat": "0.02s",
+        "flatPercent": 0.88,
+        "cum": "0.02s",
+        "cumPercent": 0.88
+      },
+      "github.com/cnooljaw/gosproto.readChunk (inline)": {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.02s",
+        "cumPercent": 0.88
+      },
+      "reflect.MakeSlice": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.88
+      }
+    },
+    "game_large-sproto_decode-allocation/objects": {
+      "github.com/cnooljaw/gosproto.decodeIntegerRecord": {
+        "flat": "984771",
+        "flatPercent": 57.21,
+        "cum": "984771",
+        "cumPercent": 57.21
+      },
+      "reflect.New": {
+        "flat": "662372",
+        "flatPercent": 38.48,
+        "cum": "662372",
+        "cumPercent": 38.48
+      },
+      "github.com/cnooljaw/gosproto.decodeMessage": {
+        "flat": "20516",
+        "flatPercent": 1.19,
+        "cum": "1702831",
+        "cumPercent": 98.92
+      },
+      "github.com/cnooljaw/gosproto.decodeIntSlice": {
+        "flat": "10258",
+        "flatPercent": 0.6,
+        "cum": "10258",
+        "cumPercent": 0.6
+      },
+      "github.com/cnooljaw/gosproto.decodeStringSlice": {
+        "flat": "10258",
+        "flatPercent": 0.6,
+        "cum": "20516",
+        "cumPercent": 1.19
+      },
+      "reflect.MakeSlice": {
+        "flat": "10258",
+        "flatPercent": 0.6,
+        "cum": "20516",
+        "cumPercent": 1.19
+      },
+      "reflect.unsafe_NewArray": {
+        "flat": "10258",
+        "flatPercent": 0.6,
+        "cum": "10258",
+        "cumPercent": 0.6
+      },
+      "github.com/cnooljaw/gosproto.DecodeWithLimits": {
+        "flat": "5129",
+        "flatPercent": 0.3,
+        "cum": "1713089",
+        "cumPercent": 99.52
+      },
+      "testing.(*B).runN": {
+        "flat": "2",
+        "flatPercent": 0.00012,
+        "cum": "1721244",
+        "cumPercent": 100.0
+      },
+      "github.com/cnooljaw/gosproto.Decode (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1713089",
+        "cumPercent": 99.52
+      },
+      "github.com/cnooljaw/gosproto.decodeStructSlice": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1651541",
+        "cumPercent": 95.94
+      },
+      "gosprotobodystudy.representativeOperations.func4": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1717883",
+        "cumPercent": 99.8
+      },
+      "testing.(*B).run1.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1721206",
+        "cumPercent": 100.0
+      }
+    },
+    "game_large-sproto_decode-allocation/space": {
+      "reflect.unsafe_NewArray": {
+        "flat": "6010.55kB",
+        "flatPercent": 11.42,
+        "cum": "6010.55kB",
+        "cumPercent": 11.42
+      },
+      "gosprotobodystudy.representativeMessages.func4": {
+        "flat": "801.56kB",
+        "flatPercent": 1.52,
+        "cum": "801.56kB",
+        "cumPercent": 1.52
+      },
+      "github.com/cnooljaw/gosproto.decodeMessage": {
+        "flat": "320.56kB",
+        "flatPercent": 0.61,
+        "cum": "50328.36kB",
+        "cumPercent": 95.65
+      },
+      "github.com/cnooljaw/gosproto.DecodeWithLimits": {
+        "flat": "240.42kB",
+        "flatPercent": 0.46,
+        "cum": "51370.19kB",
+        "cumPercent": 97.63
+      },
+      "reflect.MakeSlice": {
+        "flat": "240.42kB",
+        "flatPercent": 0.46,
+        "cum": "6250.97kB",
+        "cumPercent": 11.88
+      },
+      "github.com/cnooljaw/gosproto.decodeStringSlice": {
+        "flat": "160.28kB",
+        "flatPercent": 0.3,
+        "cum": "520.91kB",
+        "cumPercent": 0.99
+      },
+      "gosprotobodystudy.BenchmarkBodyCost": {
+        "flat": "12kB",
+        "flatPercent": 0.023,
+        "cum": "52602.76kB",
+        "cumPercent": 100.0
+      },
+      "testing.(*B).runN": {
+        "flat": "0.12kB",
+        "flatPercent": 0.00024,
+        "cum": "52607.25kB",
+        "cumPercent": 100.0
+      },
+      "github.com/cnooljaw/gosproto.Decode (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "51370.19kB",
+        "cumPercent": 97.63
+      },
+      "github.com/cnooljaw/gosproto.decodeStructSlice": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "36664.38kB",
+        "cumPercent": 69.68
+      },
+      "gosprotobodystudy.representativeOperations.func4": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "52161.42kB",
+        "cumPercent": 99.13
+      },
+      "testing.(*B).run1.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "52603.81kB",
+        "cumPercent": 100.0
+      }
+    },
+    "game_large-sproto_unpack-cpu/flat": {
+      "runtime.kevent": {
+        "flat": "0.77s",
+        "flatPercent": 33.62,
+        "cum": "0.77s",
+        "cumPercent": 33.62
+      },
+      "github.com/cnooljaw/gosproto.UnpackWithLimit": {
+        "flat": "0.66s",
+        "flatPercent": 28.82,
+        "cum": "1.49s",
+        "cumPercent": 65.07
+      },
+      "github.com/cnooljaw/gosproto.unpackVectorARM64": {
+        "flat": "0.54s",
+        "flatPercent": 23.58,
+        "cum": "0.54s",
+        "cumPercent": 23.58
+      },
+      "math/bits.OnesCount8 (inline)": {
+        "flat": "0.10s",
+        "flatPercent": 4.37,
+        "cum": "0.10s",
+        "cumPercent": 4.37
+      },
+      "runtime.scanblock": {
+        "flat": "0.04s",
+        "flatPercent": 1.75,
+        "cum": "0.05s",
+        "cumPercent": 2.18
+      },
+      "runtime.typePointers.next": {
+        "flat": "0.04s",
+        "flatPercent": 1.75,
+        "cum": "0.06s",
+        "cumPercent": 2.62
+      },
+      "runtime.(*mspan).typePointersOfUnchecked": {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.findRunnable": {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.scanobject": {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.10s",
+        "cumPercent": 4.37
+      },
+      "github.com/cnooljaw/gosproto.Unpack (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.49s",
+        "cumPercent": 65.07
+      },
+      "github.com/cnooljaw/gosproto.unpackVector (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.54s",
+        "cumPercent": 23.58
+      },
+      "gosprotobodystudy.BenchmarkBodyCost": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.49s",
+        "cumPercent": 65.07
+      },
+      "gosprotobodystudy.representativeOperations.func6": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.49s",
+        "cumPercent": 65.07
+      },
+      "runtime.deductAssistCredit": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.15s",
+        "cumPercent": 6.55
+      },
+      "runtime.gcAssistAlloc": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.15s",
+        "cumPercent": 6.55
+      },
+      "runtime.gcAssistAlloc.func2": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.15s",
+        "cumPercent": 6.55
+      },
+      "runtime.gcAssistAlloc1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.15s",
+        "cumPercent": 6.55
+      },
+      "runtime.gcDrainN": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.15s",
+        "cumPercent": 6.55
+      },
+      "runtime.gcMarkTermination.func3": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.30s",
+        "cumPercent": 13.1
+      },
+      "runtime.gcStart.func4": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.47s",
+        "cumPercent": 20.52
+      },
+      "runtime.gopreempt_m (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.goschedImpl": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.greyobject": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.makeslice": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.18s",
+        "cumPercent": 7.86
+      },
+      "runtime.mallocgc": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.18s",
+        "cumPercent": 7.86
+      },
+      "runtime.mallocgcSmallNoscan": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.31
+      },
+      "runtime.markroot": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.05s",
+        "cumPercent": 2.18
+      },
+      "runtime.markrootBlock": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.05s",
+        "cumPercent": 2.18
+      },
+      "runtime.morestack": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.netpoll": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.77s",
+        "cumPercent": 33.62
+      },
+      "runtime.newstack": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.schedule": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.startTheWorldWithSema": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.77s",
+        "cumPercent": 33.62
+      },
+      "runtime.systemstack": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.95s",
+        "cumPercent": 41.48
+      },
+      "testing.(*B).run1.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.49s",
+        "cumPercent": 65.07
+      },
+      "testing.(*B).runN": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.49s",
+        "cumPercent": 65.07
+      }
+    },
+    "game_large-sproto_unpack-cpu/cum": {
+      "github.com/cnooljaw/gosproto.Unpack (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.49s",
+        "cumPercent": 65.07
+      },
+      "github.com/cnooljaw/gosproto.UnpackWithLimit": {
+        "flat": "0.66s",
+        "flatPercent": 28.82,
+        "cum": "1.49s",
+        "cumPercent": 65.07
+      },
+      "gosprotobodystudy.BenchmarkBodyCost": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.49s",
+        "cumPercent": 65.07
+      },
+      "gosprotobodystudy.representativeOperations.func6": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.49s",
+        "cumPercent": 65.07
+      },
+      "testing.(*B).run1.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.49s",
+        "cumPercent": 65.07
+      },
+      "testing.(*B).runN": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.49s",
+        "cumPercent": 65.07
+      },
+      "runtime.systemstack": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.95s",
+        "cumPercent": 41.48
+      },
+      "runtime.kevent": {
+        "flat": "0.77s",
+        "flatPercent": 33.62,
+        "cum": "0.77s",
+        "cumPercent": 33.62
+      },
+      "runtime.netpoll": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.77s",
+        "cumPercent": 33.62
+      },
+      "runtime.startTheWorldWithSema": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.77s",
+        "cumPercent": 33.62
+      },
+      "github.com/cnooljaw/gosproto.unpackVector (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.54s",
+        "cumPercent": 23.58
+      },
+      "github.com/cnooljaw/gosproto.unpackVectorARM64": {
+        "flat": "0.54s",
+        "flatPercent": 23.58,
+        "cum": "0.54s",
+        "cumPercent": 23.58
+      },
+      "runtime.gcStart.func4": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.47s",
+        "cumPercent": 20.52
+      },
+      "runtime.gcMarkTermination.func3": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.30s",
+        "cumPercent": 13.1
+      },
+      "runtime.makeslice": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.18s",
+        "cumPercent": 7.86
+      },
+      "runtime.mallocgc": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.18s",
+        "cumPercent": 7.86
+      },
+      "runtime.deductAssistCredit": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.15s",
+        "cumPercent": 6.55
+      },
+      "runtime.gcAssistAlloc": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.15s",
+        "cumPercent": 6.55
+      },
+      "runtime.gcAssistAlloc.func2": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.15s",
+        "cumPercent": 6.55
+      },
+      "runtime.gcAssistAlloc1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.15s",
+        "cumPercent": 6.55
+      },
+      "runtime.gcDrainN": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.15s",
+        "cumPercent": 6.55
+      },
+      "math/bits.OnesCount8 (inline)": {
+        "flat": "0.10s",
+        "flatPercent": 4.37,
+        "cum": "0.10s",
+        "cumPercent": 4.37
+      },
+      "runtime.scanobject": {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.10s",
+        "cumPercent": 4.37
+      },
+      "runtime.typePointers.next": {
+        "flat": "0.04s",
+        "flatPercent": 1.75,
+        "cum": "0.06s",
+        "cumPercent": 2.62
+      },
+      "runtime.markroot": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.05s",
+        "cumPercent": 2.18
+      },
+      "runtime.markrootBlock": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.05s",
+        "cumPercent": 2.18
+      },
+      "runtime.scanblock": {
+        "flat": "0.04s",
+        "flatPercent": 1.75,
+        "cum": "0.05s",
+        "cumPercent": 2.18
+      },
+      "runtime.mallocgcSmallNoscan": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.31
+      },
+      "runtime.(*mspan).typePointersOfUnchecked": {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.findRunnable": {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.gopreempt_m (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.goschedImpl": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.greyobject": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.morestack": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.newstack": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.schedule": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      }
+    },
+    "game_large-sproto_unpack-allocation/objects": {
+      "github.com/cnooljaw/gosproto.UnpackWithLimit": {
+        "flat": "15241",
+        "flatPercent": 81.39,
+        "cum": "15241",
+        "cumPercent": 81.39
+      },
+      "reflect.New": {
+        "flat": "860",
+        "flatPercent": 4.59,
+        "cum": "860",
+        "cumPercent": 4.59
+      },
+      "reflect.Value.extendSlice": {
+        "flat": "451",
+        "flatPercent": 2.41,
+        "cum": "475",
+        "cumPercent": 2.54
+      },
+      "encoding/json.typeFields": {
+        "flat": "266",
+        "flatPercent": 1.42,
+        "cum": "449",
+        "cumPercent": 2.4
+      },
+      "github.com/cnooljaw/gosproto.decodeIntegerRecord": {
+        "flat": "192",
+        "flatPercent": 1.03,
+        "cum": "192",
+        "cumPercent": 1.03
+      },
+      "google.golang.org/protobuf/internal/encoding/json.(*Decoder).parseString": {
+        "flat": "186",
+        "flatPercent": 0.99,
+        "cum": "186",
+        "cumPercent": 0.99
+      },
+      "reflect.makeInt": {
+        "flat": "137",
+        "flatPercent": 0.73,
+        "cum": "137",
+        "cumPercent": 0.73
+      },
+      "google.golang.org/protobuf/internal/impl.(*int32Converter).GoValueOf": {
+        "flat": "135",
+        "flatPercent": 0.72,
+        "cum": "205",
+        "cumPercent": 1.09
+      },
+      "google.golang.org/protobuf/internal/encoding/json.normalizeToIntString": {
+        "flat": "104",
+        "flatPercent": 0.56,
+        "cum": "104",
+        "cumPercent": 0.56
+      },
+      "encoding/json.typeEncoder": {
+        "flat": "63",
+        "flatPercent": 0.34,
+        "cum": "401",
+        "cumPercent": 2.14
+      },
+      "google.golang.org/protobuf/internal/impl.(*uint32Converter).GoValueOf": {
+        "flat": "42",
+        "flatPercent": 0.22,
+        "cum": "109",
+        "cumPercent": 0.58
+      },
+      "google.golang.org/protobuf/internal/impl.(*MessageInfo).makeKnownFieldsFunc": {
+        "flat": "34",
+        "flatPercent": 0.18,
+        "cum": "146",
+        "cumPercent": 0.78
+      },
+      "encoding/json.(*decodeState).literalStore": {
+        "flat": "27",
+        "flatPercent": 0.14,
+        "cum": "223",
+        "cumPercent": 1.19
+      },
+      "encoding/json.(*decodeState).object": {
+        "flat": "21",
+        "flatPercent": 0.11,
+        "cum": "626",
+        "cumPercent": 3.34
+      },
+      "gosprotobodystudy.representativeOperations": {
+        "flat": "11",
+        "flatPercent": 0.059,
+        "cum": "2838",
+        "cumPercent": 15.16
+      },
+      "testing.newMatcher": {
+        "flat": "9",
+        "flatPercent": 0.048,
+        "cum": "96",
+        "cumPercent": 0.51
+      },
+      "encoding/json.cachedTypeFields": {
+        "flat": "7",
+        "flatPercent": 0.037,
+        "cum": "456",
+        "cumPercent": 2.44
+      },
+      "encoding/json.newStructEncoder (inline)": {
+        "flat": "5",
+        "flatPercent": 0.027,
+        "cum": "305",
+        "cumPercent": 1.63
+      },
+      "github.com/cnooljaw/gosproto.decodeMessage": {
+        "flat": "4",
+        "flatPercent": 0.021,
+        "cum": "332",
+        "cumPercent": 1.77
+      },
+      "testing.runBenchmarks": {
+        "flat": "4",
+        "flatPercent": 0.021,
+        "cum": "106",
+        "cumPercent": 0.57
+      },
+      "testing.(*M).Run": {
+        "flat": "3",
+        "flatPercent": 0.016,
+        "cum": "161",
+        "cumPercent": 0.86
+      },
+      "encoding/json.Unmarshal": {
+        "flat": "2",
+        "flatPercent": 0.011,
+        "cum": "638",
+        "cumPercent": 3.41
+      },
+      "google.golang.org/protobuf/internal/impl.(*MessageInfo).makeReflectFuncs": {
+        "flat": "2",
+        "flatPercent": 0.011,
+        "cum": "154",
+        "cumPercent": 0.82
+      },
+      "testing.(*B).runN": {
+        "flat": "2",
+        "flatPercent": 0.011,
+        "cum": "18599",
+        "cumPercent": 99.33
+      },
+      "encoding/json.Marshal": {
+        "flat": "1",
+        "flatPercent": 0.0053,
+        "cum": "295",
+        "cumPercent": 1.58
+      },
+      "encoding/json.MarshalIndent": {
+        "flat": "1",
+        "flatPercent": 0.0053,
+        "cum": "302",
+        "cumPercent": 1.61
+      },
+      "github.com/cnooljaw/gosproto.DecodeWithLimits": {
+        "flat": "1",
+        "flatPercent": 0.0053,
+        "cum": "334",
+        "cumPercent": 1.78
+      },
+      "gosprotobodystudy.BenchmarkBodyCost": {
+        "flat": "1",
+        "flatPercent": 0.0053,
+        "cum": "18555",
+        "cumPercent": 99.09
+      },
+      "gosprotobodystudy.representativeCases": {
+        "flat": "1",
+        "flatPercent": 0.0053,
+        "cum": "171",
+        "cumPercent": 0.91
+      },
+      "encoding/json.(*decodeState).array": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "507",
+        "cumPercent": 2.71
+      },
+      "encoding/json.(*decodeState).unmarshal": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "630",
+        "cumPercent": 3.36
+      },
+      "encoding/json.(*decodeState).value": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "630",
+        "cumPercent": 3.36
+      },
+      "encoding/json.(*encodeState).marshal": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "290",
+        "cumPercent": 1.55
+      },
+      "encoding/json.(*encodeState).reflectValue": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "290",
+        "cumPercent": 1.55
+      },
+      "encoding/json.indirect": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "324",
+        "cumPercent": 1.73
+      },
+      "encoding/json.newTypeEncoder": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "358",
+        "cumPercent": 1.91
+      },
+      "encoding/json.valueEncoder": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "277",
+        "cumPercent": 1.48
+      },
+      "github.com/cnooljaw/gosproto.Decode (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "334",
+        "cumPercent": 1.78
+      },
+      "github.com/cnooljaw/gosproto.Unpack (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "15241",
+        "cumPercent": 81.39
+      },
+      "github.com/cnooljaw/gosproto.decodeStructSlice": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "322",
+        "cumPercent": 1.72
+      }
+    },
+    "game_large-sproto_unpack-allocation/space": {
+      "gosprotobodystudy.BenchmarkBodyCost": {
+        "flat": "12kB",
+        "flatPercent": 0.023,
+        "cum": "51876.21kB",
+        "cumPercent": 100.0
+      },
+      "testing.(*B).runN": {
+        "flat": "0.12kB",
+        "flatPercent": 0.00024,
+        "cum": "51880.70kB",
+        "cumPercent": 100.0
+      },
+      "github.com/cnooljaw/gosproto.Unpack (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "51438.38kB",
+        "cumPercent": 99.12
+      },
+      "gosprotobodystudy.representativeOperations.func6": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "51435kB",
+        "cumPercent": 99.12
+      },
+      "testing.(*B).run1.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "51877.27kB",
+        "cumPercent": 100.0
+      }
+    },
+    "game_large-sproto_pdecode-cpu/flat": {
+      "runtime.kevent": {
+        "flat": "1.03s",
+        "flatPercent": 44.59,
+        "cum": "1.03s",
+        "cumPercent": 44.59
+      },
+      "github.com/cnooljaw/gosproto.decodeIntegerRecord": {
+        "flat": "0.17s",
+        "flatPercent": 7.36,
+        "cum": "0.46s",
+        "cumPercent": 19.91
+      },
+      "runtime.mallocgc": {
+        "flat": "0.16s",
+        "flatPercent": 6.93,
+        "cum": "0.46s",
+        "cumPercent": 19.91
+      },
+      "github.com/cnooljaw/gosproto.unpackVectorARM64": {
+        "flat": "0.15s",
+        "flatPercent": 6.49,
+        "cum": "0.15s",
+        "cumPercent": 6.49
+      },
+      "github.com/cnooljaw/gosproto.UnpackWithLimit": {
+        "flat": "0.11s",
+        "flatPercent": 4.76,
+        "cum": "0.29s",
+        "cumPercent": 12.55
+      },
+      "runtime.mallocgcTiny": {
+        "flat": "0.08s",
+        "flatPercent": 3.46,
+        "cum": "0.13s",
+        "cumPercent": 5.63
+      },
+      "reflect.(*rtype).ptrTo": {
+        "flat": "0.04s",
+        "flatPercent": 1.73,
+        "cum": "0.06s",
+        "cumPercent": 2.6
+      },
+      "runtime.madvise": {
+        "flat": "0.04s",
+        "flatPercent": 1.73,
+        "cum": "0.04s",
+        "cumPercent": 1.73
+      },
+      "runtime.mallocgcSmallScanNoHeader": {
+        "flat": "0.04s",
+        "flatPercent": 1.73,
+        "cum": "0.09s",
+        "cumPercent": 3.9
+      },
+      "github.com/cnooljaw/gosproto.decodeStructSlice": {
+        "flat": "0.03s",
+        "flatPercent": 1.3,
+        "cum": "0.83s",
+        "cumPercent": 35.93
+      },
+      "reflect.unsafe_New": {
+        "flat": "0.03s",
+        "flatPercent": 1.3,
+        "cum": "0.17s",
+        "cumPercent": 7.36
+      },
+      "runtime.nextFreeFast (inline)": {
+        "flat": "0.03s",
+        "flatPercent": 1.3,
+        "cum": "0.04s",
+        "cumPercent": 1.73
+      },
+      "github.com/cnooljaw/gosproto.(*SprotoType).FieldByTag (inline)": {
+        "flat": "0.02s",
+        "flatPercent": 0.87,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "github.com/cnooljaw/gosproto.countChunks": {
+        "flat": "0.02s",
+        "flatPercent": 0.87,
+        "cum": "0.03s",
+        "cumPercent": 1.3
+      },
+      "math/bits.OnesCount8 (inline)": {
+        "flat": "0.02s",
+        "flatPercent": 0.87,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "reflect.Value.UnsafePointer": {
+        "flat": "0.02s",
+        "flatPercent": 0.87,
+        "cum": "0.03s",
+        "cumPercent": 1.3
+      },
+      "runtime.(*mspan).base (inline)": {
+        "flat": "0.02s",
+        "flatPercent": 0.87,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.(*mspan).writeHeapBitsSmall": {
+        "flat": "0.02s",
+        "flatPercent": 0.87,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.typePointers.next": {
+        "flat": "0.02s",
+        "flatPercent": 0.87,
+        "cum": "0.03s",
+        "cumPercent": 1.3
+      },
+      "gcWriteBarrier": {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.03s",
+        "cumPercent": 1.3
+      },
+      "github.com/cnooljaw/gosproto.decodeIntSlice": {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.03s",
+        "cumPercent": 1.3
+      },
+      "github.com/cnooljaw/gosproto.decodeMessage": {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.90s",
+        "cumPercent": 38.96
+      },
+      "github.com/cnooljaw/gosproto.readChunk (inline)": {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "reflect.New": {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.24s",
+        "cumPercent": 10.39
+      },
+      "runtime.deductAssistCredit": {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.08s",
+        "cumPercent": 3.46
+      },
+      "runtime.findObject": {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.03s",
+        "cumPercent": 1.3
+      },
+      "runtime.resolveTypeOff": {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.scanobject": {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.05s",
+        "cumPercent": 2.16
+      },
+      "github.com/cnooljaw/gosproto.Decode (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.92s",
+        "cumPercent": 39.83
+      },
+      "github.com/cnooljaw/gosproto.DecodePacked": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.21s",
+        "cumPercent": 52.38
+      },
+      "github.com/cnooljaw/gosproto.DecodeWithLimits": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.92s",
+        "cumPercent": 39.83
+      },
+      "github.com/cnooljaw/gosproto.Unpack (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.29s",
+        "cumPercent": 12.55
+      },
+      "github.com/cnooljaw/gosproto.unpackVector (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.15s",
+        "cumPercent": 6.49
+      },
+      "gosprotobodystudy.BenchmarkBodyCost": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.21s",
+        "cumPercent": 52.38
+      },
+      "gosprotobodystudy.representativeOperations.func8": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.21s",
+        "cumPercent": 52.38
+      },
+      "reflect.(*rtype).typeOff (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "reflect.ptrTo (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.06s",
+        "cumPercent": 2.6
+      },
+      "reflect.resolveTypeOff": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.(*mheap).alloc.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.04s",
+        "cumPercent": 1.73
+      },
+      "runtime.(*mheap).allocSpan": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.04s",
+        "cumPercent": 1.73
+      }
+    },
+    "game_large-sproto_pdecode-cpu/cum": {
+      "github.com/cnooljaw/gosproto.DecodePacked": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.21s",
+        "cumPercent": 52.38
+      },
+      "gosprotobodystudy.BenchmarkBodyCost": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.21s",
+        "cumPercent": 52.38
+      },
+      "gosprotobodystudy.representativeOperations.func8": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.21s",
+        "cumPercent": 52.38
+      },
+      "testing.(*B).run1.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.21s",
+        "cumPercent": 52.38
+      },
+      "testing.(*B).runN": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.21s",
+        "cumPercent": 52.38
+      },
+      "runtime.systemstack": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.16s",
+        "cumPercent": 50.22
+      },
+      "runtime.kevent": {
+        "flat": "1.03s",
+        "flatPercent": 44.59,
+        "cum": "1.03s",
+        "cumPercent": 44.59
+      },
+      "runtime.netpoll": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.03s",
+        "cumPercent": 44.59
+      },
+      "runtime.startTheWorldWithSema": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.03s",
+        "cumPercent": 44.59
+      },
+      "github.com/cnooljaw/gosproto.Decode (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.92s",
+        "cumPercent": 39.83
+      },
+      "github.com/cnooljaw/gosproto.DecodeWithLimits": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.92s",
+        "cumPercent": 39.83
+      },
+      "github.com/cnooljaw/gosproto.decodeMessage": {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.90s",
+        "cumPercent": 38.96
+      },
+      "github.com/cnooljaw/gosproto.decodeStructSlice": {
+        "flat": "0.03s",
+        "flatPercent": 1.3,
+        "cum": "0.83s",
+        "cumPercent": 35.93
+      },
+      "runtime.gcStart.func4": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.58s",
+        "cumPercent": 25.11
+      },
+      "github.com/cnooljaw/gosproto.decodeIntegerRecord": {
+        "flat": "0.17s",
+        "flatPercent": 7.36,
+        "cum": "0.46s",
+        "cumPercent": 19.91
+      },
+      "runtime.mallocgc": {
+        "flat": "0.16s",
+        "flatPercent": 6.93,
+        "cum": "0.46s",
+        "cumPercent": 19.91
+      },
+      "runtime.gcMarkTermination.func3": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.45s",
+        "cumPercent": 19.48
+      },
+      "github.com/cnooljaw/gosproto.Unpack (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.29s",
+        "cumPercent": 12.55
+      },
+      "github.com/cnooljaw/gosproto.UnpackWithLimit": {
+        "flat": "0.11s",
+        "flatPercent": 4.76,
+        "cum": "0.29s",
+        "cumPercent": 12.55
+      },
+      "runtime.newobject": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.28s",
+        "cumPercent": 12.12
+      },
+      "reflect.New": {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.24s",
+        "cumPercent": 10.39
+      },
+      "reflect.unsafe_New": {
+        "flat": "0.03s",
+        "flatPercent": 1.3,
+        "cum": "0.17s",
+        "cumPercent": 7.36
+      },
+      "github.com/cnooljaw/gosproto.unpackVector (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.15s",
+        "cumPercent": 6.49
+      },
+      "github.com/cnooljaw/gosproto.unpackVectorARM64": {
+        "flat": "0.15s",
+        "flatPercent": 6.49,
+        "cum": "0.15s",
+        "cumPercent": 6.49
+      },
+      "runtime.mallocgcTiny": {
+        "flat": "0.08s",
+        "flatPercent": 3.46,
+        "cum": "0.13s",
+        "cumPercent": 5.63
+      },
+      "runtime.mallocgcSmallScanNoHeader": {
+        "flat": "0.04s",
+        "flatPercent": 1.73,
+        "cum": "0.09s",
+        "cumPercent": 3.9
+      },
+      "runtime.deductAssistCredit": {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.08s",
+        "cumPercent": 3.46
+      },
+      "runtime.gcAssistAlloc": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.07s",
+        "cumPercent": 3.03
+      },
+      "runtime.gcAssistAlloc.func2": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.07s",
+        "cumPercent": 3.03
+      },
+      "runtime.gcAssistAlloc1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.07s",
+        "cumPercent": 3.03
+      },
+      "runtime.gcDrainN": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.07s",
+        "cumPercent": 3.03
+      },
+      "reflect.(*rtype).ptrTo": {
+        "flat": "0.04s",
+        "flatPercent": 1.73,
+        "cum": "0.06s",
+        "cumPercent": 2.6
+      },
+      "reflect.ptrTo (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.06s",
+        "cumPercent": 2.6
+      },
+      "runtime.scanobject": {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.05s",
+        "cumPercent": 2.16
+      },
+      "runtime.(*mheap).alloc.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.04s",
+        "cumPercent": 1.73
+      },
+      "runtime.(*mheap).allocSpan": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.04s",
+        "cumPercent": 1.73
+      },
+      "runtime.madvise": {
+        "flat": "0.04s",
+        "flatPercent": 1.73,
+        "cum": "0.04s",
+        "cumPercent": 1.73
+      },
+      "runtime.nextFreeFast (inline)": {
+        "flat": "0.03s",
+        "flatPercent": 1.3,
+        "cum": "0.04s",
+        "cumPercent": 1.73
+      },
+      "runtime.sysUsed (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.04s",
+        "cumPercent": 1.73
+      },
+      "runtime.sysUsedOS (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.04s",
+        "cumPercent": 1.73
+      }
+    },
+    "game_large-sproto_pdecode-allocation/objects": {
+      "github.com/cnooljaw/gosproto.decodeIntegerRecord": {
+        "flat": "984775",
+        "flatPercent": 57.04,
+        "cum": "984775",
+        "cumPercent": 57.04
+      },
+      "reflect.New": {
+        "flat": "662372",
+        "flatPercent": 38.36,
+        "cum": "662372",
+        "cumPercent": 38.36
+      },
+      "github.com/cnooljaw/gosproto.decodeMessage": {
+        "flat": "20516",
+        "flatPercent": 1.19,
+        "cum": "1702835",
+        "cumPercent": 98.63
+      },
+      "github.com/cnooljaw/gosproto.decodeIntSlice": {
+        "flat": "10258",
+        "flatPercent": 0.59,
+        "cum": "10258",
+        "cumPercent": 0.59
+      },
+      "github.com/cnooljaw/gosproto.decodeStringSlice": {
+        "flat": "10258",
+        "flatPercent": 0.59,
+        "cum": "20516",
+        "cumPercent": 1.19
+      },
+      "reflect.MakeSlice": {
+        "flat": "10258",
+        "flatPercent": 0.59,
+        "cum": "20516",
+        "cumPercent": 1.19
+      },
+      "reflect.unsafe_NewArray": {
+        "flat": "10258",
+        "flatPercent": 0.59,
+        "cum": "10258",
+        "cumPercent": 0.59
+      },
+      "github.com/cnooljaw/gosproto.DecodeWithLimits": {
+        "flat": "5129",
+        "flatPercent": 0.3,
+        "cum": "1713093",
+        "cumPercent": 99.22
+      },
+      "testing.(*B).runN": {
+        "flat": "2",
+        "flatPercent": 0.00012,
+        "cum": "1726375",
+        "cumPercent": 100.0
+      },
+      "github.com/cnooljaw/gosproto.Decode (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1713093",
+        "cumPercent": 99.22
+      },
+      "github.com/cnooljaw/gosproto.DecodePacked": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1717887",
+        "cumPercent": 99.5
+      },
+      "github.com/cnooljaw/gosproto.decodeStructSlice": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1651545",
+        "cumPercent": 95.66
+      },
+      "gosprotobodystudy.representativeOperations.func8": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1723015",
+        "cumPercent": 99.8
+      },
+      "testing.(*B).run1.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1726336",
+        "cumPercent": 100.0
+      }
+    },
+    "game_large-sproto_pdecode-allocation/space": {
+      "reflect.unsafe_NewArray": {
+        "flat": "6010.55kB",
+        "flatPercent": 8.6,
+        "cum": "6010.55kB",
+        "cumPercent": 8.6
+      },
+      "gosprotobodystudy.representativeMessages.func4": {
+        "flat": "801.56kB",
+        "flatPercent": 1.15,
+        "cum": "801.56kB",
+        "cumPercent": 1.15
+      },
+      "github.com/cnooljaw/gosproto.decodeMessage": {
+        "flat": "320.56kB",
+        "flatPercent": 0.46,
+        "cum": "50328.42kB",
+        "cumPercent": 71.97
+      },
+      "github.com/cnooljaw/gosproto.DecodeWithLimits": {
+        "flat": "240.42kB",
+        "flatPercent": 0.34,
+        "cum": "51370.25kB",
+        "cumPercent": 73.46
+      },
+      "reflect.MakeSlice": {
+        "flat": "240.42kB",
+        "flatPercent": 0.34,
+        "cum": "6250.97kB",
+        "cumPercent": 8.94
+      },
+      "github.com/cnooljaw/gosproto.decodeStringSlice": {
+        "flat": "160.28kB",
+        "flatPercent": 0.23,
+        "cum": "520.91kB",
+        "cumPercent": 0.74
+      },
+      "gosprotobodystudy.BenchmarkBodyCost": {
+        "flat": "12kB",
+        "flatPercent": 0.017,
+        "cum": "69909.59kB",
+        "cumPercent": 100.0
+      },
+      "testing.(*B).runN": {
+        "flat": "0.12kB",
+        "flatPercent": 0.00018,
+        "cum": "69914.08kB",
+        "cumPercent": 100.0
+      },
+      "github.com/cnooljaw/gosproto.Decode (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "51370.25kB",
+        "cumPercent": 73.46
+      },
+      "github.com/cnooljaw/gosproto.DecodePacked": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "68667.23kB",
+        "cumPercent": 98.2
+      },
+      "github.com/cnooljaw/gosproto.Unpack (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "17310.38kB",
+        "cumPercent": 24.76
+      },
+      "github.com/cnooljaw/gosproto.decodeStructSlice": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "36664.45kB",
+        "cumPercent": 52.43
+      },
+      "gosprotobodystudy.representativeOperations.func8": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "69468.48kB",
+        "cumPercent": 99.35
+      },
+      "testing.(*B).run1.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "69910.64kB",
+        "cumPercent": 100.0
+      }
+    },
+    "int32_edges-sproto_decode-cpu/flat": {
+      "runtime.kevent": {
+        "flat": "1.62s",
+        "flatPercent": 75.35,
+        "cum": "1.62s",
+        "cumPercent": 75.35
+      },
+      "github.com/cnooljaw/gosproto.decodeIntSlice": {
+        "flat": "0.13s",
+        "flatPercent": 6.05,
+        "cum": "0.38s",
+        "cumPercent": 17.67
+      },
+      "runtime.typePointers.next": {
+        "flat": "0.07s",
+        "flatPercent": 3.26,
+        "cum": "0.07s",
+        "cumPercent": 3.26
+      },
+      "runtime.memclrNoHeapPointers": {
+        "flat": "0.04s",
+        "flatPercent": 1.86,
+        "cum": "0.04s",
+        "cumPercent": 1.86
+      },
+      "runtime.greyobject": {
+        "flat": "0.03s",
+        "flatPercent": 1.4,
+        "cum": "0.04s",
+        "cumPercent": 1.86
+      },
+      "runtime.scanblock": {
+        "flat": "0.03s",
+        "flatPercent": 1.4,
+        "cum": "0.03s",
+        "cumPercent": 1.4
+      },
+      "runtime.scanobject": {
+        "flat": "0.03s",
+        "flatPercent": 1.4,
+        "cum": "0.14s",
+        "cumPercent": 6.51
+      },
+      "encoding/binary.littleEndian.Uint32 (inline)": {
+        "flat": "0.02s",
+        "flatPercent": 0.93,
+        "cum": "0.02s",
+        "cumPercent": 0.93
+      },
+      "runtime.step": {
+        "flat": "0.02s",
+        "flatPercent": 0.93,
+        "cum": "0.02s",
+        "cumPercent": 0.93
+      },
+      "gosprotobodystudy.representativeMessages.func6": {
+        "flat": "0.01s",
+        "flatPercent": 0.47,
+        "cum": "0.11s",
+        "cumPercent": 5.12
+      },
+      "runtime.(*mcentral).cacheSpan": {
+        "flat": "0.01s",
+        "flatPercent": 0.47,
+        "cum": "0.06s",
+        "cumPercent": 2.79
+      },
+      "runtime.(*mheap).allocSpan": {
+        "flat": "0.01s",
+        "flatPercent": 0.47,
+        "cum": "0.02s",
+        "cumPercent": 0.93
+      },
+      "runtime.(*sweepLocked).sweep": {
+        "flat": "0.01s",
+        "flatPercent": 0.47,
+        "cum": "0.03s",
+        "cumPercent": 1.4
+      },
+      "runtime.gcDrainN": {
+        "flat": "0.01s",
+        "flatPercent": 0.47,
+        "cum": "0.18s",
+        "cumPercent": 8.37
+      },
+      "github.com/cnooljaw/gosproto.Decode (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.41s",
+        "cumPercent": 19.07
+      },
+      "github.com/cnooljaw/gosproto.DecodeWithLimits": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.41s",
+        "cumPercent": 19.07
+      },
+      "github.com/cnooljaw/gosproto.decodeMessage": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.38s",
+        "cumPercent": 17.67
+      },
+      "github.com/cnooljaw/gosproto.readUint32 (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.93
+      },
+      "gosprotobodystudy.BenchmarkBodyCost": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.52s",
+        "cumPercent": 24.19
+      },
+      "gosprotobodystudy.representativeOperations.func4": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.52s",
+        "cumPercent": 24.19
+      },
+      "runtime.(*mcache).nextFree": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.06s",
+        "cumPercent": 2.79
+      },
+      "runtime.(*mcache).refill": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.06s",
+        "cumPercent": 2.79
+      },
+      "runtime.(*mheap).alloc.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.93
+      },
+      "runtime.callers": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.93
+      },
+      "runtime.callers.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.93
+      },
+      "runtime.deductAssistCredit": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.18s",
+        "cumPercent": 8.37
+      },
+      "runtime.deductSweepCredit": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.4
+      },
+      "runtime.gcAssistAlloc": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.18s",
+        "cumPercent": 8.37
+      },
+      "runtime.gcAssistAlloc.func2": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.18s",
+        "cumPercent": 8.37
+      },
+      "runtime.gcAssistAlloc1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.18s",
+        "cumPercent": 8.37
+      },
+      "runtime.gcMarkTermination.func3": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.86s",
+        "cumPercent": 40.0
+      },
+      "runtime.gcStart.func4": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.76s",
+        "cumPercent": 35.35
+      },
+      "runtime.mProf_Malloc": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.93
+      },
+      "runtime.makeslice": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.23s",
+        "cumPercent": 10.7
+      },
+      "runtime.mallocgc": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.34s",
+        "cumPercent": 15.81
+      },
+      "runtime.mallocgcSmallNoscan": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.14s",
+        "cumPercent": 6.51
+      },
+      "runtime.mallocgcSmallScanNoHeader": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.93
+      },
+      "runtime.markroot": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.4
+      },
+      "runtime.markrootBlock": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.4
+      },
+      "runtime.netpoll": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.62s",
+        "cumPercent": 75.35
+      }
+    },
+    "int32_edges-sproto_decode-cpu/cum": {
+      "runtime.systemstack": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.86s",
+        "cumPercent": 86.51
+      },
+      "runtime.kevent": {
+        "flat": "1.62s",
+        "flatPercent": 75.35,
+        "cum": "1.62s",
+        "cumPercent": 75.35
+      },
+      "runtime.netpoll": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.62s",
+        "cumPercent": 75.35
+      },
+      "runtime.startTheWorldWithSema": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.62s",
+        "cumPercent": 75.35
+      },
+      "runtime.gcMarkTermination.func3": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.86s",
+        "cumPercent": 40.0
+      },
+      "runtime.gcStart.func4": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.76s",
+        "cumPercent": 35.35
+      },
+      "gosprotobodystudy.BenchmarkBodyCost": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.52s",
+        "cumPercent": 24.19
+      },
+      "gosprotobodystudy.representativeOperations.func4": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.52s",
+        "cumPercent": 24.19
+      },
+      "testing.(*B).run1.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.52s",
+        "cumPercent": 24.19
+      },
+      "testing.(*B).runN": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.52s",
+        "cumPercent": 24.19
+      },
+      "github.com/cnooljaw/gosproto.Decode (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.41s",
+        "cumPercent": 19.07
+      },
+      "github.com/cnooljaw/gosproto.DecodeWithLimits": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.41s",
+        "cumPercent": 19.07
+      },
+      "github.com/cnooljaw/gosproto.decodeIntSlice": {
+        "flat": "0.13s",
+        "flatPercent": 6.05,
+        "cum": "0.38s",
+        "cumPercent": 17.67
+      },
+      "github.com/cnooljaw/gosproto.decodeMessage": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.38s",
+        "cumPercent": 17.67
+      },
+      "runtime.mallocgc": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.34s",
+        "cumPercent": 15.81
+      },
+      "runtime.makeslice": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.23s",
+        "cumPercent": 10.7
+      },
+      "runtime.deductAssistCredit": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.18s",
+        "cumPercent": 8.37
+      },
+      "runtime.gcAssistAlloc": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.18s",
+        "cumPercent": 8.37
+      },
+      "runtime.gcAssistAlloc.func2": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.18s",
+        "cumPercent": 8.37
+      },
+      "runtime.gcAssistAlloc1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.18s",
+        "cumPercent": 8.37
+      },
+      "runtime.gcDrainN": {
+        "flat": "0.01s",
+        "flatPercent": 0.47,
+        "cum": "0.18s",
+        "cumPercent": 8.37
+      },
+      "runtime.mallocgcSmallNoscan": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.14s",
+        "cumPercent": 6.51
+      },
+      "runtime.scanobject": {
+        "flat": "0.03s",
+        "flatPercent": 1.4,
+        "cum": "0.14s",
+        "cumPercent": 6.51
+      },
+      "gosprotobodystudy.representativeMessages.func6": {
+        "flat": "0.01s",
+        "flatPercent": 0.47,
+        "cum": "0.11s",
+        "cumPercent": 5.12
+      },
+      "runtime.newobject": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.10s",
+        "cumPercent": 4.65
+      },
+      "runtime.typePointers.next": {
+        "flat": "0.07s",
+        "flatPercent": 3.26,
+        "cum": "0.07s",
+        "cumPercent": 3.26
+      },
+      "runtime.(*mcache).nextFree": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.06s",
+        "cumPercent": 2.79
+      },
+      "runtime.(*mcache).refill": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.06s",
+        "cumPercent": 2.79
+      },
+      "runtime.(*mcentral).cacheSpan": {
+        "flat": "0.01s",
+        "flatPercent": 0.47,
+        "cum": "0.06s",
+        "cumPercent": 2.79
+      },
+      "runtime.greyobject": {
+        "flat": "0.03s",
+        "flatPercent": 1.4,
+        "cum": "0.04s",
+        "cumPercent": 1.86
+      },
+      "runtime.memclrNoHeapPointers": {
+        "flat": "0.04s",
+        "flatPercent": 1.86,
+        "cum": "0.04s",
+        "cumPercent": 1.86
+      },
+      "runtime.(*sweepLocked).sweep": {
+        "flat": "0.01s",
+        "flatPercent": 0.47,
+        "cum": "0.03s",
+        "cumPercent": 1.4
+      },
+      "runtime.deductSweepCredit": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.4
+      },
+      "runtime.markroot": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.4
+      },
+      "runtime.markrootBlock": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.4
+      },
+      "runtime.scanblock": {
+        "flat": "0.03s",
+        "flatPercent": 1.4,
+        "cum": "0.03s",
+        "cumPercent": 1.4
+      },
+      "encoding/binary.littleEndian.Uint32 (inline)": {
+        "flat": "0.02s",
+        "flatPercent": 0.93,
+        "cum": "0.02s",
+        "cumPercent": 0.93
+      },
+      "github.com/cnooljaw/gosproto.readUint32 (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.93
+      },
+      "runtime.(*mheap).alloc.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.93
+      },
+      "runtime.(*mheap).allocSpan": {
+        "flat": "0.01s",
+        "flatPercent": 0.47,
+        "cum": "0.02s",
+        "cumPercent": 0.93
+      }
+    },
+    "int32_edges-sproto_decode-allocation/objects": {
+      "reflect.New": {
+        "flat": "12061",
+        "flatPercent": 23.81,
+        "cum": "12061",
+        "cumPercent": 23.81
+      },
+      "gosprotobodystudy.representativeMessages.func6": {
+        "flat": "12042",
+        "flatPercent": 23.77,
+        "cum": "12042",
+        "cumPercent": 23.77
+      },
+      "github.com/cnooljaw/gosproto.DecodeWithLimits": {
+        "flat": "12041",
+        "flatPercent": 23.77,
+        "cum": "36123",
+        "cumPercent": 71.31
+      },
+      "github.com/cnooljaw/gosproto.decodeIntSlice": {
+        "flat": "12041",
+        "flatPercent": 23.77,
+        "cum": "12041",
+        "cumPercent": 23.77
+      },
+      "reflect.Value.extendSlice": {
+        "flat": "896",
+        "flatPercent": 1.77,
+        "cum": "906",
+        "cumPercent": 1.79
+      },
+      "google.golang.org/protobuf/internal/encoding/json.normalizeToIntString": {
+        "flat": "511",
+        "flatPercent": 1.01,
+        "cum": "511",
+        "cumPercent": 1.01
+      },
+      "encoding/json.typeFields": {
+        "flat": "215",
+        "flatPercent": 0.42,
+        "cum": "345",
+        "cumPercent": 0.68
+      },
+      "google.golang.org/protobuf/internal/impl.(*int32Converter).GoValueOf": {
+        "flat": "128",
+        "flatPercent": 0.25,
+        "cum": "258",
+        "cumPercent": 0.51
+      },
+      "encoding/json.typeEncoder": {
+        "flat": "48",
+        "flatPercent": 0.095,
+        "cum": "332",
+        "cumPercent": 0.66
+      },
+      "gosprotobodystudy.representativeOperations": {
+        "flat": "11",
+        "flatPercent": 0.022,
+        "cum": "1861",
+        "cumPercent": 3.67
+      },
+      "encoding/json.cachedTypeFields": {
+        "flat": "6",
+        "flatPercent": 0.012,
+        "cum": "352",
+        "cumPercent": 0.69
+      },
+      "encoding/json.newStructEncoder (inline)": {
+        "flat": "4",
+        "flatPercent": 0.0079,
+        "cum": "275",
+        "cumPercent": 0.54
+      },
+      "testing.(*B).runN": {
+        "flat": "2",
+        "flatPercent": 0.0039,
+        "cum": "50529",
+        "cumPercent": 99.75
+      },
+      "encoding/json.Marshal": {
+        "flat": "1",
+        "flatPercent": 0.002,
+        "cum": "281",
+        "cumPercent": 0.55
+      },
+      "encoding/json.MarshalIndent": {
+        "flat": "1",
+        "flatPercent": 0.002,
+        "cum": "289",
+        "cumPercent": 0.57
+      },
+      "gosprotobodystudy.BenchmarkBodyCost": {
+        "flat": "1",
+        "flatPercent": 0.002,
+        "cum": "50485",
+        "cumPercent": 99.66
+      },
+      "encoding/json.(*encodeState).marshal": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "276",
+        "cumPercent": 0.54
+      },
+      "encoding/json.(*encodeState).reflectValue": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "276",
+        "cumPercent": 0.54
+      },
+      "encoding/json.newTypeEncoder": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "306",
+        "cumPercent": 0.6
+      },
+      "encoding/json.valueEncoder": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "264",
+        "cumPercent": 0.52
+      },
+      "github.com/cnooljaw/gosproto.Decode (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "36123",
+        "cumPercent": 71.31
+      },
+      "github.com/cnooljaw/gosproto.decodeMessage": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "12041",
+        "cumPercent": 23.77
+      },
+      "google.golang.org/protobuf/encoding/protojson.Unmarshal (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1787",
+        "cumPercent": 3.53
+      },
+      "google.golang.org/protobuf/encoding/protojson.UnmarshalOptions.Unmarshal (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1787",
+        "cumPercent": 3.53
+      },
+      "google.golang.org/protobuf/encoding/protojson.UnmarshalOptions.unmarshal": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1787",
+        "cumPercent": 3.53
+      },
+      "google.golang.org/protobuf/encoding/protojson.decoder.unmarshalList": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1675",
+        "cumPercent": 3.31
+      },
+      "google.golang.org/protobuf/encoding/protojson.decoder.unmarshalMessage": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1786",
+        "cumPercent": 3.53
+      },
+      "google.golang.org/protobuf/encoding/protojson.decoder.unmarshalScalar": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "511",
+        "cumPercent": 1.01
+      },
+      "google.golang.org/protobuf/encoding/protojson.getInt": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "511",
+        "cumPercent": 1.01
+      },
+      "google.golang.org/protobuf/encoding/protojson.unmarshalInt": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "511",
+        "cumPercent": 1.01
+      },
+      "google.golang.org/protobuf/internal/encoding/json.Token.Int": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "511",
+        "cumPercent": 1.01
+      },
+      "google.golang.org/protobuf/internal/encoding/json.Token.getIntStr": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "511",
+        "cumPercent": 1.01
+      },
+      "google.golang.org/protobuf/internal/impl.(*listReflect).Append": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1164",
+        "cumPercent": 2.3
+      },
+      "gosprotobodystudy.representativeOperations.func4": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "48160",
+        "cumPercent": 95.07
+      },
+      "reflect.Append": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "906",
+        "cumPercent": 1.79
+      },
+      "testing.(*B).run1.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "50491",
+        "cumPercent": 99.67
+      }
+    },
+    "int32_edges-sproto_decode-allocation/space": {
+      "github.com/cnooljaw/gosproto.decodeIntSlice": {
+        "flat": "96328kB",
+        "flatPercent": 98.5,
+        "cum": "96328kB",
+        "cumPercent": 98.5
+      },
+      "github.com/cnooljaw/gosproto.DecodeWithLimits": {
+        "flat": "564.42kB",
+        "flatPercent": 0.58,
+        "cum": "97174.63kB",
+        "cumPercent": 99.36
+      },
+      "gosprotobodystudy.BenchmarkBodyCost": {
+        "flat": "12kB",
+        "flatPercent": 0.012,
+        "cum": "97775.04kB",
+        "cumPercent": 100.0
+      },
+      "testing.(*B).runN": {
+        "flat": "0.12kB",
+        "flatPercent": 0.00013,
+        "cum": "97779.53kB",
+        "cumPercent": 100.0
+      },
+      "github.com/cnooljaw/gosproto.Decode (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "97174.63kB",
+        "cumPercent": 99.36
+      },
+      "github.com/cnooljaw/gosproto.decodeMessage": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "96328kB",
+        "cumPercent": 98.5
+      },
+      "gosprotobodystudy.representativeOperations.func4": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "97448.75kB",
+        "cumPercent": 99.64
+      },
+      "testing.(*B).run1.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "97776.09kB",
+        "cumPercent": 100.0
+      }
+    },
+    "int32_edges-sproto_unpack-cpu/flat": {
+      "runtime.kevent": {
+        "flat": "1.10s",
+        "flatPercent": 47.83,
+        "cum": "1.10s",
+        "cumPercent": 47.83
+      },
+      "github.com/cnooljaw/gosproto.unpackVectorARM64": {
+        "flat": "0.47s",
+        "flatPercent": 20.43,
+        "cum": "0.47s",
+        "cumPercent": 20.43
+      },
+      "github.com/cnooljaw/gosproto.UnpackWithLimit": {
+        "flat": "0.42s",
+        "flatPercent": 18.26,
+        "cum": "1.17s",
+        "cumPercent": 50.87
+      },
+      "math/bits.OnesCount8 (inline)": {
+        "flat": "0.13s",
+        "flatPercent": 5.65,
+        "cum": "0.13s",
+        "cumPercent": 5.65
+      },
+      "runtime.scanobject": {
+        "flat": "0.04s",
+        "flatPercent": 1.74,
+        "cum": "0.10s",
+        "cumPercent": 4.35
+      },
+      "runtime.typePointers.next": {
+        "flat": "0.04s",
+        "flatPercent": 1.74,
+        "cum": "0.04s",
+        "cumPercent": 1.74
+      },
+      "runtime.findObject": {
+        "flat": "0.02s",
+        "flatPercent": 0.87,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.findRunnable": {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.wbBufFlush1": {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "github.com/cnooljaw/gosproto.Unpack (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.17s",
+        "cumPercent": 50.87
+      },
+      "github.com/cnooljaw/gosproto.unpackVector (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.47s",
+        "cumPercent": 20.43
+      },
+      "gosprotobodystudy.BenchmarkBodyCost": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.17s",
+        "cumPercent": 50.87
+      },
+      "gosprotobodystudy.representativeOperations.func6": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.17s",
+        "cumPercent": 50.87
+      },
+      "runtime.(*mcache).nextFree": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.3
+      },
+      "runtime.(*mcache).refill": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.3
+      },
+      "runtime.(*mcentral).cacheSpan": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.(*mcentral).grow": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.(*mheap).alloc": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.(*mheap).alloc.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.(*mheap).allocSpan": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.deductAssistCredit": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.12s",
+        "cumPercent": 5.22
+      },
+      "runtime.gcAssistAlloc": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.12s",
+        "cumPercent": 5.22
+      },
+      "runtime.gcAssistAlloc.func2": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.12s",
+        "cumPercent": 5.22
+      },
+      "runtime.gcAssistAlloc1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.12s",
+        "cumPercent": 5.22
+      },
+      "runtime.gcDrainN": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.12s",
+        "cumPercent": 5.22
+      },
+      "runtime.gcMarkTermination.func3": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.78s",
+        "cumPercent": 33.91
+      },
+      "runtime.gcStart.func4": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.32s",
+        "cumPercent": 13.91
+      },
+      "runtime.gopreempt_m (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.goschedImpl": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.makeslice": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.15s",
+        "cumPercent": 6.52
+      },
+      "runtime.mallocgc": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.15s",
+        "cumPercent": 6.52
+      },
+      "runtime.mallocgcSmallNoscan": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.3
+      },
+      "runtime.morestack": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.netpoll": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.10s",
+        "cumPercent": 47.83
+      },
+      "runtime.newstack": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.schedule": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.startTheWorldWithSema": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.10s",
+        "cumPercent": 47.83
+      },
+      "runtime.systemstack": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.25s",
+        "cumPercent": 54.35
+      },
+      "runtime.wbBufFlush": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.wbBufFlush.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      }
+    },
+    "int32_edges-sproto_unpack-cpu/cum": {
+      "runtime.systemstack": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.25s",
+        "cumPercent": 54.35
+      },
+      "github.com/cnooljaw/gosproto.Unpack (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.17s",
+        "cumPercent": 50.87
+      },
+      "github.com/cnooljaw/gosproto.UnpackWithLimit": {
+        "flat": "0.42s",
+        "flatPercent": 18.26,
+        "cum": "1.17s",
+        "cumPercent": 50.87
+      },
+      "gosprotobodystudy.BenchmarkBodyCost": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.17s",
+        "cumPercent": 50.87
+      },
+      "gosprotobodystudy.representativeOperations.func6": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.17s",
+        "cumPercent": 50.87
+      },
+      "testing.(*B).run1.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.17s",
+        "cumPercent": 50.87
+      },
+      "testing.(*B).runN": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.17s",
+        "cumPercent": 50.87
+      },
+      "runtime.kevent": {
+        "flat": "1.10s",
+        "flatPercent": 47.83,
+        "cum": "1.10s",
+        "cumPercent": 47.83
+      },
+      "runtime.netpoll": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.10s",
+        "cumPercent": 47.83
+      },
+      "runtime.startTheWorldWithSema": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.10s",
+        "cumPercent": 47.83
+      },
+      "runtime.gcMarkTermination.func3": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.78s",
+        "cumPercent": 33.91
+      },
+      "github.com/cnooljaw/gosproto.unpackVector (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.47s",
+        "cumPercent": 20.43
+      },
+      "github.com/cnooljaw/gosproto.unpackVectorARM64": {
+        "flat": "0.47s",
+        "flatPercent": 20.43,
+        "cum": "0.47s",
+        "cumPercent": 20.43
+      },
+      "runtime.gcStart.func4": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.32s",
+        "cumPercent": 13.91
+      },
+      "runtime.makeslice": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.15s",
+        "cumPercent": 6.52
+      },
+      "runtime.mallocgc": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.15s",
+        "cumPercent": 6.52
+      },
+      "math/bits.OnesCount8 (inline)": {
+        "flat": "0.13s",
+        "flatPercent": 5.65,
+        "cum": "0.13s",
+        "cumPercent": 5.65
+      },
+      "runtime.deductAssistCredit": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.12s",
+        "cumPercent": 5.22
+      },
+      "runtime.gcAssistAlloc": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.12s",
+        "cumPercent": 5.22
+      },
+      "runtime.gcAssistAlloc.func2": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.12s",
+        "cumPercent": 5.22
+      },
+      "runtime.gcAssistAlloc1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.12s",
+        "cumPercent": 5.22
+      },
+      "runtime.gcDrainN": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.12s",
+        "cumPercent": 5.22
+      },
+      "runtime.scanobject": {
+        "flat": "0.04s",
+        "flatPercent": 1.74,
+        "cum": "0.10s",
+        "cumPercent": 4.35
+      },
+      "runtime.typePointers.next": {
+        "flat": "0.04s",
+        "flatPercent": 1.74,
+        "cum": "0.04s",
+        "cumPercent": 1.74
+      },
+      "runtime.(*mcache).nextFree": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.3
+      },
+      "runtime.(*mcache).refill": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.3
+      },
+      "runtime.mallocgcSmallNoscan": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.3
+      },
+      "runtime.(*mcentral).cacheSpan": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.(*mcentral).grow": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.(*mheap).alloc": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.(*mheap).alloc.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.(*mheap).allocSpan": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.findObject": {
+        "flat": "0.02s",
+        "flatPercent": 0.87,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.findRunnable": {
+        "flat": "0.01s",
+        "flatPercent": 0.43,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.gopreempt_m (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.goschedImpl": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.morestack": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.newstack": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.schedule": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.wbBufFlush": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      }
+    },
+    "int32_edges-sproto_unpack-allocation/objects": {
+      "github.com/cnooljaw/gosproto.UnpackWithLimit": {
+        "flat": "13705",
+        "flatPercent": 84.57,
+        "cum": "13705",
+        "cumPercent": 84.57
+      },
+      "reflect.Value.extendSlice": {
+        "flat": "896",
+        "flatPercent": 5.53,
+        "cum": "906",
+        "cumPercent": 5.59
+      },
+      "google.golang.org/protobuf/internal/encoding/json.normalizeToIntString": {
+        "flat": "511",
+        "flatPercent": 3.15,
+        "cum": "511",
+        "cumPercent": 3.15
+      },
+      "encoding/json.typeFields": {
+        "flat": "215",
+        "flatPercent": 1.33,
+        "cum": "349",
+        "cumPercent": 2.15
+      },
+      "reflect.makeInt": {
+        "flat": "130",
+        "flatPercent": 0.8,
+        "cum": "130",
+        "cumPercent": 0.8
+      },
+      "google.golang.org/protobuf/internal/impl.(*int32Converter).GoValueOf": {
+        "flat": "128",
+        "flatPercent": 0.79,
+        "cum": "258",
+        "cumPercent": 1.59
+      },
+      "encoding/json.typeEncoder": {
+        "flat": "48",
+        "flatPercent": 0.3,
+        "cum": "336",
+        "cumPercent": 2.07
+      },
+      "encoding/json.(*decodeState).object": {
+        "flat": "20",
+        "flatPercent": 0.12,
+        "cum": "194",
+        "cumPercent": 1.2
+      },
+      "gosprotobodystudy.representativeOperations": {
+        "flat": "11",
+        "flatPercent": 0.068,
+        "cum": "1862",
+        "cumPercent": 11.49
+      },
+      "testing.newMatcher": {
+        "flat": "9",
+        "flatPercent": 0.056,
+        "cum": "96",
+        "cumPercent": 0.59
+      },
+      "encoding/json.cachedTypeFields": {
+        "flat": "6",
+        "flatPercent": 0.037,
+        "cum": "356",
+        "cumPercent": 2.2
+      },
+      "encoding/json.newStructEncoder (inline)": {
+        "flat": "4",
+        "flatPercent": 0.025,
+        "cum": "277",
+        "cumPercent": 1.71
+      },
+      "testing.runBenchmarks": {
+        "flat": "4",
+        "flatPercent": 0.025,
+        "cum": "106",
+        "cumPercent": 0.65
+      },
+      "testing.(*M).Run": {
+        "flat": "3",
+        "flatPercent": 0.019,
+        "cum": "161",
+        "cumPercent": 0.99
+      },
+      "encoding/json.Unmarshal": {
+        "flat": "2",
+        "flatPercent": 0.012,
+        "cum": "205",
+        "cumPercent": 1.27
+      },
+      "testing.(*B).runN": {
+        "flat": "2",
+        "flatPercent": 0.012,
+        "cum": "16079",
+        "cumPercent": 99.22
+      },
+      "encoding/json.Marshal": {
+        "flat": "1",
+        "flatPercent": 0.0062,
+        "cum": "285",
+        "cumPercent": 1.76
+      },
+      "encoding/json.MarshalIndent": {
+        "flat": "1",
+        "flatPercent": 0.0062,
+        "cum": "293",
+        "cumPercent": 1.81
+      },
+      "gosprotobodystudy.BenchmarkBodyCost": {
+        "flat": "1",
+        "flatPercent": 0.0062,
+        "cum": "16035",
+        "cumPercent": 98.95
+      },
+      "gosprotobodystudy.representativeCases": {
+        "flat": "1",
+        "flatPercent": 0.0062,
+        "cum": "172",
+        "cumPercent": 1.06
+      },
+      "encoding/json.(*decodeState).array": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "171",
+        "cumPercent": 1.06
+      },
+      "encoding/json.(*decodeState).unmarshal": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "198",
+        "cumPercent": 1.22
+      },
+      "encoding/json.(*decodeState).value": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "198",
+        "cumPercent": 1.22
+      },
+      "encoding/json.(*encodeState).marshal": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "278",
+        "cumPercent": 1.72
+      },
+      "encoding/json.(*encodeState).reflectValue": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "278",
+        "cumPercent": 1.72
+      },
+      "encoding/json.newTypeEncoder": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "309",
+        "cumPercent": 1.91
+      },
+      "encoding/json.valueEncoder": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "266",
+        "cumPercent": 1.64
+      },
+      "github.com/cnooljaw/gosproto.Unpack (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "13705",
+        "cumPercent": 84.57
+      },
+      "google.golang.org/protobuf/encoding/protojson.Unmarshal (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1787",
+        "cumPercent": 11.03
+      },
+      "google.golang.org/protobuf/encoding/protojson.UnmarshalOptions.Unmarshal (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1787",
+        "cumPercent": 11.03
+      },
+      "google.golang.org/protobuf/encoding/protojson.UnmarshalOptions.unmarshal": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1787",
+        "cumPercent": 11.03
+      },
+      "google.golang.org/protobuf/encoding/protojson.decoder.unmarshalList": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1675",
+        "cumPercent": 10.34
+      },
+      "google.golang.org/protobuf/encoding/protojson.decoder.unmarshalMessage": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1786",
+        "cumPercent": 11.02
+      },
+      "google.golang.org/protobuf/encoding/protojson.decoder.unmarshalScalar": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "511",
+        "cumPercent": 3.15
+      },
+      "google.golang.org/protobuf/encoding/protojson.getInt": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "511",
+        "cumPercent": 3.15
+      },
+      "google.golang.org/protobuf/encoding/protojson.unmarshalInt": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "511",
+        "cumPercent": 3.15
+      },
+      "google.golang.org/protobuf/internal/encoding/json.Token.Int": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "511",
+        "cumPercent": 3.15
+      },
+      "google.golang.org/protobuf/internal/encoding/json.Token.getIntStr": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "511",
+        "cumPercent": 3.15
+      },
+      "google.golang.org/protobuf/internal/impl.(*listReflect).Append": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1164",
+        "cumPercent": 7.18
+      },
+      "gosprotobodystudy.representativeOperations.func6": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "13704",
+        "cumPercent": 84.57
+      }
+    },
+    "int32_edges-sproto_unpack-allocation/space": {
+      "github.com/cnooljaw/gosproto.UnpackWithLimit": {
+        "flat": "54820kB",
+        "flatPercent": 99.39,
+        "cum": "54820kB",
+        "cumPercent": 99.39
+      },
+      "gosprotobodystudy.BenchmarkBodyCost": {
+        "flat": "12kB",
+        "flatPercent": 0.022,
+        "cum": "55140.30kB",
+        "cumPercent": 100.0
+      },
+      "testing.(*B).runN": {
+        "flat": "0.12kB",
+        "flatPercent": 0.00023,
+        "cum": "55144.79kB",
+        "cumPercent": 100.0
+      },
+      "github.com/cnooljaw/gosproto.Unpack (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "54820kB",
+        "cumPercent": 99.39
+      },
+      "gosprotobodystudy.representativeOperations.func6": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "54816kB",
+        "cumPercent": 99.38
+      },
+      "testing.(*B).run1.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "55141.35kB",
+        "cumPercent": 100.0
+      }
+    },
+    "int32_edges-sproto_pdecode-cpu/flat": {
+      "runtime.kevent": {
+        "flat": "1.77s",
+        "flatPercent": 77.29,
+        "cum": "1.77s",
+        "cumPercent": 77.29
+      },
+      "github.com/cnooljaw/gosproto.UnpackWithLimit": {
+        "flat": "0.13s",
+        "flatPercent": 5.68,
+        "cum": "0.33s",
+        "cumPercent": 14.41
+      },
+      "github.com/cnooljaw/gosproto.unpackVectorARM64": {
+        "flat": "0.10s",
+        "flatPercent": 4.37,
+        "cum": "0.10s",
+        "cumPercent": 4.37
+      },
+      "runtime.scanobject": {
+        "flat": "0.05s",
+        "flatPercent": 2.18,
+        "cum": "0.11s",
+        "cumPercent": 4.8
+      },
+      "github.com/cnooljaw/gosproto.decodeIntSlice": {
+        "flat": "0.04s",
+        "flatPercent": 1.75,
+        "cum": "0.12s",
+        "cumPercent": 5.24
+      },
+      "math/bits.OnesCount8 (inline)": {
+        "flat": "0.04s",
+        "flatPercent": 1.75,
+        "cum": "0.04s",
+        "cumPercent": 1.75
+      },
+      "runtime.typePointers.next": {
+        "flat": "0.04s",
+        "flatPercent": 1.75,
+        "cum": "0.04s",
+        "cumPercent": 1.75
+      },
+      "runtime.(*spanSet).push": {
+        "flat": "0.02s",
+        "flatPercent": 0.87,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "gosprotobodystudy.representativeMessages.func6": {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.05s",
+        "cumPercent": 2.18
+      },
+      "runtime.(*mheap).allocSpan": {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.gcDrainN": {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.12s",
+        "cumPercent": 5.24
+      },
+      "github.com/cnooljaw/gosproto.Decode (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.13s",
+        "cumPercent": 5.68
+      },
+      "github.com/cnooljaw/gosproto.DecodePacked": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.46s",
+        "cumPercent": 20.09
+      },
+      "github.com/cnooljaw/gosproto.DecodeWithLimits": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.13s",
+        "cumPercent": 5.68
+      },
+      "github.com/cnooljaw/gosproto.Unpack (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.33s",
+        "cumPercent": 14.41
+      },
+      "github.com/cnooljaw/gosproto.decodeMessage": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.12s",
+        "cumPercent": 5.24
+      },
+      "github.com/cnooljaw/gosproto.unpackVector (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.10s",
+        "cumPercent": 4.37
+      },
+      "gosprotobodystudy.BenchmarkBodyCost": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.51s",
+        "cumPercent": 22.27
+      },
+      "gosprotobodystudy.representativeOperations.func8": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.51s",
+        "cumPercent": 22.27
+      },
+      "runtime.(*mcache).nextFree": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.31
+      },
+      "runtime.(*mcache).refill": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.31
+      },
+      "runtime.(*mcentral).uncacheSpan": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.(*mheap).alloc.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.deductAssistCredit": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.13s",
+        "cumPercent": 5.68
+      },
+      "runtime.gcAssistAlloc": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.13s",
+        "cumPercent": 5.68
+      },
+      "runtime.gcAssistAlloc.func2": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.12s",
+        "cumPercent": 5.24
+      },
+      "runtime.gcAssistAlloc1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.12s",
+        "cumPercent": 5.24
+      },
+      "runtime.gcMarkTermination.func3": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.09s",
+        "cumPercent": 47.6
+      },
+      "runtime.gcStart.func4": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.68s",
+        "cumPercent": 29.69
+      },
+      "runtime.makeslice": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.13s",
+        "cumPercent": 5.68
+      },
+      "runtime.mallocgc": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.18s",
+        "cumPercent": 7.86
+      },
+      "runtime.mallocgcSmallNoscan": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.05s",
+        "cumPercent": 2.18
+      },
+      "runtime.netpoll": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.77s",
+        "cumPercent": 77.29
+      },
+      "runtime.newobject": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.05s",
+        "cumPercent": 2.18
+      },
+      "runtime.startTheWorldWithSema": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.77s",
+        "cumPercent": 77.29
+      },
+      "runtime.systemstack": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.92s",
+        "cumPercent": 83.84
+      },
+      "testing.(*B).run1.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.51s",
+        "cumPercent": 22.27
+      },
+      "testing.(*B).runN": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.51s",
+        "cumPercent": 22.27
+      }
+    },
+    "int32_edges-sproto_pdecode-cpu/cum": {
+      "runtime.systemstack": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.92s",
+        "cumPercent": 83.84
+      },
+      "runtime.kevent": {
+        "flat": "1.77s",
+        "flatPercent": 77.29,
+        "cum": "1.77s",
+        "cumPercent": 77.29
+      },
+      "runtime.netpoll": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.77s",
+        "cumPercent": 77.29
+      },
+      "runtime.startTheWorldWithSema": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.77s",
+        "cumPercent": 77.29
+      },
+      "runtime.gcMarkTermination.func3": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.09s",
+        "cumPercent": 47.6
+      },
+      "runtime.gcStart.func4": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.68s",
+        "cumPercent": 29.69
+      },
+      "gosprotobodystudy.BenchmarkBodyCost": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.51s",
+        "cumPercent": 22.27
+      },
+      "gosprotobodystudy.representativeOperations.func8": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.51s",
+        "cumPercent": 22.27
+      },
+      "testing.(*B).run1.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.51s",
+        "cumPercent": 22.27
+      },
+      "testing.(*B).runN": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.51s",
+        "cumPercent": 22.27
+      },
+      "github.com/cnooljaw/gosproto.DecodePacked": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.46s",
+        "cumPercent": 20.09
+      },
+      "github.com/cnooljaw/gosproto.Unpack (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.33s",
+        "cumPercent": 14.41
+      },
+      "github.com/cnooljaw/gosproto.UnpackWithLimit": {
+        "flat": "0.13s",
+        "flatPercent": 5.68,
+        "cum": "0.33s",
+        "cumPercent": 14.41
+      },
+      "runtime.mallocgc": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.18s",
+        "cumPercent": 7.86
+      },
+      "github.com/cnooljaw/gosproto.Decode (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.13s",
+        "cumPercent": 5.68
+      },
+      "github.com/cnooljaw/gosproto.DecodeWithLimits": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.13s",
+        "cumPercent": 5.68
+      },
+      "runtime.deductAssistCredit": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.13s",
+        "cumPercent": 5.68
+      },
+      "runtime.gcAssistAlloc": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.13s",
+        "cumPercent": 5.68
+      },
+      "runtime.makeslice": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.13s",
+        "cumPercent": 5.68
+      },
+      "github.com/cnooljaw/gosproto.decodeIntSlice": {
+        "flat": "0.04s",
+        "flatPercent": 1.75,
+        "cum": "0.12s",
+        "cumPercent": 5.24
+      },
+      "github.com/cnooljaw/gosproto.decodeMessage": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.12s",
+        "cumPercent": 5.24
+      },
+      "runtime.gcAssistAlloc.func2": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.12s",
+        "cumPercent": 5.24
+      },
+      "runtime.gcAssistAlloc1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.12s",
+        "cumPercent": 5.24
+      },
+      "runtime.gcDrainN": {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.12s",
+        "cumPercent": 5.24
+      },
+      "runtime.scanobject": {
+        "flat": "0.05s",
+        "flatPercent": 2.18,
+        "cum": "0.11s",
+        "cumPercent": 4.8
+      },
+      "github.com/cnooljaw/gosproto.unpackVector (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.10s",
+        "cumPercent": 4.37
+      },
+      "github.com/cnooljaw/gosproto.unpackVectorARM64": {
+        "flat": "0.10s",
+        "flatPercent": 4.37,
+        "cum": "0.10s",
+        "cumPercent": 4.37
+      },
+      "gosprotobodystudy.representativeMessages.func6": {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.05s",
+        "cumPercent": 2.18
+      },
+      "runtime.mallocgcSmallNoscan": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.05s",
+        "cumPercent": 2.18
+      },
+      "runtime.newobject": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.05s",
+        "cumPercent": 2.18
+      },
+      "math/bits.OnesCount8 (inline)": {
+        "flat": "0.04s",
+        "flatPercent": 1.75,
+        "cum": "0.04s",
+        "cumPercent": 1.75
+      },
+      "runtime.typePointers.next": {
+        "flat": "0.04s",
+        "flatPercent": 1.75,
+        "cum": "0.04s",
+        "cumPercent": 1.75
+      },
+      "runtime.(*mcache).nextFree": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.31
+      },
+      "runtime.(*mcache).refill": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.31
+      },
+      "runtime.(*mcentral).uncacheSpan": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.(*mheap).alloc.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.(*mheap).allocSpan": {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      },
+      "runtime.(*spanSet).push": {
+        "flat": "0.02s",
+        "flatPercent": 0.87,
+        "cum": "0.02s",
+        "cumPercent": 0.87
+      }
+    },
+    "int32_edges-sproto_pdecode-allocation/objects": {
+      "reflect.New": {
+        "flat": "5725",
+        "flatPercent": 18.46,
+        "cum": "5725",
+        "cumPercent": 18.46
+      },
+      "gosprotobodystudy.representativeMessages.func6": {
+        "flat": "5706",
+        "flatPercent": 18.4,
+        "cum": "5706",
+        "cumPercent": 18.4
+      },
+      "github.com/cnooljaw/gosproto.DecodeWithLimits": {
+        "flat": "5705",
+        "flatPercent": 18.39,
+        "cum": "17115",
+        "cumPercent": 55.18
+      },
+      "github.com/cnooljaw/gosproto.UnpackWithLimit": {
+        "flat": "5705",
+        "flatPercent": 18.39,
+        "cum": "5705",
+        "cumPercent": 18.39
+      },
+      "github.com/cnooljaw/gosproto.decodeIntSlice": {
+        "flat": "5705",
+        "flatPercent": 18.39,
+        "cum": "5705",
+        "cumPercent": 18.39
+      },
+      "reflect.Value.extendSlice": {
+        "flat": "896",
+        "flatPercent": 2.89,
+        "cum": "906",
+        "cumPercent": 2.92
+      },
+      "google.golang.org/protobuf/internal/encoding/json.normalizeToIntString": {
+        "flat": "511",
+        "flatPercent": 1.65,
+        "cum": "511",
+        "cumPercent": 1.65
+      },
+      "encoding/json.typeFields": {
+        "flat": "215",
+        "flatPercent": 0.69,
+        "cum": "345",
+        "cumPercent": 1.11
+      },
+      "google.golang.org/protobuf/internal/impl.(*int32Converter).GoValueOf": {
+        "flat": "128",
+        "flatPercent": 0.41,
+        "cum": "258",
+        "cumPercent": 0.83
+      },
+      "encoding/json.typeEncoder": {
+        "flat": "48",
+        "flatPercent": 0.15,
+        "cum": "332",
+        "cumPercent": 1.07
+      },
+      "encoding/json.(*decodeState).object": {
+        "flat": "20",
+        "flatPercent": 0.064,
+        "cum": "193",
+        "cumPercent": 0.62
+      },
+      "gosprotobodystudy.representativeOperations": {
+        "flat": "11",
+        "flatPercent": 0.035,
+        "cum": "1862",
+        "cumPercent": 6.0
+      },
+      "encoding/json.cachedTypeFields": {
+        "flat": "6",
+        "flatPercent": 0.019,
+        "cum": "352",
+        "cumPercent": 1.13
+      },
+      "encoding/json.newStructEncoder (inline)": {
+        "flat": "4",
+        "flatPercent": 0.013,
+        "cum": "274",
+        "cumPercent": 0.88
+      },
+      "testing.(*M).Run": {
+        "flat": "3",
+        "flatPercent": 0.0097,
+        "cum": "161",
+        "cumPercent": 0.52
+      },
+      "encoding/json.Unmarshal": {
+        "flat": "2",
+        "flatPercent": 0.0064,
+        "cum": "204",
+        "cumPercent": 0.66
+      },
+      "testing.(*B).runN": {
+        "flat": "2",
+        "flatPercent": 0.0064,
+        "cum": "30889",
+        "cumPercent": 99.59
+      },
+      "encoding/json.Marshal": {
+        "flat": "1",
+        "flatPercent": 0.0032,
+        "cum": "281",
+        "cumPercent": 0.91
+      },
+      "encoding/json.MarshalIndent": {
+        "flat": "1",
+        "flatPercent": 0.0032,
+        "cum": "288",
+        "cumPercent": 0.93
+      },
+      "gosprotobodystudy.BenchmarkBodyCost": {
+        "flat": "1",
+        "flatPercent": 0.0032,
+        "cum": "30845",
+        "cumPercent": 99.45
+      },
+      "gosprotobodystudy.representativeCases": {
+        "flat": "1",
+        "flatPercent": 0.0032,
+        "cum": "171",
+        "cumPercent": 0.55
+      },
+      "encoding/json.(*decodeState).array": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "170",
+        "cumPercent": 0.55
+      },
+      "encoding/json.(*decodeState).unmarshal": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "197",
+        "cumPercent": 0.64
+      },
+      "encoding/json.(*decodeState).value": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "197",
+        "cumPercent": 0.64
+      },
+      "encoding/json.(*encodeState).marshal": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "276",
+        "cumPercent": 0.89
+      },
+      "encoding/json.(*encodeState).reflectValue": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "276",
+        "cumPercent": 0.89
+      },
+      "encoding/json.newTypeEncoder": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "306",
+        "cumPercent": 0.99
+      },
+      "encoding/json.valueEncoder": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "263",
+        "cumPercent": 0.85
+      },
+      "github.com/cnooljaw/gosproto.Decode (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "17115",
+        "cumPercent": 55.18
+      },
+      "github.com/cnooljaw/gosproto.DecodePacked": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "22816",
+        "cumPercent": 73.56
+      },
+      "github.com/cnooljaw/gosproto.Unpack (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "5705",
+        "cumPercent": 18.39
+      },
+      "github.com/cnooljaw/gosproto.decodeMessage": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "5705",
+        "cumPercent": 18.39
+      },
+      "google.golang.org/protobuf/encoding/protojson.Unmarshal (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1787",
+        "cumPercent": 5.76
+      },
+      "google.golang.org/protobuf/encoding/protojson.UnmarshalOptions.Unmarshal (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1787",
+        "cumPercent": 5.76
+      },
+      "google.golang.org/protobuf/encoding/protojson.UnmarshalOptions.unmarshal": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1787",
+        "cumPercent": 5.76
+      },
+      "google.golang.org/protobuf/encoding/protojson.decoder.unmarshalList": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1675",
+        "cumPercent": 5.4
+      },
+      "google.golang.org/protobuf/encoding/protojson.decoder.unmarshalMessage": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1786",
+        "cumPercent": 5.76
+      },
+      "google.golang.org/protobuf/encoding/protojson.decoder.unmarshalScalar": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "511",
+        "cumPercent": 1.65
+      },
+      "google.golang.org/protobuf/encoding/protojson.getInt": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "511",
+        "cumPercent": 1.65
+      },
+      "google.golang.org/protobuf/encoding/protojson.unmarshalInt": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "511",
+        "cumPercent": 1.65
+      }
+    },
+    "int32_edges-sproto_pdecode-allocation/space": {
+      "github.com/cnooljaw/gosproto.decodeIntSlice": {
+        "flat": "45640kB",
+        "flatPercent": 65.83,
+        "cum": "45640kB",
+        "cumPercent": 65.83
+      },
+      "github.com/cnooljaw/gosproto.UnpackWithLimit": {
+        "flat": "22820kB",
+        "flatPercent": 32.91,
+        "cum": "22820kB",
+        "cumPercent": 32.91
+      },
+      "github.com/cnooljaw/gosproto.DecodeWithLimits": {
+        "flat": "267.42kB",
+        "flatPercent": 0.39,
+        "cum": "46041.13kB",
+        "cumPercent": 66.4
+      },
+      "gosprotobodystudy.BenchmarkBodyCost": {
+        "flat": "12kB",
+        "flatPercent": 0.017,
+        "cum": "69306.31kB",
+        "cumPercent": 100.0
+      },
+      "testing.(*B).runN": {
+        "flat": "0.12kB",
+        "flatPercent": 0.00018,
+        "cum": "69310.80kB",
+        "cumPercent": 100.0
+      },
+      "github.com/cnooljaw/gosproto.Decode (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "46041.13kB",
+        "cumPercent": 66.4
+      },
+      "github.com/cnooljaw/gosproto.DecodePacked": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "68849.06kB",
+        "cumPercent": 99.3
+      },
+      "github.com/cnooljaw/gosproto.Unpack (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "22820kB",
+        "cumPercent": 32.91
+      },
+      "github.com/cnooljaw/gosproto.decodeMessage": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "45640kB",
+        "cumPercent": 65.83
+      },
+      "gosprotobodystudy.representativeOperations.func8": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "68982.75kB",
+        "cumPercent": 99.49
+      },
+      "testing.(*B).run1.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "69307.37kB",
+        "cumPercent": 100.0
+      }
+    },
+    "echo_ascii4k-sproto_decode-cpu/flat": {
+      "runtime.kevent": {
+        "flat": "1.71s",
+        "flatPercent": 75.33,
+        "cum": "1.71s",
+        "cumPercent": 75.33
+      },
+      "runtime.memmove": {
+        "flat": "0.10s",
+        "flatPercent": 4.41,
+        "cum": "0.10s",
+        "cumPercent": 4.41
+      },
+      "runtime.scanobject": {
+        "flat": "0.05s",
+        "flatPercent": 2.2,
+        "cum": "0.15s",
+        "cumPercent": 6.61
+      },
+      "runtime.typePointers.next": {
+        "flat": "0.05s",
+        "flatPercent": 2.2,
+        "cum": "0.07s",
+        "cumPercent": 3.08
+      },
+      "runtime.scanblock": {
+        "flat": "0.04s",
+        "flatPercent": 1.76,
+        "cum": "0.04s",
+        "cumPercent": 1.76
+      },
+      "runtime.pcvalue": {
+        "flat": "0.03s",
+        "flatPercent": 1.32,
+        "cum": "0.04s",
+        "cumPercent": 1.76
+      },
+      "gcWriteBarrier": {
+        "flat": "0.02s",
+        "flatPercent": 0.88,
+        "cum": "0.02s",
+        "cumPercent": 0.88
+      },
+      "internal/runtime/maps.(*groupReference).elem (inline)": {
+        "flat": "0.02s",
+        "flatPercent": 0.88,
+        "cum": "0.02s",
+        "cumPercent": 0.88
+      },
+      "runtime.findObject": {
+        "flat": "0.02s",
+        "flatPercent": 0.88,
+        "cum": "0.02s",
+        "cumPercent": 0.88
+      },
+      "github.com/cnooljaw/gosproto.decodeMessage": {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.47s",
+        "cumPercent": 20.7
+      },
+      "github.com/cnooljaw/gosproto.decodePointer.setString (inline)": {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.02s",
+        "cumPercent": 0.88
+      },
+      "gosprotobodystudy.representativeOperations.func4": {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.55s",
+        "cumPercent": 24.23
+      },
+      "runtime.(*mheap).allocSpan": {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.03s",
+        "cumPercent": 1.32
+      },
+      "runtime.(*spanSet).reset": {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.02s",
+        "cumPercent": 0.88
+      },
+      "runtime.(*unwinder).resolveInternal": {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.02s",
+        "cumPercent": 0.88
+      },
+      "runtime.mallocgc": {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.33s",
+        "cumPercent": 14.54
+      },
+      "github.com/cnooljaw/gosproto.Decode (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.52s",
+        "cumPercent": 22.91
+      },
+      "github.com/cnooljaw/gosproto.DecodeWithLimits": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.52s",
+        "cumPercent": 22.91
+      },
+      "github.com/cnooljaw/gosproto.GetSprotoType": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.88
+      },
+      "github.com/cnooljaw/gosproto.getbase": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.88
+      },
+      "gosprotobodystudy.BenchmarkBodyCost": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.55s",
+        "cumPercent": 24.23
+      },
+      "gosprotobodystudy.representativeMessages.func8": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.88
+      },
+      "internal/runtime/maps.(*Map).getWithKeySmall": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.88
+      },
+      "runtime.(*mcache).nextFree": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.04s",
+        "cumPercent": 1.76
+      },
+      "runtime.(*mcache).refill": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.04s",
+        "cumPercent": 1.76
+      },
+      "runtime.(*mcentral).cacheSpan": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.32
+      },
+      "runtime.(*mcentral).grow": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.88
+      },
+      "runtime.(*mheap).alloc": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.88
+      },
+      "runtime.(*mheap).alloc.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.32
+      },
+      "runtime.(*stkframe).getStackMap": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.32
+      },
+      "runtime.(*unwinder).next": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.88
+      },
+      "runtime.deductAssistCredit": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.23s",
+        "cumPercent": 10.13
+      },
+      "runtime.finishsweep_m": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.88
+      },
+      "runtime.gcAssistAlloc": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.23s",
+        "cumPercent": 10.13
+      },
+      "runtime.gcAssistAlloc.func2": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.23s",
+        "cumPercent": 10.13
+      },
+      "runtime.gcAssistAlloc1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.23s",
+        "cumPercent": 10.13
+      },
+      "runtime.gcDrainN": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.23s",
+        "cumPercent": 10.13
+      },
+      "runtime.gcMarkTermination.func3": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.97s",
+        "cumPercent": 42.73
+      },
+      "runtime.gcStart": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.88
+      },
+      "runtime.gcStart.func3": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.88
+      }
+    },
+    "echo_ascii4k-sproto_decode-cpu/cum": {
+      "runtime.systemstack": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "2.01s",
+        "cumPercent": 88.55
+      },
+      "runtime.kevent": {
+        "flat": "1.71s",
+        "flatPercent": 75.33,
+        "cum": "1.71s",
+        "cumPercent": 75.33
+      },
+      "runtime.netpoll": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.71s",
+        "cumPercent": 75.33
+      },
+      "runtime.startTheWorldWithSema": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.71s",
+        "cumPercent": 75.33
+      },
+      "runtime.gcMarkTermination.func3": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.97s",
+        "cumPercent": 42.73
+      },
+      "runtime.gcStart.func4": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.74s",
+        "cumPercent": 32.6
+      },
+      "gosprotobodystudy.BenchmarkBodyCost": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.55s",
+        "cumPercent": 24.23
+      },
+      "gosprotobodystudy.representativeOperations.func4": {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.55s",
+        "cumPercent": 24.23
+      },
+      "testing.(*B).run1.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.55s",
+        "cumPercent": 24.23
+      },
+      "testing.(*B).runN": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.55s",
+        "cumPercent": 24.23
+      },
+      "github.com/cnooljaw/gosproto.Decode (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.52s",
+        "cumPercent": 22.91
+      },
+      "github.com/cnooljaw/gosproto.DecodeWithLimits": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.52s",
+        "cumPercent": 22.91
+      },
+      "github.com/cnooljaw/gosproto.decodeMessage": {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.47s",
+        "cumPercent": 20.7
+      },
+      "runtime.slicebytetostring": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.40s",
+        "cumPercent": 17.62
+      },
+      "runtime.mallocgc": {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.33s",
+        "cumPercent": 14.54
+      },
+      "runtime.deductAssistCredit": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.23s",
+        "cumPercent": 10.13
+      },
+      "runtime.gcAssistAlloc": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.23s",
+        "cumPercent": 10.13
+      },
+      "runtime.gcAssistAlloc.func2": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.23s",
+        "cumPercent": 10.13
+      },
+      "runtime.gcAssistAlloc1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.23s",
+        "cumPercent": 10.13
+      },
+      "runtime.gcDrainN": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.23s",
+        "cumPercent": 10.13
+      },
+      "runtime.scanobject": {
+        "flat": "0.05s",
+        "flatPercent": 2.2,
+        "cum": "0.15s",
+        "cumPercent": 6.61
+      },
+      "runtime.memmove": {
+        "flat": "0.10s",
+        "flatPercent": 4.41,
+        "cum": "0.10s",
+        "cumPercent": 4.41
+      },
+      "runtime.mallocgcSmallNoscan": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.08s",
+        "cumPercent": 3.52
+      },
+      "runtime.markroot": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.08s",
+        "cumPercent": 3.52
+      },
+      "runtime.typePointers.next": {
+        "flat": "0.05s",
+        "flatPercent": 2.2,
+        "cum": "0.07s",
+        "cumPercent": 3.08
+      },
+      "runtime.markroot.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.05s",
+        "cumPercent": 2.2
+      },
+      "runtime.scanstack": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.05s",
+        "cumPercent": 2.2
+      },
+      "runtime.(*mcache).nextFree": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.04s",
+        "cumPercent": 1.76
+      },
+      "runtime.(*mcache).refill": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.04s",
+        "cumPercent": 1.76
+      },
+      "runtime.pcvalue": {
+        "flat": "0.03s",
+        "flatPercent": 1.32,
+        "cum": "0.04s",
+        "cumPercent": 1.76
+      },
+      "runtime.scanblock": {
+        "flat": "0.04s",
+        "flatPercent": 1.76,
+        "cum": "0.04s",
+        "cumPercent": 1.76
+      },
+      "runtime.scanframeworker": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.04s",
+        "cumPercent": 1.76
+      },
+      "runtime.(*mcentral).cacheSpan": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.32
+      },
+      "runtime.(*mheap).alloc.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.32
+      },
+      "runtime.(*mheap).allocSpan": {
+        "flat": "0.01s",
+        "flatPercent": 0.44,
+        "cum": "0.03s",
+        "cumPercent": 1.32
+      },
+      "runtime.(*stkframe).getStackMap": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.32
+      },
+      "runtime.markrootBlock": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.32
+      },
+      "runtime.newobject": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.32
+      },
+      "runtime.pcdatavalue": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.32
+      },
+      "gcWriteBarrier": {
+        "flat": "0.02s",
+        "flatPercent": 0.88,
+        "cum": "0.02s",
+        "cumPercent": 0.88
+      }
+    },
+    "echo_ascii4k-sproto_decode-allocation/objects": {
+      "github.com/cnooljaw/gosproto.decodeMessage": {
+        "flat": "20882",
+        "flatPercent": 39.39,
+        "cum": "20882",
+        "cumPercent": 39.39
+      },
+      "reflect.New": {
+        "flat": "10463",
+        "flatPercent": 19.74,
+        "cum": "10463",
+        "cumPercent": 19.74
+      },
+      "gosprotobodystudy.representativeMessages.func8": {
+        "flat": "10442",
+        "flatPercent": 19.7,
+        "cum": "10442",
+        "cumPercent": 19.7
+      },
+      "github.com/cnooljaw/gosproto.DecodeWithLimits": {
+        "flat": "10441",
+        "flatPercent": 19.7,
+        "cum": "41764",
+        "cumPercent": 78.79
+      },
+      "encoding/json.typeFields": {
+        "flat": "215",
+        "flatPercent": 0.41,
+        "cum": "339",
+        "cumPercent": 0.64
+      },
+      "encoding/json.typeEncoder": {
+        "flat": "45",
+        "flatPercent": 0.085,
+        "cum": "327",
+        "cumPercent": 0.62
+      },
+      "encoding/json.cachedTypeFields": {
+        "flat": "6",
+        "flatPercent": 0.011,
+        "cum": "346",
+        "cumPercent": 0.65
+      },
+      "encoding/json.newStructEncoder (inline)": {
+        "flat": "4",
+        "flatPercent": 0.0075,
+        "cum": "274",
+        "cumPercent": 0.52
+      },
+      "testing.(*B).runN": {
+        "flat": "2",
+        "flatPercent": 0.0038,
+        "cum": "52882",
+        "cumPercent": 99.76
+      },
+      "encoding/json.Marshal": {
+        "flat": "1",
+        "flatPercent": 0.0019,
+        "cum": "280",
+        "cumPercent": 0.53
+      },
+      "encoding/json.MarshalIndent": {
+        "flat": "1",
+        "flatPercent": 0.0019,
+        "cum": "287",
+        "cumPercent": 0.54
+      },
+      "gosprotobodystudy.BenchmarkBodyCost": {
+        "flat": "1",
+        "flatPercent": 0.0019,
+        "cum": "52838",
+        "cumPercent": 99.68
+      },
+      "encoding/json.(*encodeState).marshal": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "275",
+        "cumPercent": 0.52
+      },
+      "encoding/json.(*encodeState).reflectValue": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "275",
+        "cumPercent": 0.52
+      },
+      "encoding/json.newTypeEncoder": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "299",
+        "cumPercent": 0.56
+      },
+      "github.com/cnooljaw/gosproto.Decode (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "41764",
+        "cumPercent": 78.79
+      },
+      "gosprotobodystudy.representativeOperations.func4": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "52200",
+        "cumPercent": 98.48
+      },
+      "testing.(*B).run1.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "52844",
+        "cumPercent": 99.69
+      }
+    },
+    "echo_ascii4k-sproto_decode-allocation/space": {
+      "github.com/cnooljaw/gosproto.DecodeWithLimits": {
+        "flat": "489.42kB",
+        "flatPercent": 1.14,
+        "cum": "42498.13kB",
+        "cumPercent": 99.17
+      },
+      "gosprotobodystudy.BenchmarkBodyCost": {
+        "flat": "12kB",
+        "flatPercent": 0.028,
+        "cum": "42836.94kB",
+        "cumPercent": 100.0
+      },
+      "testing.(*B).runN": {
+        "flat": "0.12kB",
+        "flatPercent": 0.00029,
+        "cum": "42841.43kB",
+        "cumPercent": 100.0
+      },
+      "github.com/cnooljaw/gosproto.Decode (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "42498.13kB",
+        "cumPercent": 99.17
+      },
+      "gosprotobodystudy.representativeOperations.func4": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "42575.62kB",
+        "cumPercent": 99.35
+      },
+      "testing.(*B).run1.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "42837.99kB",
+        "cumPercent": 100.0
+      }
+    },
+    "echo_ascii4k-sproto_unpack-cpu/flat": {
+      "runtime.kevent": {
+        "flat": "1.74s",
+        "flatPercent": 79.09,
+        "cum": "1.74s",
+        "cumPercent": 79.09
+      },
+      "github.com/cnooljaw/gosproto.unpackVectorARM64": {
+        "flat": "0.12s",
+        "flatPercent": 5.45,
+        "cum": "0.12s",
+        "cumPercent": 5.45
+      },
+      "runtime.typePointers.next": {
+        "flat": "0.09s",
+        "flatPercent": 4.09,
+        "cum": "0.10s",
+        "cumPercent": 4.55
+      },
+      "runtime.scanobject": {
+        "flat": "0.04s",
+        "flatPercent": 1.82,
+        "cum": "0.18s",
+        "cumPercent": 8.18
+      },
+      "runtime.findObject": {
+        "flat": "0.02s",
+        "flatPercent": 0.91,
+        "cum": "0.02s",
+        "cumPercent": 0.91
+      },
+      "runtime.gcDrainN": {
+        "flat": "0.02s",
+        "flatPercent": 0.91,
+        "cum": "0.26s",
+        "cumPercent": 11.82
+      },
+      "runtime.greyobject": {
+        "flat": "0.02s",
+        "flatPercent": 0.91,
+        "cum": "0.02s",
+        "cumPercent": 0.91
+      },
+      "runtime.madvise": {
+        "flat": "0.02s",
+        "flatPercent": 0.91,
+        "cum": "0.02s",
+        "cumPercent": 0.91
+      },
+      "runtime.scanblock": {
+        "flat": "0.02s",
+        "flatPercent": 0.91,
+        "cum": "0.02s",
+        "cumPercent": 0.91
+      },
+      "runtime.(*mheap).allocSpan": {
+        "flat": "0.01s",
+        "flatPercent": 0.45,
+        "cum": "0.04s",
+        "cumPercent": 1.82
+      },
+      "runtime.mallocgcSmallNoscan": {
+        "flat": "0.01s",
+        "flatPercent": 0.45,
+        "cum": "0.05s",
+        "cumPercent": 2.27
+      },
+      "runtime.pcvalue": {
+        "flat": "0.01s",
+        "flatPercent": 0.45,
+        "cum": "0.02s",
+        "cumPercent": 0.91
+      },
+      "github.com/cnooljaw/gosproto.Unpack (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.43s",
+        "cumPercent": 19.55
+      },
+      "github.com/cnooljaw/gosproto.UnpackWithLimit": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.43s",
+        "cumPercent": 19.55
+      },
+      "github.com/cnooljaw/gosproto.unpackVector (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.12s",
+        "cumPercent": 5.45
+      },
+      "gosprotobodystudy.BenchmarkBodyCost": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.43s",
+        "cumPercent": 19.55
+      },
+      "gosprotobodystudy.representativeOperations.func6": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.43s",
+        "cumPercent": 19.55
+      },
+      "runtime.(*mcache).nextFree": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.36
+      },
+      "runtime.(*mcache).refill": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.36
+      },
+      "runtime.(*mcentral).cacheSpan": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.36
+      },
+      "runtime.(*mcentral).grow": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.91
+      },
+      "runtime.(*mheap).alloc": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.91
+      },
+      "runtime.(*mheap).alloc.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.04s",
+        "cumPercent": 1.82
+      },
+      "runtime.(*pageAlloc).update": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.91
+      },
+      "runtime.deductAssistCredit": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.26s",
+        "cumPercent": 11.82
+      },
+      "runtime.gcAssistAlloc": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.26s",
+        "cumPercent": 11.82
+      },
+      "runtime.gcAssistAlloc.func2": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.26s",
+        "cumPercent": 11.82
+      },
+      "runtime.gcAssistAlloc1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.26s",
+        "cumPercent": 11.82
+      },
+      "runtime.gcMarkTermination.func3": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.10s",
+        "cumPercent": 50.0
+      },
+      "runtime.gcStart.func4": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.64s",
+        "cumPercent": 29.09
+      },
+      "runtime.makeslice": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.31s",
+        "cumPercent": 14.09
+      },
+      "runtime.mallocgc": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.31s",
+        "cumPercent": 14.09
+      },
+      "runtime.markroot": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.05s",
+        "cumPercent": 2.27
+      },
+      "runtime.markroot.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.91
+      },
+      "runtime.markrootBlock": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.91
+      },
+      "runtime.netpoll": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.74s",
+        "cumPercent": 79.09
+      },
+      "runtime.scanstack": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.91
+      },
+      "runtime.startTheWorldWithSema": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.74s",
+        "cumPercent": 79.09
+      },
+      "runtime.sysUsed (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.91
+      },
+      "runtime.sysUsedOS (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.91
+      }
+    },
+    "echo_ascii4k-sproto_unpack-cpu/cum": {
+      "runtime.systemstack": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "2.05s",
+        "cumPercent": 93.18
+      },
+      "runtime.kevent": {
+        "flat": "1.74s",
+        "flatPercent": 79.09,
+        "cum": "1.74s",
+        "cumPercent": 79.09
+      },
+      "runtime.netpoll": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.74s",
+        "cumPercent": 79.09
+      },
+      "runtime.startTheWorldWithSema": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.74s",
+        "cumPercent": 79.09
+      },
+      "runtime.gcMarkTermination.func3": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.10s",
+        "cumPercent": 50.0
+      },
+      "runtime.gcStart.func4": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.64s",
+        "cumPercent": 29.09
+      },
+      "github.com/cnooljaw/gosproto.Unpack (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.43s",
+        "cumPercent": 19.55
+      },
+      "github.com/cnooljaw/gosproto.UnpackWithLimit": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.43s",
+        "cumPercent": 19.55
+      },
+      "gosprotobodystudy.BenchmarkBodyCost": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.43s",
+        "cumPercent": 19.55
+      },
+      "gosprotobodystudy.representativeOperations.func6": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.43s",
+        "cumPercent": 19.55
+      },
+      "testing.(*B).run1.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.43s",
+        "cumPercent": 19.55
+      },
+      "testing.(*B).runN": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.43s",
+        "cumPercent": 19.55
+      },
+      "runtime.makeslice": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.31s",
+        "cumPercent": 14.09
+      },
+      "runtime.mallocgc": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.31s",
+        "cumPercent": 14.09
+      },
+      "runtime.deductAssistCredit": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.26s",
+        "cumPercent": 11.82
+      },
+      "runtime.gcAssistAlloc": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.26s",
+        "cumPercent": 11.82
+      },
+      "runtime.gcAssistAlloc.func2": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.26s",
+        "cumPercent": 11.82
+      },
+      "runtime.gcAssistAlloc1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.26s",
+        "cumPercent": 11.82
+      },
+      "runtime.gcDrainN": {
+        "flat": "0.02s",
+        "flatPercent": 0.91,
+        "cum": "0.26s",
+        "cumPercent": 11.82
+      },
+      "runtime.scanobject": {
+        "flat": "0.04s",
+        "flatPercent": 1.82,
+        "cum": "0.18s",
+        "cumPercent": 8.18
+      },
+      "github.com/cnooljaw/gosproto.unpackVector (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.12s",
+        "cumPercent": 5.45
+      },
+      "github.com/cnooljaw/gosproto.unpackVectorARM64": {
+        "flat": "0.12s",
+        "flatPercent": 5.45,
+        "cum": "0.12s",
+        "cumPercent": 5.45
+      },
+      "runtime.typePointers.next": {
+        "flat": "0.09s",
+        "flatPercent": 4.09,
+        "cum": "0.10s",
+        "cumPercent": 4.55
+      },
+      "runtime.mallocgcSmallNoscan": {
+        "flat": "0.01s",
+        "flatPercent": 0.45,
+        "cum": "0.05s",
+        "cumPercent": 2.27
+      },
+      "runtime.markroot": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.05s",
+        "cumPercent": 2.27
+      },
+      "runtime.(*mheap).alloc.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.04s",
+        "cumPercent": 1.82
+      },
+      "runtime.(*mheap).allocSpan": {
+        "flat": "0.01s",
+        "flatPercent": 0.45,
+        "cum": "0.04s",
+        "cumPercent": 1.82
+      },
+      "runtime.(*mcache).nextFree": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.36
+      },
+      "runtime.(*mcache).refill": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.36
+      },
+      "runtime.(*mcentral).cacheSpan": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.03s",
+        "cumPercent": 1.36
+      },
+      "runtime.(*mcentral).grow": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.91
+      },
+      "runtime.(*mheap).alloc": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.91
+      },
+      "runtime.(*pageAlloc).update": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.91
+      },
+      "runtime.findObject": {
+        "flat": "0.02s",
+        "flatPercent": 0.91,
+        "cum": "0.02s",
+        "cumPercent": 0.91
+      },
+      "runtime.greyobject": {
+        "flat": "0.02s",
+        "flatPercent": 0.91,
+        "cum": "0.02s",
+        "cumPercent": 0.91
+      },
+      "runtime.madvise": {
+        "flat": "0.02s",
+        "flatPercent": 0.91,
+        "cum": "0.02s",
+        "cumPercent": 0.91
+      },
+      "runtime.markroot.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.91
+      },
+      "runtime.markrootBlock": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.91
+      },
+      "runtime.pcvalue": {
+        "flat": "0.01s",
+        "flatPercent": 0.45,
+        "cum": "0.02s",
+        "cumPercent": 0.91
+      },
+      "runtime.scanblock": {
+        "flat": "0.02s",
+        "flatPercent": 0.91,
+        "cum": "0.02s",
+        "cumPercent": 0.91
+      }
+    },
+    "echo_ascii4k-sproto_unpack-allocation/objects": {
+      "github.com/cnooljaw/gosproto.UnpackWithLimit": {
+        "flat": "41609",
+        "flatPercent": 98.09,
+        "cum": "41609",
+        "cumPercent": 98.09
+      },
+      "encoding/json.typeFields": {
+        "flat": "215",
+        "flatPercent": 0.51,
+        "cum": "340",
+        "cumPercent": 0.8
+      },
+      "encoding/json.typeEncoder": {
+        "flat": "45",
+        "flatPercent": 0.11,
+        "cum": "329",
+        "cumPercent": 0.78
+      },
+      "encoding/json.cachedTypeFields": {
+        "flat": "6",
+        "flatPercent": 0.014,
+        "cum": "347",
+        "cumPercent": 0.82
+      },
+      "encoding/json.newStructEncoder (inline)": {
+        "flat": "4",
+        "flatPercent": 0.0094,
+        "cum": "276",
+        "cumPercent": 0.65
+      },
+      "testing.(*B).runN": {
+        "flat": "2",
+        "flatPercent": 0.0047,
+        "cum": "42295",
+        "cumPercent": 99.7
+      },
+      "encoding/json.Marshal": {
+        "flat": "1",
+        "flatPercent": 0.0024,
+        "cum": "285",
+        "cumPercent": 0.67
+      },
+      "encoding/json.MarshalIndent": {
+        "flat": "1",
+        "flatPercent": 0.0024,
+        "cum": "293",
+        "cumPercent": 0.69
+      },
+      "gosprotobodystudy.BenchmarkBodyCost": {
+        "flat": "1",
+        "flatPercent": 0.0024,
+        "cum": "42251",
+        "cumPercent": 99.6
+      },
+      "encoding/json.(*encodeState).marshal": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "280",
+        "cumPercent": 0.66
+      },
+      "encoding/json.(*encodeState).reflectValue": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "280",
+        "cumPercent": 0.66
+      },
+      "encoding/json.newTypeEncoder": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "301",
+        "cumPercent": 0.71
+      },
+      "encoding/json.valueEncoder": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "266",
+        "cumPercent": 0.63
+      },
+      "github.com/cnooljaw/gosproto.Unpack (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "41609",
+        "cumPercent": 98.09
+      },
+      "gosprotobodystudy.representativeOperations.func6": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "41608",
+        "cumPercent": 98.08
+      },
+      "testing.(*B).run1.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "42257",
+        "cumPercent": 99.61
+      }
+    },
+    "echo_ascii4k-sproto_unpack-allocation/space": {
+      "gosprotobodystudy.BenchmarkBodyCost": {
+        "flat": "12kB",
+        "flatPercent": 0.0061,
+        "cum": "197909.68kB",
+        "cumPercent": 100.0
+      },
+      "github.com/cnooljaw/gosproto.Unpack (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "197642.75kB",
+        "cumPercent": 99.86
+      },
+      "gosprotobodystudy.representativeOperations.func6": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "197638kB",
+        "cumPercent": 99.85
+      },
+      "testing.(*B).run1.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "197910.73kB",
+        "cumPercent": 100.0
+      }
+    },
+    "echo_ascii4k-sproto_pdecode-cpu/flat": {
+      "runtime.kevent": {
+        "flat": "1.88s",
+        "flatPercent": 87.44,
+        "cum": "1.88s",
+        "cumPercent": 87.44
+      },
+      "runtime.typePointers.next": {
+        "flat": "0.06s",
+        "flatPercent": 2.79,
+        "cum": "0.06s",
+        "cumPercent": 2.79
+      },
+      "github.com/cnooljaw/gosproto.unpackVectorARM64": {
+        "flat": "0.04s",
+        "flatPercent": 1.86,
+        "cum": "0.04s",
+        "cumPercent": 1.86
+      },
+      "github.com/cnooljaw/gosproto.decodeMessage": {
+        "flat": "0.02s",
+        "flatPercent": 0.93,
+        "cum": "0.14s",
+        "cumPercent": 6.51
+      },
+      "runtime.findObject": {
+        "flat": "0.02s",
+        "flatPercent": 0.93,
+        "cum": "0.03s",
+        "cumPercent": 1.4
+      },
+      "github.com/cnooljaw/gosproto.unpackVector (inline)": {
+        "flat": "0.01s",
+        "flatPercent": 0.47,
+        "cum": "0.05s",
+        "cumPercent": 2.33
+      },
+      "runtime.scanobject": {
+        "flat": "0.01s",
+        "flatPercent": 0.47,
+        "cum": "0.10s",
+        "cumPercent": 4.65
+      },
+      "github.com/cnooljaw/gosproto.Decode (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.15s",
+        "cumPercent": 6.98
+      },
+      "github.com/cnooljaw/gosproto.DecodePacked": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.27s",
+        "cumPercent": 12.56
+      },
+      "github.com/cnooljaw/gosproto.DecodeWithLimits": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.15s",
+        "cumPercent": 6.98
+      },
+      "github.com/cnooljaw/gosproto.Unpack (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.12s",
+        "cumPercent": 5.58
+      },
+      "github.com/cnooljaw/gosproto.UnpackWithLimit": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.12s",
+        "cumPercent": 5.58
+      },
+      "gosprotobodystudy.BenchmarkBodyCost": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.27s",
+        "cumPercent": 12.56
+      },
+      "gosprotobodystudy.representativeOperations.func8": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.27s",
+        "cumPercent": 12.56
+      },
+      "runtime.(*mcache).nextFree": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.04s",
+        "cumPercent": 1.86
+      },
+      "runtime.(*mcache).refill": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.04s",
+        "cumPercent": 1.86
+      },
+      "runtime.(*mcentral).cacheSpan": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.04s",
+        "cumPercent": 1.86
+      },
+      "runtime.(*mcentral).grow": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.93
+      },
+      "runtime.(*mheap).alloc": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.93
+      },
+      "runtime.(*mheap).alloc.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.93
+      },
+      "runtime.(*mheap).allocSpan": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.93
+      },
+      "runtime.(*mheap).initSpan": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.93
+      },
+      "runtime.(*sweepLocked).sweep": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.93
+      },
+      "runtime.deductAssistCredit": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.11s",
+        "cumPercent": 5.12
+      },
+      "runtime.gcAssistAlloc": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.11s",
+        "cumPercent": 5.12
+      },
+      "runtime.gcAssistAlloc.func2": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.11s",
+        "cumPercent": 5.12
+      },
+      "runtime.gcAssistAlloc1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.11s",
+        "cumPercent": 5.12
+      },
+      "runtime.gcDrainN": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.11s",
+        "cumPercent": 5.12
+      },
+      "runtime.gcMarkTermination.func3": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.17s",
+        "cumPercent": 54.42
+      },
+      "runtime.gcStart.func4": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.71s",
+        "cumPercent": 33.02
+      },
+      "runtime.makeslice": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.07s",
+        "cumPercent": 3.26
+      },
+      "runtime.mallocgc": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.17s",
+        "cumPercent": 7.91
+      },
+      "runtime.mallocgcSmallNoscan": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.06s",
+        "cumPercent": 2.79
+      },
+      "runtime.netpoll": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.88s",
+        "cumPercent": 87.44
+      },
+      "runtime.slicebytetostring": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.10s",
+        "cumPercent": 4.65
+      },
+      "runtime.startTheWorldWithSema": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.88s",
+        "cumPercent": 87.44
+      },
+      "runtime.systemstack": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "2.03s",
+        "cumPercent": 94.42
+      },
+      "testing.(*B).run1.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.27s",
+        "cumPercent": 12.56
+      },
+      "testing.(*B).runN": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.27s",
+        "cumPercent": 12.56
+      }
+    },
+    "echo_ascii4k-sproto_pdecode-cpu/cum": {
+      "runtime.systemstack": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "2.03s",
+        "cumPercent": 94.42
+      },
+      "runtime.kevent": {
+        "flat": "1.88s",
+        "flatPercent": 87.44,
+        "cum": "1.88s",
+        "cumPercent": 87.44
+      },
+      "runtime.netpoll": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.88s",
+        "cumPercent": 87.44
+      },
+      "runtime.startTheWorldWithSema": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.88s",
+        "cumPercent": 87.44
+      },
+      "runtime.gcMarkTermination.func3": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "1.17s",
+        "cumPercent": 54.42
+      },
+      "runtime.gcStart.func4": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.71s",
+        "cumPercent": 33.02
+      },
+      "github.com/cnooljaw/gosproto.DecodePacked": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.27s",
+        "cumPercent": 12.56
+      },
+      "gosprotobodystudy.BenchmarkBodyCost": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.27s",
+        "cumPercent": 12.56
+      },
+      "gosprotobodystudy.representativeOperations.func8": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.27s",
+        "cumPercent": 12.56
+      },
+      "testing.(*B).run1.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.27s",
+        "cumPercent": 12.56
+      },
+      "testing.(*B).runN": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.27s",
+        "cumPercent": 12.56
+      },
+      "runtime.mallocgc": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.17s",
+        "cumPercent": 7.91
+      },
+      "github.com/cnooljaw/gosproto.Decode (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.15s",
+        "cumPercent": 6.98
+      },
+      "github.com/cnooljaw/gosproto.DecodeWithLimits": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.15s",
+        "cumPercent": 6.98
+      },
+      "github.com/cnooljaw/gosproto.decodeMessage": {
+        "flat": "0.02s",
+        "flatPercent": 0.93,
+        "cum": "0.14s",
+        "cumPercent": 6.51
+      },
+      "github.com/cnooljaw/gosproto.Unpack (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.12s",
+        "cumPercent": 5.58
+      },
+      "github.com/cnooljaw/gosproto.UnpackWithLimit": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.12s",
+        "cumPercent": 5.58
+      },
+      "runtime.deductAssistCredit": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.11s",
+        "cumPercent": 5.12
+      },
+      "runtime.gcAssistAlloc": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.11s",
+        "cumPercent": 5.12
+      },
+      "runtime.gcAssistAlloc.func2": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.11s",
+        "cumPercent": 5.12
+      },
+      "runtime.gcAssistAlloc1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.11s",
+        "cumPercent": 5.12
+      },
+      "runtime.gcDrainN": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.11s",
+        "cumPercent": 5.12
+      },
+      "runtime.scanobject": {
+        "flat": "0.01s",
+        "flatPercent": 0.47,
+        "cum": "0.10s",
+        "cumPercent": 4.65
+      },
+      "runtime.slicebytetostring": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.10s",
+        "cumPercent": 4.65
+      },
+      "runtime.makeslice": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.07s",
+        "cumPercent": 3.26
+      },
+      "runtime.mallocgcSmallNoscan": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.06s",
+        "cumPercent": 2.79
+      },
+      "runtime.typePointers.next": {
+        "flat": "0.06s",
+        "flatPercent": 2.79,
+        "cum": "0.06s",
+        "cumPercent": 2.79
+      },
+      "github.com/cnooljaw/gosproto.unpackVector (inline)": {
+        "flat": "0.01s",
+        "flatPercent": 0.47,
+        "cum": "0.05s",
+        "cumPercent": 2.33
+      },
+      "github.com/cnooljaw/gosproto.unpackVectorARM64": {
+        "flat": "0.04s",
+        "flatPercent": 1.86,
+        "cum": "0.04s",
+        "cumPercent": 1.86
+      },
+      "runtime.(*mcache).nextFree": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.04s",
+        "cumPercent": 1.86
+      },
+      "runtime.(*mcache).refill": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.04s",
+        "cumPercent": 1.86
+      },
+      "runtime.(*mcentral).cacheSpan": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.04s",
+        "cumPercent": 1.86
+      },
+      "runtime.findObject": {
+        "flat": "0.02s",
+        "flatPercent": 0.93,
+        "cum": "0.03s",
+        "cumPercent": 1.4
+      },
+      "runtime.(*mcentral).grow": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.93
+      },
+      "runtime.(*mheap).alloc": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.93
+      },
+      "runtime.(*mheap).alloc.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.93
+      },
+      "runtime.(*mheap).allocSpan": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.93
+      },
+      "runtime.(*mheap).initSpan": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.93
+      },
+      "runtime.(*sweepLocked).sweep": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "0.02s",
+        "cumPercent": 0.93
+      }
+    },
+    "echo_ascii4k-sproto_pdecode-allocation/objects": {
+      "github.com/cnooljaw/gosproto.decodeMessage": {
+        "flat": "19090",
+        "flatPercent": 32.87,
+        "cum": "19090",
+        "cumPercent": 32.87
+      },
+      "reflect.New": {
+        "flat": "9567",
+        "flatPercent": 16.47,
+        "cum": "9567",
+        "cumPercent": 16.47
+      },
+      "gosprotobodystudy.representativeMessages.func8": {
+        "flat": "9546",
+        "flatPercent": 16.44,
+        "cum": "9546",
+        "cumPercent": 16.44
+      },
+      "github.com/cnooljaw/gosproto.DecodeWithLimits": {
+        "flat": "9545",
+        "flatPercent": 16.44,
+        "cum": "38180",
+        "cumPercent": 65.74
+      },
+      "github.com/cnooljaw/gosproto.UnpackWithLimit": {
+        "flat": "9545",
+        "flatPercent": 16.44,
+        "cum": "9545",
+        "cumPercent": 16.44
+      },
+      "encoding/json.typeFields": {
+        "flat": "215",
+        "flatPercent": 0.37,
+        "cum": "341",
+        "cumPercent": 0.59
+      },
+      "encoding/json.typeEncoder": {
+        "flat": "45",
+        "flatPercent": 0.077,
+        "cum": "330",
+        "cumPercent": 0.57
+      },
+      "encoding/json.cachedTypeFields": {
+        "flat": "6",
+        "flatPercent": 0.01,
+        "cum": "348",
+        "cumPercent": 0.6
+      },
+      "testing.(*B).runN": {
+        "flat": "2",
+        "flatPercent": 0.0034,
+        "cum": "57949",
+        "cumPercent": 99.78
+      },
+      "encoding/json.MarshalIndent": {
+        "flat": "1",
+        "flatPercent": 0.0017,
+        "cum": "290",
+        "cumPercent": 0.5
+      },
+      "gosprotobodystudy.BenchmarkBodyCost": {
+        "flat": "1",
+        "flatPercent": 0.0017,
+        "cum": "57905",
+        "cumPercent": 99.71
+      },
+      "encoding/json.newTypeEncoder": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "301",
+        "cumPercent": 0.52
+      },
+      "github.com/cnooljaw/gosproto.Decode (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "38180",
+        "cumPercent": 65.74
+      },
+      "github.com/cnooljaw/gosproto.DecodePacked": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "47720",
+        "cumPercent": 82.17
+      },
+      "github.com/cnooljaw/gosproto.Unpack (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "9545",
+        "cumPercent": 16.44
+      },
+      "gosprotobodystudy.representativeOperations.func8": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "57264",
+        "cumPercent": 98.6
+      },
+      "testing.(*B).run1.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "57911",
+        "cumPercent": 99.72
+      }
+    },
+    "echo_ascii4k-sproto_pdecode-allocation/space": {
+      "github.com/cnooljaw/gosproto.DecodeWithLimits": {
+        "flat": "447.42kB",
+        "flatPercent": 0.53,
+        "cum": "38851.13kB",
+        "cumPercent": 45.96
+      },
+      "gosprotobodystudy.BenchmarkBodyCost": {
+        "flat": "12kB",
+        "flatPercent": 0.014,
+        "cum": "84520.16kB",
+        "cumPercent": 100.0
+      },
+      "testing.(*B).runN": {
+        "flat": "0.12kB",
+        "flatPercent": 0.00015,
+        "cum": "84524.65kB",
+        "cumPercent": 100.0
+      },
+      "github.com/cnooljaw/gosproto.Decode (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "38851.13kB",
+        "cumPercent": 45.96
+      },
+      "github.com/cnooljaw/gosproto.DecodePacked": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "84181.06kB",
+        "cumPercent": 99.58
+      },
+      "github.com/cnooljaw/gosproto.Unpack (inline)": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "45338.75kB",
+        "cumPercent": 53.63
+      },
+      "gosprotobodystudy.representativeOperations.func8": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "84255.62kB",
+        "cumPercent": 99.67
+      },
+      "testing.(*B).run1.func1": {
+        "flat": "0",
+        "flatPercent": 0.0,
+        "cum": "84521.21kB",
+        "cumPercent": 100.0
+      }
+    }
+  }
+}

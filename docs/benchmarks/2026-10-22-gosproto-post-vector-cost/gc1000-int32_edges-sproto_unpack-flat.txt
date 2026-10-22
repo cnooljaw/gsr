@@ -1,0 +1,30 @@
+File: body.test
+Type: cpu
+Time: 2026-10-22 15:55:38 CST
+Duration: 2.72s, Total samples = 2.40s (88.34%)
+Showing nodes accounting for 2.33s, 97.08% of 2.40s total
+Dropped 23 nodes (cum <= 0.01s)
+      flat  flat%   sum%        cum   cum%
+     0.95s 39.58% 39.58%      0.95s 39.58%  github.com/cnooljaw/gosproto.unpackVectorARM64
+     0.77s 32.08% 71.67%      2.10s 87.50%  github.com/cnooljaw/gosproto.UnpackWithLimit
+     0.25s 10.42% 82.08%      0.25s 10.42%  runtime.madvise
+     0.20s  8.33% 90.42%      0.20s  8.33%  math/bits.OnesCount8 (inline)
+     0.13s  5.42% 95.83%      0.13s  5.42%  runtime.memclrNoHeapPointers
+     0.01s  0.42% 96.25%      2.12s 88.33%  gosprotobodystudy.representativeOperations.func6
+     0.01s  0.42% 96.67%      0.03s  1.25%  runtime.deductSweepCredit
+     0.01s  0.42% 97.08%      0.28s 11.67%  runtime.systemstack
+         0     0% 97.08%      2.10s 87.50%  github.com/cnooljaw/gosproto.Unpack (inline)
+         0     0% 97.08%      0.95s 39.58%  github.com/cnooljaw/gosproto.unpackVector (inline)
+         0     0% 97.08%      2.12s 88.33%  gosprotobodystudy.BenchmarkBodyCost
+         0     0% 97.08%      0.05s  2.08%  runtime.(*mcache).nextFree
+         0     0% 97.08%      0.05s  2.08%  runtime.(*mcache).refill
+         0     0% 97.08%      0.05s  2.08%  runtime.(*mcentral).cacheSpan
+         0     0% 97.08%      0.25s 10.42%  runtime.(*mheap).alloc.func1
+         0     0% 97.08%      0.25s 10.42%  runtime.(*mheap).allocSpan
+         0     0% 97.08%      0.18s  7.50%  runtime.makeslice
+         0     0% 97.08%      0.18s  7.50%  runtime.mallocgc
+         0     0% 97.08%      0.18s  7.50%  runtime.mallocgcSmallNoscan
+         0     0% 97.08%      0.24s 10.00%  runtime.sysUsed (inline)
+         0     0% 97.08%      0.24s 10.00%  runtime.sysUsedOS (inline)
+         0     0% 97.08%      2.12s 88.33%  testing.(*B).run1.func1
+         0     0% 97.08%      2.12s 88.33%  testing.(*B).runN

@@ -1,0 +1,45 @@
+File: body.test
+Type: cpu
+Time: 2026-10-22 15:54:08 CST
+Duration: 2.63s, Total samples = 2.29s (87.15%)
+Showing nodes accounting for 2.22s, 96.94% of 2.29s total
+Dropped 24 nodes (cum <= 0.01s)
+      flat  flat%   sum%        cum   cum%
+     1.77s 77.29% 77.29%      1.77s 77.29%  runtime.kevent
+     0.13s  5.68% 82.97%      0.33s 14.41%  github.com/cnooljaw/gosproto.UnpackWithLimit
+     0.10s  4.37% 87.34%      0.10s  4.37%  github.com/cnooljaw/gosproto.unpackVectorARM64
+     0.05s  2.18% 89.52%      0.11s  4.80%  runtime.scanobject
+     0.04s  1.75% 91.27%      0.12s  5.24%  github.com/cnooljaw/gosproto.decodeIntSlice
+     0.04s  1.75% 93.01%      0.04s  1.75%  math/bits.OnesCount8 (inline)
+     0.04s  1.75% 94.76%      0.04s  1.75%  runtime.typePointers.next
+     0.02s  0.87% 95.63%      0.02s  0.87%  runtime.(*spanSet).push
+     0.01s  0.44% 96.07%      0.05s  2.18%  gosprotobodystudy.representativeMessages.func6
+     0.01s  0.44% 96.51%      0.02s  0.87%  runtime.(*mheap).allocSpan
+     0.01s  0.44% 96.94%      0.12s  5.24%  runtime.gcDrainN
+         0     0% 96.94%      0.13s  5.68%  github.com/cnooljaw/gosproto.Decode (inline)
+         0     0% 96.94%      0.46s 20.09%  github.com/cnooljaw/gosproto.DecodePacked
+         0     0% 96.94%      0.13s  5.68%  github.com/cnooljaw/gosproto.DecodeWithLimits
+         0     0% 96.94%      0.33s 14.41%  github.com/cnooljaw/gosproto.Unpack (inline)
+         0     0% 96.94%      0.12s  5.24%  github.com/cnooljaw/gosproto.decodeMessage
+         0     0% 96.94%      0.10s  4.37%  github.com/cnooljaw/gosproto.unpackVector (inline)
+         0     0% 96.94%      0.51s 22.27%  gosprotobodystudy.BenchmarkBodyCost
+         0     0% 96.94%      0.51s 22.27%  gosprotobodystudy.representativeOperations.func8
+         0     0% 96.94%      0.03s  1.31%  runtime.(*mcache).nextFree
+         0     0% 96.94%      0.03s  1.31%  runtime.(*mcache).refill
+         0     0% 96.94%      0.02s  0.87%  runtime.(*mcentral).uncacheSpan
+         0     0% 96.94%      0.02s  0.87%  runtime.(*mheap).alloc.func1
+         0     0% 96.94%      0.13s  5.68%  runtime.deductAssistCredit
+         0     0% 96.94%      0.13s  5.68%  runtime.gcAssistAlloc
+         0     0% 96.94%      0.12s  5.24%  runtime.gcAssistAlloc.func2
+         0     0% 96.94%      0.12s  5.24%  runtime.gcAssistAlloc1
+         0     0% 96.94%      1.09s 47.60%  runtime.gcMarkTermination.func3
+         0     0% 96.94%      0.68s 29.69%  runtime.gcStart.func4
+         0     0% 96.94%      0.13s  5.68%  runtime.makeslice
+         0     0% 96.94%      0.18s  7.86%  runtime.mallocgc
+         0     0% 96.94%      0.05s  2.18%  runtime.mallocgcSmallNoscan
+         0     0% 96.94%      1.77s 77.29%  runtime.netpoll
+         0     0% 96.94%      0.05s  2.18%  runtime.newobject
+         0     0% 96.94%      1.77s 77.29%  runtime.startTheWorldWithSema
+         0     0% 96.94%      1.92s 83.84%  runtime.systemstack
+         0     0% 96.94%      0.51s 22.27%  testing.(*B).run1.func1
+         0     0% 96.94%      0.51s 22.27%  testing.(*B).runN

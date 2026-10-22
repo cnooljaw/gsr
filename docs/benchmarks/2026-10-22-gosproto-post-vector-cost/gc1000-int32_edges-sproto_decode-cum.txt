@@ -1,0 +1,48 @@
+File: body.test
+Type: cpu
+Time: 2026-10-22 15:55:35 CST
+Duration: 2.59s, Total samples = 2.30s (88.94%)
+Showing nodes accounting for 1.57s, 68.26% of 2.30s total
+Dropped 56 nodes (cum <= 0.01s)
+Showing top 40 nodes out of 89
+      flat  flat%   sum%        cum   cum%
+         0     0%     0%      2.12s 92.17%  gosprotobodystudy.BenchmarkBodyCost
+         0     0%     0%      2.12s 92.17%  testing.(*B).run1.func1
+         0     0%     0%      2.12s 92.17%  testing.(*B).runN
+         0     0%     0%      2.11s 91.74%  gosprotobodystudy.representativeOperations.func4
+         0     0%     0%      2.04s 88.70%  github.com/cnooljaw/gosproto.Decode (inline)
+         0     0%     0%      2.04s 88.70%  github.com/cnooljaw/gosproto.DecodeWithLimits
+         0     0%     0%      1.79s 77.83%  github.com/cnooljaw/gosproto.decodeMessage
+     0.91s 39.57% 39.57%      1.76s 76.52%  github.com/cnooljaw/gosproto.decodeIntSlice
+     0.04s  1.74% 41.30%      0.94s 40.87%  runtime.mallocgc
+         0     0% 41.30%      0.76s 33.04%  runtime.makeslice
+     0.01s  0.43% 41.74%      0.75s 32.61%  runtime.mallocgcSmallNoscan
+         0     0% 41.74%      0.51s 22.17%  runtime.(*mcache).nextFree
+     0.06s  2.61% 44.35%      0.50s 21.74%  runtime.(*mcache).refill
+     0.01s  0.43% 44.78%      0.49s 21.30%  runtime.systemstack
+     0.05s  2.17% 46.96%      0.41s 17.83%  runtime.(*mcentral).cacheSpan
+     0.01s  0.43% 47.39%      0.23s 10.00%  runtime.deductSweepCredit
+     0.02s  0.87% 48.26%      0.20s  8.70%  runtime.(*sweepLocked).sweep
+         0     0% 48.26%      0.20s  8.70%  runtime.sweepone
+         0     0% 48.26%      0.16s  6.96%  runtime.(*mheap).freeSpan (inline)
+         0     0% 48.26%      0.15s  6.52%  runtime.(*mheap).alloc.func1
+         0     0% 48.26%      0.15s  6.52%  runtime.(*sweepLocked).sweep.(*mheap).freeSpan.func2
+     0.15s  6.52% 54.78%      0.15s  6.52%  runtime.memclrNoHeapPointers
+         0     0% 54.78%      0.14s  6.09%  runtime.(*mheap).allocSpan
+     0.04s  1.74% 56.52%      0.14s  6.09%  runtime.(*mheap).freeSpanLocked
+         0     0% 56.52%      0.12s  5.22%  runtime.newobject
+     0.09s  3.91% 60.43%      0.09s  3.91%  runtime.madvise
+         0     0% 60.43%      0.09s  3.91%  runtime.sysUsed (inline)
+         0     0% 60.43%      0.09s  3.91%  runtime.sysUsedOS (inline)
+     0.08s  3.48% 63.91%      0.08s  3.48%  encoding/binary.littleEndian.Uint32 (inline)
+         0     0% 63.91%      0.08s  3.48%  github.com/cnooljaw/gosproto.readUint32 (inline)
+         0     0% 63.91%      0.08s  3.48%  runtime.(*mcentral).grow
+         0     0% 63.91%      0.08s  3.48%  runtime.deductAssistCredit
+     0.01s  0.43% 64.35%      0.08s  3.48%  runtime.gcAssistAlloc
+         0     0% 64.35%      0.07s  3.04%  gosprotobodystudy.representativeMessages.func6
+     0.01s  0.43% 64.78%      0.07s  3.04%  reflect.New
+     0.01s  0.43% 65.22%      0.07s  3.04%  runtime.(*mheap).alloc
+         0     0% 65.22%      0.07s  3.04%  runtime.gcAssistAlloc.func2
+         0     0% 65.22%      0.07s  3.04%  runtime.gcAssistAlloc1
+         0     0% 65.22%      0.07s  3.04%  runtime.gcDrainN
+     0.07s  3.04% 68.26%      0.07s  3.04%  runtime.kevent

@@ -1,0 +1,20 @@
+File: body.test
+Type: alloc_objects
+Time: 2026-10-22 15:53:52 CST
+Showing nodes accounting for 1713823, 99.56% of 1721370 total
+Dropped 334 nodes (cum <= 8606)
+      flat  flat%   sum%        cum   cum%
+    984771 57.21% 57.21%     984771 57.21%  github.com/cnooljaw/gosproto.decodeIntegerRecord
+    662372 38.48% 95.69%     662372 38.48%  reflect.New
+     20516  1.19% 96.88%    1702831 98.92%  github.com/cnooljaw/gosproto.decodeMessage
+     10258   0.6% 97.48%      10258   0.6%  github.com/cnooljaw/gosproto.decodeIntSlice
+     10258   0.6% 98.07%      20516  1.19%  github.com/cnooljaw/gosproto.decodeStringSlice
+     10258   0.6% 98.67%      20516  1.19%  reflect.MakeSlice
+     10258   0.6% 99.26%      10258   0.6%  reflect.unsafe_NewArray
+      5129   0.3% 99.56%    1713089 99.52%  github.com/cnooljaw/gosproto.DecodeWithLimits
+         2 0.00012% 99.56%    1721244   100%  testing.(*B).runN
+         1 5.8e-05% 99.56%    1721200   100%  gosprotobodystudy.BenchmarkBodyCost
+         0     0% 99.56%    1713089 99.52%  github.com/cnooljaw/gosproto.Decode (inline)
+         0     0% 99.56%    1651541 95.94%  github.com/cnooljaw/gosproto.decodeStructSlice
+         0     0% 99.56%    1717883 99.80%  gosprotobodystudy.representativeOperations.func4
+         0     0% 99.56%    1721206   100%  testing.(*B).run1.func1

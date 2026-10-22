@@ -1,0 +1,48 @@
+File: body.test
+Type: cpu
+Time: 2026-10-22 15:53:55 CST
+Duration: 2.54s, Total samples = 2.31s (90.98%)
+Showing nodes accounting for 2.14s, 92.64% of 2.31s total
+Dropped 45 nodes (cum <= 0.01s)
+Showing top 40 nodes out of 61
+      flat  flat%   sum%        cum   cum%
+     1.03s 44.59% 44.59%      1.03s 44.59%  runtime.kevent
+     0.17s  7.36% 51.95%      0.46s 19.91%  github.com/cnooljaw/gosproto.decodeIntegerRecord
+     0.16s  6.93% 58.87%      0.46s 19.91%  runtime.mallocgc
+     0.15s  6.49% 65.37%      0.15s  6.49%  github.com/cnooljaw/gosproto.unpackVectorARM64
+     0.11s  4.76% 70.13%      0.29s 12.55%  github.com/cnooljaw/gosproto.UnpackWithLimit
+     0.08s  3.46% 73.59%      0.13s  5.63%  runtime.mallocgcTiny
+     0.04s  1.73% 75.32%      0.06s  2.60%  reflect.(*rtype).ptrTo
+     0.04s  1.73% 77.06%      0.04s  1.73%  runtime.madvise
+     0.04s  1.73% 78.79%      0.09s  3.90%  runtime.mallocgcSmallScanNoHeader
+     0.03s  1.30% 80.09%      0.83s 35.93%  github.com/cnooljaw/gosproto.decodeStructSlice
+     0.03s  1.30% 81.39%      0.17s  7.36%  reflect.unsafe_New
+     0.03s  1.30% 82.68%      0.04s  1.73%  runtime.nextFreeFast (inline)
+     0.02s  0.87% 83.55%      0.02s  0.87%  github.com/cnooljaw/gosproto.(*SprotoType).FieldByTag (inline)
+     0.02s  0.87% 84.42%      0.03s  1.30%  github.com/cnooljaw/gosproto.countChunks
+     0.02s  0.87% 85.28%      0.02s  0.87%  math/bits.OnesCount8 (inline)
+     0.02s  0.87% 86.15%      0.03s  1.30%  reflect.Value.UnsafePointer
+     0.02s  0.87% 87.01%      0.02s  0.87%  runtime.(*mspan).base (inline)
+     0.02s  0.87% 87.88%      0.02s  0.87%  runtime.(*mspan).writeHeapBitsSmall
+     0.02s  0.87% 88.74%      0.03s  1.30%  runtime.typePointers.next
+     0.01s  0.43% 89.18%      0.03s  1.30%  gcWriteBarrier
+     0.01s  0.43% 89.61%      0.03s  1.30%  github.com/cnooljaw/gosproto.decodeIntSlice
+     0.01s  0.43% 90.04%      0.90s 38.96%  github.com/cnooljaw/gosproto.decodeMessage
+     0.01s  0.43% 90.48%      0.02s  0.87%  github.com/cnooljaw/gosproto.readChunk (inline)
+     0.01s  0.43% 90.91%      0.24s 10.39%  reflect.New
+     0.01s  0.43% 91.34%      0.08s  3.46%  runtime.deductAssistCredit
+     0.01s  0.43% 91.77%      0.03s  1.30%  runtime.findObject
+     0.01s  0.43% 92.21%      0.02s  0.87%  runtime.resolveTypeOff
+     0.01s  0.43% 92.64%      0.05s  2.16%  runtime.scanobject
+         0     0% 92.64%      0.92s 39.83%  github.com/cnooljaw/gosproto.Decode (inline)
+         0     0% 92.64%      1.21s 52.38%  github.com/cnooljaw/gosproto.DecodePacked
+         0     0% 92.64%      0.92s 39.83%  github.com/cnooljaw/gosproto.DecodeWithLimits
+         0     0% 92.64%      0.29s 12.55%  github.com/cnooljaw/gosproto.Unpack (inline)
+         0     0% 92.64%      0.15s  6.49%  github.com/cnooljaw/gosproto.unpackVector (inline)
+         0     0% 92.64%      1.21s 52.38%  gosprotobodystudy.BenchmarkBodyCost
+         0     0% 92.64%      1.21s 52.38%  gosprotobodystudy.representativeOperations.func8
+         0     0% 92.64%      0.02s  0.87%  reflect.(*rtype).typeOff (inline)
+         0     0% 92.64%      0.06s  2.60%  reflect.ptrTo (inline)
+         0     0% 92.64%      0.02s  0.87%  reflect.resolveTypeOff
+         0     0% 92.64%      0.04s  1.73%  runtime.(*mheap).alloc.func1
+         0     0% 92.64%      0.04s  1.73%  runtime.(*mheap).allocSpan
