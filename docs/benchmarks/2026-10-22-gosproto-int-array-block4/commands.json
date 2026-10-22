@@ -1,0 +1,587 @@
+[
+  {
+    "args": [
+      "git",
+      "rev-parse",
+      "9048cfa"
+    ],
+    "cwd": "/private/tmp/gsr-gosproto-fork",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.019702123478055,
+    "output": "9048cfaff68472d09535c6767a3e71fa148446a8\n"
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "decode.go",
+      "string_experiment.go",
+      "string_experiment_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/gosproto",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.030750375241041183,
+    "output": ""
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "experiment_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/harness",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.004328500479459763,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-gcflags=all=-d=checkptr=2",
+      "-run",
+      "^(TestIntArrayBlockDifferential|TestUnknownField|TestLimits|TestNativePointerDecode|TestSchemaEvolution|TestIntegerRecordArrayBudgetsAndTags)",
+      "-timeout=2m",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/gosproto",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 4.6306965835392475,
+    "output": "ok  \tgithub.com/cnooljaw/gosproto\t2.032s\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-run",
+      "^TestRepresentativeFixtures$",
+      "-timeout=30s",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 1.4828897919505835,
+    "output": "ok  \tunpackinprocess\t0.396s\n"
+  },
+  {
+    "args": [
+      "go",
+      "vet",
+      "-mod=mod",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 0.20344337448477745,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-c",
+      "-o",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/experiment.test",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 0.4089703317731619,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "list",
+      "-m",
+      "-json",
+      "github.com/cnooljaw/gosproto"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 0.012504041194915771,
+    "output": "{\n\t\"Path\": \"github.com/cnooljaw/gosproto\",\n\t\"Version\": \"v0.4.0\",\n\t\"Replace\": {\n\t\t\"Path\": \"/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/gosproto\",\n\t\t\"Dir\": \"/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/gosproto\",\n\t\t\"GoMod\": \"/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/gosproto/go.mod\",\n\t\t\"GoVersion\": \"1.24.0\"\n\t},\n\t\"Dir\": \"/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/gosproto\",\n\t\"GoMod\": \"/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/gosproto/go.mod\",\n\t\"GoVersion\": \"1.24.0\"\n}\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "objdump",
+      "-s",
+      "github.com/cnooljaw/gosproto\\.(experimentStringBaseline|experimentStringClone|experimentStringCandidate)",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/experiment.test"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/harness",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.03413825109601021,
+    "output": "TEXT github.com/cnooljaw/gosproto.experimentStringBaseline(SB) /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/gosproto/string_experiment.go\n  string_experiment.go:8\t0x1001581b0\t\tf9400b90\t\tMOVD 16(R28), R16\t\t\t\t\t\t\n  string_experiment.go:8\t0x1001581b4\t\td10083f1\t\tSUB $32, RSP, R17\t\t\t\t\t\t\n  string_experiment.go:8\t0x1001581b8\t\teb10023f\t\tCMP R16, R17\t\t\t\t\t\t\t\n  string_experiment.go:8\t0x1001581bc\t\t54002909\t\tBLS 328(PC)\t\t\t\t\t\t\t\n  string_experiment.go:8\t0x1001581c0\t\tf8160ffe\t\tMOVD.W R30, -160(RSP)\t\t\t\t\t\t\n  string_experiment.go:8\t0x1001581c4\t\tf81f83fd\t\tMOVD R29, -8(RSP)\t\t\t\t\t\t\n  string_experiment.go:8\t0x1001581c8\t\td10023fd\t\tSUB $8, RSP, R29\t\t\t\t\t\t\n  string_experiment.go:8\t0x1001581cc\t\tf9005be2\t\tMOVD R2, 176(RSP)\t\t\t\t\t\t\n  string_experiment.go:8\t0x1001581d0\t\tf9006be6\t\tMOVD R6, 208(RSP)\t\t\t\t\t\t\n  string_experiment.go:8\t0x1001581d4\t\tf9006fe7\t\tMOVD R7, 216(RSP)\t\t\t\t\t\t\n  string_experiment.go:10\t0x1001581d8\t\tf90037e8\t\tMOVD R8, 104(RSP)\t\t\t\t\t\t\n  string_experiment.go:10\t0x1001581dc\t\tf9004be7\t\tMOVD R7, 144(RSP)\t\t\t\t\t\t\n  string_experiment.go:10\t0x1001581e0\t\tf90047e6\t\tMOVD R6, 136(RSP)\t\t\t\t\t\t\n  string_experiment.go:10\t0x1001581e4\t\tf100047f\t\tCMP $1, R3\t\t\t\t\t\t\t\n  string_experiment.go:10\t0x1001581e8\t\t54000bad\t\tBLE 93(PC)\t\t\t\t\t\t\t\n  string_experiment.go:18\t0x1001581ec\t\t3940004a\t\tMOVBU (R2), R10\t\t\t\t\t\t\t\n  string_experiment.go:20\t0x1001581f0\t\tf100115f\t\tCMP $4, R10\t\t\t\t\t\t\t\n  string_experiment.go:20\t0x1001581f4\t\t54000060\t\tBEQ 3(PC)\t\t\t\t\t\t\t\n  string_experiment.go:20\t0x1001581f8\t\tf100215f\t\tCMP $8, R10\t\t\t\t\t\t\t\n  string_experiment.go:20\t0x1001581fc\t\t54000a21\t\tBNE 81(PC)\t\t\t\t\t\t\t\n  string_experiment.go:19\t0x100158200\t\td100046b\t\tSUB $1, R3, R11\t\t\t\t\t\t\t\n  string_experiment.go:20\t0x100158204\t\t9aca0d7b\t\tSDIV R10, R11, R27\t\t\t\t\t\t\n  string_experiment.go:20\t0x100158208\t\t9b0aaf6c\t\tMSUB R10, R11, R27, R12\t\t\t\t\t\t\n  string_experiment.go:20\t0x10015820c\t\tb50009ac\t\tCBNZ R12, 77(PC)\t\t\t\t\t\t\n  string_experiment.go:23\t0x100158210\t\t9aca0d61\t\tSDIV R10, R11, R1\t\t\t\t\t\t\n  limits.go:50\t\t\t0x100158214\t\tf940092c\t\tMOVD 16(R9), R12\t\t\t\t\t\t\n  limits.go:50\t\t\t0x100158218\t\tf940112d\t\tMOVD 32(R9), R13\t\t\t\t\t\t\n  limits.go:50\t\t\t0x10015821c\t\tcb0d018c\t\tSUB R13, R12, R12\t\t\t\t\t\t\n  limits.go:50\t\t\t0x100158220\t\teb0c003f\t\tCMP R12, R1\t\t\t\t\t\t\t\n  limits.go:50\t\t\t0x100158224\t\t540000cd\t\tBLE 6(PC)\t\t\t\t\t\t\t\n  string_experiment.go:24\t0x100158228\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\t\n  string_experiment.go:24\t0x10015822c\t\tf940fb69\t\tMOVD 496(R27), R9\t\t\t\t\t\t\n  string_experiment.go:24\t0x100158230\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\t\n  string_experiment.go:24\t0x100158234\t\tf940ff6c\t\tMOVD 504(R27), R12\t\t\t\t\t\t\n  string_experiment.go:24\t0x100158238\t\t14000005\t\tJMP 5(PC)\t\t\t\t\t\t\t\n  limits.go:53\t\t\t0x10015823c\t\t8b0d002d\t\tADD R13, R1, R13\t\t\t\t\t\t\n  limits.go:53\t\t\t0x100158240\t\tf900112d\t\tMOVD R13, 32(R9)\t\t\t\t\t\t\n  limits.go:53\t\t\t0x100158244\t\taa1f03e9\t\tMOVD ZR, R9\t\t\t\t\t\t\t\n  limits.go:53\t\t\t0x100158248\t\taa1f03ec\t\tMOVD ZR, R12\t\t\t\t\t\t\t\n  string_experiment.go:24\t0x10015824c\t\tb5000709\t\tCBNZ R9, 56(PC)\t\t\t\t\t\t\t\n  string_experiment.go:18\t0x100158250\t\tf9001fea\t\tMOVD R10, 56(RSP)\t\t\t\t\t\t\n  string_experiment.go:23\t0x100158254\t\tf90027e1\t\tMOVD R1, 72(RSP)\t\t\t\t\t\t\n  string_experiment.go:10\t0x100158258\t\tf90063e4\t\tMOVD R4, 192(RSP)\t\t\t\t\t\t\n  string_experiment.go:19\t0x10015825c\t\t91000449\t\tADD $1, R2, R9\t\t\t\t\t\t\t\n  string_experiment.go:19\t0x100158260\t\tf90043e9\t\tMOVD R9, 128(RSP)\t\t\t\t\t\t\n  string_experiment.go:27\t0x100158264\t\t394200ac\t\tMOVBU 128(R5), R12\t\t\t\t\t\t\n  string_experiment.go:27\t0x100158268\t\t370003ec\t\tTBNZ $0, R12, 31(PC)\t\t\t\t\t\t\n  string_experiment.go:10\t0x10015826c\t\tf90067e5\t\tMOVD R5, 200(RSP)\t\t\t\t\t\t\n  string_experiment.go:19\t0x100158270\t\tf90033eb\t\tMOVD R11, 96(RSP)\t\t\t\t\t\t\n  string_experiment.go:10\t0x100158274\t\tf9005fe3\t\tMOVD R3, 184(RSP)\t\t\t\t\t\t\n  value.go:2380\t\t\t0x100158278\t\tb40000a8\t\tCBZ R8, 5(PC)\t\t\t\t\t\t\t\n  value.go:2380\t\t\t0x10015827c\t\t37480088\t\tTBNZ $9, R8, 4(PC)\t\t\t\t\t\t\n  value.go:2380\t\t\t0x100158280\t\t90000e00\t\tADRP 1835008(PC), R0\t\t\t\t\t\t\n  value.go:2380\t\t\t0x100158284\t\t9136c000\t\tADD $3504, R0, R0\t\t\t\t\t\t\n  string_experiment.go:41\t0x100158288\t\t14000007\t\tJMP 7(PC)\t\t\t\t\t\t\t\n  value.go:2383\t\t\t0x10015828c\t\taa0603e0\t\tMOVD R6, R0\t\t\t\t\t\t\t\n  value.go:2383\t\t\t0x100158290\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\t\n  value.go:2383\t\t\t0x100158294\t\taa0803e2\t\tMOVD R8, R2\t\t\t\t\t\t\t\n  value.go:2383\t\t\t0x100158298\t\t97fdbc0a\t\tCALL reflect.Value.typeSlow(SB)\t\t\t\t\t\n  string_experiment.go:41\t0x10015829c\t\taa0103e6\t\tMOVD R1, R6\t\t\t\t\t\t\t\n  string_experiment.go:41\t0x1001582a0\t\tf94027e1\t\tMOVD 72(RSP), R1\t\t\t\t\t\t\n  string_experiment.go:41\t0x1001582a4\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\t\n  string_experiment.go:41\t0x1001582a8\t\taa0203e3\t\tMOVD R2, R3\t\t\t\t\t\t\t\n  string_experiment.go:41\t0x1001582ac\t\taa0603e1\t\tMOVD R6, R1\t\t\t\t\t\t\t\n  string_experiment.go:41\t0x1001582b0\t\t97fdbe20\t\tCALL reflect.MakeSlice(SB)\t\t\t\t\t\n  string_experiment.go:41\t0x1001582b4\t\tf9003fe0\t\tMOVD R0, 120(RSP)\t\t\t\t\t\t\n  string_experiment.go:41\t0x1001582b8\t\tf9003be1\t\tMOVD R1, 112(RSP)\t\t\t\t\t\t\n  string_experiment.go:41\t0x1001582bc\t\tf9002fe2\t\tMOVD R2, 88(RSP)\t\t\t\t\t\t\n  string_experiment.go:42\t0x1001582c0\t\tf94027e3\t\tMOVD 72(RSP), R3\t\t\t\t\t\t\n  string_experiment.go:42\t0x1001582c4\t\tf94067e4\t\tMOVD 200(RSP), R4\t\t\t\t\t\t\n  string_experiment.go:42\t0x1001582c8\t\tf94043e5\t\tMOVD 128(RSP), R5\t\t\t\t\t\t\n  string_experiment.go:42\t0x1001582cc\t\tf94063e6\t\tMOVD 192(RSP), R6\t\t\t\t\t\t\n  string_experiment.go:42\t0x1001582d0\t\tf94033e7\t\tMOVD 96(RSP), R7\t\t\t\t\t\t\n  string_experiment.go:42\t0x1001582d4\t\tf9405fe8\t\tMOVD 184(RSP), R8\t\t\t\t\t\t\n  string_experiment.go:42\t0x1001582d8\t\tf9401fe9\t\tMOVD 56(RSP), R9\t\t\t\t\t\t\n  string_experiment.go:42\t0x1001582dc\t\taa1f03ea\t\tMOVD ZR, R10\t\t\t\t\t\t\t\n  string_experiment.go:42\t0x1001582e0\t\t140000a9\t\tJMP 169(PC)\t\t\t\t\t\t\t\n  string_experiment.go:28\t0x1001582e4\t\t90000aa0\t\tADRP 1392640(PC), R0\t\t\t\t\t\t\n  string_experiment.go:28\t0x1001582e8\t\t910f8000\t\tADD $992, R0, R0\t\t\t\t\t\t\n  string_experiment.go:28\t0x1001582ec\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\t\n  string_experiment.go:28\t0x1001582f0\t\t97fc6898\t\tCALL runtime.makeslice(SB)\t\t\t\t\t\n  string_experiment.go:28\t0x1001582f4\t\tf9003be0\t\tMOVD R0, 112(RSP)\t\t\t\t\t\t\n  string_experiment.go:19\t0x1001582f8\t\tf94063e3\t\tMOVD 192(RSP), R3\t\t\t\t\t\t\n  string_experiment.go:19\t0x1001582fc\t\td1000463\t\tSUB $1, R3, R3\t\t\t\t\t\t\t\n  string_experiment.go:20\t0x100158300\t\tf9401fe4\t\tMOVD 56(RSP), R4\t\t\t\t\t\t\n  string_experiment.go:20\t0x100158304\t\tf100109f\t\tCMP $4, R4\t\t\t\t\t\t\t\n  string_experiment.go:29\t0x100158308\t\t540000a1\t\tBNE 5(PC)\t\t\t\t\t\t\t\n  string_experiment.go:30\t0x10015830c\t\tf94043e4\t\tMOVD 128(RSP), R4\t\t\t\t\t\t\n  string_experiment.go:30\t0x100158310\t\tf94027e5\t\tMOVD 72(RSP), R5\t\t\t\t\t\t\n  string_experiment.go:30\t0x100158314\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\t\n  string_experiment.go:30\t0x100158318\t\t14000083\t\tJMP 131(PC)\t\t\t\t\t\t\t\n  string_experiment.go:34\t0x10015831c\t\tf94043e4\t\tMOVD 128(RSP), R4\t\t\t\t\t\t\n  string_experiment.go:34\t0x100158320\t\tf94027e5\t\tMOVD 72(RSP), R5\t\t\t\t\t\t\n  string_experiment.go:34\t0x100158324\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\t\n  string_experiment.go:34\t0x100158328\t\t1400004b\t\tJMP 75(PC)\t\t\t\t\t\t\t\n  string_experiment.go:25\t0x10015832c\t\taa0903e0\t\tMOVD R9, R0\t\t\t\t\t\t\t\n  string_experiment.go:25\t0x100158330\t\taa0c03e1\t\tMOVD R12, R1\t\t\t\t\t\t\t\n  string_experiment.go:25\t0x100158334\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  string_experiment.go:25\t0x100158338\t\tf84a07fe\t\tMOVD.P 160(RSP), R30\t\t\t\t\t\t\n  string_experiment.go:25\t0x10015833c\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  string_experiment.go:21\t0x100158340\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\t\n  string_experiment.go:21\t0x100158344\t\tf9412b60\t\tMOVD 592(R27), R0\t\t\t\t\t\t\n  string_experiment.go:21\t0x100158348\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\t\n  string_experiment.go:21\t0x10015834c\t\tf9412f61\t\tMOVD 600(R27), R1\t\t\t\t\t\t\n  string_experiment.go:21\t0x100158350\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  string_experiment.go:21\t0x100158354\t\tf84a07fe\t\tMOVD.P 160(RSP), R30\t\t\t\t\t\t\n  string_experiment.go:21\t0x100158358\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  string_experiment.go:11\t0x10015835c\t\t394200a4\t\tMOVBU 128(R5), R4\t\t\t\t\t\t\n  string_experiment.go:11\t0x100158360\t\t37000364\t\tTBNZ $0, R4, 27(PC)\t\t\t\t\t\t\n  value.go:2380\t\t\t0x100158364\t\tb40000a8\t\tCBZ R8, 5(PC)\t\t\t\t\t\t\t\n  value.go:2380\t\t\t0x100158368\t\t37480088\t\tTBNZ $9, R8, 4(PC)\t\t\t\t\t\t\n  value.go:2380\t\t\t0x10015836c\t\t90000e00\t\tADRP 1835008(PC), R0\t\t\t\t\t\t\n  value.go:2380\t\t\t0x100158370\t\t9136c000\t\tADD $3504, R0, R0\t\t\t\t\t\t\n  string_experiment.go:15\t0x100158374\t\t14000006\t\tJMP 6(PC)\t\t\t\t\t\t\t\n  value.go:2383\t\t\t0x100158378\t\taa0603e0\t\tMOVD R6, R0\t\t\t\t\t\t\t\n  value.go:2383\t\t\t0x10015837c\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\t\n  value.go:2383\t\t\t0x100158380\t\taa0803e2\t\tMOVD R8, R2\t\t\t\t\t\t\t\n  value.go:2383\t\t\t0x100158384\t\t97fdbbcf\t\tCALL reflect.Value.typeSlow(SB)\t\t\t\t\t\n  string_experiment.go:15\t0x100158388\t\taa0103e6\t\tMOVD R1, R6\t\t\t\t\t\t\t\n  string_experiment.go:15\t0x10015838c\t\taa0603e1\t\tMOVD R6, R1\t\t\t\t\t\t\t\n  string_experiment.go:15\t0x100158390\t\taa1f03e2\t\tMOVD ZR, R2\t\t\t\t\t\t\t\n  string_experiment.go:15\t0x100158394\t\taa0203e3\t\tMOVD R2, R3\t\t\t\t\t\t\t\n  string_experiment.go:15\t0x100158398\t\t97fdbde6\t\tCALL reflect.MakeSlice(SB)\t\t\t\t\t\n  string_experiment.go:15\t0x10015839c\t\taa0003e3\t\tMOVD R0, R3\t\t\t\t\t\t\t\n  string_experiment.go:15\t0x1001583a0\t\taa0103e4\t\tMOVD R1, R4\t\t\t\t\t\t\t\n  string_experiment.go:15\t0x1001583a4\t\taa0203e5\t\tMOVD R2, R5\t\t\t\t\t\t\t\n  string_experiment.go:15\t0x1001583a8\t\tf94047e0\t\tMOVD 136(RSP), R0\t\t\t\t\t\t\n  string_experiment.go:15\t0x1001583ac\t\tf9404be1\t\tMOVD 144(RSP), R1\t\t\t\t\t\t\n  string_experiment.go:15\t0x1001583b0\t\tf94037e2\t\tMOVD 104(RSP), R2\t\t\t\t\t\t\n  string_experiment.go:15\t0x1001583b4\t\t97fdb81b\t\tCALL reflect.Value.Set(SB)\t\t\t\t\t\n  string_experiment.go:16\t0x1001583b8\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\t\n  string_experiment.go:16\t0x1001583bc\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\t\n  string_experiment.go:16\t0x1001583c0\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  string_experiment.go:16\t0x1001583c4\t\tf84a07fe\t\tMOVD.P 160(RSP), R30\t\t\t\t\t\t\n  string_experiment.go:16\t0x1001583c8\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  string_experiment.go:12\t0x1001583cc\t\taa0603e0\t\tMOVD R6, R0\t\t\t\t\t\t\t\n  string_experiment.go:12\t0x1001583d0\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\t\n  string_experiment.go:12\t0x1001583d4\t\taa0803e2\t\tMOVD R8, R2\t\t\t\t\t\t\t\n  string_experiment.go:12\t0x1001583d8\t\t97fda56a\t\tCALL reflect.Value.Addr(SB)\t\t\t\t\t\n  value.go:1484\t\t\t0x1001583dc\t\tb24003e3\t\tORR $1, ZR, R3\t\t\t\t\t\t\t\n  value.go:1484\t\t\t0x1001583e0\t\t97fdd144\t\tCALL reflect.valueInterface(SB)\t\t\t\t\t\n  string_experiment.go:12\t0x1001583e4\t\td0000a63\t\tADRP 1368064(PC), R3\t\t\t\t\t\t\n  string_experiment.go:12\t0x1001583e8\t\t91308063\t\tADD $3104, R3, R3\t\t\t\t\t\t\n  string_experiment.go:12\t0x1001583ec\t\teb03001f\t\tCMP R3, R0\t\t\t\t\t\t\t\n  string_experiment.go:12\t0x1001583f0\t\t54000201\t\tBNE 16(PC)\t\t\t\t\t\t\t\n  string_experiment.go:12\t0x1001583f4\t\ta900fc3f\t\tSTP (ZR, ZR), 8(R1)\t\t\t\t\t\t\n  string_experiment.go:12\t0x1001583f8\t\t90001d3b\t\tADRP 3817472(PC), R27\t\t\t\t\t\t\n  string_experiment.go:12\t0x1001583fc\t\tb946f362\t\tMOVWU 1776(R27), R2\t\t\t\t\t\t\n  string_experiment.go:12\t0x100158400\t\t34000082\t\tCBZW R2, 4(PC)\t\t\t\t\t\t\t\n  string_experiment.go:12\t0x100158404\t\tf9400022\t\tMOVD (R1), R2\t\t\t\t\t\t\t\n  string_experiment.go:12\t0x100158408\t\t97fc7f9e\t\tCALL runtime.gcWriteBarrier1(SB)\t\t\t\t\n  string_experiment.go:12\t0x10015840c\t\tf9000322\t\tMOVD R2, (R25)\t\t\t\t\t\t\t\n  string_experiment.go:12\t0x100158410\t\t90001d22\t\tADRP 3817472(PC), R2\t\t\t\t\t\t\n  string_experiment.go:12\t0x100158414\t\t910b0042\t\tADD $704, R2, R2\t\t\t\t\t\t\n  string_experiment.go:12\t0x100158418\t\tf9000022\t\tMOVD R2, (R1)\t\t\t\t\t\t\t\n  string_experiment.go:13\t0x10015841c\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\t\n  string_experiment.go:13\t0x100158420\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\t\n  string_experiment.go:13\t0x100158424\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  string_experiment.go:13\t0x100158428\t\tf84a07fe\t\tMOVD.P 160(RSP), R30\t\t\t\t\t\t\n  string_experiment.go:13\t0x10015842c\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  string_experiment.go:12\t0x100158430\t\taa0303e1\t\tMOVD R3, R1\t\t\t\t\t\t\t\n  string_experiment.go:12\t0x100158434\t\tb0000b02\t\tADRP 1445888(PC), R2\t\t\t\t\t\t\n  string_experiment.go:12\t0x100158438\t\t91008042\t\tADD $32, R2, R2\t\t\t\t\t\t\t\n  string_experiment.go:12\t0x10015843c\t\t97fadf25\t\tCALL runtime.panicdottypeE(SB)\t\t\t\t\t\n  binary.go:117\t\t\t0x100158440\t\tf8617886\t\tMOVD (R4)(R1<<3), R6\t\t\t\t\t\t\n  string_experiment.go:34\t0x100158444\t\t91000427\t\tADD $1, R1, R7\t\t\t\t\t\t\t\n  decode.go:24\t\t\t0x100158448\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\t\n  string_experiment.go:35\t0x10015844c\t\tf8217806\t\tMOVD R6, (R0)(R1<<3)\t\t\t\t\t\t\n  string_experiment.go:34\t0x100158450\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\t\n  string_experiment.go:34\t0x100158454\t\teb05003f\t\tCMP R5, R1\t\t\t\t\t\t\t\n  string_experiment.go:34\t0x100158458\t\t5400010a\t\tBGE 8(PC)\t\t\t\t\t\t\t\n  string_experiment.go:35\t0x10015845c\t\td37df026\t\tLSL $3, R1, R6\t\t\t\t\t\t\t\n  string_experiment.go:35\t0x100158460\t\t910020c2\t\tADD $8, R6, R2\t\t\t\t\t\t\t\n  string_experiment.go:35\t0x100158464\t\teb02007f\t\tCMP R2, R3\t\t\t\t\t\t\t\n  string_experiment.go:35\t0x100158468\t\t54000503\t\tBCC 40(PC)\t\t\t\t\t\t\t\n  string_experiment.go:35\t0x10015846c\t\teb010c5f\t\tCMP R1<<3, R2\t\t\t\t\t\t\t\n  string_experiment.go:35\t0x100158470\t\t54fffe82\t\tBCS -12(PC)\t\t\t\t\t\t\t\n  string_experiment.go:35\t0x100158474\t\t14000022\t\tJMP 34(PC)\t\t\t\t\t\t\t\n  string_experiment.go:38\t0x100158478\t\tf94047e0\t\tMOVD 136(RSP), R0\t\t\t\t\t\t\n  string_experiment.go:38\t0x10015847c\t\tf9404be1\t\tMOVD 144(RSP), R1\t\t\t\t\t\t\n  string_experiment.go:38\t0x100158480\t\tf94037e2\t\tMOVD 104(RSP), R2\t\t\t\t\t\t\n  string_experiment.go:38\t0x100158484\t\t97fda53f\t\tCALL reflect.Value.Addr(SB)\t\t\t\t\t\n  value.go:1484\t\t\t0x100158488\t\tb24003e3\t\tORR $1, ZR, R3\t\t\t\t\t\t\t\n  value.go:1484\t\t\t0x10015848c\t\t97fdd119\t\tCALL reflect.valueInterface(SB)\t\t\t\t\t\n  string_experiment.go:38\t0x100158490\t\td0000a63\t\tADRP 1368064(PC), R3\t\t\t\t\t\t\n  string_experiment.go:38\t0x100158494\t\t91308063\t\tADD $3104, R3, R3\t\t\t\t\t\t\n  string_experiment.go:38\t0x100158498\t\teb03001f\t\tCMP R3, R0\t\t\t\t\t\t\t\n  string_experiment.go:38\t0x10015849c\t\t54000281\t\tBNE 20(PC)\t\t\t\t\t\t\t\n  string_experiment.go:38\t0x1001584a0\t\tf94027e2\t\tMOVD 72(RSP), R2\t\t\t\t\t\t\n  string_experiment.go:38\t0x1001584a4\t\tf9000422\t\tMOVD R2, 8(R1)\t\t\t\t\t\t\t\n  string_experiment.go:38\t0x1001584a8\t\tf9000822\t\tMOVD R2, 16(R1)\t\t\t\t\t\t\t\n  string_experiment.go:38\t0x1001584ac\t\t90001d3b\t\tADRP 3817472(PC), R27\t\t\t\t\t\t\n  string_experiment.go:38\t0x1001584b0\t\tb946f362\t\tMOVWU 1776(R27), R2\t\t\t\t\t\t\n  string_experiment.go:38\t0x1001584b4\t\t35000062\t\tCBNZW R2, 3(PC)\t\t\t\t\t\t\t\n  string_experiment.go:38\t0x1001584b8\t\tf9403be2\t\tMOVD 112(RSP), R2\t\t\t\t\t\t\n  string_experiment.go:38\t0x1001584bc\t\t14000006\t\tJMP 6(PC)\t\t\t\t\t\t\t\n  string_experiment.go:38\t0x1001584c0\t\t97fc7f74\t\tCALL runtime.gcWriteBarrier2(SB)\t\t\t\t\n  string_experiment.go:38\t0x1001584c4\t\tf9403be2\t\tMOVD 112(RSP), R2\t\t\t\t\t\t\n  string_experiment.go:38\t0x1001584c8\t\tf9000322\t\tMOVD R2, (R25)\t\t\t\t\t\t\t\n  string_experiment.go:38\t0x1001584cc\t\tf9400023\t\tMOVD (R1), R3\t\t\t\t\t\t\t\n  string_experiment.go:38\t0x1001584d0\t\tf9000723\t\tMOVD R3, 8(R25)\t\t\t\t\t\t\t\n  string_experiment.go:38\t0x1001584d4\t\tf9000022\t\tMOVD R2, (R1)\t\t\t\t\t\t\t\n  string_experiment.go:39\t0x1001584d8\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\t\n  string_experiment.go:39\t0x1001584dc\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\t\n  string_experiment.go:39\t0x1001584e0\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  string_experiment.go:39\t0x1001584e4\t\tf84a07fe\t\tMOVD.P 160(RSP), R30\t\t\t\t\t\t\n  string_experiment.go:39\t0x1001584e8\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  string_experiment.go:38\t0x1001584ec\t\taa0303e1\t\tMOVD R3, R1\t\t\t\t\t\t\t\n  string_experiment.go:38\t0x1001584f0\t\tb0000b02\t\tADRP 1445888(PC), R2\t\t\t\t\t\t\n  string_experiment.go:38\t0x1001584f4\t\t91008042\t\tADD $32, R2, R2\t\t\t\t\t\t\t\n  string_experiment.go:38\t0x1001584f8\t\t97fadef6\t\tCALL runtime.panicdottypeE(SB)\t\t\t\t\t\n  string_experiment.go:35\t0x1001584fc\t\taa0603e0\t\tMOVD R6, R0\t\t\t\t\t\t\t\n  string_experiment.go:35\t0x100158500\t\taa0203e1\t\tMOVD R2, R1\t\t\t\t\t\t\t\n  string_experiment.go:35\t0x100158504\t\t97fc8043\t\tCALL runtime.panicSlice3C(SB)\t\t\t\t\t\n  string_experiment.go:35\t0x100158508\t\t97fc803a\t\tCALL runtime.panicSlice3Acap(SB)\t\t\t\t\n  binary.go:92\t\t\t0x10015850c\t\tb8617886\t\tMOVWU (R4)(R1<<2), R6\t\t\t\t\t\t\n  string_experiment.go:31\t0x100158510\t\t93407cc6\t\tSXTW R6, R6\t\t\t\t\t\t\t\n  string_experiment.go:30\t0x100158514\t\t91000427\t\tADD $1, R1, R7\t\t\t\t\t\t\t\n  decode.go:20\t\t\t0x100158518\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\t\n  string_experiment.go:31\t0x10015851c\t\tf8217806\t\tMOVD R6, (R0)(R1<<3)\t\t\t\t\t\t\n  string_experiment.go:30\t0x100158520\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\t\n  string_experiment.go:30\t0x100158524\t\teb05003f\t\tCMP R5, R1\t\t\t\t\t\t\t\n  string_experiment.go:30\t0x100158528\t\t54fffa8a\t\tBGE -44(PC)\t\t\t\t\t\t\t\n  string_experiment.go:31\t0x10015852c\t\td37ef426\t\tLSL $2, R1, R6\t\t\t\t\t\t\t\n  string_experiment.go:31\t0x100158530\t\t910010c2\t\tADD $4, R6, R2\t\t\t\t\t\t\t\n  string_experiment.go:31\t0x100158534\t\teb02007f\t\tCMP R2, R3\t\t\t\t\t\t\t\n  string_experiment.go:31\t0x100158538\t\t540000c3\t\tBCC 6(PC)\t\t\t\t\t\t\t\n  string_experiment.go:31\t0x10015853c\t\teb01085f\t\tCMP R1<<2, R2\t\t\t\t\t\t\t\n  string_experiment.go:31\t0x100158540\t\t54fffe62\t\tBCS -13(PC)\t\t\t\t\t\t\t\n  string_experiment.go:31\t0x100158544\t\taa0603e0\t\tMOVD R6, R0\t\t\t\t\t\t\t\n  string_experiment.go:31\t0x100158548\t\taa0203e1\t\tMOVD R2, R1\t\t\t\t\t\t\t\n  string_experiment.go:31\t0x10015854c\t\t97fc8031\t\tCALL runtime.panicSlice3C(SB)\t\t\t\t\t\n  string_experiment.go:31\t0x100158550\t\t97fc8028\t\tCALL runtime.panicSlice3Acap(SB)\t\t\t\t\n  string_experiment.go:42\t0x100158554\t\tf94023eb\t\tMOVD 64(RSP), R11\t\t\t\t\t\t\n  string_experiment.go:42\t0x100158558\t\t9100056a\t\tADD $1, R11, R10\t\t\t\t\t\t\n  string_experiment.go:42\t0x10015855c\t\tf94027e3\t\tMOVD 72(RSP), R3\t\t\t\t\t\t\n  string_experiment.go:42\t0x100158560\t\tf94067e4\t\tMOVD 200(RSP), R4\t\t\t\t\t\t\n  string_experiment.go:42\t0x100158564\t\tf9403fe0\t\tMOVD 120(RSP), R0\t\t\t\t\t\t\n  string_experiment.go:42\t0x100158568\t\tf9403be1\t\tMOVD 112(RSP), R1\t\t\t\t\t\t\n  string_experiment.go:42\t0x10015856c\t\tf9402fe2\t\tMOVD 88(RSP), R2\t\t\t\t\t\t\n  string_experiment.go:42\t0x100158570\t\tf94043e5\t\tMOVD 128(RSP), R5\t\t\t\t\t\t\n  string_experiment.go:42\t0x100158574\t\tf94063e6\t\tMOVD 192(RSP), R6\t\t\t\t\t\t\n  string_experiment.go:42\t0x100158578\t\tf94033e7\t\tMOVD 96(RSP), R7\t\t\t\t\t\t\n  string_experiment.go:42\t0x10015857c\t\tf9405fe8\t\tMOVD 184(RSP), R8\t\t\t\t\t\t\n  string_experiment.go:42\t0x100158580\t\tf9401fe9\t\tMOVD 56(RSP), R9\t\t\t\t\t\t\n  string_experiment.go:42\t0x100158584\t\teb03015f\t\tCMP R3, R10\t\t\t\t\t\t\t\n  string_experiment.go:42\t0x100158588\t\t5400078a\t\tBGE 60(PC)\t\t\t\t\t\t\t\n  string_experiment.go:20\t0x10015858c\t\tf100113f\t\tCMP $4, R9\t\t\t\t\t\t\t\n  string_experiment.go:44\t0x100158590\t\t54000201\t\tBNE 16(PC)\t\t\t\t\t\t\t\n  string_experiment.go:45\t0x100158594\t\td37ef54b\t\tLSL $2, R10, R11\t\t\t\t\t\t\n  string_experiment.go:45\t0x100158598\t\teb0a08ff\t\tCMP R10<<2, R7\t\t\t\t\t\t\t\n  string_experiment.go:45\t0x10015859c\t\t54000983\t\tBCC 76(PC)\t\t\t\t\t\t\t\n  string_experiment.go:45\t0x1001585a0\t\tcb0a090c\t\tSUB R10<<2, R8, R12\t\t\t\t\t\t\n  string_experiment.go:45\t0x1001585a4\t\tcb0a08cd\t\tSUB R10<<2, R6, R13\t\t\t\t\t\t\n  string_experiment.go:45\t0x1001585a8\t\td100058c\t\tSUB $1, R12, R12\t\t\t\t\t\t\n  string_experiment.go:45\t0x1001585ac\t\td10005ad\t\tSUB $1, R13, R13\t\t\t\t\t\t\n  string_experiment.go:45\t0x1001585b0\t\tcb0d03ed\t\tNEG R13, R13\t\t\t\t\t\t\t\n  string_experiment.go:45\t0x1001585b4\t\t8a8dfd6b\t\tAND R13->63, R11, R11\t\t\t\t\t\t\n  decode.go:20\t\t\t0x1001585b8\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\t\n  binary.go:91\t\t\t0x1001585bc\t\tf1000d9f\t\tCMP $3, R12\t\t\t\t\t\t\t\n  binary.go:91\t\t\t0x1001585c0\t\t54000809\t\tBLS 64(PC)\t\t\t\t\t\t\t\n  binary.go:92\t\t\t0x1001585c4\t\tb86b68ab\t\tMOVWU (R5)(R11), R11\t\t\t\t\t\t\n  string_experiment.go:45\t0x1001585c8\t\t93407d6b\t\tSXTW R11, R11\t\t\t\t\t\t\t\n  string_experiment.go:45\t0x1001585cc\t\t1400000e\t\tJMP 14(PC)\t\t\t\t\t\t\t\n  string_experiment.go:47\t0x1001585d0\t\t9b097d4b\t\tMUL R9, R10, R11\t\t\t\t\t\t\n  string_experiment.go:47\t0x1001585d4\t\teb07017f\t\tCMP R7, R11\t\t\t\t\t\t\t\n  string_experiment.go:47\t0x1001585d8\t\t540006e8\t\tBHI 55(PC)\t\t\t\t\t\t\t\n  string_experiment.go:47\t0x1001585dc\t\tcb0b010c\t\tSUB R11, R8, R12\t\t\t\t\t\t\n  string_experiment.go:47\t0x1001585e0\t\tcb0b00cd\t\tSUB R11, R6, R13\t\t\t\t\t\t\n  string_experiment.go:47\t0x1001585e4\t\td100058c\t\tSUB $1, R12, R12\t\t\t\t\t\t\n  string_experiment.go:47\t0x1001585e8\t\td10005ad\t\tSUB $1, R13, R13\t\t\t\t\t\t\n  string_experiment.go:47\t0x1001585ec\t\tcb0d03ed\t\tNEG R13, R13\t\t\t\t\t\t\t\n  string_experiment.go:47\t0x1001585f0\t\t8a8dfd6b\t\tAND R13->63, R11, R11\t\t\t\t\t\t\n  decode.go:24\t\t\t0x1001585f4\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\t\n  binary.go:116\t\t\t0x1001585f8\t\tf1001d9f\t\tCMP $7, R12\t\t\t\t\t\t\t\n  binary.go:116\t\t\t0x1001585fc\t\t54000569\t\tBLS 43(PC)\t\t\t\t\t\t\t\n  binary.go:117\t\t\t0x100158600\t\tf86b68ab\t\tMOVD (R5)(R11), R11\t\t\t\t\t\t\n  string_experiment.go:42\t0x100158604\t\tf90023ea\t\tMOVD R10, 64(RSP)\t\t\t\t\t\t\n  string_experiment.go:51\t0x100158608\t\tf9002beb\t\tMOVD R11, 80(RSP)\t\t\t\t\t\t\n  string_experiment.go:49\t0x10015860c\t\tf940148c\t\tMOVD 40(R4), R12\t\t\t\t\t\t\n  string_experiment.go:49\t0x100158610\t\tf100199f\t\tCMP $6, R12\t\t\t\t\t\t\t\n  string_experiment.go:49\t0x100158614\t\t54000221\t\tBNE 17(PC)\t\t\t\t\t\t\t\n  string_experiment.go:49\t0x100158618\t\tf940108c\t\tMOVD 32(R4), R12\t\t\t\t\t\t\n  string_experiment.go:49\t0x10015861c\t\tb940018d\t\tMOVWU (R12), R13\t\t\t\t\t\t\n  string_experiment.go:49\t0x100158620\t\td28dec8e\t\tMOVD $28516, R14\t\t\t\t\t\t\n  string_experiment.go:49\t0x100158624\t\tf2ac4eae\t\tMOVK $(25205<<16), R14\t\t\t\t\t\t\n  string_experiment.go:49\t0x100158628\t\t6b0e01bf\t\tCMPW R14, R13\t\t\t\t\t\t\t\n  string_experiment.go:49\t0x10015862c\t\t54000161\t\tBNE 11(PC)\t\t\t\t\t\t\t\n  string_experiment.go:49\t0x100158630\t\t7940098c\t\tMOVHU 4(R12), R12\t\t\t\t\t\t\n  string_experiment.go:49\t0x100158634\t\td28cad8d\t\tMOVD $25964, R13\t\t\t\t\t\t\n  string_experiment.go:49\t0x100158638\t\t6b0d019f\t\tCMPW R13, R12\t\t\t\t\t\t\t\n  string_experiment.go:49\t0x10015863c\t\t540000e1\t\tBNE 7(PC)\t\t\t\t\t\t\t\n  string_experiment.go:50\t0x100158640\t\taa0a03e3\t\tMOVD R10, R3\t\t\t\t\t\t\t\n  string_experiment.go:50\t0x100158644\t\t97fdb12f\t\tCALL reflect.Value.Index(SB)\t\t\t\t\t\n  unsafe.go:41\t\t\t0x100158648\t\tf9402be4\t\tMOVD 80(RSP), R4\t\t\t\t\t\t\n  unsafe.go:41\t\t\t0x10015864c\t\t9e670080\t\tFMOVD R4, F0\t\t\t\t\t\t\t\n  string_experiment.go:50\t0x100158650\t\t97fdb8e0\t\tCALL reflect.Value.SetFloat(SB)\t\t\t\t\t\n  string_experiment.go:50\t0x100158654\t\t17ffffc0\t\tJMP -64(PC)\t\t\t\t\t\t\t\n  string_experiment.go:51\t0x100158658\t\taa0a03e3\t\tMOVD R10, R3\t\t\t\t\t\t\t\n  string_experiment.go:51\t0x10015865c\t\t97fdb129\t\tCALL reflect.Value.Index(SB)\t\t\t\t\t\n  string_experiment.go:51\t0x100158660\t\tf9402be3\t\tMOVD 80(RSP), R3\t\t\t\t\t\t\n  string_experiment.go:51\t0x100158664\t\t97ffd563\t\tCALL github.com/cnooljaw/gosproto.setInteger(SB)\t\t\n  string_experiment.go:51\t0x100158668\t\tb4fff760\t\tCBZ R0, -69(PC)\t\t\t\t\t\t\t\n  string_experiment.go:52\t0x10015866c\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  string_experiment.go:52\t0x100158670\t\tf84a07fe\t\tMOVD.P 160(RSP), R30\t\t\t\t\t\t\n  string_experiment.go:52\t0x100158674\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  string_experiment.go:55\t0x100158678\t\taa0003e3\t\tMOVD R0, R3\t\t\t\t\t\t\t\n  string_experiment.go:55\t0x10015867c\t\taa0103e4\t\tMOVD R1, R4\t\t\t\t\t\t\t\n  string_experiment.go:55\t0x100158680\t\taa0203e5\t\tMOVD R2, R5\t\t\t\t\t\t\t\n  string_experiment.go:55\t0x100158684\t\tf94047e0\t\tMOVD 136(RSP), R0\t\t\t\t\t\t\n  string_experiment.go:55\t0x100158688\t\tf9404be1\t\tMOVD 144(RSP), R1\t\t\t\t\t\t\n  string_experiment.go:55\t0x10015868c\t\tf94037e2\t\tMOVD 104(RSP), R2\t\t\t\t\t\t\n  string_experiment.go:55\t0x100158690\t\t97fdb764\t\tCALL reflect.Value.Set(SB)\t\t\t\t\t\n  string_experiment.go:56\t0x100158694\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\t\n  string_experiment.go:56\t0x100158698\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\t\n  string_experiment.go:56\t0x10015869c\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  string_experiment.go:56\t0x1001586a0\t\tf84a07fe\t\tMOVD.P 160(RSP), R30\t\t\t\t\t\t\n  string_experiment.go:56\t0x1001586a4\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  binary.go:116\t\t\t0x1001586a8\t\tb2400be0\t\tORR $7, ZR, R0\t\t\t\t\t\t\t\n  binary.go:116\t\t\t0x1001586ac\t\taa0c03e1\t\tMOVD R12, R1\t\t\t\t\t\t\t\n  binary.go:116\t\t\t0x1001586b0\t\t97fc7fac\t\tCALL runtime.panicIndex(SB)\t\t\t\t\t\n  string_experiment.go:47\t0x1001586b4\t\taa0b03e0\t\tMOVD R11, R0\t\t\t\t\t\t\t\n  string_experiment.go:47\t0x1001586b8\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\t\n  string_experiment.go:47\t0x1001586bc\t\t97fc7fc1\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\t\n  binary.go:91\t\t\t0x1001586c0\t\tb24007e0\t\tORR $3, ZR, R0\t\t\t\t\t\t\t\n  binary.go:91\t\t\t0x1001586c4\t\taa0c03e1\t\tMOVD R12, R1\t\t\t\t\t\t\t\n  binary.go:91\t\t\t0x1001586c8\t\t97fc7fa6\t\tCALL runtime.panicIndex(SB)\t\t\t\t\t\n  string_experiment.go:45\t0x1001586cc\t\taa0b03e0\t\tMOVD R11, R0\t\t\t\t\t\t\t\n  string_experiment.go:45\t0x1001586d0\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\t\n  string_experiment.go:45\t0x1001586d4\t\t97fc7fbb\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\t\n  string_experiment.go:45\t0x1001586d8\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\t\n  string_experiment.go:8\t0x1001586dc\t\t790013e0\t\tMOVH R0, 8(RSP)\t\t\t\t\t\t\t\n  string_experiment.go:8\t0x1001586e0\t\t39002be1\t\tMOVB R1, 10(RSP)\t\t\t\t\t\t\n  string_experiment.go:8\t0x1001586e4\t\ta9010fe2\t\tSTP (R2, R3), 16(RSP)\t\t\t\t\t\t\n  string_experiment.go:8\t0x1001586e8\t\ta90217e4\t\tSTP (R4, R5), 32(RSP)\t\t\t\t\t\t\n  string_experiment.go:8\t0x1001586ec\t\ta9031fe6\t\tSTP (R6, R7), 48(RSP)\t\t\t\t\t\t\n  string_experiment.go:8\t0x1001586f0\t\ta90427e8\t\tSTP (R8, R9), 64(RSP)\t\t\t\t\t\t\n  string_experiment.go:8\t0x1001586f4\t\taa1e03e3\t\tMOVD R30, R3\t\t\t\t\t\t\t\n  string_experiment.go:8\t0x1001586f8\t\t97fc7642\t\tCALL runtime.morestack_noctxt.abi0(SB)\t\t\t\t\n  string_experiment.go:8\t0x1001586fc\t\t794013e0\t\tMOVHU 8(RSP), R0\t\t\t\t\t\t\n  string_experiment.go:8\t0x100158700\t\t39402be1\t\tMOVBU 10(RSP), R1\t\t\t\t\t\t\n  string_experiment.go:8\t0x100158704\t\ta9410fe2\t\tLDP 16(RSP), (R2, R3)\t\t\t\t\t\t\n  string_experiment.go:8\t0x100158708\t\ta94217e4\t\tLDP 32(RSP), (R4, R5)\t\t\t\t\t\t\n  string_experiment.go:8\t0x10015870c\t\ta9431fe6\t\tLDP 48(RSP), (R6, R7)\t\t\t\t\t\t\n  string_experiment.go:8\t0x100158710\t\ta94427e8\t\tLDP 64(RSP), (R8, R9)\t\t\t\t\t\t\n  string_experiment.go:8\t0x100158714\t\t17fffea7\t\tJMP github.com/cnooljaw/gosproto.experimentStringBaseline(SB)\t\n  string_experiment.go:8\t0x100158718\t\t00000000\t\t?\t\t\t\t\t\t\t\t\n  string_experiment.go:8\t0x10015871c\t\t00000000\t\t?\t\t\t\t\t\t\t\t\n\nTEXT github.com/cnooljaw/gosproto.experimentStringClone(SB) /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/gosproto/string_experiment.go\n  string_experiment.go:59\t0x100158720\t\tf9400b90\t\tMOVD 16(R28), R16\t\t\t\t\t\t\n  string_experiment.go:59\t0x100158724\t\td10083f1\t\tSUB $32, RSP, R17\t\t\t\t\t\t\n  string_experiment.go:59\t0x100158728\t\teb10023f\t\tCMP R16, R17\t\t\t\t\t\t\t\n  string_experiment.go:59\t0x10015872c\t\t54002909\t\tBLS 328(PC)\t\t\t\t\t\t\t\n  string_experiment.go:59\t0x100158730\t\tf8160ffe\t\tMOVD.W R30, -160(RSP)\t\t\t\t\t\t\n  string_experiment.go:59\t0x100158734\t\tf81f83fd\t\tMOVD R29, -8(RSP)\t\t\t\t\t\t\n  string_experiment.go:59\t0x100158738\t\td10023fd\t\tSUB $8, RSP, R29\t\t\t\t\t\t\n  string_experiment.go:59\t0x10015873c\t\tf9005be2\t\tMOVD R2, 176(RSP)\t\t\t\t\t\t\n  string_experiment.go:59\t0x100158740\t\tf9006be6\t\tMOVD R6, 208(RSP)\t\t\t\t\t\t\n  string_experiment.go:59\t0x100158744\t\tf9006fe7\t\tMOVD R7, 216(RSP)\t\t\t\t\t\t\n  string_experiment.go:61\t0x100158748\t\tf90037e8\t\tMOVD R8, 104(RSP)\t\t\t\t\t\t\n  string_experiment.go:61\t0x10015874c\t\tf9004be7\t\tMOVD R7, 144(RSP)\t\t\t\t\t\t\n  string_experiment.go:61\t0x100158750\t\tf90047e6\t\tMOVD R6, 136(RSP)\t\t\t\t\t\t\n  string_experiment.go:61\t0x100158754\t\tf100047f\t\tCMP $1, R3\t\t\t\t\t\t\t\n  string_experiment.go:61\t0x100158758\t\t54000bad\t\tBLE 93(PC)\t\t\t\t\t\t\t\n  string_experiment.go:69\t0x10015875c\t\t3940004a\t\tMOVBU (R2), R10\t\t\t\t\t\t\t\n  string_experiment.go:71\t0x100158760\t\tf100115f\t\tCMP $4, R10\t\t\t\t\t\t\t\n  string_experiment.go:71\t0x100158764\t\t54000060\t\tBEQ 3(PC)\t\t\t\t\t\t\t\n  string_experiment.go:71\t0x100158768\t\tf100215f\t\tCMP $8, R10\t\t\t\t\t\t\t\n  string_experiment.go:71\t0x10015876c\t\t54000a21\t\tBNE 81(PC)\t\t\t\t\t\t\t\n  string_experiment.go:70\t0x100158770\t\td100046b\t\tSUB $1, R3, R11\t\t\t\t\t\t\t\n  string_experiment.go:71\t0x100158774\t\t9aca0d7b\t\tSDIV R10, R11, R27\t\t\t\t\t\t\n  string_experiment.go:71\t0x100158778\t\t9b0aaf6c\t\tMSUB R10, R11, R27, R12\t\t\t\t\t\t\n  string_experiment.go:71\t0x10015877c\t\tb50009ac\t\tCBNZ R12, 77(PC)\t\t\t\t\t\t\n  string_experiment.go:74\t0x100158780\t\t9aca0d61\t\tSDIV R10, R11, R1\t\t\t\t\t\t\n  limits.go:50\t\t\t0x100158784\t\tf940092c\t\tMOVD 16(R9), R12\t\t\t\t\t\t\n  limits.go:50\t\t\t0x100158788\t\tf940112d\t\tMOVD 32(R9), R13\t\t\t\t\t\t\n  limits.go:50\t\t\t0x10015878c\t\tcb0d018c\t\tSUB R13, R12, R12\t\t\t\t\t\t\n  limits.go:50\t\t\t0x100158790\t\teb0c003f\t\tCMP R12, R1\t\t\t\t\t\t\t\n  limits.go:50\t\t\t0x100158794\t\t540000cd\t\tBLE 6(PC)\t\t\t\t\t\t\t\n  string_experiment.go:75\t0x100158798\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\t\n  string_experiment.go:75\t0x10015879c\t\tf940fb69\t\tMOVD 496(R27), R9\t\t\t\t\t\t\n  string_experiment.go:75\t0x1001587a0\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\t\n  string_experiment.go:75\t0x1001587a4\t\tf940ff6c\t\tMOVD 504(R27), R12\t\t\t\t\t\t\n  string_experiment.go:75\t0x1001587a8\t\t14000005\t\tJMP 5(PC)\t\t\t\t\t\t\t\n  limits.go:53\t\t\t0x1001587ac\t\t8b0d002d\t\tADD R13, R1, R13\t\t\t\t\t\t\n  limits.go:53\t\t\t0x1001587b0\t\tf900112d\t\tMOVD R13, 32(R9)\t\t\t\t\t\t\n  limits.go:53\t\t\t0x1001587b4\t\taa1f03e9\t\tMOVD ZR, R9\t\t\t\t\t\t\t\n  limits.go:53\t\t\t0x1001587b8\t\taa1f03ec\t\tMOVD ZR, R12\t\t\t\t\t\t\t\n  string_experiment.go:75\t0x1001587bc\t\tb5000709\t\tCBNZ R9, 56(PC)\t\t\t\t\t\t\t\n  string_experiment.go:69\t0x1001587c0\t\tf9001fea\t\tMOVD R10, 56(RSP)\t\t\t\t\t\t\n  string_experiment.go:74\t0x1001587c4\t\tf90027e1\t\tMOVD R1, 72(RSP)\t\t\t\t\t\t\n  string_experiment.go:61\t0x1001587c8\t\tf90063e4\t\tMOVD R4, 192(RSP)\t\t\t\t\t\t\n  string_experiment.go:70\t0x1001587cc\t\t91000449\t\tADD $1, R2, R9\t\t\t\t\t\t\t\n  string_experiment.go:70\t0x1001587d0\t\tf90043e9\t\tMOVD R9, 128(RSP)\t\t\t\t\t\t\n  string_experiment.go:78\t0x1001587d4\t\t394200ac\t\tMOVBU 128(R5), R12\t\t\t\t\t\t\n  string_experiment.go:78\t0x1001587d8\t\t370003ec\t\tTBNZ $0, R12, 31(PC)\t\t\t\t\t\t\n  string_experiment.go:61\t0x1001587dc\t\tf90067e5\t\tMOVD R5, 200(RSP)\t\t\t\t\t\t\n  string_experiment.go:70\t0x1001587e0\t\tf90033eb\t\tMOVD R11, 96(RSP)\t\t\t\t\t\t\n  string_experiment.go:61\t0x1001587e4\t\tf9005fe3\t\tMOVD R3, 184(RSP)\t\t\t\t\t\t\n  value.go:2380\t\t\t0x1001587e8\t\tb40000a8\t\tCBZ R8, 5(PC)\t\t\t\t\t\t\t\n  value.go:2380\t\t\t0x1001587ec\t\t37480088\t\tTBNZ $9, R8, 4(PC)\t\t\t\t\t\t\n  value.go:2380\t\t\t0x1001587f0\t\t90000e00\t\tADRP 1835008(PC), R0\t\t\t\t\t\t\n  value.go:2380\t\t\t0x1001587f4\t\t9136c000\t\tADD $3504, R0, R0\t\t\t\t\t\t\n  string_experiment.go:92\t0x1001587f8\t\t14000007\t\tJMP 7(PC)\t\t\t\t\t\t\t\n  value.go:2383\t\t\t0x1001587fc\t\taa0603e0\t\tMOVD R6, R0\t\t\t\t\t\t\t\n  value.go:2383\t\t\t0x100158800\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\t\n  value.go:2383\t\t\t0x100158804\t\taa0803e2\t\tMOVD R8, R2\t\t\t\t\t\t\t\n  value.go:2383\t\t\t0x100158808\t\t97fdbaae\t\tCALL reflect.Value.typeSlow(SB)\t\t\t\t\t\n  string_experiment.go:92\t0x10015880c\t\taa0103e6\t\tMOVD R1, R6\t\t\t\t\t\t\t\n  string_experiment.go:92\t0x100158810\t\tf94027e1\t\tMOVD 72(RSP), R1\t\t\t\t\t\t\n  string_experiment.go:92\t0x100158814\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\t\n  string_experiment.go:92\t0x100158818\t\taa0203e3\t\tMOVD R2, R3\t\t\t\t\t\t\t\n  string_experiment.go:92\t0x10015881c\t\taa0603e1\t\tMOVD R6, R1\t\t\t\t\t\t\t\n  string_experiment.go:92\t0x100158820\t\t97fdbcc4\t\tCALL reflect.MakeSlice(SB)\t\t\t\t\t\n  string_experiment.go:92\t0x100158824\t\tf9003fe0\t\tMOVD R0, 120(RSP)\t\t\t\t\t\t\n  string_experiment.go:92\t0x100158828\t\tf9003be1\t\tMOVD R1, 112(RSP)\t\t\t\t\t\t\n  string_experiment.go:92\t0x10015882c\t\tf9002fe2\t\tMOVD R2, 88(RSP)\t\t\t\t\t\t\n  string_experiment.go:93\t0x100158830\t\tf94027e3\t\tMOVD 72(RSP), R3\t\t\t\t\t\t\n  string_experiment.go:93\t0x100158834\t\tf94067e4\t\tMOVD 200(RSP), R4\t\t\t\t\t\t\n  string_experiment.go:93\t0x100158838\t\tf94043e5\t\tMOVD 128(RSP), R5\t\t\t\t\t\t\n  string_experiment.go:93\t0x10015883c\t\tf94063e6\t\tMOVD 192(RSP), R6\t\t\t\t\t\t\n  string_experiment.go:93\t0x100158840\t\tf94033e7\t\tMOVD 96(RSP), R7\t\t\t\t\t\t\n  string_experiment.go:93\t0x100158844\t\tf9405fe8\t\tMOVD 184(RSP), R8\t\t\t\t\t\t\n  string_experiment.go:93\t0x100158848\t\tf9401fe9\t\tMOVD 56(RSP), R9\t\t\t\t\t\t\n  string_experiment.go:93\t0x10015884c\t\taa1f03ea\t\tMOVD ZR, R10\t\t\t\t\t\t\t\n  string_experiment.go:93\t0x100158850\t\t140000a9\t\tJMP 169(PC)\t\t\t\t\t\t\t\n  string_experiment.go:79\t0x100158854\t\t90000aa0\t\tADRP 1392640(PC), R0\t\t\t\t\t\t\n  string_experiment.go:79\t0x100158858\t\t910f8000\t\tADD $992, R0, R0\t\t\t\t\t\t\n  string_experiment.go:79\t0x10015885c\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\t\n  string_experiment.go:79\t0x100158860\t\t97fc673c\t\tCALL runtime.makeslice(SB)\t\t\t\t\t\n  string_experiment.go:79\t0x100158864\t\tf9003be0\t\tMOVD R0, 112(RSP)\t\t\t\t\t\t\n  string_experiment.go:70\t0x100158868\t\tf94063e3\t\tMOVD 192(RSP), R3\t\t\t\t\t\t\n  string_experiment.go:70\t0x10015886c\t\td1000463\t\tSUB $1, R3, R3\t\t\t\t\t\t\t\n  string_experiment.go:71\t0x100158870\t\tf9401fe4\t\tMOVD 56(RSP), R4\t\t\t\t\t\t\n  string_experiment.go:71\t0x100158874\t\tf100109f\t\tCMP $4, R4\t\t\t\t\t\t\t\n  string_experiment.go:80\t0x100158878\t\t540000a1\t\tBNE 5(PC)\t\t\t\t\t\t\t\n  string_experiment.go:81\t0x10015887c\t\tf94043e4\t\tMOVD 128(RSP), R4\t\t\t\t\t\t\n  string_experiment.go:81\t0x100158880\t\tf94027e5\t\tMOVD 72(RSP), R5\t\t\t\t\t\t\n  string_experiment.go:81\t0x100158884\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\t\n  string_experiment.go:81\t0x100158888\t\t14000083\t\tJMP 131(PC)\t\t\t\t\t\t\t\n  string_experiment.go:85\t0x10015888c\t\tf94043e4\t\tMOVD 128(RSP), R4\t\t\t\t\t\t\n  string_experiment.go:85\t0x100158890\t\tf94027e5\t\tMOVD 72(RSP), R5\t\t\t\t\t\t\n  string_experiment.go:85\t0x100158894\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\t\n  string_experiment.go:85\t0x100158898\t\t1400004b\t\tJMP 75(PC)\t\t\t\t\t\t\t\n  string_experiment.go:76\t0x10015889c\t\taa0903e0\t\tMOVD R9, R0\t\t\t\t\t\t\t\n  string_experiment.go:76\t0x1001588a0\t\taa0c03e1\t\tMOVD R12, R1\t\t\t\t\t\t\t\n  string_experiment.go:76\t0x1001588a4\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  string_experiment.go:76\t0x1001588a8\t\tf84a07fe\t\tMOVD.P 160(RSP), R30\t\t\t\t\t\t\n  string_experiment.go:76\t0x1001588ac\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  string_experiment.go:72\t0x1001588b0\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\t\n  string_experiment.go:72\t0x1001588b4\t\tf9412b60\t\tMOVD 592(R27), R0\t\t\t\t\t\t\n  string_experiment.go:72\t0x1001588b8\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\t\n  string_experiment.go:72\t0x1001588bc\t\tf9412f61\t\tMOVD 600(R27), R1\t\t\t\t\t\t\n  string_experiment.go:72\t0x1001588c0\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  string_experiment.go:72\t0x1001588c4\t\tf84a07fe\t\tMOVD.P 160(RSP), R30\t\t\t\t\t\t\n  string_experiment.go:72\t0x1001588c8\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  string_experiment.go:62\t0x1001588cc\t\t394200a4\t\tMOVBU 128(R5), R4\t\t\t\t\t\t\n  string_experiment.go:62\t0x1001588d0\t\t37000364\t\tTBNZ $0, R4, 27(PC)\t\t\t\t\t\t\n  value.go:2380\t\t\t0x1001588d4\t\tb40000a8\t\tCBZ R8, 5(PC)\t\t\t\t\t\t\t\n  value.go:2380\t\t\t0x1001588d8\t\t37480088\t\tTBNZ $9, R8, 4(PC)\t\t\t\t\t\t\n  value.go:2380\t\t\t0x1001588dc\t\t90000e00\t\tADRP 1835008(PC), R0\t\t\t\t\t\t\n  value.go:2380\t\t\t0x1001588e0\t\t9136c000\t\tADD $3504, R0, R0\t\t\t\t\t\t\n  string_experiment.go:66\t0x1001588e4\t\t14000006\t\tJMP 6(PC)\t\t\t\t\t\t\t\n  value.go:2383\t\t\t0x1001588e8\t\taa0603e0\t\tMOVD R6, R0\t\t\t\t\t\t\t\n  value.go:2383\t\t\t0x1001588ec\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\t\n  value.go:2383\t\t\t0x1001588f0\t\taa0803e2\t\tMOVD R8, R2\t\t\t\t\t\t\t\n  value.go:2383\t\t\t0x1001588f4\t\t97fdba73\t\tCALL reflect.Value.typeSlow(SB)\t\t\t\t\t\n  string_experiment.go:66\t0x1001588f8\t\taa0103e6\t\tMOVD R1, R6\t\t\t\t\t\t\t\n  string_experiment.go:66\t0x1001588fc\t\taa0603e1\t\tMOVD R6, R1\t\t\t\t\t\t\t\n  string_experiment.go:66\t0x100158900\t\taa1f03e2\t\tMOVD ZR, R2\t\t\t\t\t\t\t\n  string_experiment.go:66\t0x100158904\t\taa0203e3\t\tMOVD R2, R3\t\t\t\t\t\t\t\n  string_experiment.go:66\t0x100158908\t\t97fdbc8a\t\tCALL reflect.MakeSlice(SB)\t\t\t\t\t\n  string_experiment.go:66\t0x10015890c\t\taa0003e3\t\tMOVD R0, R3\t\t\t\t\t\t\t\n  string_experiment.go:66\t0x100158910\t\taa0103e4\t\tMOVD R1, R4\t\t\t\t\t\t\t\n  string_experiment.go:66\t0x100158914\t\taa0203e5\t\tMOVD R2, R5\t\t\t\t\t\t\t\n  string_experiment.go:66\t0x100158918\t\tf94047e0\t\tMOVD 136(RSP), R0\t\t\t\t\t\t\n  string_experiment.go:66\t0x10015891c\t\tf9404be1\t\tMOVD 144(RSP), R1\t\t\t\t\t\t\n  string_experiment.go:66\t0x100158920\t\tf94037e2\t\tMOVD 104(RSP), R2\t\t\t\t\t\t\n  string_experiment.go:66\t0x100158924\t\t97fdb6bf\t\tCALL reflect.Value.Set(SB)\t\t\t\t\t\n  string_experiment.go:67\t0x100158928\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\t\n  string_experiment.go:67\t0x10015892c\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\t\n  string_experiment.go:67\t0x100158930\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  string_experiment.go:67\t0x100158934\t\tf84a07fe\t\tMOVD.P 160(RSP), R30\t\t\t\t\t\t\n  string_experiment.go:67\t0x100158938\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  string_experiment.go:63\t0x10015893c\t\taa0603e0\t\tMOVD R6, R0\t\t\t\t\t\t\t\n  string_experiment.go:63\t0x100158940\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\t\n  string_experiment.go:63\t0x100158944\t\taa0803e2\t\tMOVD R8, R2\t\t\t\t\t\t\t\n  string_experiment.go:63\t0x100158948\t\t97fda40e\t\tCALL reflect.Value.Addr(SB)\t\t\t\t\t\n  value.go:1484\t\t\t0x10015894c\t\tb24003e3\t\tORR $1, ZR, R3\t\t\t\t\t\t\t\n  value.go:1484\t\t\t0x100158950\t\t97fdcfe8\t\tCALL reflect.valueInterface(SB)\t\t\t\t\t\n  string_experiment.go:63\t0x100158954\t\td0000a63\t\tADRP 1368064(PC), R3\t\t\t\t\t\t\n  string_experiment.go:63\t0x100158958\t\t91308063\t\tADD $3104, R3, R3\t\t\t\t\t\t\n  string_experiment.go:63\t0x10015895c\t\teb03001f\t\tCMP R3, R0\t\t\t\t\t\t\t\n  string_experiment.go:63\t0x100158960\t\t54000201\t\tBNE 16(PC)\t\t\t\t\t\t\t\n  string_experiment.go:63\t0x100158964\t\ta900fc3f\t\tSTP (ZR, ZR), 8(R1)\t\t\t\t\t\t\n  string_experiment.go:63\t0x100158968\t\t90001d3b\t\tADRP 3817472(PC), R27\t\t\t\t\t\t\n  string_experiment.go:63\t0x10015896c\t\tb946f362\t\tMOVWU 1776(R27), R2\t\t\t\t\t\t\n  string_experiment.go:63\t0x100158970\t\t34000082\t\tCBZW R2, 4(PC)\t\t\t\t\t\t\t\n  string_experiment.go:63\t0x100158974\t\tf9400022\t\tMOVD (R1), R2\t\t\t\t\t\t\t\n  string_experiment.go:63\t0x100158978\t\t97fc7e42\t\tCALL runtime.gcWriteBarrier1(SB)\t\t\t\t\n  string_experiment.go:63\t0x10015897c\t\tf9000322\t\tMOVD R2, (R25)\t\t\t\t\t\t\t\n  string_experiment.go:63\t0x100158980\t\t90001d22\t\tADRP 3817472(PC), R2\t\t\t\t\t\t\n  string_experiment.go:63\t0x100158984\t\t910b0042\t\tADD $704, R2, R2\t\t\t\t\t\t\n  string_experiment.go:63\t0x100158988\t\tf9000022\t\tMOVD R2, (R1)\t\t\t\t\t\t\t\n  string_experiment.go:64\t0x10015898c\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\t\n  string_experiment.go:64\t0x100158990\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\t\n  string_experiment.go:64\t0x100158994\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  string_experiment.go:64\t0x100158998\t\tf84a07fe\t\tMOVD.P 160(RSP), R30\t\t\t\t\t\t\n  string_experiment.go:64\t0x10015899c\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  string_experiment.go:63\t0x1001589a0\t\taa0303e1\t\tMOVD R3, R1\t\t\t\t\t\t\t\n  string_experiment.go:63\t0x1001589a4\t\tb0000b02\t\tADRP 1445888(PC), R2\t\t\t\t\t\t\n  string_experiment.go:63\t0x1001589a8\t\t91008042\t\tADD $32, R2, R2\t\t\t\t\t\t\t\n  string_experiment.go:63\t0x1001589ac\t\t97faddc9\t\tCALL runtime.panicdottypeE(SB)\t\t\t\t\t\n  binary.go:117\t\t\t0x1001589b0\t\tf8617886\t\tMOVD (R4)(R1<<3), R6\t\t\t\t\t\t\n  string_experiment.go:85\t0x1001589b4\t\t91000427\t\tADD $1, R1, R7\t\t\t\t\t\t\t\n  decode.go:24\t\t\t0x1001589b8\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\t\n  string_experiment.go:86\t0x1001589bc\t\tf8217806\t\tMOVD R6, (R0)(R1<<3)\t\t\t\t\t\t\n  string_experiment.go:85\t0x1001589c0\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\t\n  string_experiment.go:85\t0x1001589c4\t\teb05003f\t\tCMP R5, R1\t\t\t\t\t\t\t\n  string_experiment.go:85\t0x1001589c8\t\t5400010a\t\tBGE 8(PC)\t\t\t\t\t\t\t\n  string_experiment.go:86\t0x1001589cc\t\td37df026\t\tLSL $3, R1, R6\t\t\t\t\t\t\t\n  string_experiment.go:86\t0x1001589d0\t\t910020c2\t\tADD $8, R6, R2\t\t\t\t\t\t\t\n  string_experiment.go:86\t0x1001589d4\t\teb02007f\t\tCMP R2, R3\t\t\t\t\t\t\t\n  string_experiment.go:86\t0x1001589d8\t\t54000503\t\tBCC 40(PC)\t\t\t\t\t\t\t\n  string_experiment.go:86\t0x1001589dc\t\teb010c5f\t\tCMP R1<<3, R2\t\t\t\t\t\t\t\n  string_experiment.go:86\t0x1001589e0\t\t54fffe82\t\tBCS -12(PC)\t\t\t\t\t\t\t\n  string_experiment.go:86\t0x1001589e4\t\t14000022\t\tJMP 34(PC)\t\t\t\t\t\t\t\n  string_experiment.go:89\t0x1001589e8\t\tf94047e0\t\tMOVD 136(RSP), R0\t\t\t\t\t\t\n  string_experiment.go:89\t0x1001589ec\t\tf9404be1\t\tMOVD 144(RSP), R1\t\t\t\t\t\t\n  string_experiment.go:89\t0x1001589f0\t\tf94037e2\t\tMOVD 104(RSP), R2\t\t\t\t\t\t\n  string_experiment.go:89\t0x1001589f4\t\t97fda3e3\t\tCALL reflect.Value.Addr(SB)\t\t\t\t\t\n  value.go:1484\t\t\t0x1001589f8\t\tb24003e3\t\tORR $1, ZR, R3\t\t\t\t\t\t\t\n  value.go:1484\t\t\t0x1001589fc\t\t97fdcfbd\t\tCALL reflect.valueInterface(SB)\t\t\t\t\t\n  string_experiment.go:89\t0x100158a00\t\td0000a63\t\tADRP 1368064(PC), R3\t\t\t\t\t\t\n  string_experiment.go:89\t0x100158a04\t\t91308063\t\tADD $3104, R3, R3\t\t\t\t\t\t\n  string_experiment.go:89\t0x100158a08\t\teb03001f\t\tCMP R3, R0\t\t\t\t\t\t\t\n  string_experiment.go:89\t0x100158a0c\t\t54000281\t\tBNE 20(PC)\t\t\t\t\t\t\t\n  string_experiment.go:89\t0x100158a10\t\tf94027e2\t\tMOVD 72(RSP), R2\t\t\t\t\t\t\n  string_experiment.go:89\t0x100158a14\t\tf9000422\t\tMOVD R2, 8(R1)\t\t\t\t\t\t\t\n  string_experiment.go:89\t0x100158a18\t\tf9000822\t\tMOVD R2, 16(R1)\t\t\t\t\t\t\t\n  string_experiment.go:89\t0x100158a1c\t\t90001d3b\t\tADRP 3817472(PC), R27\t\t\t\t\t\t\n  string_experiment.go:89\t0x100158a20\t\tb946f362\t\tMOVWU 1776(R27), R2\t\t\t\t\t\t\n  string_experiment.go:89\t0x100158a24\t\t35000062\t\tCBNZW R2, 3(PC)\t\t\t\t\t\t\t\n  string_experiment.go:89\t0x100158a28\t\tf9403be2\t\tMOVD 112(RSP), R2\t\t\t\t\t\t\n  string_experiment.go:89\t0x100158a2c\t\t14000006\t\tJMP 6(PC)\t\t\t\t\t\t\t\n  string_experiment.go:89\t0x100158a30\t\t97fc7e18\t\tCALL runtime.gcWriteBarrier2(SB)\t\t\t\t\n  string_experiment.go:89\t0x100158a34\t\tf9403be2\t\tMOVD 112(RSP), R2\t\t\t\t\t\t\n  string_experiment.go:89\t0x100158a38\t\tf9000322\t\tMOVD R2, (R25)\t\t\t\t\t\t\t\n  string_experiment.go:89\t0x100158a3c\t\tf9400023\t\tMOVD (R1), R3\t\t\t\t\t\t\t\n  string_experiment.go:89\t0x100158a40\t\tf9000723\t\tMOVD R3, 8(R25)\t\t\t\t\t\t\t\n  string_experiment.go:89\t0x100158a44\t\tf9000022\t\tMOVD R2, (R1)\t\t\t\t\t\t\t\n  string_experiment.go:90\t0x100158a48\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\t\n  string_experiment.go:90\t0x100158a4c\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\t\n  string_experiment.go:90\t0x100158a50\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  string_experiment.go:90\t0x100158a54\t\tf84a07fe\t\tMOVD.P 160(RSP), R30\t\t\t\t\t\t\n  string_experiment.go:90\t0x100158a58\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  string_experiment.go:89\t0x100158a5c\t\taa0303e1\t\tMOVD R3, R1\t\t\t\t\t\t\t\n  string_experiment.go:89\t0x100158a60\t\tb0000b02\t\tADRP 1445888(PC), R2\t\t\t\t\t\t\n  string_experiment.go:89\t0x100158a64\t\t91008042\t\tADD $32, R2, R2\t\t\t\t\t\t\t\n  string_experiment.go:89\t0x100158a68\t\t97fadd9a\t\tCALL runtime.panicdottypeE(SB)\t\t\t\t\t\n  string_experiment.go:86\t0x100158a6c\t\taa0603e0\t\tMOVD R6, R0\t\t\t\t\t\t\t\n  string_experiment.go:86\t0x100158a70\t\taa0203e1\t\tMOVD R2, R1\t\t\t\t\t\t\t\n  string_experiment.go:86\t0x100158a74\t\t97fc7ee7\t\tCALL runtime.panicSlice3C(SB)\t\t\t\t\t\n  string_experiment.go:86\t0x100158a78\t\t97fc7ede\t\tCALL runtime.panicSlice3Acap(SB)\t\t\t\t\n  binary.go:92\t\t\t0x100158a7c\t\tb8617886\t\tMOVWU (R4)(R1<<2), R6\t\t\t\t\t\t\n  string_experiment.go:82\t0x100158a80\t\t93407cc6\t\tSXTW R6, R6\t\t\t\t\t\t\t\n  string_experiment.go:81\t0x100158a84\t\t91000427\t\tADD $1, R1, R7\t\t\t\t\t\t\t\n  decode.go:20\t\t\t0x100158a88\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\t\n  string_experiment.go:82\t0x100158a8c\t\tf8217806\t\tMOVD R6, (R0)(R1<<3)\t\t\t\t\t\t\n  string_experiment.go:81\t0x100158a90\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\t\n  string_experiment.go:81\t0x100158a94\t\teb05003f\t\tCMP R5, R1\t\t\t\t\t\t\t\n  string_experiment.go:81\t0x100158a98\t\t54fffa8a\t\tBGE -44(PC)\t\t\t\t\t\t\t\n  string_experiment.go:82\t0x100158a9c\t\td37ef426\t\tLSL $2, R1, R6\t\t\t\t\t\t\t\n  string_experiment.go:82\t0x100158aa0\t\t910010c2\t\tADD $4, R6, R2\t\t\t\t\t\t\t\n  string_experiment.go:82\t0x100158aa4\t\teb02007f\t\tCMP R2, R3\t\t\t\t\t\t\t\n  string_experiment.go:82\t0x100158aa8\t\t540000c3\t\tBCC 6(PC)\t\t\t\t\t\t\t\n  string_experiment.go:82\t0x100158aac\t\teb01085f\t\tCMP R1<<2, R2\t\t\t\t\t\t\t\n  string_experiment.go:82\t0x100158ab0\t\t54fffe62\t\tBCS -13(PC)\t\t\t\t\t\t\t\n  string_experiment.go:82\t0x100158ab4\t\taa0603e0\t\tMOVD R6, R0\t\t\t\t\t\t\t\n  string_experiment.go:82\t0x100158ab8\t\taa0203e1\t\tMOVD R2, R1\t\t\t\t\t\t\t\n  string_experiment.go:82\t0x100158abc\t\t97fc7ed5\t\tCALL runtime.panicSlice3C(SB)\t\t\t\t\t\n  string_experiment.go:82\t0x100158ac0\t\t97fc7ecc\t\tCALL runtime.panicSlice3Acap(SB)\t\t\t\t\n  string_experiment.go:93\t0x100158ac4\t\tf94023eb\t\tMOVD 64(RSP), R11\t\t\t\t\t\t\n  string_experiment.go:93\t0x100158ac8\t\t9100056a\t\tADD $1, R11, R10\t\t\t\t\t\t\n  string_experiment.go:93\t0x100158acc\t\tf94027e3\t\tMOVD 72(RSP), R3\t\t\t\t\t\t\n  string_experiment.go:93\t0x100158ad0\t\tf94067e4\t\tMOVD 200(RSP), R4\t\t\t\t\t\t\n  string_experiment.go:93\t0x100158ad4\t\tf9403fe0\t\tMOVD 120(RSP), R0\t\t\t\t\t\t\n  string_experiment.go:93\t0x100158ad8\t\tf9403be1\t\tMOVD 112(RSP), R1\t\t\t\t\t\t\n  string_experiment.go:93\t0x100158adc\t\tf9402fe2\t\tMOVD 88(RSP), R2\t\t\t\t\t\t\n  string_experiment.go:93\t0x100158ae0\t\tf94043e5\t\tMOVD 128(RSP), R5\t\t\t\t\t\t\n  string_experiment.go:93\t0x100158ae4\t\tf94063e6\t\tMOVD 192(RSP), R6\t\t\t\t\t\t\n  string_experiment.go:93\t0x100158ae8\t\tf94033e7\t\tMOVD 96(RSP), R7\t\t\t\t\t\t\n  string_experiment.go:93\t0x100158aec\t\tf9405fe8\t\tMOVD 184(RSP), R8\t\t\t\t\t\t\n  string_experiment.go:93\t0x100158af0\t\tf9401fe9\t\tMOVD 56(RSP), R9\t\t\t\t\t\t\n  string_experiment.go:93\t0x100158af4\t\teb03015f\t\tCMP R3, R10\t\t\t\t\t\t\t\n  string_experiment.go:93\t0x100158af8\t\t5400078a\t\tBGE 60(PC)\t\t\t\t\t\t\t\n  string_experiment.go:71\t0x100158afc\t\tf100113f\t\tCMP $4, R9\t\t\t\t\t\t\t\n  string_experiment.go:95\t0x100158b00\t\t54000201\t\tBNE 16(PC)\t\t\t\t\t\t\t\n  string_experiment.go:96\t0x100158b04\t\td37ef54b\t\tLSL $2, R10, R11\t\t\t\t\t\t\n  string_experiment.go:96\t0x100158b08\t\teb0a08ff\t\tCMP R10<<2, R7\t\t\t\t\t\t\t\n  string_experiment.go:96\t0x100158b0c\t\t54000983\t\tBCC 76(PC)\t\t\t\t\t\t\t\n  string_experiment.go:96\t0x100158b10\t\tcb0a090c\t\tSUB R10<<2, R8, R12\t\t\t\t\t\t\n  string_experiment.go:96\t0x100158b14\t\tcb0a08cd\t\tSUB R10<<2, R6, R13\t\t\t\t\t\t\n  string_experiment.go:96\t0x100158b18\t\td100058c\t\tSUB $1, R12, R12\t\t\t\t\t\t\n  string_experiment.go:96\t0x100158b1c\t\td10005ad\t\tSUB $1, R13, R13\t\t\t\t\t\t\n  string_experiment.go:96\t0x100158b20\t\tcb0d03ed\t\tNEG R13, R13\t\t\t\t\t\t\t\n  string_experiment.go:96\t0x100158b24\t\t8a8dfd6b\t\tAND R13->63, R11, R11\t\t\t\t\t\t\n  decode.go:20\t\t\t0x100158b28\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\t\n  binary.go:91\t\t\t0x100158b2c\t\tf1000d9f\t\tCMP $3, R12\t\t\t\t\t\t\t\n  binary.go:91\t\t\t0x100158b30\t\t54000809\t\tBLS 64(PC)\t\t\t\t\t\t\t\n  binary.go:92\t\t\t0x100158b34\t\tb86b68ab\t\tMOVWU (R5)(R11), R11\t\t\t\t\t\t\n  string_experiment.go:96\t0x100158b38\t\t93407d6b\t\tSXTW R11, R11\t\t\t\t\t\t\t\n  string_experiment.go:96\t0x100158b3c\t\t1400000e\t\tJMP 14(PC)\t\t\t\t\t\t\t\n  string_experiment.go:98\t0x100158b40\t\t9b097d4b\t\tMUL R9, R10, R11\t\t\t\t\t\t\n  string_experiment.go:98\t0x100158b44\t\teb07017f\t\tCMP R7, R11\t\t\t\t\t\t\t\n  string_experiment.go:98\t0x100158b48\t\t540006e8\t\tBHI 55(PC)\t\t\t\t\t\t\t\n  string_experiment.go:98\t0x100158b4c\t\tcb0b010c\t\tSUB R11, R8, R12\t\t\t\t\t\t\n  string_experiment.go:98\t0x100158b50\t\tcb0b00cd\t\tSUB R11, R6, R13\t\t\t\t\t\t\n  string_experiment.go:98\t0x100158b54\t\td100058c\t\tSUB $1, R12, R12\t\t\t\t\t\t\n  string_experiment.go:98\t0x100158b58\t\td10005ad\t\tSUB $1, R13, R13\t\t\t\t\t\t\n  string_experiment.go:98\t0x100158b5c\t\tcb0d03ed\t\tNEG R13, R13\t\t\t\t\t\t\t\n  string_experiment.go:98\t0x100158b60\t\t8a8dfd6b\t\tAND R13->63, R11, R11\t\t\t\t\t\t\n  decode.go:24\t\t\t0x100158b64\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\t\n  binary.go:116\t\t\t0x100158b68\t\tf1001d9f\t\tCMP $7, R12\t\t\t\t\t\t\t\n  binary.go:116\t\t\t0x100158b6c\t\t54000569\t\tBLS 43(PC)\t\t\t\t\t\t\t\n  binary.go:117\t\t\t0x100158b70\t\tf86b68ab\t\tMOVD (R5)(R11), R11\t\t\t\t\t\t\n  string_experiment.go:93\t0x100158b74\t\tf90023ea\t\tMOVD R10, 64(RSP)\t\t\t\t\t\t\n  string_experiment.go:102\t0x100158b78\t\tf9002beb\t\tMOVD R11, 80(RSP)\t\t\t\t\t\t\n  string_experiment.go:100\t0x100158b7c\t\tf940148c\t\tMOVD 40(R4), R12\t\t\t\t\t\t\n  string_experiment.go:100\t0x100158b80\t\tf100199f\t\tCMP $6, R12\t\t\t\t\t\t\t\n  string_experiment.go:100\t0x100158b84\t\t54000221\t\tBNE 17(PC)\t\t\t\t\t\t\t\n  string_experiment.go:100\t0x100158b88\t\tf940108c\t\tMOVD 32(R4), R12\t\t\t\t\t\t\n  string_experiment.go:100\t0x100158b8c\t\tb940018d\t\tMOVWU (R12), R13\t\t\t\t\t\t\n  string_experiment.go:100\t0x100158b90\t\td28dec8e\t\tMOVD $28516, R14\t\t\t\t\t\t\n  string_experiment.go:100\t0x100158b94\t\tf2ac4eae\t\tMOVK $(25205<<16), R14\t\t\t\t\t\t\n  string_experiment.go:100\t0x100158b98\t\t6b0e01bf\t\tCMPW R14, R13\t\t\t\t\t\t\t\n  string_experiment.go:100\t0x100158b9c\t\t54000161\t\tBNE 11(PC)\t\t\t\t\t\t\t\n  string_experiment.go:100\t0x100158ba0\t\t7940098c\t\tMOVHU 4(R12), R12\t\t\t\t\t\t\n  string_experiment.go:100\t0x100158ba4\t\td28cad8d\t\tMOVD $25964, R13\t\t\t\t\t\t\n  string_experiment.go:100\t0x100158ba8\t\t6b0d019f\t\tCMPW R13, R12\t\t\t\t\t\t\t\n  string_experiment.go:100\t0x100158bac\t\t540000e1\t\tBNE 7(PC)\t\t\t\t\t\t\t\n  string_experiment.go:101\t0x100158bb0\t\taa0a03e3\t\tMOVD R10, R3\t\t\t\t\t\t\t\n  string_experiment.go:101\t0x100158bb4\t\t97fdafd3\t\tCALL reflect.Value.Index(SB)\t\t\t\t\t\n  unsafe.go:41\t\t\t0x100158bb8\t\tf9402be4\t\tMOVD 80(RSP), R4\t\t\t\t\t\t\n  unsafe.go:41\t\t\t0x100158bbc\t\t9e670080\t\tFMOVD R4, F0\t\t\t\t\t\t\t\n  string_experiment.go:101\t0x100158bc0\t\t97fdb784\t\tCALL reflect.Value.SetFloat(SB)\t\t\t\t\t\n  string_experiment.go:101\t0x100158bc4\t\t17ffffc0\t\tJMP -64(PC)\t\t\t\t\t\t\t\n  string_experiment.go:102\t0x100158bc8\t\taa0a03e3\t\tMOVD R10, R3\t\t\t\t\t\t\t\n  string_experiment.go:102\t0x100158bcc\t\t97fdafcd\t\tCALL reflect.Value.Index(SB)\t\t\t\t\t\n  string_experiment.go:102\t0x100158bd0\t\tf9402be3\t\tMOVD 80(RSP), R3\t\t\t\t\t\t\n  string_experiment.go:102\t0x100158bd4\t\t97ffd407\t\tCALL github.com/cnooljaw/gosproto.setInteger(SB)\t\t\n  string_experiment.go:102\t0x100158bd8\t\tb4fff760\t\tCBZ R0, -69(PC)\t\t\t\t\t\t\t\n  string_experiment.go:103\t0x100158bdc\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  string_experiment.go:103\t0x100158be0\t\tf84a07fe\t\tMOVD.P 160(RSP), R30\t\t\t\t\t\t\n  string_experiment.go:103\t0x100158be4\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  string_experiment.go:106\t0x100158be8\t\taa0003e3\t\tMOVD R0, R3\t\t\t\t\t\t\t\n  string_experiment.go:106\t0x100158bec\t\taa0103e4\t\tMOVD R1, R4\t\t\t\t\t\t\t\n  string_experiment.go:106\t0x100158bf0\t\taa0203e5\t\tMOVD R2, R5\t\t\t\t\t\t\t\n  string_experiment.go:106\t0x100158bf4\t\tf94047e0\t\tMOVD 136(RSP), R0\t\t\t\t\t\t\n  string_experiment.go:106\t0x100158bf8\t\tf9404be1\t\tMOVD 144(RSP), R1\t\t\t\t\t\t\n  string_experiment.go:106\t0x100158bfc\t\tf94037e2\t\tMOVD 104(RSP), R2\t\t\t\t\t\t\n  string_experiment.go:106\t0x100158c00\t\t97fdb608\t\tCALL reflect.Value.Set(SB)\t\t\t\t\t\n  string_experiment.go:107\t0x100158c04\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\t\n  string_experiment.go:107\t0x100158c08\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\t\n  string_experiment.go:107\t0x100158c0c\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  string_experiment.go:107\t0x100158c10\t\tf84a07fe\t\tMOVD.P 160(RSP), R30\t\t\t\t\t\t\n  string_experiment.go:107\t0x100158c14\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  binary.go:116\t\t\t0x100158c18\t\tb2400be0\t\tORR $7, ZR, R0\t\t\t\t\t\t\t\n  binary.go:116\t\t\t0x100158c1c\t\taa0c03e1\t\tMOVD R12, R1\t\t\t\t\t\t\t\n  binary.go:116\t\t\t0x100158c20\t\t97fc7e50\t\tCALL runtime.panicIndex(SB)\t\t\t\t\t\n  string_experiment.go:98\t0x100158c24\t\taa0b03e0\t\tMOVD R11, R0\t\t\t\t\t\t\t\n  string_experiment.go:98\t0x100158c28\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\t\n  string_experiment.go:98\t0x100158c2c\t\t97fc7e65\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\t\n  binary.go:91\t\t\t0x100158c30\t\tb24007e0\t\tORR $3, ZR, R0\t\t\t\t\t\t\t\n  binary.go:91\t\t\t0x100158c34\t\taa0c03e1\t\tMOVD R12, R1\t\t\t\t\t\t\t\n  binary.go:91\t\t\t0x100158c38\t\t97fc7e4a\t\tCALL runtime.panicIndex(SB)\t\t\t\t\t\n  string_experiment.go:96\t0x100158c3c\t\taa0b03e0\t\tMOVD R11, R0\t\t\t\t\t\t\t\n  string_experiment.go:96\t0x100158c40\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\t\n  string_experiment.go:96\t0x100158c44\t\t97fc7e5f\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\t\n  string_experiment.go:96\t0x100158c48\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\t\n  string_experiment.go:59\t0x100158c4c\t\t790013e0\t\tMOVH R0, 8(RSP)\t\t\t\t\t\t\t\n  string_experiment.go:59\t0x100158c50\t\t39002be1\t\tMOVB R1, 10(RSP)\t\t\t\t\t\t\n  string_experiment.go:59\t0x100158c54\t\ta9010fe2\t\tSTP (R2, R3), 16(RSP)\t\t\t\t\t\t\n  string_experiment.go:59\t0x100158c58\t\ta90217e4\t\tSTP (R4, R5), 32(RSP)\t\t\t\t\t\t\n  string_experiment.go:59\t0x100158c5c\t\ta9031fe6\t\tSTP (R6, R7), 48(RSP)\t\t\t\t\t\t\n  string_experiment.go:59\t0x100158c60\t\ta90427e8\t\tSTP (R8, R9), 64(RSP)\t\t\t\t\t\t\n  string_experiment.go:59\t0x100158c64\t\taa1e03e3\t\tMOVD R30, R3\t\t\t\t\t\t\t\n  string_experiment.go:59\t0x100158c68\t\t97fc74e6\t\tCALL runtime.morestack_noctxt.abi0(SB)\t\t\t\t\n  string_experiment.go:59\t0x100158c6c\t\t794013e0\t\tMOVHU 8(RSP), R0\t\t\t\t\t\t\n  string_experiment.go:59\t0x100158c70\t\t39402be1\t\tMOVBU 10(RSP), R1\t\t\t\t\t\t\n  string_experiment.go:59\t0x100158c74\t\ta9410fe2\t\tLDP 16(RSP), (R2, R3)\t\t\t\t\t\t\n  string_experiment.go:59\t0x100158c78\t\ta94217e4\t\tLDP 32(RSP), (R4, R5)\t\t\t\t\t\t\n  string_experiment.go:59\t0x100158c7c\t\ta9431fe6\t\tLDP 48(RSP), (R6, R7)\t\t\t\t\t\t\n  string_experiment.go:59\t0x100158c80\t\ta94427e8\t\tLDP 64(RSP), (R8, R9)\t\t\t\t\t\t\n  string_experiment.go:59\t0x100158c84\t\t17fffea7\t\tJMP github.com/cnooljaw/gosproto.experimentStringClone(SB)\t\n  string_experiment.go:59\t0x100158c88\t\t00000000\t\t?\t\t\t\t\t\t\t\t\n  string_experiment.go:59\t0x100158c8c\t\t00000000\t\t?\t\t\t\t\t\t\t\t\n\nTEXT github.com/cnooljaw/gosproto.experimentStringCandidate(SB) /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/gosproto/string_experiment.go\n  string_experiment.go:110\t0x100158c90\t\tf9400b90\t\tMOVD 16(R28), R16\t\t\t\t\t\t\n  string_experiment.go:110\t0x100158c94\t\td10083f1\t\tSUB $32, RSP, R17\t\t\t\t\t\t\n  string_experiment.go:110\t0x100158c98\t\teb10023f\t\tCMP R16, R17\t\t\t\t\t\t\t\n  string_experiment.go:110\t0x100158c9c\t\t540034c9\t\tBLS 422(PC)\t\t\t\t\t\t\t\n  string_experiment.go:110\t0x100158ca0\t\tf8160ffe\t\tMOVD.W R30, -160(RSP)\t\t\t\t\t\t\n  string_experiment.go:110\t0x100158ca4\t\tf81f83fd\t\tMOVD R29, -8(RSP)\t\t\t\t\t\t\n  string_experiment.go:110\t0x100158ca8\t\td10023fd\t\tSUB $8, RSP, R29\t\t\t\t\t\t\n  string_experiment.go:110\t0x100158cac\t\tf9005be2\t\tMOVD R2, 176(RSP)\t\t\t\t\t\t\n  string_experiment.go:110\t0x100158cb0\t\tf9006be6\t\tMOVD R6, 208(RSP)\t\t\t\t\t\t\n  string_experiment.go:110\t0x100158cb4\t\tf9006fe7\t\tMOVD R7, 216(RSP)\t\t\t\t\t\t\n  string_experiment.go:112\t0x100158cb8\t\tf90037e8\t\tMOVD R8, 104(RSP)\t\t\t\t\t\t\n  string_experiment.go:112\t0x100158cbc\t\tf9004be7\t\tMOVD R7, 144(RSP)\t\t\t\t\t\t\n  string_experiment.go:112\t0x100158cc0\t\tf90047e6\t\tMOVD R6, 136(RSP)\t\t\t\t\t\t\n  string_experiment.go:112\t0x100158cc4\t\tf100047f\t\tCMP $1, R3\t\t\t\t\t\t\t\n  string_experiment.go:112\t0x100158cc8\t\t54000bad\t\tBLE 93(PC)\t\t\t\t\t\t\t\n  string_experiment.go:120\t0x100158ccc\t\t3940004a\t\tMOVBU (R2), R10\t\t\t\t\t\t\t\n  string_experiment.go:122\t0x100158cd0\t\tf100115f\t\tCMP $4, R10\t\t\t\t\t\t\t\n  string_experiment.go:122\t0x100158cd4\t\t54000060\t\tBEQ 3(PC)\t\t\t\t\t\t\t\n  string_experiment.go:122\t0x100158cd8\t\tf100215f\t\tCMP $8, R10\t\t\t\t\t\t\t\n  string_experiment.go:122\t0x100158cdc\t\t54000a21\t\tBNE 81(PC)\t\t\t\t\t\t\t\n  string_experiment.go:121\t0x100158ce0\t\td100046b\t\tSUB $1, R3, R11\t\t\t\t\t\t\t\n  string_experiment.go:122\t0x100158ce4\t\t9aca0d7b\t\tSDIV R10, R11, R27\t\t\t\t\t\t\n  string_experiment.go:122\t0x100158ce8\t\t9b0aaf6c\t\tMSUB R10, R11, R27, R12\t\t\t\t\t\t\n  string_experiment.go:122\t0x100158cec\t\tb50009ac\t\tCBNZ R12, 77(PC)\t\t\t\t\t\t\n  string_experiment.go:125\t0x100158cf0\t\t9aca0d61\t\tSDIV R10, R11, R1\t\t\t\t\t\t\n  limits.go:50\t\t\t0x100158cf4\t\tf940092c\t\tMOVD 16(R9), R12\t\t\t\t\t\t\n  limits.go:50\t\t\t0x100158cf8\t\tf940112d\t\tMOVD 32(R9), R13\t\t\t\t\t\t\n  limits.go:50\t\t\t0x100158cfc\t\tcb0d018c\t\tSUB R13, R12, R12\t\t\t\t\t\t\n  limits.go:50\t\t\t0x100158d00\t\teb0c003f\t\tCMP R12, R1\t\t\t\t\t\t\t\n  limits.go:50\t\t\t0x100158d04\t\t540000cd\t\tBLE 6(PC)\t\t\t\t\t\t\t\n  string_experiment.go:126\t0x100158d08\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\t\n  string_experiment.go:126\t0x100158d0c\t\tf940fb69\t\tMOVD 496(R27), R9\t\t\t\t\t\t\n  string_experiment.go:126\t0x100158d10\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\t\n  string_experiment.go:126\t0x100158d14\t\tf940ff6c\t\tMOVD 504(R27), R12\t\t\t\t\t\t\n  string_experiment.go:126\t0x100158d18\t\t14000005\t\tJMP 5(PC)\t\t\t\t\t\t\t\n  limits.go:53\t\t\t0x100158d1c\t\t8b0d002d\t\tADD R13, R1, R13\t\t\t\t\t\t\n  limits.go:53\t\t\t0x100158d20\t\tf900112d\t\tMOVD R13, 32(R9)\t\t\t\t\t\t\n  limits.go:53\t\t\t0x100158d24\t\taa1f03e9\t\tMOVD ZR, R9\t\t\t\t\t\t\t\n  limits.go:53\t\t\t0x100158d28\t\taa1f03ec\t\tMOVD ZR, R12\t\t\t\t\t\t\t\n  string_experiment.go:126\t0x100158d2c\t\tb5000709\t\tCBNZ R9, 56(PC)\t\t\t\t\t\t\t\n  string_experiment.go:120\t0x100158d30\t\tf9001fea\t\tMOVD R10, 56(RSP)\t\t\t\t\t\t\n  string_experiment.go:125\t0x100158d34\t\tf90027e1\t\tMOVD R1, 72(RSP)\t\t\t\t\t\t\n  string_experiment.go:112\t0x100158d38\t\tf90063e4\t\tMOVD R4, 192(RSP)\t\t\t\t\t\t\n  string_experiment.go:121\t0x100158d3c\t\t91000449\t\tADD $1, R2, R9\t\t\t\t\t\t\t\n  string_experiment.go:121\t0x100158d40\t\tf90043e9\t\tMOVD R9, 128(RSP)\t\t\t\t\t\t\n  string_experiment.go:129\t0x100158d44\t\t394200ac\t\tMOVBU 128(R5), R12\t\t\t\t\t\t\n  string_experiment.go:129\t0x100158d48\t\t370003ec\t\tTBNZ $0, R12, 31(PC)\t\t\t\t\t\t\n  string_experiment.go:112\t0x100158d4c\t\tf90067e5\t\tMOVD R5, 200(RSP)\t\t\t\t\t\t\n  string_experiment.go:121\t0x100158d50\t\tf90033eb\t\tMOVD R11, 96(RSP)\t\t\t\t\t\t\n  string_experiment.go:112\t0x100158d54\t\tf9005fe3\t\tMOVD R3, 184(RSP)\t\t\t\t\t\t\n  value.go:2380\t\t\t0x100158d58\t\tb40000a8\t\tCBZ R8, 5(PC)\t\t\t\t\t\t\t\n  value.go:2380\t\t\t0x100158d5c\t\t37480088\t\tTBNZ $9, R8, 4(PC)\t\t\t\t\t\t\n  value.go:2380\t\t\t0x100158d60\t\t90000e00\t\tADRP 1835008(PC), R0\t\t\t\t\t\t\n  value.go:2380\t\t\t0x100158d64\t\t9136c000\t\tADD $3504, R0, R0\t\t\t\t\t\t\n  string_experiment.go:161\t0x100158d68\t\t14000007\t\tJMP 7(PC)\t\t\t\t\t\t\t\n  value.go:2383\t\t\t0x100158d6c\t\taa0603e0\t\tMOVD R6, R0\t\t\t\t\t\t\t\n  value.go:2383\t\t\t0x100158d70\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\t\n  value.go:2383\t\t\t0x100158d74\t\taa0803e2\t\tMOVD R8, R2\t\t\t\t\t\t\t\n  value.go:2383\t\t\t0x100158d78\t\t97fdb952\t\tCALL reflect.Value.typeSlow(SB)\t\t\t\t\t\n  string_experiment.go:161\t0x100158d7c\t\taa0103e6\t\tMOVD R1, R6\t\t\t\t\t\t\t\n  string_experiment.go:161\t0x100158d80\t\tf94027e1\t\tMOVD 72(RSP), R1\t\t\t\t\t\t\n  string_experiment.go:161\t0x100158d84\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\t\n  string_experiment.go:161\t0x100158d88\t\taa0203e3\t\tMOVD R2, R3\t\t\t\t\t\t\t\n  string_experiment.go:161\t0x100158d8c\t\taa0603e1\t\tMOVD R6, R1\t\t\t\t\t\t\t\n  string_experiment.go:161\t0x100158d90\t\t97fdbb68\t\tCALL reflect.MakeSlice(SB)\t\t\t\t\t\n  string_experiment.go:161\t0x100158d94\t\tf9003fe0\t\tMOVD R0, 120(RSP)\t\t\t\t\t\t\n  string_experiment.go:161\t0x100158d98\t\tf9003be1\t\tMOVD R1, 112(RSP)\t\t\t\t\t\t\n  string_experiment.go:161\t0x100158d9c\t\tf9002fe2\t\tMOVD R2, 88(RSP)\t\t\t\t\t\t\n  string_experiment.go:162\t0x100158da0\t\tf94027e3\t\tMOVD 72(RSP), R3\t\t\t\t\t\t\n  string_experiment.go:162\t0x100158da4\t\tf94067e4\t\tMOVD 200(RSP), R4\t\t\t\t\t\t\n  string_experiment.go:162\t0x100158da8\t\tf94043e5\t\tMOVD 128(RSP), R5\t\t\t\t\t\t\n  string_experiment.go:162\t0x100158dac\t\tf94063e6\t\tMOVD 192(RSP), R6\t\t\t\t\t\t\n  string_experiment.go:162\t0x100158db0\t\tf94033e7\t\tMOVD 96(RSP), R7\t\t\t\t\t\t\n  string_experiment.go:162\t0x100158db4\t\tf9405fe8\t\tMOVD 184(RSP), R8\t\t\t\t\t\t\n  string_experiment.go:162\t0x100158db8\t\tf9401fe9\t\tMOVD 56(RSP), R9\t\t\t\t\t\t\n  string_experiment.go:162\t0x100158dbc\t\taa1f03ea\t\tMOVD ZR, R10\t\t\t\t\t\t\t\n  string_experiment.go:162\t0x100158dc0\t\t14000107\t\tJMP 263(PC)\t\t\t\t\t\t\t\n  string_experiment.go:130\t0x100158dc4\t\t90000aa0\t\tADRP 1392640(PC), R0\t\t\t\t\t\t\n  string_experiment.go:130\t0x100158dc8\t\t910f8000\t\tADD $992, R0, R0\t\t\t\t\t\t\n  string_experiment.go:130\t0x100158dcc\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\t\n  string_experiment.go:130\t0x100158dd0\t\t97fc65e0\t\tCALL runtime.makeslice(SB)\t\t\t\t\t\n  string_experiment.go:130\t0x100158dd4\t\tf9003be0\t\tMOVD R0, 112(RSP)\t\t\t\t\t\t\n  string_experiment.go:121\t0x100158dd8\t\tf94063e3\t\tMOVD 192(RSP), R3\t\t\t\t\t\t\n  string_experiment.go:121\t0x100158ddc\t\td1000463\t\tSUB $1, R3, R3\t\t\t\t\t\t\t\n  string_experiment.go:122\t0x100158de0\t\tf9401fe4\t\tMOVD 56(RSP), R4\t\t\t\t\t\t\n  string_experiment.go:122\t0x100158de4\t\tf100109f\t\tCMP $4, R4\t\t\t\t\t\t\t\n  string_experiment.go:131\t0x100158de8\t\t540000a1\t\tBNE 5(PC)\t\t\t\t\t\t\t\n  string_experiment.go:131\t0x100158dec\t\tf94043e4\t\tMOVD 128(RSP), R4\t\t\t\t\t\t\n  string_experiment.go:131\t0x100158df0\t\tf94027e1\t\tMOVD 72(RSP), R1\t\t\t\t\t\t\n  string_experiment.go:131\t0x100158df4\t\taa1f03e2\t\tMOVD ZR, R2\t\t\t\t\t\t\t\n  string_experiment.go:131\t0x100158df8\t\t140000bc\t\tJMP 188(PC)\t\t\t\t\t\t\t\n  string_experiment.go:131\t0x100158dfc\t\tf94043e4\t\tMOVD 128(RSP), R4\t\t\t\t\t\t\n  string_experiment.go:131\t0x100158e00\t\tf94027e1\t\tMOVD 72(RSP), R1\t\t\t\t\t\t\n  string_experiment.go:131\t0x100158e04\t\taa1f03e2\t\tMOVD ZR, R2\t\t\t\t\t\t\t\n  string_experiment.go:131\t0x100158e08\t\t14000054\t\tJMP 84(PC)\t\t\t\t\t\t\t\n  string_experiment.go:127\t0x100158e0c\t\taa0903e0\t\tMOVD R9, R0\t\t\t\t\t\t\t\n  string_experiment.go:127\t0x100158e10\t\taa0c03e1\t\tMOVD R12, R1\t\t\t\t\t\t\t\n  string_experiment.go:127\t0x100158e14\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  string_experiment.go:127\t0x100158e18\t\tf84a07fe\t\tMOVD.P 160(RSP), R30\t\t\t\t\t\t\n  string_experiment.go:127\t0x100158e1c\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  string_experiment.go:123\t0x100158e20\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\t\n  string_experiment.go:123\t0x100158e24\t\tf9412b60\t\tMOVD 592(R27), R0\t\t\t\t\t\t\n  string_experiment.go:123\t0x100158e28\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\t\n  string_experiment.go:123\t0x100158e2c\t\tf9412f61\t\tMOVD 600(R27), R1\t\t\t\t\t\t\n  string_experiment.go:123\t0x100158e30\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  string_experiment.go:123\t0x100158e34\t\tf84a07fe\t\tMOVD.P 160(RSP), R30\t\t\t\t\t\t\n  string_experiment.go:123\t0x100158e38\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  string_experiment.go:113\t0x100158e3c\t\t394200a4\t\tMOVBU 128(R5), R4\t\t\t\t\t\t\n  string_experiment.go:113\t0x100158e40\t\t37000364\t\tTBNZ $0, R4, 27(PC)\t\t\t\t\t\t\n  value.go:2380\t\t\t0x100158e44\t\tb40000a8\t\tCBZ R8, 5(PC)\t\t\t\t\t\t\t\n  value.go:2380\t\t\t0x100158e48\t\t37480088\t\tTBNZ $9, R8, 4(PC)\t\t\t\t\t\t\n  value.go:2380\t\t\t0x100158e4c\t\t90000e00\t\tADRP 1835008(PC), R0\t\t\t\t\t\t\n  value.go:2380\t\t\t0x100158e50\t\t9136c000\t\tADD $3504, R0, R0\t\t\t\t\t\t\n  string_experiment.go:117\t0x100158e54\t\t14000006\t\tJMP 6(PC)\t\t\t\t\t\t\t\n  value.go:2383\t\t\t0x100158e58\t\taa0603e0\t\tMOVD R6, R0\t\t\t\t\t\t\t\n  value.go:2383\t\t\t0x100158e5c\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\t\n  value.go:2383\t\t\t0x100158e60\t\taa0803e2\t\tMOVD R8, R2\t\t\t\t\t\t\t\n  value.go:2383\t\t\t0x100158e64\t\t97fdb917\t\tCALL reflect.Value.typeSlow(SB)\t\t\t\t\t\n  string_experiment.go:117\t0x100158e68\t\taa0103e6\t\tMOVD R1, R6\t\t\t\t\t\t\t\n  string_experiment.go:117\t0x100158e6c\t\taa0603e1\t\tMOVD R6, R1\t\t\t\t\t\t\t\n  string_experiment.go:117\t0x100158e70\t\taa1f03e2\t\tMOVD ZR, R2\t\t\t\t\t\t\t\n  string_experiment.go:117\t0x100158e74\t\taa0203e3\t\tMOVD R2, R3\t\t\t\t\t\t\t\n  string_experiment.go:117\t0x100158e78\t\t97fdbb2e\t\tCALL reflect.MakeSlice(SB)\t\t\t\t\t\n  string_experiment.go:117\t0x100158e7c\t\taa0003e3\t\tMOVD R0, R3\t\t\t\t\t\t\t\n  string_experiment.go:117\t0x100158e80\t\taa0103e4\t\tMOVD R1, R4\t\t\t\t\t\t\t\n  string_experiment.go:117\t0x100158e84\t\taa0203e5\t\tMOVD R2, R5\t\t\t\t\t\t\t\n  string_experiment.go:117\t0x100158e88\t\tf94047e0\t\tMOVD 136(RSP), R0\t\t\t\t\t\t\n  string_experiment.go:117\t0x100158e8c\t\tf9404be1\t\tMOVD 144(RSP), R1\t\t\t\t\t\t\n  string_experiment.go:117\t0x100158e90\t\tf94037e2\t\tMOVD 104(RSP), R2\t\t\t\t\t\t\n  string_experiment.go:117\t0x100158e94\t\t97fdb563\t\tCALL reflect.Value.Set(SB)\t\t\t\t\t\n  string_experiment.go:118\t0x100158e98\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\t\n  string_experiment.go:118\t0x100158e9c\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\t\n  string_experiment.go:118\t0x100158ea0\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  string_experiment.go:118\t0x100158ea4\t\tf84a07fe\t\tMOVD.P 160(RSP), R30\t\t\t\t\t\t\n  string_experiment.go:118\t0x100158ea8\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  string_experiment.go:114\t0x100158eac\t\taa0603e0\t\tMOVD R6, R0\t\t\t\t\t\t\t\n  string_experiment.go:114\t0x100158eb0\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\t\n  string_experiment.go:114\t0x100158eb4\t\taa0803e2\t\tMOVD R8, R2\t\t\t\t\t\t\t\n  string_experiment.go:114\t0x100158eb8\t\t97fda2b2\t\tCALL reflect.Value.Addr(SB)\t\t\t\t\t\n  value.go:1484\t\t\t0x100158ebc\t\tb24003e3\t\tORR $1, ZR, R3\t\t\t\t\t\t\t\n  value.go:1484\t\t\t0x100158ec0\t\t97fdce8c\t\tCALL reflect.valueInterface(SB)\t\t\t\t\t\n  string_experiment.go:114\t0x100158ec4\t\td0000a63\t\tADRP 1368064(PC), R3\t\t\t\t\t\t\n  string_experiment.go:114\t0x100158ec8\t\t91308063\t\tADD $3104, R3, R3\t\t\t\t\t\t\n  string_experiment.go:114\t0x100158ecc\t\teb03001f\t\tCMP R3, R0\t\t\t\t\t\t\t\n  string_experiment.go:114\t0x100158ed0\t\t54000201\t\tBNE 16(PC)\t\t\t\t\t\t\t\n  string_experiment.go:114\t0x100158ed4\t\ta900fc3f\t\tSTP (ZR, ZR), 8(R1)\t\t\t\t\t\t\n  string_experiment.go:114\t0x100158ed8\t\t90001d3b\t\tADRP 3817472(PC), R27\t\t\t\t\t\t\n  string_experiment.go:114\t0x100158edc\t\tb946f362\t\tMOVWU 1776(R27), R2\t\t\t\t\t\t\n  string_experiment.go:114\t0x100158ee0\t\t34000082\t\tCBZW R2, 4(PC)\t\t\t\t\t\t\t\n  string_experiment.go:114\t0x100158ee4\t\tf9400022\t\tMOVD (R1), R2\t\t\t\t\t\t\t\n  string_experiment.go:114\t0x100158ee8\t\t97fc7ce6\t\tCALL runtime.gcWriteBarrier1(SB)\t\t\t\t\n  string_experiment.go:114\t0x100158eec\t\tf9000322\t\tMOVD R2, (R25)\t\t\t\t\t\t\t\n  string_experiment.go:114\t0x100158ef0\t\t90001d22\t\tADRP 3817472(PC), R2\t\t\t\t\t\t\n  string_experiment.go:114\t0x100158ef4\t\t910b0042\t\tADD $704, R2, R2\t\t\t\t\t\t\n  string_experiment.go:114\t0x100158ef8\t\tf9000022\t\tMOVD R2, (R1)\t\t\t\t\t\t\t\n  string_experiment.go:115\t0x100158efc\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\t\n  string_experiment.go:115\t0x100158f00\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\t\n  string_experiment.go:115\t0x100158f04\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  string_experiment.go:115\t0x100158f08\t\tf84a07fe\t\tMOVD.P 160(RSP), R30\t\t\t\t\t\t\n  string_experiment.go:115\t0x100158f0c\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  string_experiment.go:114\t0x100158f10\t\taa0303e1\t\tMOVD R3, R1\t\t\t\t\t\t\t\n  string_experiment.go:114\t0x100158f14\t\tb0000b02\t\tADRP 1445888(PC), R2\t\t\t\t\t\t\n  string_experiment.go:114\t0x100158f18\t\t91008042\t\tADD $32, R2, R2\t\t\t\t\t\t\t\n  string_experiment.go:114\t0x100158f1c\t\t97fadc6d\t\tCALL runtime.panicdottypeE(SB)\t\t\t\t\t\n  string_experiment.go:148\t0x100158f20\t\t8b020c86\t\tADD R2<<3, R4, R6\t\t\t\t\t\t\n  binary.go:117\t\t\t0x100158f24\t\tf8627887\t\tMOVD (R4)(R2<<3), R7\t\t\t\t\t\t\n  decode.go:24\t\t\t0x100158f28\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\t\n  string_experiment.go:149\t0x100158f2c\t\tf8227807\t\tMOVD R7, (R0)(R2<<3)\t\t\t\t\t\t\n  binary.go:117\t\t\t0x100158f30\t\tf94004c7\t\tMOVD 8(R6), R7\t\t\t\t\t\t\t\n  decode.go:24\t\t\t0x100158f34\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\t\n  string_experiment.go:150\t0x100158f38\t\tf9000507\t\tMOVD R7, 8(R8)\t\t\t\t\t\t\t\n  binary.go:117\t\t\t0x100158f3c\t\tf94008c7\t\tMOVD 16(R6), R7\t\t\t\t\t\t\t\n  decode.go:24\t\t\t0x100158f40\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\t\n  string_experiment.go:151\t0x100158f44\t\tf9000907\t\tMOVD R7, 16(R8)\t\t\t\t\t\t\t\n  binary.go:117\t\t\t0x100158f48\t\tf9400cc6\t\tMOVD 24(R6), R6\t\t\t\t\t\t\t\n  decode.go:24\t\t\t0x100158f4c\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\t\n  string_experiment.go:152\t0x100158f50\t\tf9000d06\t\tMOVD R6, 24(R8)\t\t\t\t\t\t\t\n  string_experiment.go:146\t0x100158f54\t\taa0503e2\t\tMOVD R5, R2\t\t\t\t\t\t\t\n  string_experiment.go:146\t0x100158f58\t\td1000c25\t\tSUB $3, R1, R5\t\t\t\t\t\t\t\n  string_experiment.go:146\t0x100158f5c\t\teb05005f\t\tCMP R5, R2\t\t\t\t\t\t\t\n  string_experiment.go:146\t0x100158f60\t\t5400020a\t\tBGE 16(PC)\t\t\t\t\t\t\t\n  string_experiment.go:147\t0x100158f64\t\t91001045\t\tADD $4, R2, R5\t\t\t\t\t\t\t\n  string_experiment.go:147\t0x100158f68\t\teb05003f\t\tCMP R5, R1\t\t\t\t\t\t\t\n  string_experiment.go:147\t0x100158f6c\t\t54000943\t\tBCC 74(PC)\t\t\t\t\t\t\t\n  string_experiment.go:147\t0x100158f70\t\teb05005f\t\tCMP R5, R2\t\t\t\t\t\t\t\n  string_experiment.go:147\t0x100158f74\t\t540008a8\t\tBHI 69(PC)\t\t\t\t\t\t\t\n  string_experiment.go:148\t0x100158f78\t\td37df046\t\tLSL $3, R2, R6\t\t\t\t\t\t\t\n  string_experiment.go:148\t0x100158f7c\t\t910080c7\t\tADD $32, R6, R7\t\t\t\t\t\t\t\n  string_experiment.go:147\t0x100158f80\t\t8b020c08\t\tADD R2<<3, R0, R8\t\t\t\t\t\t\n  string_experiment.go:148\t0x100158f84\t\teb07007f\t\tCMP R7, R3\t\t\t\t\t\t\t\n  string_experiment.go:148\t0x100158f88\t\t540007c3\t\tBCC 62(PC)\t\t\t\t\t\t\t\n  string_experiment.go:148\t0x100158f8c\t\teb020cff\t\tCMP R2<<3, R7\t\t\t\t\t\t\t\n  string_experiment.go:148\t0x100158f90\t\t54fffc82\t\tBCS -28(PC)\t\t\t\t\t\t\t\n  string_experiment.go:148\t0x100158f94\t\t14000038\t\tJMP 56(PC)\t\t\t\t\t\t\t\n  string_experiment.go:155\t0x100158f98\t\tf8227805\t\tMOVD R5, (R0)(R2<<3)\t\t\t\t\t\t\n  string_experiment.go:154\t0x100158f9c\t\t91000442\t\tADD $1, R2, R2\t\t\t\t\t\t\t\n  string_experiment.go:154\t0x100158fa0\t\teb01005f\t\tCMP R1, R2\t\t\t\t\t\t\t\n  string_experiment.go:154\t0x100158fa4\t\t5400018a\t\tBGE 12(PC)\t\t\t\t\t\t\t\n  string_experiment.go:155\t0x100158fa8\t\td37df045\t\tLSL $3, R2, R5\t\t\t\t\t\t\t\n  string_experiment.go:155\t0x100158fac\t\t910020a6\t\tADD $8, R5, R6\t\t\t\t\t\t\t\n  string_experiment.go:155\t0x100158fb0\t\teb06007f\t\tCMP R6, R3\t\t\t\t\t\t\t\n  string_experiment.go:155\t0x100158fb4\t\t540005c3\t\tBCC 46(PC)\t\t\t\t\t\t\t\n  string_experiment.go:155\t0x100158fb8\t\teb020cdf\t\tCMP R2<<3, R6\t\t\t\t\t\t\t\n  string_experiment.go:155\t0x100158fbc\t\t54000523\t\tBCC 41(PC)\t\t\t\t\t\t\t\n  decode.go:24\t\t\t0x100158fc0\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\t\n  binary.go:117\t\t\t0x100158fc4\t\tf8627885\t\tMOVD (R4)(R2<<3), R5\t\t\t\t\t\t\n  string_experiment.go:154\t0x100158fc8\t\teb01005f\t\tCMP R1, R2\t\t\t\t\t\t\t\n  string_experiment.go:155\t0x100158fcc\t\t54fffe63\t\tBCC -13(PC)\t\t\t\t\t\t\t\n  string_experiment.go:155\t0x100158fd0\t\t14000022\t\tJMP 34(PC)\t\t\t\t\t\t\t\n  string_experiment.go:158\t0x100158fd4\t\tf94047e0\t\tMOVD 136(RSP), R0\t\t\t\t\t\t\n  string_experiment.go:158\t0x100158fd8\t\tf9404be1\t\tMOVD 144(RSP), R1\t\t\t\t\t\t\n  string_experiment.go:158\t0x100158fdc\t\tf94037e2\t\tMOVD 104(RSP), R2\t\t\t\t\t\t\n  string_experiment.go:158\t0x100158fe0\t\t97fda268\t\tCALL reflect.Value.Addr(SB)\t\t\t\t\t\n  value.go:1484\t\t\t0x100158fe4\t\tb24003e3\t\tORR $1, ZR, R3\t\t\t\t\t\t\t\n  value.go:1484\t\t\t0x100158fe8\t\t97fdce42\t\tCALL reflect.valueInterface(SB)\t\t\t\t\t\n  string_experiment.go:158\t0x100158fec\t\td0000a63\t\tADRP 1368064(PC), R3\t\t\t\t\t\t\n  string_experiment.go:158\t0x100158ff0\t\t91308063\t\tADD $3104, R3, R3\t\t\t\t\t\t\n  string_experiment.go:158\t0x100158ff4\t\teb03001f\t\tCMP R3, R0\t\t\t\t\t\t\t\n  string_experiment.go:158\t0x100158ff8\t\t54000281\t\tBNE 20(PC)\t\t\t\t\t\t\t\n  string_experiment.go:158\t0x100158ffc\t\tf94027e2\t\tMOVD 72(RSP), R2\t\t\t\t\t\t\n  string_experiment.go:158\t0x100159000\t\tf9000422\t\tMOVD R2, 8(R1)\t\t\t\t\t\t\t\n  string_experiment.go:158\t0x100159004\t\tf9000822\t\tMOVD R2, 16(R1)\t\t\t\t\t\t\t\n  string_experiment.go:158\t0x100159008\t\tf0001d1b\t\tADRP 3813376(PC), R27\t\t\t\t\t\t\n  string_experiment.go:158\t0x10015900c\t\tb946f362\t\tMOVWU 1776(R27), R2\t\t\t\t\t\t\n  string_experiment.go:158\t0x100159010\t\t35000062\t\tCBNZW R2, 3(PC)\t\t\t\t\t\t\t\n  string_experiment.go:158\t0x100159014\t\tf9403be2\t\tMOVD 112(RSP), R2\t\t\t\t\t\t\n  string_experiment.go:158\t0x100159018\t\t14000006\t\tJMP 6(PC)\t\t\t\t\t\t\t\n  string_experiment.go:158\t0x10015901c\t\t97fc7c9d\t\tCALL runtime.gcWriteBarrier2(SB)\t\t\t\t\n  string_experiment.go:158\t0x100159020\t\tf9403be2\t\tMOVD 112(RSP), R2\t\t\t\t\t\t\n  string_experiment.go:158\t0x100159024\t\tf9000322\t\tMOVD R2, (R25)\t\t\t\t\t\t\t\n  string_experiment.go:158\t0x100159028\t\tf9400023\t\tMOVD (R1), R3\t\t\t\t\t\t\t\n  string_experiment.go:158\t0x10015902c\t\tf9000723\t\tMOVD R3, 8(R25)\t\t\t\t\t\t\t\n  string_experiment.go:158\t0x100159030\t\tf9000022\t\tMOVD R2, (R1)\t\t\t\t\t\t\t\n  string_experiment.go:159\t0x100159034\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\t\n  string_experiment.go:159\t0x100159038\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\t\n  string_experiment.go:159\t0x10015903c\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  string_experiment.go:159\t0x100159040\t\tf84a07fe\t\tMOVD.P 160(RSP), R30\t\t\t\t\t\t\n  string_experiment.go:159\t0x100159044\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  string_experiment.go:158\t0x100159048\t\taa0303e1\t\tMOVD R3, R1\t\t\t\t\t\t\t\n  string_experiment.go:158\t0x10015904c\t\t90000b02\t\tADRP 1441792(PC), R2\t\t\t\t\t\t\n  string_experiment.go:158\t0x100159050\t\t91008042\t\tADD $32, R2, R2\t\t\t\t\t\t\t\n  string_experiment.go:158\t0x100159054\t\t97fadc1f\t\tCALL runtime.panicdottypeE(SB)\t\t\t\t\t\n  string_experiment.go:155\t0x100159058\t\taa0203e0\t\tMOVD R2, R0\t\t\t\t\t\t\t\n  string_experiment.go:155\t0x10015905c\t\t97fc7d41\t\tCALL runtime.panicIndex(SB)\t\t\t\t\t\n  string_experiment.go:155\t0x100159060\t\taa0503e0\t\tMOVD R5, R0\t\t\t\t\t\t\t\n  string_experiment.go:155\t0x100159064\t\taa0603e1\t\tMOVD R6, R1\t\t\t\t\t\t\t\n  string_experiment.go:155\t0x100159068\t\t97fc7d6a\t\tCALL runtime.panicSlice3C(SB)\t\t\t\t\t\n  string_experiment.go:155\t0x10015906c\t\taa0603e2\t\tMOVD R6, R2\t\t\t\t\t\t\t\n  string_experiment.go:155\t0x100159070\t\t97fc7d60\t\tCALL runtime.panicSlice3Acap(SB)\t\t\t\t\n  string_experiment.go:148\t0x100159074\t\taa0603e0\t\tMOVD R6, R0\t\t\t\t\t\t\t\n  string_experiment.go:148\t0x100159078\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\t\n  string_experiment.go:148\t0x10015907c\t\t97fc7d65\t\tCALL runtime.panicSlice3C(SB)\t\t\t\t\t\n  string_experiment.go:148\t0x100159080\t\taa0703e2\t\tMOVD R7, R2\t\t\t\t\t\t\t\n  string_experiment.go:148\t0x100159084\t\t97fc7d5b\t\tCALL runtime.panicSlice3Acap(SB)\t\t\t\t\n  string_experiment.go:147\t0x100159088\t\taa0203e0\t\tMOVD R2, R0\t\t\t\t\t\t\t\n  string_experiment.go:147\t0x10015908c\t\taa0503e1\t\tMOVD R5, R1\t\t\t\t\t\t\t\n  string_experiment.go:147\t0x100159090\t\t97fc7d60\t\tCALL runtime.panicSlice3C(SB)\t\t\t\t\t\n  string_experiment.go:147\t0x100159094\t\taa0503e2\t\tMOVD R5, R2\t\t\t\t\t\t\t\n  string_experiment.go:147\t0x100159098\t\taa0103e3\t\tMOVD R1, R3\t\t\t\t\t\t\t\n  string_experiment.go:147\t0x10015909c\t\t97fc7d55\t\tCALL runtime.panicSlice3Acap(SB)\t\t\t\t\n  string_experiment.go:135\t0x1001590a0\t\t8b020886\t\tADD R2<<2, R4, R6\t\t\t\t\t\t\n  binary.go:92\t\t\t0x1001590a4\t\tb8627887\t\tMOVWU (R4)(R2<<2), R7\t\t\t\t\t\t\n  string_experiment.go:136\t0x1001590a8\t\t93407ce7\t\tSXTW R7, R7\t\t\t\t\t\t\t\n  decode.go:20\t\t\t0x1001590ac\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\t\n  string_experiment.go:136\t0x1001590b0\t\tf8227807\t\tMOVD R7, (R0)(R2<<3)\t\t\t\t\t\t\n  binary.go:92\t\t\t0x1001590b4\t\tb94004c7\t\tMOVWU 4(R6), R7\t\t\t\t\t\t\t\n  string_experiment.go:137\t0x1001590b8\t\t93407ce7\t\tSXTW R7, R7\t\t\t\t\t\t\t\n  decode.go:20\t\t\t0x1001590bc\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\t\n  string_experiment.go:137\t0x1001590c0\t\tf9000507\t\tMOVD R7, 8(R8)\t\t\t\t\t\t\t\n  binary.go:92\t\t\t0x1001590c4\t\tb94008c7\t\tMOVWU 8(R6), R7\t\t\t\t\t\t\t\n  string_experiment.go:138\t0x1001590c8\t\t93407ce7\t\tSXTW R7, R7\t\t\t\t\t\t\t\n  decode.go:20\t\t\t0x1001590cc\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\t\n  string_experiment.go:138\t0x1001590d0\t\tf9000907\t\tMOVD R7, 16(R8)\t\t\t\t\t\t\t\n  binary.go:92\t\t\t0x1001590d4\t\tb9400cc6\t\tMOVWU 12(R6), R6\t\t\t\t\t\t\n  string_experiment.go:139\t0x1001590d8\t\t93407cc6\t\tSXTW R6, R6\t\t\t\t\t\t\t\n  decode.go:20\t\t\t0x1001590dc\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\t\n  string_experiment.go:139\t0x1001590e0\t\tf9000d06\t\tMOVD R6, 24(R8)\t\t\t\t\t\t\t\n  string_experiment.go:133\t0x1001590e4\t\taa0503e2\t\tMOVD R5, R2\t\t\t\t\t\t\t\n  string_experiment.go:133\t0x1001590e8\t\td1000c25\t\tSUB $3, R1, R5\t\t\t\t\t\t\t\n  string_experiment.go:133\t0x1001590ec\t\teb05005f\t\tCMP R5, R2\t\t\t\t\t\t\t\n  string_experiment.go:133\t0x1001590f0\t\t5400022a\t\tBGE 17(PC)\t\t\t\t\t\t\t\n  string_experiment.go:134\t0x1001590f4\t\t91001045\t\tADD $4, R2, R5\t\t\t\t\t\t\t\n  string_experiment.go:134\t0x1001590f8\t\teb05003f\t\tCMP R5, R1\t\t\t\t\t\t\t\n  string_experiment.go:134\t0x1001590fc\t\t54000523\t\tBCC 41(PC)\t\t\t\t\t\t\t\n  string_experiment.go:134\t0x100159100\t\teb05005f\t\tCMP R5, R2\t\t\t\t\t\t\t\n  string_experiment.go:134\t0x100159104\t\t54000488\t\tBHI 36(PC)\t\t\t\t\t\t\t\n  string_experiment.go:135\t0x100159108\t\td37ef446\t\tLSL $2, R2, R6\t\t\t\t\t\t\t\n  string_experiment.go:135\t0x10015910c\t\t910040c7\t\tADD $16, R6, R7\t\t\t\t\t\t\t\n  string_experiment.go:134\t0x100159110\t\t8b020c08\t\tADD R2<<3, R0, R8\t\t\t\t\t\t\n  string_experiment.go:135\t0x100159114\t\teb07007f\t\tCMP R7, R3\t\t\t\t\t\t\t\n  string_experiment.go:135\t0x100159118\t\t540003a3\t\tBCC 29(PC)\t\t\t\t\t\t\t\n  string_experiment.go:135\t0x10015911c\t\teb0208ff\t\tCMP R2<<2, R7\t\t\t\t\t\t\t\n  string_experiment.go:135\t0x100159120\t\t54fffc02\t\tBCS -32(PC)\t\t\t\t\t\t\t\n  string_experiment.go:135\t0x100159124\t\t14000017\t\tJMP 23(PC)\t\t\t\t\t\t\t\n  string_experiment.go:142\t0x100159128\t\t93407ca5\t\tSXTW R5, R5\t\t\t\t\t\t\t\n  string_experiment.go:142\t0x10015912c\t\tf8227805\t\tMOVD R5, (R0)(R2<<3)\t\t\t\t\t\t\n  string_experiment.go:141\t0x100159130\t\t91000442\t\tADD $1, R2, R2\t\t\t\t\t\t\t\n  string_experiment.go:141\t0x100159134\t\teb01005f\t\tCMP R1, R2\t\t\t\t\t\t\t\n  string_experiment.go:141\t0x100159138\t\t54fff4ea\t\tBGE -89(PC)\t\t\t\t\t\t\t\n  string_experiment.go:142\t0x10015913c\t\td37ef445\t\tLSL $2, R2, R5\t\t\t\t\t\t\t\n  string_experiment.go:142\t0x100159140\t\t910010a6\t\tADD $4, R5, R6\t\t\t\t\t\t\t\n  string_experiment.go:142\t0x100159144\t\teb06007f\t\tCMP R6, R3\t\t\t\t\t\t\t\n  string_experiment.go:142\t0x100159148\t\t54000183\t\tBCC 12(PC)\t\t\t\t\t\t\t\n  string_experiment.go:142\t0x10015914c\t\teb0208df\t\tCMP R2<<2, R6\t\t\t\t\t\t\t\n  string_experiment.go:142\t0x100159150\t\t540000e3\t\tBCC 7(PC)\t\t\t\t\t\t\t\n  decode.go:20\t\t\t0x100159154\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\t\n  binary.go:92\t\t\t0x100159158\t\tb8627885\t\tMOVWU (R4)(R2<<2), R5\t\t\t\t\t\t\n  string_experiment.go:141\t0x10015915c\t\teb01005f\t\tCMP R1, R2\t\t\t\t\t\t\t\n  string_experiment.go:142\t0x100159160\t\t54fffe43\t\tBCC -14(PC)\t\t\t\t\t\t\t\n  string_experiment.go:142\t0x100159164\t\taa0203e0\t\tMOVD R2, R0\t\t\t\t\t\t\t\n  string_experiment.go:142\t0x100159168\t\t97fc7cfe\t\tCALL runtime.panicIndex(SB)\t\t\t\t\t\n  string_experiment.go:142\t0x10015916c\t\taa0503e0\t\tMOVD R5, R0\t\t\t\t\t\t\t\n  string_experiment.go:142\t0x100159170\t\taa0603e1\t\tMOVD R6, R1\t\t\t\t\t\t\t\n  string_experiment.go:142\t0x100159174\t\t97fc7d27\t\tCALL runtime.panicSlice3C(SB)\t\t\t\t\t\n  string_experiment.go:142\t0x100159178\t\taa0603e2\t\tMOVD R6, R2\t\t\t\t\t\t\t\n  string_experiment.go:142\t0x10015917c\t\t97fc7d1d\t\tCALL runtime.panicSlice3Acap(SB)\t\t\t\t\n  string_experiment.go:135\t0x100159180\t\taa0603e0\t\tMOVD R6, R0\t\t\t\t\t\t\t\n  string_experiment.go:135\t0x100159184\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\t\n  string_experiment.go:135\t0x100159188\t\t97fc7d22\t\tCALL runtime.panicSlice3C(SB)\t\t\t\t\t\n  string_experiment.go:135\t0x10015918c\t\taa0703e2\t\tMOVD R7, R2\t\t\t\t\t\t\t\n  string_experiment.go:135\t0x100159190\t\t97fc7d18\t\tCALL runtime.panicSlice3Acap(SB)\t\t\t\t\n  string_experiment.go:134\t0x100159194\t\taa0203e0\t\tMOVD R2, R0\t\t\t\t\t\t\t\n  string_experiment.go:134\t0x100159198\t\taa0503e1\t\tMOVD R5, R1\t\t\t\t\t\t\t\n  string_experiment.go:134\t0x10015919c\t\t97fc7d1d\t\tCALL runtime.panicSlice3C(SB)\t\t\t\t\t\n  string_experiment.go:134\t0x1001591a0\t\taa0503e2\t\tMOVD R5, R2\t\t\t\t\t\t\t\n  string_experiment.go:134\t0x1001591a4\t\taa0103e3\t\tMOVD R1, R3\t\t\t\t\t\t\t\n  string_experiment.go:134\t0x1001591a8\t\t97fc7d12\t\tCALL runtime.panicSlice3Acap(SB)\t\t\t\t\n  string_experiment.go:162\t0x1001591ac\t\tf94023eb\t\tMOVD 64(RSP), R11\t\t\t\t\t\t\n  string_experiment.go:162\t0x1001591b0\t\t9100056a\t\tADD $1, R11, R10\t\t\t\t\t\t\n  string_experiment.go:162\t0x1001591b4\t\tf94027e3\t\tMOVD 72(RSP), R3\t\t\t\t\t\t\n  string_experiment.go:162\t0x1001591b8\t\tf94067e4\t\tMOVD 200(RSP), R4\t\t\t\t\t\t\n  string_experiment.go:162\t0x1001591bc\t\tf9403fe0\t\tMOVD 120(RSP), R0\t\t\t\t\t\t\n  string_experiment.go:162\t0x1001591c0\t\tf9403be1\t\tMOVD 112(RSP), R1\t\t\t\t\t\t\n  string_experiment.go:162\t0x1001591c4\t\tf9402fe2\t\tMOVD 88(RSP), R2\t\t\t\t\t\t\n  string_experiment.go:162\t0x1001591c8\t\tf94043e5\t\tMOVD 128(RSP), R5\t\t\t\t\t\t\n  string_experiment.go:162\t0x1001591cc\t\tf94063e6\t\tMOVD 192(RSP), R6\t\t\t\t\t\t\n  string_experiment.go:162\t0x1001591d0\t\tf94033e7\t\tMOVD 96(RSP), R7\t\t\t\t\t\t\n  string_experiment.go:162\t0x1001591d4\t\tf9405fe8\t\tMOVD 184(RSP), R8\t\t\t\t\t\t\n  string_experiment.go:162\t0x1001591d8\t\tf9401fe9\t\tMOVD 56(RSP), R9\t\t\t\t\t\t\n  string_experiment.go:162\t0x1001591dc\t\teb03015f\t\tCMP R3, R10\t\t\t\t\t\t\t\n  string_experiment.go:162\t0x1001591e0\t\t5400078a\t\tBGE 60(PC)\t\t\t\t\t\t\t\n  string_experiment.go:122\t0x1001591e4\t\tf100113f\t\tCMP $4, R9\t\t\t\t\t\t\t\n  string_experiment.go:164\t0x1001591e8\t\t54000201\t\tBNE 16(PC)\t\t\t\t\t\t\t\n  string_experiment.go:165\t0x1001591ec\t\td37ef54b\t\tLSL $2, R10, R11\t\t\t\t\t\t\n  string_experiment.go:165\t0x1001591f0\t\teb0a08ff\t\tCMP R10<<2, R7\t\t\t\t\t\t\t\n  string_experiment.go:165\t0x1001591f4\t\t54000983\t\tBCC 76(PC)\t\t\t\t\t\t\t\n  string_experiment.go:165\t0x1001591f8\t\tcb0a090c\t\tSUB R10<<2, R8, R12\t\t\t\t\t\t\n  string_experiment.go:165\t0x1001591fc\t\tcb0a08cd\t\tSUB R10<<2, R6, R13\t\t\t\t\t\t\n  string_experiment.go:165\t0x100159200\t\td100058c\t\tSUB $1, R12, R12\t\t\t\t\t\t\n  string_experiment.go:165\t0x100159204\t\td10005ad\t\tSUB $1, R13, R13\t\t\t\t\t\t\n  string_experiment.go:165\t0x100159208\t\tcb0d03ed\t\tNEG R13, R13\t\t\t\t\t\t\t\n  string_experiment.go:165\t0x10015920c\t\t8a8dfd6b\t\tAND R13->63, R11, R11\t\t\t\t\t\t\n  decode.go:20\t\t\t0x100159210\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\t\n  binary.go:91\t\t\t0x100159214\t\tf1000d9f\t\tCMP $3, R12\t\t\t\t\t\t\t\n  binary.go:91\t\t\t0x100159218\t\t54000809\t\tBLS 64(PC)\t\t\t\t\t\t\t\n  binary.go:92\t\t\t0x10015921c\t\tb86b68ab\t\tMOVWU (R5)(R11), R11\t\t\t\t\t\t\n  string_experiment.go:165\t0x100159220\t\t93407d6b\t\tSXTW R11, R11\t\t\t\t\t\t\t\n  string_experiment.go:165\t0x100159224\t\t1400000e\t\tJMP 14(PC)\t\t\t\t\t\t\t\n  string_experiment.go:167\t0x100159228\t\t9b097d4b\t\tMUL R9, R10, R11\t\t\t\t\t\t\n  string_experiment.go:167\t0x10015922c\t\teb07017f\t\tCMP R7, R11\t\t\t\t\t\t\t\n  string_experiment.go:167\t0x100159230\t\t540006e8\t\tBHI 55(PC)\t\t\t\t\t\t\t\n  string_experiment.go:167\t0x100159234\t\tcb0b010c\t\tSUB R11, R8, R12\t\t\t\t\t\t\n  string_experiment.go:167\t0x100159238\t\tcb0b00cd\t\tSUB R11, R6, R13\t\t\t\t\t\t\n  string_experiment.go:167\t0x10015923c\t\td100058c\t\tSUB $1, R12, R12\t\t\t\t\t\t\n  string_experiment.go:167\t0x100159240\t\td10005ad\t\tSUB $1, R13, R13\t\t\t\t\t\t\n  string_experiment.go:167\t0x100159244\t\tcb0d03ed\t\tNEG R13, R13\t\t\t\t\t\t\t\n  string_experiment.go:167\t0x100159248\t\t8a8dfd6b\t\tAND R13->63, R11, R11\t\t\t\t\t\t\n  decode.go:24\t\t\t0x10015924c\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\t\n  binary.go:116\t\t\t0x100159250\t\tf1001d9f\t\tCMP $7, R12\t\t\t\t\t\t\t\n  binary.go:116\t\t\t0x100159254\t\t54000569\t\tBLS 43(PC)\t\t\t\t\t\t\t\n  binary.go:117\t\t\t0x100159258\t\tf86b68ab\t\tMOVD (R5)(R11), R11\t\t\t\t\t\t\n  string_experiment.go:162\t0x10015925c\t\tf90023ea\t\tMOVD R10, 64(RSP)\t\t\t\t\t\t\n  string_experiment.go:171\t0x100159260\t\tf9002beb\t\tMOVD R11, 80(RSP)\t\t\t\t\t\t\n  string_experiment.go:169\t0x100159264\t\tf940148c\t\tMOVD 40(R4), R12\t\t\t\t\t\t\n  string_experiment.go:169\t0x100159268\t\tf100199f\t\tCMP $6, R12\t\t\t\t\t\t\t\n  string_experiment.go:169\t0x10015926c\t\t54000221\t\tBNE 17(PC)\t\t\t\t\t\t\t\n  string_experiment.go:169\t0x100159270\t\tf940108c\t\tMOVD 32(R4), R12\t\t\t\t\t\t\n  string_experiment.go:169\t0x100159274\t\tb940018d\t\tMOVWU (R12), R13\t\t\t\t\t\t\n  string_experiment.go:169\t0x100159278\t\td28dec8e\t\tMOVD $28516, R14\t\t\t\t\t\t\n  string_experiment.go:169\t0x10015927c\t\tf2ac4eae\t\tMOVK $(25205<<16), R14\t\t\t\t\t\t\n  string_experiment.go:169\t0x100159280\t\t6b0e01bf\t\tCMPW R14, R13\t\t\t\t\t\t\t\n  string_experiment.go:169\t0x100159284\t\t54000161\t\tBNE 11(PC)\t\t\t\t\t\t\t\n  string_experiment.go:169\t0x100159288\t\t7940098c\t\tMOVHU 4(R12), R12\t\t\t\t\t\t\n  string_experiment.go:169\t0x10015928c\t\td28cad8d\t\tMOVD $25964, R13\t\t\t\t\t\t\n  string_experiment.go:169\t0x100159290\t\t6b0d019f\t\tCMPW R13, R12\t\t\t\t\t\t\t\n  string_experiment.go:169\t0x100159294\t\t540000e1\t\tBNE 7(PC)\t\t\t\t\t\t\t\n  string_experiment.go:170\t0x100159298\t\taa0a03e3\t\tMOVD R10, R3\t\t\t\t\t\t\t\n  string_experiment.go:170\t0x10015929c\t\t97fdae19\t\tCALL reflect.Value.Index(SB)\t\t\t\t\t\n  unsafe.go:41\t\t\t0x1001592a0\t\tf9402be4\t\tMOVD 80(RSP), R4\t\t\t\t\t\t\n  unsafe.go:41\t\t\t0x1001592a4\t\t9e670080\t\tFMOVD R4, F0\t\t\t\t\t\t\t\n  string_experiment.go:170\t0x1001592a8\t\t97fdb5ca\t\tCALL reflect.Value.SetFloat(SB)\t\t\t\t\t\n  string_experiment.go:170\t0x1001592ac\t\t17ffffc0\t\tJMP -64(PC)\t\t\t\t\t\t\t\n  string_experiment.go:171\t0x1001592b0\t\taa0a03e3\t\tMOVD R10, R3\t\t\t\t\t\t\t\n  string_experiment.go:171\t0x1001592b4\t\t97fdae13\t\tCALL reflect.Value.Index(SB)\t\t\t\t\t\n  string_experiment.go:171\t0x1001592b8\t\tf9402be3\t\tMOVD 80(RSP), R3\t\t\t\t\t\t\n  string_experiment.go:171\t0x1001592bc\t\t97ffd24d\t\tCALL github.com/cnooljaw/gosproto.setInteger(SB)\t\t\n  string_experiment.go:171\t0x1001592c0\t\tb4fff760\t\tCBZ R0, -69(PC)\t\t\t\t\t\t\t\n  string_experiment.go:172\t0x1001592c4\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  string_experiment.go:172\t0x1001592c8\t\tf84a07fe\t\tMOVD.P 160(RSP), R30\t\t\t\t\t\t\n  string_experiment.go:172\t0x1001592cc\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  string_experiment.go:175\t0x1001592d0\t\taa0003e3\t\tMOVD R0, R3\t\t\t\t\t\t\t\n  string_experiment.go:175\t0x1001592d4\t\taa0103e4\t\tMOVD R1, R4\t\t\t\t\t\t\t\n  string_experiment.go:175\t0x1001592d8\t\taa0203e5\t\tMOVD R2, R5\t\t\t\t\t\t\t\n  string_experiment.go:175\t0x1001592dc\t\tf94047e0\t\tMOVD 136(RSP), R0\t\t\t\t\t\t\n  string_experiment.go:175\t0x1001592e0\t\tf9404be1\t\tMOVD 144(RSP), R1\t\t\t\t\t\t\n  string_experiment.go:175\t0x1001592e4\t\tf94037e2\t\tMOVD 104(RSP), R2\t\t\t\t\t\t\n  string_experiment.go:175\t0x1001592e8\t\t97fdb44e\t\tCALL reflect.Value.Set(SB)\t\t\t\t\t\n  string_experiment.go:176\t0x1001592ec\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\t\n  string_experiment.go:176\t0x1001592f0\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\t\n  string_experiment.go:176\t0x1001592f4\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\t\n  string_experiment.go:176\t0x1001592f8\t\tf84a07fe\t\tMOVD.P 160(RSP), R30\t\t\t\t\t\t\n  string_experiment.go:176\t0x1001592fc\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\t\n  binary.go:116\t\t\t0x100159300\t\tb2400be0\t\tORR $7, ZR, R0\t\t\t\t\t\t\t\n  binary.go:116\t\t\t0x100159304\t\taa0c03e1\t\tMOVD R12, R1\t\t\t\t\t\t\t\n  binary.go:116\t\t\t0x100159308\t\t97fc7c96\t\tCALL runtime.panicIndex(SB)\t\t\t\t\t\n  string_experiment.go:167\t0x10015930c\t\taa0b03e0\t\tMOVD R11, R0\t\t\t\t\t\t\t\n  string_experiment.go:167\t0x100159310\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\t\n  string_experiment.go:167\t0x100159314\t\t97fc7cab\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\t\n  binary.go:91\t\t\t0x100159318\t\tb24007e0\t\tORR $3, ZR, R0\t\t\t\t\t\t\t\n  binary.go:91\t\t\t0x10015931c\t\taa0c03e1\t\tMOVD R12, R1\t\t\t\t\t\t\t\n  binary.go:91\t\t\t0x100159320\t\t97fc7c90\t\tCALL runtime.panicIndex(SB)\t\t\t\t\t\n  string_experiment.go:165\t0x100159324\t\taa0b03e0\t\tMOVD R11, R0\t\t\t\t\t\t\t\n  string_experiment.go:165\t0x100159328\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\t\n  string_experiment.go:165\t0x10015932c\t\t97fc7ca5\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\t\n  string_experiment.go:165\t0x100159330\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\t\n  string_experiment.go:110\t0x100159334\t\t790013e0\t\tMOVH R0, 8(RSP)\t\t\t\t\t\t\t\n  string_experiment.go:110\t0x100159338\t\t39002be1\t\tMOVB R1, 10(RSP)\t\t\t\t\t\t\n  string_experiment.go:110\t0x10015933c\t\ta9010fe2\t\tSTP (R2, R3), 16(RSP)\t\t\t\t\t\t\n  string_experiment.go:110\t0x100159340\t\ta90217e4\t\tSTP (R4, R5), 32(RSP)\t\t\t\t\t\t\n  string_experiment.go:110\t0x100159344\t\ta9031fe6\t\tSTP (R6, R7), 48(RSP)\t\t\t\t\t\t\n  string_experiment.go:110\t0x100159348\t\ta90427e8\t\tSTP (R8, R9), 64(RSP)\t\t\t\t\t\t\n  string_experiment.go:110\t0x10015934c\t\taa1e03e3\t\tMOVD R30, R3\t\t\t\t\t\t\t\n  string_experiment.go:110\t0x100159350\t\t97fc732c\t\tCALL runtime.morestack_noctxt.abi0(SB)\t\t\t\t\n  string_experiment.go:110\t0x100159354\t\t794013e0\t\tMOVHU 8(RSP), R0\t\t\t\t\t\t\n  string_experiment.go:110\t0x100159358\t\t39402be1\t\tMOVBU 10(RSP), R1\t\t\t\t\t\t\n  string_experiment.go:110\t0x10015935c\t\ta9410fe2\t\tLDP 16(RSP), (R2, R3)\t\t\t\t\t\t\n  string_experiment.go:110\t0x100159360\t\ta94217e4\t\tLDP 32(RSP), (R4, R5)\t\t\t\t\t\t\n  string_experiment.go:110\t0x100159364\t\ta9431fe6\t\tLDP 48(RSP), (R6, R7)\t\t\t\t\t\t\n  string_experiment.go:110\t0x100159368\t\ta94427e8\t\tLDP 64(RSP), (R8, R9)\t\t\t\t\t\t\n  string_experiment.go:110\t0x10015936c\t\t17fffe49\t\tJMP github.com/cnooljaw/gosproto.experimentStringCandidate(SB)\t\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/experiment.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=30s"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "decode",
+      "GSR_MODE": "pass1",
+      "GSR_PREFLIGHT": "1"
+    },
+    "exitCode": 0,
+    "seconds": 0.3454616256058216,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/experiment.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=30s"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "pass1",
+      "GSR_PREFLIGHT": "1"
+    },
+    "exitCode": 0,
+    "seconds": 0.003913290798664093,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/experiment.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=30s"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "decode",
+      "GSR_MODE": "pass1",
+      "GSR_PREFLIGHT": "1"
+    },
+    "exitCode": 0,
+    "seconds": 0.004614124074578285,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/experiment.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=30s"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "pass1",
+      "GSR_PREFLIGHT": "1"
+    },
+    "exitCode": 0,
+    "seconds": 0.0041504595428705215,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "go",
+      "version"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.012163832783699036,
+    "output": "go version go1.24.13 darwin/arm64\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/experiment.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "decode",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/self-int32_edges-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.097155833616853,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/experiment.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/self-int32_edges-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.315610833466053,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/experiment.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "decode",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/self-game_large-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.224611291661859,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/experiment.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/self-game_large-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 5.957431333139539,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/experiment.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "decode",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/clone-int32_edges-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.281464040279388,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/experiment.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/clone-int32_edges-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 4.301999708637595,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/experiment.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "decode",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/clone-game_large-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.091595750302076,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/experiment.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "clone",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/clone-game_large-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 5.754255209118128,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/experiment.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "decode",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/pass1-int32_edges-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.3361775409430265,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/experiment.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/pass1-int32_edges-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.3216161243617535,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/experiment.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "decode",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/pass1-game_large-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.024487959221005,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/experiment.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/pass1-game_large-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.288520209491253,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/experiment.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "decode",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/pass2-int32_edges-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.852454084903002,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/experiment.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/pass2-int32_edges-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.793683499097824,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/experiment.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "decode",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/pass2-game_large-decode.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.343527415767312,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/experiment.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "pdecode",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-int-array-block4-20261022/pass2-game_large-pdecode.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.351305415853858,
+    "output": "PASS\n"
+  }
+]

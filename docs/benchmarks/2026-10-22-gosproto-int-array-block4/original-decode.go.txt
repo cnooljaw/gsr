@@ -1,0 +1,50 @@
+func decodeIntSlice(_ uint16, _ bool, data []byte, field *SprotoField, value reflect.Value, budget *decodeBudget) error {
+	// 官方接受空内容或仅有宽度前缀的空数组；非空数组必须先校验宽度。
+	if len(data) <= 1 {
+		if field.int64Slice {
+			*value.Addr().Interface().(*[]int64) = []int64{}
+			return nil
+		}
+		value.Set(reflect.MakeSlice(value.Type(), 0, 0))
+		return nil
+	}
+	width := int(data[0])
+	data = data[1:]
+	if (width != 4 && width != 8) || len(data)%width != 0 {
+		return ErrDecode
+	}
+	count := len(data) / width
+	if err := budget.add(count); err != nil {
+		return err
+	}
+	if field.int64Slice {
+		result := make([]int64, count)
+		if width == 4 {
+			for index := range result {
+				result[index] = int64(int32(readUint32(data[index*4 : index*4+4 : index*4+4])))
+			}
+		} else {
+			for index := range result {
+				result[index] = int64(readUint64(data[index*8 : index*8+8 : index*8+8]))
+			}
+		}
+		*value.Addr().Interface().(*[]int64) = result
+		return nil
+	}
+	result := reflect.MakeSlice(value.Type(), count, count)
+	for i := 0; i < count; i++ {
+		var bits uint64
+		if width == 4 {
+			bits = uint64(int64(int32(readUint32(data[i*width:]))))
+		} else {
+			bits = readUint64(data[i*width:])
+		}
+		if field.Wire == WireDoubleName {
+			result.Index(i).SetFloat(math.Float64frombits(bits))
+		} else if err := setInteger(result.Index(i), bits); err != nil {
+			return err
+		}
+	}
+	value.Set(result)
+	return nil
+}
