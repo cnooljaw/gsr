@@ -1,5 +1,7 @@
 # Go Sproto双主线目标
 
+2026-10-22最新实验：[普通word独立预检](benchmarks/2026-10-22-gosproto-preflight-ordinary/RESULTS.md)完成45进程4320块，含真实DecodePacked复核。稀疏word改善约16%～18%，但混合整数Unpack慢约1.4%，公开整数PDecode中位慢0.57%/6.49%，未采用通用替换；全部小收益、累计反向与控制保留。native/purego差分race/checkptr、完整库官方oracle及来源核对通过。前轮报告已提交8438a42；新实验未提交，库92a155a、正式依赖及十项用户删除保持。
+
 2026-10-22最新实验：[Unpack预检收紧临时切片容量](benchmarks/2026-10-22-gosproto-preflight-cap/RESULTS.md)完成33进程3168交错块，未采用通用替换。稀疏word两遍改善12.37%/6.89%，但整数数组PDecode中位慢1.14%/0.95%，6/7非零word明显退化；全部小收益、累计反向、自对照及校准不足保留，不设百分比采纳门槛。native/purego差分race/checkptr、完整库官方oracle及来源核对通过。前轮诊断已提交2d95255，新报告未提交；库92a155a、正式依赖及十项用户删除保持。
 
 2026-10-22最新诊断：[向量恢复后的解码成本](benchmarks/2026-10-22-gosproto-post-vector-cost/RESULTS.md)基于已提交库92a155a/GSR feb7c31完成9 CPU＋9全量分配及3份GC敏感性profile，80＋12条命令与源码/汇编/夹具/二进制/raw核对通过。整数数组仍优先Unpack普通mask预检循环；OnesCount8已是常量查表，不重复造表。默认kevent占比高已披露，不将profile耗时当PB新排名。无新生产改动；本轮诊断未提交，正式依赖与十项用户删除保持。
