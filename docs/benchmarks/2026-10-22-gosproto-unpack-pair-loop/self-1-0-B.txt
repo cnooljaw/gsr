@@ -1,0 +1,25 @@
+goos: darwin
+goarch: arm64
+pkg: arrayreview
+cpu: Apple M2
+BenchmarkPairUnpackReview/addressbook/sproto_unpack         	  758773	       163.1 ns/op	     144 B/op	       1 allocs/op
+BenchmarkPairUnpackReview/addressbook/sproto_pdecode        	  102915	      1182 ns/op	     672 B/op	      30 allocs/op
+BenchmarkPairUnpackReview/game_large/sproto_unpack          	   26575	      4611 ns/op	    3456 B/op	       1 allocs/op
+BenchmarkPairUnpackReview/game_large/sproto_pdecode         	    7957	     16929 ns/op	   13872 B/op	     533 allocs/op
+BenchmarkPairUnpackReview/int32_edges/sproto_unpack         	   24474	      4928 ns/op	    4096 B/op	       1 allocs/op
+BenchmarkPairUnpackReview/int32_edges/sproto_pdecode        	   19334	      6230 ns/op	   12384 B/op	       5 allocs/op
+BenchmarkPairUnpackReview/zero32                            	 4139863	        28.95 ns/op	      32 B/op	       1 allocs/op
+BenchmarkPairUnpackReview/ascii32                           	 4654026	        25.71 ns/op	      32 B/op	       1 allocs/op
+BenchmarkPairUnpackReview/zero4096                          	  226972	       533.9 ns/op	    4096 B/op	       1 allocs/op
+BenchmarkPairUnpackReview/ascii4096                         	  240300	       485.4 ns/op	    4096 B/op	       1 allocs/op
+BenchmarkPairUnpackReview/nonzero1x256                      	   98214	      1232 ns/op	    2048 B/op	       1 allocs/op
+BenchmarkPairUnpackReview/nonzero2x256                      	   72066	      1830 ns/op	    2048 B/op	       1 allocs/op
+BenchmarkPairUnpackReview/nonzero3x256                      	   55834	      2785 ns/op	    2048 B/op	       1 allocs/op
+BenchmarkPairUnpackReview/nonzero4x256                      	   59672	      1943 ns/op	    2048 B/op	       1 allocs/op
+BenchmarkPairUnpackReview/nonzero5x256                      	   60939	      1982 ns/op	    2048 B/op	       1 allocs/op
+BenchmarkPairUnpackReview/nonzero6x256                      	   52534	      2264 ns/op	    2048 B/op	       1 allocs/op
+BenchmarkPairUnpackReview/nonzero7x256                      	   49562	      2411 ns/op	    2048 B/op	       1 allocs/op
+BenchmarkPairUnpackReview/single1                           	 6821152	        17.74 ns/op	       8 B/op	       1 allocs/op
+BenchmarkPairUnpackReview/single3                           	 6620810	        18.83 ns/op	       8 B/op	       1 allocs/op
+BenchmarkPairUnpackReview/single7                           	 6062047	        20.64 ns/op	       8 B/op	       1 allocs/op
+PASS

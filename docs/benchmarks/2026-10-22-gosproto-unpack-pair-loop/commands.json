@@ -1,0 +1,973 @@
+[
+  {
+    "args": [
+      "git",
+      "rev-parse",
+      "9e47281"
+    ],
+    "cwd": "/private/tmp/gsr-gosproto-fork",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.03196537494659424,
+    "output": "9e47281db9877dd1de203608c6cb89a6e387bc41\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-gcflags=all=-d=checkptr=2",
+      "-run",
+      "^(TestUnpack|TestLimits|TestOfficial|TestMalformed)",
+      "-timeout=2m",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A",
+    "env": {
+      "GOMAXPROCS": "2",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 3.7969971243292093,
+    "output": "ok  \tgithub.com/cnooljaw/gosproto\t2.174s\n"
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "review_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A-harness",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.011618958786129951,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-run",
+      "^TestRepresentativeFixtures$",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 1.628931414335966,
+    "output": "ok  \tarrayreview\t0.369s\n"
+  },
+  {
+    "args": [
+      "go",
+      "vet",
+      "-mod=mod",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 0.3616277500987053,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-c",
+      "-o",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A.test",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 0.6159278750419617,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "objdump",
+      "-s",
+      "github.com/cnooljaw/gosproto.UnpackWithLimit",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A.test"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A-harness",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.06993616744875908,
+    "output": "TEXT github.com/cnooljaw/gosproto.UnpackWithLimit(SB) /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A/pack.go\n  pack.go:193\t\t0x100158140\t\tf9400b90\t\tMOVD 16(R28), R16\t\t\t\t\t\n  pack.go:193\t\t0x100158144\t\teb3063ff\t\tCMP R16, RSP\t\t\t\t\t\t\n  pack.go:193\t\t0x100158148\t\t54002f49\t\tBLS 378(PC)\t\t\t\t\t\t\n  pack.go:193\t\t0x10015814c\t\tf8190ffe\t\tMOVD.W R30, -112(RSP)\t\t\t\t\t\n  pack.go:193\t\t0x100158150\t\tf81f83fd\t\tMOVD R29, -8(RSP)\t\t\t\t\t\n  pack.go:193\t\t0x100158154\t\td10023fd\t\tSUB $8, RSP, R29\t\t\t\t\t\n  pack.go:193\t\t0x100158158\t\tf9003fe0\t\tMOVD R0, 120(RSP)\t\t\t\t\t\n  pack.go:194\t\t0x10015815c\t\tf100007f\t\tCMP $0, R3\t\t\t\t\t\t\n  pack.go:194\t\t0x100158160\t\t540000cd\t\tBLE 6(PC)\t\t\t\t\t\t\n  pack.go:194\t\t0x100158164\t\taa0103e4\t\tMOVD R1, R4\t\t\t\t\t\t\n  pack.go:194\t\t0x100158168\t\taa0203e5\t\tMOVD R2, R5\t\t\t\t\t\t\n  pack.go:194\t\t0x10015816c\t\taa0003e6\t\tMOVD R0, R6\t\t\t\t\t\t\n  pack.go:194\t\t0x100158170\t\taa1f03e7\t\tMOVD ZR, R7\t\t\t\t\t\t\n  pack.go:199\t\t0x100158174\t\t14000010\t\tJMP 16(PC)\t\t\t\t\t\t\n  pack.go:195\t\t0x100158178\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\n  pack.go:195\t\t0x10015817c\t\tf940eb63\t\tMOVD 464(R27), R3\t\t\t\t\t\n  pack.go:195\t\t0x100158180\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\n  pack.go:195\t\t0x100158184\t\tf940ef64\t\tMOVD 472(R27), R4\t\t\t\t\t\n  pack.go:195\t\t0x100158188\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\n  pack.go:195\t\t0x10015818c\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\n  pack.go:195\t\t0x100158190\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\n  pack.go:195\t\t0x100158194\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\n  pack.go:195\t\t0x100158198\t\tf84707fe\t\tMOVD.P 112(RSP), R30\t\t\t\t\t\n  pack.go:195\t\t0x10015819c\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\n  pack.go:232\t\t0x1001581a0\t\tcb090042\t\tSUB R9, R2, R2\t\t\t\t\t\t\n  pack.go:232\t\t0x1001581a4\t\tcb0203e8\t\tNEG R2, R8\t\t\t\t\t\t\n  pack.go:232\t\t0x1001581a8\t\t8a88fd28\t\tAND R8->63, R9, R8\t\t\t\t\t\n  pack.go:232\t\t0x1001581ac\t\tcb090021\t\tSUB R9, R1, R1\t\t\t\t\t\t\n  pack.go:232\t\t0x1001581b0\t\t8b080000\t\tADD R8, R0, R0\t\t\t\t\t\t\n  pack.go:199\t\t0x1001581b4\t\tb40009a1\t\tCBZ R1, 77(PC)\t\t\t\t\t\t\n  pack.go:200\t\t0x1001581b8\t\t39400008\t\tMOVBU (R0), R8\t\t\t\t\t\t\n  pack.go:202\t\t0x1001581bc\t\taa0803e9\t\tMOVD R8, R9\t\t\t\t\t\t\n  pack.go:202\t\t0x1001581c0\t\t350003c9\t\tCBNZW R9, 30(PC)\t\t\t\t\t\n  pack.go:203\t\t0x1001581c4\t\tf100083f\t\tCMP $2, R1\t\t\t\t\t\t\n  pack.go:203\t\t0x1001581c8\t\t5400032b\t\tBLT 25(PC)\t\t\t\t\t\t\n  pack.go:203\t\t0x1001581cc\t\t39400408\t\tMOVBU 1(R0), R8\t\t\t\t\t\t\n  pack.go:203\t\t0x1001581d0\t\t35000288\t\tCBNZW R8, 20(PC)\t\t\t\t\t\n  pack.go:204\t\t0x1001581d4\t\tcb070068\t\tSUB R7, R3, R8\t\t\t\t\t\t\n  pack.go:204\t\t0x1001581d8\t\t937ffd09\t\tASR $63, R8, R9\t\t\t\t\t\t\n  pack.go:204\t\t0x1001581dc\t\t8b49f508\t\tADD R9>>61, R8, R8\t\t\t\t\t\n  pack.go:204\t\t0x1001581e0\t\t9343fd09\t\tASR $3, R8, R9\t\t\t\t\t\t\n  pack.go:205\t\t0x1001581e4\t\tf100093f\t\tCMP $2, R9\t\t\t\t\t\t\n  pack.go:205\t\t0x1001581e8\t\t5400058b\t\tBLT 44(PC)\t\t\t\t\t\t\n  pack.go:209\t\t0x1001581ec\t\t9100052a\t\tADD $1, R9, R10\t\t\t\t\t\t\n  pack.go:209\t\t0x1001581f0\t\teb0a003f\t\tCMP R10, R1\t\t\t\t\t\t\n  pack.go:209\t\t0x1001581f4\t\t9a89d429\t\tCSINC LE, R1, R9, R9\t\t\t\t\t\n  pack.go:210\t\t0x1001581f8\t\teb09005f\t\tCMP R9, R2\t\t\t\t\t\t\n  pack.go:209\t\t0x1001581fc\t\t54002943\t\tBCC 330(PC)\t\t\t\t\t\t\n  pack.go:210\t\t0x100158200\t\td100084a\t\tSUB $2, R2, R10\t\t\t\t\t\t\n  pack.go:210\t\t0x100158204\t\tcb0a03ea\t\tNEG R10, R10\t\t\t\t\t\t\n  pack.go:210\t\t0x100158208\t\t937ffd4a\t\tASR $63, R10, R10\t\t\t\t\t\n  pack.go:210\t\t0x10015820c\t\t927f014a\t\tAND $2, R10, R10\t\t\t\t\t\n  pack.go:210\t\t0x100158210\t\t8b0a000a\t\tADD R10, R0, R10\t\t\t\t\t\n  pack.go:210\t\t0x100158214\t\td100092b\t\tSUB $2, R9, R11\t\t\t\t\t\t\n  pack.go:210\t\t0x100158218\t\taa1f03ec\t\tMOVD ZR, R12\t\t\t\t\t\t\n  pack.go:174\t\t0x10015821c\t\t14000114\t\tJMP 276(PC)\t\t\t\t\t\t\n  pack.go:174\t\t0x100158220\t\tb24003e8\t\tORR $1, ZR, R8\t\t\t\t\t\t\n  pack.go:174\t\t0x100158224\t\tb27d03e9\t\tORR $8, ZR, R9\t\t\t\t\t\t\n  pack.go:203\t\t0x100158228\t\t1400010c\t\tJMP 268(PC)\t\t\t\t\t\t\n  pack.go:203\t\t0x10015822c\t\tb24003e8\t\tORR $1, ZR, R8\t\t\t\t\t\t\n  pack.go:203\t\t0x100158230\t\tb27d03e9\t\tORR $8, ZR, R9\t\t\t\t\t\t\n  pack.go:203\t\t0x100158234\t\t14000109\t\tJMP 265(PC)\t\t\t\t\t\t\n  pack.go:216\t\t0x100158238\t\t7103fd3f\t\tCMPW $255, R9\t\t\t\t\t\t\n  pack.go:216\t\t0x10015823c\t\t54000101\t\tBNE 8(PC)\t\t\t\t\t\t\n  pack.go:217\t\t0x100158240\t\tf100083f\t\tCMP $2, R1\t\t\t\t\t\t\n  pack.go:217\t\t0x100158244\t\t540003eb\t\tBLT 31(PC)\t\t\t\t\t\t\n  pack.go:220\t\t0x100158248\t\t39400408\t\tMOVBU 1(R0), R8\t\t\t\t\t\t\n  pack.go:220\t\t0x10015824c\t\t91000508\t\tADD $1, R8, R8\t\t\t\t\t\t\n  pack.go:220\t\t0x100158250\t\td37df108\t\tLSL $3, R8, R8\t\t\t\t\t\t\n  pack.go:221\t\t0x100158254\t\t91000909\t\tADD $2, R8, R9\t\t\t\t\t\t\n  pack.go:221\t\t0x100158258\t\t14000007\t\tJMP 7(PC)\t\t\t\t\t\t\n  bits.go:126\t\t0x10015825c\t\taa0803ea\t\tMOVD R8, R10\t\t\t\t\t\t\n  bits.go:126\t\t0x100158260\t\t9000070b\t\tADRP 917504(PC), R11\t\t\t\t\t\n  bits.go:126\t\t0x100158264\t\t913f6d6b\t\tADD $4059, R11, R11\t\t\t\t\t\n  bits.go:126\t\t0x100158268\t\t386a696a\t\tMOVBU (R11)(R10), R10\t\t\t\t\t\n  pack.go:223\t\t0x10015826c\t\t91000549\t\tADD $1, R10, R9\t\t\t\t\t\t\n  pack.go:223\t\t0x100158270\t\tb27d03e8\t\tORR $8, ZR, R8\t\t\t\t\t\t\n  pack.go:225\t\t0x100158274\t\teb01013f\t\tCMP R1, R9\t\t\t\t\t\t\n  pack.go:225\t\t0x100158278\t\t54001d8c\t\tBGT 236(PC)\t\t\t\t\t\t\n  pack.go:228\t\t0x10015827c\t\tcb07006a\t\tSUB R7, R3, R10\t\t\t\t\t\t\n  pack.go:228\t\t0x100158280\t\teb0a011f\t\tCMP R10, R8\t\t\t\t\t\t\n  pack.go:228\t\t0x100158284\t\t54001bec\t\tBGT 223(PC)\t\t\t\t\t\t\n  pack.go:231\t\t0x100158288\t\t8b0800e7\t\tADD R8, R7, R7\t\t\t\t\t\t\n  pack.go:225\t\t0x10015828c\t\teb01013f\t\tCMP R1, R9\t\t\t\t\t\t\n  pack.go:232\t\t0x100158290\t\t54fff889\t\tBLS -60(PC)\t\t\t\t\t\t\n  pack.go:232\t\t0x100158294\t\t140000ef\t\tJMP 239(PC)\t\t\t\t\t\t\n  pack.go:206\t\t0x100158298\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\n  pack.go:206\t\t0x10015829c\t\tf940e363\t\tMOVD 448(R27), R3\t\t\t\t\t\n  pack.go:206\t\t0x1001582a0\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\n  pack.go:206\t\t0x1001582a4\t\tf940e764\t\tMOVD 456(R27), R4\t\t\t\t\t\n  pack.go:206\t\t0x1001582a8\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\n  pack.go:206\t\t0x1001582ac\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\n  pack.go:206\t\t0x1001582b0\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\n  pack.go:206\t\t0x1001582b4\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\n  pack.go:206\t\t0x1001582b8\t\tf84707fe\t\tMOVD.P 112(RSP), R30\t\t\t\t\t\n  pack.go:206\t\t0x1001582bc\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\n  pack.go:218\t\t0x1001582c0\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\n  pack.go:218\t\t0x1001582c4\t\tf9411b63\t\tMOVD 560(R27), R3\t\t\t\t\t\n  pack.go:218\t\t0x1001582c8\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\n  pack.go:218\t\t0x1001582cc\t\tf9411f64\t\tMOVD 568(R27), R4\t\t\t\t\t\n  pack.go:218\t\t0x1001582d0\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\n  pack.go:218\t\t0x1001582d4\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\n  pack.go:218\t\t0x1001582d8\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\n  pack.go:218\t\t0x1001582dc\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\n  pack.go:218\t\t0x1001582e0\t\tf84707fe\t\tMOVD.P 112(RSP), R30\t\t\t\t\t\n  pack.go:218\t\t0x1001582e4\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\n  pack.go:194\t\t0x1001582e8\t\tf9002be5\t\tMOVD R5, 80(RSP)\t\t\t\t\t\n  pack.go:194\t\t0x1001582ec\t\tf90027e4\t\tMOVD R4, 72(RSP)\t\t\t\t\t\n  pack.go:194\t\t0x1001582f0\t\tf90033e6\t\tMOVD R6, 96(RSP)\t\t\t\t\t\n  pack.go:228\t\t0x1001582f4\t\tf90013e7\t\tMOVD R7, 32(RSP)\t\t\t\t\t\n  pack.go:234\t\t0x1001582f8\t\tf0000a80\t\tADRP 1388544(PC), R0\t\t\t\t\t\n  pack.go:234\t\t0x1001582fc\t\t912e8000\t\tADD $2976, R0, R0\t\t\t\t\t\n  pack.go:234\t\t0x100158300\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\n  pack.go:234\t\t0x100158304\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\n  pack.go:234\t\t0x100158308\t\t97fc6892\t\tCALL runtime.makeslice(SB)\t\t\t\t\n  pack.go:234\t\t0x10015830c\t\tf9002fe0\t\tMOVD R0, 88(RSP)\t\t\t\t\t\n  pack.go:236\t\t0x100158310\t\tf94013e2\t\tMOVD 32(RSP), R2\t\t\t\t\t\n  pack.go:236\t\t0x100158314\t\tf94033e3\t\tMOVD 96(RSP), R3\t\t\t\t\t\n  pack.go:236\t\t0x100158318\t\tf9402be4\t\tMOVD 80(RSP), R4\t\t\t\t\t\n  pack.go:236\t\t0x10015831c\t\tf94027e5\t\tMOVD 72(RSP), R5\t\t\t\t\t\n  pack.go:236\t\t0x100158320\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\n  pack.go:236\t\t0x100158324\t\t14000004\t\tJMP 4(PC)\t\t\t\t\t\t\n  pack.go:236\t\t0x100158328\t\taa0603e4\t\tMOVD R6, R4\t\t\t\t\t\t\n  pack.go:236\t\t0x10015832c\t\taa0803e3\t\tMOVD R8, R3\t\t\t\t\t\t\n  pack.go:251\t\t0x100158330\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\n  pack.go:236\t\t0x100158334\t\tb4000b85\t\tCBZ R5, 92(PC)\t\t\t\t\t\t\n  pack.go:237\t\t0x100158338\t\t39400066\t\tMOVBU (R3), R6\t\t\t\t\t\t\n  pack.go:238\t\t0x10015833c\t\taa0603e7\t\tMOVD R6, R7\t\t\t\t\t\t\n  pack.go:238\t\t0x100158340\t\t350001e7\t\tCBNZW R7, 15(PC)\t\t\t\t\t\n  pack.go:240\t\t0x100158344\t\tf10008bf\t\tCMP $2, R5\t\t\t\t\t\t\n  pack.go:240\t\t0x100158348\t\t5400016b\t\tBLT 11(PC)\t\t\t\t\t\t\n  pack.go:240\t\t0x10015834c\t\t39400466\t\tMOVBU 1(R3), R6\t\t\t\t\t\t\n  pack.go:240\t\t0x100158350\t\t35000126\t\tCBNZW R6, 9(PC)\t\t\t\t\t\t\n  pack.go:241\t\t0x100158354\t\td1000886\t\tSUB $2, R4, R6\t\t\t\t\t\t\n  pack.go:241\t\t0x100158358\t\tcb0603e6\t\tNEG R6, R6\t\t\t\t\t\t\n  pack.go:241\t\t0x10015835c\t\t937ffcc6\t\tASR $63, R6, R6\t\t\t\t\t\t\n  pack.go:241\t\t0x100158360\t\t927f00c6\t\tAND $2, R6, R6\t\t\t\t\t\t\n  pack.go:241\t\t0x100158364\t\t8b060066\t\tADD R6, R3, R6\t\t\t\t\t\t\n  pack.go:241\t\t0x100158368\t\td10008a7\t\tSUB $2, R5, R7\t\t\t\t\t\t\n  pack.go:241\t\t0x10015836c\t\taa1f03e8\t\tMOVD ZR, R8\t\t\t\t\t\t\n  pack.go:174\t\t0x100158370\t\t14000085\t\tJMP 133(PC)\t\t\t\t\t\t\n  pack.go:174\t\t0x100158374\t\tb24003e6\t\tORR $1, ZR, R6\t\t\t\t\t\t\n  pack.go:240\t\t0x100158378\t\t14000075\t\tJMP 117(PC)\t\t\t\t\t\t\n  pack.go:248\t\t0x10015837c\t\td1000488\t\tSUB $1, R4, R8\t\t\t\t\t\t\n  pack.go:248\t\t0x100158380\t\tcb0803e9\t\tNEG R8, R9\t\t\t\t\t\t\n  pack.go:248\t\t0x100158384\t\t937ffd29\t\tASR $63, R9, R9\t\t\t\t\t\t\n  pack.go:248\t\t0x100158388\t\t92400129\t\tAND $1, R9, R9\t\t\t\t\t\t\n  pack.go:248\t\t0x10015838c\t\t8b03012a\t\tADD R3, R9, R10\t\t\t\t\t\t\n  pack.go:248\t\t0x100158390\t\td10004ab\t\tSUB $1, R5, R11\t\t\t\t\t\t\n  pack.go:249\t\t0x100158394\t\t7103fcff\t\tCMPW $255, R7\t\t\t\t\t\t\n  pack.go:249\t\t0x100158398\t\t54000661\t\tBNE 51(PC)\t\t\t\t\t\t\n  pack.go:250\t\t0x10015839c\t\tf100017f\t\tCMP $0, R11\t\t\t\t\t\t\n  pack.go:250\t\t0x1001583a0\t\t54000d09\t\tBLS 104(PC)\t\t\t\t\t\t\n  pack.go:250\t\t0x1001583a4\t\t38696866\t\tMOVBU (R3)(R9), R6\t\t\t\t\t\n  pack.go:251\t\t0x1001583a8\t\teb02003f\t\tCMP R2, R1\t\t\t\t\t\t\n  pack.go:251\t\t0x1001583ac\t\t54000c48\t\tBHI 98(PC)\t\t\t\t\t\t\n  pack.go:250\t\t0x1001583b0\t\t910004c6\t\tADD $1, R6, R6\t\t\t\t\t\t\n  pack.go:250\t\t0x1001583b4\t\td37df0c7\t\tLSL $3, R6, R7\t\t\t\t\t\t\n  pack.go:251\t\t0x1001583b8\t\tcb010049\t\tSUB R1, R2, R9\t\t\t\t\t\t\n  pack.go:251\t\t0x1001583bc\t\tcb0903ec\t\tNEG R9, R12\t\t\t\t\t\t\n  pack.go:251\t\t0x1001583c0\t\t8a8cfc2c\t\tAND R12->63, R1, R12\t\t\t\t\t\n  pack.go:251\t\t0x1001583c4\t\t910004ed\t\tADD $1, R7, R13\t\t\t\t\t\t\n  pack.go:251\t\t0x1001583c8\t\t8b0c000c\t\tADD R12, R0, R12\t\t\t\t\t\n  pack.go:251\t\t0x1001583cc\t\teb0d011f\t\tCMP R13, R8\t\t\t\t\t\t\n  pack.go:251\t\t0x1001583d0\t\t54000ac3\t\tBCC 86(PC)\t\t\t\t\t\t\n  pack.go:251\t\t0x1001583d4\t\t91000548\t\tADD $1, R10, R8\t\t\t\t\t\t\n  pack.go:251\t\t0x1001583d8\t\teb060d3f\t\tCMP R6<<3, R9\t\t\t\t\t\t\n  pack.go:251\t\t0x1001583dc\t\t9a89c0e7\t\tCSEL GT, R7, R9, R7\t\t\t\t\t\n  pack.go:251\t\t0x1001583e0\t\teb0c011f\t\tCMP R12, R8\t\t\t\t\t\t\n  pack.go:251\t\t0x1001583e4\t\t540002a0\t\tBEQ 21(PC)\t\t\t\t\t\t\n  pack.go:236\t\t0x1001583e8\t\tf9002be4\t\tMOVD R4, 80(RSP)\t\t\t\t\t\n  pack.go:236\t\t0x1001583ec\t\tf90027e5\t\tMOVD R5, 72(RSP)\t\t\t\t\t\n  pack.go:248\t\t0x1001583f0\t\tf90023eb\t\tMOVD R11, 64(RSP)\t\t\t\t\t\n  pack.go:248\t\t0x1001583f4\t\tf90033ea\t\tMOVD R10, 96(RSP)\t\t\t\t\t\n  pack.go:250\t\t0x1001583f8\t\tf9001fe6\t\tMOVD R6, 56(RSP)\t\t\t\t\t\n  pack.go:251\t\t0x1001583fc\t\tf9001bed\t\tMOVD R13, 48(RSP)\t\t\t\t\t\n  pack.go:251\t\t0x100158400\t\tf90017e1\t\tMOVD R1, 40(RSP)\t\t\t\t\t\n  pack.go:251\t\t0x100158404\t\taa0c03e0\t\tMOVD R12, R0\t\t\t\t\t\t\n  pack.go:251\t\t0x100158408\t\taa0803e1\t\tMOVD R8, R1\t\t\t\t\t\t\n  pack.go:251\t\t0x10015840c\t\taa0703e2\t\tMOVD R7, R2\t\t\t\t\t\t\n  pack.go:251\t\t0x100158410\t\t97fc81c0\t\tCALL runtime.memmove(SB)\t\t\t\t\n  pack.go:258\t\t0x100158414\t\tf9402fe0\t\tMOVD 88(RSP), R0\t\t\t\t\t\n  pack.go:252\t\t0x100158418\t\tf94017e1\t\tMOVD 40(RSP), R1\t\t\t\t\t\n  pack.go:258\t\t0x10015841c\t\tf94013e2\t\tMOVD 32(RSP), R2\t\t\t\t\t\n  pack.go:253\t\t0x100158420\t\tf9402be4\t\tMOVD 80(RSP), R4\t\t\t\t\t\n  pack.go:253\t\t0x100158424\t\tf94027e5\t\tMOVD 72(RSP), R5\t\t\t\t\t\n  pack.go:252\t\t0x100158428\t\tf9401fe6\t\tMOVD 56(RSP), R6\t\t\t\t\t\n  pack.go:253\t\t0x10015842c\t\tf94033ea\t\tMOVD 96(RSP), R10\t\t\t\t\t\n  pack.go:253\t\t0x100158430\t\tf94023eb\t\tMOVD 64(RSP), R11\t\t\t\t\t\n  pack.go:253\t\t0x100158434\t\tf9401bed\t\tMOVD 48(RSP), R13\t\t\t\t\t\n  pack.go:252\t\t0x100158438\t\t8b060c27\t\tADD R6<<3, R1, R7\t\t\t\t\t\n  pack.go:253\t\t0x10015843c\t\teb0d017f\t\tCMP R13, R11\t\t\t\t\t\t\n  pack.go:253\t\t0x100158440\t\t540006e3\t\tBCC 55(PC)\t\t\t\t\t\t\n  pack.go:253\t\t0x100158444\t\tcb060ca5\t\tSUB R6<<3, R5, R5\t\t\t\t\t\n  pack.go:253\t\t0x100158448\t\tcb060c86\t\tSUB R6<<3, R4, R6\t\t\t\t\t\n  pack.go:253\t\t0x10015844c\t\td10008c6\t\tSUB $2, R6, R6\t\t\t\t\t\t\n  pack.go:253\t\t0x100158450\t\tcb0603e8\t\tNEG R6, R8\t\t\t\t\t\t\n  pack.go:253\t\t0x100158454\t\t8a88fda8\t\tAND R8->63, R13, R8\t\t\t\t\t\n  pack.go:253\t\t0x100158458\t\t8b0a0108\t\tADD R10, R8, R8\t\t\t\t\t\t\n  pack.go:253\t\t0x10015845c\t\td10008a5\t\tSUB $2, R5, R5\t\t\t\t\t\t\n  pack.go:254\t\t0x100158460\t\t17ffffb2\t\tJMP -78(PC)\t\t\t\t\t\t\n  pack.go:258\t\t0x100158464\t\t91002027\t\tADD $8, R1, R7\t\t\t\t\t\t\n  pack.go:258\t\t0x100158468\t\teb07005f\t\tCMP R7, R2\t\t\t\t\t\t\n  pack.go:258\t\t0x10015846c\t\t54000523\t\tBCC 41(PC)\t\t\t\t\t\t\n  pack.go:258\t\t0x100158470\t\teb07003f\t\tCMP R7, R1\t\t\t\t\t\t\n  pack.go:258\t\t0x100158474\t\t54000488\t\tBHI 36(PC)\t\t\t\t\t\t\n  pack.go:258\t\t0x100158478\t\t8b010008\t\tADD R1, R0, R8\t\t\t\t\t\t\n  pack.go:258\t\t0x10015847c\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\n  pack.go:260\t\t0x100158480\t\t14000010\t\tJMP 16(PC)\t\t\t\t\t\t\n  pack.go:269\t\t0x100158484\t\tcb0100ab\t\tSUB R1, R5, R11\t\t\t\t\t\t\n  pack.go:269\t\t0x100158488\t\tcb01008c\t\tSUB R1, R4, R12\t\t\t\t\t\t\n  pack.go:269\t\t0x10015848c\t\td1000986\t\tSUB $2, R12, R6\t\t\t\t\t\t\n  pack.go:269\t\t0x100158490\t\tcb0603ec\t\tNEG R6, R12\t\t\t\t\t\t\n  pack.go:269\t\t0x100158494\t\t8a8cfd29\t\tAND R12->63, R9, R9\t\t\t\t\t\n  pack.go:269\t\t0x100158498\t\t8b0a0128\t\tADD R10, R9, R8\t\t\t\t\t\t\n  pack.go:269\t\t0x10015849c\t\td1000965\t\tSUB $2, R11, R5\t\t\t\t\t\t\n  pack.go:270\t\t0x1001584a0\t\t17ffffa2\t\tJMP -94(PC)\t\t\t\t\t\t\n  pack.go:272\t\t0x1001584a4\t\taa0203e1\t\tMOVD R2, R1\t\t\t\t\t\t\n  pack.go:272\t\t0x1001584a8\t\taa1f03e3\t\tMOVD ZR, R3\t\t\t\t\t\t\n  pack.go:272\t\t0x1001584ac\t\taa1f03e4\t\tMOVD ZR, R4\t\t\t\t\t\t\n  pack.go:272\t\t0x1001584b0\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\n  pack.go:272\t\t0x1001584b4\t\tf84707fe\t\tMOVD.P 112(RSP), R30\t\t\t\t\t\n  pack.go:272\t\t0x1001584b8\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\n  pack.go:262\t\t0x1001584bc\t\taa0903e1\t\tMOVD R9, R1\t\t\t\t\t\t\n  pack.go:262\t\t0x1001584c0\t\teb0b003f\t\tCMP R11, R1\t\t\t\t\t\t\n  pack.go:262\t\t0x1001584c4\t\t540001a2\t\tBCS 13(PC)\t\t\t\t\t\t\n  pack.go:261\t\t0x1001584c8\t\tb27800c9\t\tORR $256, R6, R9\t\t\t\t\t\n  pack.go:261\t\t0x1001584cc\t\t5ac00129\t\tRBITW R9, R9\t\t\t\t\t\t\n  pack.go:261\t\t0x1001584d0\t\t5ac01129\t\tCLZW R9, R9\t\t\t\t\t\t\n  pack.go:261\t\t0x1001584d4\t\t92400929\t\tAND $7, R9, R9\t\t\t\t\t\t\n  pack.go:262\t\t0x1001584d8\t\t3861694c\t\tMOVBU (R10)(R1), R12\t\t\t\t\t\n  pack.go:262\t\t0x1001584dc\t\t3829690c\t\tMOVB R12, (R8)(R9)\t\t\t\t\t\n  pack.go:264\t\t0x1001584e0\t\td10004c9\t\tSUB $1, R6, R9\t\t\t\t\t\t\n  pack.go:264\t\t0x1001584e4\t\t8a0900c6\t\tAND R9, R6, R6\t\t\t\t\t\t\n  pack.go:263\t\t0x1001584e8\t\t91000429\t\tADD $1, R1, R9\t\t\t\t\t\t\n  pack.go:265\t\t0x1001584ec\t\td3401ccc\t\tUBFX $0, R6, $8, R12\t\t\t\t\t\n  pack.go:265\t\t0x1001584f0\t\t35fffe6c\t\tCBNZW R12, -13(PC)\t\t\t\t\t\n  pack.go:265\t\t0x1001584f4\t\t17ffffe4\t\tJMP -28(PC)\t\t\t\t\t\t\n  pack.go:262\t\t0x1001584f8\t\taa0103e0\t\tMOVD R1, R0\t\t\t\t\t\t\n  pack.go:262\t\t0x1001584fc\t\taa0b03e1\t\tMOVD R11, R1\t\t\t\t\t\t\n  pack.go:262\t\t0x100158500\t\t97fc8018\t\tCALL runtime.panicIndex(SB)\t\t\t\t\n  pack.go:258\t\t0x100158504\t\taa0103e0\t\tMOVD R1, R0\t\t\t\t\t\t\n  pack.go:258\t\t0x100158508\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\n  pack.go:258\t\t0x10015850c\t\t97fc8041\t\tCALL runtime.panicSlice3C(SB)\t\t\t\t\n  pack.go:258\t\t0x100158510\t\taa0203e3\t\tMOVD R2, R3\t\t\t\t\t\t\n  pack.go:258\t\t0x100158514\t\taa0703e2\t\tMOVD R7, R2\t\t\t\t\t\t\n  pack.go:258\t\t0x100158518\t\t97fc8036\t\tCALL runtime.panicSlice3Acap(SB)\t\t\t\n  pack.go:253\t\t0x10015851c\t\taa0d03e0\t\tMOVD R13, R0\t\t\t\t\t\t\n  pack.go:253\t\t0x100158520\t\taa0b03e1\t\tMOVD R11, R1\t\t\t\t\t\t\n  pack.go:253\t\t0x100158524\t\t97fc8027\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\n  pack.go:251\t\t0x100158528\t\taa0d03e1\t\tMOVD R13, R1\t\t\t\t\t\t\n  pack.go:251\t\t0x10015852c\t\taa0803e2\t\tMOVD R8, R2\t\t\t\t\t\t\n  pack.go:251\t\t0x100158530\t\t97fc801c\t\tCALL runtime.panicSliceAcap(SB)\t\t\t\t\n  pack.go:251\t\t0x100158534\t\taa0103e0\t\tMOVD R1, R0\t\t\t\t\t\t\n  pack.go:251\t\t0x100158538\t\taa0203e1\t\tMOVD R2, R1\t\t\t\t\t\t\n  pack.go:251\t\t0x10015853c\t\t97fc8021\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\n  pack.go:250\t\t0x100158540\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\n  pack.go:250\t\t0x100158544\t\taa0003e1\t\tMOVD R0, R1\t\t\t\t\t\t\n  pack.go:250\t\t0x100158548\t\t97fc8006\t\tCALL runtime.panicIndex(SB)\t\t\t\t\n  pack.go:244\t\t0x10015854c\t\t8b060c27\t\tADD R6<<3, R1, R7\t\t\t\t\t\n  pack.go:245\t\t0x100158550\t\teb0500df\t\tCMP R5, R6\t\t\t\t\t\t\n  pack.go:245\t\t0x100158554\t\t54000108\t\tBHI 8(PC)\t\t\t\t\t\t\n  pack.go:245\t\t0x100158558\t\tcb060089\t\tSUB R6, R4, R9\t\t\t\t\t\t\n  pack.go:245\t\t0x10015855c\t\tcb0903ea\t\tNEG R9, R10\t\t\t\t\t\t\n  pack.go:245\t\t0x100158560\t\t8a8afcca\t\tAND R10->63, R6, R10\t\t\t\t\t\n  pack.go:245\t\t0x100158564\t\tcb0600a5\t\tSUB R6, R5, R5\t\t\t\t\t\t\n  pack.go:245\t\t0x100158568\t\t8b0a0068\t\tADD R10, R3, R8\t\t\t\t\t\t\n  pack.go:236\t\t0x10015856c\t\taa0903e6\t\tMOVD R9, R6\t\t\t\t\t\t\n  pack.go:246\t\t0x100158570\t\t17ffff6e\t\tJMP -146(PC)\t\t\t\t\t\t\n  pack.go:245\t\t0x100158574\t\taa0603e0\t\tMOVD R6, R0\t\t\t\t\t\t\n  pack.go:245\t\t0x100158578\t\taa0503e1\t\tMOVD R5, R1\t\t\t\t\t\t\n  pack.go:245\t\t0x10015857c\t\t97fc8011\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\n  pack.go:179\t\t0x100158580\t\t91002108\t\tADD $8, R8, R8\t\t\t\t\t\t\n  pack.go:174\t\t0x100158584\t\tcb0800a9\t\tSUB R8, R5, R9\t\t\t\t\t\t\n  pack.go:174\t\t0x100158588\t\td1000929\t\tSUB $2, R9, R9\t\t\t\t\t\t\n  pack.go:174\t\t0x10015858c\t\tf100213f\t\tCMP $8, R9\t\t\t\t\t\t\n  pack.go:174\t\t0x100158590\t\t540001eb\t\tBLT 15(PC)\t\t\t\t\t\t\n  pack.go:175\t\t0x100158594\t\teb07011f\t\tCMP R7, R8\t\t\t\t\t\t\n  pack.go:175\t\t0x100158598\t\t540002e8\t\tBHI 23(PC)\t\t\t\t\t\t\n  pack.go:175\t\t0x10015859c\t\tcb080089\t\tSUB R8, R4, R9\t\t\t\t\t\t\n  pack.go:175\t\t0x1001585a0\t\td1000929\t\tSUB $2, R9, R9\t\t\t\t\t\t\n  pack.go:175\t\t0x1001585a4\t\tcb0903e9\t\tNEG R9, R9\t\t\t\t\t\t\n  pack.go:175\t\t0x1001585a8\t\t8a89fd09\t\tAND R9->63, R8, R9\t\t\t\t\t\n  binary.go:117\t\t0x1001585ac\t\tf86968c9\t\tMOVD (R6)(R9), R9\t\t\t\t\t\n  pack.go:176\t\t0x1001585b0\t\tb4fffe89\t\tCBZ R9, -12(PC)\t\t\t\t\t\t\n  pack.go:177\t\t0x1001585b4\t\tdac00126\t\tRBIT R9, R6\t\t\t\t\t\t\n  pack.go:177\t\t0x1001585b8\t\tdac010c6\t\tCLZ R6, R6\t\t\t\t\t\t\n  pack.go:177\t\t0x1001585bc\t\t8b460d06\t\tADD R6>>3, R8, R6\t\t\t\t\t\n  pack.go:241\t\t0x1001585c0\t\taa0603e8\t\tMOVD R6, R8\t\t\t\t\t\t\n  pack.go:241\t\t0x1001585c4\t\t14000007\t\tJMP 7(PC)\t\t\t\t\t\t\n  pack.go:182\t\t0x1001585c8\t\t91000508\t\tADD $1, R8, R8\t\t\t\t\t\t\n  pack.go:181\t\t0x1001585cc\t\teb07011f\t\tCMP R7, R8\t\t\t\t\t\t\n  pack.go:181\t\t0x1001585d0\t\t5400008a\t\tBGE 4(PC)\t\t\t\t\t\t\n  pack.go:181\t\t0x1001585d4\t\t540000a2\t\tBCS 5(PC)\t\t\t\t\t\t\n  pack.go:181\t\t0x1001585d8\t\t386868c9\t\tMOVBU (R6)(R8), R9\t\t\t\t\t\n  pack.go:181\t\t0x1001585dc\t\t34ffff69\t\tCBZW R9, -5(PC)\t\t\t\t\t\t\n  pack.go:241\t\t0x1001585e0\t\t91000906\t\tADD $2, R8, R6\t\t\t\t\t\t\n  pack.go:241\t\t0x1001585e4\t\t17ffffda\t\tJMP -38(PC)\t\t\t\t\t\t\n  pack.go:181\t\t0x1001585e8\t\taa0803e0\t\tMOVD R8, R0\t\t\t\t\t\t\n  pack.go:181\t\t0x1001585ec\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\n  pack.go:181\t\t0x1001585f0\t\t97fc7fdc\t\tCALL runtime.panicIndex(SB)\t\t\t\t\n  pack.go:175\t\t0x1001585f4\t\taa0803e0\t\tMOVD R8, R0\t\t\t\t\t\t\n  pack.go:175\t\t0x1001585f8\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\n  pack.go:175\t\t0x1001585fc\t\t97fc7ff1\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\n  pack.go:229\t\t0x100158600\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\n  pack.go:229\t\t0x100158604\t\tf940e363\t\tMOVD 448(R27), R3\t\t\t\t\t\n  pack.go:229\t\t0x100158608\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\n  pack.go:229\t\t0x10015860c\t\tf940e764\t\tMOVD 456(R27), R4\t\t\t\t\t\n  pack.go:229\t\t0x100158610\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\n  pack.go:229\t\t0x100158614\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\n  pack.go:229\t\t0x100158618\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\n  pack.go:229\t\t0x10015861c\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\n  pack.go:229\t\t0x100158620\t\tf84707fe\t\tMOVD.P 112(RSP), R30\t\t\t\t\t\n  pack.go:229\t\t0x100158624\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\n  pack.go:226\t\t0x100158628\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\n  pack.go:226\t\t0x10015862c\t\tf9411b63\t\tMOVD 560(R27), R3\t\t\t\t\t\n  pack.go:226\t\t0x100158630\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\n  pack.go:226\t\t0x100158634\t\tf9411f64\t\tMOVD 568(R27), R4\t\t\t\t\t\n  pack.go:226\t\t0x100158638\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\n  pack.go:226\t\t0x10015863c\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\n  pack.go:226\t\t0x100158640\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\n  pack.go:226\t\t0x100158644\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\n  pack.go:226\t\t0x100158648\t\tf84707fe\t\tMOVD.P 112(RSP), R30\t\t\t\t\t\n  pack.go:226\t\t0x10015864c\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\n  pack.go:232\t\t0x100158650\t\taa0903e0\t\tMOVD R9, R0\t\t\t\t\t\t\n  pack.go:232\t\t0x100158654\t\t97fc7fdb\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\n  pack.go:225\t\t0x100158658\t\taa0903ea\t\tMOVD R9, R10\t\t\t\t\t\t\n  pack.go:225\t\t0x10015865c\t\taa0803e9\t\tMOVD R8, R9\t\t\t\t\t\t\n  pack.go:228\t\t0x100158660\t\taa0a03e8\t\tMOVD R10, R8\t\t\t\t\t\t\n  pack.go:228\t\t0x100158664\t\t17ffff04\t\tJMP -252(PC)\t\t\t\t\t\t\n  pack.go:179\t\t0x100158668\t\t9100218c\t\tADD $8, R12, R12\t\t\t\t\t\n  pack.go:174\t\t0x10015866c\t\tcb0c012d\t\tSUB R12, R9, R13\t\t\t\t\t\n  pack.go:174\t\t0x100158670\t\td10009ad\t\tSUB $2, R13, R13\t\t\t\t\t\n  pack.go:174\t\t0x100158674\t\tf10021bf\t\tCMP $8, R13\t\t\t\t\t\t\n  pack.go:174\t\t0x100158678\t\t540001eb\t\tBLT 15(PC)\t\t\t\t\t\t\n  pack.go:175\t\t0x10015867c\t\teb0b019f\t\tCMP R11, R12\t\t\t\t\t\t\n  pack.go:175\t\t0x100158680\t\t540004c8\t\tBHI 38(PC)\t\t\t\t\t\t\n  pack.go:175\t\t0x100158684\t\tcb0c004d\t\tSUB R12, R2, R13\t\t\t\t\t\n  pack.go:175\t\t0x100158688\t\td10009ad\t\tSUB $2, R13, R13\t\t\t\t\t\n  pack.go:175\t\t0x10015868c\t\tcb0d03ed\t\tNEG R13, R13\t\t\t\t\t\t\n  pack.go:175\t\t0x100158690\t\t8a8dfd8d\t\tAND R13->63, R12, R13\t\t\t\t\t\n  binary.go:117\t\t0x100158694\t\tf86d694d\t\tMOVD (R10)(R13), R13\t\t\t\t\t\n  pack.go:176\t\t0x100158698\t\tb4fffe8d\t\tCBZ R13, -12(PC)\t\t\t\t\t\n  pack.go:177\t\t0x10015869c\t\tdac001a9\t\tRBIT R13, R9\t\t\t\t\t\t\n  pack.go:177\t\t0x1001586a0\t\tdac01129\t\tCLZ R9, R9\t\t\t\t\t\t\n  pack.go:177\t\t0x1001586a4\t\t8b490d89\t\tADD R9>>3, R12, R9\t\t\t\t\t\n  pack.go:210\t\t0x1001586a8\t\taa0903ec\t\tMOVD R9, R12\t\t\t\t\t\t\n  pack.go:210\t\t0x1001586ac\t\t14000007\t\tJMP 7(PC)\t\t\t\t\t\t\n  pack.go:182\t\t0x1001586b0\t\t9100058c\t\tADD $1, R12, R12\t\t\t\t\t\n  pack.go:181\t\t0x1001586b4\t\teb0b019f\t\tCMP R11, R12\t\t\t\t\t\t\n  pack.go:181\t\t0x1001586b8\t\t5400008a\t\tBGE 4(PC)\t\t\t\t\t\t\n  pack.go:181\t\t0x1001586bc\t\t54000282\t\tBCS 20(PC)\t\t\t\t\t\t\n  pack.go:181\t\t0x1001586c0\t\t386c6949\t\tMOVBU (R10)(R12), R9\t\t\t\t\t\n  pack.go:181\t\t0x1001586c4\t\t34ffff69\t\tCBZW R9, -5(PC)\t\t\t\t\t\t\n  pack.go:210\t\t0x1001586c8\t\t91000989\t\tADD $2, R12, R9\t\t\t\t\t\t\n  pack.go:211\t\t0x1001586cc\t\teb880d3f\t\tCMP R8->3, R9\t\t\t\t\t\t\n  pack.go:211\t\t0x1001586d0\t\t540000ac\t\tBGT 5(PC)\t\t\t\t\t\t\n  pack.go:214\t\t0x1001586d4\t\td37df12a\t\tLSL $3, R9, R10\t\t\t\t\t\t\n  pack.go:225\t\t0x1001586d8\t\taa0903e8\t\tMOVD R9, R8\t\t\t\t\t\t\n  pack.go:228\t\t0x1001586dc\t\taa0a03e9\t\tMOVD R10, R9\t\t\t\t\t\t\n  pack.go:214\t\t0x1001586e0\t\t17ffffde\t\tJMP -34(PC)\t\t\t\t\t\t\n  pack.go:212\t\t0x1001586e4\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\n  pack.go:212\t\t0x1001586e8\t\tf940e363\t\tMOVD 448(R27), R3\t\t\t\t\t\n  pack.go:212\t\t0x1001586ec\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\n  pack.go:212\t\t0x1001586f0\t\tf940e764\t\tMOVD 456(R27), R4\t\t\t\t\t\n  pack.go:212\t\t0x1001586f4\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\n  pack.go:212\t\t0x1001586f8\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\n  pack.go:212\t\t0x1001586fc\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\n  pack.go:212\t\t0x100158700\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\n  pack.go:212\t\t0x100158704\t\tf84707fe\t\tMOVD.P 112(RSP), R30\t\t\t\t\t\n  pack.go:212\t\t0x100158708\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\n  pack.go:181\t\t0x10015870c\t\taa0c03e0\t\tMOVD R12, R0\t\t\t\t\t\t\n  pack.go:181\t\t0x100158710\t\taa0b03e1\t\tMOVD R11, R1\t\t\t\t\t\t\n  pack.go:181\t\t0x100158714\t\t97fc7f93\t\tCALL runtime.panicIndex(SB)\t\t\t\t\n  pack.go:175\t\t0x100158718\t\taa0c03e0\t\tMOVD R12, R0\t\t\t\t\t\t\n  pack.go:175\t\t0x10015871c\t\taa0b03e1\t\tMOVD R11, R1\t\t\t\t\t\t\n  pack.go:175\t\t0x100158720\t\t97fc7fa8\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\n  pack.go:210\t\t0x100158724\t\taa0903e1\t\tMOVD R9, R1\t\t\t\t\t\t\n  pack.go:210\t\t0x100158728\t\t97fc7f9e\t\tCALL runtime.panicSliceAcap(SB)\t\t\t\t\n  pack.go:210\t\t0x10015872c\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\n  pack.go:193\t\t0x100158730\t\ta90087e0\t\tSTP (R0, R1), 8(RSP)\t\t\t\t\t\n  pack.go:193\t\t0x100158734\t\ta9018fe2\t\tSTP (R2, R3), 24(RSP)\t\t\t\t\t\n  pack.go:193\t\t0x100158738\t\taa1e03e3\t\tMOVD R30, R3\t\t\t\t\t\t\n  pack.go:193\t\t0x10015873c\t\t97fc7631\t\tCALL runtime.morestack_noctxt.abi0(SB)\t\t\t\n  pack.go:193\t\t0x100158740\t\ta94087e0\t\tLDP 8(RSP), (R0, R1)\t\t\t\t\t\n  pack.go:193\t\t0x100158744\t\ta9418fe2\t\tLDP 24(RSP), (R2, R3)\t\t\t\t\t\n  pack.go:193\t\t0x100158748\t\t17fffe7e\t\tJMP github.com/cnooljaw/gosproto.UnpackWithLimit(SB)\t\n  pack.go:193\t\t0x10015874c\t\t00000000\t\t?\t\t\t\t\t\t\t\n"
+  },
+  {
+    "args": [
+      "git",
+      "rev-parse",
+      "9e47281"
+    ],
+    "cwd": "/private/tmp/gsr-gosproto-fork",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.0161945428699255,
+    "output": "9e47281db9877dd1de203608c6cb89a6e387bc41\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-gcflags=all=-d=checkptr=2",
+      "-run",
+      "^(TestUnpack|TestLimits|TestOfficial|TestMalformed)",
+      "-timeout=2m",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/B",
+    "env": {
+      "GOMAXPROCS": "2",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 3.3206560406833887,
+    "output": "ok  \tgithub.com/cnooljaw/gosproto\t1.636s\n"
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "review_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/B-harness",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.012783458456397057,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-run",
+      "^TestRepresentativeFixtures$",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/B-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 1.0945833753794432,
+    "output": "ok  \tarrayreview\t0.347s\n"
+  },
+  {
+    "args": [
+      "go",
+      "vet",
+      "-mod=mod",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/B-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 0.2328880000859499,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-c",
+      "-o",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/B.test",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/B-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 0.5922261252999306,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "objdump",
+      "-s",
+      "github.com/cnooljaw/gosproto.UnpackWithLimit",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/B.test"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/B-harness",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.025974124670028687,
+    "output": "TEXT github.com/cnooljaw/gosproto.UnpackWithLimit(SB) /Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/B/pack.go\n  pack.go:193\t\t0x100158140\t\tf9400b90\t\tMOVD 16(R28), R16\t\t\t\t\t\n  pack.go:193\t\t0x100158144\t\teb3063ff\t\tCMP R16, RSP\t\t\t\t\t\t\n  pack.go:193\t\t0x100158148\t\t540031c9\t\tBLS 398(PC)\t\t\t\t\t\t\n  pack.go:193\t\t0x10015814c\t\tf8190ffe\t\tMOVD.W R30, -112(RSP)\t\t\t\t\t\n  pack.go:193\t\t0x100158150\t\tf81f83fd\t\tMOVD R29, -8(RSP)\t\t\t\t\t\n  pack.go:193\t\t0x100158154\t\td10023fd\t\tSUB $8, RSP, R29\t\t\t\t\t\n  pack.go:193\t\t0x100158158\t\tf9003fe0\t\tMOVD R0, 120(RSP)\t\t\t\t\t\n  pack.go:194\t\t0x10015815c\t\tf100007f\t\tCMP $0, R3\t\t\t\t\t\t\n  pack.go:194\t\t0x100158160\t\t540000cd\t\tBLE 6(PC)\t\t\t\t\t\t\n  pack.go:194\t\t0x100158164\t\taa0103e4\t\tMOVD R1, R4\t\t\t\t\t\t\n  pack.go:194\t\t0x100158168\t\taa0203e5\t\tMOVD R2, R5\t\t\t\t\t\t\n  pack.go:194\t\t0x10015816c\t\taa0003e6\t\tMOVD R0, R6\t\t\t\t\t\t\n  pack.go:194\t\t0x100158170\t\taa1f03e7\t\tMOVD ZR, R7\t\t\t\t\t\t\n  pack.go:199\t\t0x100158174\t\t14000010\t\tJMP 16(PC)\t\t\t\t\t\t\n  pack.go:195\t\t0x100158178\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\n  pack.go:195\t\t0x10015817c\t\tf940eb63\t\tMOVD 464(R27), R3\t\t\t\t\t\n  pack.go:195\t\t0x100158180\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\n  pack.go:195\t\t0x100158184\t\tf940ef64\t\tMOVD 472(R27), R4\t\t\t\t\t\n  pack.go:195\t\t0x100158188\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\n  pack.go:195\t\t0x10015818c\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\n  pack.go:195\t\t0x100158190\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\n  pack.go:195\t\t0x100158194\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\n  pack.go:195\t\t0x100158198\t\tf84707fe\t\tMOVD.P 112(RSP), R30\t\t\t\t\t\n  pack.go:195\t\t0x10015819c\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\n  pack.go:232\t\t0x1001581a0\t\tcb090042\t\tSUB R9, R2, R2\t\t\t\t\t\t\n  pack.go:232\t\t0x1001581a4\t\tcb0203e8\t\tNEG R2, R8\t\t\t\t\t\t\n  pack.go:232\t\t0x1001581a8\t\t8a88fd28\t\tAND R8->63, R9, R8\t\t\t\t\t\n  pack.go:232\t\t0x1001581ac\t\tcb090021\t\tSUB R9, R1, R1\t\t\t\t\t\t\n  pack.go:232\t\t0x1001581b0\t\t8b080000\t\tADD R8, R0, R0\t\t\t\t\t\t\n  pack.go:199\t\t0x1001581b4\t\tb40009a1\t\tCBZ R1, 77(PC)\t\t\t\t\t\t\n  pack.go:200\t\t0x1001581b8\t\t39400008\t\tMOVBU (R0), R8\t\t\t\t\t\t\n  pack.go:202\t\t0x1001581bc\t\taa0803e9\t\tMOVD R8, R9\t\t\t\t\t\t\n  pack.go:202\t\t0x1001581c0\t\t350003c9\t\tCBNZW R9, 30(PC)\t\t\t\t\t\n  pack.go:203\t\t0x1001581c4\t\tf100083f\t\tCMP $2, R1\t\t\t\t\t\t\n  pack.go:203\t\t0x1001581c8\t\t5400032b\t\tBLT 25(PC)\t\t\t\t\t\t\n  pack.go:203\t\t0x1001581cc\t\t39400408\t\tMOVBU 1(R0), R8\t\t\t\t\t\t\n  pack.go:203\t\t0x1001581d0\t\t35000288\t\tCBNZW R8, 20(PC)\t\t\t\t\t\n  pack.go:204\t\t0x1001581d4\t\tcb070068\t\tSUB R7, R3, R8\t\t\t\t\t\t\n  pack.go:204\t\t0x1001581d8\t\t937ffd09\t\tASR $63, R8, R9\t\t\t\t\t\t\n  pack.go:204\t\t0x1001581dc\t\t8b49f508\t\tADD R9>>61, R8, R8\t\t\t\t\t\n  pack.go:204\t\t0x1001581e0\t\t9343fd09\t\tASR $3, R8, R9\t\t\t\t\t\t\n  pack.go:205\t\t0x1001581e4\t\tf100093f\t\tCMP $2, R9\t\t\t\t\t\t\n  pack.go:205\t\t0x1001581e8\t\t5400058b\t\tBLT 44(PC)\t\t\t\t\t\t\n  pack.go:209\t\t0x1001581ec\t\t9100052a\t\tADD $1, R9, R10\t\t\t\t\t\t\n  pack.go:209\t\t0x1001581f0\t\teb0a003f\t\tCMP R10, R1\t\t\t\t\t\t\n  pack.go:209\t\t0x1001581f4\t\t9a89d429\t\tCSINC LE, R1, R9, R9\t\t\t\t\t\n  pack.go:210\t\t0x1001581f8\t\teb09005f\t\tCMP R9, R2\t\t\t\t\t\t\n  pack.go:209\t\t0x1001581fc\t\t54002bc3\t\tBCC 350(PC)\t\t\t\t\t\t\n  pack.go:210\t\t0x100158200\t\td100084a\t\tSUB $2, R2, R10\t\t\t\t\t\t\n  pack.go:210\t\t0x100158204\t\tcb0a03ea\t\tNEG R10, R10\t\t\t\t\t\t\n  pack.go:210\t\t0x100158208\t\t937ffd4a\t\tASR $63, R10, R10\t\t\t\t\t\n  pack.go:210\t\t0x10015820c\t\t927f014a\t\tAND $2, R10, R10\t\t\t\t\t\n  pack.go:210\t\t0x100158210\t\t8b0a000a\t\tADD R10, R0, R10\t\t\t\t\t\n  pack.go:210\t\t0x100158214\t\td100092b\t\tSUB $2, R9, R11\t\t\t\t\t\t\n  pack.go:210\t\t0x100158218\t\taa1f03ec\t\tMOVD ZR, R12\t\t\t\t\t\t\n  pack.go:174\t\t0x10015821c\t\t14000128\t\tJMP 296(PC)\t\t\t\t\t\t\n  pack.go:174\t\t0x100158220\t\tb24003e8\t\tORR $1, ZR, R8\t\t\t\t\t\t\n  pack.go:174\t\t0x100158224\t\tb27d03e9\t\tORR $8, ZR, R9\t\t\t\t\t\t\n  pack.go:203\t\t0x100158228\t\t14000120\t\tJMP 288(PC)\t\t\t\t\t\t\n  pack.go:203\t\t0x10015822c\t\tb24003e8\t\tORR $1, ZR, R8\t\t\t\t\t\t\n  pack.go:203\t\t0x100158230\t\tb27d03e9\t\tORR $8, ZR, R9\t\t\t\t\t\t\n  pack.go:203\t\t0x100158234\t\t1400011d\t\tJMP 285(PC)\t\t\t\t\t\t\n  pack.go:216\t\t0x100158238\t\t7103fd3f\t\tCMPW $255, R9\t\t\t\t\t\t\n  pack.go:216\t\t0x10015823c\t\t54000101\t\tBNE 8(PC)\t\t\t\t\t\t\n  pack.go:217\t\t0x100158240\t\tf100083f\t\tCMP $2, R1\t\t\t\t\t\t\n  pack.go:217\t\t0x100158244\t\t540003eb\t\tBLT 31(PC)\t\t\t\t\t\t\n  pack.go:220\t\t0x100158248\t\t39400408\t\tMOVBU 1(R0), R8\t\t\t\t\t\t\n  pack.go:220\t\t0x10015824c\t\t91000508\t\tADD $1, R8, R8\t\t\t\t\t\t\n  pack.go:220\t\t0x100158250\t\td37df108\t\tLSL $3, R8, R8\t\t\t\t\t\t\n  pack.go:221\t\t0x100158254\t\t91000909\t\tADD $2, R8, R9\t\t\t\t\t\t\n  pack.go:221\t\t0x100158258\t\t14000007\t\tJMP 7(PC)\t\t\t\t\t\t\n  bits.go:126\t\t0x10015825c\t\taa0803ea\t\tMOVD R8, R10\t\t\t\t\t\t\n  bits.go:126\t\t0x100158260\t\tb000070b\t\tADRP 921600(PC), R11\t\t\t\t\t\n  bits.go:126\t\t0x100158264\t\t91006d6b\t\tADD $27, R11, R11\t\t\t\t\t\n  bits.go:126\t\t0x100158268\t\t386a696a\t\tMOVBU (R11)(R10), R10\t\t\t\t\t\n  pack.go:223\t\t0x10015826c\t\t91000549\t\tADD $1, R10, R9\t\t\t\t\t\t\n  pack.go:223\t\t0x100158270\t\tb27d03e8\t\tORR $8, ZR, R8\t\t\t\t\t\t\n  pack.go:225\t\t0x100158274\t\teb01013f\t\tCMP R1, R9\t\t\t\t\t\t\n  pack.go:225\t\t0x100158278\t\t5400200c\t\tBGT 256(PC)\t\t\t\t\t\t\n  pack.go:228\t\t0x10015827c\t\tcb07006a\t\tSUB R7, R3, R10\t\t\t\t\t\t\n  pack.go:228\t\t0x100158280\t\teb0a011f\t\tCMP R10, R8\t\t\t\t\t\t\n  pack.go:228\t\t0x100158284\t\t54001e6c\t\tBGT 243(PC)\t\t\t\t\t\t\n  pack.go:231\t\t0x100158288\t\t8b0800e7\t\tADD R8, R7, R7\t\t\t\t\t\t\n  pack.go:225\t\t0x10015828c\t\teb01013f\t\tCMP R1, R9\t\t\t\t\t\t\n  pack.go:232\t\t0x100158290\t\t54fff889\t\tBLS -60(PC)\t\t\t\t\t\t\n  pack.go:232\t\t0x100158294\t\t14000103\t\tJMP 259(PC)\t\t\t\t\t\t\n  pack.go:206\t\t0x100158298\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\n  pack.go:206\t\t0x10015829c\t\tf940e363\t\tMOVD 448(R27), R3\t\t\t\t\t\n  pack.go:206\t\t0x1001582a0\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\n  pack.go:206\t\t0x1001582a4\t\tf940e764\t\tMOVD 456(R27), R4\t\t\t\t\t\n  pack.go:206\t\t0x1001582a8\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\n  pack.go:206\t\t0x1001582ac\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\n  pack.go:206\t\t0x1001582b0\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\n  pack.go:206\t\t0x1001582b4\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\n  pack.go:206\t\t0x1001582b8\t\tf84707fe\t\tMOVD.P 112(RSP), R30\t\t\t\t\t\n  pack.go:206\t\t0x1001582bc\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\n  pack.go:218\t\t0x1001582c0\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\n  pack.go:218\t\t0x1001582c4\t\tf9411b63\t\tMOVD 560(R27), R3\t\t\t\t\t\n  pack.go:218\t\t0x1001582c8\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\n  pack.go:218\t\t0x1001582cc\t\tf9411f64\t\tMOVD 568(R27), R4\t\t\t\t\t\n  pack.go:218\t\t0x1001582d0\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\n  pack.go:218\t\t0x1001582d4\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\n  pack.go:218\t\t0x1001582d8\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\n  pack.go:218\t\t0x1001582dc\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\n  pack.go:218\t\t0x1001582e0\t\tf84707fe\t\tMOVD.P 112(RSP), R30\t\t\t\t\t\n  pack.go:218\t\t0x1001582e4\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\n  pack.go:194\t\t0x1001582e8\t\tf9002be4\t\tMOVD R4, 80(RSP)\t\t\t\t\t\n  pack.go:194\t\t0x1001582ec\t\tf90033e6\t\tMOVD R6, 96(RSP)\t\t\t\t\t\n  pack.go:194\t\t0x1001582f0\t\tf90027e5\t\tMOVD R5, 72(RSP)\t\t\t\t\t\n  pack.go:228\t\t0x1001582f4\t\tf90013e7\t\tMOVD R7, 32(RSP)\t\t\t\t\t\n  pack.go:234\t\t0x1001582f8\t\tf0000a80\t\tADRP 1388544(PC), R0\t\t\t\t\t\n  pack.go:234\t\t0x1001582fc\t\t912e8000\t\tADD $2976, R0, R0\t\t\t\t\t\n  pack.go:234\t\t0x100158300\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\n  pack.go:234\t\t0x100158304\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\n  pack.go:234\t\t0x100158308\t\t97fc6892\t\tCALL runtime.makeslice(SB)\t\t\t\t\n  pack.go:234\t\t0x10015830c\t\tf9002fe0\t\tMOVD R0, 88(RSP)\t\t\t\t\t\n  pack.go:236\t\t0x100158310\t\tf94013e2\t\tMOVD 32(RSP), R2\t\t\t\t\t\n  pack.go:236\t\t0x100158314\t\tf94033e3\t\tMOVD 96(RSP), R3\t\t\t\t\t\n  pack.go:236\t\t0x100158318\t\tf94027e4\t\tMOVD 72(RSP), R4\t\t\t\t\t\n  pack.go:236\t\t0x10015831c\t\tf9402be5\t\tMOVD 80(RSP), R5\t\t\t\t\t\n  pack.go:236\t\t0x100158320\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\n  pack.go:236\t\t0x100158324\t\t14000004\t\tJMP 4(PC)\t\t\t\t\t\t\n  pack.go:236\t\t0x100158328\t\taa0603e4\t\tMOVD R6, R4\t\t\t\t\t\t\n  pack.go:236\t\t0x10015832c\t\taa0803e3\t\tMOVD R8, R3\t\t\t\t\t\t\n  pack.go:251\t\t0x100158330\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\n  pack.go:236\t\t0x100158334\t\tb4000bc5\t\tCBZ R5, 94(PC)\t\t\t\t\t\t\n  pack.go:237\t\t0x100158338\t\t39400066\t\tMOVBU (R3), R6\t\t\t\t\t\t\n  pack.go:238\t\t0x10015833c\t\taa0603e7\t\tMOVD R6, R7\t\t\t\t\t\t\n  pack.go:238\t\t0x100158340\t\t350001e7\t\tCBNZW R7, 15(PC)\t\t\t\t\t\n  pack.go:240\t\t0x100158344\t\tf10008bf\t\tCMP $2, R5\t\t\t\t\t\t\n  pack.go:240\t\t0x100158348\t\t5400016b\t\tBLT 11(PC)\t\t\t\t\t\t\n  pack.go:240\t\t0x10015834c\t\t39400466\t\tMOVBU 1(R3), R6\t\t\t\t\t\t\n  pack.go:240\t\t0x100158350\t\t35000126\t\tCBNZW R6, 9(PC)\t\t\t\t\t\t\n  pack.go:241\t\t0x100158354\t\td1000886\t\tSUB $2, R4, R6\t\t\t\t\t\t\n  pack.go:241\t\t0x100158358\t\tcb0603e6\t\tNEG R6, R6\t\t\t\t\t\t\n  pack.go:241\t\t0x10015835c\t\t937ffcc6\t\tASR $63, R6, R6\t\t\t\t\t\t\n  pack.go:241\t\t0x100158360\t\t927f00c6\t\tAND $2, R6, R6\t\t\t\t\t\t\n  pack.go:241\t\t0x100158364\t\t8b060066\t\tADD R6, R3, R6\t\t\t\t\t\t\n  pack.go:241\t\t0x100158368\t\td10008a7\t\tSUB $2, R5, R7\t\t\t\t\t\t\n  pack.go:241\t\t0x10015836c\t\taa1f03e8\t\tMOVD ZR, R8\t\t\t\t\t\t\n  pack.go:174\t\t0x100158370\t\t14000099\t\tJMP 153(PC)\t\t\t\t\t\t\n  pack.go:174\t\t0x100158374\t\tb24003e6\t\tORR $1, ZR, R6\t\t\t\t\t\t\n  pack.go:240\t\t0x100158378\t\t14000089\t\tJMP 137(PC)\t\t\t\t\t\t\n  pack.go:248\t\t0x10015837c\t\td1000488\t\tSUB $1, R4, R8\t\t\t\t\t\t\n  pack.go:248\t\t0x100158380\t\tcb0803e9\t\tNEG R8, R9\t\t\t\t\t\t\n  pack.go:248\t\t0x100158384\t\t937ffd29\t\tASR $63, R9, R9\t\t\t\t\t\t\n  pack.go:248\t\t0x100158388\t\t92400129\t\tAND $1, R9, R9\t\t\t\t\t\t\n  pack.go:248\t\t0x10015838c\t\t8b03012a\t\tADD R3, R9, R10\t\t\t\t\t\t\n  pack.go:248\t\t0x100158390\t\td10004ab\t\tSUB $1, R5, R11\t\t\t\t\t\t\n  pack.go:249\t\t0x100158394\t\t7103fcff\t\tCMPW $255, R7\t\t\t\t\t\t\n  pack.go:249\t\t0x100158398\t\t54000661\t\tBNE 51(PC)\t\t\t\t\t\t\n  pack.go:250\t\t0x10015839c\t\tf100017f\t\tCMP $0, R11\t\t\t\t\t\t\n  pack.go:250\t\t0x1001583a0\t\t54000f89\t\tBLS 124(PC)\t\t\t\t\t\t\n  pack.go:250\t\t0x1001583a4\t\t38696866\t\tMOVBU (R3)(R9), R6\t\t\t\t\t\n  pack.go:251\t\t0x1001583a8\t\teb02003f\t\tCMP R2, R1\t\t\t\t\t\t\n  pack.go:251\t\t0x1001583ac\t\t54000ec8\t\tBHI 118(PC)\t\t\t\t\t\t\n  pack.go:250\t\t0x1001583b0\t\t910004c6\t\tADD $1, R6, R6\t\t\t\t\t\t\n  pack.go:250\t\t0x1001583b4\t\td37df0c7\t\tLSL $3, R6, R7\t\t\t\t\t\t\n  pack.go:251\t\t0x1001583b8\t\tcb010049\t\tSUB R1, R2, R9\t\t\t\t\t\t\n  pack.go:251\t\t0x1001583bc\t\tcb0903ec\t\tNEG R9, R12\t\t\t\t\t\t\n  pack.go:251\t\t0x1001583c0\t\t8a8cfc2c\t\tAND R12->63, R1, R12\t\t\t\t\t\n  pack.go:251\t\t0x1001583c4\t\t910004ed\t\tADD $1, R7, R13\t\t\t\t\t\t\n  pack.go:251\t\t0x1001583c8\t\t8b0c000c\t\tADD R12, R0, R12\t\t\t\t\t\n  pack.go:251\t\t0x1001583cc\t\teb0d011f\t\tCMP R13, R8\t\t\t\t\t\t\n  pack.go:251\t\t0x1001583d0\t\t54000d43\t\tBCC 106(PC)\t\t\t\t\t\t\n  pack.go:251\t\t0x1001583d4\t\t91000548\t\tADD $1, R10, R8\t\t\t\t\t\t\n  pack.go:251\t\t0x1001583d8\t\teb060d3f\t\tCMP R6<<3, R9\t\t\t\t\t\t\n  pack.go:251\t\t0x1001583dc\t\t9a89c0e7\t\tCSEL GT, R7, R9, R7\t\t\t\t\t\n  pack.go:251\t\t0x1001583e0\t\teb0c011f\t\tCMP R12, R8\t\t\t\t\t\t\n  pack.go:251\t\t0x1001583e4\t\t540002a0\t\tBEQ 21(PC)\t\t\t\t\t\t\n  pack.go:236\t\t0x1001583e8\t\tf9002be4\t\tMOVD R4, 80(RSP)\t\t\t\t\t\n  pack.go:236\t\t0x1001583ec\t\tf90027e5\t\tMOVD R5, 72(RSP)\t\t\t\t\t\n  pack.go:248\t\t0x1001583f0\t\tf90023eb\t\tMOVD R11, 64(RSP)\t\t\t\t\t\n  pack.go:248\t\t0x1001583f4\t\tf90033ea\t\tMOVD R10, 96(RSP)\t\t\t\t\t\n  pack.go:250\t\t0x1001583f8\t\tf9001fe6\t\tMOVD R6, 56(RSP)\t\t\t\t\t\n  pack.go:251\t\t0x1001583fc\t\tf9001bed\t\tMOVD R13, 48(RSP)\t\t\t\t\t\n  pack.go:251\t\t0x100158400\t\tf90017e1\t\tMOVD R1, 40(RSP)\t\t\t\t\t\n  pack.go:251\t\t0x100158404\t\taa0c03e0\t\tMOVD R12, R0\t\t\t\t\t\t\n  pack.go:251\t\t0x100158408\t\taa0803e1\t\tMOVD R8, R1\t\t\t\t\t\t\n  pack.go:251\t\t0x10015840c\t\taa0703e2\t\tMOVD R7, R2\t\t\t\t\t\t\n  pack.go:251\t\t0x100158410\t\t97fc81c0\t\tCALL runtime.memmove(SB)\t\t\t\t\n  pack.go:258\t\t0x100158414\t\tf9402fe0\t\tMOVD 88(RSP), R0\t\t\t\t\t\n  pack.go:252\t\t0x100158418\t\tf94017e1\t\tMOVD 40(RSP), R1\t\t\t\t\t\n  pack.go:258\t\t0x10015841c\t\tf94013e2\t\tMOVD 32(RSP), R2\t\t\t\t\t\n  pack.go:253\t\t0x100158420\t\tf9402be4\t\tMOVD 80(RSP), R4\t\t\t\t\t\n  pack.go:253\t\t0x100158424\t\tf94027e5\t\tMOVD 72(RSP), R5\t\t\t\t\t\n  pack.go:252\t\t0x100158428\t\tf9401fe6\t\tMOVD 56(RSP), R6\t\t\t\t\t\n  pack.go:253\t\t0x10015842c\t\tf94033ea\t\tMOVD 96(RSP), R10\t\t\t\t\t\n  pack.go:253\t\t0x100158430\t\tf94023eb\t\tMOVD 64(RSP), R11\t\t\t\t\t\n  pack.go:253\t\t0x100158434\t\tf9401bed\t\tMOVD 48(RSP), R13\t\t\t\t\t\n  pack.go:252\t\t0x100158438\t\t8b060c27\t\tADD R6<<3, R1, R7\t\t\t\t\t\n  pack.go:253\t\t0x10015843c\t\teb0d017f\t\tCMP R13, R11\t\t\t\t\t\t\n  pack.go:253\t\t0x100158440\t\t54000963\t\tBCC 75(PC)\t\t\t\t\t\t\n  pack.go:253\t\t0x100158444\t\tcb060c88\t\tSUB R6<<3, R4, R8\t\t\t\t\t\n  pack.go:253\t\t0x100158448\t\tcb060ca5\t\tSUB R6<<3, R5, R5\t\t\t\t\t\n  pack.go:253\t\t0x10015844c\t\td1000906\t\tSUB $2, R8, R6\t\t\t\t\t\t\n  pack.go:253\t\t0x100158450\t\tcb0603e8\t\tNEG R6, R8\t\t\t\t\t\t\n  pack.go:253\t\t0x100158454\t\t8a88fda8\t\tAND R8->63, R13, R8\t\t\t\t\t\n  pack.go:253\t\t0x100158458\t\t8b0a0108\t\tADD R10, R8, R8\t\t\t\t\t\t\n  pack.go:253\t\t0x10015845c\t\td10008a5\t\tSUB $2, R5, R5\t\t\t\t\t\t\n  pack.go:254\t\t0x100158460\t\t17ffffb2\t\tJMP -78(PC)\t\t\t\t\t\t\n  pack.go:258\t\t0x100158464\t\t91002027\t\tADD $8, R1, R7\t\t\t\t\t\t\n  pack.go:258\t\t0x100158468\t\teb07005f\t\tCMP R7, R2\t\t\t\t\t\t\n  pack.go:258\t\t0x10015846c\t\t540007a3\t\tBCC 61(PC)\t\t\t\t\t\t\n  pack.go:258\t\t0x100158470\t\teb07003f\t\tCMP R7, R1\t\t\t\t\t\t\n  pack.go:258\t\t0x100158474\t\t54000708\t\tBHI 56(PC)\t\t\t\t\t\t\n  pack.go:258\t\t0x100158478\t\t8b010008\t\tADD R1, R0, R8\t\t\t\t\t\t\n  pack.go:258\t\t0x10015847c\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\n  pack.go:260\t\t0x100158480\t\t14000012\t\tJMP 18(PC)\t\t\t\t\t\t\n  pack.go:276\t\t0x100158484\t\teb0b013f\t\tCMP R11, R9\t\t\t\t\t\t\n  pack.go:276\t\t0x100158488\t\t54000548\t\tBHI 42(PC)\t\t\t\t\t\t\n  pack.go:276\t\t0x10015848c\t\tcb0900ab\t\tSUB R9, R5, R11\t\t\t\t\t\t\n  pack.go:276\t\t0x100158490\t\tcb09008c\t\tSUB R9, R4, R12\t\t\t\t\t\t\n  pack.go:276\t\t0x100158494\t\td1000586\t\tSUB $1, R12, R6\t\t\t\t\t\t\n  pack.go:276\t\t0x100158498\t\tcb0603ec\t\tNEG R6, R12\t\t\t\t\t\t\n  pack.go:276\t\t0x10015849c\t\t8a8cfd29\t\tAND R12->63, R9, R9\t\t\t\t\t\n  pack.go:276\t\t0x1001584a0\t\t8b0a0128\t\tADD R10, R9, R8\t\t\t\t\t\t\n  pack.go:276\t\t0x1001584a4\t\td1000565\t\tSUB $1, R11, R5\t\t\t\t\t\t\n  pack.go:277\t\t0x1001584a8\t\t17ffffa0\t\tJMP -96(PC)\t\t\t\t\t\t\n  pack.go:279\t\t0x1001584ac\t\taa0203e1\t\tMOVD R2, R1\t\t\t\t\t\t\n  pack.go:279\t\t0x1001584b0\t\taa1f03e3\t\tMOVD ZR, R3\t\t\t\t\t\t\n  pack.go:279\t\t0x1001584b4\t\taa1f03e4\t\tMOVD ZR, R4\t\t\t\t\t\t\n  pack.go:279\t\t0x1001584b8\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\n  pack.go:279\t\t0x1001584bc\t\tf84707fe\t\tMOVD.P 112(RSP), R30\t\t\t\t\t\n  pack.go:279\t\t0x1001584c0\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\n  pack.go:262\t\t0x1001584c4\t\taa0903e1\t\tMOVD R9, R1\t\t\t\t\t\t\n  pack.go:262\t\t0x1001584c8\t\teb0b003f\t\tCMP R11, R1\t\t\t\t\t\t\n  pack.go:262\t\t0x1001584cc\t\t540003e2\t\tBCS 31(PC)\t\t\t\t\t\t\n  pack.go:261\t\t0x1001584d0\t\tb27800c9\t\tORR $256, R6, R9\t\t\t\t\t\n  pack.go:261\t\t0x1001584d4\t\t5ac00129\t\tRBITW R9, R9\t\t\t\t\t\t\n  pack.go:261\t\t0x1001584d8\t\t5ac01129\t\tCLZW R9, R9\t\t\t\t\t\t\n  pack.go:261\t\t0x1001584dc\t\t92400929\t\tAND $7, R9, R9\t\t\t\t\t\t\n  pack.go:262\t\t0x1001584e0\t\t3861694c\t\tMOVBU (R10)(R1), R12\t\t\t\t\t\n  pack.go:262\t\t0x1001584e4\t\t3829690c\t\tMOVB R12, (R8)(R9)\t\t\t\t\t\n  pack.go:264\t\t0x1001584e8\t\td10004c9\t\tSUB $1, R6, R9\t\t\t\t\t\t\n  pack.go:264\t\t0x1001584ec\t\t8a0900c6\t\tAND R9, R6, R6\t\t\t\t\t\t\n  pack.go:263\t\t0x1001584f0\t\t91000429\t\tADD $1, R1, R9\t\t\t\t\t\t\n  pack.go:265\t\t0x1001584f4\t\td3401ccc\t\tUBFX $0, R6, $8, R12\t\t\t\t\t\n  pack.go:265\t\t0x1001584f8\t\t34fffc6c\t\tCBZW R12, -29(PC)\t\t\t\t\t\n  pack.go:269\t\t0x1001584fc\t\teb09017f\t\tCMP R9, R11\t\t\t\t\t\t\n  pack.go:269\t\t0x100158500\t\t540001e9\t\tBLS 15(PC)\t\t\t\t\t\t\n  pack.go:268\t\t0x100158504\t\t5ac000cc\t\tRBITW R6, R12\t\t\t\t\t\t\n  pack.go:268\t\t0x100158508\t\t5ac0118c\t\tCLZW R12, R12\t\t\t\t\t\t\n  pack.go:268\t\t0x10015850c\t\t9240098c\t\tAND $7, R12, R12\t\t\t\t\t\n  pack.go:269\t\t0x100158510\t\t38696949\t\tMOVBU (R10)(R9), R9\t\t\t\t\t\n  pack.go:269\t\t0x100158514\t\t382c6909\t\tMOVB R9, (R8)(R12)\t\t\t\t\t\n  pack.go:271\t\t0x100158518\t\td10004c9\t\tSUB $1, R6, R9\t\t\t\t\t\t\n  pack.go:271\t\t0x10015851c\t\t8a060126\t\tAND R6, R9, R6\t\t\t\t\t\t\n  pack.go:270\t\t0x100158520\t\t91000829\t\tADD $2, R1, R9\t\t\t\t\t\t\n  pack.go:272\t\t0x100158524\t\td3401ccc\t\tUBFX $0, R6, $8, R12\t\t\t\t\t\n  pack.go:272\t\t0x100158528\t\t35fffcec\t\tCBNZW R12, -25(PC)\t\t\t\t\t\n  pack.go:272\t\t0x10015852c\t\t17ffffd6\t\tJMP -42(PC)\t\t\t\t\t\t\n  pack.go:276\t\t0x100158530\t\taa0903e0\t\tMOVD R9, R0\t\t\t\t\t\t\n  pack.go:276\t\t0x100158534\t\taa0b03e1\t\tMOVD R11, R1\t\t\t\t\t\t\n  pack.go:276\t\t0x100158538\t\t97fc8022\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\n  pack.go:269\t\t0x10015853c\t\taa0903e0\t\tMOVD R9, R0\t\t\t\t\t\t\n  pack.go:269\t\t0x100158540\t\taa0b03e1\t\tMOVD R11, R1\t\t\t\t\t\t\n  pack.go:269\t\t0x100158544\t\t97fc8007\t\tCALL runtime.panicIndex(SB)\t\t\t\t\n  pack.go:262\t\t0x100158548\t\taa0103e0\t\tMOVD R1, R0\t\t\t\t\t\t\n  pack.go:262\t\t0x10015854c\t\taa0b03e1\t\tMOVD R11, R1\t\t\t\t\t\t\n  pack.go:262\t\t0x100158550\t\t97fc8004\t\tCALL runtime.panicIndex(SB)\t\t\t\t\n  pack.go:258\t\t0x100158554\t\taa0103e0\t\tMOVD R1, R0\t\t\t\t\t\t\n  pack.go:258\t\t0x100158558\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\n  pack.go:258\t\t0x10015855c\t\t97fc802d\t\tCALL runtime.panicSlice3C(SB)\t\t\t\t\n  pack.go:258\t\t0x100158560\t\taa0203e3\t\tMOVD R2, R3\t\t\t\t\t\t\n  pack.go:258\t\t0x100158564\t\taa0703e2\t\tMOVD R7, R2\t\t\t\t\t\t\n  pack.go:258\t\t0x100158568\t\t97fc8022\t\tCALL runtime.panicSlice3Acap(SB)\t\t\t\n  pack.go:253\t\t0x10015856c\t\taa0d03e0\t\tMOVD R13, R0\t\t\t\t\t\t\n  pack.go:253\t\t0x100158570\t\taa0b03e1\t\tMOVD R11, R1\t\t\t\t\t\t\n  pack.go:253\t\t0x100158574\t\t97fc8013\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\n  pack.go:251\t\t0x100158578\t\taa0d03e1\t\tMOVD R13, R1\t\t\t\t\t\t\n  pack.go:251\t\t0x10015857c\t\taa0803e2\t\tMOVD R8, R2\t\t\t\t\t\t\n  pack.go:251\t\t0x100158580\t\t97fc8008\t\tCALL runtime.panicSliceAcap(SB)\t\t\t\t\n  pack.go:251\t\t0x100158584\t\taa0103e0\t\tMOVD R1, R0\t\t\t\t\t\t\n  pack.go:251\t\t0x100158588\t\taa0203e1\t\tMOVD R2, R1\t\t\t\t\t\t\n  pack.go:251\t\t0x10015858c\t\t97fc800d\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\n  pack.go:250\t\t0x100158590\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\n  pack.go:250\t\t0x100158594\t\taa0003e1\t\tMOVD R0, R1\t\t\t\t\t\t\n  pack.go:250\t\t0x100158598\t\t97fc7ff2\t\tCALL runtime.panicIndex(SB)\t\t\t\t\n  pack.go:244\t\t0x10015859c\t\t8b060c27\t\tADD R6<<3, R1, R7\t\t\t\t\t\n  pack.go:245\t\t0x1001585a0\t\teb0500df\t\tCMP R5, R6\t\t\t\t\t\t\n  pack.go:245\t\t0x1001585a4\t\t54000108\t\tBHI 8(PC)\t\t\t\t\t\t\n  pack.go:245\t\t0x1001585a8\t\tcb060089\t\tSUB R6, R4, R9\t\t\t\t\t\t\n  pack.go:245\t\t0x1001585ac\t\tcb0903ea\t\tNEG R9, R10\t\t\t\t\t\t\n  pack.go:245\t\t0x1001585b0\t\t8a8afcca\t\tAND R10->63, R6, R10\t\t\t\t\t\n  pack.go:245\t\t0x1001585b4\t\tcb0600a5\t\tSUB R6, R5, R5\t\t\t\t\t\t\n  pack.go:245\t\t0x1001585b8\t\t8b0a0068\t\tADD R10, R3, R8\t\t\t\t\t\t\n  pack.go:236\t\t0x1001585bc\t\taa0903e6\t\tMOVD R9, R6\t\t\t\t\t\t\n  pack.go:246\t\t0x1001585c0\t\t17ffff5a\t\tJMP -166(PC)\t\t\t\t\t\t\n  pack.go:245\t\t0x1001585c4\t\taa0603e0\t\tMOVD R6, R0\t\t\t\t\t\t\n  pack.go:245\t\t0x1001585c8\t\taa0503e1\t\tMOVD R5, R1\t\t\t\t\t\t\n  pack.go:245\t\t0x1001585cc\t\t97fc7ffd\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\n  pack.go:179\t\t0x1001585d0\t\t91002108\t\tADD $8, R8, R8\t\t\t\t\t\t\n  pack.go:174\t\t0x1001585d4\t\tcb0800a9\t\tSUB R8, R5, R9\t\t\t\t\t\t\n  pack.go:174\t\t0x1001585d8\t\td1000929\t\tSUB $2, R9, R9\t\t\t\t\t\t\n  pack.go:174\t\t0x1001585dc\t\tf100213f\t\tCMP $8, R9\t\t\t\t\t\t\n  pack.go:174\t\t0x1001585e0\t\t540001eb\t\tBLT 15(PC)\t\t\t\t\t\t\n  pack.go:175\t\t0x1001585e4\t\teb07011f\t\tCMP R7, R8\t\t\t\t\t\t\n  pack.go:175\t\t0x1001585e8\t\t540002e8\t\tBHI 23(PC)\t\t\t\t\t\t\n  pack.go:175\t\t0x1001585ec\t\tcb080089\t\tSUB R8, R4, R9\t\t\t\t\t\t\n  pack.go:175\t\t0x1001585f0\t\td1000929\t\tSUB $2, R9, R9\t\t\t\t\t\t\n  pack.go:175\t\t0x1001585f4\t\tcb0903e9\t\tNEG R9, R9\t\t\t\t\t\t\n  pack.go:175\t\t0x1001585f8\t\t8a89fd09\t\tAND R9->63, R8, R9\t\t\t\t\t\n  binary.go:117\t\t0x1001585fc\t\tf86968c9\t\tMOVD (R6)(R9), R9\t\t\t\t\t\n  pack.go:176\t\t0x100158600\t\tb4fffe89\t\tCBZ R9, -12(PC)\t\t\t\t\t\t\n  pack.go:177\t\t0x100158604\t\tdac00126\t\tRBIT R9, R6\t\t\t\t\t\t\n  pack.go:177\t\t0x100158608\t\tdac010c6\t\tCLZ R6, R6\t\t\t\t\t\t\n  pack.go:177\t\t0x10015860c\t\t8b460d06\t\tADD R6>>3, R8, R6\t\t\t\t\t\n  pack.go:241\t\t0x100158610\t\taa0603e8\t\tMOVD R6, R8\t\t\t\t\t\t\n  pack.go:241\t\t0x100158614\t\t14000007\t\tJMP 7(PC)\t\t\t\t\t\t\n  pack.go:182\t\t0x100158618\t\t91000508\t\tADD $1, R8, R8\t\t\t\t\t\t\n  pack.go:181\t\t0x10015861c\t\teb07011f\t\tCMP R7, R8\t\t\t\t\t\t\n  pack.go:181\t\t0x100158620\t\t5400008a\t\tBGE 4(PC)\t\t\t\t\t\t\n  pack.go:181\t\t0x100158624\t\t540000a2\t\tBCS 5(PC)\t\t\t\t\t\t\n  pack.go:181\t\t0x100158628\t\t386868c9\t\tMOVBU (R6)(R8), R9\t\t\t\t\t\n  pack.go:181\t\t0x10015862c\t\t34ffff69\t\tCBZW R9, -5(PC)\t\t\t\t\t\t\n  pack.go:241\t\t0x100158630\t\t91000906\t\tADD $2, R8, R6\t\t\t\t\t\t\n  pack.go:241\t\t0x100158634\t\t17ffffda\t\tJMP -38(PC)\t\t\t\t\t\t\n  pack.go:181\t\t0x100158638\t\taa0803e0\t\tMOVD R8, R0\t\t\t\t\t\t\n  pack.go:181\t\t0x10015863c\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\n  pack.go:181\t\t0x100158640\t\t97fc7fc8\t\tCALL runtime.panicIndex(SB)\t\t\t\t\n  pack.go:175\t\t0x100158644\t\taa0803e0\t\tMOVD R8, R0\t\t\t\t\t\t\n  pack.go:175\t\t0x100158648\t\taa0703e1\t\tMOVD R7, R1\t\t\t\t\t\t\n  pack.go:175\t\t0x10015864c\t\t97fc7fdd\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\n  pack.go:229\t\t0x100158650\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\n  pack.go:229\t\t0x100158654\t\tf940e363\t\tMOVD 448(R27), R3\t\t\t\t\t\n  pack.go:229\t\t0x100158658\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\n  pack.go:229\t\t0x10015865c\t\tf940e764\t\tMOVD 456(R27), R4\t\t\t\t\t\n  pack.go:229\t\t0x100158660\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\n  pack.go:229\t\t0x100158664\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\n  pack.go:229\t\t0x100158668\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\n  pack.go:229\t\t0x10015866c\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\n  pack.go:229\t\t0x100158670\t\tf84707fe\t\tMOVD.P 112(RSP), R30\t\t\t\t\t\n  pack.go:229\t\t0x100158674\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\n  pack.go:226\t\t0x100158678\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\n  pack.go:226\t\t0x10015867c\t\tf9411b63\t\tMOVD 560(R27), R3\t\t\t\t\t\n  pack.go:226\t\t0x100158680\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\n  pack.go:226\t\t0x100158684\t\tf9411f64\t\tMOVD 568(R27), R4\t\t\t\t\t\n  pack.go:226\t\t0x100158688\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\n  pack.go:226\t\t0x10015868c\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\n  pack.go:226\t\t0x100158690\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\n  pack.go:226\t\t0x100158694\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\n  pack.go:226\t\t0x100158698\t\tf84707fe\t\tMOVD.P 112(RSP), R30\t\t\t\t\t\n  pack.go:226\t\t0x10015869c\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\n  pack.go:232\t\t0x1001586a0\t\taa0903e0\t\tMOVD R9, R0\t\t\t\t\t\t\n  pack.go:232\t\t0x1001586a4\t\t97fc7fc7\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\n  pack.go:225\t\t0x1001586a8\t\taa0903ea\t\tMOVD R9, R10\t\t\t\t\t\t\n  pack.go:225\t\t0x1001586ac\t\taa0803e9\t\tMOVD R8, R9\t\t\t\t\t\t\n  pack.go:228\t\t0x1001586b0\t\taa0a03e8\t\tMOVD R10, R8\t\t\t\t\t\t\n  pack.go:228\t\t0x1001586b4\t\t17fffef0\t\tJMP -272(PC)\t\t\t\t\t\t\n  pack.go:179\t\t0x1001586b8\t\t9100218c\t\tADD $8, R12, R12\t\t\t\t\t\n  pack.go:174\t\t0x1001586bc\t\tcb0c012d\t\tSUB R12, R9, R13\t\t\t\t\t\n  pack.go:174\t\t0x1001586c0\t\td10009ad\t\tSUB $2, R13, R13\t\t\t\t\t\n  pack.go:174\t\t0x1001586c4\t\tf10021bf\t\tCMP $8, R13\t\t\t\t\t\t\n  pack.go:174\t\t0x1001586c8\t\t540001eb\t\tBLT 15(PC)\t\t\t\t\t\t\n  pack.go:175\t\t0x1001586cc\t\teb0b019f\t\tCMP R11, R12\t\t\t\t\t\t\n  pack.go:175\t\t0x1001586d0\t\t540004c8\t\tBHI 38(PC)\t\t\t\t\t\t\n  pack.go:175\t\t0x1001586d4\t\tcb0c004d\t\tSUB R12, R2, R13\t\t\t\t\t\n  pack.go:175\t\t0x1001586d8\t\td10009ad\t\tSUB $2, R13, R13\t\t\t\t\t\n  pack.go:175\t\t0x1001586dc\t\tcb0d03ed\t\tNEG R13, R13\t\t\t\t\t\t\n  pack.go:175\t\t0x1001586e0\t\t8a8dfd8d\t\tAND R13->63, R12, R13\t\t\t\t\t\n  binary.go:117\t\t0x1001586e4\t\tf86d694d\t\tMOVD (R10)(R13), R13\t\t\t\t\t\n  pack.go:176\t\t0x1001586e8\t\tb4fffe8d\t\tCBZ R13, -12(PC)\t\t\t\t\t\n  pack.go:177\t\t0x1001586ec\t\tdac001a9\t\tRBIT R13, R9\t\t\t\t\t\t\n  pack.go:177\t\t0x1001586f0\t\tdac01129\t\tCLZ R9, R9\t\t\t\t\t\t\n  pack.go:177\t\t0x1001586f4\t\t8b490d89\t\tADD R9>>3, R12, R9\t\t\t\t\t\n  pack.go:210\t\t0x1001586f8\t\taa0903ec\t\tMOVD R9, R12\t\t\t\t\t\t\n  pack.go:210\t\t0x1001586fc\t\t14000007\t\tJMP 7(PC)\t\t\t\t\t\t\n  pack.go:182\t\t0x100158700\t\t9100058c\t\tADD $1, R12, R12\t\t\t\t\t\n  pack.go:181\t\t0x100158704\t\teb0b019f\t\tCMP R11, R12\t\t\t\t\t\t\n  pack.go:181\t\t0x100158708\t\t5400008a\t\tBGE 4(PC)\t\t\t\t\t\t\n  pack.go:181\t\t0x10015870c\t\t54000282\t\tBCS 20(PC)\t\t\t\t\t\t\n  pack.go:181\t\t0x100158710\t\t386c6949\t\tMOVBU (R10)(R12), R9\t\t\t\t\t\n  pack.go:181\t\t0x100158714\t\t34ffff69\t\tCBZW R9, -5(PC)\t\t\t\t\t\t\n  pack.go:210\t\t0x100158718\t\t91000989\t\tADD $2, R12, R9\t\t\t\t\t\t\n  pack.go:211\t\t0x10015871c\t\teb880d3f\t\tCMP R8->3, R9\t\t\t\t\t\t\n  pack.go:211\t\t0x100158720\t\t540000ac\t\tBGT 5(PC)\t\t\t\t\t\t\n  pack.go:214\t\t0x100158724\t\td37df12a\t\tLSL $3, R9, R10\t\t\t\t\t\t\n  pack.go:225\t\t0x100158728\t\taa0903e8\t\tMOVD R9, R8\t\t\t\t\t\t\n  pack.go:228\t\t0x10015872c\t\taa0a03e9\t\tMOVD R10, R9\t\t\t\t\t\t\n  pack.go:214\t\t0x100158730\t\t17ffffde\t\tJMP -34(PC)\t\t\t\t\t\t\n  pack.go:212\t\t0x100158734\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\n  pack.go:212\t\t0x100158738\t\tf940e363\t\tMOVD 448(R27), R3\t\t\t\t\t\n  pack.go:212\t\t0x10015873c\t\td0001b7b\t\tADRP 3596288(PC), R27\t\t\t\t\t\n  pack.go:212\t\t0x100158740\t\tf940e764\t\tMOVD 456(R27), R4\t\t\t\t\t\n  pack.go:212\t\t0x100158744\t\taa1f03e0\t\tMOVD ZR, R0\t\t\t\t\t\t\n  pack.go:212\t\t0x100158748\t\taa1f03e1\t\tMOVD ZR, R1\t\t\t\t\t\t\n  pack.go:212\t\t0x10015874c\t\taa0103e2\t\tMOVD R1, R2\t\t\t\t\t\t\n  pack.go:212\t\t0x100158750\t\tf85f83fd\t\tMOVD -8(RSP), R29\t\t\t\t\t\n  pack.go:212\t\t0x100158754\t\tf84707fe\t\tMOVD.P 112(RSP), R30\t\t\t\t\t\n  pack.go:212\t\t0x100158758\t\td65f03c0\t\tRET\t\t\t\t\t\t\t\n  pack.go:181\t\t0x10015875c\t\taa0c03e0\t\tMOVD R12, R0\t\t\t\t\t\t\n  pack.go:181\t\t0x100158760\t\taa0b03e1\t\tMOVD R11, R1\t\t\t\t\t\t\n  pack.go:181\t\t0x100158764\t\t97fc7f7f\t\tCALL runtime.panicIndex(SB)\t\t\t\t\n  pack.go:175\t\t0x100158768\t\taa0c03e0\t\tMOVD R12, R0\t\t\t\t\t\t\n  pack.go:175\t\t0x10015876c\t\taa0b03e1\t\tMOVD R11, R1\t\t\t\t\t\t\n  pack.go:175\t\t0x100158770\t\t97fc7f94\t\tCALL runtime.panicSliceB(SB)\t\t\t\t\n  pack.go:210\t\t0x100158774\t\taa0903e1\t\tMOVD R9, R1\t\t\t\t\t\t\n  pack.go:210\t\t0x100158778\t\t97fc7f8a\t\tCALL runtime.panicSliceAcap(SB)\t\t\t\t\n  pack.go:210\t\t0x10015877c\t\td503201f\t\tNOOP\t\t\t\t\t\t\t\n  pack.go:193\t\t0x100158780\t\ta90087e0\t\tSTP (R0, R1), 8(RSP)\t\t\t\t\t\n  pack.go:193\t\t0x100158784\t\ta9018fe2\t\tSTP (R2, R3), 24(RSP)\t\t\t\t\t\n  pack.go:193\t\t0x100158788\t\taa1e03e3\t\tMOVD R30, R3\t\t\t\t\t\t\n  pack.go:193\t\t0x10015878c\t\t97fc761d\t\tCALL runtime.morestack_noctxt.abi0(SB)\t\t\t\n  pack.go:193\t\t0x100158790\t\ta94087e0\t\tLDP 8(RSP), (R0, R1)\t\t\t\t\t\n  pack.go:193\t\t0x100158794\t\ta9418fe2\t\tLDP 24(RSP), (R2, R3)\t\t\t\t\t\n  pack.go:193\t\t0x100158798\t\t17fffe6a\t\tJMP github.com/cnooljaw/gosproto.UnpackWithLimit(SB)\t\n  pack.go:193\t\t0x10015879c\t\t00000000\t\t?\t\t\t\t\t\t\t\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkPairUnpackReview$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 3.306172624230385,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkPairUnpackReview/addressbook/sproto_unpack         \t  765936\t       162.0 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/addressbook/sproto_pdecode        \t  102470\t      1169 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_unpack          \t   25874\t      4809 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_pdecode         \t    8006\t     17663 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_unpack         \t   24372\t      4912 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_pdecode        \t   19006\t      9323 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkPairUnpackReview/zero32                            \t 3978516\t        30.15 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii32                           \t 4574506\t        25.90 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/zero4096                          \t  223765\t       537.0 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii4096                         \t  234710\t       642.8 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero1x256                      \t  108562\t      1148 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero2x256                      \t   93730\t      1270 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero3x256                      \t   82137\t      1427 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero4x256                      \t   75441\t      1551 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero5x256                      \t   68762\t      1763 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero6x256                      \t   59887\t      2036 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero7x256                      \t   53290\t      2232 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single1                           \t 6928738\t        17.54 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single3                           \t 6487420\t        19.06 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single7                           \t 5917195\t        21.42 ns/op\t       8 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkPairUnpackReview$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 3.1712267491966486,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkPairUnpackReview/addressbook/sproto_unpack         \t  816394\t       170.6 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/addressbook/sproto_pdecode        \t  101642\t      1158 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_unpack          \t   26278\t      4560 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_pdecode         \t    7849\t     16842 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_unpack         \t   24488\t      4948 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_pdecode        \t   19302\t      6243 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkPairUnpackReview/zero32                            \t 4160196\t        28.79 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii32                           \t 4626698\t        25.83 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/zero4096                          \t  176047\t       630.1 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii4096                         \t  249229\t       510.4 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero1x256                      \t  107685\t      1135 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero2x256                      \t   94579\t      1348 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero3x256                      \t   76356\t      1494 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero4x256                      \t   74236\t      1668 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero5x256                      \t   65500\t      1843 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero6x256                      \t   59373\t      2003 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero7x256                      \t   53223\t      2210 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single1                           \t 6743856\t        17.66 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single3                           \t 6493154\t        20.89 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single7                           \t 5962053\t        21.05 ns/op\t       8 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkPairUnpackReview$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 2.928155915811658,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkPairUnpackReview/addressbook/sproto_unpack         \t  801736\t       164.9 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/addressbook/sproto_pdecode        \t  102860\t      1138 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_unpack          \t   26091\t      4555 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_pdecode         \t    8233\t     16811 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_unpack         \t   24614\t      5421 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_pdecode        \t   17450\t      6388 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkPairUnpackReview/zero32                            \t 4190632\t        28.88 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii32                           \t 4578448\t        25.60 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/zero4096                          \t  216992\t       542.0 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii4096                         \t  251745\t       479.0 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero1x256                      \t  105025\t      1321 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero2x256                      \t   91804\t      1312 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero3x256                      \t   73399\t      1826 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero4x256                      \t   69295\t      1677 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero5x256                      \t   66742\t      1848 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero6x256                      \t   61694\t      2008 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero7x256                      \t   56601\t      2180 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single1                           \t 7052150\t        17.63 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single3                           \t 6467520\t        18.99 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single7                           \t 5981071\t        20.52 ns/op\t       8 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkPairUnpackReview$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 3.008810957893729,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkPairUnpackReview/addressbook/sproto_unpack         \t  803548\t       164.5 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/addressbook/sproto_pdecode        \t  103114\t      1146 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_unpack          \t   26194\t      4601 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_pdecode         \t    8404\t     17204 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_unpack         \t   24560\t      6147 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_pdecode        \t   18823\t      6166 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkPairUnpackReview/zero32                            \t 4149992\t        28.35 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii32                           \t 4720126\t        25.55 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/zero4096                          \t  227005\t       540.1 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii4096                         \t  232053\t       495.6 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero1x256                      \t  104311\t      1143 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero2x256                      \t   95373\t      1298 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero3x256                      \t   86924\t      2245 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero4x256                      \t   66822\t      1717 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero5x256                      \t   64286\t      1822 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero6x256                      \t   60231\t      2017 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero7x256                      \t   53431\t      2225 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single1                           \t 7042838\t        17.23 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single3                           \t 6519376\t        22.87 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single7                           \t 6087237\t        20.40 ns/op\t       8 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkPairUnpackReview$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 2.9380462504923344,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkPairUnpackReview/addressbook/sproto_unpack         \t  758773\t       163.1 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/addressbook/sproto_pdecode        \t  102915\t      1182 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_unpack          \t   26575\t      4611 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_pdecode         \t    7957\t     16929 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_unpack         \t   24474\t      4928 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_pdecode        \t   19334\t      6230 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkPairUnpackReview/zero32                            \t 4139863\t        28.95 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii32                           \t 4654026\t        25.71 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/zero4096                          \t  226972\t       533.9 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii4096                         \t  240300\t       485.4 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero1x256                      \t   98214\t      1232 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero2x256                      \t   72066\t      1830 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero3x256                      \t   55834\t      2785 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero4x256                      \t   59672\t      1943 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero5x256                      \t   60939\t      1982 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero6x256                      \t   52534\t      2264 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero7x256                      \t   49562\t      2411 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single1                           \t 6821152\t        17.74 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single3                           \t 6620810\t        18.83 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single7                           \t 6062047\t        20.64 ns/op\t       8 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkPairUnpackReview$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 2.986514251679182,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkPairUnpackReview/addressbook/sproto_unpack         \t  819835\t       167.4 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/addressbook/sproto_pdecode        \t  103467\t      1157 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_unpack          \t   25912\t      4588 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_pdecode         \t    7762\t     17052 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_unpack         \t   24428\t      4936 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_pdecode        \t   19117\t      6228 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkPairUnpackReview/zero32                            \t 3894546\t        28.67 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii32                           \t 4575974\t        26.22 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/zero4096                          \t  239604\t       527.8 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii4096                         \t  245748\t       470.7 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero1x256                      \t  108799\t      1129 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero2x256                      \t   90456\t      1315 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero3x256                      \t   81081\t      1473 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero4x256                      \t   71276\t      1681 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero5x256                      \t   64314\t      1821 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero6x256                      \t   60073\t      2012 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero7x256                      \t   53582\t      2193 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single1                           \t 7493656\t        16.79 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single3                           \t 6443716\t        18.93 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single7                           \t 6007233\t        20.60 ns/op\t       8 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkPairUnpackReview$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 3.072558084502816,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkPairUnpackReview/addressbook/sproto_unpack         \t  809602\t       192.4 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/addressbook/sproto_pdecode        \t  105762\t      1143 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_unpack          \t   26499\t      4566 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_pdecode         \t    8054\t     17052 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_unpack         \t   24622\t      4939 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_pdecode        \t   19255\t      6372 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkPairUnpackReview/zero32                            \t 4134283\t        29.04 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii32                           \t 4554201\t        26.18 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/zero4096                          \t  230880\t       539.7 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii4096                         \t  237352\t       485.6 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero1x256                      \t  110287\t      1124 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero2x256                      \t   87366\t      1414 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero3x256                      \t   82480\t      1512 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero4x256                      \t   72115\t      2169 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero5x256                      \t   66583\t      1867 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero6x256                      \t   59750\t      2063 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero7x256                      \t   53454\t      2253 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single1                           \t 7041082\t        17.52 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single3                           \t 6432720\t        19.09 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single7                           \t 6527517\t        23.83 ns/op\t       8 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkPairUnpackReview$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 3.035024417564273,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkPairUnpackReview/addressbook/sproto_unpack         \t  879147\t       156.6 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/addressbook/sproto_pdecode        \t  106988\t      1128 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_unpack          \t   26175\t      4551 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_pdecode         \t    8205\t     17591 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_unpack         \t   26540\t      4657 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_pdecode        \t   18894\t      6450 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkPairUnpackReview/zero32                            \t 4388304\t        27.72 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii32                           \t 4694382\t        25.57 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/zero4096                          \t  224625\t       511.1 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii4096                         \t  246477\t       620.3 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero1x256                      \t  106336\t      1146 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero2x256                      \t   92935\t      1311 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero3x256                      \t   81098\t      1463 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero4x256                      \t   71950\t      1647 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero5x256                      \t   69478\t      1713 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero6x256                      \t   64780\t      2101 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero7x256                      \t   54016\t      2210 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single1                           \t 7102237\t        17.43 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single3                           \t 6542778\t        20.61 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single7                           \t 5934411\t        20.56 ns/op\t       8 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkPairUnpackReview$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 3.0460677910596132,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkPairUnpackReview/addressbook/sproto_unpack         \t  746092\t       209.1 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/addressbook/sproto_pdecode        \t  101998\t      1166 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_unpack          \t   26148\t      4565 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_pdecode         \t    8083\t     17023 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_unpack         \t   24584\t      4917 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_pdecode        \t   19028\t      5712 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkPairUnpackReview/zero32                            \t 4507648\t        27.26 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii32                           \t 5199888\t        25.19 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/zero4096                          \t  227353\t       520.9 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii4096                         \t  243538\t       471.6 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero1x256                      \t  109626\t      1078 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero2x256                      \t   90603\t      1773 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero3x256                      \t   75548\t      1535 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero4x256                      \t   70369\t      1660 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero5x256                      \t   53354\t      2477 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero6x256                      \t   60472\t      2013 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero7x256                      \t   54087\t      2231 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single1                           \t 6901509\t        17.93 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single3                           \t 6021891\t        19.22 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single7                           \t 6062901\t        20.64 ns/op\t       8 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkPairUnpackReview$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 2.960202833637595,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkPairUnpackReview/addressbook/sproto_unpack         \t  878209\t       166.3 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/addressbook/sproto_pdecode        \t   98388\t      1153 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_unpack          \t   26221\t      4609 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_pdecode         \t    8662\t     17023 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_unpack         \t   24121\t      4933 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_pdecode        \t   19002\t      6238 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkPairUnpackReview/zero32                            \t 4146516\t        31.59 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii32                           \t 4566390\t        32.59 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/zero4096                          \t  214040\t       539.0 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii4096                         \t  232676\t       484.6 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero1x256                      \t   96558\t      1285 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero2x256                      \t   73813\t      1717 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero3x256                      \t   61184\t      2016 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero4x256                      \t   60496\t      1982 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero5x256                      \t   56752\t      2053 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero6x256                      \t   52611\t      2288 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero7x256                      \t   48694\t      2441 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single1                           \t 7049406\t        17.60 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single3                           \t 6445086\t        19.05 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single7                           \t 6119026\t        20.45 ns/op\t       8 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkPairUnpackReview$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 3.0840519163757563,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkPairUnpackReview/addressbook/sproto_unpack         \t  787551\t       166.8 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/addressbook/sproto_pdecode        \t  102852\t      1195 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_unpack          \t   26554\t      6716 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_pdecode         \t    8256\t     16858 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_unpack         \t   24115\t      4973 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_pdecode        \t   17619\t      6290 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkPairUnpackReview/zero32                            \t 4206498\t        29.38 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii32                           \t 4414658\t        26.12 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/zero4096                          \t  226794\t       542.5 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii4096                         \t  238596\t       484.6 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero1x256                      \t  106357\t      1123 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero2x256                      \t   94880\t      1283 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero3x256                      \t   82099\t      1469 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero4x256                      \t   73022\t      1670 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero5x256                      \t   63836\t      1823 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero6x256                      \t   59737\t      2600 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero7x256                      \t   53739\t      2184 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single1                           \t 6866722\t        17.38 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single3                           \t 6474484\t        19.16 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single7                           \t 6056450\t        20.66 ns/op\t       8 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkPairUnpackReview$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 2.9008692912757397,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkPairUnpackReview/addressbook/sproto_unpack         \t  786090\t       166.0 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/addressbook/sproto_pdecode        \t  106377\t      1140 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_unpack          \t   25813\t      4571 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_pdecode         \t    8011\t     16894 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_unpack         \t   24157\t      4945 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_pdecode        \t   19077\t      6243 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkPairUnpackReview/zero32                            \t 4130198\t        27.83 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii32                           \t 4556904\t        25.99 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/zero4096                          \t  230390\t       535.0 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii4096                         \t  237526\t       689.1 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero1x256                      \t  106489\t      1144 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero2x256                      \t   93232\t      1295 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero3x256                      \t   81518\t      1382 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero4x256                      \t   71586\t      1655 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero5x256                      \t   65520\t      1837 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero6x256                      \t   59254\t      2020 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero7x256                      \t   53794\t      2215 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single1                           \t 6911479\t        16.66 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single3                           \t 6502626\t        19.44 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single7                           \t 4747962\t        21.22 ns/op\t       8 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkPairUnpackReview$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 3.0702128764241934,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkPairUnpackReview/addressbook/sproto_unpack         \t  763479\t       161.8 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/addressbook/sproto_pdecode        \t  103578\t      1137 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_unpack          \t   26158\t      4596 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_pdecode         \t    8094\t     16890 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_unpack         \t   26503\t      4951 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_pdecode        \t   19092\t      6200 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkPairUnpackReview/zero32                            \t 4153350\t        29.15 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii32                           \t 4502925\t        26.46 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/zero4096                          \t  229359\t       535.5 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii4096                         \t  237126\t       694.3 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero1x256                      \t  105752\t      1151 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero2x256                      \t   91707\t      1317 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero3x256                      \t   82530\t      1466 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero4x256                      \t   73850\t      1668 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero5x256                      \t   64642\t      1833 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero6x256                      \t   58832\t      2049 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero7x256                      \t   53875\t      2220 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single1                           \t 7013578\t        21.75 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single3                           \t 6452710\t        19.34 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single7                           \t 5966338\t        20.65 ns/op\t       8 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/B.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkPairUnpackReview$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/B-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 3.3888712506741285,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkPairUnpackReview/addressbook/sproto_unpack         \t  811656\t       164.5 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/addressbook/sproto_pdecode        \t  103516\t      1138 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_unpack          \t   27296\t      4508 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_pdecode         \t    9109\t     16900 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_unpack         \t   24736\t      4857 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_pdecode        \t   19438\t      6264 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkPairUnpackReview/zero32                            \t 4136961\t        28.87 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii32                           \t 4582432\t        23.91 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/zero4096                          \t  230654\t      1051 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii4096                         \t  225367\t       546.0 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero1x256                      \t  105085\t      1135 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero2x256                      \t   90076\t      1320 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero3x256                      \t   80749\t      1446 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero4x256                      \t   73957\t      1620 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero5x256                      \t   66994\t      1800 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero6x256                      \t   61972\t      1984 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero7x256                      \t   55692\t      2163 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single1                           \t 6963265\t        17.53 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single3                           \t 6786770\t        18.25 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single7                           \t 5860316\t        21.50 ns/op\t       8 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/B.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkPairUnpackReview$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/B-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 3.0794957503676414,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkPairUnpackReview/addressbook/sproto_unpack         \t  867966\t       163.7 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/addressbook/sproto_pdecode        \t  105896\t      1141 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_unpack          \t   27036\t      9063 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_pdecode         \t    8022\t     18637 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_unpack         \t   25141\t      4863 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_pdecode        \t   19353\t      6161 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkPairUnpackReview/zero32                            \t 4160124\t        28.63 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii32                           \t 4660125\t        25.95 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/zero4096                          \t  226533\t       524.3 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii4096                         \t  240123\t       490.8 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero1x256                      \t  108324\t      1141 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero2x256                      \t   86858\t      1348 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero3x256                      \t   81097\t      1488 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero4x256                      \t   73792\t      1625 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero5x256                      \t   68582\t      1801 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero6x256                      \t   60034\t      2011 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero7x256                      \t   57955\t      3011 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single1                           \t 6971761\t        17.64 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single3                           \t 6597967\t        18.36 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single7                           \t 5632028\t        21.82 ns/op\t       8 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkPairUnpackReview$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 2.988371543586254,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkPairUnpackReview/addressbook/sproto_unpack         \t  844474\t       165.6 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/addressbook/sproto_pdecode        \t  103714\t      1151 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_unpack          \t   28189\t      5325 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_pdecode         \t    7729\t     16961 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_unpack         \t   24363\t      4973 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_pdecode        \t   19060\t      6277 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkPairUnpackReview/zero32                            \t 4169911\t        28.47 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii32                           \t 4609510\t        25.83 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/zero4096                          \t  217092\t       531.8 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii4096                         \t  247815\t       503.8 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero1x256                      \t  109845\t      1549 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero2x256                      \t   89950\t      1305 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero3x256                      \t   81714\t      1471 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero4x256                      \t   71672\t      1637 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero5x256                      \t   66783\t      1831 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero6x256                      \t   59197\t      2025 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero7x256                      \t   53689\t      2216 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single1                           \t 7300435\t        22.69 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single3                           \t 6421690\t        17.98 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single7                           \t 5894862\t        20.73 ns/op\t       8 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/B.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkPairUnpackReview$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/B-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 2.9749320410192013,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkPairUnpackReview/addressbook/sproto_unpack         \t  860857\t       162.3 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/addressbook/sproto_pdecode        \t  105060\t      1103 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_unpack          \t   26719\t      4449 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_pdecode         \t    8182\t     16798 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_unpack         \t   24717\t      6019 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_pdecode        \t   19639\t      6199 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkPairUnpackReview/zero32                            \t 4142686\t        28.09 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii32                           \t 4620826\t        25.95 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/zero4096                          \t  223395\t       538.4 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii4096                         \t  238894\t       488.9 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero1x256                      \t  106670\t      1126 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero2x256                      \t   90916\t      1302 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero3x256                      \t   89792\t      1436 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero4x256                      \t   76725\t      1615 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero5x256                      \t   65301\t      1808 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero6x256                      \t   60938\t      1984 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero7x256                      \t   58746\t      2568 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single1                           \t 7312020\t        17.25 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single3                           \t 6655803\t        22.80 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single7                           \t 5835664\t        21.33 ns/op\t       8 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkPairUnpackReview$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 2.951495625078678,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkPairUnpackReview/addressbook/sproto_unpack         \t  844821\t       164.7 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/addressbook/sproto_pdecode        \t  102120\t      1151 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_unpack          \t   26413\t      4564 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_pdecode         \t    8048\t     17111 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_unpack         \t   24826\t      4919 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_pdecode        \t   19122\t      6270 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkPairUnpackReview/zero32                            \t 4145834\t        28.70 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii32                           \t 4676067\t        26.22 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/zero4096                          \t  244831\t       525.4 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii4096                         \t  231391\t       500.6 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero1x256                      \t  104541\t      1122 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero2x256                      \t   89556\t      1350 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero3x256                      \t   80763\t      1963 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero4x256                      \t   71073\t      1665 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero5x256                      \t   67886\t      1832 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero6x256                      \t   62055\t      2011 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero7x256                      \t   53834\t      2260 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single1                           \t 7135635\t        17.55 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single3                           \t 7355796\t        18.61 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single7                           \t 5945143\t        20.61 ns/op\t       8 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkPairUnpackReview$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 3.2319574169814587,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkPairUnpackReview/addressbook/sproto_unpack         \t  837256\t       165.9 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/addressbook/sproto_pdecode        \t  104667\t      1142 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_unpack          \t   27021\t      4602 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_pdecode         \t    8143\t     16597 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_unpack         \t   24129\t      4935 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_pdecode        \t   19328\t      6204 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkPairUnpackReview/zero32                            \t 3045249\t        42.30 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii32                           \t 4591162\t        25.97 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/zero4096                          \t  222462\t       566.1 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii4096                         \t  200469\t       564.7 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero1x256                      \t  104782\t      1144 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero2x256                      \t   88132\t      1307 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero3x256                      \t   75940\t      1536 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero4x256                      \t   70695\t      1672 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero5x256                      \t   66136\t      1928 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero6x256                      \t   59458\t      2040 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero7x256                      \t   53098\t      2318 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single1                           \t 6338557\t        18.36 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single3                           \t 6392427\t        19.24 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single7                           \t 6277024\t        30.38 ns/op\t       8 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/B.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkPairUnpackReview$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/B-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 3.420803915709257,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkPairUnpackReview/addressbook/sproto_unpack         \t  826446\t       168.1 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/addressbook/sproto_pdecode        \t  102632\t      4558 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_unpack          \t   26798\t      4417 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_pdecode         \t    8034\t     16728 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_unpack         \t   24958\t      4817 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_pdecode        \t   19104\t      6174 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkPairUnpackReview/zero32                            \t 4215487\t        29.55 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii32                           \t 4669298\t        26.05 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/zero4096                          \t  224590\t       523.1 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii4096                         \t  234765\t       725.0 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero1x256                      \t  106026\t      1158 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero2x256                      \t   88320\t      1383 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero3x256                      \t   79748\t      1512 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero4x256                      \t   74329\t      1623 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero5x256                      \t   68490\t      1816 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero6x256                      \t   63616\t      1941 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero7x256                      \t   56062\t      2154 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single1                           \t 6235060\t        19.76 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single3                           \t 6654066\t        21.82 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single7                           \t 5171150\t        22.28 ns/op\t       8 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkPairUnpackReview$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 3.0280577912926674,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkPairUnpackReview/addressbook/sproto_unpack         \t  855996\t       168.1 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/addressbook/sproto_pdecode        \t  100873\t      1143 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_unpack          \t   26287\t      4455 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_pdecode         \t    8071\t     17886 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_unpack         \t   24141\t      4952 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_pdecode        \t   19118\t      6142 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkPairUnpackReview/zero32                            \t 4026141\t        29.38 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii32                           \t 4624365\t        25.77 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/zero4096                          \t  227539\t       529.5 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii4096                         \t  231295\t       494.2 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero1x256                      \t  106210\t      1137 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero2x256                      \t   89713\t      1367 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero3x256                      \t   79747\t      1492 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero4x256                      \t   71542\t      1679 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero5x256                      \t   65020\t      1849 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero6x256                      \t   58842\t      2054 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero7x256                      \t   53155\t      2228 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single1                           \t 6976354\t        22.70 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single3                           \t 6402660\t        19.25 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single7                           \t 5911208\t        20.28 ns/op\t       8 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/B.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkPairUnpackReview$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/B-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 3.0954473335295916,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkPairUnpackReview/addressbook/sproto_unpack         \t  875592\t       164.5 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/addressbook/sproto_pdecode        \t  101180\t      1147 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_unpack          \t   26432\t      4463 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_pdecode         \t    7989\t     17075 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_unpack         \t   25408\t      4904 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_pdecode        \t   20919\t      5971 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkPairUnpackReview/zero32                            \t 4216165\t        28.63 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii32                           \t 4454734\t        26.10 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/zero4096                          \t  234050\t       540.8 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii4096                         \t  237531\t       467.9 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero1x256                      \t  110781\t      3016 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero2x256                      \t   85081\t      1413 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero3x256                      \t   81526\t      1428 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero4x256                      \t   76737\t      1651 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero5x256                      \t   66289\t      1805 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero6x256                      \t   59086\t      2012 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero7x256                      \t   55233\t      2172 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single1                           \t 6864906\t        18.18 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single3                           \t 6534241\t        18.21 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single7                           \t 5760621\t        20.89 ns/op\t       8 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/B.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkPairUnpackReview$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/B-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 3.0780632495880127,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkPairUnpackReview/addressbook/sproto_unpack         \t  877086\t       159.3 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/addressbook/sproto_pdecode        \t  103110\t      1138 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_unpack          \t   26834\t      4504 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_pdecode         \t    7864\t     16685 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_unpack         \t   24666\t      5345 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_pdecode        \t   19173\t      6140 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkPairUnpackReview/zero32                            \t 4077194\t        28.68 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii32                           \t 4690255\t        25.97 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/zero4096                          \t  233980\t       531.7 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii4096                         \t  200990\t       498.5 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero1x256                      \t  105224\t      1146 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero2x256                      \t   84996\t      1429 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero3x256                      \t   84426\t      1465 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero4x256                      \t   74164\t      1616 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero5x256                      \t   71709\t      1761 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero6x256                      \t   64359\t      2123 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero7x256                      \t   57685\t      2261 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single1                           \t 6987610\t        17.40 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single3                           \t 6974074\t        25.69 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single7                           \t 5645431\t        21.80 ns/op\t       8 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkPairUnpackReview$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 3.052149249240756,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkPairUnpackReview/addressbook/sproto_unpack         \t  796812\t       167.6 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/addressbook/sproto_pdecode        \t  102619\t      1162 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_unpack          \t   26330\t      4560 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_pdecode         \t    7869\t     19393 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_unpack         \t   23001\t      5098 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_pdecode        \t   18919\t      6256 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkPairUnpackReview/zero32                            \t 4225760\t        28.94 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii32                           \t 4723610\t        26.00 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/zero4096                          \t  231745\t       533.2 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii4096                         \t  239589\t       471.8 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero1x256                      \t  111228\t      1142 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero2x256                      \t   90457\t      1335 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero3x256                      \t   82548\t      1991 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero4x256                      \t   71506\t      1654 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero5x256                      \t   64608\t      1823 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero6x256                      \t   58725\t      2007 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero7x256                      \t   55708\t      2200 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single1                           \t 7641243\t        17.66 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single3                           \t 6463238\t        18.81 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single7                           \t 6106248\t        20.41 ns/op\t       8 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkPairUnpackReview$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 3.044088499620557,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkPairUnpackReview/addressbook/sproto_unpack         \t  765326\t       166.0 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/addressbook/sproto_pdecode        \t  102376\t      1135 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_unpack          \t   25768\t      4536 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_pdecode         \t    8635\t     17081 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_unpack         \t   24375\t      4784 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_pdecode        \t   18264\t      9437 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkPairUnpackReview/zero32                            \t 4164666\t        28.53 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii32                           \t 4572291\t        25.81 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/zero4096                          \t  235479\t       530.6 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii4096                         \t  233870\t       501.8 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero1x256                      \t  105006\t      1050 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero2x256                      \t  104277\t      1290 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero3x256                      \t   82269\t      1438 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero4x256                      \t   72046\t      1629 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero5x256                      \t   67425\t      1738 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero6x256                      \t   63433\t      1982 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero7x256                      \t   51445\t      2383 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single1                           \t 6439027\t        17.79 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single3                           \t 6485376\t        17.81 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single7                           \t 6114298\t        27.40 ns/op\t       8 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/B.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkPairUnpackReview$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/B-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 2.9750761669129133,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkPairUnpackReview/addressbook/sproto_unpack         \t  835460\t       153.7 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/addressbook/sproto_pdecode        \t  114762\t      1571 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_unpack          \t   29077\t      4461 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_pdecode         \t    8078\t     16527 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_unpack         \t   22935\t      4922 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_pdecode        \t   18351\t      6199 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkPairUnpackReview/zero32                            \t 4381480\t        29.92 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii32                           \t 4695516\t        25.44 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/zero4096                          \t  234590\t       531.8 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii4096                         \t  229084\t       498.2 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero1x256                      \t  104697\t      1109 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero2x256                      \t   87350\t      1354 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero3x256                      \t   80662\t      1480 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero4x256                      \t   77562\t      2173 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero5x256                      \t   66754\t      1791 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero6x256                      \t   59281\t      1954 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero7x256                      \t   55122\t      2212 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single1                           \t 6051766\t        18.74 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single3                           \t 6737803\t        18.41 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single7                           \t 5836894\t        21.45 ns/op\t       8 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/B.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkPairUnpackReview$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/B-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 2.990753958001733,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkPairUnpackReview/addressbook/sproto_unpack         \t  881487\t       164.1 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/addressbook/sproto_pdecode        \t  102247\t      1199 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_unpack          \t   23226\t      5023 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_pdecode         \t    8067\t     17159 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_unpack         \t   24764\t      4825 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_pdecode        \t   19255\t      6152 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkPairUnpackReview/zero32                            \t 4235150\t        37.32 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii32                           \t 4689247\t        25.79 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/zero4096                          \t  243199\t       527.1 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii4096                         \t  258133\t       642.0 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero1x256                      \t  100600\t      1199 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero2x256                      \t   89611\t      1311 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero3x256                      \t   87096\t      1453 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero4x256                      \t   75012\t      1601 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero5x256                      \t   65886\t      1771 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero6x256                      \t   59188\t      1977 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero7x256                      \t   58071\t      1989 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single1                           \t 6513154\t        18.25 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single3                           \t 6918619\t        19.67 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single7                           \t 5578962\t        22.03 ns/op\t       8 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkPairUnpackReview$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 3.17428058385849,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkPairUnpackReview/addressbook/sproto_unpack         \t  874262\t       162.2 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/addressbook/sproto_pdecode        \t  104911\t      1146 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_unpack          \t   27037\t      4594 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_pdecode         \t    9200\t     17168 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_unpack         \t   24111\t      4793 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_pdecode        \t   19197\t      6253 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkPairUnpackReview/zero32                            \t 4152206\t        28.66 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii32                           \t 4605957\t        25.87 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/zero4096                          \t  228936\t       539.5 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii4096                         \t  230868\t       492.1 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero1x256                      \t  110274\t      1123 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero2x256                      \t   88930\t      1311 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero3x256                      \t   81067\t      1436 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero4x256                      \t   74300\t      1681 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero5x256                      \t   65520\t      1843 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero6x256                      \t   60742\t      1948 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero7x256                      \t   54428\t      2197 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single1                           \t 6944946\t        17.55 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single3                           \t 6579608\t        19.10 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single7                           \t 5914449\t        20.37 ns/op\t       8 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/B.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkPairUnpackReview$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/B-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 3.0472123324871063,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkPairUnpackReview/addressbook/sproto_unpack         \t  851718\t       160.3 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/addressbook/sproto_pdecode        \t  102093\t      1148 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_unpack          \t   30008\t      4769 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_pdecode         \t    9217\t     16783 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_unpack         \t   27394\t      4755 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_pdecode        \t   19322\t      5937 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkPairUnpackReview/zero32                            \t 4330820\t        28.20 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii32                           \t 4399989\t        26.10 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/zero4096                          \t  215062\t       562.7 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii4096                         \t  253125\t       496.9 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero1x256                      \t  117706\t      1158 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero2x256                      \t   92803\t      1308 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero3x256                      \t   82374\t      1452 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero4x256                      \t   75877\t      1610 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero5x256                      \t   67786\t      1796 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero6x256                      \t   60417\t      1978 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero7x256                      \t   55438\t      2475 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single1                           \t 6899260\t        17.62 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single3                           \t 6722359\t        18.43 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single7                           \t 5746231\t        21.84 ns/op\t       8 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkPairUnpackReview$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 2.9749677926301956,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkPairUnpackReview/addressbook/sproto_unpack         \t  875938\t       163.6 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/addressbook/sproto_pdecode        \t   64160\t      1711 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_unpack          \t   26853\t      4608 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_pdecode         \t    8025\t     16954 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_unpack         \t   24610\t      4921 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_pdecode        \t   19144\t      6244 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkPairUnpackReview/zero32                            \t 4316623\t        28.02 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii32                           \t 4570136\t        25.98 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/zero4096                          \t  229458\t       532.8 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii4096                         \t  230966\t       528.6 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero1x256                      \t  107641\t      1119 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero2x256                      \t   91568\t      1321 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero3x256                      \t   82100\t      1458 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero4x256                      \t   73670\t      1657 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero5x256                      \t   65608\t      1825 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero6x256                      \t   59760\t      3353 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero7x256                      \t   49699\t      2342 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single1                           \t 7004367\t        17.34 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single3                           \t 6530982\t        18.80 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single7                           \t 6008373\t        20.39 ns/op\t       8 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkPairUnpackReview$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 2.9618088752031326,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkPairUnpackReview/addressbook/sproto_unpack         \t  854370\t       162.6 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/addressbook/sproto_pdecode        \t  105430\t      1147 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_unpack          \t   26157\t      4576 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_pdecode         \t    8103\t     17042 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_unpack         \t   24596\t      4896 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_pdecode        \t   19044\t      6217 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkPairUnpackReview/zero32                            \t 4212108\t        28.10 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii32                           \t 4710061\t        25.76 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/zero4096                          \t  228490\t       653.5 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii4096                         \t  226765\t       474.1 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero1x256                      \t  107108\t      1141 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero2x256                      \t   91911\t      1308 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero3x256                      \t   81586\t      1448 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero4x256                      \t   73941\t      1628 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero5x256                      \t   65956\t      1825 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero6x256                      \t   59336\t      2034 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero7x256                      \t   53990\t      2236 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single1                           \t 7003617\t        17.53 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single3                           \t 6454243\t        19.01 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single7                           \t 5955087\t        20.43 ns/op\t       8 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/B.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkPairUnpackReview$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/B-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 3.008639583364129,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkPairUnpackReview/addressbook/sproto_unpack         \t  786454\t       163.6 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/addressbook/sproto_pdecode        \t  105474\t      1131 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_unpack          \t   26817\t      4420 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_pdecode         \t    8670\t     24699 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_unpack         \t   24290\t      4854 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_pdecode        \t   19285\t      6198 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkPairUnpackReview/zero32                            \t 4372174\t        28.69 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii32                           \t 4635471\t        25.99 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/zero4096                          \t  228295\t       618.1 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii4096                         \t  207066\t       539.8 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero1x256                      \t  111478\t      1092 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero2x256                      \t   93231\t      1271 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero3x256                      \t   86851\t      1554 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero4x256                      \t   80251\t      1575 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero5x256                      \t   68359\t      1797 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero6x256                      \t   61411\t      1995 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero7x256                      \t   55593\t      2135 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single1                           \t 3543555\t        35.01 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single3                           \t 6402603\t        19.46 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single7                           \t 5206609\t        22.45 ns/op\t       8 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkPairUnpackReview$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 2.8922770004719496,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkPairUnpackReview/addressbook/sproto_unpack         \t  853863\t       168.0 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/addressbook/sproto_pdecode        \t  101715\t      1162 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_unpack          \t   26389\t      4580 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_pdecode         \t    9246\t     17151 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_unpack         \t   24141\t      4820 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_pdecode        \t   17179\t      6042 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkPairUnpackReview/zero32                            \t 4109964\t        29.83 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii32                           \t 4582345\t        25.87 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/zero4096                          \t  227568\t       531.5 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii4096                         \t  227311\t       523.9 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero1x256                      \t   99213\t      1121 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero2x256                      \t   47252\t      2136 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero3x256                      \t   81490\t      1463 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero4x256                      \t   72810\t      1647 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero5x256                      \t   65869\t      1826 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero6x256                      \t   62050\t      2019 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero7x256                      \t   53499\t      2204 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single1                           \t 7188013\t        17.48 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single3                           \t 6495234\t        18.79 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single7                           \t 5963436\t        20.56 ns/op\t       8 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/B.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkPairUnpackReview$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/B-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 2.8443277068436146,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkPairUnpackReview/addressbook/sproto_unpack         \t  786604\t       163.7 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/addressbook/sproto_pdecode        \t  106272\t      1137 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_unpack          \t   27350\t      4430 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_pdecode         \t    8104\t     22907 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_unpack         \t   23997\t      4875 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_pdecode        \t   10000\t     10409 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkPairUnpackReview/zero32                            \t 4175037\t        28.71 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii32                           \t 4608397\t        25.69 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/zero4096                          \t  229263\t       531.6 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii4096                         \t  235066\t       483.0 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero1x256                      \t  103944\t      1133 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero2x256                      \t   88314\t      1343 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero3x256                      \t   85174\t      1484 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero4x256                      \t   74166\t      1609 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero5x256                      \t   66290\t      1803 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero6x256                      \t   60244\t      1992 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero7x256                      \t   56556\t      2169 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single1                           \t 6971794\t        17.43 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single3                           \t 6863172\t        18.25 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single7                           \t 5722267\t        21.66 ns/op\t       8 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/B.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkPairUnpackReview$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/B-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 3.0882186237722635,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkPairUnpackReview/addressbook/sproto_unpack         \t  872118\t       241.4 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/addressbook/sproto_pdecode        \t  106783\t      1162 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_unpack          \t   26600\t      4448 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_pdecode         \t    8041\t     17039 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_unpack         \t   24699\t      4843 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_pdecode        \t   19194\t      6162 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkPairUnpackReview/zero32                            \t 4319374\t        28.91 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii32                           \t 4598934\t        24.97 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/zero4096                          \t  246872\t       530.5 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii4096                         \t  234636\t       469.0 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero1x256                      \t  111271\t      1100 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero2x256                      \t   92379\t      1316 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero3x256                      \t   81817\t      1761 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero4x256                      \t   74121\t      1557 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero5x256                      \t   71263\t      2351 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero6x256                      \t   62432\t      1967 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero7x256                      \t   59404\t      2122 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single1                           \t 6951970\t        20.44 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single3                           \t 6672535\t        23.82 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single7                           \t 5591917\t        21.74 ns/op\t       8 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkPairUnpackReview$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-unpack-pair-loop-20261022/A-harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 2.94477541744709,
+    "output": "goos: darwin\ngoarch: arm64\npkg: arrayreview\ncpu: Apple M2\nBenchmarkPairUnpackReview/addressbook/sproto_unpack         \t  802898\t       166.5 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/addressbook/sproto_pdecode        \t  102123\t      1124 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_unpack          \t   26017\t      4550 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/game_large/sproto_pdecode         \t    8179\t     16937 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_unpack         \t   24343\t      4899 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/int32_edges/sproto_pdecode        \t   19076\t      6330 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkPairUnpackReview/zero32                            \t 4206952\t        28.53 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii32                           \t 4568896\t        37.02 ns/op\t      32 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/zero4096                          \t  214354\t       534.8 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/ascii4096                         \t  240288\t       476.0 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero1x256                      \t  102847\t      1185 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero2x256                      \t   72824\t      1627 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero3x256                      \t   61912\t      1980 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero4x256                      \t   62490\t      1957 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero5x256                      \t   62604\t      1943 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero6x256                      \t   53738\t      2180 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/nonzero7x256                      \t   51714\t      2384 ns/op\t    2048 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single1                           \t 7178464\t        17.68 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single3                           \t 6534226\t        18.78 ns/op\t       8 B/op\t       1 allocs/op\nBenchmarkPairUnpackReview/single7                           \t 6201175\t        20.47 ns/op\t       8 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "go",
+      "version"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.10898908413946629,
+    "output": "go version go1.24.13 darwin/arm64\n"
+  }
+]
