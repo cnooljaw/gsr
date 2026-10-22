@@ -1,0 +1,37 @@
+[
+  {
+    "args": [
+      "go",
+      "test",
+      "-tags=purego",
+      "-race",
+      "-gcflags=all=-d=checkptr=2",
+      "-run",
+      "^TestPreflightCapComparison$",
+      ".",
+      "-timeout=2m"
+    ],
+    "env": {
+      "GOMAXPROCS": "2",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 3.0573409162461758,
+    "output": "ok  \tgithub.com/cnooljaw/gosproto\t1.803s\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "./...",
+      "-timeout=2m"
+    ],
+    "env": {
+      "SPROTO_ORACLE_DIR": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-payload/oracle",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 1.9161433335393667,
+    "output": "ok  \tgithub.com/cnooljaw/gosproto\t1.262s\n?   \tgithub.com/cnooljaw/gosproto/examples/echo\t[no test files]\n"
+  }
+]

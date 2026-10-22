@@ -1,5 +1,7 @@
 # 当前阶段验证清单
 
+2026-10-22最新实验：[Unpack预检收紧临时切片容量](benchmarks/2026-10-22-gosproto-preflight-cap/RESULTS.md)完成33进程3168交错块，未采用通用替换。稀疏word两遍改善12.37%/6.89%，但整数数组PDecode中位慢1.14%/0.95%，6/7非零word明显退化；全部小收益、累计反向、自对照及校准不足保留，不设百分比采纳门槛。native/purego差分race/checkptr、完整库官方oracle及来源核对通过。前轮诊断已提交2d95255，新报告未提交；库92a155a、正式依赖及十项用户删除保持。
+
 2026-10-22最新诊断：[向量恢复后的解码成本](benchmarks/2026-10-22-gosproto-post-vector-cost/RESULTS.md)基于已提交库92a155a/GSR feb7c31完成9 CPU＋9全量分配及3份GC敏感性profile，80＋12条命令与源码/汇编/夹具/二进制/raw核对通过。整数数组仍优先Unpack普通mask预检循环；OnesCount8已是常量查表，不重复造表。默认kevent占比高已披露，不将profile耗时当PB新排名。无新生产改动；本轮诊断未提交，正式依赖与十项用户删除保持。
 
 2026-10-22最新：[ARM64 Unpack向量恢复](benchmarks/2026-10-22-gosproto-unpack-vector/RESULTS.md)在完整预检后对128B～1MiB压缩输入启用VTBL及FF批量复制；其他架构/purego回退。M2同进程两遍整数数组Unpack约改善8.7%、PDecode约4.5%～5.4%，AddressBook与ASCII有局部代价。完整库、官方oracle、race/checkptr、purego、vet、有限fuzz、保护页及4096组混合wire、GoTS7/7通过。正式72项对照中数组PDecode仍慢PB约38.3%，未宣称全面胜出。前轮报告已提交76ffa2b；新源码与报告未提交，正式依赖v0.4.0及十项用户删除保持。
