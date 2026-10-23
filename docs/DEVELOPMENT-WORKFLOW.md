@@ -48,6 +48,8 @@ git diff --stat
 
 每个 `Test...` 测试函数前写一句注释，说明它保护的可观察行为，方便审查者从测试入口快速理解契约；不要只重复函数名。
 
+临时程序、profile 和本地实验统一输出到根目录 `/_scratch/`，该目录由 Git 忽略，且不会被 Go 的 `./...` 扫描。不要在 `tmp/` 下放 Go 实验源码；通用 Sproto 编解码及 Benchmark 实验在独立 gosproto 仓库进行。旧实验的清理及仓库外归档位置见 [工作区清理记录](WORKSPACE-CLEANUP.md)。
+
 本阶段 Agent 不执行以下操作：
 
 ~~~text

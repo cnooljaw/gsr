@@ -4,7 +4,7 @@ Gate只处理不透明字节、连接和认证，Agent选择业务协议。Proto
 
 ## 依赖与职责
 
-Go通过 `github.com/cnooljaw/gosproto v0.4.0` 正式依赖接入，不在GSR维护codec副本、源补丁或永久本机replace。后续优化版本发布后再显式升级；新目录迁移不等于正式版本已变更。
+Go通过 `github.com/cnooljaw/gosproto v1.0.1` 正式依赖接入，不在GSR维护codec副本、源补丁或永久本机replace。后续版本发布后再显式升级。
 
 `protocol/sproto` 负责GSR Dispatcher、Context、业务错误与字节发送窄接口。Agent组合Gate连接与Dispatcher；连接归Gate，协议层不拥有网络生命周期。
 

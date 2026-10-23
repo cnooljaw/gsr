@@ -431,4 +431,4 @@ Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/
 
 ## Sproto 开发切片
 
-当前工作树按 [ADR 0013](adr/0013-client-protocol-boundaries.md) 新增独立 protocol/sproto 和原生 package(type/session) 分发，复用上述安全模式、字节投递与生命周期。上文 Protobuf 的 Envelope、MessageRoute 与 ErrorResponse 规则仅属于 Protobuf，Sproto 不借用它们；接口及错误契约见 [双协议指南](SPROTO-INTEGRATION.md)。GSR 新增 API 尚未发布。
+v1.0.2 按 [ADR 0013](adr/0013-client-protocol-boundaries.md) 新增独立 protocol/sproto 和原生 package(type/session) 分发，复用上述安全模式、字节投递与生命周期。上文 Protobuf 的 Envelope、MessageRoute 与 ErrorResponse 规则仅属于 Protobuf，Sproto 不借用它们；接口及错误契约见 [双协议指南](SPROTO-INTEGRATION.md)。新增 API 随 GSR v1.0.2 发布。

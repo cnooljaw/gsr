@@ -1,0 +1,50 @@
+# GSR v1.0.2 发布说明
+
+版本：`1.0.2`（见 [VERSION](../VERSION)）。发布日期：2026-10-23。阶段：正式内部发布。附注标签 `v1.0.2` 固定发布代码，旧标签保持原样。
+
+## 相对 v1.0.1 的主要变化
+
+1. **Gate 安全模式命名明确**：`Protocol` 改为 `SecurityMode`，只表示握手与传输认证，业务协议由 Agent 选择。默认 MAC、Plain 绑定限制、TLS、wire 和连接生命周期保持不变。
+2. **独立 Sproto 接入**：新增 `protocol/sproto`，支持强类型 Handler、客户端 Request/Response、Notify 和服务端 Push；每连接 Agent 独占会话，构造时检查协议及 Handler，设置解码预算与 packed 大小上限。Gate 继续只收发不透明字节，Protobuf 与 Sproto 保留各自模型。
+3. **固定正式编解码依赖**：使用 `github.com/cnooljaw/gosproto v1.0.1` 和发布校验和，无本地 replace。编解码权威实现、通用 Go/TS/PB Benchmark 及性能研究由独立仓库维护；GSR 保留接入层和网络集成。
+4. **Go/TypeScript 双协议示例**：WebSocket Echo 可选择 Protobuf 或 Sproto，Sproto 分别覆盖 Plain/MAC；TS 消费副本通过同步脚本记录来源、许可证和 SHA256，构建时离线核对指纹。
+5. **工作区与开发流程整理**：旧 codec 实验移出 GSR，核对后删除重复资料和可重建程序；临时输出统一使用忽略的 `/_scratch/`，避免干扰 Go 的 package 扫描。源码、schema、生成代码、测试及许可证保留。
+
+## 升级注意
+
+**本版包含源码不兼容的 Gate 命名调整**，虽使用 v1.0.2 版本号，调用方仍须按下表迁移；不提供旧名别名。
+
+| v1.0.1 | v1.0.2 |
+| --- | --- |
+| `gate.Protocol` | `gate.SecurityMode` |
+| `gate.ProtocolMAC` | `gate.SecurityModeMAC` |
+| `gate.ProtocolPlain` | `gate.SecurityModePlain` |
+| `gate.Config.Protocol` | `gate.Config.SecurityMode` |
+| `gsr.GateConfig.Protocol` | `gsr.GateConfig.SecurityMode` |
+
+```sh
+go get github.com/cnooljaw/gsr@v1.0.2
+```
+
+Protobuf 继续使用 `protocol` 包和原 Envelope；Sproto 使用 `protocol/sproto` 与自己的协议定义，不增加公共 Envelope 或万能 Codec。既有 Protobuf 业务无需改用 Sproto。具体接线见 [双协议指南](SPROTO-INTEGRATION.md)和 [WebSocket 示例](../examples/websocket-gate/README.md)。
+
+从 v1.0.0 升级的项目还须应用 [v1.0.1 节点入口迁移](RELEASE-1.0.1.md#升级注意)。Core 消息投递、Source 绑定、Cluster wire、资源归属和关闭顺序不因本版改变。
+
+## 发布验证
+
+环境：Go 1.24.13，darwin/arm64；最低 Go 版本仍为 1.24.0。
+
+- `GSR_PROCESS_TEST=1 go test -race ./... -timeout=2m`：通过，含全仓行为测试、双进程正常停机与强杀后恢复；Gate 约 35 秒，双节点约 18 秒。
+- `go vet ./...`：通过。
+- WebSocket 示例 `npm run test:sproto:integration`：四项通过、零跳过，含 Plain/MAC 真实 Go↔TS 链路、会话隔离和报文边界。
+- 复用同次 TS 构建，执行 `node --test client/dist/auth_vectors.test.js client/dist/secure_auth.test.js`：五项认证测试通过、零跳过。
+- 清理后的真实工作区 `go mod tidy` 通过，go.mod/go.sum 无额外变化；全仓普通 Go 测试已在清理验收中通过，本轮由 race 覆盖后不重复。
+- diff、发布相关 Markdown 本地链接及版本入口检查：通过。
+
+本轮不重跑独立 gosproto 的官方 C/Lua、完整 codec Benchmark、负载、Gate 压力或真实 MySQL 门禁；这些不由 GSR 的 Echo 验证替代。详细证据见 [验证清单](VALIDATION-STATUS.md)。
+
+## 支持范围与资料归属
+
+Sproto 首版不支持服务端发请求并等待客户端响应。TS 示例只验收 Node；安全整数以外的完整 int64/BigInt、double、所有 binary 组合，以及浏览器/Laya/Cocos 兼容性不作为本版承诺。Send 成功仍只表示本地接纳，玩家身份校验、幂等和业务失败语义由 Agent/业务负责。
+
+[工作区清理记录](WORKSPACE-CLEANUP.md)中的本机归档用于保存未匹配的历史实验，不是构建或使用 GSR 的前置依赖。性能原始资料归独立 gosproto 历史档案维护，不把过往本机采样作为本版生产容量或跨平台性能承诺。

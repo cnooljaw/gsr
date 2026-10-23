@@ -144,7 +144,7 @@ npm run client -- --secure --url wss://127.0.0.1:7889/ws --text "hello WSS"
 
 ## Sproto 联调
 
-GSR 当前工作树提供此示例；v1.0.1 发布标签尚不包含新 API。Sproto 与安全模式独立，`--protocol sproto` 使用 Plain，附加 `--prod` 使用现有 MAC。服务端不猜测客户端编码。
+GSR v1.0.2 提供此示例；v1.0.1 发布标签不包含新 API。Sproto 与安全模式独立，`--protocol sproto` 使用 Plain，附加 `--prod` 使用现有 MAC。服务端不猜测客户端编码。
 
 在仓库根目录启动服务端：
 

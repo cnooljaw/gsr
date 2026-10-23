@@ -1,6 +1,26 @@
 # 当前阶段验证清单
 
-2026-10-23：Sproto编解码实现、通用Go/TS/PB基准及性能研究迁入独立gosproto仓库；GSR继续维护接入层与集成验证，见 [接入指南](SPROTO-INTEGRATION.md)。历史codec验证日志随独立库归档，以下保留GSR集成/Runtime记录。迁移验收中，GSR Plain/MAC真实Go↔TS四项全通过、零跳过；当前受版本管理及新增文件的干净快照全仓Go测试通过。本机直接全仓扫描仍受ignored tmp下旧实验影响，资料保持原样。独立库的完整结果见其 `docs/MIGRATION-VALIDATION.md`。
+当前发布基线为 GSR v1.0.2。Sproto 编解码、通用 Go/TS/PB 基准及性能研究归独立 gosproto 仓库，GSR 依赖其 v1.0.1 正式版本并保留接入层与集成验证。旧 tmp 实验已移出工作区，真实目录的全仓依赖整理与测试通过；迁移及清理细节见 [接入指南](SPROTO-INTEGRATION.md)和 [清理记录](WORKSPACE-CLEANUP.md)。
+
+## v1.0.2 发布验收（2026-10-23）
+
+`GSR_PROCESS_TEST=1 go test -race ./... -timeout=2m` 与 `go vet ./...` 通过，包含双进程正常停机和强杀后恢复；Gate 约 35 秒、双节点约 18 秒。WebSocket 示例 `npm run test:sproto:integration` 四项通过、零跳过；复用同次构建运行 `node --test client/dist/auth_vectors.test.js client/dist/secure_auth.test.js`，五项认证测试通过、零跳过。
+
+VERSION、README、API/术语、业务接入指南及模板已统一到 v1.0.2；发布说明包含相对 v1.0.1 的 Gate 源码命名迁移及 Sproto 接入。发布相关 Markdown 本地链接与 diff 检查通过，模板参考链接固定到 v1.0.2 标签。未重跑 codec 官方 C/Lua、完整性能矩阵、负载、Gate 压力或真实 MySQL 门禁；完整范围见 [发布说明](RELEASE-1.0.2.md)。
+
+## GSR 工作区清理验收（2026-10-23）
+
+用户确认后已将旧 `tmp/` 实验移到仓库外持久归档，删除与 gosproto v1.0.0 历史树逐字节核对一致的重复文件及可重建程序/缓存，保留未匹配资料和完整恢复快照。清单和处置结果见 [工作区清理记录](WORKSPACE-CLEANUP.md)。根目录 `/_scratch/` 已加入忽略规则，WebSocket 示例集成测试输出同步调整；旧日志及验证后的构建产物已清理。
+
+真实 GSR 工作目录执行 `go mod tidy` 通过，go.mod/go.sum 校验值未变化；`go test ./... -timeout=2m` 全部通过，正常复用缓存。`npm run test:sproto:integration` 四项通过、零跳过，包含 Plain/MAC 真实 Go↔TS 链路。迁移后保留的 45,882 个条目已逐项复核内容/链接目标；`git diff --check` 通过，无已跟踪且命中忽略规则的文件。本轮未运行 race/vet，未提交。
+
+## GSR 升级 gosproto v1.0.1（2026-10-23）
+
+GSR 已正式 require `github.com/cnooljaw/gosproto v1.0.1`，go.sum 固定发布校验和，移除 v1.0.0 校验和，无 replace。`go test ./protocol/sproto ./examples/websocket-gate/cmd/debugserver -timeout=2m` 通过；WebSocket 示例 `npm run test:sproto:integration` 四项全部通过、零跳过，包含 Plain/MAC 真实 Go↔TS 链路。依赖整理仍在受版本管理文件的临时快照中进行，未运行全仓测试；工作区旧实验的处置见 [清理方案](WORKSPACE-CLEANUP.md)，本轮未删除或迁移文件。
+
+## GSR 升级 gosproto v1.0.0（2026-10-23）
+
+GSR 已正式 require `github.com/cnooljaw/gosproto v1.0.0`，go.sum 固定发布校验和，无 replace。当前版本说明同步更新，接入代码与 TS 消费副本无需修改。`go test ./protocol/sproto ./examples/websocket-gate/cmd/debugserver -timeout=2m` 通过；WebSocket 示例的 `npm run test:sproto:integration` 四项全部通过、零跳过，包含 Plain/MAC 真实 Go↔TS 链路。`go mod tidy` 在受版本管理文件的临时快照中完成，避开 ignored tmp 下旧实验导入，仅替换 gosproto 校验和；本次未运行全仓测试。
 
 ## gosproto v0.4.0 发布与 GSR 正式依赖升级（2026-10-15）
 

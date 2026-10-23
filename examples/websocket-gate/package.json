@@ -13,7 +13,7 @@
     "generate:sproto": "node scripts/generate-sproto.mjs",
     "test:sproto": "npm run build && node --test client/dist/sproto_client.test.js",
     "client:sproto": "npm run build && node client/dist/sproto_client.js",
-    "test:sproto:integration": "npm run build && go build -o ../../tmp/sproto-echo ./cmd/debugserver && GSR_SPROTO_SERVER_BIN=../../tmp/sproto-echo node --test client/dist/sproto_client.test.js",
+    "test:sproto:integration": "npm run build && go build -o ../../_scratch/sproto-echo ./cmd/debugserver && GSR_SPROTO_SERVER_BIN=../../_scratch/sproto-echo node --test client/dist/sproto_client.test.js",
     "sync:sproto": "node scripts/sync-sproto.mjs",
     "check:sproto-source": "node scripts/sync-sproto.mjs --check"
   },

@@ -2,7 +2,7 @@
 
 ## 状态
 
-Accepted，2026-10-14 用户确认双协议方案并要求调整 Gate 模式命名。边界裁决已接受；当前工作树已完成安全模式命名、独立 Sproto Dispatcher 和 Go/TypeScript Echo，新增 GSR API 尚未发布。
+Accepted，2026-10-14 用户确认双协议方案并要求调整 Gate 模式命名。边界裁决已接受；安全模式命名、独立 Sproto Dispatcher 和 Go/TypeScript Echo 随 GSR v1.0.2 发布。
 
 ## 依据
 

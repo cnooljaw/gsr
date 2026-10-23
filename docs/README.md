@@ -2,7 +2,7 @@
 
 本目录记录 `gsr` 当前设计。项目按新实现推进，兄弟目录中的旧工程和 Skynet 源码只用于比较与学习，不构成本项目的兼容契约。
 
-当前版本为 GSR 1.0.1，处于正式内部发布阶段。版本变化与迁移见 [1.0.1 发布说明](RELEASE-1.0.1.md)，最初的接入范围见 [1.0 内部发布说明](RELEASE-1.0.md)。初次接入也可从根目录 [README](../README.md) 开始。
+当前版本为 GSR 1.0.2，处于正式内部发布阶段。版本变化与迁移见 [1.0.2 发布说明](RELEASE-1.0.2.md)，最初的接入范围见 [1.0 内部发布说明](RELEASE-1.0.md)。初次接入也可从根目录 [README](../README.md) 开始。
 
 v1.0.1 入口已按 [ADR 0012](adr/0012-node-capabilities-and-service-logging.md) 调整，与 v1.0.0 源码不兼容；旧版代码和文档保留在原标签。
 
@@ -42,10 +42,14 @@ v1.0.1 入口已按 [ADR 0012](adr/0012-node-capabilities-and-service-logging.md
 24. [GSR 1.0.1 发布说明](RELEASE-1.0.1.md)：相对 v1.0.0 的六项变化、API 迁移与发布验证。
 25. [ADR 0013：客户端协议与 Gate 安全模式](adr/0013-client-protocol-boundaries.md)：安全模式命名、Agent 选择协议与两个协议实现的独立边界。
 26. [Protobuf / Sproto 接入指南](SPROTO-INTEGRATION.md)：独立修复库、Dispatcher、Go/TS Echo、支持范围与历史兼容证据。
-27. [TS → Go Sproto 优化经验](https://github.com/cnooljaw/gosproto/blob/codex/official-compat/docs/SPROTO-OPTIMIZATION-LESSONS.md)：TS 阶段收尾、有效做法、失败候选、测量陷阱和 Go 验证矩阵。
-28. [gosproto 后续性能方案](https://github.com/cnooljaw/gosproto/blob/codex/official-compat/docs/RFC-GOSPROTO-PERFORMANCE.md)：已完成切片、当前 Go 基线与基于新 profile 的增量实施入口。
+27. [TS → Go Sproto 优化经验](https://github.com/cnooljaw/gosproto/blob/v1.0.0/docs/SPROTO-OPTIMIZATION-LESSONS.md)：TS 阶段收尾、有效做法、失败候选、测量陷阱和 Go 验证矩阵。
+28. [gosproto 后续性能方案](https://github.com/cnooljaw/gosproto/blob/v1.0.0/docs/RFC-GOSPROTO-PERFORMANCE.md)：已完成切片、当前 Go 基线与基于新 profile 的增量实施入口。
+
+29. [GSR 1.0.2 发布说明](RELEASE-1.0.2.md)：安全模式命名迁移、独立 Sproto 接入、正式依赖与工作区清理。
 
 后续出现需要长期保留的重大架构取舍时，新增 ADR 或 RFC，并从这里建立索引。
+
+本地旧实验、构建产物和工具缓存的盘点、清理结果及后续输出约定见 [工作区清理记录](WORKSPACE-CLEANUP.md)。
 
 ## 示例选择
 

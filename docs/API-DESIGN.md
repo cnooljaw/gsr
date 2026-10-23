@@ -1,6 +1,6 @@
 # GSR API 设计规范
 
-本文描述当前开发 API，以 v1.0.1 为发布基线。按 [ADR 0013](adr/0013-client-protocol-boundaries.md)，Gate 的 Protocol/ProtocolMAC/ProtocolPlain 和配置字段 Protocol 已改名为 SecurityMode/SecurityModeMAC/SecurityModePlain 与 SecurityMode，此改名尚未发布。v1.0.1 的节点入口迁移与验证见 [发布说明](RELEASE-1.0.1.md)。旧版契约以相应标签文档为准，标签不移动。
+本文描述 v1.0.2 API。按 [ADR 0013](adr/0013-client-protocol-boundaries.md)，Gate 的 Protocol/ProtocolMAC/ProtocolPlain 和配置字段 Protocol 已改名为 SecurityMode/SecurityModeMAC/SecurityModePlain 与 SecurityMode，随 v1.0.2 发布；迁移与验证见 [发布说明](RELEASE-1.0.2.md)。v1.0.1 的节点入口迁移仍见 [上一版发布说明](RELEASE-1.0.1.md)。旧版契约以相应标签文档为准，标签不移动。
 
 应用组装通过 self.Node()：RegisterService 发布目标名称，OpenCluster 开放共享监听，OpenHTTP 打开节点 HTTP，CreateGate 创建独立 GateService，ClusterListenAddress 观测实际 Cluster 绑定地址。Node 保存节点运行状态，由 Run 管理生命周期，业务借用同一对象的公开能力，不提供 Close、业务通信或内部组件 getter，限当前回调使用。同一 Run 共享唯一 Node，不同 Run 隔离；内部字段和 close 不公开。MainService 可完成组装后退出，原有 owner 继续管理资源。
 
@@ -33,7 +33,7 @@ Gate 负责有界、顺序、失败可观察地收发不透明消息；具体客
 
 业务协议由 Agent 构造时选定，Gate 不提供 Protobuf/Sproto/JSON 枚举或格式探测。SecurityModeMAC/Plain 只控制握手和传输认证，TLS 独立配置；MAC 不仅握手，还校验后续消息的 seq/MAC。一个具体 Agent 固定使用一个业务协议实现，协议选择与安全模式相互独立。
 
-现有 `protocol` 是 Protobuf 实现，Envelope、Registry、MessageRoute、Direction、Kind 和 request_id 均属于它。当前开发切片新增独立 `protocol/sproto`，使用 Sproto 自身的协议、Request/Response、package(type/session) 和 pack/unpack；不依赖父包的 Protobuf 模型，不再套 Envelope 或重复的 MessageRoute。Sproto Dispatcher 与 Go/TS Echo 已实现，新增 API 尚未发布；接入方式、支持类型及限制见 [双协议指南](SPROTO-INTEGRATION.md)。JSON 只保留同样的字节接入能力，本轮不增加实现。
+现有 `protocol` 是 Protobuf 实现，Envelope、Registry、MessageRoute、Direction、Kind 和 request_id 均属于它。v1.0.2 新增独立 `protocol/sproto`，使用 Sproto 自身的协议、Request/Response、package(type/session) 和 pack/unpack；不依赖父包的 Protobuf 模型，不再套 Envelope 或重复的 MessageRoute。Sproto Dispatcher 与 Go/TS Echo 随 v1.0.2 发布；接入方式、支持类型及限制见 [双协议指南](SPROTO-INTEGRATION.md)。JSON 只保留同样的字节接入能力，本轮不增加实现。
 
 - Gate 管理连接、握手、seq/MAC、容量、出站队列和关闭；不导入 Protobuf，不解释 msg_id、request_id 或 payload。握手是传输认证格式，不属于业务 Protocol。Plain 不具备 MAC 模式的认证保证。
 - `gate.ClientSession` 留在 Gate，只提供 `Send([]byte) error` 和 `Close() error`。Send 在成功接纳时复制快照，之后发送方可以复用缓冲区；nil 与空切片均表示零字节消息，仍收取队列条目开销。成功仅代表本地队列接纳，不保证客户端收到、业务执行或执行一次，不自动重放。
@@ -44,7 +44,7 @@ Gate 负责有界、顺序、失败可观察地收发不透明消息；具体客
 
 入站为 `Gate → 字节快照 → Agent → 具体协议 Dispatcher → Handler`；出站为 `Handler → 具体协议编码 → 字节消息 → Gate`。包级依赖仅由 Agent 同时指向 Gate 和协议实现；上面的箭头表示数据流，不表示 Gate 与协议实现互相导入。Sproto 会话状态归每连接 Agent，不与 Core/Cluster Session 混用；不可变协议定义可共享。框架不增加 ProtocolCodec、公共 Message/Route/SchemaProvider 或统一 Envelope。
 
-Sproto 接线使用 `sproto.NewDispatcher[gsr.CommandContext](sproto.Config{C2S: c2s.Protocols, S2C: s2c.Protocols}, client, handlers)`；原生 `gosproto.Protocol` 定义 Request/Response，无公共 Registry 或 MessageRoute。底层正常依赖 gosproto v0.4.0，只使用协议字段，不绑定 Go MethodName 或借用其已移除的网络 Service helper。构造时复制协议并检查名称、非负 type（零有效）、payload schema 和 Handler 精确签名。含 Request 的 Handler 为 `func(gsr.CommandContext, sproto.Context, *具体Request) error`，无 Request 时省略最后参数；定义可以先存在，未实现协议不要求绑定。
+Sproto 接线使用 `sproto.NewDispatcher[gsr.CommandContext](sproto.Config{C2S: c2s.Protocols, S2C: s2c.Protocols}, client, handlers)`；原生 `gosproto.Protocol` 定义 Request/Response，无公共 Registry 或 MessageRoute。底层正常依赖 gosproto v1.0.1，只使用协议字段，不绑定 Go MethodName 或借用其已移除的网络 Service helper。构造时复制协议并检查名称、非负 type（零有效）、payload schema 和 Handler 精确签名。含 Request 的 Handler 为 `func(gsr.CommandContext, sproto.Context, *具体Request) error`，无 Request 时省略最后参数；定义可以先存在，未实现协议不要求绑定。
 
 `Context.Session/Response/Push` 仅在当前同步 Handler 使用，Response 按当前定义匹配类型并保留原 session，最多成功接纳一次；Notify 不接受 Response。普通 Command 中使用 `Dispatcher.Push`，不保存旧 Context。需要响应的客户端请求必须使用正 int32 session，Notify/Push 不带 session；与 Core/Cluster ID 分配无关。S2C 首版只接受不带 Response 的 Push，不提供服务端请求客户端的等待机制。
 
