@@ -179,12 +179,26 @@ SPROTODUMP_DIR=/path/to/sprotodump npm run generate:sproto
 
 阅读 [`sproto_agent.go`](cmd/debugserver/sproto_agent.go) 及 [Sproto Dispatcher](../../protocol/sproto/README.md)。Go 编码器完整支持范围和官方对照证据见 [双协议指南](../../docs/SPROTO-INTEGRATION.md)。
 
-## 编解码 Benchmark
+## 编解码实现与 Benchmark
 
-在仓库根目录执行 `npm --prefix examples/websocket-gate run bench:protocol`，顺序测量 Go 和 TypeScript 对相同 Echo 内容的 Protobuf/Sproto 编解码速度，分别报告 payload、应用帧和包大小。需先安装本示例锁定的 npm 依赖；不需要启动服务器或安装 Lua。
+Sproto TS权威源码、通用Go/TS/PB基准、官方向量和性能研究已迁到 [gosproto仓库](https://github.com/cnooljaw/gosproto)。本示例只保留GSR接入与网络集成测试。
 
-口径与单独运行命令见 [Benchmark 使用说明](benchmarks/README.md)，已保存的本机结果见 [2026-10-15 报告](../../docs/benchmarks/2026-10-15/report.md)。默认输出位于仓库的 `tmp/protocol-benchmark/`，包含 Markdown 报告、Go 原始采样、TS 五轮 JSON 和运行环境。该微基准不包含网络、MAC 或 Service 调度。
+同步TS消费副本后会记录源码及许可证的来源指纹：
 
-官方 AddressBook、游戏数值与数组的独立消息体套件运行 `npm --prefix examples/websocket-gate run bench:representative`；CPU/分配分析运行 `npm --prefix examples/websocket-gate run profile:protocol`。两条命令顺序执行，采样口径、TS 已知能力缺口及后续优化顺序见 [代表性消息报告](../../docs/benchmarks/2026-10-15-representative/report.md) 和 [分析与方案](../../docs/benchmarks/2026-10-15-representative/ANALYSIS-AND-PLAN.md)。
+```sh
+npm run sync:sproto -- /path/to/gosproto
+npm run check:sproto-source
+```
 
-TS 布尔/混合正负 int64 数组修复及五步性能优化已完成，当前结果与 32 字节小包检查见 [优化实施与验收](../../docs/benchmarks/2026-10-15-optimized/RESULTS.md)。TS 改动已在示例中；Go 优化已随 gosproto v0.4.0 发布，正式依赖已升级且无 replace，报告保留发布前同一源码的采样环境。
+`build`会离线核对副本指纹，不要求旁边存在gosproto目录。后续修改请回权威源码，验证后再同步。当前副本依赖node:buffer；浏览器/Laya/Cocos兼容性已列为独立库待办。
+
+Benchmark在gosproto目录运行，安装及完整口径见其 `benchmarks/README.md`：
+
+```sh
+npm --prefix typescript ci
+npm --prefix benchmarks ci
+npm --prefix benchmarks run check
+npm --prefix benchmarks run bench:representative
+```
+
+GSR Runtime与Dispatcher自身的Benchmark继续保留在本仓。

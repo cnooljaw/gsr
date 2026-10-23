@@ -1,8 +1,0 @@
-package sproto
-// ExperimentDecodePackedClone 仅为隔离测量保留基线公开入口的调用层次。
-func ExperimentDecodePackedClone(data []byte, sp interface{}) error {
- unpacked, err := ExperimentUnpackClone(data, 8<<20)
- if err != nil { return err }
- _, err = Decode(unpacked, sp)
- return err
-}

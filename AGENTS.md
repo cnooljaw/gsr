@@ -36,6 +36,7 @@
 - Gate 的 SecurityMode 只控制握手与传输认证，业务协议由 Agent 选择；Protobuf 与 Sproto 保留独立模型，不增加公共 Envelope 或万能协议接口。见 [ADR 0013](docs/adr/0013-client-protocol-boundaries.md)及 [Sproto 接入计划](docs/SPROTO-INTEGRATION.md)。
 - 公开 API 或架构边界发生变化时，同步更新 `docs/API-DESIGN.md`。
 - 新增或修改 Go 代码必须遵守 `docs/GO-CODE-STYLE.md`。
+- Sproto编解码权威实现、通用Go/TS/PB基准和性能文档在独立 `gosproto` 仓库维护；本仓只保留接入层、网络集成及带来源指纹的TS副本。副本通过 `examples/websocket-gate/scripts/sync-sproto.mjs` 同步，不在vendor内独立优化；浏览器/Laya/Cocos兼容性仍为待办。
 - 形成稳定的新设计结论时写入相关文档；较大的取舍可新增 ADR 或 RFC，不把 `AGENTS.md` 扩写成架构百科。
 - 默认不为旧参考项目提供兼容层、迁移别名或废弃 API，除非用户明确提出兼容需求。
 
