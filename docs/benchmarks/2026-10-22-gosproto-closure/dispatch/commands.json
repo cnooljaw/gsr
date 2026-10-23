@@ -1,0 +1,522 @@
+[
+  {
+    "args": [
+      "git",
+      "rev-parse",
+      "6b0430e"
+    ],
+    "cwd": "/private/tmp/gsr-gosproto-fork",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.028369707986712456,
+    "output": "6b0430e8bb8e69f5ad584b156289ce8860b7dbf1\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-gcflags=all=-d=checkptr=2",
+      "-run",
+      "^TestUnpackSize",
+      ".",
+      "-timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/gosproto",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 4.855285041034222,
+    "output": "ok  \tgithub.com/cnooljaw/gosproto\t2.027s\n"
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "pack.go",
+      "experiment.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/gosproto",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.013290958479046822,
+    "output": ""
+  },
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "experiment_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/harness",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.003495415672659874,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-run",
+      "^TestRepresentativeFixtures$",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 1.7990822922438383,
+    "output": "ok  \tspreadpairs\t0.344s\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-mod=mod",
+      "-c",
+      "-o",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/pairs.test",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off"
+    },
+    "exitCode": 0,
+    "seconds": 0.6633725427091122,
+    "output": ""
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "public",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/self-int32_edges-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.60468795709312,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "public",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/self-game_large-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.2339145839214325,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "addressbook",
+      "GSR_OP": "public",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/self-addressbook-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 5.455550290644169,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "echo_ascii4k",
+      "GSR_OP": "public",
+      "GSR_MODE": "self",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/self-echo_ascii4k-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.64086683280766,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "public",
+      "GSR_MODE": "clone1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/clone1-int32_edges-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.238959833979607,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "public",
+      "GSR_MODE": "clone1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/clone1-game_large-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.2923363745212555,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "addressbook",
+      "GSR_OP": "public",
+      "GSR_MODE": "clone1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/clone1-addressbook-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 5.126279208809137,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "echo_ascii4k",
+      "GSR_OP": "public",
+      "GSR_MODE": "clone1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/clone1-echo_ascii4k-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.426039792597294,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "public",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/pass1-int32_edges-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.116553584113717,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "public",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/pass1-game_large-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.785103291273117,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "addressbook",
+      "GSR_OP": "public",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/pass1-addressbook-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.437453750520945,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "echo_ascii4k",
+      "GSR_OP": "public",
+      "GSR_MODE": "pass1",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/pass1-echo_ascii4k-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.176559958606958,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "public",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/pass2-int32_edges-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.093942582607269,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "public",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/pass2-game_large-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.192984666675329,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "addressbook",
+      "GSR_OP": "public",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/pass2-addressbook-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.455674957484007,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "echo_ascii4k",
+      "GSR_OP": "public",
+      "GSR_MODE": "pass2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/pass2-echo_ascii4k-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.0290922075510025,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "int32_edges",
+      "GSR_OP": "public",
+      "GSR_MODE": "clone2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/clone2-int32_edges-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.006841124966741,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "game_large",
+      "GSR_OP": "public",
+      "GSR_MODE": "clone2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/clone2-game_large-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 6.25212650001049,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "addressbook",
+      "GSR_OP": "public",
+      "GSR_MODE": "clone2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/clone2-addressbook-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 4.994587626308203,
+    "output": "PASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/pairs.test",
+      "-test.run=^TestStringInProcessExperiment$",
+      "-test.timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/harness",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off",
+      "GOPROXY": "off",
+      "GSR_CASE": "echo_ascii4k",
+      "GSR_OP": "public",
+      "GSR_MODE": "clone2",
+      "GSR_OUTPUT": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-dispatch-pairs-20261022/clone2-echo_ascii4k-public.json"
+    },
+    "exitCode": 0,
+    "seconds": 7.209823876619339,
+    "output": "PASS\n"
+  }
+]

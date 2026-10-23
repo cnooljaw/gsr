@@ -1,0 +1,309 @@
+[
+  {
+    "args": [
+      "gofmt",
+      "-w",
+      "pack.go",
+      "pack_words_arm64.go",
+      "pack_words_other.go",
+      "pack_words_arm64_test.go",
+      "pack_words_guard_arm64_test.go",
+      "pack_native_reference_arm64_test.go"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/candidate",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.017131956294178963,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "./...",
+      "-timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/candidate",
+    "env": {
+      "GOPROXY": "off",
+      "SPROTO_ORACLE_DIR": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-payload/oracle"
+    },
+    "exitCode": 0,
+    "seconds": 2.9133490845561028,
+    "output": "ok  \tgithub.com/cnooljaw/gosproto\t1.420s\n?   \tgithub.com/cnooljaw/gosproto/examples/echo\t[no test files]\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-tags=purego",
+      "./...",
+      "-timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/candidate",
+    "env": {
+      "GOPROXY": "off",
+      "SPROTO_ORACLE_DIR": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-payload/oracle"
+    },
+    "exitCode": 0,
+    "seconds": 1.1324870008975267,
+    "output": "ok  \tgithub.com/cnooljaw/gosproto\t0.522s\n?   \tgithub.com/cnooljaw/gosproto/examples/echo\t[no test files]\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-gcflags=all=-d=checkptr=2",
+      "./...",
+      "-timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/candidate",
+    "env": {
+      "GOPROXY": "off",
+      "SPROTO_ORACLE_DIR": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-payload/oracle",
+      "GOMAXPROCS": "2"
+    },
+    "exitCode": 0,
+    "seconds": 6.362622832879424,
+    "output": "ok  \tgithub.com/cnooljaw/gosproto\t5.016s\n?   \tgithub.com/cnooljaw/gosproto/examples/echo\t[no test files]\n"
+  },
+  {
+    "args": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/candidate",
+    "env": {
+      "GOPROXY": "off",
+      "SPROTO_ORACLE_DIR": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-pack-payload/oracle"
+    },
+    "exitCode": 0,
+    "seconds": 0.3367144148796797,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-run",
+      "^$",
+      "-fuzz",
+      "^FuzzCodecRoundTrip$",
+      "-fuzztime=10s",
+      "-parallel=2",
+      ".",
+      "-timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/candidate",
+    "env": {
+      "GOPROXY": "off",
+      "GOMAXPROCS": "2"
+    },
+    "exitCode": 0,
+    "seconds": 11.530481334775686,
+    "output": "fuzz: elapsed: 0s, gathering baseline coverage: 0/79 completed\nfuzz: elapsed: 0s, gathering baseline coverage: 79/79 completed, now fuzzing with 2 workers\nfuzz: elapsed: 3s, execs: 125245 (41720/sec), new interesting: 0 (total: 79)\nfuzz: elapsed: 6s, execs: 263267 (46007/sec), new interesting: 0 (total: 79)\nfuzz: elapsed: 9s, execs: 394445 (43725/sec), new interesting: 0 (total: 79)\nfuzz: elapsed: 10s, execs: 439290 (42277/sec), new interesting: 0 (total: 79)\nPASS\nok  \tgithub.com/cnooljaw/gosproto\t10.398s\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-run",
+      "^$",
+      "-fuzz",
+      "^FuzzPackRoundTrip$",
+      "-fuzztime=10s",
+      "-parallel=2",
+      ".",
+      "-timeout=1m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/candidate",
+    "env": {
+      "GOPROXY": "off",
+      "GOMAXPROCS": "2"
+    },
+    "exitCode": 0,
+    "seconds": 11.69751475006342,
+    "output": "fuzz: elapsed: 0s, gathering baseline coverage: 0/57 completed\nfuzz: elapsed: 0s, gathering baseline coverage: 57/57 completed, now fuzzing with 2 workers\nfuzz: elapsed: 3s, execs: 13591 (4528/sec), new interesting: 1 (total: 58)\nfuzz: elapsed: 6s, execs: 13591 (0/sec), new interesting: 1 (total: 58)\nfuzz: elapsed: 9s, execs: 13591 (0/sec), new interesting: 1 (total: 58)\nfuzz: elapsed: 11s, execs: 13591 (0/sec), new interesting: 1 (total: 58)\nPASS\nok  \tgithub.com/cnooljaw/gosproto\t11.214s\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-c",
+      "-o",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/amd64.test",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/candidate",
+    "env": {
+      "GOPROXY": "off",
+      "CGO_ENABLED": "0",
+      "GOOS": "linux",
+      "GOARCH": "amd64",
+      "GOMAXPROCS": "2"
+    },
+    "exitCode": 0,
+    "seconds": 0.8612868748605251,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-c",
+      "-o",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/s390x.test",
+      "."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/candidate",
+    "env": {
+      "GOPROXY": "off",
+      "CGO_ENABLED": "0",
+      "GOOS": "linux",
+      "GOARCH": "s390x",
+      "GOMAXPROCS": "2"
+    },
+    "exitCode": 0,
+    "seconds": 0.800152501091361,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "build",
+      "./..."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/candidate",
+    "env": {
+      "GOPROXY": "off",
+      "CGO_ENABLED": "0",
+      "GOOS": "linux",
+      "GOARCH": "386",
+      "GOMAXPROCS": "2"
+    },
+    "exitCode": 0,
+    "seconds": 0.5134576261043549,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "build",
+      "./..."
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/candidate",
+    "env": {
+      "GOPROXY": "off",
+      "CGO_ENABLED": "0",
+      "GOOS": "linux",
+      "GOARCH": "arm",
+      "GOMAXPROCS": "2"
+    },
+    "exitCode": 0,
+    "seconds": 0.4470589589327574,
+    "output": ""
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-modfile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/integration.mod",
+      "./protocol/sproto",
+      "./examples/websocket-gate/cmd/debugserver",
+      "./examples/websocket-gate/benchmarks",
+      "-timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 1.732877790927887,
+    "output": "ok  \tgithub.com/cnooljaw/gsr/protocol/sproto\t0.330s\nok  \tgithub.com/cnooljaw/gsr/examples/websocket-gate/cmd/debugserver\t0.777s\nok  \tgithub.com/cnooljaw/gsr/examples/websocket-gate/benchmarks\t0.444s\n"
+  },
+  {
+    "args": [
+      "npm",
+      "--prefix",
+      "examples/websocket-gate",
+      "run",
+      "test:sproto:integration"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {
+      "GOFLAGS": "-modfile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/integration.mod"
+    },
+    "exitCode": 0,
+    "seconds": 4.2465988751500845,
+    "output": "\n> test:sproto:integration\n> npm run build && go build -o ../../tmp/sproto-echo ./cmd/debugserver && GSR_SPROTO_SERVER_BIN=../../tmp/sproto-echo node --test client/dist/sproto_client.test.js\n\n\n> build\n> tsc --project tsconfig.json\n\n\u2714 official Sproto vectors and safe integer boundary (2.835875ms)\n\u2714 official Sproto boolean and mixed signed int64 arrays (114.593167ms)\n\u2714 Sproto decoded results and unpacked buffers stay independent (3.965959ms)\n\u2714 Sproto sessions stay independent and close clears pending (1.17475ms)\n\u2714 Sproto pending and packet limits (60.245125ms)\n\u2714 Go/TS Sproto Echo Plain (570.070208ms)\n\u2714 Go/TS Sproto Echo MAC (38.349959ms)\n\u2139 tests 7\n\u2139 suites 0\n\u2139 pass 7\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 844.397708\n"
+  },
+  {
+    "args": [
+      "go",
+      "version",
+      "-m",
+      "tmp/sproto-echo"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.019553832709789276,
+    "output": "tmp/sproto-echo: go1.24.13\n\tpath\tgithub.com/cnooljaw/gsr/examples/websocket-gate/cmd/debugserver\n\tmod\tgithub.com/cnooljaw/gsr\tv1.0.2-0.20261022143817-6d464390cafd+dirty\t\n\tdep\tgithub.com/cnooljaw/gosproto\tv0.4.0\n\t=>\t/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/candidate\t(devel)\t\n\t\n\tdep\tgithub.com/gorilla/websocket\tv1.5.3\th1:saDtZ6Pbx/0u+bgYQ3q96pZgCzfhKXGPqt7kZ72aNNg=\n\tdep\tgoogle.golang.org/protobuf\tv1.36.1\th1:yBPeRvTftaleIgM3PZ/WBIZ7XM/eEYAaEyCwvyjq/gk=\n\tbuild\t-buildmode=exe\n\tbuild\t-compiler=gc\n\tbuild\tCGO_ENABLED=1\n\tbuild\tCGO_CFLAGS=\n\tbuild\tCGO_CPPFLAGS=\n\tbuild\tCGO_CXXFLAGS=\n\tbuild\tCGO_LDFLAGS=\n\tbuild\tGOARCH=arm64\n\tbuild\tGOOS=darwin\n\tbuild\tGOARM64=v8.0\n\tbuild\tvcs=git\n\tbuild\tvcs.revision=6d464390cafd11a6301b33a1f59bf2084f94acf0\n\tbuild\tvcs.time=2026-10-22T14:38:17Z\n\tbuild\tvcs.modified=true\n"
+  },
+  {
+    "args": [
+      "go",
+      "test",
+      "-modfile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/integration.mod",
+      "-c",
+      "-o",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/final.test",
+      "./examples/websocket-gate/benchmarks"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr",
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.4301456678658724,
+    "output": ""
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/final.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkRepresentativeCodec$",
+      "-test.benchmem",
+      "-test.benchtime=200ms",
+      "-test.count=3",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/examples/websocket-gate/benchmarks",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off"
+    },
+    "exitCode": 0,
+    "seconds": 34.922166500240564,
+    "output": "goos: darwin\ngoarch: arm64\npkg: github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks\ncpu: Apple M2\nBenchmarkRepresentativeCodec/addressbook/protobuf_encode         \t  801379\t       332.7 ns/op\t      80 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/addressbook/protobuf_encode         \t  784035\t       332.9 ns/op\t      80 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/addressbook/protobuf_encode         \t  731390\t       330.1 ns/op\t      80 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/addressbook/protobuf_decode         \t  301972\t      1079 ns/op\t     648 B/op\t      26 allocs/op\nBenchmarkRepresentativeCodec/addressbook/protobuf_decode         \t  277729\t       813.7 ns/op\t     648 B/op\t      26 allocs/op\nBenchmarkRepresentativeCodec/addressbook/protobuf_decode         \t  314245\t       801.9 ns/op\t     648 B/op\t      26 allocs/op\nBenchmarkRepresentativeCodec/addressbook/sproto_encode           \t  511231\t       516.9 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/addressbook/sproto_encode           \t  466362\t       523.1 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/addressbook/sproto_encode           \t  468612\t       543.5 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/addressbook/sproto_decode           \t  240816\t      1005 ns/op\t     528 B/op\t      29 allocs/op\nBenchmarkRepresentativeCodec/addressbook/sproto_decode           \t  253312\t       974.4 ns/op\t     528 B/op\t      29 allocs/op\nBenchmarkRepresentativeCodec/addressbook/sproto_decode           \t  250586\t      1216 ns/op\t     528 B/op\t      29 allocs/op\nBenchmarkRepresentativeCodec/addressbook/sproto_pack             \t 2678036\t        89.80 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/addressbook/sproto_pack             \t 2614144\t        88.79 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/addressbook/sproto_pack             \t 2714312\t        87.75 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/addressbook/sproto_unpack           \t 1401459\t       170.1 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/addressbook/sproto_unpack           \t 1423825\t       187.7 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/addressbook/sproto_unpack           \t 1000000\t       218.5 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/addressbook/sproto_pencode          \t  410512\t       586.3 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/addressbook/sproto_pencode          \t  410197\t       586.2 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/addressbook/sproto_pencode          \t  403332\t       590.4 ns/op\t     144 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/addressbook/sproto_pdecode          \t  205483\t      1167 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkRepresentativeCodec/addressbook/sproto_pdecode          \t  209288\t      1153 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkRepresentativeCodec/addressbook/sproto_pdecode          \t  206316\t      1153 ns/op\t     672 B/op\t      30 allocs/op\nBenchmarkRepresentativeCodec/game_small/protobuf_encode          \t  366313\t       583.9 ns/op\t     192 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/game_small/protobuf_encode          \t  430341\t       723.7 ns/op\t     192 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/game_small/protobuf_encode          \t  363801\t       652.5 ns/op\t     192 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/game_small/protobuf_decode          \t  144476\t      1648 ns/op\t    1208 B/op\t      53 allocs/op\nBenchmarkRepresentativeCodec/game_small/protobuf_decode          \t  147578\t      1633 ns/op\t    1208 B/op\t      53 allocs/op\nBenchmarkRepresentativeCodec/game_small/protobuf_decode          \t  148414\t      1647 ns/op\t    1208 B/op\t      53 allocs/op\nBenchmarkRepresentativeCodec/game_small/sproto_encode            \t  387567\t       611.5 ns/op\t     352 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/game_small/sproto_encode            \t  392082\t       609.2 ns/op\t     352 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/game_small/sproto_encode            \t  440030\t       611.6 ns/op\t     352 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/game_small/sproto_decode            \t  164730\t      1712 ns/op\t    1200 B/op\t      52 allocs/op\nBenchmarkRepresentativeCodec/game_small/sproto_decode            \t  166734\t      1471 ns/op\t    1200 B/op\t      52 allocs/op\nBenchmarkRepresentativeCodec/game_small/sproto_decode            \t  165492\t      1448 ns/op\t    1200 B/op\t      52 allocs/op\nBenchmarkRepresentativeCodec/game_small/sproto_pack              \t 1898348\t       127.4 ns/op\t     352 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/game_small/sproto_pack              \t 1512300\t       135.7 ns/op\t     352 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/game_small/sproto_pack              \t 1828273\t       128.4 ns/op\t     352 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/game_small/sproto_unpack            \t  750028\t       322.3 ns/op\t     352 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/game_small/sproto_unpack            \t  904947\t       386.2 ns/op\t     352 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/game_small/sproto_unpack            \t  746151\t       312.6 ns/op\t     352 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/game_small/sproto_pencode           \t  402466\t       673.4 ns/op\t     352 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/game_small/sproto_pencode           \t  349272\t       686.6 ns/op\t     352 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/game_small/sproto_pencode           \t  345331\t       691.5 ns/op\t     352 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/game_small/sproto_pdecode           \t  131343\t      1816 ns/op\t    1552 B/op\t      53 allocs/op\nBenchmarkRepresentativeCodec/game_small/sproto_pdecode           \t  129387\t      2092 ns/op\t    1552 B/op\t      53 allocs/op\nBenchmarkRepresentativeCodec/game_small/sproto_pdecode           \t  131362\t      2394 ns/op\t    1552 B/op\t      53 allocs/op\nBenchmarkRepresentativeCodec/game_large/protobuf_encode          \t   31173\t      7448 ns/op\t    2304 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/game_large/protobuf_encode          \t   32524\t      7433 ns/op\t    2304 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/game_large/protobuf_encode          \t   32764\t      7464 ns/op\t    2304 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/game_large/protobuf_decode          \t   14115\t     17064 ns/op\t   13560 B/op\t     537 allocs/op\nBenchmarkRepresentativeCodec/game_large/protobuf_decode          \t   14050\t     17174 ns/op\t   13560 B/op\t     537 allocs/op\nBenchmarkRepresentativeCodec/game_large/protobuf_decode          \t   10000\t     23880 ns/op\t   13560 B/op\t     537 allocs/op\nBenchmarkRepresentativeCodec/game_large/sproto_encode            \t   58208\t      3997 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkRepresentativeCodec/game_large/sproto_encode            \t   59930\t      4501 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkRepresentativeCodec/game_large/sproto_encode            \t   60374\t      4010 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkRepresentativeCodec/game_large/sproto_decode            \t   19065\t     12442 ns/op\t   10416 B/op\t     532 allocs/op\nBenchmarkRepresentativeCodec/game_large/sproto_decode            \t   19300\t     12271 ns/op\t   10416 B/op\t     532 allocs/op\nBenchmarkRepresentativeCodec/game_large/sproto_decode            \t   19342\t     12408 ns/op\t   10416 B/op\t     532 allocs/op\nBenchmarkRepresentativeCodec/game_large/sproto_pack              \t  280191\t      1039 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/game_large/sproto_pack              \t  283506\t       869.8 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/game_large/sproto_pack              \t  297729\t       872.5 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/game_large/sproto_unpack            \t   69117\t      3494 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/game_large/sproto_unpack            \t   68545\t      3522 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/game_large/sproto_unpack            \t   67410\t      3455 ns/op\t    3456 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/game_large/sproto_pencode           \t   53521\t      4467 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkRepresentativeCodec/game_large/sproto_pencode           \t   59382\t      5588 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkRepresentativeCodec/game_large/sproto_pencode           \t   53121\t      4485 ns/op\t    3968 B/op\t       2 allocs/op\nBenchmarkRepresentativeCodec/game_large/sproto_pdecode           \t   14710\t     15995 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkRepresentativeCodec/game_large/sproto_pdecode           \t   14929\t     15953 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkRepresentativeCodec/game_large/sproto_pdecode           \t   15144\t     16019 ns/op\t   13872 B/op\t     533 allocs/op\nBenchmarkRepresentativeCodec/int32_edges/protobuf_encode         \t   49669\t      5576 ns/op\t    2688 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/int32_edges/protobuf_encode         \t   49053\t      5584 ns/op\t    2688 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/int32_edges/protobuf_encode         \t   49630\t      4770 ns/op\t    2688 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/int32_edges/protobuf_decode         \t   58471\t      4142 ns/op\t    4160 B/op\t       2 allocs/op\nBenchmarkRepresentativeCodec/int32_edges/protobuf_decode         \t   58615\t      4103 ns/op\t    4160 B/op\t       2 allocs/op\nBenchmarkRepresentativeCodec/int32_edges/protobuf_decode         \t   58792\t      4099 ns/op\t    4160 B/op\t       2 allocs/op\nBenchmarkRepresentativeCodec/int32_edges/sproto_encode           \t  180954\t      1318 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/int32_edges/sproto_encode           \t  176288\t      1361 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/int32_edges/sproto_encode           \t  178596\t      1614 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/int32_edges/sproto_decode           \t  180890\t      1318 ns/op\t    8288 B/op\t       4 allocs/op\nBenchmarkRepresentativeCodec/int32_edges/sproto_decode           \t  182679\t      1330 ns/op\t    8288 B/op\t       4 allocs/op\nBenchmarkRepresentativeCodec/int32_edges/sproto_decode           \t  178029\t      1323 ns/op\t    8288 B/op\t       4 allocs/op\nBenchmarkRepresentativeCodec/int32_edges/sproto_pack             \t  252519\t       941.3 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/int32_edges/sproto_pack             \t  245868\t       939.8 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/int32_edges/sproto_pack             \t  258768\t      1060 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/int32_edges/sproto_unpack           \t   62763\t      3866 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/int32_edges/sproto_unpack           \t   62130\t      4560 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/int32_edges/sproto_unpack           \t   63696\t      3890 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/int32_edges/sproto_pencode          \t  123301\t      1825 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/int32_edges/sproto_pencode          \t  135648\t      1822 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/int32_edges/sproto_pencode          \t  131830\t      1992 ns/op\t    4096 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/int32_edges/sproto_pdecode          \t   43134\t      5391 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkRepresentativeCodec/int32_edges/sproto_pdecode          \t   46014\t      5278 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkRepresentativeCodec/int32_edges/sproto_pdecode          \t   45522\t      6249 ns/op\t   12384 B/op\t       5 allocs/op\nBenchmarkRepresentativeCodec/echo_ascii4k/protobuf_encode        \t  400647\t       561.3 ns/op\t    4864 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/echo_ascii4k/protobuf_encode        \t  442243\t       559.4 ns/op\t    4864 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/echo_ascii4k/protobuf_encode        \t  456516\t       573.6 ns/op\t    4864 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/echo_ascii4k/protobuf_decode        \t  388419\t       607.6 ns/op\t    4160 B/op\t       3 allocs/op\nBenchmarkRepresentativeCodec/echo_ascii4k/protobuf_decode        \t  410565\t       610.7 ns/op\t    4160 B/op\t       3 allocs/op\nBenchmarkRepresentativeCodec/echo_ascii4k/protobuf_decode        \t  412962\t       615.5 ns/op\t    4160 B/op\t       3 allocs/op\nBenchmarkRepresentativeCodec/echo_ascii4k/sproto_encode          \t  401533\t       607.8 ns/op\t    4864 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/echo_ascii4k/sproto_encode          \t  400678\t       730.7 ns/op\t    4864 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/echo_ascii4k/sproto_encode          \t  384040\t       612.9 ns/op\t    4864 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/echo_ascii4k/sproto_decode          \t  372489\t       649.6 ns/op\t    4176 B/op\t       5 allocs/op\nBenchmarkRepresentativeCodec/echo_ascii4k/sproto_decode          \t  401514\t       652.0 ns/op\t    4176 B/op\t       5 allocs/op\nBenchmarkRepresentativeCodec/echo_ascii4k/sproto_decode          \t  356962\t       631.2 ns/op\t    4176 B/op\t       5 allocs/op\nBenchmarkRepresentativeCodec/echo_ascii4k/sproto_pack            \t  417896\t       592.8 ns/op\t    4864 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/echo_ascii4k/sproto_pack            \t  424015\t       592.8 ns/op\t    4864 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/echo_ascii4k/sproto_pack            \t  426631\t       558.1 ns/op\t    4864 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/echo_ascii4k/sproto_unpack          \t  445875\t       682.3 ns/op\t    4864 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/echo_ascii4k/sproto_unpack          \t  416722\t       537.3 ns/op\t    4864 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/echo_ascii4k/sproto_unpack          \t  446424\t       567.2 ns/op\t    4864 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/echo_ascii4k/sproto_pencode         \t  309828\t       735.8 ns/op\t    4864 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/echo_ascii4k/sproto_pencode         \t  324176\t       736.3 ns/op\t    4864 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/echo_ascii4k/sproto_pencode         \t  320653\t       735.1 ns/op\t    4864 B/op\t       1 allocs/op\nBenchmarkRepresentativeCodec/echo_ascii4k/sproto_pdecode         \t  201621\t      1176 ns/op\t    9040 B/op\t       6 allocs/op\nBenchmarkRepresentativeCodec/echo_ascii4k/sproto_pdecode         \t  206875\t      1162 ns/op\t    9040 B/op\t       6 allocs/op\nBenchmarkRepresentativeCodec/echo_ascii4k/sproto_pdecode         \t  209828\t      1483 ns/op\t    9040 B/op\t       6 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/final.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkProtocolCodec$",
+      "-test.benchmem",
+      "-test.benchtime=200ms",
+      "-test.count=3",
+      "-test.timeout=2m"
+    ],
+    "cwd": "/Users/lijiawang/Documents/cocos/laya/gsr/examples/websocket-gate/benchmarks",
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off"
+    },
+    "exitCode": 0,
+    "seconds": 26.770331416279078,
+    "output": "goos: darwin\ngoarch: arm64\npkg: github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks\ncpu: Apple M2\nBenchmarkProtocolCodec/ascii32/protobuf_payload/encode         \t 3660165\t        66.73 ns/op\t 479.56 MB/s\t      48 B/op\t       1 allocs/op\nBenchmarkProtocolCodec/ascii32/protobuf_payload/encode         \t 3587197\t        67.24 ns/op\t 475.93 MB/s\t      48 B/op\t       1 allocs/op\nBenchmarkProtocolCodec/ascii32/protobuf_payload/encode         \t 3559047\t        67.31 ns/op\t 475.41 MB/s\t      48 B/op\t       1 allocs/op\nBenchmarkProtocolCodec/ascii32/protobuf_payload/decode         \t 2238969\t       108.9 ns/op\t 293.84 MB/s\t      96 B/op\t       2 allocs/op\nBenchmarkProtocolCodec/ascii32/protobuf_payload/decode         \t 2501146\t        98.14 ns/op\t 326.08 MB/s\t      96 B/op\t       2 allocs/op\nBenchmarkProtocolCodec/ascii32/protobuf_payload/decode         \t 2487396\t       127.2 ns/op\t 251.51 MB/s\t      96 B/op\t       2 allocs/op\nBenchmarkProtocolCodec/ascii32/sproto_payload/encode           \t 2900872\t        81.18 ns/op\t 394.21 MB/s\t      48 B/op\t       1 allocs/op\nBenchmarkProtocolCodec/ascii32/sproto_payload/encode           \t 2965201\t        80.23 ns/op\t 398.83 MB/s\t      48 B/op\t       1 allocs/op\nBenchmarkProtocolCodec/ascii32/sproto_payload/encode           \t 3008251\t        80.32 ns/op\t 398.40 MB/s\t      48 B/op\t       1 allocs/op\nBenchmarkProtocolCodec/ascii32/sproto_payload/decode           \t 1749492\t       141.6 ns/op\t 226.03 MB/s\t     112 B/op\t       5 allocs/op\nBenchmarkProtocolCodec/ascii32/sproto_payload/decode           \t 1632667\t       141.2 ns/op\t 226.63 MB/s\t     112 B/op\t       5 allocs/op\nBenchmarkProtocolCodec/ascii32/sproto_payload/decode           \t 1367937\t       217.5 ns/op\t 147.13 MB/s\t     112 B/op\t       5 allocs/op\nBenchmarkProtocolCodec/ascii32/protobuf_frame/encode           \t 1315308\t       185.1 ns/op\t 172.85 MB/s\t     176 B/op\t       3 allocs/op\nBenchmarkProtocolCodec/ascii32/protobuf_frame/encode           \t 1302594\t       186.1 ns/op\t 171.92 MB/s\t     176 B/op\t       3 allocs/op\nBenchmarkProtocolCodec/ascii32/protobuf_frame/encode           \t 1288454\t       184.4 ns/op\t 173.57 MB/s\t     176 B/op\t       3 allocs/op\nBenchmarkProtocolCodec/ascii32/protobuf_frame/decode           \t 1000000\t       244.3 ns/op\t 131.01 MB/s\t     224 B/op\t       4 allocs/op\nBenchmarkProtocolCodec/ascii32/protobuf_frame/decode           \t 1000000\t       245.1 ns/op\t 130.58 MB/s\t     224 B/op\t       4 allocs/op\nBenchmarkProtocolCodec/ascii32/protobuf_frame/decode           \t 1000000\t       297.5 ns/op\t 107.56 MB/s\t     224 B/op\t       4 allocs/op\nBenchmarkProtocolCodec/ascii32/sproto_frame/encode             \t  983253\t       270.8 ns/op\t 118.16 MB/s\t     184 B/op\t       5 allocs/op\nBenchmarkProtocolCodec/ascii32/sproto_frame/encode             \t  958162\t       269.2 ns/op\t 118.89 MB/s\t     184 B/op\t       5 allocs/op\nBenchmarkProtocolCodec/ascii32/sproto_frame/encode             \t  943874\t       267.6 ns/op\t 119.57 MB/s\t     184 B/op\t       5 allocs/op\nBenchmarkProtocolCodec/ascii32/sproto_frame/decode             \t  748731\t       354.5 ns/op\t  90.26 MB/s\t     256 B/op\t      11 allocs/op\nBenchmarkProtocolCodec/ascii32/sproto_frame/decode             \t  773060\t       353.4 ns/op\t  90.54 MB/s\t     256 B/op\t      11 allocs/op\nBenchmarkProtocolCodec/ascii32/sproto_frame/decode             \t  889918\t       354.3 ns/op\t  90.32 MB/s\t     256 B/op\t      11 allocs/op\nBenchmarkProtocolCodec/utf8_1k/protobuf_payload/encode         \t  191283\t      1516 ns/op\t 659.54 MB/s\t    1024 B/op\t       1 allocs/op\nBenchmarkProtocolCodec/utf8_1k/protobuf_payload/encode         \t  188791\t      1280 ns/op\t 781.01 MB/s\t    1024 B/op\t       1 allocs/op\nBenchmarkProtocolCodec/utf8_1k/protobuf_payload/encode         \t  186517\t      1270 ns/op\t 787.46 MB/s\t    1024 B/op\t       1 allocs/op\nBenchmarkProtocolCodec/utf8_1k/protobuf_payload/decode         \t  179544\t      1335 ns/op\t 749.07 MB/s\t    1088 B/op\t       2 allocs/op\nBenchmarkProtocolCodec/utf8_1k/protobuf_payload/decode         \t  178467\t      1313 ns/op\t 761.89 MB/s\t    1088 B/op\t       2 allocs/op\nBenchmarkProtocolCodec/utf8_1k/protobuf_payload/decode         \t  178993\t      1491 ns/op\t 670.64 MB/s\t    1088 B/op\t       2 allocs/op\nBenchmarkProtocolCodec/utf8_1k/sproto_payload/encode           \t 1000000\t       215.1 ns/op\t4648.09 MB/s\t    1024 B/op\t       1 allocs/op\nBenchmarkProtocolCodec/utf8_1k/sproto_payload/encode           \t 1000000\t       217.4 ns/op\t4600.33 MB/s\t    1024 B/op\t       1 allocs/op\nBenchmarkProtocolCodec/utf8_1k/sproto_payload/encode           \t 1000000\t       250.9 ns/op\t3984.96 MB/s\t    1024 B/op\t       1 allocs/op\nBenchmarkProtocolCodec/utf8_1k/sproto_payload/decode           \t  910628\t       258.5 ns/op\t3868.15 MB/s\t    1104 B/op\t       5 allocs/op\nBenchmarkProtocolCodec/utf8_1k/sproto_payload/decode           \t  912243\t       380.3 ns/op\t2629.82 MB/s\t    1104 B/op\t       5 allocs/op\nBenchmarkProtocolCodec/utf8_1k/sproto_payload/decode           \t  952428\t       279.2 ns/op\t3581.95 MB/s\t    1104 B/op\t       5 allocs/op\nBenchmarkProtocolCodec/utf8_1k/protobuf_frame/encode           \t  159291\t      1531 ns/op\t 653.35 MB/s\t    2128 B/op\t       3 allocs/op\nBenchmarkProtocolCodec/utf8_1k/protobuf_frame/encode           \t  161521\t      1526 ns/op\t 655.10 MB/s\t    2128 B/op\t       3 allocs/op\nBenchmarkProtocolCodec/utf8_1k/protobuf_frame/encode           \t  160352\t      1537 ns/op\t 650.66 MB/s\t    2128 B/op\t       3 allocs/op\nBenchmarkProtocolCodec/utf8_1k/protobuf_frame/decode           \t  153189\t      1592 ns/op\t 628.17 MB/s\t    2192 B/op\t       4 allocs/op\nBenchmarkProtocolCodec/utf8_1k/protobuf_frame/decode           \t  149814\t      1908 ns/op\t 524.19 MB/s\t    2192 B/op\t       4 allocs/op\nBenchmarkProtocolCodec/utf8_1k/protobuf_frame/decode           \t  151191\t      1575 ns/op\t 634.96 MB/s\t    2192 B/op\t       4 allocs/op\nBenchmarkProtocolCodec/utf8_1k/sproto_frame/encode             \t  346164\t       626.0 ns/op\t1597.44 MB/s\t    3096 B/op\t       5 allocs/op\nBenchmarkProtocolCodec/utf8_1k/sproto_frame/encode             \t  381366\t       629.1 ns/op\t1589.65 MB/s\t    3096 B/op\t       5 allocs/op\nBenchmarkProtocolCodec/utf8_1k/sproto_frame/encode             \t  371564\t       620.4 ns/op\t1611.84 MB/s\t    3096 B/op\t       5 allocs/op\nBenchmarkProtocolCodec/utf8_1k/sproto_frame/decode             \t  394736\t       573.1 ns/op\t1744.92 MB/s\t    2224 B/op\t      11 allocs/op\nBenchmarkProtocolCodec/utf8_1k/sproto_frame/decode             \t  409518\t       573.9 ns/op\t1742.33 MB/s\t    2224 B/op\t      11 allocs/op\nBenchmarkProtocolCodec/utf8_1k/sproto_frame/decode             \t  404198\t       581.0 ns/op\t1721.17 MB/s\t    2224 B/op\t      11 allocs/op\nBenchmarkProtocolCodec/ascii4k/protobuf_payload/encode         \t  289209\t       998.1 ns/op\t4103.80 MB/s\t    4864 B/op\t       1 allocs/op\nBenchmarkProtocolCodec/ascii4k/protobuf_payload/encode         \t  296286\t       845.1 ns/op\t4846.89 MB/s\t    4864 B/op\t       1 allocs/op\nBenchmarkProtocolCodec/ascii4k/protobuf_payload/encode         \t  295617\t       960.6 ns/op\t4264.08 MB/s\t    4864 B/op\t       1 allocs/op\nBenchmarkProtocolCodec/ascii4k/protobuf_payload/decode         \t  231507\t       973.3 ns/op\t4208.38 MB/s\t    4160 B/op\t       2 allocs/op\nBenchmarkProtocolCodec/ascii4k/protobuf_payload/decode         \t  246957\t       931.8 ns/op\t4395.59 MB/s\t    4160 B/op\t       2 allocs/op\nBenchmarkProtocolCodec/ascii4k/protobuf_payload/decode         \t  243260\t       938.4 ns/op\t4364.84 MB/s\t    4160 B/op\t       2 allocs/op\nBenchmarkProtocolCodec/ascii4k/sproto_payload/encode           \t  398623\t       547.2 ns/op\t7485.86 MB/s\t    4864 B/op\t       1 allocs/op\nBenchmarkProtocolCodec/ascii4k/sproto_payload/encode           \t  438968\t       551.1 ns/op\t7432.64 MB/s\t    4864 B/op\t       1 allocs/op\nBenchmarkProtocolCodec/ascii4k/sproto_payload/encode           \t  426694\t       719.5 ns/op\t5693.11 MB/s\t    4864 B/op\t       1 allocs/op\nBenchmarkProtocolCodec/ascii4k/sproto_payload/decode           \t  391916\t       636.8 ns/op\t6432.44 MB/s\t    4176 B/op\t       5 allocs/op\nBenchmarkProtocolCodec/ascii4k/sproto_payload/decode           \t  360247\t       606.1 ns/op\t6757.92 MB/s\t    4176 B/op\t       5 allocs/op\nBenchmarkProtocolCodec/ascii4k/sproto_payload/decode           \t  344799\t       585.0 ns/op\t7001.58 MB/s\t    4176 B/op\t       5 allocs/op\nBenchmarkProtocolCodec/ascii4k/protobuf_frame/encode           \t  183495\t      1394 ns/op\t2937.32 MB/s\t    9808 B/op\t       3 allocs/op\nBenchmarkProtocolCodec/ascii4k/protobuf_frame/encode           \t  157568\t      1427 ns/op\t2870.23 MB/s\t    9808 B/op\t       3 allocs/op\nBenchmarkProtocolCodec/ascii4k/protobuf_frame/encode           \t  173758\t      1343 ns/op\t3049.62 MB/s\t    9808 B/op\t       3 allocs/op\nBenchmarkProtocolCodec/ascii4k/protobuf_frame/decode           \t  164632\t      1487 ns/op\t2754.76 MB/s\t    9104 B/op\t       4 allocs/op\nBenchmarkProtocolCodec/ascii4k/protobuf_frame/decode           \t  159830\t      1832 ns/op\t2235.22 MB/s\t    9104 B/op\t       4 allocs/op\nBenchmarkProtocolCodec/ascii4k/protobuf_frame/decode           \t  153982\t      1467 ns/op\t2792.57 MB/s\t    9104 B/op\t       4 allocs/op\nBenchmarkProtocolCodec/ascii4k/sproto_frame/encode             \t  143179\t      1594 ns/op\t2569.87 MB/s\t   14616 B/op\t       5 allocs/op\nBenchmarkProtocolCodec/ascii4k/sproto_frame/encode             \t  148015\t      1574 ns/op\t2602.32 MB/s\t   14616 B/op\t       5 allocs/op\nBenchmarkProtocolCodec/ascii4k/sproto_frame/encode             \t  155329\t      1546 ns/op\t2649.76 MB/s\t   14616 B/op\t       5 allocs/op\nBenchmarkProtocolCodec/ascii4k/sproto_frame/decode             \t  198451\t      1205 ns/op\t3397.99 MB/s\t    9136 B/op\t      11 allocs/op\nBenchmarkProtocolCodec/ascii4k/sproto_frame/decode             \t  191313\t      1228 ns/op\t3335.59 MB/s\t    9136 B/op\t      11 allocs/op\nBenchmarkProtocolCodec/ascii4k/sproto_frame/decode             \t  190873\t      1213 ns/op\t3375.51 MB/s\t    9136 B/op\t      11 allocs/op\nBenchmarkProtocolCodec/zeros4k/protobuf_payload/encode         \t  285655\t      1177 ns/op\t3481.08 MB/s\t    4864 B/op\t       1 allocs/op\nBenchmarkProtocolCodec/zeros4k/protobuf_payload/encode         \t  274530\t       871.1 ns/op\t4702.35 MB/s\t    4864 B/op\t       1 allocs/op\nBenchmarkProtocolCodec/zeros4k/protobuf_payload/encode         \t  281650\t       859.1 ns/op\t4767.85 MB/s\t    4864 B/op\t       1 allocs/op\nBenchmarkProtocolCodec/zeros4k/protobuf_payload/decode         \t  241940\t       964.9 ns/op\t4244.93 MB/s\t    4160 B/op\t       2 allocs/op\nBenchmarkProtocolCodec/zeros4k/protobuf_payload/decode         \t  258435\t       953.0 ns/op\t4298.22 MB/s\t    4160 B/op\t       2 allocs/op\nBenchmarkProtocolCodec/zeros4k/protobuf_payload/decode         \t  250162\t       960.2 ns/op\t4265.77 MB/s\t    4160 B/op\t       2 allocs/op\nBenchmarkProtocolCodec/zeros4k/sproto_payload/encode           \t  423420\t       564.8 ns/op\t7252.01 MB/s\t    4864 B/op\t       1 allocs/op\nBenchmarkProtocolCodec/zeros4k/sproto_payload/encode           \t  430354\t       554.0 ns/op\t7393.56 MB/s\t    4864 B/op\t       1 allocs/op\nBenchmarkProtocolCodec/zeros4k/sproto_payload/encode           \t  417660\t       676.1 ns/op\t6058.17 MB/s\t    4864 B/op\t       1 allocs/op\nBenchmarkProtocolCodec/zeros4k/sproto_payload/decode           \t  425821\t       602.4 ns/op\t6799.40 MB/s\t    4176 B/op\t       5 allocs/op\nBenchmarkProtocolCodec/zeros4k/sproto_payload/decode           \t  411513\t       585.5 ns/op\t6995.68 MB/s\t    4176 B/op\t       5 allocs/op\nBenchmarkProtocolCodec/zeros4k/sproto_payload/decode           \t  378493\t       586.1 ns/op\t6989.08 MB/s\t    4176 B/op\t       5 allocs/op\nBenchmarkProtocolCodec/zeros4k/protobuf_frame/encode           \t  177710\t      1351 ns/op\t3031.27 MB/s\t    9808 B/op\t       3 allocs/op\nBenchmarkProtocolCodec/zeros4k/protobuf_frame/encode           \t  164293\t      1408 ns/op\t2909.06 MB/s\t    9808 B/op\t       3 allocs/op\nBenchmarkProtocolCodec/zeros4k/protobuf_frame/encode           \t  173277\t      1424 ns/op\t2876.42 MB/s\t    9808 B/op\t       3 allocs/op\nBenchmarkProtocolCodec/zeros4k/protobuf_frame/decode           \t  160360\t      1449 ns/op\t2825.83 MB/s\t    9104 B/op\t       4 allocs/op\nBenchmarkProtocolCodec/zeros4k/protobuf_frame/decode           \t  168637\t      1814 ns/op\t2257.83 MB/s\t    9104 B/op\t       4 allocs/op\nBenchmarkProtocolCodec/zeros4k/protobuf_frame/decode           \t  153589\t      1536 ns/op\t2667.06 MB/s\t    9104 B/op\t       4 allocs/op\nBenchmarkProtocolCodec/zeros4k/sproto_frame/encode             \t  111246\t      2125 ns/op\t1927.64 MB/s\t   14616 B/op\t       5 allocs/op\nBenchmarkProtocolCodec/zeros4k/sproto_frame/encode             \t  111513\t      2055 ns/op\t1992.78 MB/s\t   14616 B/op\t       5 allocs/op\nBenchmarkProtocolCodec/zeros4k/sproto_frame/encode             \t  113132\t      2024 ns/op\t2024.13 MB/s\t   14616 B/op\t       5 allocs/op\nBenchmarkProtocolCodec/zeros4k/sproto_frame/decode             \t  194580\t      1409 ns/op\t2907.78 MB/s\t    9136 B/op\t      11 allocs/op\nBenchmarkProtocolCodec/zeros4k/sproto_frame/decode             \t  173605\t      1263 ns/op\t3244.18 MB/s\t    9136 B/op\t      11 allocs/op\nBenchmarkProtocolCodec/zeros4k/sproto_frame/decode             \t  198820\t      1200 ns/op\t3413.24 MB/s\t    9136 B/op\t      11 allocs/op\nPASS\n"
+  }
+]

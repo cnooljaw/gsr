@@ -72,3 +72,22 @@ func BenchmarkUnpackShapes(b *testing.B) {
 		})
 	}
 }
+
+// BenchmarkPackShapes 分离压缩阶段，复用零段、FF、稀疏及高密度输入观察吞吐与分配。
+func BenchmarkPackShapes(b *testing.B) {
+	for _, shape := range unpackShapes() {
+		packed := sproto.Pack(shape.raw)
+		unpacked, err := sproto.Unpack(packed)
+		if err != nil || !bytes.Equal(unpacked, shape.raw) {
+			b.Fatalf("%s pack round trip differs: %v", shape.name, err)
+		}
+		b.Run(shape.name, func(b *testing.B) {
+			b.ReportAllocs()
+			b.SetBytes(int64(len(shape.raw)))
+			b.ResetTimer()
+			for range b.N {
+				encodedSink = sproto.Pack(shape.raw)
+			}
+		})
+	}
+}

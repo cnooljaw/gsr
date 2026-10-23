@@ -1,0 +1,157 @@
+package benchmarks
+
+import (
+	"bytes"
+	"encoding/json"
+	"math"
+	"os"
+	"runtime"
+	"sort"
+	"testing"
+	"time"
+
+	sp "github.com/cnooljaw/gosproto"
+)
+
+type calibrationBatch struct {
+	Phase            string
+	Iteration, Calls int
+	Nanoseconds      int64
+	Bytes, Allocs    uint64
+	GC               uint32
+}
+
+type unpackBlock struct {
+	Arm                   string `json:"arm"`
+	Calls                 int    `json:"calls"`
+	Nanoseconds           int64  `json:"nanoseconds"`
+	Bytes, Allocs         uint64
+	GC                    uint32
+	PauseNs               uint64
+	HeapBefore, HeapAfter uint64
+}
+
+type unpackQuartet struct {
+	Round, Index int
+	Order        string
+	Blocks       []unpackBlock
+	Ratio        float64
+}
+
+// TestStringInProcessExperiment 在同一模块/进程交错消息头parser，保留全部GC、分配与时间块。
+func TestStringInProcessExperiment(t *testing.T) {
+	if runtime.GOMAXPROCS(0) != 1 {
+		t.Fatal("GOMAXPROCS1 required")
+	}
+	name, mode := os.Getenv("GSR_CASE"), os.Getenv("GSR_MODE")
+	operation := os.Getenv("GSR_OP")
+ var packed []byte
+ var message any
+ for _,sample:=range representativeCases(t){
+  if sample.Name!=name {continue}
+  _,wires:=representativeOperations(t,sample);checkRepresentativeWire(t,sample,wires);packed=wires["sproto_encode"]
+  _,create:=representativeMessages(sample.Type);message=create();if err:=json.Unmarshal(sample.Data,message);err!=nil{t.Fatal(err)}
+ }
+ if packed==nil {for _,shape:=range unpackShapes(){if shape.name==name{packed=shape.raw}}}
+ if packed==nil {t.Fatal("unknown fixture")}
+ beforeInput:=append([]byte(nil),packed...)
+ want:=sp.ExperimentPack(packed);got:=sp.Pack(packed)
+ if !bytes.Equal(want,got)||cap(want)!=cap(got){t.Fatal("wire/cap mismatch")}
+ runs:=map[string]func(){}
+ if operation=="public" {
+  left,right:=sp.ExperimentEncodePacked,sp.EncodePacked
+  if mode=="self" {right=left} else if mode=="clone1"||mode=="clone2"{right=sp.ExperimentEncodePackedClone}else if mode!="pass1"&&mode!="pass2"{t.Fatal("mode")}
+  makeRun:=func(fn func(interface{})([]byte,error))func(){return func(){output,err:=fn(message);if err!=nil{t.Fatal(err)};encodedSink=output}}
+  runs["A"],runs["B"]=makeRun(left),makeRun(right)
+ }else if operation=="pack" {
+  left,right:=sp.ExperimentPack,sp.Pack
+  if mode=="self" {right=left} else if mode=="clone1"||mode=="clone2"{right=sp.ExperimentPackClone}else if mode!="pass1"&&mode!="pass2"{t.Fatal("mode")}
+  makeRun:=func(fn func([]byte)[]byte)func(){return func(){encodedSink=fn(packed)}}
+  runs["A"],runs["B"]=makeRun(left),makeRun(right)
+ }else{t.Fatal("operation")}
+	runtime.GC()
+	for _, arm := range []string{"A", "B"} {
+		start := time.Now()
+		for time.Since(start) < 50*time.Millisecond {
+			for range 64 {
+				runs[arm]()
+			}
+		}
+	}
+	calibration := []calibrationBatch{}
+	measureCalibration := func(phase string, iteration, n int) int64 {
+		var before, after runtime.MemStats
+		runtime.ReadMemStats(&before)
+		start := time.Now()
+		for range n {
+			runs["A"]()
+		}
+		ns := time.Since(start).Nanoseconds()
+		runtime.ReadMemStats(&after)
+		calibration = append(calibration, calibrationBatch{phase, iteration, n, ns, after.TotalAlloc - before.TotalAlloc, after.Mallocs - before.Mallocs, after.NumGC - before.NumGC})
+		return ns
+	}
+	seeds := make([]int64, 7)
+	for i := range seeds {
+		seeds[i] = measureCalibration("seed", 0, 256)
+	}
+	sorted := append([]int64(nil), seeds...)
+	sort.Slice(sorted, func(i, j int) bool { return sorted[i] < sorted[j] })
+	calls := max(256, min(1<<16, int(float64(60*time.Millisecond)/float64(max(int64(1), sorted[3]))*256)))
+	for iteration := 0; iteration < 3; iteration++ {
+		pilots := []int64{measureCalibration("pilot", iteration, calls), measureCalibration("pilot", iteration, calls), measureCalibration("pilot", iteration, calls)}
+		sort.Slice(pilots, func(i, j int) bool { return pilots[i] < pilots[j] })
+		if pilots[1] >= int64(40*time.Millisecond) || iteration == 2 || calls == 1<<16 {
+			break
+		}
+		calls = min(1<<16, max(calls+1, int(float64(calls)*float64(60*time.Millisecond)/float64(max(int64(1), pilots[1])))))
+	}
+	blocks := []unpackQuartet{}
+	for round := 0; round < 6; round++ {
+		for quartet := 0; quartet < 4; quartet++ {
+			order := "ABBA"
+			if (round+quartet)%2 != 0 {
+				order = "BAAB"
+			}
+			q := unpackQuartet{Round: round, Index: quartet, Order: order}
+			logRatio := 0.0
+			for _, label := range order {
+				arm := string(label)
+				var before, after runtime.MemStats
+				runtime.ReadMemStats(&before)
+				run := runs[arm]
+				start := time.Now()
+				for range calls {
+					run()
+				}
+				ns := time.Since(start).Nanoseconds()
+				runtime.ReadMemStats(&after)
+				block := unpackBlock{Arm: arm, Calls: calls, Nanoseconds: ns, Bytes: after.TotalAlloc - before.TotalAlloc, Allocs: after.Mallocs - before.Mallocs, GC: after.NumGC - before.NumGC, PauseNs: after.PauseTotalNs - before.PauseTotalNs, HeapBefore: before.HeapAlloc, HeapAfter: after.HeapAlloc}
+				q.Blocks = append(q.Blocks, block)
+				sign := 1.0
+				if arm == "A" {
+					sign = -1
+				}
+				logRatio += sign * math.Log(float64(ns)/float64(calls))
+			}
+			q.Ratio = math.Exp(logRatio / 2)
+			blocks = append(blocks, q)
+		}
+	}
+	if !bytes.Equal(packed, beforeInput) {
+		t.Fatal("input modified")
+	}
+	raw, err := json.MarshalIndent(struct {
+		Name, Operation, Mode string
+		CallsPerBlock         int
+		Calibration           []calibrationBatch
+		Quartets              []unpackQuartet
+	}{name, operation, mode, calls, calibration, blocks}, "", "  ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(os.Getenv("GSR_OUTPUT"), append(raw, '\n'), 0644); err != nil {
+		t.Fatal(err)
+	}
+	runtime.KeepAlive(runs)
+}

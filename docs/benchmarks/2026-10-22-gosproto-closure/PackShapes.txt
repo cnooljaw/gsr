@@ -1,0 +1,41 @@
+goos: darwin
+goarch: arm64
+pkg: github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks
+cpu: Apple M2
+BenchmarkPackShapes/zero32         	 5666576	        30.97 ns/op	1033.25 MB/s	      48 B/op	       1 allocs/op
+BenchmarkPackShapes/zero32         	 5619343	        31.54 ns/op	1014.74 MB/s	      48 B/op	       1 allocs/op
+BenchmarkPackShapes/ascii32        	 5729328	        29.57 ns/op	1082.15 MB/s	      48 B/op	       1 allocs/op
+BenchmarkPackShapes/ascii32        	 6155406	        29.07 ns/op	1100.95 MB/s	      48 B/op	       1 allocs/op
+BenchmarkPackShapes/zero4096       	  217768	       847.0 ns/op	4836.04 MB/s	    4864 B/op	       1 allocs/op
+BenchmarkPackShapes/zero4096       	  168033	       936.8 ns/op	4372.29 MB/s	    4864 B/op	       1 allocs/op
+BenchmarkPackShapes/ascii4096      	  370983	       464.4 ns/op	8819.56 MB/s	    4864 B/op	       1 allocs/op
+BenchmarkPackShapes/ascii4096      	  392890	       630.0 ns/op	6501.29 MB/s	    4864 B/op	       1 allocs/op
+BenchmarkPackShapes/zero65536      	   14762	     12737 ns/op	5145.40 MB/s	   73728 B/op	       1 allocs/op
+BenchmarkPackShapes/zero65536      	   12268	     14005 ns/op	4679.47 MB/s	   73728 B/op	       1 allocs/op
+BenchmarkPackShapes/ascii65536     	   25662	      5958 ns/op	10999.16 MB/s	   73728 B/op	       1 allocs/op
+BenchmarkPackShapes/ascii65536     	   30363	      5902 ns/op	11103.94 MB/s	   73728 B/op	       1 allocs/op
+BenchmarkPackShapes/nonzero1x256   	  390529	       457.6 ns/op	4475.61 MB/s	    2304 B/op	       1 allocs/op
+BenchmarkPackShapes/nonzero1x256   	  389764	       488.1 ns/op	4196.18 MB/s	    2304 B/op	       1 allocs/op
+BenchmarkPackShapes/nonzero2x256   	  367052	       491.6 ns/op	4166.27 MB/s	    2304 B/op	       1 allocs/op
+BenchmarkPackShapes/nonzero2x256   	  349958	       459.7 ns/op	4455.32 MB/s	    2304 B/op	       1 allocs/op
+BenchmarkPackShapes/nonzero3x256   	  415740	       562.8 ns/op	3638.94 MB/s	    2304 B/op	       1 allocs/op
+BenchmarkPackShapes/nonzero3x256   	  401479	       473.2 ns/op	4327.89 MB/s	    2304 B/op	       1 allocs/op
+BenchmarkPackShapes/nonzero4x256   	  375850	       479.7 ns/op	4269.73 MB/s	    2304 B/op	       1 allocs/op
+BenchmarkPackShapes/nonzero4x256   	  332653	       947.3 ns/op	2161.88 MB/s	    2304 B/op	       1 allocs/op
+BenchmarkPackShapes/nonzero5x256   	  348193	       511.0 ns/op	4008.21 MB/s	    2304 B/op	       1 allocs/op
+BenchmarkPackShapes/nonzero5x256   	  348321	       516.6 ns/op	3964.23 MB/s	    2304 B/op	       1 allocs/op
+BenchmarkPackShapes/nonzero6x256   	  378482	       512.8 ns/op	3994.01 MB/s	    2304 B/op	       1 allocs/op
+BenchmarkPackShapes/nonzero6x256   	  369410	       543.4 ns/op	3768.59 MB/s	    2304 B/op	       1 allocs/op
+BenchmarkPackShapes/nonzero7x256   	  311708	       492.6 ns/op	4157.55 MB/s	    2304 B/op	       1 allocs/op
+BenchmarkPackShapes/nonzero7x256   	  385304	       491.9 ns/op	4163.83 MB/s	    2304 B/op	       1 allocs/op
+BenchmarkPackShapes/FF512-sparse4096         	  191388	       967.1 ns/op	4764.67 MB/s	    4864 B/op	       1 allocs/op
+BenchmarkPackShapes/FF512-sparse4096         	  185776	       966.9 ns/op	4765.86 MB/s	    4864 B/op	       1 allocs/op
+BenchmarkPackShapes/zeroRun8x64              	   74577	      2407 ns/op	1914.51 MB/s	    4864 B/op	       1 allocs/op
+BenchmarkPackShapes/zeroRun8x64              	   74054	      2429 ns/op	1896.99 MB/s	    4864 B/op	       1 allocs/op
+BenchmarkPackShapes/zeroRun16x64             	   54746	      3297 ns/op	2639.66 MB/s	    9472 B/op	       1 allocs/op
+BenchmarkPackShapes/zeroRun16x64             	   53934	      3325 ns/op	2617.44 MB/s	    9472 B/op	       1 allocs/op
+BenchmarkPackShapes/zeroRun64x64             	   20710	      8589 ns/op	3874.62 MB/s	   40960 B/op	       1 allocs/op
+BenchmarkPackShapes/zeroRun64x64             	   20877	      9940 ns/op	3348.04 MB/s	   40960 B/op	       1 allocs/op
+BenchmarkPackShapes/random4096               	  189724	       922.3 ns/op	4441.00 MB/s	    4864 B/op	       1 allocs/op
+BenchmarkPackShapes/random4096               	  202599	       909.6 ns/op	4503.18 MB/s	    4864 B/op	       1 allocs/op
+PASS

@@ -1,5 +1,7 @@
 # Go Sproto双主线目标
 
+2026-10-22收尾：[gosproto优化状态](GOSPROTO-OPTIMIZATION-STATUS.md)与[完整报告](benchmarks/2026-10-22-gosproto-closure/RESULTS.md)。本轮P0～P5已完成验收；新增原生普通word Pack使整数EncodePacked两遍约快35%、大型约快14%～18%，另保留准入的小收益，purego回退恢复原指令形态。最终整数packed解码仍慢PB26.5%，不宣称全面胜出。完整库/官方oracle/purego/race/checkptr/vet、fuzz、跨架构编译、GoTS7/7和完整Benchmark通过。普通word Pack与回归已本地提交gosproto `3c505c3`；本次收尾资料随GSR提交归档，均未推送。正式依赖仍v0.4.0，库中已有删除未纳入提交。历史“下一步”不代表当前待办。
+
 2026-10-22最新实现：[ARM64完整预检扫描](benchmarks/2026-10-22-gosproto-preflight-arm64/RESULTS.md)保留256B紧凑计数表版，完整边界/预算/错误顺序与预检后分配保持。公开整数DecodePacked两遍改善15.79%/10.33%，大型改善1.45%/5.87%，ASCII/小消息代价与clone波动全部保留。正式72项对照整数packed仍慢PB30.7%，大型快8.0%，40项分配不变；完整库官方oracle/purego/race/checkptr/vet、有限fuzz、跨架构编译及GoTS7/7通过。新源码与报告未提交，前轮91e6c01已提交未推送；正式依赖及十项用户删除保持。
 
 2026-10-22最新复核：[递减预算同源clone控制](benchmarks/2026-10-22-gosproto-budget-clone/RESULTS.md)完成20进程1920块，26条流程命令、源码/助记符/不同符号地址及二进制核对通过。相同算法clone也有数个百分点差异；候选大型公开入口本轮+0.06%/−0.72%，未重复确认前轮小收益。旧收益与全部控制保留，不扣clone校正，候选仍归档待确认、未应用。下一步转向可直接减少状态维护的预检实验。前轮已提交0dc46d8，新报告未提交；库92a155a、正式依赖及十项用户删除保持。

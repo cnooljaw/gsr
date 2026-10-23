@@ -1,5 +1,7 @@
 # gosproto 后续性能优化方案
 
+2026-10-22收尾：[gosproto优化状态](GOSPROTO-OPTIMIZATION-STATUS.md)与[完整报告](benchmarks/2026-10-22-gosproto-closure/RESULTS.md)。本轮P0～P5已完成验收；新增原生普通word Pack使整数EncodePacked两遍约快35%、大型约快14%～18%，另保留准入的小收益，purego回退恢复原指令形态。最终整数packed解码仍慢PB26.5%，不宣称全面胜出。完整库/官方oracle/purego/race/checkptr/vet、fuzz、跨架构编译、GoTS7/7和完整Benchmark通过。普通word Pack与回归已本地提交gosproto `3c505c3`；本次收尾资料随GSR提交归档，均未推送。正式依赖仍v0.4.0，库中已有删除未纳入提交。历史“下一步”不代表当前待办。
+
 当前Body与测量诊断（2026-10-20）：[字段Tag局部复用](benchmarks/2026-10-20-gosproto-record-tag/RESULTS.md)确认两记录函数Tag加载2→1、指令/栈不变，但净收益未确认，未采用。原37项大型Encode+6.22%/+7.18%，同源跨模块clone本身+6.66%，不能直接归因于候选。追加单模块独立二进制96worker，Encode+1.95%、PEncode−0.86%，控制/离散仍明显，全部小收益与反向保留，不扣控制差值。原178条流程＋补充102条及两侧描述替换race/checkptr通过；后续关键Go候选补单模块复核，旧数据不回填。前轮440f436已提交，库a93bb0d及原6项删除保持，新报告未提交，双主线继续。
 
 当前Body实验（2026-10-20）：[数组局部字段引用](benchmarks/2026-10-20-gosproto-record-fields/RESULTS.md)固定37项及补充17/32字段4项两轮完成，未采用。大型Encode+9.03%/+15.75%、PEncode+6.47%/+7.34%，回退17/32字段Encode约慢10%～12%；全部正收益与累计反向保留，不设比例门槛。无新增堆分配但fieldSize栈256→432B、记录循环指令与检查增多。178+46条测量命令、原契约/109形态525差分、两侧字段容量/乱序tag/描述替换race/checkptr回归通过；库a93bb0d和原6项删除保持，前轮28c494f已提交，新报告未提交，双主线继续。

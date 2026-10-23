@@ -1,0 +1,15 @@
+package sproto
+func experimentSizeHelper(src []byte, maxBytes int) (int, error, bool) {
+	if len(src) < 128 || len(src) > 1<<20 {
+		return 0, nil, false
+	}
+	size, status := unpackedSizeARM64(src, maxBytes, &unpackSizeCounts)
+	switch status {
+	case 1:
+		return 0, ErrUnpack, true
+	case 2:
+		return 0, ErrLimit, true
+	default:
+		return size, nil, true
+	}
+}

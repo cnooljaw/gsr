@@ -1,0 +1,18 @@
+{
+  "args": [
+    "go",
+    "test",
+    "-run",
+    "^$",
+    "-fuzz",
+    "^FuzzPackRoundTrip$",
+    "-fuzztime=10000x",
+    "-parallel=1",
+    "-timeout=45s",
+    "."
+  ],
+  "exitCode": 0,
+  "seconds": 1.5427677500993013,
+  "output": "fuzz: elapsed: 0s, gathering baseline coverage: 0/58 completed\nfuzz: elapsed: 0s, gathering baseline coverage: 58/58 completed, now fuzzing with 1 workers\nfuzz: elapsed: 0s, execs: 10000 (27083/sec), new interesting: 0 (total: 58)\nPASS\nok  \tgithub.com/cnooljaw/gosproto\t0.975s\n",
+  "scope": "Investigate elapsed-time fuzz plateau using fixed completed iteration count; no source changes"
+}

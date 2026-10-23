@@ -1,0 +1,43 @@
+File: final.test
+Type: cpu
+Time: 2026-10-22 23:08:35 CST
+Duration: 5.74s, Total samples = 4.96s (86.44%)
+Showing nodes accounting for 4.31s, 86.90% of 4.96s total
+Dropped 55 nodes (cum <= 0.02s)
+Showing top 35 nodes out of 64
+      flat  flat%   sum%        cum   cum%
+     0.02s   0.4%   0.4%      4.33s 87.30%  github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks.BenchmarkRepresentativeCodec.func1
+         0     0%   0.4%      4.33s 87.30%  testing.(*B).launch
+         0     0%   0.4%      4.33s 87.30%  testing.(*B).runN
+     0.01s   0.2%   0.6%      4.31s 86.90%  github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks.representativeOperations.func5
+         0     0%   0.6%      4.28s 86.29%  github.com/cnooljaw/gosproto.Pack (inline)
+     0.02s   0.4%  1.01%      3.29s 66.33%  github.com/cnooljaw/gosproto.packInto
+     3.25s 65.52% 66.53%      3.25s 65.52%  github.com/cnooljaw/gosproto.packWordsARM64
+         0     0% 66.53%      3.25s 65.52%  github.com/cnooljaw/gosproto.packWordsFast (inline)
+         0     0% 66.53%      1.01s 20.36%  runtime.systemstack
+         0     0% 66.53%      0.99s 19.96%  runtime.makeslice
+     0.01s   0.2% 66.73%      0.99s 19.96%  runtime.mallocgc
+     0.03s   0.6% 67.34%      0.94s 18.95%  runtime.mallocgcSmallNoscan
+     0.01s   0.2% 67.54%      0.68s 13.71%  runtime.(*mcache).nextFree
+     0.04s  0.81% 68.35%      0.64s 12.90%  runtime.(*mcache).refill
+     0.01s   0.2% 68.55%      0.48s  9.68%  runtime.(*mcentral).cacheSpan
+         0     0% 68.55%      0.46s  9.27%  runtime.(*mheap).alloc.func1
+     0.01s   0.2% 68.75%      0.46s  9.27%  runtime.(*mheap).allocSpan
+     0.36s  7.26% 76.01%      0.36s  7.26%  runtime.madvise
+         0     0% 76.01%      0.33s  6.65%  runtime.sysUsed (inline)
+         0     0% 76.01%      0.33s  6.65%  runtime.sysUsedOS (inline)
+     0.04s  0.81% 76.81%      0.28s  5.65%  runtime.(*sweepLocked).sweep
+     0.01s   0.2% 77.02%      0.26s  5.24%  runtime.deductSweepCredit
+         0     0% 77.02%      0.26s  5.24%  runtime.sweepone
+     0.24s  4.84% 81.85%      0.24s  4.84%  runtime.kevent
+         0     0% 81.85%      0.24s  4.84%  runtime.netpoll
+         0     0% 81.85%      0.24s  4.84%  runtime.startTheWorldWithSema
+         0     0% 81.85%      0.22s  4.44%  runtime.(*mheap).freeSpan (inline)
+         0     0% 81.85%      0.22s  4.44%  runtime.(*sweepLocked).sweep.(*mheap).freeSpan.func2
+         0     0% 81.85%      0.18s  3.63%  runtime.gcStart.func4
+     0.04s  0.81% 82.66%      0.17s  3.43%  runtime.(*mheap).freeSpanLocked
+     0.17s  3.43% 86.09%      0.17s  3.43%  runtime.memclrNoHeapPointers
+         0     0% 86.09%      0.14s  2.82%  runtime.(*mcentral).grow
+         0     0% 86.09%      0.13s  2.62%  runtime.(*mheap).alloc
+     0.01s   0.2% 86.29%      0.09s  1.81%  runtime.(*pageAlloc).free
+     0.03s   0.6% 86.90%      0.08s  1.61%  runtime.(*gcControllerState).update

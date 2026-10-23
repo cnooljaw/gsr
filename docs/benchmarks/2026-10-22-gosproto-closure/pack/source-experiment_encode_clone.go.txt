@@ -1,0 +1,19 @@
+package sproto
+
+func experimentEncodeWithLimitsClone(message interface{}, limits Limits, packResult bool, prefix []byte) ([]byte, error) {
+	output, encoded, err := encodeBufferWithLimits(message, limits, packResult, prefix)
+	if err != nil {
+		return nil, err
+	}
+	if packResult {
+		return ExperimentPackIntoClone(output, encoded), nil
+	}
+	return output, nil
+}
+
+func ExperimentEncodePackedClone(message interface{}) ([]byte, error) {
+	return experimentEncodeWithLimitsClone(message, Limits{}, true, nil)
+}
+func ExperimentPackClone(src []byte) []byte {
+	return ExperimentPackIntoClone(make([]byte, packedBufferSize(len(src))), src)
+}

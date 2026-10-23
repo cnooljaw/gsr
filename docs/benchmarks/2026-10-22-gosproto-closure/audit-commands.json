@@ -1,0 +1,440 @@
+[
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/final.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkPackShapes$",
+      "-test.benchmem",
+      "-test.benchtime=150ms",
+      "-test.count=2",
+      "-test.timeout=2m"
+    ],
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off"
+    },
+    "exitCode": 0,
+    "seconds": 7.79763862490654,
+    "output": "goos: darwin\ngoarch: arm64\npkg: github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks\ncpu: Apple M2\nBenchmarkPackShapes/zero32         \t 5853340\t        42.86 ns/op\t 746.56 MB/s\t      48 B/op\t       1 allocs/op\nBenchmarkPackShapes/zero32         \t 5634110\t        31.55 ns/op\t1014.17 MB/s\t      48 B/op\t       1 allocs/op\nBenchmarkPackShapes/ascii32        \t 5371904\t        35.97 ns/op\t 889.51 MB/s\t      48 B/op\t       1 allocs/op\nBenchmarkPackShapes/ascii32        \t 5212254\t        33.52 ns/op\t 954.68 MB/s\t      48 B/op\t       1 allocs/op\nBenchmarkPackShapes/zero4096       \t  196669\t       967.8 ns/op\t4232.21 MB/s\t    4864 B/op\t       1 allocs/op\nBenchmarkPackShapes/zero4096       \t  188446\t       906.0 ns/op\t4520.91 MB/s\t    4864 B/op\t       1 allocs/op\nBenchmarkPackShapes/ascii4096      \t  357526\t       499.3 ns/op\t8203.71 MB/s\t    4864 B/op\t       1 allocs/op\nBenchmarkPackShapes/ascii4096      \t  353324\t       507.6 ns/op\t8069.60 MB/s\t    4864 B/op\t       1 allocs/op\nBenchmarkPackShapes/zero65536      \t   13383\t     13428 ns/op\t4880.54 MB/s\t   73728 B/op\t       1 allocs/op\nBenchmarkPackShapes/zero65536      \t   13644\t     18167 ns/op\t3607.38 MB/s\t   73728 B/op\t       1 allocs/op\nBenchmarkPackShapes/ascii65536     \t   27474\t      6473 ns/op\t10124.13 MB/s\t   73728 B/op\t       1 allocs/op\nBenchmarkPackShapes/ascii65536     \t   27388\t      6492 ns/op\t10095.15 MB/s\t   73728 B/op\t       1 allocs/op\nBenchmarkPackShapes/nonzero1x256   \t  374538\t       604.4 ns/op\t3388.22 MB/s\t    2304 B/op\t       1 allocs/op\nBenchmarkPackShapes/nonzero1x256   \t  297007\t       532.7 ns/op\t3844.27 MB/s\t    2304 B/op\t       1 allocs/op\nBenchmarkPackShapes/nonzero2x256   \t  347179\t       522.1 ns/op\t3922.64 MB/s\t    2304 B/op\t       1 allocs/op\nBenchmarkPackShapes/nonzero2x256   \t  346731\t       544.5 ns/op\t3761.31 MB/s\t    2304 B/op\t       1 allocs/op\nBenchmarkPackShapes/nonzero3x256   \t  344895\t       516.0 ns/op\t3969.06 MB/s\t    2304 B/op\t       1 allocs/op\nBenchmarkPackShapes/nonzero3x256   \t  341979\t       524.0 ns/op\t3908.51 MB/s\t    2304 B/op\t       1 allocs/op\nBenchmarkPackShapes/nonzero4x256   \t  369501\t       513.7 ns/op\t3986.41 MB/s\t    2304 B/op\t       1 allocs/op\nBenchmarkPackShapes/nonzero4x256   \t  341247\t       711.9 ns/op\t2876.87 MB/s\t    2304 B/op\t       1 allocs/op\nBenchmarkPackShapes/nonzero5x256   \t  359708\t       549.1 ns/op\t3729.58 MB/s\t    2304 B/op\t       1 allocs/op\nBenchmarkPackShapes/nonzero5x256   \t  350353\t       513.9 ns/op\t3985.49 MB/s\t    2304 B/op\t       1 allocs/op\nBenchmarkPackShapes/nonzero6x256   \t  339387\t       512.3 ns/op\t3997.44 MB/s\t    2304 B/op\t       1 allocs/op\nBenchmarkPackShapes/nonzero6x256   \t  343987\t       514.2 ns/op\t3982.75 MB/s\t    2304 B/op\t       1 allocs/op\nBenchmarkPackShapes/nonzero7x256   \t  347403\t       529.6 ns/op\t3867.25 MB/s\t    2304 B/op\t       1 allocs/op\nBenchmarkPackShapes/nonzero7x256   \t  359107\t       521.4 ns/op\t3928.24 MB/s\t    2304 B/op\t       1 allocs/op\nBenchmarkPackShapes/FF512-sparse4096         \t  185968\t       975.5 ns/op\t4723.93 MB/s\t    4864 B/op\t       1 allocs/op\nBenchmarkPackShapes/FF512-sparse4096         \t  183373\t       973.3 ns/op\t4734.50 MB/s\t    4864 B/op\t       1 allocs/op\nBenchmarkPackShapes/zeroRun8x64              \t   75069\t      2415 ns/op\t1907.74 MB/s\t    4864 B/op\t       1 allocs/op\nBenchmarkPackShapes/zeroRun8x64              \t   73282\t      2440 ns/op\t1888.35 MB/s\t    4864 B/op\t       1 allocs/op\nBenchmarkPackShapes/zeroRun16x64             \t   53714\t      4212 ns/op\t2066.44 MB/s\t    9472 B/op\t       1 allocs/op\nBenchmarkPackShapes/zeroRun16x64             \t   53052\t      3360 ns/op\t2590.24 MB/s\t    9472 B/op\t       1 allocs/op\nBenchmarkPackShapes/zeroRun64x64             \t   20974\t      8484 ns/op\t3922.51 MB/s\t   40960 B/op\t       1 allocs/op\nBenchmarkPackShapes/zeroRun64x64             \t   21160\t      8498 ns/op\t3916.32 MB/s\t   40960 B/op\t       1 allocs/op\nBenchmarkPackShapes/random4096               \t  195241\t       938.3 ns/op\t4365.42 MB/s\t    4864 B/op\t       1 allocs/op\nBenchmarkPackShapes/random4096               \t  191829\t       935.4 ns/op\t4378.91 MB/s\t    4864 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/final.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkUnpackShapes$",
+      "-test.benchmem",
+      "-test.benchtime=150ms",
+      "-test.count=2",
+      "-test.timeout=2m"
+    ],
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "100",
+      "GOMEMLIMIT": "off"
+    },
+    "exitCode": 0,
+    "seconds": 7.9384142104536295,
+    "output": "goos: darwin\ngoarch: arm64\npkg: github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks\ncpu: Apple M2\nBenchmarkUnpackShapes/zero32         \t 6324350\t        29.15 ns/op\t1097.65 MB/s\t      32 B/op\t       1 allocs/op\nBenchmarkUnpackShapes/zero32         \t 6199520\t        29.29 ns/op\t1092.56 MB/s\t      32 B/op\t       1 allocs/op\nBenchmarkUnpackShapes/ascii32        \t 6805881\t        27.04 ns/op\t1183.60 MB/s\t      32 B/op\t       1 allocs/op\nBenchmarkUnpackShapes/ascii32        \t 6839272\t        39.99 ns/op\t 800.14 MB/s\t      32 B/op\t       1 allocs/op\nBenchmarkUnpackShapes/zero4096       \t  324909\t       500.0 ns/op\t8191.27 MB/s\t    4096 B/op\t       1 allocs/op\nBenchmarkUnpackShapes/zero4096       \t  350324\t       516.3 ns/op\t7933.80 MB/s\t    4096 B/op\t       1 allocs/op\nBenchmarkUnpackShapes/ascii4096      \t  399244\t       514.6 ns/op\t7959.57 MB/s\t    4096 B/op\t       1 allocs/op\nBenchmarkUnpackShapes/ascii4096      \t  358892\t       480.6 ns/op\t8523.17 MB/s\t    4096 B/op\t       1 allocs/op\nBenchmarkUnpackShapes/zero65536      \t   34538\t      5211 ns/op\t12577.51 MB/s\t   65536 B/op\t       1 allocs/op\nBenchmarkUnpackShapes/zero65536      \t   35216\t      5278 ns/op\t12417.80 MB/s\t   65536 B/op\t       1 allocs/op\nBenchmarkUnpackShapes/ascii65536     \t   35036\t      4850 ns/op\t13512.82 MB/s\t   65536 B/op\t       1 allocs/op\nBenchmarkUnpackShapes/ascii65536     \t   37249\t      4867 ns/op\t13466.02 MB/s\t   65536 B/op\t       1 allocs/op\nBenchmarkUnpackShapes/nonzero1x256   \t  202543\t       961.8 ns/op\t2129.38 MB/s\t    2048 B/op\t       1 allocs/op\nBenchmarkUnpackShapes/nonzero1x256   \t  184173\t      1383 ns/op\t1480.74 MB/s\t    2048 B/op\t       1 allocs/op\nBenchmarkUnpackShapes/nonzero2x256   \t  199790\t       935.8 ns/op\t2188.54 MB/s\t    2048 B/op\t       1 allocs/op\nBenchmarkUnpackShapes/nonzero2x256   \t  199236\t       940.7 ns/op\t2177.07 MB/s\t    2048 B/op\t       1 allocs/op\nBenchmarkUnpackShapes/nonzero3x256   \t  190482\t       925.2 ns/op\t2213.65 MB/s\t    2048 B/op\t       1 allocs/op\nBenchmarkUnpackShapes/nonzero3x256   \t  207458\t      1716 ns/op\t1193.31 MB/s\t    2048 B/op\t       1 allocs/op\nBenchmarkUnpackShapes/nonzero4x256   \t  189512\t       878.0 ns/op\t2332.66 MB/s\t    2048 B/op\t       1 allocs/op\nBenchmarkUnpackShapes/nonzero4x256   \t  202051\t      1140 ns/op\t1795.82 MB/s\t    2048 B/op\t       1 allocs/op\nBenchmarkUnpackShapes/nonzero5x256   \t  213544\t       899.2 ns/op\t2277.47 MB/s\t    2048 B/op\t       1 allocs/op\nBenchmarkUnpackShapes/nonzero5x256   \t  207392\t       902.2 ns/op\t2269.96 MB/s\t    2048 B/op\t       1 allocs/op\nBenchmarkUnpackShapes/nonzero6x256   \t  196472\t      1276 ns/op\t1604.76 MB/s\t    2048 B/op\t       1 allocs/op\nBenchmarkUnpackShapes/nonzero6x256   \t  207554\t       905.0 ns/op\t2262.86 MB/s\t    2048 B/op\t       1 allocs/op\nBenchmarkUnpackShapes/nonzero7x256   \t  185402\t       912.5 ns/op\t2244.46 MB/s\t    2048 B/op\t       1 allocs/op\nBenchmarkUnpackShapes/nonzero7x256   \t  199520\t       890.8 ns/op\t2298.95 MB/s\t    2048 B/op\t       1 allocs/op\nBenchmarkUnpackShapes/FF512-sparse4096         \t   86208\t      2127 ns/op\t2166.32 MB/s\t    4864 B/op\t       1 allocs/op\nBenchmarkUnpackShapes/FF512-sparse4096         \t   86961\t      2063 ns/op\t2233.95 MB/s\t    4864 B/op\t       1 allocs/op\nBenchmarkUnpackShapes/zeroRun8x64              \t  158904\t      1421 ns/op\t3243.41 MB/s\t    4864 B/op\t       1 allocs/op\nBenchmarkUnpackShapes/zeroRun8x64              \t  131763\t      1274 ns/op\t3618.08 MB/s\t    4864 B/op\t       1 allocs/op\nBenchmarkUnpackShapes/zeroRun16x64             \t  111639\t      1620 ns/op\t5372.70 MB/s\t    9472 B/op\t       1 allocs/op\nBenchmarkUnpackShapes/zeroRun16x64             \t  108984\t      2278 ns/op\t3821.23 MB/s\t    9472 B/op\t       1 allocs/op\nBenchmarkUnpackShapes/zeroRun64x64             \t   43681\t      4084 ns/op\t8148.57 MB/s\t   40960 B/op\t       1 allocs/op\nBenchmarkUnpackShapes/zeroRun64x64             \t   44655\t      4238 ns/op\t7852.17 MB/s\t   40960 B/op\t       1 allocs/op\nBenchmarkUnpackShapes/random4096               \t  372751\t       487.1 ns/op\t8408.90 MB/s\t    4096 B/op\t       1 allocs/op\nBenchmarkUnpackShapes/random4096               \t  369337\t       468.8 ns/op\t8737.55 MB/s\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/final.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkRepresentativeCodec$/^game_large$/^sproto_encode$",
+      "-test.benchmem",
+      "-test.benchtime=2s",
+      "-test.timeout=1m",
+      "-test.cpuprofile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-audit-20261022/game_large-sproto_encode.cpu"
+    ],
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "1000",
+      "GOMEMLIMIT": "128MiB"
+    },
+    "exitCode": 0,
+    "seconds": 2.559948293492198,
+    "output": "goos: darwin\ngoarch: arm64\npkg: github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks\ncpu: Apple M2\nBenchmarkRepresentativeCodec/game_large/sproto_encode         \t  607812\t      3941 ns/op\t    3968 B/op\t       2 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-top",
+      "-nodecount=35",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/final.test",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-audit-20261022/game_large-sproto_encode.cpu"
+    ],
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.22478070855140686,
+    "output": "File: final.test\nType: cpu\nTime: 2026-10-22 23:08:15 CST\nDuration: 2.55s, Total samples = 2.27s (88.94%)\nShowing nodes accounting for 2.12s, 93.39% of 2.27s total\nDropped 49 nodes (cum <= 0.01s)\nShowing top 35 nodes out of 50\n      flat  flat%   sum%        cum   cum%\n     0.57s 25.11% 25.11%      0.80s 35.24%  github.com/cnooljaw/gosproto.encodedIntegerRecordSize\n     0.28s 12.33% 37.44%      0.48s 21.15%  github.com/cnooljaw/gosproto.encodeIntegerRecordInto\n     0.21s  9.25% 46.70%      1.04s 45.81%  github.com/cnooljaw/gosproto.fieldSize\n     0.19s  8.37% 55.07%      0.19s  8.37%  runtime.madvise\n     0.17s  7.49% 62.56%      0.17s  7.49%  runtime.memclrNoHeapPointers\n     0.11s  4.85% 67.40%      0.11s  4.85%  github.com/cnooljaw/gosproto.encodePointer.integer (inline)\n     0.09s  3.96% 71.37%      0.09s  3.96%  github.com/cnooljaw/gosproto.encodeInt64Slice\n     0.07s  3.08% 74.45%      0.07s  3.08%  github.com/cnooljaw/gosproto.(*decodeBudget).add (inline)\n     0.06s  2.64% 77.09%      0.15s  6.61%  github.com/cnooljaw/gosproto.(*encodeLayout).add (inline)\n     0.05s  2.20% 79.30%      0.57s 25.11%  github.com/cnooljaw/gosproto.encodeIntegerRecordArrayInto\n     0.05s  2.20% 81.50%      0.78s 34.36%  github.com/cnooljaw/gosproto.encodeMessageInto\n     0.05s  2.20% 83.70%      0.05s  2.20%  github.com/cnooljaw/gosproto.skipTag (inline)\n     0.04s  1.76% 85.46%      0.04s  1.76%  encoding/binary.littleEndian.PutUint16 (inline)\n     0.03s  1.32% 86.78%      0.03s  1.32%  github.com/cnooljaw/gosproto.encodeIntegerInto (inline)\n     0.03s  1.32% 88.11%      0.04s  1.76%  github.com/cnooljaw/gosproto.messageEncodePointer (inline)\n     0.03s  1.32% 89.43%      0.04s  1.76%  runtime.resolveTypeOff\n     0.02s  0.88% 90.31%      0.02s  0.88%  github.com/cnooljaw/gosproto.(*SprotoField).nativeInteger (inline)\n     0.02s  0.88% 91.19%      1.10s 48.46%  github.com/cnooljaw/gosproto.encodedSize\n     0.02s  0.88% 92.07%      0.02s  0.88%  reflect.Value.Field\n     0.01s  0.44% 92.51%      0.05s  2.20%  reflect.resolveTypeOff\n     0.01s  0.44% 92.95%      0.02s  0.88%  runtime.(*mcentral).cacheSpan\n     0.01s  0.44% 93.39%      0.24s 10.57%  runtime.mallocgcSmallNoscan\n         0     0% 93.39%      2.06s 90.75%  github.com/cnooljaw/gosproto.Encode\n         0     0% 93.39%      2.06s 90.75%  github.com/cnooljaw/gosproto.EncodeWithLimits (inline)\n         0     0% 93.39%      2.06s 90.75%  github.com/cnooljaw/gosproto.encodeBufferWithLimits\n         0     0% 93.39%      0.70s 30.84%  github.com/cnooljaw/gosproto.encodeFieldInto\n         0     0% 93.39%      2.06s 90.75%  github.com/cnooljaw/gosproto.encodeWithLimits\n         0     0% 93.39%      0.04s  1.76%  github.com/cnooljaw/gosproto.writeUint16 (inline)\n         0     0% 93.39%      2.06s 90.75%  github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks.BenchmarkRepresentativeCodec.func1\n         0     0% 93.39%      2.06s 90.75%  github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks.representativeOperations.func3\n         0     0% 93.39%      0.05s  2.20%  reflect.(*rtype).ptrTo\n         0     0% 93.39%      0.05s  2.20%  reflect.(*rtype).typeOff (inline)\n         0     0% 93.39%      0.05s  2.20%  reflect.Value.Addr\n         0     0% 93.39%      0.05s  2.20%  reflect.ptrTo (inline)\n         0     0% 93.39%      0.03s  1.32%  runtime.(*mcache).nextFree\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-top",
+      "-cum",
+      "-nodecount=35",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/final.test",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-audit-20261022/game_large-sproto_encode.cpu"
+    ],
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.018866458907723427,
+    "output": "File: final.test\nType: cpu\nTime: 2026-10-22 23:08:15 CST\nDuration: 2.55s, Total samples = 2.27s (88.94%)\nShowing nodes accounting for 1.94s, 85.46% of 2.27s total\nDropped 49 nodes (cum <= 0.01s)\nShowing top 35 nodes out of 50\n      flat  flat%   sum%        cum   cum%\n         0     0%     0%      2.06s 90.75%  github.com/cnooljaw/gosproto.Encode\n         0     0%     0%      2.06s 90.75%  github.com/cnooljaw/gosproto.EncodeWithLimits (inline)\n         0     0%     0%      2.06s 90.75%  github.com/cnooljaw/gosproto.encodeBufferWithLimits\n         0     0%     0%      2.06s 90.75%  github.com/cnooljaw/gosproto.encodeWithLimits\n         0     0%     0%      2.06s 90.75%  github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks.BenchmarkRepresentativeCodec.func1\n         0     0%     0%      2.06s 90.75%  github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks.representativeOperations.func3\n         0     0%     0%      2.06s 90.75%  testing.(*B).launch\n         0     0%     0%      2.06s 90.75%  testing.(*B).runN\n     0.02s  0.88%  0.88%      1.10s 48.46%  github.com/cnooljaw/gosproto.encodedSize\n     0.21s  9.25% 10.13%      1.04s 45.81%  github.com/cnooljaw/gosproto.fieldSize\n     0.57s 25.11% 35.24%      0.80s 35.24%  github.com/cnooljaw/gosproto.encodedIntegerRecordSize\n     0.05s  2.20% 37.44%      0.78s 34.36%  github.com/cnooljaw/gosproto.encodeMessageInto\n         0     0% 37.44%      0.70s 30.84%  github.com/cnooljaw/gosproto.encodeFieldInto\n     0.05s  2.20% 39.65%      0.57s 25.11%  github.com/cnooljaw/gosproto.encodeIntegerRecordArrayInto\n     0.28s 12.33% 51.98%      0.48s 21.15%  github.com/cnooljaw/gosproto.encodeIntegerRecordInto\n         0     0% 51.98%      0.25s 11.01%  runtime.makeslice\n         0     0% 51.98%      0.25s 11.01%  runtime.mallocgc\n     0.01s  0.44% 52.42%      0.24s 10.57%  runtime.mallocgcSmallNoscan\n         0     0% 52.42%      0.22s  9.69%  runtime.systemstack\n     0.19s  8.37% 60.79%      0.19s  8.37%  runtime.madvise\n         0     0% 60.79%      0.17s  7.49%  runtime.(*mheap).alloc.func1\n         0     0% 60.79%      0.17s  7.49%  runtime.(*mheap).allocSpan\n     0.17s  7.49% 68.28%      0.17s  7.49%  runtime.memclrNoHeapPointers\n         0     0% 68.28%      0.17s  7.49%  runtime.sysUsed (inline)\n         0     0% 68.28%      0.17s  7.49%  runtime.sysUsedOS (inline)\n     0.06s  2.64% 70.93%      0.15s  6.61%  github.com/cnooljaw/gosproto.(*encodeLayout).add (inline)\n     0.11s  4.85% 75.77%      0.11s  4.85%  github.com/cnooljaw/gosproto.encodePointer.integer (inline)\n     0.09s  3.96% 79.74%      0.09s  3.96%  github.com/cnooljaw/gosproto.encodeInt64Slice\n     0.07s  3.08% 82.82%      0.07s  3.08%  github.com/cnooljaw/gosproto.(*decodeBudget).add (inline)\n     0.05s  2.20% 85.02%      0.05s  2.20%  github.com/cnooljaw/gosproto.skipTag (inline)\n         0     0% 85.02%      0.05s  2.20%  reflect.(*rtype).ptrTo\n         0     0% 85.02%      0.05s  2.20%  reflect.(*rtype).typeOff (inline)\n         0     0% 85.02%      0.05s  2.20%  reflect.Value.Addr\n         0     0% 85.02%      0.05s  2.20%  reflect.ptrTo (inline)\n     0.01s  0.44% 85.46%      0.05s  2.20%  reflect.resolveTypeOff\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/final.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkRepresentativeCodec$/^game_large$/^sproto_decode$",
+      "-test.benchmem",
+      "-test.benchtime=2s",
+      "-test.timeout=1m",
+      "-test.cpuprofile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-audit-20261022/game_large-sproto_decode.cpu"
+    ],
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "1000",
+      "GOMEMLIMIT": "128MiB"
+    },
+    "exitCode": 0,
+    "seconds": 3.012413499876857,
+    "output": "goos: darwin\ngoarch: arm64\npkg: github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks\ncpu: Apple M2\nBenchmarkRepresentativeCodec/game_large/sproto_decode         \t  219054\t     12293 ns/op\t   10416 B/op\t     532 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-top",
+      "-nodecount=35",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/final.test",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-audit-20261022/game_large-sproto_decode.cpu"
+    ],
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.021232668310403824,
+    "output": "File: final.test\nType: cpu\nTime: 2026-10-22 23:08:18 CST\nDuration: 3s, Total samples = 2.47s (82.24%)\nShowing nodes accounting for 2.30s, 93.12% of 2.47s total\nDropped 41 nodes (cum <= 0.01s)\nShowing top 35 nodes out of 77\n      flat  flat%   sum%        cum   cum%\n     0.34s 13.77% 13.77%      1.07s 43.32%  github.com/cnooljaw/gosproto.decodeIntegerRecord\n     0.27s 10.93% 24.70%      0.27s 10.93%  runtime.madvise\n     0.24s  9.72% 34.41%      0.43s 17.41%  runtime.mallocgcTiny\n     0.23s  9.31% 43.72%      1.22s 49.39%  runtime.mallocgc\n     0.19s  7.69% 51.42%      0.19s  7.69%  runtime.memclrNoHeapPointers\n     0.11s  4.45% 55.87%      0.44s 17.81%  runtime.mallocgcSmallScanNoHeader\n     0.08s  3.24% 59.11%      0.08s  3.24%  github.com/cnooljaw/gosproto.readChunk (inline)\n     0.08s  3.24% 62.35%      0.09s  3.64%  runtime.nextFreeFast (inline)\n     0.07s  2.83% 65.18%      0.09s  3.64%  runtime.(*mspan).writeHeapBitsSmall\n     0.06s  2.43% 67.61%      1.89s 76.52%  github.com/cnooljaw/gosproto.decodeStructSlice\n     0.06s  2.43% 70.04%      0.08s  3.24%  runtime.resolveTypeOff\n     0.05s  2.02% 72.06%      0.05s  2.02%  github.com/cnooljaw/gosproto.(*SprotoType).FieldByTag (inline)\n     0.05s  2.02% 74.09%      0.14s  5.67%  github.com/cnooljaw/gosproto.countChunks\n     0.04s  1.62% 75.71%      0.04s  1.62%  github.com/cnooljaw/gosproto.(*decodeBudget).add (inline)\n     0.04s  1.62% 77.33%      0.04s  1.62%  runtime.acquirem (inline)\n     0.03s  1.21% 78.54%      0.03s  1.21%  encoding/binary.littleEndian.Uint16 (inline)\n     0.03s  1.21% 79.76%      0.11s  4.45%  github.com/cnooljaw/gosproto.decodeIntSlice\n     0.03s  1.21% 80.97%      0.03s  1.21%  internal/runtime/atomic.(*UnsafePointer).Load (inline)\n     0.03s  1.21% 82.19%      0.13s  5.26%  reflect.(*rtype).ptrTo\n     0.03s  1.21% 83.40%      0.72s 29.15%  runtime.newobject\n     0.03s  1.21% 84.62%      0.03s  1.21%  runtime.releasem (inline)\n     0.02s  0.81% 85.43%      0.02s  0.81%  gcWriteBarrier\n     0.02s  0.81% 86.23%      0.05s  2.02%  reflect.Value.UnsafePointer\n     0.02s  0.81% 87.04%      0.10s  4.05%  reflect.resolveTypeOff\n     0.02s  0.81% 87.85%      0.02s  0.81%  runtime.(*pallocBits).summarize\n     0.02s  0.81% 88.66%      0.02s  0.81%  runtime.getMCache (inline)\n     0.02s  0.81% 89.47%      0.02s  0.81%  runtime.kevent\n     0.02s  0.81% 90.28%      0.09s  3.64%  runtime.mallocgcSmallNoscan\n     0.02s  0.81% 91.09%      0.02s  0.81%  runtime.mapaccess1_fast32\n     0.01s   0.4% 91.50%      0.02s  0.81%  reflect.Value.pointer (inline)\n     0.01s   0.4% 91.90%      0.42s 17.00%  reflect.unsafe_New\n     0.01s   0.4% 92.31%      0.05s  2.02%  reflect.unsafe_NewArray\n     0.01s   0.4% 92.71%      0.02s  0.81%  runtime.deductAssistCredit\n     0.01s   0.4% 93.12%      0.03s  1.21%  runtime.deductSweepCredit\n         0     0% 93.12%      2.15s 87.04%  github.com/cnooljaw/gosproto.Decode\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-top",
+      "-cum",
+      "-nodecount=35",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/final.test",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-audit-20261022/game_large-sproto_decode.cpu"
+    ],
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.020200833678245544,
+    "output": "File: final.test\nType: cpu\nTime: 2026-10-22 23:08:18 CST\nDuration: 3s, Total samples = 2.47s (82.24%)\nShowing nodes accounting for 1.70s, 68.83% of 2.47s total\nDropped 41 nodes (cum <= 0.01s)\nShowing top 35 nodes out of 77\n      flat  flat%   sum%        cum   cum%\n         0     0%     0%      2.18s 88.26%  github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks.BenchmarkRepresentativeCodec.func1\n         0     0%     0%      2.18s 88.26%  github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks.representativeOperations.func4\n         0     0%     0%      2.18s 88.26%  testing.(*B).launch\n         0     0%     0%      2.18s 88.26%  testing.(*B).runN\n         0     0%     0%      2.15s 87.04%  github.com/cnooljaw/gosproto.Decode (inline)\n         0     0%     0%      2.15s 87.04%  github.com/cnooljaw/gosproto.DecodeWithLimits\n         0     0%     0%      2.13s 86.23%  github.com/cnooljaw/gosproto.decodeMessage\n     0.06s  2.43%  2.43%      1.89s 76.52%  github.com/cnooljaw/gosproto.decodeStructSlice\n     0.23s  9.31% 11.74%      1.22s 49.39%  runtime.mallocgc\n     0.34s 13.77% 25.51%      1.07s 43.32%  github.com/cnooljaw/gosproto.decodeIntegerRecord\n     0.03s  1.21% 26.72%      0.72s 29.15%  runtime.newobject\n         0     0% 26.72%      0.55s 22.27%  reflect.New\n     0.11s  4.45% 31.17%      0.44s 17.81%  runtime.mallocgcSmallScanNoHeader\n     0.24s  9.72% 40.89%      0.43s 17.41%  runtime.mallocgcTiny\n     0.01s   0.4% 41.30%      0.42s 17.00%  reflect.unsafe_New\n         0     0% 41.30%      0.35s 14.17%  runtime.systemstack\n         0     0% 41.30%      0.28s 11.34%  runtime.(*mheap).alloc.func1\n         0     0% 41.30%      0.28s 11.34%  runtime.(*mheap).allocSpan\n     0.27s 10.93% 52.23%      0.27s 10.93%  runtime.madvise\n         0     0% 52.23%      0.25s 10.12%  runtime.sysUsed (inline)\n         0     0% 52.23%      0.25s 10.12%  runtime.sysUsedOS (inline)\n     0.19s  7.69% 59.92%      0.19s  7.69%  runtime.memclrNoHeapPointers\n     0.05s  2.02% 61.94%      0.14s  5.67%  github.com/cnooljaw/gosproto.countChunks\n     0.03s  1.21% 63.16%      0.13s  5.26%  reflect.(*rtype).ptrTo\n         0     0% 63.16%      0.13s  5.26%  reflect.ptrTo (inline)\n         0     0% 63.16%      0.12s  4.86%  runtime.(*mcache).nextFree\n     0.03s  1.21% 64.37%      0.11s  4.45%  github.com/cnooljaw/gosproto.decodeIntSlice\n         0     0% 64.37%      0.11s  4.45%  runtime.(*mcache).refill\n         0     0% 64.37%      0.11s  4.45%  runtime.(*mcentral).cacheSpan\n         0     0% 64.37%      0.10s  4.05%  reflect.(*rtype).typeOff (inline)\n     0.02s  0.81% 65.18%      0.10s  4.05%  reflect.resolveTypeOff\n         0     0% 65.18%      0.09s  3.64%  github.com/cnooljaw/gosproto.decodeStringSlice\n     0.07s  2.83% 68.02%      0.09s  3.64%  runtime.(*mspan).writeHeapBitsSmall\n         0     0% 68.02%      0.09s  3.64%  runtime.heapSetTypeNoHeader (inline)\n     0.02s  0.81% 68.83%      0.09s  3.64%  runtime.mallocgcSmallNoscan\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/final.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkRepresentativeCodec$/^game_large$/^sproto_pack$",
+      "-test.benchmem",
+      "-test.benchtime=2s",
+      "-test.timeout=1m",
+      "-test.cpuprofile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-audit-20261022/game_large-sproto_pack.cpu"
+    ],
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "1000",
+      "GOMEMLIMIT": "128MiB"
+    },
+    "exitCode": 0,
+    "seconds": 3.513095375150442,
+    "output": "goos: darwin\ngoarch: arm64\npkg: github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks\ncpu: Apple M2\nBenchmarkRepresentativeCodec/game_large/sproto_pack         \t 3091437\t       820.6 ns/op\t    3456 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-top",
+      "-nodecount=35",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/final.test",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-audit-20261022/game_large-sproto_pack.cpu"
+    ],
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.020436374470591545,
+    "output": "File: final.test\nType: cpu\nTime: 2026-10-22 23:08:21 CST\nDuration: 3.51s, Total samples = 3.03s (86.41%)\nShowing nodes accounting for 2.86s, 94.39% of 3.03s total\nDropped 37 nodes (cum <= 0.02s)\nShowing top 35 nodes out of 54\n      flat  flat%   sum%        cum   cum%\n     2.20s 72.61% 72.61%      2.20s 72.61%  github.com/cnooljaw/gosproto.packWordsARM64\n     0.21s  6.93% 79.54%      0.21s  6.93%  runtime.madvise\n     0.12s  3.96% 83.50%      0.12s  3.96%  runtime.memclrNoHeapPointers\n     0.07s  2.31% 85.81%      0.42s 13.86%  runtime.mallocgcSmallNoscan\n     0.05s  1.65% 87.46%      2.29s 75.58%  github.com/cnooljaw/gosproto.packInto\n     0.05s  1.65% 89.11%      0.05s  1.65%  runtime.kevent\n     0.04s  1.32% 90.43%      0.04s  1.32%  github.com/cnooljaw/gosproto.writeFF (inline)\n     0.04s  1.32% 91.75%      0.09s  2.97%  runtime.(*sweepLocked).sweep\n     0.03s  0.99% 92.74%      0.03s  0.99%  runtime.(*pallocBits).summarize\n     0.02s  0.66% 93.40%      0.04s  1.32%  runtime.(*mheap).freeSpanLocked\n     0.01s  0.33% 93.73%      0.17s  5.61%  runtime.(*mcache).refill\n     0.01s  0.33% 94.06%      0.06s  1.98%  runtime.(*mcentral).grow\n     0.01s  0.33% 94.39%      0.45s 14.85%  runtime.mallocgc\n         0     0% 94.39%      2.74s 90.43%  github.com/cnooljaw/gosproto.Pack (inline)\n         0     0% 94.39%      2.20s 72.61%  github.com/cnooljaw/gosproto.packWordsFast (inline)\n         0     0% 94.39%      2.74s 90.43%  github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks.BenchmarkRepresentativeCodec.func1\n         0     0% 94.39%      2.74s 90.43%  github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks.representativeOperations.func5\n         0     0% 94.39%      0.18s  5.94%  runtime.(*mcache).nextFree\n         0     0% 94.39%      0.15s  4.95%  runtime.(*mcentral).cacheSpan\n         0     0% 94.39%      0.05s  1.65%  runtime.(*mheap).alloc\n         0     0% 94.39%      0.24s  7.92%  runtime.(*mheap).alloc.func1\n         0     0% 94.39%      0.24s  7.92%  runtime.(*mheap).allocSpan\n         0     0% 94.39%      0.04s  1.32%  runtime.(*mheap).freeSpan (inline)\n         0     0% 94.39%      0.02s  0.66%  runtime.(*mheap).initSpan\n         0     0% 94.39%      0.04s  1.32%  runtime.(*pageAlloc).alloc\n         0     0% 94.39%      0.03s  0.99%  runtime.(*pageAlloc).allocRange\n         0     0% 94.39%      0.04s  1.32%  runtime.(*pageAlloc).scavenge.func1\n         0     0% 94.39%      0.04s  1.32%  runtime.(*pageAlloc).scavengeOne\n         0     0% 94.39%      0.04s  1.32%  runtime.(*pageAlloc).update\n         0     0% 94.39%      0.04s  1.32%  runtime.(*sweepLocked).sweep.(*mheap).freeSpan.func2\n         0     0% 94.39%      0.02s  0.66%  runtime.callers\n         0     0% 94.39%      0.02s  0.66%  runtime.callers.func1\n         0     0% 94.39%      0.02s  0.66%  runtime.deductAssistCredit\n         0     0% 94.39%      0.07s  2.31%  runtime.deductSweepCredit\n         0     0% 94.39%      0.02s  0.66%  runtime.gcAssistAlloc\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-top",
+      "-cum",
+      "-nodecount=35",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/final.test",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-audit-20261022/game_large-sproto_pack.cpu"
+    ],
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.018236834555864334,
+    "output": "File: final.test\nType: cpu\nTime: 2026-10-22 23:08:21 CST\nDuration: 3.51s, Total samples = 3.03s (86.41%)\nShowing nodes accounting for 2.83s, 93.40% of 3.03s total\nDropped 37 nodes (cum <= 0.02s)\nShowing top 35 nodes out of 54\n      flat  flat%   sum%        cum   cum%\n         0     0%     0%      2.74s 90.43%  github.com/cnooljaw/gosproto.Pack (inline)\n         0     0%     0%      2.74s 90.43%  github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks.BenchmarkRepresentativeCodec.func1\n         0     0%     0%      2.74s 90.43%  github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks.representativeOperations.func5\n         0     0%     0%      2.74s 90.43%  testing.(*B).launch\n         0     0%     0%      2.74s 90.43%  testing.(*B).runN\n     0.05s  1.65%  1.65%      2.29s 75.58%  github.com/cnooljaw/gosproto.packInto\n     2.20s 72.61% 74.26%      2.20s 72.61%  github.com/cnooljaw/gosproto.packWordsARM64\n         0     0% 74.26%      2.20s 72.61%  github.com/cnooljaw/gosproto.packWordsFast (inline)\n         0     0% 74.26%      0.45s 14.85%  runtime.makeslice\n     0.01s  0.33% 74.59%      0.45s 14.85%  runtime.mallocgc\n     0.07s  2.31% 76.90%      0.42s 13.86%  runtime.mallocgcSmallNoscan\n         0     0% 76.90%      0.40s 13.20%  runtime.systemstack\n         0     0% 76.90%      0.24s  7.92%  runtime.(*mheap).alloc.func1\n         0     0% 76.90%      0.24s  7.92%  runtime.(*mheap).allocSpan\n     0.21s  6.93% 83.83%      0.21s  6.93%  runtime.madvise\n         0     0% 83.83%      0.18s  5.94%  runtime.(*mcache).nextFree\n     0.01s  0.33% 84.16%      0.17s  5.61%  runtime.(*mcache).refill\n         0     0% 84.16%      0.17s  5.61%  runtime.sysUsed (inline)\n         0     0% 84.16%      0.17s  5.61%  runtime.sysUsedOS (inline)\n         0     0% 84.16%      0.15s  4.95%  runtime.(*mcentral).cacheSpan\n     0.12s  3.96% 88.12%      0.12s  3.96%  runtime.memclrNoHeapPointers\n     0.04s  1.32% 89.44%      0.09s  2.97%  runtime.(*sweepLocked).sweep\n         0     0% 89.44%      0.08s  2.64%  runtime.sweepone\n         0     0% 89.44%      0.07s  2.31%  runtime.deductSweepCredit\n     0.01s  0.33% 89.77%      0.06s  1.98%  runtime.(*mcentral).grow\n         0     0% 89.77%      0.05s  1.65%  runtime.(*mheap).alloc\n     0.05s  1.65% 91.42%      0.05s  1.65%  runtime.kevent\n         0     0% 91.42%      0.05s  1.65%  runtime.netpoll\n         0     0% 91.42%      0.05s  1.65%  runtime.startTheWorldWithSema\n     0.04s  1.32% 92.74%      0.04s  1.32%  github.com/cnooljaw/gosproto.writeFF (inline)\n         0     0% 92.74%      0.04s  1.32%  runtime.(*mheap).freeSpan (inline)\n     0.02s  0.66% 93.40%      0.04s  1.32%  runtime.(*mheap).freeSpanLocked\n         0     0% 93.40%      0.04s  1.32%  runtime.(*pageAlloc).alloc\n         0     0% 93.40%      0.04s  1.32%  runtime.(*pageAlloc).scavenge.func1\n         0     0% 93.40%      0.04s  1.32%  runtime.(*pageAlloc).scavengeOne\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/final.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkRepresentativeCodec$/^game_large$/^sproto_unpack$",
+      "-test.benchmem",
+      "-test.benchtime=2s",
+      "-test.timeout=1m",
+      "-test.cpuprofile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-audit-20261022/game_large-sproto_unpack.cpu"
+    ],
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "1000",
+      "GOMEMLIMIT": "128MiB"
+    },
+    "exitCode": 0,
+    "seconds": 2.729575166478753,
+    "output": "goos: darwin\ngoarch: arm64\npkg: github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks\ncpu: Apple M2\nBenchmarkRepresentativeCodec/game_large/sproto_unpack         \t  697088\t      3668 ns/op\t    3456 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-top",
+      "-nodecount=35",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/final.test",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-audit-20261022/game_large-sproto_unpack.cpu"
+    ],
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.019490208476781845,
+    "output": "File: final.test\nType: cpu\nTime: 2026-10-22 23:08:24 CST\nDuration: 2.72s, Total samples = 2.22s (81.52%)\nShowing nodes accounting for 2.20s, 99.10% of 2.22s total\nDropped 6 nodes (cum <= 0.01s)\n      flat  flat%   sum%        cum   cum%\n     1.13s 50.90% 50.90%      1.13s 50.90%  github.com/cnooljaw/gosproto.unpackVectorARM64\n     0.82s 36.94% 87.84%      0.82s 36.94%  github.com/cnooljaw/gosproto.unpackedSizeARM64\n     0.12s  5.41% 93.24%      0.12s  5.41%  runtime.madvise\n     0.12s  5.41% 98.65%      0.12s  5.41%  runtime.memclrNoHeapPointers\n     0.01s  0.45% 99.10%      0.14s  6.31%  runtime.mallocgcSmallNoscan\n         0     0% 99.10%      2.09s 94.14%  github.com/cnooljaw/gosproto.Unpack (inline)\n         0     0% 99.10%      2.09s 94.14%  github.com/cnooljaw/gosproto.UnpackWithLimit\n         0     0% 99.10%      0.82s 36.94%  github.com/cnooljaw/gosproto.unpackSizeFast\n         0     0% 99.10%      1.13s 50.90%  github.com/cnooljaw/gosproto.unpackVector (inline)\n         0     0% 99.10%      2.09s 94.14%  github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks.BenchmarkRepresentativeCodec.func1\n         0     0% 99.10%      2.09s 94.14%  github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks.representativeOperations.func6\n         0     0% 99.10%      0.12s  5.41%  runtime.(*mheap).alloc.func1\n         0     0% 99.10%      0.12s  5.41%  runtime.(*mheap).allocSpan\n         0     0% 99.10%      0.14s  6.31%  runtime.makeslice\n         0     0% 99.10%      0.14s  6.31%  runtime.mallocgc\n         0     0% 99.10%      0.12s  5.41%  runtime.sysUsed (inline)\n         0     0% 99.10%      0.12s  5.41%  runtime.sysUsedOS (inline)\n         0     0% 99.10%      0.13s  5.86%  runtime.systemstack\n         0     0% 99.10%      2.09s 94.14%  testing.(*B).launch\n         0     0% 99.10%      2.09s 94.14%  testing.(*B).runN\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-top",
+      "-cum",
+      "-nodecount=35",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/final.test",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-audit-20261022/game_large-sproto_unpack.cpu"
+    ],
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.018125250935554504,
+    "output": "File: final.test\nType: cpu\nTime: 2026-10-22 23:08:24 CST\nDuration: 2.72s, Total samples = 2.22s (81.52%)\nShowing nodes accounting for 2.20s, 99.10% of 2.22s total\nDropped 6 nodes (cum <= 0.01s)\n      flat  flat%   sum%        cum   cum%\n         0     0%     0%      2.09s 94.14%  github.com/cnooljaw/gosproto.Unpack (inline)\n         0     0%     0%      2.09s 94.14%  github.com/cnooljaw/gosproto.UnpackWithLimit\n         0     0%     0%      2.09s 94.14%  github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks.BenchmarkRepresentativeCodec.func1\n         0     0%     0%      2.09s 94.14%  github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks.representativeOperations.func6\n         0     0%     0%      2.09s 94.14%  testing.(*B).launch\n         0     0%     0%      2.09s 94.14%  testing.(*B).runN\n         0     0%     0%      1.13s 50.90%  github.com/cnooljaw/gosproto.unpackVector (inline)\n     1.13s 50.90% 50.90%      1.13s 50.90%  github.com/cnooljaw/gosproto.unpackVectorARM64\n         0     0% 50.90%      0.82s 36.94%  github.com/cnooljaw/gosproto.unpackSizeFast\n     0.82s 36.94% 87.84%      0.82s 36.94%  github.com/cnooljaw/gosproto.unpackedSizeARM64\n         0     0% 87.84%      0.14s  6.31%  runtime.makeslice\n         0     0% 87.84%      0.14s  6.31%  runtime.mallocgc\n     0.01s  0.45% 88.29%      0.14s  6.31%  runtime.mallocgcSmallNoscan\n         0     0% 88.29%      0.13s  5.86%  runtime.systemstack\n         0     0% 88.29%      0.12s  5.41%  runtime.(*mheap).alloc.func1\n         0     0% 88.29%      0.12s  5.41%  runtime.(*mheap).allocSpan\n     0.12s  5.41% 93.69%      0.12s  5.41%  runtime.madvise\n     0.12s  5.41% 99.10%      0.12s  5.41%  runtime.memclrNoHeapPointers\n         0     0% 99.10%      0.12s  5.41%  runtime.sysUsed (inline)\n         0     0% 99.10%      0.12s  5.41%  runtime.sysUsedOS (inline)\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/final.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkRepresentativeCodec$/^int32_edges$/^sproto_encode$",
+      "-test.benchmem",
+      "-test.benchtime=2s",
+      "-test.timeout=1m",
+      "-test.cpuprofile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-audit-20261022/int32_edges-sproto_encode.cpu"
+    ],
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "1000",
+      "GOMEMLIMIT": "128MiB"
+    },
+    "exitCode": 0,
+    "seconds": 4.058035042136908,
+    "output": "goos: darwin\ngoarch: arm64\npkg: github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks\ncpu: Apple M2\nBenchmarkRepresentativeCodec/int32_edges/sproto_encode         \t 2032141\t      1339 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-top",
+      "-nodecount=35",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/final.test",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-audit-20261022/int32_edges-sproto_encode.cpu"
+    ],
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.018866082653403282,
+    "output": "File: final.test\nType: cpu\nTime: 2026-10-22 23:08:27 CST\nDuration: 4.05s, Total samples = 3.56s (87.85%)\nShowing nodes accounting for 3.24s, 91.01% of 3.56s total\nDropped 42 nodes (cum <= 0.02s)\nShowing top 35 nodes out of 90\n      flat  flat%   sum%        cum   cum%\n        1s 28.09% 28.09%         1s 28.09%  github.com/cnooljaw/gosproto.encodeInt64Slice\n     0.93s 26.12% 54.21%      0.94s 26.40%  github.com/cnooljaw/gosproto.fieldSize\n     0.21s  5.90% 60.11%      0.21s  5.90%  runtime.madvise\n     0.17s  4.78% 64.89%      0.17s  4.78%  runtime.memclrNoHeapPointers\n     0.12s  3.37% 68.26%      0.20s  5.62%  runtime.resolveTypeOff\n     0.08s  2.25% 70.51%      0.08s  2.25%  runtime.mapaccess1_fast32\n     0.06s  1.69% 72.19%      1.06s 29.78%  github.com/cnooljaw/gosproto.encodedSize\n     0.04s  1.12% 73.31%      0.04s  1.12%  runtime.kevent\n     0.03s  0.84% 74.16%      0.03s  0.84%  encoding/binary.littleEndian.PutUint16 (inline)\n     0.03s  0.84% 75.00%      0.05s  1.40%  reflect.valueInterface\n     0.03s  0.84% 75.84%      0.03s  0.84%  runtime.(*fixalloc).alloc\n     0.03s  0.84% 76.69%      0.06s  1.69%  runtime.(*mheap).allocMSpanLocked\n     0.03s  0.84% 77.53%      0.08s  2.25%  runtime.(*mheap).freeSpanLocked\n     0.03s  0.84% 78.37%      0.03s  0.84%  runtime.(*mspan).nextFreeIndex\n     0.03s  0.84% 79.21%      0.04s  1.12%  runtime.(*pallocBits).summarize\n     0.03s  0.84% 80.06%      0.21s  5.90%  runtime.(*sweepLocked).sweep\n     0.03s  0.84% 80.90%      0.04s  1.12%  runtime.unlock2\n     0.02s  0.56% 81.46%      0.02s  0.56%  github.com/cnooljaw/gosproto.(*decodeBudget).add (inline)\n     0.02s  0.56% 82.02%      3.25s 91.29%  github.com/cnooljaw/gosproto.Encode\n     0.02s  0.56% 82.58%      1.35s 37.92%  github.com/cnooljaw/gosproto.encodeMessageInto\n     0.02s  0.56% 83.15%      0.07s  1.97%  github.com/cnooljaw/gosproto.getbase\n     0.02s  0.56% 83.71%      0.02s  0.56%  internal/runtime/atomic.(*Uint64).Add (inline)\n     0.02s  0.56% 84.27%      0.02s  0.56%  internal/runtime/maps.(*Map).getWithKeySmall\n     0.02s  0.56% 84.83%      0.04s  1.12%  reflect.(*rtype).Elem\n     0.02s  0.56% 85.39%      0.02s  0.56%  reflect.(*rtype).Kind\n     0.02s  0.56% 85.96%      0.22s  6.18%  reflect.(*rtype).ptrTo\n     0.02s  0.56% 86.52%      0.02s  0.56%  reflect.Value.Elem\n     0.02s  0.56% 87.08%      0.03s  0.84%  reflect.Value.Field\n     0.02s  0.56% 87.64%      0.02s  0.56%  reflect.toType (inline)\n     0.02s  0.56% 88.20%      0.02s  0.56%  runtime.(*consistentHeapStats).release\n     0.02s  0.56% 88.76%      0.02s  0.56%  runtime.(*gcBits).bytep (inline)\n     0.02s  0.56% 89.33%      0.03s  0.84%  runtime.(*mspan).refillAllocCache\n     0.02s  0.56% 89.89%      0.02s  0.56%  runtime.(*sweepLocker).tryAcquire\n     0.02s  0.56% 90.45%      0.02s  0.56%  runtime.lock2\n     0.02s  0.56% 91.01%      0.68s 19.10%  runtime.mallocgc\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-top",
+      "-cum",
+      "-nodecount=35",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/final.test",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-audit-20261022/int32_edges-sproto_encode.cpu"
+    ],
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.019149206578731537,
+    "output": "File: final.test\nType: cpu\nTime: 2026-10-22 23:08:27 CST\nDuration: 4.05s, Total samples = 3.56s (87.85%)\nShowing nodes accounting for 2.68s, 75.28% of 3.56s total\nDropped 42 nodes (cum <= 0.02s)\nShowing top 35 nodes out of 90\n      flat  flat%   sum%        cum   cum%\n         0     0%     0%      3.26s 91.57%  github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks.BenchmarkRepresentativeCodec.func1\n     0.01s  0.28%  0.28%      3.26s 91.57%  github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks.representativeOperations.func3\n         0     0%  0.28%      3.26s 91.57%  testing.(*B).launch\n         0     0%  0.28%      3.26s 91.57%  testing.(*B).runN\n     0.02s  0.56%  0.84%      3.25s 91.29%  github.com/cnooljaw/gosproto.Encode\n         0     0%  0.84%      3.23s 90.73%  github.com/cnooljaw/gosproto.EncodeWithLimits (inline)\n     0.01s  0.28%  1.12%      3.23s 90.73%  github.com/cnooljaw/gosproto.encodeBufferWithLimits\n         0     0%  1.12%      3.23s 90.73%  github.com/cnooljaw/gosproto.encodeWithLimits\n     0.02s  0.56%  1.69%      1.35s 37.92%  github.com/cnooljaw/gosproto.encodeMessageInto\n     0.01s  0.28%  1.97%      1.27s 35.67%  github.com/cnooljaw/gosproto.encodeFieldInto\n     0.06s  1.69%  3.65%      1.06s 29.78%  github.com/cnooljaw/gosproto.encodedSize\n        1s 28.09% 31.74%         1s 28.09%  github.com/cnooljaw/gosproto.encodeInt64Slice\n     0.93s 26.12% 57.87%      0.94s 26.40%  github.com/cnooljaw/gosproto.fieldSize\n     0.01s  0.28% 58.15%      0.69s 19.38%  runtime.makeslice\n     0.02s  0.56% 58.71%      0.68s 19.10%  runtime.mallocgc\n     0.02s  0.56% 59.27%      0.65s 18.26%  runtime.mallocgcSmallNoscan\n         0     0% 59.27%      0.53s 14.89%  runtime.systemstack\n         0     0% 59.27%      0.41s 11.52%  runtime.(*mcache).nextFree\n     0.01s  0.28% 59.55%      0.39s 10.96%  runtime.(*mcache).refill\n         0     0% 59.55%      0.37s 10.39%  runtime.(*mcentral).cacheSpan\n         0     0% 59.55%      0.29s  8.15%  runtime.(*mheap).alloc.func1\n     0.01s  0.28% 59.83%      0.29s  8.15%  runtime.(*mheap).allocSpan\n     0.02s  0.56% 60.39%      0.22s  6.18%  reflect.(*rtype).ptrTo\n         0     0% 60.39%      0.22s  6.18%  reflect.Value.Addr\n         0     0% 60.39%      0.22s  6.18%  reflect.ptrTo (inline)\n     0.03s  0.84% 61.24%      0.21s  5.90%  runtime.(*sweepLocked).sweep\n     0.21s  5.90% 67.13%      0.21s  5.90%  runtime.madvise\n         0     0% 67.13%      0.20s  5.62%  reflect.(*rtype).typeOff (inline)\n         0     0% 67.13%      0.20s  5.62%  reflect.resolveTypeOff\n     0.12s  3.37% 70.51%      0.20s  5.62%  runtime.resolveTypeOff\n         0     0% 70.51%      0.20s  5.62%  runtime.rtype.typeOff (inline)\n         0     0% 70.51%      0.18s  5.06%  runtime.sysUsed (inline)\n         0     0% 70.51%      0.18s  5.06%  runtime.sysUsedOS (inline)\n     0.17s  4.78% 75.28%      0.17s  4.78%  runtime.memclrNoHeapPointers\n         0     0% 75.28%      0.17s  4.78%  runtime.sweepone\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/final.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkRepresentativeCodec$/^int32_edges$/^sproto_decode$",
+      "-test.benchmem",
+      "-test.benchtime=2s",
+      "-test.timeout=1m",
+      "-test.cpuprofile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-audit-20261022/int32_edges-sproto_decode.cpu"
+    ],
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "1000",
+      "GOMEMLIMIT": "128MiB"
+    },
+    "exitCode": 0,
+    "seconds": 4.175362166017294,
+    "output": "goos: darwin\ngoarch: arm64\npkg: github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks\ncpu: Apple M2\nBenchmarkRepresentativeCodec/int32_edges/sproto_decode         \t 2180696\t      1344 ns/op\t    8288 B/op\t       4 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-top",
+      "-nodecount=35",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/final.test",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-audit-20261022/int32_edges-sproto_decode.cpu"
+    ],
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.07737774960696697,
+    "output": "File: final.test\nType: cpu\nTime: 2026-10-22 23:08:31 CST\nDuration: 4.17s, Total samples = 3.31s (79.47%)\nShowing nodes accounting for 3.01s, 90.94% of 3.31s total\nDropped 43 nodes (cum <= 0.02s)\nShowing top 35 nodes out of 99\n      flat  flat%   sum%        cum   cum%\n     1.02s 30.82% 30.82%      2.18s 65.86%  github.com/cnooljaw/gosproto.decodeIntSlice\n     0.44s 13.29% 44.11%      0.44s 13.29%  runtime.madvise\n     0.36s 10.88% 54.98%      0.36s 10.88%  runtime.memclrNoHeapPointers\n     0.35s 10.57% 65.56%      0.35s 10.57%  runtime.kevent\n     0.09s  2.72% 68.28%      0.09s  2.72%  encoding/binary.littleEndian.Uint32 (inline)\n     0.08s  2.42% 70.69%      0.27s  8.16%  runtime.(*sweepLocked).sweep\n     0.05s  1.51% 72.21%      0.05s  1.51%  runtime.(*sysMemStat).add\n     0.04s  1.21% 73.41%      0.04s  1.21%  runtime.(*consistentHeapStats).acquire\n     0.04s  1.21% 74.62%      1.14s 34.44%  runtime.mallocgc\n     0.03s  0.91% 75.53%      0.54s 16.31%  runtime.(*mcache).nextFree\n     0.03s  0.91% 76.44%      0.50s 15.11%  runtime.(*mcache).refill\n     0.03s  0.91% 77.34%      0.03s  0.91%  runtime.(*pallocBits).summarize\n     0.03s  0.91% 78.25%      1.03s 31.12%  runtime.mallocgcSmallNoscan\n     0.03s  0.91% 79.15%      0.05s  1.51%  runtime.mallocgcSmallScanNoHeader\n     0.03s  0.91% 80.06%      0.03s  0.91%  runtime.releasem (inline)\n     0.02s   0.6% 80.66%      2.24s 67.67%  github.com/cnooljaw/gosproto.decodeMessage\n     0.02s   0.6% 81.27%      0.02s   0.6%  reflect.Value.Elem\n     0.02s   0.6% 81.87%      0.02s   0.6%  reflect.Value.Field\n     0.02s   0.6% 82.48%      0.02s   0.6%  runtime.(*consistentHeapStats).release\n     0.02s   0.6% 83.08%      0.04s  1.21%  runtime.(*mheap).allocMSpanLocked\n     0.02s   0.6% 83.69%      0.15s  4.53%  runtime.(*mheap).freeSpanLocked\n     0.02s   0.6% 84.29%      0.02s   0.6%  runtime.(*moduledata).textAddr\n     0.02s   0.6% 84.89%      0.03s  0.91%  runtime.(*scavengeIndex).free\n     0.02s   0.6% 85.50%      0.04s  1.21%  runtime.(*spanSet).pop\n     0.02s   0.6% 86.10%      0.02s   0.6%  runtime.findObject\n     0.02s   0.6% 86.71%      0.02s   0.6%  runtime.ifaceeq\n     0.02s   0.6% 87.31%      0.02s   0.6%  runtime.newMarkBits\n     0.02s   0.6% 87.92%      0.02s   0.6%  runtime.nextFreeFast (inline)\n     0.02s   0.6% 88.52%      0.02s   0.6%  runtime.resolveTypeOff\n     0.02s   0.6% 89.12%      0.02s   0.6%  runtime.step\n     0.02s   0.6% 89.73%      0.22s  6.65%  runtime.sweepone\n     0.01s   0.3% 90.03%      2.45s 74.02%  github.com/cnooljaw/gosproto.DecodeWithLimits\n     0.01s   0.3% 90.33%      0.07s  2.11%  github.com/cnooljaw/gosproto.GetSprotoType\n     0.01s   0.3% 90.63%      0.03s  0.91%  github.com/cnooljaw/gosproto.getbase\n     0.01s   0.3% 90.94%      0.03s  0.91%  internal/runtime/maps.(*Map).getWithKeySmall\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-top",
+      "-cum",
+      "-nodecount=35",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/final.test",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-audit-20261022/int32_edges-sproto_decode.cpu"
+    ],
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.026445791125297546,
+    "output": "File: final.test\nType: cpu\nTime: 2026-10-22 23:08:31 CST\nDuration: 4.17s, Total samples = 3.31s (79.47%)\nShowing nodes accounting for 2.57s, 77.64% of 3.31s total\nDropped 43 nodes (cum <= 0.02s)\nShowing top 35 nodes out of 99\n      flat  flat%   sum%        cum   cum%\n         0     0%     0%      2.49s 75.23%  github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks.BenchmarkRepresentativeCodec.func1\n         0     0%     0%      2.49s 75.23%  github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks.representativeOperations.func4\n         0     0%     0%      2.49s 75.23%  testing.(*B).launch\n         0     0%     0%      2.49s 75.23%  testing.(*B).runN\n         0     0%     0%      2.45s 74.02%  github.com/cnooljaw/gosproto.Decode (inline)\n     0.01s   0.3%   0.3%      2.45s 74.02%  github.com/cnooljaw/gosproto.DecodeWithLimits\n     0.02s   0.6%  0.91%      2.24s 67.67%  github.com/cnooljaw/gosproto.decodeMessage\n     1.02s 30.82% 31.72%      2.18s 65.86%  github.com/cnooljaw/gosproto.decodeIntSlice\n     0.04s  1.21% 32.93%      1.14s 34.44%  runtime.mallocgc\n         0     0% 32.93%      1.14s 34.44%  runtime.systemstack\n     0.01s   0.3% 33.23%      1.05s 31.72%  runtime.makeslice\n     0.03s  0.91% 34.14%      1.03s 31.12%  runtime.mallocgcSmallNoscan\n     0.03s  0.91% 35.05%      0.54s 16.31%  runtime.(*mcache).nextFree\n     0.03s  0.91% 35.95%      0.50s 15.11%  runtime.(*mcache).refill\n         0     0% 35.95%      0.50s 15.11%  runtime.(*mheap).alloc.func1\n     0.01s   0.3% 36.25%      0.50s 15.11%  runtime.(*mheap).allocSpan\n     0.44s 13.29% 49.55%      0.44s 13.29%  runtime.madvise\n         0     0% 49.55%      0.42s 12.69%  runtime.(*mcentral).cacheSpan\n         0     0% 49.55%      0.38s 11.48%  runtime.sysUsed (inline)\n         0     0% 49.55%      0.38s 11.48%  runtime.sysUsedOS (inline)\n     0.36s 10.88% 60.42%      0.36s 10.88%  runtime.memclrNoHeapPointers\n     0.35s 10.57% 71.00%      0.35s 10.57%  runtime.kevent\n         0     0% 71.00%      0.35s 10.57%  runtime.netpoll\n         0     0% 71.00%      0.35s 10.57%  runtime.startTheWorldWithSema\n     0.08s  2.42% 73.41%      0.27s  8.16%  runtime.(*sweepLocked).sweep\n         0     0% 73.41%      0.22s  6.65%  runtime.deductSweepCredit\n         0     0% 73.41%      0.22s  6.65%  runtime.gcStart.func4\n     0.02s   0.6% 74.02%      0.22s  6.65%  runtime.sweepone\n         0     0% 74.02%      0.16s  4.83%  runtime.(*mheap).freeSpan (inline)\n     0.01s   0.3% 74.32%      0.16s  4.83%  runtime.(*sweepLocked).sweep.(*mheap).freeSpan.func2\n     0.02s   0.6% 74.92%      0.15s  4.53%  runtime.(*mheap).freeSpanLocked\n         0     0% 74.92%      0.13s  3.93%  runtime.gcMarkTermination.func3\n     0.09s  2.72% 77.64%      0.09s  2.72%  encoding/binary.littleEndian.Uint32 (inline)\n         0     0% 77.64%      0.09s  2.72%  github.com/cnooljaw/gosproto.readUint32 (inline)\n         0     0% 77.64%      0.08s  2.42%  runtime.(*mcentral).grow\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/final.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkRepresentativeCodec$/^int32_edges$/^sproto_pack$",
+      "-test.benchmem",
+      "-test.benchtime=2s",
+      "-test.timeout=1m",
+      "-test.cpuprofile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-audit-20261022/int32_edges-sproto_pack.cpu"
+    ],
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "1000",
+      "GOMEMLIMIT": "128MiB"
+    },
+    "exitCode": 0,
+    "seconds": 5.747474834322929,
+    "output": "goos: darwin\ngoarch: arm64\npkg: github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks\ncpu: Apple M2\nBenchmarkRepresentativeCodec/int32_edges/sproto_pack         \t 2826698\t       953.4 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-top",
+      "-nodecount=35",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/final.test",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-audit-20261022/int32_edges-sproto_pack.cpu"
+    ],
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.022613709792494774,
+    "output": "File: final.test\nType: cpu\nTime: 2026-10-22 23:08:35 CST\nDuration: 5.74s, Total samples = 4.96s (86.44%)\nShowing nodes accounting for 4.65s, 93.75% of 4.96s total\nDropped 55 nodes (cum <= 0.02s)\nShowing top 35 nodes out of 64\n      flat  flat%   sum%        cum   cum%\n     3.25s 65.52% 65.52%      3.25s 65.52%  github.com/cnooljaw/gosproto.packWordsARM64\n     0.36s  7.26% 72.78%      0.36s  7.26%  runtime.madvise\n     0.24s  4.84% 77.62%      0.24s  4.84%  runtime.kevent\n     0.17s  3.43% 81.05%      0.17s  3.43%  runtime.memclrNoHeapPointers\n     0.05s  1.01% 82.06%      0.05s  1.01%  runtime.(*pallocBits).summarize\n     0.04s  0.81% 82.86%      0.04s  0.81%  runtime.(*gcControllerState).memoryLimitHeapGoal\n     0.04s  0.81% 83.67%      0.64s 12.90%  runtime.(*mcache).refill\n     0.04s  0.81% 84.48%      0.17s  3.43%  runtime.(*mheap).freeSpanLocked\n     0.04s  0.81% 85.28%      0.28s  5.65%  runtime.(*sweepLocked).sweep\n     0.04s  0.81% 86.09%      0.04s  0.81%  runtime.lock2\n     0.03s   0.6% 86.69%      0.03s   0.6%  internal/runtime/atomic.(*Uint64).Add (inline)\n     0.03s   0.6% 87.30%      0.03s   0.6%  runtime.(*fixalloc).alloc\n     0.03s   0.6% 87.90%      0.08s  1.61%  runtime.(*gcControllerState).update\n     0.03s   0.6% 88.51%      0.06s  1.21%  runtime.(*mheap).allocMSpanLocked\n     0.03s   0.6% 89.11%      0.03s   0.6%  runtime.(*mspan).nextFreeIndex\n     0.03s   0.6% 89.72%      0.03s   0.6%  runtime.(*sysMemStat).add\n     0.03s   0.6% 90.32%      0.94s 18.95%  runtime.mallocgcSmallNoscan\n     0.02s   0.4% 90.73%      3.29s 66.33%  github.com/cnooljaw/gosproto.packInto\n     0.02s   0.4% 91.13%      4.33s 87.30%  github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks.BenchmarkRepresentativeCodec.func1\n     0.02s   0.4% 91.53%      0.03s   0.6%  runtime.(*atomicHeadTailIndex).incTail\n     0.01s   0.2% 91.73%      4.31s 86.90%  github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks.representativeOperations.func5\n     0.01s   0.2% 91.94%      0.68s 13.71%  runtime.(*mcache).nextFree\n     0.01s   0.2% 92.14%      0.48s  9.68%  runtime.(*mcentral).cacheSpan\n     0.01s   0.2% 92.34%      0.04s  0.81%  runtime.(*mcentral).uncacheSpan\n     0.01s   0.2% 92.54%      0.46s  9.27%  runtime.(*mheap).allocSpan\n     0.01s   0.2% 92.74%      0.04s  0.81%  runtime.(*mheap).initSpan\n     0.01s   0.2% 92.94%      0.09s  1.81%  runtime.(*pageAlloc).free\n     0.01s   0.2% 93.15%      0.04s  0.81%  runtime.deductAssistCredit\n     0.01s   0.2% 93.35%      0.26s  5.24%  runtime.deductSweepCredit\n     0.01s   0.2% 93.55%      0.03s   0.6%  runtime.gcTrigger.test\n     0.01s   0.2% 93.75%      0.99s 19.96%  runtime.mallocgc\n         0     0% 93.75%      4.28s 86.29%  github.com/cnooljaw/gosproto.Pack (inline)\n         0     0% 93.75%      3.25s 65.52%  github.com/cnooljaw/gosproto.packWordsFast (inline)\n         0     0% 93.75%      0.03s   0.6%  runtime.(*gcControllerState).heapGoal (inline)\n         0     0% 93.75%      0.04s  0.81%  runtime.(*gcControllerState).heapGoalInternal\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-top",
+      "-cum",
+      "-nodecount=35",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/final.test",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-audit-20261022/int32_edges-sproto_pack.cpu"
+    ],
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.019709166139364243,
+    "output": "File: final.test\nType: cpu\nTime: 2026-10-22 23:08:35 CST\nDuration: 5.74s, Total samples = 4.96s (86.44%)\nShowing nodes accounting for 4.31s, 86.90% of 4.96s total\nDropped 55 nodes (cum <= 0.02s)\nShowing top 35 nodes out of 64\n      flat  flat%   sum%        cum   cum%\n     0.02s   0.4%   0.4%      4.33s 87.30%  github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks.BenchmarkRepresentativeCodec.func1\n         0     0%   0.4%      4.33s 87.30%  testing.(*B).launch\n         0     0%   0.4%      4.33s 87.30%  testing.(*B).runN\n     0.01s   0.2%   0.6%      4.31s 86.90%  github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks.representativeOperations.func5\n         0     0%   0.6%      4.28s 86.29%  github.com/cnooljaw/gosproto.Pack (inline)\n     0.02s   0.4%  1.01%      3.29s 66.33%  github.com/cnooljaw/gosproto.packInto\n     3.25s 65.52% 66.53%      3.25s 65.52%  github.com/cnooljaw/gosproto.packWordsARM64\n         0     0% 66.53%      3.25s 65.52%  github.com/cnooljaw/gosproto.packWordsFast (inline)\n         0     0% 66.53%      1.01s 20.36%  runtime.systemstack\n         0     0% 66.53%      0.99s 19.96%  runtime.makeslice\n     0.01s   0.2% 66.73%      0.99s 19.96%  runtime.mallocgc\n     0.03s   0.6% 67.34%      0.94s 18.95%  runtime.mallocgcSmallNoscan\n     0.01s   0.2% 67.54%      0.68s 13.71%  runtime.(*mcache).nextFree\n     0.04s  0.81% 68.35%      0.64s 12.90%  runtime.(*mcache).refill\n     0.01s   0.2% 68.55%      0.48s  9.68%  runtime.(*mcentral).cacheSpan\n         0     0% 68.55%      0.46s  9.27%  runtime.(*mheap).alloc.func1\n     0.01s   0.2% 68.75%      0.46s  9.27%  runtime.(*mheap).allocSpan\n     0.36s  7.26% 76.01%      0.36s  7.26%  runtime.madvise\n         0     0% 76.01%      0.33s  6.65%  runtime.sysUsed (inline)\n         0     0% 76.01%      0.33s  6.65%  runtime.sysUsedOS (inline)\n     0.04s  0.81% 76.81%      0.28s  5.65%  runtime.(*sweepLocked).sweep\n     0.01s   0.2% 77.02%      0.26s  5.24%  runtime.deductSweepCredit\n         0     0% 77.02%      0.26s  5.24%  runtime.sweepone\n     0.24s  4.84% 81.85%      0.24s  4.84%  runtime.kevent\n         0     0% 81.85%      0.24s  4.84%  runtime.netpoll\n         0     0% 81.85%      0.24s  4.84%  runtime.startTheWorldWithSema\n         0     0% 81.85%      0.22s  4.44%  runtime.(*mheap).freeSpan (inline)\n         0     0% 81.85%      0.22s  4.44%  runtime.(*sweepLocked).sweep.(*mheap).freeSpan.func2\n         0     0% 81.85%      0.18s  3.63%  runtime.gcStart.func4\n     0.04s  0.81% 82.66%      0.17s  3.43%  runtime.(*mheap).freeSpanLocked\n     0.17s  3.43% 86.09%      0.17s  3.43%  runtime.memclrNoHeapPointers\n         0     0% 86.09%      0.14s  2.82%  runtime.(*mcentral).grow\n         0     0% 86.09%      0.13s  2.62%  runtime.(*mheap).alloc\n     0.01s   0.2% 86.29%      0.09s  1.81%  runtime.(*pageAlloc).free\n     0.03s   0.6% 86.90%      0.08s  1.61%  runtime.(*gcControllerState).update\n"
+  },
+  {
+    "args": [
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/final.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkRepresentativeCodec$/^int32_edges$/^sproto_unpack$",
+      "-test.benchmem",
+      "-test.benchtime=2s",
+      "-test.timeout=1m",
+      "-test.cpuprofile=/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-audit-20261022/int32_edges-sproto_unpack.cpu"
+    ],
+    "env": {
+      "GOMAXPROCS": "1",
+      "GOGC": "1000",
+      "GOMEMLIMIT": "128MiB"
+    },
+    "exitCode": 0,
+    "seconds": 2.6491870004683733,
+    "output": "goos: darwin\ngoarch: arm64\npkg: github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks\ncpu: Apple M2\nBenchmarkRepresentativeCodec/int32_edges/sproto_unpack         \t  607684\t      3965 ns/op\t    4096 B/op\t       1 allocs/op\nPASS\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-top",
+      "-nodecount=35",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/final.test",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-audit-20261022/int32_edges-sproto_unpack.cpu"
+    ],
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.018704665824770927,
+    "output": "File: final.test\nType: cpu\nTime: 2026-10-22 23:08:41 CST\nDuration: 2.64s, Total samples = 2.18s (82.57%)\nShowing nodes accounting for 2.12s, 97.25% of 2.18s total\nDropped 22 nodes (cum <= 0.01s)\n      flat  flat%   sum%        cum   cum%\n     0.86s 39.45% 39.45%      0.86s 39.45%  github.com/cnooljaw/gosproto.unpackVectorARM64\n     0.83s 38.07% 77.52%      0.83s 38.07%  github.com/cnooljaw/gosproto.unpackedSizeARM64\n     0.21s  9.63% 87.16%      0.21s  9.63%  runtime.memclrNoHeapPointers\n     0.16s  7.34% 94.50%      0.16s  7.34%  runtime.madvise\n     0.02s  0.92% 95.41%      0.02s  0.92%  runtime.(*pallocBits).summarize\n     0.01s  0.46% 95.87%      2.01s 92.20%  github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks.representativeOperations.func6\n     0.01s  0.46% 96.33%      0.07s  3.21%  runtime.(*mcache).refill\n     0.01s  0.46% 96.79%      0.31s 14.22%  runtime.mallocgc\n     0.01s  0.46% 97.25%      0.29s 13.30%  runtime.mallocgcSmallNoscan\n         0     0% 97.25%         2s 91.74%  github.com/cnooljaw/gosproto.Unpack (inline)\n         0     0% 97.25%         2s 91.74%  github.com/cnooljaw/gosproto.UnpackWithLimit\n         0     0% 97.25%      0.83s 38.07%  github.com/cnooljaw/gosproto.unpackSizeFast\n         0     0% 97.25%      0.86s 39.45%  github.com/cnooljaw/gosproto.unpackVector (inline)\n         0     0% 97.25%      2.01s 92.20%  github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks.BenchmarkRepresentativeCodec.func1\n         0     0% 97.25%      0.07s  3.21%  runtime.(*mcache).nextFree\n         0     0% 97.25%      0.06s  2.75%  runtime.(*mcentral).cacheSpan\n         0     0% 97.25%      0.17s  7.80%  runtime.(*mheap).alloc.func1\n         0     0% 97.25%      0.17s  7.80%  runtime.(*mheap).allocSpan\n         0     0% 97.25%      0.03s  1.38%  runtime.(*mheap).freeSpan (inline)\n         0     0% 97.25%      0.02s  0.92%  runtime.(*mheap).freeSpanLocked\n         0     0% 97.25%      0.02s  0.92%  runtime.(*pageAlloc).free\n         0     0% 97.25%      0.02s  0.92%  runtime.(*pageAlloc).update\n         0     0% 97.25%      0.03s  1.38%  runtime.(*sweepLocked).sweep\n         0     0% 97.25%      0.03s  1.38%  runtime.(*sweepLocked).sweep.(*mheap).freeSpan.func2\n         0     0% 97.25%      0.05s  2.29%  runtime.deductSweepCredit\n         0     0% 97.25%      0.31s 14.22%  runtime.makeslice\n         0     0% 97.25%      0.05s  2.29%  runtime.sweepone\n         0     0% 97.25%      0.16s  7.34%  runtime.sysUsed (inline)\n         0     0% 97.25%      0.16s  7.34%  runtime.sysUsedOS (inline)\n         0     0% 97.25%      0.22s 10.09%  runtime.systemstack\n         0     0% 97.25%      2.01s 92.20%  testing.(*B).launch\n         0     0% 97.25%      2.01s 92.20%  testing.(*B).runN\n"
+  },
+  {
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-top",
+      "-cum",
+      "-nodecount=35",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-final-guard-20261022/final.test",
+      "/Users/lijiawang/Documents/cocos/laya/gsr/tmp/gosproto-closure-audit-20261022/int32_edges-sproto_unpack.cpu"
+    ],
+    "env": {},
+    "exitCode": 0,
+    "seconds": 0.018135206773877144,
+    "output": "File: final.test\nType: cpu\nTime: 2026-10-22 23:08:41 CST\nDuration: 2.64s, Total samples = 2.18s (82.57%)\nShowing nodes accounting for 2.12s, 97.25% of 2.18s total\nDropped 22 nodes (cum <= 0.01s)\n      flat  flat%   sum%        cum   cum%\n         0     0%     0%      2.01s 92.20%  github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks.BenchmarkRepresentativeCodec.func1\n     0.01s  0.46%  0.46%      2.01s 92.20%  github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks.representativeOperations.func6\n         0     0%  0.46%      2.01s 92.20%  testing.(*B).launch\n         0     0%  0.46%      2.01s 92.20%  testing.(*B).runN\n         0     0%  0.46%         2s 91.74%  github.com/cnooljaw/gosproto.Unpack (inline)\n         0     0%  0.46%         2s 91.74%  github.com/cnooljaw/gosproto.UnpackWithLimit\n         0     0%  0.46%      0.86s 39.45%  github.com/cnooljaw/gosproto.unpackVector (inline)\n     0.86s 39.45% 39.91%      0.86s 39.45%  github.com/cnooljaw/gosproto.unpackVectorARM64\n         0     0% 39.91%      0.83s 38.07%  github.com/cnooljaw/gosproto.unpackSizeFast\n     0.83s 38.07% 77.98%      0.83s 38.07%  github.com/cnooljaw/gosproto.unpackedSizeARM64\n         0     0% 77.98%      0.31s 14.22%  runtime.makeslice\n     0.01s  0.46% 78.44%      0.31s 14.22%  runtime.mallocgc\n     0.01s  0.46% 78.90%      0.29s 13.30%  runtime.mallocgcSmallNoscan\n         0     0% 78.90%      0.22s 10.09%  runtime.systemstack\n     0.21s  9.63% 88.53%      0.21s  9.63%  runtime.memclrNoHeapPointers\n         0     0% 88.53%      0.17s  7.80%  runtime.(*mheap).alloc.func1\n         0     0% 88.53%      0.17s  7.80%  runtime.(*mheap).allocSpan\n     0.16s  7.34% 95.87%      0.16s  7.34%  runtime.madvise\n         0     0% 95.87%      0.16s  7.34%  runtime.sysUsed (inline)\n         0     0% 95.87%      0.16s  7.34%  runtime.sysUsedOS (inline)\n         0     0% 95.87%      0.07s  3.21%  runtime.(*mcache).nextFree\n     0.01s  0.46% 96.33%      0.07s  3.21%  runtime.(*mcache).refill\n         0     0% 96.33%      0.06s  2.75%  runtime.(*mcentral).cacheSpan\n         0     0% 96.33%      0.05s  2.29%  runtime.deductSweepCredit\n         0     0% 96.33%      0.05s  2.29%  runtime.sweepone\n         0     0% 96.33%      0.03s  1.38%  runtime.(*mheap).freeSpan (inline)\n         0     0% 96.33%      0.03s  1.38%  runtime.(*sweepLocked).sweep\n         0     0% 96.33%      0.03s  1.38%  runtime.(*sweepLocked).sweep.(*mheap).freeSpan.func2\n         0     0% 96.33%      0.02s  0.92%  runtime.(*mheap).freeSpanLocked\n         0     0% 96.33%      0.02s  0.92%  runtime.(*pageAlloc).free\n         0     0% 96.33%      0.02s  0.92%  runtime.(*pageAlloc).update\n     0.02s  0.92% 97.25%      0.02s  0.92%  runtime.(*pallocBits).summarize\n"
+  }
+]

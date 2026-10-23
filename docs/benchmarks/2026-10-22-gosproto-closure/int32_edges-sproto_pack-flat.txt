@@ -1,0 +1,43 @@
+File: final.test
+Type: cpu
+Time: 2026-10-22 23:08:35 CST
+Duration: 5.74s, Total samples = 4.96s (86.44%)
+Showing nodes accounting for 4.65s, 93.75% of 4.96s total
+Dropped 55 nodes (cum <= 0.02s)
+Showing top 35 nodes out of 64
+      flat  flat%   sum%        cum   cum%
+     3.25s 65.52% 65.52%      3.25s 65.52%  github.com/cnooljaw/gosproto.packWordsARM64
+     0.36s  7.26% 72.78%      0.36s  7.26%  runtime.madvise
+     0.24s  4.84% 77.62%      0.24s  4.84%  runtime.kevent
+     0.17s  3.43% 81.05%      0.17s  3.43%  runtime.memclrNoHeapPointers
+     0.05s  1.01% 82.06%      0.05s  1.01%  runtime.(*pallocBits).summarize
+     0.04s  0.81% 82.86%      0.04s  0.81%  runtime.(*gcControllerState).memoryLimitHeapGoal
+     0.04s  0.81% 83.67%      0.64s 12.90%  runtime.(*mcache).refill
+     0.04s  0.81% 84.48%      0.17s  3.43%  runtime.(*mheap).freeSpanLocked
+     0.04s  0.81% 85.28%      0.28s  5.65%  runtime.(*sweepLocked).sweep
+     0.04s  0.81% 86.09%      0.04s  0.81%  runtime.lock2
+     0.03s   0.6% 86.69%      0.03s   0.6%  internal/runtime/atomic.(*Uint64).Add (inline)
+     0.03s   0.6% 87.30%      0.03s   0.6%  runtime.(*fixalloc).alloc
+     0.03s   0.6% 87.90%      0.08s  1.61%  runtime.(*gcControllerState).update
+     0.03s   0.6% 88.51%      0.06s  1.21%  runtime.(*mheap).allocMSpanLocked
+     0.03s   0.6% 89.11%      0.03s   0.6%  runtime.(*mspan).nextFreeIndex
+     0.03s   0.6% 89.72%      0.03s   0.6%  runtime.(*sysMemStat).add
+     0.03s   0.6% 90.32%      0.94s 18.95%  runtime.mallocgcSmallNoscan
+     0.02s   0.4% 90.73%      3.29s 66.33%  github.com/cnooljaw/gosproto.packInto
+     0.02s   0.4% 91.13%      4.33s 87.30%  github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks.BenchmarkRepresentativeCodec.func1
+     0.02s   0.4% 91.53%      0.03s   0.6%  runtime.(*atomicHeadTailIndex).incTail
+     0.01s   0.2% 91.73%      4.31s 86.90%  github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks.representativeOperations.func5
+     0.01s   0.2% 91.94%      0.68s 13.71%  runtime.(*mcache).nextFree
+     0.01s   0.2% 92.14%      0.48s  9.68%  runtime.(*mcentral).cacheSpan
+     0.01s   0.2% 92.34%      0.04s  0.81%  runtime.(*mcentral).uncacheSpan
+     0.01s   0.2% 92.54%      0.46s  9.27%  runtime.(*mheap).allocSpan
+     0.01s   0.2% 92.74%      0.04s  0.81%  runtime.(*mheap).initSpan
+     0.01s   0.2% 92.94%      0.09s  1.81%  runtime.(*pageAlloc).free
+     0.01s   0.2% 93.15%      0.04s  0.81%  runtime.deductAssistCredit
+     0.01s   0.2% 93.35%      0.26s  5.24%  runtime.deductSweepCredit
+     0.01s   0.2% 93.55%      0.03s   0.6%  runtime.gcTrigger.test
+     0.01s   0.2% 93.75%      0.99s 19.96%  runtime.mallocgc
+         0     0% 93.75%      4.28s 86.29%  github.com/cnooljaw/gosproto.Pack (inline)
+         0     0% 93.75%      3.25s 65.52%  github.com/cnooljaw/gosproto.packWordsFast (inline)
+         0     0% 93.75%      0.03s   0.6%  runtime.(*gcControllerState).heapGoal (inline)
+         0     0% 93.75%      0.04s  0.81%  runtime.(*gcControllerState).heapGoalInternal

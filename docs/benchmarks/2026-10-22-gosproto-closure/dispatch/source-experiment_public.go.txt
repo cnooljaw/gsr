@@ -1,0 +1,8 @@
+package sproto
+// ExperimentDecodePacked 仅为隔离测量保留基线公开入口的调用层次。
+func ExperimentDecodePacked(data []byte, sp interface{}) error {
+ unpacked, err := ExperimentUnpackOriginal(data, 8<<20)
+ if err != nil { return err }
+ _, err = Decode(unpacked, sp)
+ return err
+}

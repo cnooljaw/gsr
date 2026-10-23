@@ -1,0 +1,43 @@
+File: final.test
+Type: cpu
+Time: 2026-10-22 23:08:27 CST
+Duration: 4.05s, Total samples = 3.56s (87.85%)
+Showing nodes accounting for 2.68s, 75.28% of 3.56s total
+Dropped 42 nodes (cum <= 0.02s)
+Showing top 35 nodes out of 90
+      flat  flat%   sum%        cum   cum%
+         0     0%     0%      3.26s 91.57%  github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks.BenchmarkRepresentativeCodec.func1
+     0.01s  0.28%  0.28%      3.26s 91.57%  github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks.representativeOperations.func3
+         0     0%  0.28%      3.26s 91.57%  testing.(*B).launch
+         0     0%  0.28%      3.26s 91.57%  testing.(*B).runN
+     0.02s  0.56%  0.84%      3.25s 91.29%  github.com/cnooljaw/gosproto.Encode
+         0     0%  0.84%      3.23s 90.73%  github.com/cnooljaw/gosproto.EncodeWithLimits (inline)
+     0.01s  0.28%  1.12%      3.23s 90.73%  github.com/cnooljaw/gosproto.encodeBufferWithLimits
+         0     0%  1.12%      3.23s 90.73%  github.com/cnooljaw/gosproto.encodeWithLimits
+     0.02s  0.56%  1.69%      1.35s 37.92%  github.com/cnooljaw/gosproto.encodeMessageInto
+     0.01s  0.28%  1.97%      1.27s 35.67%  github.com/cnooljaw/gosproto.encodeFieldInto
+     0.06s  1.69%  3.65%      1.06s 29.78%  github.com/cnooljaw/gosproto.encodedSize
+        1s 28.09% 31.74%         1s 28.09%  github.com/cnooljaw/gosproto.encodeInt64Slice
+     0.93s 26.12% 57.87%      0.94s 26.40%  github.com/cnooljaw/gosproto.fieldSize
+     0.01s  0.28% 58.15%      0.69s 19.38%  runtime.makeslice
+     0.02s  0.56% 58.71%      0.68s 19.10%  runtime.mallocgc
+     0.02s  0.56% 59.27%      0.65s 18.26%  runtime.mallocgcSmallNoscan
+         0     0% 59.27%      0.53s 14.89%  runtime.systemstack
+         0     0% 59.27%      0.41s 11.52%  runtime.(*mcache).nextFree
+     0.01s  0.28% 59.55%      0.39s 10.96%  runtime.(*mcache).refill
+         0     0% 59.55%      0.37s 10.39%  runtime.(*mcentral).cacheSpan
+         0     0% 59.55%      0.29s  8.15%  runtime.(*mheap).alloc.func1
+     0.01s  0.28% 59.83%      0.29s  8.15%  runtime.(*mheap).allocSpan
+     0.02s  0.56% 60.39%      0.22s  6.18%  reflect.(*rtype).ptrTo
+         0     0% 60.39%      0.22s  6.18%  reflect.Value.Addr
+         0     0% 60.39%      0.22s  6.18%  reflect.ptrTo (inline)
+     0.03s  0.84% 61.24%      0.21s  5.90%  runtime.(*sweepLocked).sweep
+     0.21s  5.90% 67.13%      0.21s  5.90%  runtime.madvise
+         0     0% 67.13%      0.20s  5.62%  reflect.(*rtype).typeOff (inline)
+         0     0% 67.13%      0.20s  5.62%  reflect.resolveTypeOff
+     0.12s  3.37% 70.51%      0.20s  5.62%  runtime.resolveTypeOff
+         0     0% 70.51%      0.20s  5.62%  runtime.rtype.typeOff (inline)
+         0     0% 70.51%      0.18s  5.06%  runtime.sysUsed (inline)
+         0     0% 70.51%      0.18s  5.06%  runtime.sysUsedOS (inline)
+     0.17s  4.78% 75.28%      0.17s  4.78%  runtime.memclrNoHeapPointers
+         0     0% 75.28%      0.17s  4.78%  runtime.sweepone

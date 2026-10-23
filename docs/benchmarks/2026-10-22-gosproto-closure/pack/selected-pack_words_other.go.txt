@@ -1,0 +1,7 @@
+//go:build !arm64 || purego
+
+package sproto
+
+func packWordsFast(_ []byte, _ []byte) (int, int) {
+	return 0, 0
+}

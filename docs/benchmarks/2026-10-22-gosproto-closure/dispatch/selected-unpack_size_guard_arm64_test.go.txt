@@ -1,0 +1,64 @@
+//go:build arm64 && !purego && (darwin || linux)
+
+package sproto
+
+import (
+	"bytes"
+	"fmt"
+	"syscall"
+	"testing"
+)
+
+// TestUnpackSizeGuardPages 保护只读源的头尾边界，并核对错误优先级及公开入口接线。
+func TestUnpackSizeGuardPages(t *testing.T) {
+	check := func(t *testing.T, packed []byte) {
+		t.Helper()
+		input, page := guardedVectorBuffer(t, len(packed))
+		copy(input, packed)
+		if err := syscall.Mprotect(page, syscall.PROT_READ); err != nil {
+			t.Fatal(err)
+		}
+		for _, limit := range []int{1, 7, 8, 9, 15, 16, 63, 64, 2047, 2048, int(^uint(0) >> 1)} {
+			want, wantErr := referenceUnpackSize(input, limit)
+			size, status := unpackedSizeARM64(input, limit, &unpackSizeCounts)
+			var sizeErr error
+			if status == 1 {
+				sizeErr = ErrUnpack
+			} else if status == 2 {
+				sizeErr = ErrLimit
+			} else if status != 0 {
+				t.Fatalf("unknown status %d", status)
+			}
+			if sizeErr != wantErr || (sizeErr == nil && size != want) {
+				t.Fatalf("limit=%d size=%d/%v want=%d/%v", limit, size, sizeErr, want, wantErr)
+			}
+			got, err := UnpackWithLimit(input, limit)
+			if err != wantErr || (err == nil && (len(got) != want || cap(got) != len(got))) || !bytes.Equal(input, packed) {
+				t.Fatalf("public result limit=%d: %v", limit, err)
+			}
+		}
+	}
+	for mask := 0; mask < 256; mask++ {
+		wire := []byte{byte(mask)}
+		if mask == 255 {
+			wire = append(wire, 0)
+		}
+		for bit := 0; bit < 8; bit++ {
+			if mask&(1<<bit) != 0 {
+				wire = append(wire, byte(0x81+bit))
+			}
+		}
+		for cut := 0; cut <= len(wire); cut++ {
+			t.Run(fmt.Sprintf("mask%d-cut%d", mask, cut), func(t *testing.T) { check(t, wire[:cut]) })
+		}
+	}
+	for count := 0; count < 256; count++ {
+		wire := append([]byte{255, byte(count)}, bytes.Repeat([]byte{0x81}, (count+1)*8)...)
+		for _, cut := range []int{1, 2, len(wire) - 1, len(wire)} {
+			t.Run(fmt.Sprintf("ff%d-cut%d", count, cut), func(t *testing.T) { check(t, wire[:cut]) })
+		}
+	}
+	for _, size := range []int{7, 8, 9, 63, 64, 65, 127, 128, 129, 4096} {
+		t.Run(fmt.Sprintf("zero%d", size), func(t *testing.T) { check(t, make([]byte, size)) })
+	}
+}

@@ -1,0 +1,43 @@
+File: final.test
+Type: cpu
+Time: 2026-10-22 23:08:18 CST
+Duration: 3s, Total samples = 2.47s (82.24%)
+Showing nodes accounting for 1.70s, 68.83% of 2.47s total
+Dropped 41 nodes (cum <= 0.01s)
+Showing top 35 nodes out of 77
+      flat  flat%   sum%        cum   cum%
+         0     0%     0%      2.18s 88.26%  github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks.BenchmarkRepresentativeCodec.func1
+         0     0%     0%      2.18s 88.26%  github.com/cnooljaw/gsr/examples/websocket-gate/benchmarks.representativeOperations.func4
+         0     0%     0%      2.18s 88.26%  testing.(*B).launch
+         0     0%     0%      2.18s 88.26%  testing.(*B).runN
+         0     0%     0%      2.15s 87.04%  github.com/cnooljaw/gosproto.Decode (inline)
+         0     0%     0%      2.15s 87.04%  github.com/cnooljaw/gosproto.DecodeWithLimits
+         0     0%     0%      2.13s 86.23%  github.com/cnooljaw/gosproto.decodeMessage
+     0.06s  2.43%  2.43%      1.89s 76.52%  github.com/cnooljaw/gosproto.decodeStructSlice
+     0.23s  9.31% 11.74%      1.22s 49.39%  runtime.mallocgc
+     0.34s 13.77% 25.51%      1.07s 43.32%  github.com/cnooljaw/gosproto.decodeIntegerRecord
+     0.03s  1.21% 26.72%      0.72s 29.15%  runtime.newobject
+         0     0% 26.72%      0.55s 22.27%  reflect.New
+     0.11s  4.45% 31.17%      0.44s 17.81%  runtime.mallocgcSmallScanNoHeader
+     0.24s  9.72% 40.89%      0.43s 17.41%  runtime.mallocgcTiny
+     0.01s   0.4% 41.30%      0.42s 17.00%  reflect.unsafe_New
+         0     0% 41.30%      0.35s 14.17%  runtime.systemstack
+         0     0% 41.30%      0.28s 11.34%  runtime.(*mheap).alloc.func1
+         0     0% 41.30%      0.28s 11.34%  runtime.(*mheap).allocSpan
+     0.27s 10.93% 52.23%      0.27s 10.93%  runtime.madvise
+         0     0% 52.23%      0.25s 10.12%  runtime.sysUsed (inline)
+         0     0% 52.23%      0.25s 10.12%  runtime.sysUsedOS (inline)
+     0.19s  7.69% 59.92%      0.19s  7.69%  runtime.memclrNoHeapPointers
+     0.05s  2.02% 61.94%      0.14s  5.67%  github.com/cnooljaw/gosproto.countChunks
+     0.03s  1.21% 63.16%      0.13s  5.26%  reflect.(*rtype).ptrTo
+         0     0% 63.16%      0.13s  5.26%  reflect.ptrTo (inline)
+         0     0% 63.16%      0.12s  4.86%  runtime.(*mcache).nextFree
+     0.03s  1.21% 64.37%      0.11s  4.45%  github.com/cnooljaw/gosproto.decodeIntSlice
+         0     0% 64.37%      0.11s  4.45%  runtime.(*mcache).refill
+         0     0% 64.37%      0.11s  4.45%  runtime.(*mcentral).cacheSpan
+         0     0% 64.37%      0.10s  4.05%  reflect.(*rtype).typeOff (inline)
+     0.02s  0.81% 65.18%      0.10s  4.05%  reflect.resolveTypeOff
+         0     0% 65.18%      0.09s  3.64%  github.com/cnooljaw/gosproto.decodeStringSlice
+     0.07s  2.83% 68.02%      0.09s  3.64%  runtime.(*mspan).writeHeapBitsSmall
+         0     0% 68.02%      0.09s  3.64%  runtime.heapSetTypeNoHeader (inline)
+     0.02s  0.81% 68.83%      0.09s  3.64%  runtime.mallocgcSmallNoscan

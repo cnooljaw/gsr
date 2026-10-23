@@ -1,0 +1,60 @@
+./unpack_size_arm64.go:34:6: cannot inline unpackedSizeARM64: no function body
+./unpack_size_arm64.go:16:6: cannot inline unpackSizeFast: function too complex: cost 103 exceeds budget 80
+./unpack_vector_arm64.go:36:6: cannot inline unpackVectorARM64: no function body
+./unpack_vector_arm64.go:30:6: can inline unpackVector with cost 65 as: func([]byte, []byte) bool { unpackVectorARM64(dst, src, &unpackVectorTable); return true }
+./pack.go:193:6: cannot inline UnpackWithLimit: function too complex: cost 599 exceeds budget 80
+./pack.go:188:6: can inline Unpack with cost 71 as: func([]byte) ([]byte, error) { return ([]byte)(.autotmp_3), .autotmp_4 }
+./decode.go:278:50:     from reflect.New(field.valueType) (call parameter) at ./decode.go:279:23
+./decode.go:278:37: leaking param: data
+./decode.go:278:50: leaking param content: field
+./decode.go:278:70: leaking param: value
+./decode.go:278:91: leaking param: budget
+./decode_integer_record.go:24:83: decodeIntegerRecord capturing by value: budget (addr=false assign=false width=8)
+./decode.go:291:55:     from reflect.New(field.st.typ) (call parameter) at ./decode.go:310:25
+./decode.go:291:42: leaking param: data
+./decode.go:291:55: leaking param content: field
+./decode.go:291:75: leaking param: value
+./decode.go:291:96: leaking param: budget
+./meta.go:363:12: &reflect.ValueError{...} escapes to heap:
+./decode.go:418:36:     from reflect.Value.Set(reflect.Value.Elem(value), reflect.Value.Elem(result)) (call parameter) at ./decode.go:439:18
+./decode.go:418:23: parameter data leaks to {heap} with derefs=0:
+./decode.go:418:23:   flow: {heap} = data:
+./decode.go:418:23:     from decodeMessage(data, schema, result, &decodeBudget{...}) (call parameter) at ./decode.go:435:28
+./decode.go:418:23: leaking param: data
+./decode.go:418:36: leaking param: message
+./decode.go:418:23:     from decodeMessage(data, schema, result, &decodeBudget{...}) (call parameter) at ./decode.go:435:28
+./decode.go:418:23: leaking param: data
+./decode.go:418:36: leaking param: message
+./decode.go:435:51: &decodeBudget{...} escapes to heap
+./decode.go:413:26: parameter message leaks to {heap} with derefs=0:
+./decode.go:413:26:   flow: {heap} = message:
+./decode.go:413:26:     from DecodeWithLimits(data, message, Limits{}) (call parameter) at ./decode.go:414:25
+./decode.go:413:13: parameter data leaks to {heap} with derefs=0:
+./decode.go:413:13:   flow: {heap} = data:
+./decode.go:413:13:     from DecodeWithLimits(data, message, Limits{}) (call parameter) at ./decode.go:414:25
+./decode.go:413:13: leaking param: data
+./decode.go:413:26: leaking param: message
+./decode.go:413:13:     from DecodeWithLimits(data, message, Limits{}) (call parameter) at ./decode.go:414:25
+./decode.go:413:13: leaking param: data
+./decode.go:413:26: leaking param: message
+./decode.go:443:30: parameter message leaks to {heap} with derefs=0:
+./decode.go:443:30:   flow: message = message:
+./decode.go:443:30:     from data, message := data, message (assign-pair) at ./decode.go:444:21
+./decode.go:443:17:     from DecodeWithLimits(data, message, Limits{}) (call parameter) at ./decode.go:444:21
+./decode.go:443:17: leaking param: data
+./decode.go:443:30: leaking param: message
+./decode_integer_record.go:7:30: schema does not escape
+./decode_pointer.go:15:27: parameter value leaks to ~r0 with derefs=0:
+./decode_pointer.go:15:27:   flow: ~r0 = value:
+./fuzz_test.go:34:14: leaking param: t
+./fuzz_test.go:34:28: leaking param: data
+./fuzz_test.go:38:24: make([]byte, ~r0) escapes to heap
+./fuzz_test.go:39:28: []byte{} does not escape
+./fuzz_test.go:40:35: make([]byte, (8 - len(data) % 8) % 8) escapes to heap
+./fuzz_test.go:42:32: string(bytes.a) does not escape
+./limits_test.go:242:14: t does not escape
+./limits_test.go:242:28: leaking param: data
+./limits_test.go:246:7: moved to heap: output
+./limits_test.go:248:7: moved to heap: recursive
+./limits_test.go:242:9: func literal escapes to heap:
+./limits_test.go:242:9:   flow: {heap} = &{storage for func literal}:
