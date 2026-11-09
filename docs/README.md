@@ -57,5 +57,6 @@ v1.0.1 入口已按 [ADR 0012](adr/0012-node-capabilities-and-service-logging.md
 ## 示例选择
 
 - 普通业务：先看 Counter，再看双节点、WebSocket Echo、Redis/MySQL Service 示例。统一使用 `gsr.Run + MainService` 和当前 Service 的 `self` 能力。
+- 有界并行：见 [Service 池示例](../examples/service-pool/README.md)，多个调用者通过普通 Call 访问同一名称，每个成员保持串行。
 - HTTP 管理入口：先看 [HTTP 示例](../examples/http-inbound/README.md) 中的 MainService 和 `HTTPIngress` 接线，再看底层测试夹具。
 - 基础设施验证：显式 Runtime、ClusterClient、Transport 等组装只用于理解或测试框架边界，不是业务启动必经步骤。

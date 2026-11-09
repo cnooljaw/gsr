@@ -2,6 +2,12 @@
 
 当前发布基线为 GSR v1.0.2。Sproto 编解码、通用 Go/TS/PB 基准及性能研究归独立 gosproto 仓库，GSR 依赖其 v1.0.1 正式版本并保留接入层与集成验证。旧 tmp 实验已移出工作区，真实目录的全仓依赖整理与测试通过；迁移及清理细节见 [接入指南](SPROTO-INTEGRATION.md)和 [清理记录](WORKSPACE-CLEANUP.md)。
 
+## Service 池可运行示例（2026-11-09）
+
+服务池实现、测试及设计文档已创建本地提交 `971bf20`。后续新增 `examples/service-pool`：两个独立调用者使用普通 CallName 访问同名池，成员独占计数并自动回复，MainService 收集结果后通知宿主结束；全程由 Runtime 管理执行，不启动业务 goroutine。
+
+示例接线测试先因缺少 run 入口编译失败，补实现后 `go test -race ./examples/service-pool -timeout=2m` 通过；实际执行 `go run ./examples/service-pool` 输出两个不同成员的工作结果并正常退出。测试只保护示例的创建、调用、收集及关闭接线，不复制框架的并发、满载与失败矩阵。示例与本节文档改动尚未提交，未推送或发布。
+
 ## 有界 Service 池切片（2026-11-06）
 
 用户确认通用有界并行能力，新增 Node.CreateServicePool 和显式工厂配置，保持每成员串行及原 Call 自动回复；不加入结算业务、异步 Reply、重放、自动补员或额外调度 goroutine。Core 的窄基础设施入口支持实例 Mailbox 容量与批量局部停止，后者先通知所有目标再在共享有限预算内等待。
