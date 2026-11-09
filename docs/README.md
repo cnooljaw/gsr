@@ -1,6 +1,6 @@
 # GSR 文档
 
-GSR 是 Go 游戏服务器 Service Runtime。已发布版本为 **v1.0.2**；当前工作树另外提供尚未发布的有界 Service 池。固定依赖接入时使用对应标签的文档，不能把开发分支 API 当成已发布能力。
+GSR 是 Go 游戏服务器 Service Runtime。已发布版本为 **v1.0.3**，包含有界 Service 池。固定依赖接入时使用对应标签的文档，不能把开发分支 API 当成已发布能力。
 
 ## 1. 运行与接入
 
@@ -10,7 +10,7 @@ GSR 是 Go 游戏服务器 Service Runtime。已发布版本为 **v1.0.2**；当
 2. [独立业务项目开发指南](guides/APPLICATION.md)：依赖版本、项目结构、MainService 和状态归属。
 3. [Cluster 调用指南](guides/CLUSTER.md)：双节点、参数编码、返回值与错误。
 4. [客户端协议接入](guides/CLIENT-PROTOCOLS.md)：Protobuf / Sproto、Agent 和 TS 副本同步。
-5. [Service 池](guides/SERVICE-POOLS.md)：固定并行成员、普通 Call、容量与失败语义；尚未发布。
+5. [Service 池](guides/SERVICE-POOLS.md)：固定并行成员、普通 Call、容量与失败语义；自 v1.0.3 提供。
 
 | 场景 | 可运行示例 |
 | --- | --- |
@@ -47,6 +47,7 @@ GSR 是 Go 游戏服务器 Service Runtime。已发布版本为 **v1.0.2**；当
 
 | 版本 | 主要内容 |
 | --- | --- |
+| [v1.0.3](releases/v1.0.3.md) | 有界 Service 池、可运行示例与文档重组 |
 | [v1.0.2](releases/v1.0.2.md) | Gate SecurityMode 命名、独立 Sproto 接入与正式依赖 |
 | [v1.0.1](releases/v1.0.1.md) | Node 组装、来源绑定的 Cluster 与窄日志入口 |
 | [v1.0.0](releases/v1.0.0.md) | 首次内部发布及接入边界 |

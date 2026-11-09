@@ -2,7 +2,7 @@
 
 GSR 是使用 Go 实现的游戏服务器 Service Runtime，借鉴 Skynet 的 Service、消息和生命周期思想，以显式依赖、强类型 Handler 和有界消息接纳组织业务。
 
-已发布版本为 **v1.0.2**（[VERSION](VERSION)），主要变化和升级说明见 [发布说明](docs/releases/v1.0.2.md)。当前开发分支另外提供尚未发布的有界 Service 池。
+已发布版本为 **v1.0.3**（[VERSION](VERSION)），包含有界 Service 池，主要变化和升级说明见 [发布说明](docs/releases/v1.0.3.md)。
 
 ## 快速开始
 

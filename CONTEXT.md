@@ -11,7 +11,7 @@
 - **Node**：Run 创建并管理的节点对象。同 Run 共享、不同 Run 隔离；通过 `self.Node()` 借用名称、服务池、Cluster/HTTP/Gate 组装能力，不提供业务通信或关闭入口。
 - **应用配置**：`gsr.RuntimeConfig` / `gsr.ClusterConfig` 不暴露 Logger，Run 转换到底层配置并统一注入依赖。
 - **Service 组装**：`ServiceContext.CreateService` 接受已构造实例并交给 Runtime 管理，不随创建者退出而停止；服务池另用显式工厂创建独立成员。
-- **Service 池**：一个节点内名称对应多个独立 ServiceID 的可选有界并行能力，尚未发布。成员各自串行，轮询只选一次，不重放、不保证整体顺序、不自动补员；见 [指南](docs/guides/SERVICE-POOLS.md)。
+- **Service 池**：一个节点内名称对应多个独立 ServiceID 的可选有界并行能力，自 v1.0.3 提供。成员各自串行，轮询只选一次，不重放、不保证整体顺序、不自动补员；见 [指南](docs/guides/SERVICE-POOLS.md)。
 
 ## 本地消息与状态
 

@@ -1,6 +1,6 @@
 # GSR API 设计规范
 
-本文定义当前代码的公开行为与 Runtime 边界。已发布基线为 v1.0.2；有界 Service 池尚未发布。版本差异和迁移统一见 [发布说明](releases/v1.0.2.md)，接入顺序见 [文档索引](README.md)。
+本文定义当前代码的公开行为与 Runtime 边界。已发布基线为 v1.0.3，包含有界 Service 池。版本差异和迁移统一见 [发布说明](releases/v1.0.3.md)，接入顺序见 [文档索引](README.md)。
 
 应用组装通过 self.Node()：RegisterService 发布目标名称，CreateServicePool 创建命名池，OpenCluster 开放共享监听，OpenHTTP 打开节点 HTTP，CreateGate 创建独立 GateService，ClusterListenAddress 观测实际 Cluster 绑定地址。Node 保存节点运行状态，由 Run 管理生命周期，业务借用同一对象的公开能力，不提供 Close、业务通信或内部组件 getter，限当前回调使用。同一 Run 共享唯一 Node，不同 Run 隔离；内部字段和 close 不公开。MainService 可完成组装后退出，原有 owner 继续管理资源。
 
@@ -440,7 +440,7 @@ func (service *userService) Handle(ctx gsr.CommandContext, command runtime.Comma
 
 不把普通命令改回大 `switch`，不增加 `RegisterFastHandler` 等机制，也不把代码生成作为所有 Service 的构建前提。不使用 Dispatcher 的特殊 Service 无需持有它。
 
-### 4.5 有界 Service 池（尚未发布）
+### 4.5 有界 Service 池（v1.0.3）
 
 `self.Node().CreateServicePool(ctx, name, gsr.ServicePoolConfig{Size: 4, MailboxCapacity: 32, NewService: func() gsr.Service { return newWorker(store) }})` 创建一个逻辑名称下的独立实例。工厂须返回非 nil 指针且不得复用有状态实例（零大小无状态对象允许同址），成员实现相同业务命令契约；共享依赖的并发安全由业务负责。Size 必须为正，MailboxCapacity 零值沿用 Runtime 默认，负值拒绝；并行上限 Size、总等待消息容量 Size × 每成员容量。
 

@@ -1,6 +1,6 @@
 # 有界 Service 池示例
 
-使用仓库当前开发版本，在根目录运行：
+GSR v1.0.3 起提供此能力。在仓库根目录运行：
 
 ```sh
 go run ./examples/service-pool

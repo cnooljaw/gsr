@@ -1,6 +1,6 @@
 # 有界 Service 池
 
-当前开发能力，尚未发布；不属于 v1.0.2 标签已有 API。设计裁决见 [ADR 0014](../adr/0014-bounded-service-pools.md)。
+自 GSR v1.0.3 提供；v1.0.2 及更早标签不包含此 API。设计裁决见 [ADR 0014](../adr/0014-bounded-service-pools.md)。
 
 可直接运行 `go run ./examples/service-pool` 查看两个独立调用者通过普通 Call 使用同一池名的完整流程，见 [服务池示例](../../examples/service-pool/README.md)。
 

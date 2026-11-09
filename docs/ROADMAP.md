@@ -1,10 +1,6 @@
 # 后续工作与范围
 
-已发布能力与迁移见 [发布说明](releases/v1.0.2.md)，当前契约见 [API](API-DESIGN.md)，测试证据见 [验证覆盖](validation/COVERAGE.md)。这里仅记录尚未完成的范围，不重复已完成的实施步骤。
-
-## 当前开发能力
-
-有界 Service 池已实现并具备本地、跨节点和可运行示例验证，尚未发布。接入方式与限制见 [使用指南](guides/SERVICE-POOLS.md)。发布时更新版本、变更说明和相应验证基线。
+已发布能力与迁移见 [发布说明](releases/v1.0.3.md)，当前契约见 [API](API-DESIGN.md)，测试证据见 [验证覆盖](validation/COVERAGE.md)。这里仅记录尚未完成的范围，不重复已完成的实施步骤。
 
 ## 接入前按场景验证
 

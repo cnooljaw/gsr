@@ -1,6 +1,6 @@
 # 验证覆盖与边界
 
-发布基线为 **GSR v1.0.2**，当前开发分支另外包含有界 Service 池。本页记录覆盖范围、已有验证证据与复现入口；发布说明保留各版本当时的验收，不维护逐轮执行流水。
+发布基线为 **GSR v1.0.3**，包含有界 Service 池。本页记录覆盖范围、已有验证证据与复现入口；发布说明保留各版本当时的验收，不维护逐轮执行流水。
 
 ## 测试覆盖
 
@@ -23,8 +23,9 @@
 
 | 基线 | 已通过的检查 | 限制 |
 | --- | --- | --- |
+| v1.0.3，2026-11-09 | 全仓 race（含服务池、示例与双进程恢复）、vet、Sproto Go↔TS 四项、TS 认证五项 | 发布验证详情见 [v1.0.3](../releases/v1.0.3.md#发布验证)；不替代专项负载与真实外部资源验收 |
 | v1.0.2，2026-10-23 | 全仓 race（含双进程恢复）、vet、Sproto Go↔TS 四项、TS 认证五项 | 见 [发布验收](../releases/v1.0.2.md#发布验证)；未重跑完整负载或真实 MySQL |
-| Service 池，2026-11-06 | `GSR_PROCESS_TEST=1 go test -race ./... -timeout=2m`、`go vet ./...`；零大小成员增量后根包 race 与根包/Runtime vet | 服务池尚未发布；全仓结果在零大小增量前取得 |
+| Service 池，2026-11-06 | `GSR_PROCESS_TEST=1 go test -race ./... -timeout=2m`、`go vet ./...`；零大小成员增量后根包 race 与根包/Runtime vet | 全仓结果在零大小增量前取得；完整发布验收见 v1.0.3 |
 | 池示例，2026-11-09 | `go test -race ./examples/service-pool -timeout=2m`、`go run ./examples/service-pool` | 两个调用者、两个成员的接线与正常退出，不是容量测试 |
 
 ## 复现入口
