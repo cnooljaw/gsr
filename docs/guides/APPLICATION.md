@@ -11,7 +11,7 @@ go mod init example.com/mygame/server
 go get github.com/cnooljaw/gsr@v1.0.2
 ```
 
-需要 Go 1.24 或更高版本。提交 `go.mod` 与 `go.sum`，CI 使用明确的 Go 工具链版本。生产依赖固定版本，不长期追随 `@main`；升级时记录版本、API/错误代码/参数类型变化，并验证业务自己的集成链路。本文骨架与模板对应 `v1.0.2`；从 v1.0.0 升级时先按 [迁移对照](RELEASE-1.0.1.md#升级注意) 更新入口；从 v1.0.1 升级时按 [安全模式迁移](RELEASE-1.0.2.md#升级注意) 更新 Gate 命名。
+需要 Go 1.24 或更高版本。提交 `go.mod` 与 `go.sum`，CI 使用明确的 Go 工具链版本。生产依赖固定版本，不长期追随 `@main`；升级时记录版本、API/错误代码/参数类型变化，并验证业务自己的集成链路。本文骨架与模板对应 `v1.0.2`；从 v1.0.0 升级时先按 [迁移对照](../releases/v1.0.1.md#升级注意) 更新入口；从 v1.0.1 升级时按 [安全模式迁移](../releases/v1.0.2.md#升级注意) 更新 Gate 命名。
 
 本地联调可以临时指定 GSR checkout：
 
@@ -53,7 +53,7 @@ server/
 
 `AGENTS.md` 只保留工作约束和文档入口；状态归属、协议和重大取舍写入项目自己的文档。尚未涉及的模块无需先建目录、通用接口或完整 Service 体系。
 
-可复制 [业务项目 AGENTS.md 模板](templates/AGENTS.application.md) 到新仓库根目录，改名为 `AGENTS.md`。随后根据实际业务补齐文档和验证命令；模板中的 GSR 版本链接应随依赖升级同步调整。
+可复制 [业务项目 AGENTS.md 模板](../development/AGENTS.application.md) 到新仓库根目录，改名为 `AGENTS.md`。随后根据实际业务补齐文档和验证命令；模板中的 GSR 版本链接应随依赖升级同步调整。
 
 ## 3. 入口、Service 与状态归属
 
@@ -221,7 +221,7 @@ var (
 
 本地调用不编码，Dispatcher 不自动转换。准备同时供本地和远程调用的 Handler，调用方和接收方统一用规范类型；`type PlayerID uint64` 的类型名不会跨网保留。业务 struct 需展开、转换成规范 map 或自行编码为字节，结果也须可编码。集合元素和字段仍由业务校验。
 
-完整参数、nil/空集合、大小限制与双节点演练见 [Cluster 教程](CLUSTER-CALL-TUTORIAL.md)。节点路由与 Service 名由业务配置；固定 Command 的参数顺序、类型和错误代码属于业务协议，升级时不得静默改变。
+完整参数、nil/空集合、大小限制与双节点演练见 [Cluster 教程](CLUSTER.md)。节点路由与 Service 名由业务配置；固定 Command 的参数顺序、类型和错误代码属于业务协议，升级时不得静默改变。
 
 ### Send、Call、Timer
 
@@ -247,7 +247,7 @@ Go 不能强杀不返回的 Handler、OnStart、OnStop；退出超时不是资�
 
 客户端 Agent 的普通命令与客户端入口分别显式实现 `Handle` / `HandleClientMessage`，使用具名 `commandDispatcher` / `protocolDispatcher`。业务 `.proto` 和生成目录归业务项目；`protocol.NewRegistry` 已包含框架通用目录，不能占用通用 ErrorResponse 编号 9001。客户端 `msg_id`、`request_id` 与内部 `CommandID`、Call SessionID 是不同协议空间。
 
-Gate 的 MAC/seq 不代替玩家 token 鉴权。Plain 只用于回环/私有网络；公网使用 WSS，配置连接数、帧上限及每连接出站预算。Cluster 当前用于可信网络，NodeID 与远程 Source 都不能作为认证依据；跨节点 Source 为零，需要身份时显式携带并校验业务字段。具体接线见 [WebSocket 示例](../examples/websocket-gate/README.md)、[HTTP 示例](../examples/http-inbound/README.md)、[Redis 示例](../examples/redis-user-cache/README.md)和 [MySQL 示例](../examples/mysql-product/README.md)。
+Gate 的 MAC/seq 不代替玩家 token 鉴权。Plain 只用于回环/私有网络；公网使用 WSS，配置连接数、帧上限及每连接出站预算。Cluster 当前用于可信网络，NodeID 与远程 Source 都不能作为认证依据；跨节点 Source 为零，需要身份时显式携带并校验业务字段。具体接线见 [WebSocket 示例](../../examples/websocket-gate/README.md)、[HTTP 示例](../../examples/http-inbound/README.md)、[Redis 示例](../../examples/redis-user-cache/README.md)和 [MySQL 示例](../../examples/mysql-product/README.md)。
 
 ## 7. 错误、日志和 Go 编码
 
@@ -258,7 +258,7 @@ Gate 的 MAC/seq 不代替玩家 token 鉴权。Plain 只用于回环/私有网�
 - 构造器建立依赖不变量；接口由使用者定义且保持窄，不为抽象本身增加 interface、泛型层或包装 Service。
 - Go 自然语言注释尽量中文，导出符号写有契约价值的 Go doc；测试前注释解释保护的可观察行为。机器指令、许可证和必要协议术语保持原义。
 
-完整参考见 [Go 编码规范](GO-CODE-STYLE.md)和 [API 契约](API-DESIGN.md)。采用其中的规则时在业务项目自己的编码文档中记录，框架内部的组件实现规则无需搬进业务仓库。
+完整参考见 [Go 编码规范](../development/GO-CODE-STYLE.md)和 [API 契约](../API-DESIGN.md)。采用其中的规则时在业务项目自己的编码文档中记录，框架内部的组件实现规则无需搬进业务仓库。
 
 ## 8. 测试和上线前验证
 

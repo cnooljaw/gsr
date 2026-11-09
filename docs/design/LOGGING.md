@@ -1,4 +1,4 @@
-# 统一 FIFO 日志服务
+# 统一 FIFO 日志
 
 状态：已实现统一入口、单写入者、Runtime/Cluster 直接接线、滚动文件及可查询的输出失败状态。Cluster 同连接同类坏帧首条保留与重复抑制已实现；SLS 采集部署尚未实现。
 
@@ -10,7 +10,7 @@
 
 本地 Skynet 的 skynet_error 先格式化文本、附 Service 地址再推入 logger；skynet_mq_push 在锁内追加，logger 串行输出。文件时间戳是在 logger 消费时生成，普通 skynet.error 不自动附代码行号。GSR 沿用 FIFO 模型，改为记录处采集时间和调用位置，不照搬可扩容队列或 Lua/C 运行机制。
 
-## 已实现使用方式
+## 使用方式
 
 ```go
 // main：默认 stdout；Run 负责共享日志接线与关闭。
@@ -24,7 +24,7 @@ err = log.Error("结算失败", "battleID", battleID, "err", cause)
 // 根据需要处理入队错误；不等待写盘。
 ```
 
-logging.Logger 是共享日志 owner，不依赖普通 Runtime Mailbox。WithService 返回具体 ServiceLogger，仅提供 Info/Error，不提供 Close、WithService 或 owner getter。所有视图共享一个队列和串行 writer，记录处捕获调用位置。gsr.Run 持有原始 Logger，Runtime/Cluster 借用它，业务取得自身来源绑定的 ServiceLogger；运行环境最后关闭 owner。业务可保存 ServiceLogger 用于 OnStop，不保存 ServiceContext。此公开方法集按 [ADR 0012](adr/0012-node-capabilities-and-service-logging.md) 更新，随 v1.0.1 发布。
+logging.Logger 是共享日志 owner，不依赖普通 Runtime Mailbox。WithService 返回具体 ServiceLogger，仅提供 Info/Error，不提供 Close、WithService 或 owner getter。所有视图共享一个队列和串行 writer，记录处捕获调用位置。gsr.Run 持有原始 Logger，Runtime/Cluster 借用它，业务取得自身来源绑定的 ServiceLogger；运行环境最后关闭 owner。业务可保存 ServiceLogger 用于 OnStop，不保存 ServiceContext。此公开方法集按 [ADR 0012](../adr/0012-node-capabilities-and-service-logging.md) 更新，随 v1.0.1 发布。
 
 底层 Runtime.Config.Logger 与 ClusterConfig.Logger 都只借用该实例，不管理其生命周期；底层直接构造时 nil 保留仅 Diagnostics 的行为，不隐式启动后台写入者。应用使用 gsr.Run 时通过 Config.Logging 配置；应用层 RuntimeConfig/ClusterConfig 不暴露 Logger 字段，由 Run 内部转换注入。logging.New 的 Directory 和 Writer 都未设置时默认终端；可传入 io.Writer，输出所有权仍归应用。
 
@@ -44,13 +44,13 @@ err := gsr.Run(ctx, gsr.Config{
 
 服务标识由框架通过 WithService 绑定当前 Self；无绑定为零。框架自动日志的位置是 Runtime/Cluster 捕获并记录故障的边界，不伪造为业务错误源头。Handler panic 另带已有 stack；普通 error 的原始位置需要业务在发生处记录。
 
-Diagnostics 保留独立观测用途：Runtime/Cluster 在产生诊断的同步路径直接写 Logger，然后投递观测事件。不得再消费 Diagnostics 转发到同一 Logger，否则会重复记录并扭曲顺序。此前“外层消费 Diagnostics 作为主日志”的方案已被此裁决替代。
+Diagnostics 保留独立观测用途：Runtime/Cluster 在产生诊断的同步路径直接写 Logger，然后投递观测事件。不得再消费 Diagnostics 转发到同一 Logger，否则会重复记录并扭曲顺序。
 
-客户端接入的 WebSocket Gate 也使用同一个共享 Logger，直接记录握手、帧、seq、MAC 和连接关闭等传输/安全错误；Gate 不把这些错误包装成业务 Service 日志。已认证 Envelope 的路由错误归 Agent，余额不足等领域拒绝归业务 Service，避免同一失败在多个层重复记录。Gate 按单连接和错误类别保留首条明细并汇总重复项，业务日志不套用这条去重规则；字段脱敏和不记录密钥、原始载荷的约束见 [WebSocket Gate 草案](RFC-WEBSOCKET-GATE.md)。
+客户端接入的 WebSocket Gate 也使用同一个共享 Logger，直接记录握手、帧、seq、MAC 和连接关闭等传输/安全错误；Gate 不把这些错误包装成业务 Service 日志。已认证 Envelope 的路由错误归 Agent，余额不足等领域拒绝归业务 Service，避免同一失败在多个层重复记录。Gate 按单连接和错误类别保留首条明细并汇总重复项，业务日志不套用这条去重规则；字段脱敏和不记录密钥、原始载荷的约束见 [WebSocket Gate 设计](GATE-PROTOCOL.md)。
 
 ## 有界性与失败
 
-本轮采用非阻塞有界 admission：默认 Capacity=1024，负数无效，正数显式配置。满载返回 ErrQueueFull，并由 DroppedCount 计数；不会静默扩容或等待磁盘。序号仅分配给成功接纳记录，uint64 耗尽返回 ErrSequenceExhausted，不回绕。
+采用非阻塞有界 admission：默认 Capacity=1024，零值使用默认，负数无效，正数显式配置。满载返回 ErrQueueFull，并由 DroppedCount 计数；不会静默扩容或等待磁盘。序号仅分配给成功接纳记录，uint64 耗尽返回 ErrSequenceExhausted，不回绕。
 
 每条编码记录最多 64 KiB（不含换行），超限或不可快照字段返回 ErrInvalidRecord；字段为 string 键值对，不允许重复键。字段格式化 panic 被捕获。该上限限制排队记录大小，不等同于限制任意自定义 MarshalJSON 的执行时间或临时分配，扩展实现必须协作返回。
 

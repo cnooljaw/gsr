@@ -1,8 +1,8 @@
 # GSR API 设计规范
 
-已发布基线为 v1.0.2；本文另标注当前尚未发布的有界 Service 池能力。按 [ADR 0013](adr/0013-client-protocol-boundaries.md)，Gate 的 Protocol/ProtocolMAC/ProtocolPlain 和配置字段 Protocol 已改名为 SecurityMode/SecurityModeMAC/SecurityModePlain 与 SecurityMode，随 v1.0.2 发布；迁移与验证见 [发布说明](RELEASE-1.0.2.md)。v1.0.1 的节点入口迁移仍见 [上一版发布说明](RELEASE-1.0.1.md)。旧版契约以相应标签文档为准，标签不移动。
+本文定义当前代码的公开行为与 Runtime 边界。已发布基线为 v1.0.2；有界 Service 池尚未发布。版本差异和迁移统一见 [发布说明](releases/v1.0.2.md)，接入顺序见 [文档索引](README.md)。
 
-应用组装通过 self.Node()：RegisterService 发布目标名称，OpenCluster 开放共享监听，OpenHTTP 打开节点 HTTP，CreateGate 创建独立 GateService，ClusterListenAddress 观测实际 Cluster 绑定地址。Node 保存节点运行状态，由 Run 管理生命周期，业务借用同一对象的公开能力，不提供 Close、业务通信或内部组件 getter，限当前回调使用。同一 Run 共享唯一 Node，不同 Run 隔离；内部字段和 close 不公开。MainService 可完成组装后退出，原有 owner 继续管理资源。
+应用组装通过 self.Node()：RegisterService 发布目标名称，CreateServicePool 创建命名池，OpenCluster 开放共享监听，OpenHTTP 打开节点 HTTP，CreateGate 创建独立 GateService，ClusterListenAddress 观测实际 Cluster 绑定地址。Node 保存节点运行状态，由 Run 管理生命周期，业务借用同一对象的公开能力，不提供 Close、业务通信或内部组件 getter，限当前回调使用。同一 Run 共享唯一 Node，不同 Run 隔离；内部字段和 close 不公开。MainService 可完成组装后退出，原有 owner 继续管理资源。
 
 应用 `gsr.Config` 包含 `Logging logging.Config`、`Runtime gsr.RuntimeConfig`、`Cluster gsr.ClusterConfig`。RuntimeConfig 的可调项是 MaxCallWait、MailboxCapacity、ShutdownTimeout；ClusterConfig 的可调项是 Nodes、Codec、MaxCallWait、DialTimeout、WriteTimeout、OutboundQueueCapacity、MaxFrame。两者没有 Logger、不嵌入底层配置，零值和校验继续沿用原契约。
 
@@ -34,7 +34,7 @@ Gate 负责有界、顺序、失败可观察地收发不透明消息；具体客
 
 业务协议由 Agent 构造时选定，Gate 不提供 Protobuf/Sproto/JSON 枚举或格式探测。SecurityModeMAC/Plain 只控制握手和传输认证，TLS 独立配置；MAC 不仅握手，还校验后续消息的 seq/MAC。一个具体 Agent 固定使用一个业务协议实现，协议选择与安全模式相互独立。
 
-现有 `protocol` 是 Protobuf 实现，Envelope、Registry、MessageRoute、Direction、Kind 和 request_id 均属于它。v1.0.2 新增独立 `protocol/sproto`，使用 Sproto 自身的协议、Request/Response、package(type/session) 和 pack/unpack；不依赖父包的 Protobuf 模型，不再套 Envelope 或重复的 MessageRoute。Sproto Dispatcher 与 Go/TS Echo 随 v1.0.2 发布；接入方式、支持类型及限制见 [双协议指南](SPROTO-INTEGRATION.md)。JSON 只保留同样的字节接入能力，本轮不增加实现。
+现有 `protocol` 是 Protobuf 实现，Envelope、Registry、MessageRoute、Direction、Kind 和 request_id 均属于它。v1.0.2 新增独立 `protocol/sproto`，使用 Sproto 自身的协议、Request/Response、package(type/session) 和 pack/unpack；不依赖父包的 Protobuf 模型，不再套 Envelope 或重复的 MessageRoute。Sproto Dispatcher 与 Go/TS Echo 随 v1.0.2 发布；接入方式、支持类型及限制见 [双协议指南](guides/CLIENT-PROTOCOLS.md)。JSON 可通过同一字节边界扩展，当前不提供实现。
 
 - Gate 管理连接、握手、seq/MAC、容量、出站队列和关闭；不导入 Protobuf，不解释 msg_id、request_id 或 payload。握手是传输认证格式，不属于业务 Protocol。Plain 不具备 MAC 模式的认证保证。
 - `gate.ClientSession` 留在 Gate，只提供 `Send([]byte) error` 和 `Close() error`。Send 在成功接纳时复制快照，之后发送方可以复用缓冲区；nil 与空切片均表示零字节消息，仍收取队列条目开销。成功仅代表本地队列接纳，不保证客户端收到、业务执行或执行一次，不自动重放。
@@ -57,13 +57,13 @@ Sproto 接线使用 `sproto.NewDispatcher[gsr.CommandContext](sproto.Config{C2S:
 
 `gsr.Service`、`gsr.ServiceContext` 是推荐的应用接口；`runtime.Service`、`runtime.ServiceContext` 是 Core 接口，服务于基础设施和底层集成。下文 Core 签名中的未限定类型属于 `runtime`，不能当成应用层接口的另一种写法。`Runtime.Send/Call` 是 Source 为零的受信任注入入口，不是业务调用捷径。
 
-本文描述当前契约；历史实现阶段见 IMPLEMENTATION-PLAN 和 ADR。框架内部组件关联由构造器保证，不要求业务重复组装并校验内部不变量。
+本文描述当前契约；重要取舍见 [ADR 索引](adr/README.md)。框架内部组件关联由构造器保证，不要求业务重复组装并校验内部不变量。
 
 客户端协议 Handler 使用当前 Agent 的逐消息上下文：应用构造 `protocol.NewDispatcher[gsr.CommandContext](registry, client, handlers)`，在显式 `map[uint32]any` 中绑定 msg_id 与 `func(self gsr.CommandContext, ctx protocol.Context, request *Request) error`，并在 `HandleClientMessage` 内调用 `protocolDispatcher.HandleFrame(self, frame)`。self 提供 Service 的 Send/Call、名称调用和 Cluster 等能力，ctx 提供客户端 RequestID/Response/Push；Dispatcher 不保存 self，也不创建额外执行单元。底层集成可使用 `runtime.CommandContext` 作为类型参数，协议包不反向依赖 `gsr`。Handler 仍在 Agent 原有 runner 中同步执行，不得将上下文保存到字段或用于异步任务。
 
 Protocol 的构造器复制 Handler 表，校验编号已定义且属于客户端入站、Handler 签名精确匹配 Scope/Context/error，以及请求参数类型与该编号的生成目录一致；构造后只读，不提供逐条 Register 或运行期修改。`MustDispatcher` 用于程序员定义的静态接线，构造错误时 panic；外部组装需要返回错误时使用 `NewDispatcher`。运行时沿用 Command Dispatcher 的反射调用做法，不逐消息重新解析签名，但仍使用 reflect.Call。协议可以先定义，表中只绑定已实现的 Handler；未绑定消息保持原有错误语义。Agent 使用具名 `commandDispatcher` 与 `protocolDispatcher` 字段区分两个入口，不混用编号或合并执行层。
 
-默认 Protobuf 示例的客户端接入另见 [WebSocket Gate 协议与边界](RFC-WEBSOCKET-GATE.md)：生产 Gate 使用固定 33 字节二进制握手，MAC 上行使用 seq + 不透明业务字节 + MAC，下行传输业务字节；Gate 的显式 Plain 模式直接传输业务字节。Protobuf Agent 使用 Envelope，Sproto Agent 使用原生 packed package + body。Envelope 使用 msg_id、request_id(uint32) 和 payload，由业务定义的 `AgentService` 中转。C/S request_id、Gate 的两种安全模式、连接认证、关闭码和错误归属均在 Core/Cluster 之外；Gate 只负责传输与安全边界。Runtime 内部消息类型区分客户端消息与普通 Core Command，Service 通过可选的 `ClientMessageHandler` 明确启用客户端处理能力；Agent 在同一 Service runner 中将客户端 Envelope 按 `msg_id` 路由到协议分发器，业务按实现进度注册强类型 Handler；本地或 Cluster 投递的普通 Core Command 由显式 `Service.Handle` 按 `CommandID` 分发。协议 `.proto` 显式声明每个 msg_id 对应的 payload、方向和 Request/Notify/Response/Push 种类，并生成目录；未实现 Handler 的消息仍可先存在于协议定义中。Core Command 的 Send/Call 仍是同一种消息类型，由 Session 是否为零区分；`Source` 只表示 Service 来源，不作为入口类别。AgentService 持有客户端写回能力，组合通用 `protocol.Dispatcher` 并注册业务项目实现的 Handler；Gate 到 Agent 使用 Runtime-owned 的 `Runtime.DeliverClientMessage` 单向基础设施投递，Agent 到 Gate 使用不暴露 socket 的 `ClientSession` 写回能力。这里的 `ClientSession` 指绑定一条客户端连接的写回能力，不是 Core `SessionID` 或 Envelope 的 `request_id`。业务协议组件只做协议适配、简单收发和业务 Service 路由，可以持有连接私有的轻量状态，但不持有跨连接共享或需恢复的权威业务状态；业务 Service 负责业务拒绝和状态变化。GSR 不内置大厅、游戏或其它具体协议实现，只提供通用接入边界。Runtime 客户端消息投递能力已实现；`examples/websocket-gate` 的 Go 与 TypeScript 类型由通用和业务 `.proto` 生成，Go Agent 用独立协议目录解码并手动注册已实现的 Echo Handler，完成请求/响应及 `request_id` 回传。当前 Echo 联调示例由 MainService 在 `gsr.Run` 中通过 `self.Node().CreateGate` 创建对应 Gate 与应用 Agent；Plain 没有握手或 MAC，仅允许内网绑定，TLS 独立配置。框架 Gate、跨语言认证固定向量和结构化诊断已有实现，完整压力验收仍按 RFC 推进。标准关闭码、结构化日志和 Agent 组装边界见 RFC。首版不实现 DES 或旧 12 字节头兼容。
+客户端接入见 [Gate 与协议设计](design/GATE-PROTOCOL.md) 和 [协议接入指南](guides/CLIENT-PROTOCOLS.md)。Gate 校验连接安全并投递不透明字节；Agent 显式实现 ClientMessageHandler，与普通 Command 共用串行 Mailbox/runner，并组合所选协议 Dispatcher。Protobuf 使用 Envelope 与生成目录，Sproto 使用原生 packed package + body，各自的请求关联号不进入 Core Session。ClientSession 只提供连接写回/关闭，Agent 不持有权威房间或玩家状态，业务通过普通 Send/Call 请求所属 owner。
 
 框架能力边界如下。
 
@@ -169,7 +169,7 @@ Close
 
 Skynet 的接口形状是 API 设计的重要参照，但 GSR 的具体契约由 Go 的类型系统、错误模型、消息所有权和生命周期约束决定。
 
-完整的术语、实现机制和有意不照搬项见 [GSR 与 Skynet 概念对照表](SKYNET-COMPARISON.md)。
+完整的术语、实现机制和有意不照搬项见 [GSR 与 Skynet 概念对照表](design/SKYNET-COMPARISON.md)。
 
 - 不使用 `Actor`、`Spawn`、`Ask`、`Tell` 替代 GSR 术语。
 - 不向业务 API 暴露 Skynet `PTYPE`、Mailbox、Session table、Scheduler queue 或 Transport frame。
@@ -306,16 +306,6 @@ func (runtime *Runtime) DeliverClientMessage(target ServiceID, frame []byte) err
 
 第二条路径只对实现客户端处理接口的 Service 开放；普通 Service 无需实现客户端方法或准备占位 Handler。两条路径同步执行，任一 Handler 等待 Call 时，该 Service 都不会处理下一条消息。
 
-### 4.0 有界 Service 池（当前开发能力，尚未发布）
-
-`self.Node().CreateServicePool(ctx, name, gsr.ServicePoolConfig{Size: 4, MailboxCapacity: 32, NewService: func() gsr.Service { return newWorker(store) }})` 创建一个逻辑名称下的独立实例。工厂须返回非 nil 指针且不得复用有状态实例（零大小无状态对象允许同址），成员实现相同业务命令契约；共享依赖的并发安全由业务负责。Size 必须为正，MailboxCapacity 零值沿用 Runtime 默认，负值拒绝；并行上限 Size、总等待消息容量 Size × 每成员容量。
-
-本地 SendName/CallName、HTTPIngress 和 Cluster 名称入站在创建本地 Call 前轮询选定一个成员，再走现有 Mailbox/Reply 路径。单实例串行，池整体无顺序保证；Call 仍阻塞调用方。选定队列满返回 ErrMailboxFull，不扫描其它队列、不自动重放、不增加 goroutine 或延期回复。
-
-池创建完成才发布，重复名在工厂前拒绝；启动失败撤销名称并有界回滚已启动成员。创建者退出不影响池。成员 Exit/panic 后移除且不自动补员，最后一个成员退出释放名称；超时不等于执行结束。业务可并行性、事务和幂等不由池判断。使用示意见 [Service 池指南](SERVICE-POOLS.md)，裁决见 [ADR 0014](adr/0014-bounded-service-pools.md)。
-
-Core 的 `Runtime.CreateServiceWithConfig(ctx, service, runtime.ServiceConfig{MailboxCapacity: n})` 仅为基础设施覆盖实例 Mailbox 容量，默认 CreateService 保持原行为；`Runtime.StopServices(ctx, ids...)` 先关闭所有指定成员的接纳并完成相关 PendingCall，再在 ShutdownTimeout/调用方 context 范围内等待，取消等待不取消停止流程，不影响其它 Service，不强杀 Handler。它们不进入业务 ServiceContext，Core 不持有池或名称。
-
 ### 4.1 Args 的所有权
 
 未编码不代表可以共享可变状态。Runtime 接受消息时浅拷贝最外层 `Args` 切片；这只隔离参数列表本身，不递归复制 `any` 内部的数据。对每个参数遵守以下契约：
@@ -450,6 +440,16 @@ func (service *userService) Handle(ctx gsr.CommandContext, command runtime.Comma
 
 不把普通命令改回大 `switch`，不增加 `RegisterFastHandler` 等机制，也不把代码生成作为所有 Service 的构建前提。不使用 Dispatcher 的特殊 Service 无需持有它。
 
+### 4.5 有界 Service 池（尚未发布）
+
+`self.Node().CreateServicePool(ctx, name, gsr.ServicePoolConfig{Size: 4, MailboxCapacity: 32, NewService: func() gsr.Service { return newWorker(store) }})` 创建一个逻辑名称下的独立实例。工厂须返回非 nil 指针且不得复用有状态实例（零大小无状态对象允许同址），成员实现相同业务命令契约；共享依赖的并发安全由业务负责。Size 必须为正，MailboxCapacity 零值沿用 Runtime 默认，负值拒绝；并行上限 Size、总等待消息容量 Size × 每成员容量。
+
+本地 SendName/CallName、HTTPIngress 和 Cluster 名称入站在创建本地 Call 前轮询选定一个成员，再走现有 Mailbox/Reply 路径。单实例串行，池整体无顺序保证；Call 仍阻塞调用方。选定队列满返回 ErrMailboxFull，不扫描其它队列、不自动重放、不增加 goroutine 或延期回复。
+
+池创建完成才发布，重复名在工厂前拒绝；启动失败撤销名称并有界回滚已启动成员。创建者退出不影响池。成员 Exit/panic 后移除且不自动补员，最后一个成员退出释放名称；超时不等于执行结束。业务可并行性、事务和幂等不由池判断。使用示意见 [Service 池指南](guides/SERVICE-POOLS.md)，裁决见 [ADR 0014](adr/0014-bounded-service-pools.md)。
+
+Core 的 `Runtime.CreateServiceWithConfig(ctx, service, runtime.ServiceConfig{MailboxCapacity: n})` 仅为基础设施覆盖实例 Mailbox 容量，默认 CreateService 保持原行为；`Runtime.StopServices(ctx, ids...)` 先关闭所有指定成员的接纳并完成相关 PendingCall，再在 ShutdownTimeout/调用方 context 范围内等待，取消等待不取消停止流程，不影响其它 Service，不强杀 Handler。它们不进入业务 ServiceContext，Core 不持有池或名称。
+
 ## 5. Source 语义
 
 - 普通 Service 发起 Send 或 Call 时，Runtime 创建的 `Message.Source` 是当前发起 Service 的 `ServiceID`。
@@ -536,234 +536,11 @@ Go 没有可靠的“当前 Service”隐式上下文；禁止使用包级全局
 - 本地没有可用路由/sender、编码或参数校验失败、出站队列满以及 Cluster 边界已关闭，都发生在 admission 前，必须由 `Send` 立即返回稳定错误。
 - admission 成功后的节点不可达、断线、网络或 I/O 错误不能追溯修改 `Send` 的 nil 返回；它们由 NodeSender 发布本地基础设施诊断。需要确认远端处理结果时使用 Call，并为有歧义的网络失败设计 RequestID 与幂等。
 
-以下是底层基础设施的值边界与 Transport 接口，不是普通业务的组装步骤：
+基础设施的公开组装、默认配置、入站并发、连接恢复、两阶段关闭和诊断统一见 [Cluster 设计](design/CLUSTER.md)。普通应用不手工创建 ClusterClient、NodeSender 或 PendingCall 表。
 
-```go
-type ServiceTarget struct {
-	ServiceID   runtime.ServiceID
-	ServiceName ServiceName
-}
-
-type ClusterEnvelope struct {
-	Kind    FrameKind
-	Session ClusterSessionID
-	Target  ServiceTarget
-	Command runtime.CommandID
-	Payload []byte
-	Error   *runtime.StatusError
-}
-
-type Transport interface {
-	Send(to NodeID, envelope ClusterEnvelope) error
-}
-
-type OutboundSender interface {
-	Send(ClusterEnvelope) error
-}
-
-type NodeSenderResolver interface {
-	ResolveNodeSender(NodeID) (OutboundSender, error)
-}
-
-type ClusterClientConfig struct {
-	Source       runtime.ServiceID
-	Senders      NodeSenderResolver
-	Codec        PayloadCodec
-	PendingCalls *ClusterCallRegistry
-	MaxCallWait  time.Duration
-}
-
-type ClusterCallRegistry struct{}
-
-func NewClusterClient(config ClusterClientConfig) (*ClusterClient, error)
-func (client *ClusterClient) Source() runtime.ServiceID
-func (client *ClusterClient) Send(node NodeID, target ServiceTarget, command runtime.CommandID, args ...any) error
-func (client *ClusterClient) Call(ctx context.Context, node NodeID, target ServiceTarget, command runtime.CommandID, args ...any) (any, error)
-
-func NewClusterCallRegistry() *ClusterCallRegistry
-func (registry *ClusterCallRegistry) Complete(remoteNode NodeID, envelope ClusterEnvelope) error
-func (registry *ClusterCallRegistry) Close() error
-func (registry *ClusterCallRegistry) PendingCount() int
-
-type DeliveryFailure struct {
-	RemoteNode NodeID
-	Kind       FrameKind
-	Session    ClusterSessionID
-	Target     ServiceTarget
-	Command    runtime.CommandID
-	Err        error
-}
-
-type NodeSenderConfig struct {
-	RemoteNode    NodeID
-	Transport     Transport
-	QueueCapacity int
-}
-
-func NewNodeSender(config NodeSenderConfig) (*NodeSender, error)
-func (sender *NodeSender) Send(envelope ClusterEnvelope) error
-func (sender *NodeSender) Failures() <-chan DeliveryFailure
-func (sender *NodeSender) DroppedFailureCount() uint64
-func (sender *NodeSender) Close(ctx context.Context) error
-
-type ValueCodecConfig struct {
-	MaxDepth   int
-	MaxPayload int
-}
-
-func NewValueCodec(config ValueCodecConfig) (*ValueCodec, error)
-func (codec *ValueCodec) Encode(value any) ([]byte, error)
-func (codec *ValueCodec) Decode(payload []byte) (any, error)
-
-type PayloadCodec interface {
-	Encode(value any) ([]byte, error)
-	Decode(payload []byte) (any, error)
-}
-
-type FrameCodecConfig struct {
-	MaxFrame int
-}
-
-func NewFrameCodec(config FrameCodecConfig) (*FrameCodec, error)
-func (codec *FrameCodec) Encode(envelope ClusterEnvelope) ([]byte, error)
-func (codec *FrameCodec) Decode(frame []byte) (ClusterEnvelope, error)
-```
-
-`ClusterEnvelope.Validate()` 在 Transport admission 前检查 frame kind、目标、Command、Session 和 Error/Payload 组合；`Clone()` 复制 `Payload` 与 `StatusError`，避免接收方修改发送方持有的可变值。当前 `InMemoryTransport` 是同步、确定性的进程内测试边界，具有有限 payload 上限和最终 `Close` 状态；它不承诺 TCP、重连、出站队列或远端 Handler 已执行。`ClusterEnvelope` 不携带 wire version；未来兼容由 Codec framing 或连接握手负责。
-
-当前 Cluster 1 基础子切片提供 `NodeSender`，把一个本地节点到一个远端节点的出站 admission 收口到单一 owner：
-
-- `QueueCapacity == 0` 使用默认容量 1024；其它值必须大于零。队列满时 `Send` 立即返回 `ErrOutboundQueueFull`，不无限阻塞或扩容。
-- `Send` 先校验并 Clone Envelope，再以 FIFO 顺序交给唯一 worker；返回 nil 只表示本地队列 admission 成功，不表示远端执行成功。
-- `Transport.Send` 的错误或 panic 发生在 admission 后时，NodeSender 向有界的 `Failures()` stream 非阻塞发布一条基础设施事件；慢消费者不会阻塞发送 worker，stream 满时丢弃事件并由 `DroppedFailureCount()` 累计。
-- `Close(ctx)` 先停止 admission；队列中尚未开始发送的 Envelope 以 `ErrNodeSenderClosed` 报告并丢弃，已经进入 `Transport.Send` 的调用允许自然返回。`ctx` 只控制调用方等待，不强杀 transport goroutine；超时后可以再次调用 `Close` 等待同一 worker。
-- sender 直接调用注入的 `Transport`，自身不管理 TCP；内部单目标 outboundPeer 已提供按需建连、连接复用与恢复，公开静态出站组装已实现，Open 已实现，动态路由尚未实现。这些连接行为不能由 `Send` 的 nil 返回暗示。
-
-公开组装的易用性方向已确认：显式 Cluster 对象统一管理静态目标路由、共享等待表和每目标发送组件，应用通过 self.Cluster() 使用自动来源绑定入口，底层适配器使用 source-bound ClusterClient；主动调用不要求本地 NodeID、Runtime 或 open。已确认签名 `NewCluster(config ClusterConfig) (*Cluster, error)` 与 `(*Cluster).Client(source runtime.ServiceID) (*ClusterClient, error)`；两者只构造本地状态，不拨号、不监听，Client 不单独拥有发送器或等待表。绑定来源是受信任组装能力，只校验非零 ID，不验证 Service 存活。该出站组装层已实现，首轮配置与两阶段关闭已确认，统一诊断入口也已确认，见 [组装入口方案](RFC-CLUSTER-ASSEMBLY.md)。
-
-已确认的首轮出站配置（已实现）：
-
-```go
-type ClusterConfig struct {
-    Nodes                 map[NodeID]string
-    Codec                 PayloadCodec
-    Logger                *logging.Logger
-    MaxCallWait           time.Duration
-    DialTimeout           time.Duration
-    WriteTimeout          time.Duration
-    OutboundQueueCapacity int
-    MaxFrame              int
-}
-```
-
-Logger 是借用入口，Cluster 不负责关闭；使用 gsr.Run 时由 Logging 统一创建并注入，不由业务自行设置。Nodes 在构造时复制，允许空表；每项要求非空 NodeID 与非空 host、1–65535 数字端口组成的 TCP 地址，构造不进行 DNS 查询或拨号。Codec 为空时内建默认 ValueCodec，自定义 codec 实例必须并发安全。数值零值采用默认值：MaxCallWait 5 秒、DialTimeout 3 秒、WriteTimeout 3 秒、每目标 OutboundQueueCapacity 1024 条、MaxFrame 4 MiB（含四字节长度前缀）；负数拒绝，零不表示无限。Call 总等待、单次拨号和单次 socket 写入是不同预算；调用方放弃等待不强杀连接级 Dial 或撤销已开始写入。配置不包含本地身份、Runtime、监听地址或热更新入口。
-
-公开 Cluster 关闭契约已确认（已实现）：
-
-```go
-func (cluster *Cluster) Quiesce()
-func (cluster *Cluster) Close(ctx context.Context) error
-```
-
-Quiesce 幂等且不可恢复，同步拒绝新 Client/Send/Call 及新 sender/Dial，取消未绑定 Call，尚未开始投递的 Send 丢弃并诊断；已绑定 Call 保留原 deadline 与回复机会。它不关闭已建立的 socket，不等待任务退出；绑定与 Quiesce 必须在统一同步边界竞争。Close 自动发起 Quiesce，结束剩余等待，先对所有目标发出取消/关闭信号，再等待 sender、连接与诊断生产者退出。nil context 拒绝，调用方取消等待不终止唯一清理流程，后续 Close 可继续等待并获取最终合并错误；不增加 Cluster ShutdownTimeout 配置。业务退出保存应在 Quiesce 前完成，OnStop 不拥有新的跨节点调用旁路。gsr.Run 内部按“Cluster.Quiesce（统一停止入站与出站接纳，关闭监听）→ Runtime.Close → Cluster.Close(ctx) → 最终日志 → Logger.Close(ctx)”收尾；Runtime 停止超时也不能跳过 Cluster 资源清理。详见 [两阶段关闭](RFC-CLUSTER-SHUTDOWN.md)，诊断公开形式见已确认的统一诊断方案。
-
-公开 Cluster 统一诊断契约已确认（已实现）：
-
-```go
-func (cluster *Cluster) Diagnostics() <-chan Diagnostic
-func (cluster *Cluster) DroppedDiagnosticCount() uint64
-
-type DiagnosticKind uint8
-
-const (
-    DiagnosticDeliveryFailure DiagnosticKind = iota + 1
-    DiagnosticConnectionFailure
-    DiagnosticResponseRejected
-    DiagnosticInboundFailure
-    DiagnosticBadFramesSuppressed
-)
-
-type Diagnostic struct {
-    Kind       DiagnosticKind
-    RemoteNode NodeID
-    RemoteAddress string
-    Session    ClusterSessionID
-    Target     ServiceTarget
-    Command    runtime.CommandID
-    Err        error
-    Suppressed uint64
-}
-```
-
-每个 Cluster 使用一个固定 256 容量的非阻塞队列，满载丢弃新事件并单调累计 DroppedDiagnosticCount；重复获取为同一消费通道，不是广播。只保存出站目标、可信的请求关联元数据与错误链，不携带 payload；错误文本不承诺天然脱敏。内部生产者直接写共享出口，不执行外部 callback、不为每目标保留诊断转发 goroutine 或在两套出口双写。应用基础设施消费日志，普通 Service 不管理诊断任务。
-
-重复坏帧按单条连接生命周期去重，同类只尝试记录首条，不按秒重复。固定类别为完整帧格式错误、请求载荷解码失败、错误的入站请求类型；合法未知 Command 由目标 Service 判断，不属于坏帧；不按 Command 值或错误文本建立无界表。重复项不进入 Logger 或 Diagnostics，单独累计 `Cluster.SuppressedDiagnosticCount()`，不混入 DroppedDiagnosticCount。连接结束且所属请求任务退出后，若有抑制，追加一条 DiagnosticBadFramesSuppressed 汇总，Suppressed 为该连接抑制总数；汇总不重复错误明细、不携带请求关联字段，同样受日志与诊断队列容量限制。首条即使遇满载也不重试，累计抑制数在 Close 后仍可读取。新连接重新保留首条；合法请求、业务错误、Send 投递失败、断线、迟到或不匹配响应不受此规则抑制。这不是全局防攻击或可靠审计机制。
-
-admission 前错误不重复上报；远端领域错误及正常 Call 取消/超时走调用方结果，迟到响应仍可产生 ResponseRejected。一次断线可能产生连接事件及受影响投递事件，不做全局根因去重。主动关闭的预期连接结束不报 ConnectionFailure，但丢弃排队 Send 仍报告投递失败。Quiesce 不关闭出口，Close 等全部生产者退出后关闭，不等待消费者读空；丢弃计数在关闭后仍可读取。此出口不提供可靠审计、逐节点公平性或完整限频保证。具体字段有效性与门禁见 [统一诊断](RFC-CLUSTER-DIAGNOSTICS.md)。
-
-Cluster 1 同时提供 source-bound `ClusterClient` 的单向 `Send`：
-
-- 构造时必须绑定非零 Source、`NodeSenderResolver` 和统一的 `PayloadCodec`；resolver 负责返回每个远端 Node 的唯一 sender，client 不拥有 sender 或连接。
-- `Send` 校验 Node/Target/Command，通过共享 PayloadCodec 将 `args` 作为一个参数列表编码，再交给 sender admission；编码或本地 sender 错误直接返回，sender 的 nil 仍只表示本地 admission。
-- Source 只用于绑定调用者能力和后续本地 Call/PendingCall 归属，不是业务可覆盖的 Envelope 字段；ClusterEnvelope 不携带任意 Core Source，远端 adapter 按本地策略创建 Message Source。
-- `ClusterClient` 需要共享的 `ClusterCallRegistry` 和正数 `MaxCallWait` 配置；所有绑定同一 Cluster 的 client 复用这个 registry，当前 `Send` 仍只确认本地 admission。
-
-`DeliveryFailure` 只包含 RemoteNode、frame kind、Session、Target、Command 和底层 error，不复制或暴露业务 payload，也不用于自动重放。Cluster diagnostics owner 可以消费它写一条网络/I/O 诊断记录；如果消费能力不足，丢弃计数仍然可观测。它是 best-effort 基础设施诊断，不是不能丢失的业务审计日志。
-
-Cluster 2 的远程 Call 使用 Cluster-owned `ClusterCallRegistry` 和内部 `ClusterPendingCall` 表：
-
-- 发起 Call 时由 Cluster 单调分配非零 `ClusterSessionID`，本地记录 `Session → Source A、RemoteNode、Target、Command` 以及等待完成句柄；`Source A` 只留在 A 的 Cluster 内部。
-- wire request 只携带 `Session + Target + Command + Payload`；B 返回同一 `Session` 的 Response 或 Error，A 再按 Session 找回原 PendingCall 并恢复调用方 runner。
-- completion 必须来自登记的 RemoteNode，且 Target/Command 与原请求一致；未知、迟到、重复或错路由的 frame 不得完成其它 Session，只进入受控诊断。
-- cancellation、timeout、相关节点关闭和 Cluster 关闭都只完成并清理一次 PendingCall；不存在自动重放或 Session 转移。
-- 已实现 `ClusterClient.Call` 的请求编码、共享 Session 注册、本地有限等待、caller cancellation、Response/Error 解码及公开出站组装。逻辑 `Complete` 只处理未绑定连接的等待；真实 TCP 响应校验连接归属，断线只清理该连接等待，不按整个 NodeID 批量清理。公开 Open 已实现，动态路由尚未实现。
-
-可选入站组装的资源归属及签名已确认：`func (cluster *Cluster) Open(target *runtime.Runtime, config ListenConfig) (string, error)` 显式接收目标 Runtime，成功返回实际监听地址（`host:port`），监听失败返回 error。由现有 Cluster 管理监听、入站连接及网络任务，不返回独立 Listener owner，也不启动、停止或关闭 Runtime。第一版每个 Cluster 最多一个监听，可接纳多个连接并投递到多个 Service；不支持多监听、监听热切换或运行中换绑 Runtime。不 Open 仍可主动 Send/Call，回复沿原连接返回。ListenConfig 已确认四个字段：必填 `Address string`、监听连接上限 `MaxConnections int`、每连接 Call 上限 `MaxConcurrentCalls int`、可选 `ResolveService func(ServiceName) (runtime.ServiceID, error)`。统一编解码器、帧长及写超时复用 ClusterConfig，本地 Call 等待上限由目标 Runtime 控制。默认连接上限为 128、每连接 Call 上限为 32（零值使用默认，负数无效），Address 为空报错，ResolveService 可为 nil。Open 成功后再次调用返回错误（不比较配置），失败清理本次资源后允许应用重试；并发只允许一个打开流程，其余报错；Quiesce/Close 后拒绝 Open。停止接线约定已确认：Quiesce 统一停止接纳并关闭监听，监听关闭错误由 Close 合并返回；不主动关闭已建立连接或等待任务退出。入站诊断方案已确认：增加 DiagnosticInboundFailure 和 RemoteAddress，入站 RemoteNode 留空；可信请求关联字段按需记录，Handler 错误仍归 Runtime。入站与出站共用容量 256 的 Diagnostics，最终 Close 等所有生产者退出才关闭，最小接线已实现，见 [可选入站组装](RFC-CLUSTER-OPEN.md)。
-
-ListenConfig 类型及内部校验已实现，公开 Open 已实现。地址必须包含显式主机和数字端口，监听允许端口 0；非法格式或负容量返回 ErrInvalidListenConfig。此校验不执行 DNS、绑定或 ResolveService，实际网络错误留到 Open 处理。
-
-注册与发现属于 Core 和 Cluster 之外的能力：外层维护 `NodeID → 可访问地址`，Open 不自动注册、续约或发布地址。保留显式 `ListenConfig.Address`，不为底层 cluster 包增加按 NodeID 打开的重载；普通应用的 `self.Node().OpenCluster(name)` 由 gsr 组装层查节点表并取端口绑定 0.0.0.0。Open 返回实际绑定地址，不保证是外部可访问地址。当前 ClusterConfig.Nodes 仅提供静态路由，不表示成员存活、业务就绪或资源所有权；动态发现结果的路由更新接线另行设计，当前不提供通用 Discovery 框架。
-
-Cluster 入站只沿一条生产路径执行：
-
-```text
-tcpListener → inboundConnection → localRequestAdapter → Runtime.Send/Call
-```
-
-- 私有 `inboundConnection` 管理单条 socket 的读取、有界 Call 任务、取消与等待；不是一个业务 Service，也不建立公开 ConnectionAgent。
-- `localRequestAdapter` 解码参数、解析名称并投递本地 Runtime，不直接调用业务 Handler。
-- `Session == 0` 的 Send 不回包；接收节点独立记录接纳或 Handler 错误。
-- `Session > 0` 的 Call 沿原连接写回同一 Session、Target、Command 的 Response/Error；Handler error/panic 复用 Runtime 的安全错误边界。
-- 响应构造与 writer 故障收容为私有函数；写入错误保留 I/O 原因，由连接 owner 记录并关闭失效连接。
-- 回复编码错误的自定义 `As/Unwrap` 分类发生 panic 时，仍沿原连接返回安全的 `ErrHandlerFailed`，不泄露内部文本、不跳过回包；本地诊断由连接 owner 收容，健康 Service 与连接后续请求继续工作。原错误链仅留在本地诊断边界，不进入 wire。
-
-失败归属依赖稳定 error identity，不解析错误字符串：`Send` 直接返回的错误表示 A 侧未完成本地 admission；`DeliveryFailure` 表示 admission 后的 Transport 投递失败。当前 `InMemoryTransport` 用 `ErrNodeNotFound` 表示目标节点当前没有 receiver，用 `ErrTransportClosed` 表示本地 Transport 已关闭。TCP 传输故障同样提供可通过 `errors.Is`/`errors.As` 判断的稳定错误；网络分区、拒绝连接或握手失败只能记录为“远端当前不可达”及其安全原因，不能据此断言 B 的进程一定没有启动。
-
-远程 Send 坚持“A 管 A、B 管 B”：A 在本地 Cluster admission 成功后继续运行；B 收到后独立执行并在 B 侧记录自己的 Handler error。A 不通过 Send 获得 B 的 Handler 结果。需要返回值或远端处理错误时使用 Call；Call 的 response/error 由共享 `ClusterCallRegistry` 完成，真实 TCP stream 由私有连接 owner 管理。
-
-默认 `ValueCodec` 的解码结果使用稳定的规范类型：有符号整数为 `int64`，无符号整数为 `uint64`，浮点数为 `float64`；复合值为 `[]any` 和 `map[string]any`。它拒绝 pointer、func、chan、struct、复杂数、`uintptr`、非有限浮点和非 string map key。自定义结构须在业务边界转换为支持的值，不由默认 Codec 猜测，也不按 Command 注册编码器。
-
-集合数量必须先符合剩余载荷的最小编码大小，再用于容量分配；不能让伪造的 map 数量将很小的输入放大为大额预分配。此检查不改变合法值的 wire 格式。
-
-Cluster 不维护 Command 清单。`ClusterConfig.Codec` 为节点所有命令共享的 PayloadCodec，未设置时使用默认 ValueCodec；不能按 CommandID 切换协议或把编码配置用作命令准入表。需要自定义编码时两端须一致，普通业务无需配置。未知 Command 与其它合法 Message 一样进入目标 Mailbox，Send 不回包，Call 由目标返回 ErrUnknownCommand。
-
-`FrameCodec` 为每个逻辑 Envelope 添加四字节大端 body length，长度上限 `MaxFrame` 包含这四个字节。`Decode` 只接受一个边界完整、没有尾随数据的 frame；读取部分帧、拼接多个 frame 和连接关闭由私有连接 owner 负责。Envelope 仍不携带 version，版本协商留在 framing 或连接握手。
+远程 Call 的关键保证是：等待预算从编码前开始，PendingCall 在排队前登记，写入前绑定具体连接；completion 校验 Session、目标节点、Target、Command 与连接归属，断线只清理属于该连接的等待。取消、超时、重复与迟到结果只能完成一次，不转移 Session 或自动重放。名称在目标节点解析，可路由到单个实例或 Service 池。
 
 ### 6.3 Cluster wire 与连接模型
-
-出站 Call 在排队前登记有限等待，在具体连接取得写入权后、尝试 socket 写入前原子绑定该连接的内部等待 owner。已经取消/超时的未绑定请求不再发包；绑定是发送尝试的开始，之后的取消不保证撤销远端执行。断线只完成该连接绑定的 Call，不清理同节点尚在排队或绑定到其它连接的等待。网络回复还须匹配连接 owner；内存/逻辑适配的 `Complete(remoteNode, response)` 仅能完成未绑定网络连接的等待，不能绕过连接归属校验。重连创建新内部 owner，不增加 Epoch 或 wire 字段、不重放已尝试发送的请求；原 deadline 不重置。详见 [出站等待归属](RFC-CLUSTER-OUTBOUND-CALL-OWNERSHIP.md)。
-
-入站诊断由 listener 创建的 `inboundDiagnostics` 统一承接：所有连接直接非阻塞上报到一个固定容量队列，共享丢弃计数，不创建每连接诊断缓冲或转发 goroutine，也不执行外部 callback。单连接仅借用出口，不能关闭；listener 等全部生产者退出后才关闭通道。共享容量意味着噪声连接可能挤占其它连接的诊断，事件仍是 best-effort，不承诺审计可靠性。
-
-内部 `tcpListener` 接管一个已经建立的 TCP listener，显式配置正数连接上限、每连接 Call 上限及写 timeout。连接满额时立即关闭新接入 socket，不为其创建处理任务或用户态等待队列；已接纳连接不受影响。诊断以远端地址和 Session 定位，有界、非阻塞，满载计数可观测，不依赖 NodeID。
-
-入站停止接纳已确认：关闭监听并阻止旧连接接纳新请求，但保留已接纳 Call 的原连接回复机会；最终关闭才取消剩余等待并断连。完整帧交给处理任务前的门禁检查是入站请求 admission 边界，不等于本地 Mailbox admission。停止后暂停读取，不新增拒绝回包；未接纳 Call 仍由原有限超时或断线结束。公开 Open 接线已确认复用 Cluster.Quiesce 关闭监听及入站门禁，替代原无网络 I/O 表述；不增加公共停止入口，已实现公开入站接线，详见两阶段关闭文档。
-
-listener 的 context 取消或非停止接纳导致的 Accept 失败时，组件关闭监听及所有已接纳 socket，取消连接内基础设施等待，并等待全部连接处理任务退出；不自动重新监听，不强杀 Handler。内部 quiesce 关闭监听后，serve 保留已有连接并等待最终 context 取消，不提前关闭诊断出口。当前连接上限属于单个 listener owner，公开 Open 和共享 Logger 诊断接线已实现；当前仅支持一个 listener，不提供多监听或动态发现；此组件不拥有出站连接或 Runtime 生命周期。
-
-入站连接采用一个读循环和数量有上限的 Call 等待任务。Send 在读循环中只完成本地接纳；Call 交给连接组件管理的任务，经 Runtime.Call 等待。每连接 Call 名额满载时暂停读取（包括后续 Send），不建立无界队列。响应通过同一连接串行写入，允许不同 Call 按完成顺序回包。
-
-同连接 Send 保持接纳顺序；混合 Send/Call 不保证 wire 到达顺序等于本地执行顺序，目标 Service 仍按 Mailbox 成功接纳顺序串行执行。外层负责节点级连接数上限、任务取消与等待；关闭时取消基础设施 Call，但不能强杀目标 Handler。codec 与名称解析器必须并发安全且不执行无限阻塞 I/O。完整方案见 [入站并发方案](RFC-CLUSTER-INBOUND-CONCURRENCY.md)。
 
 ClusterEnvelope 至少编码以下逻辑字段：
 
@@ -787,11 +564,11 @@ Error frame 实际携带 `ErrorClass + ErrorCode + Message`；Message 只用于�
 
 - 每个远端 Node 只有一个 outbound NodeSender；并发建连请求合并到该 sender，不创建多个竞争 sender。
 - 每条 inbound socket 由独立的私有 inboundConnection 管理读取和响应，不要求把两个方向合并成一条全双工连接。
-- outbound 通道断开后按需恢复：没有请求时不后台拨号，下一条尚未发送的请求至多触发一次有限 Dial。失败只结束当前请求，后续请求可再次尝试；已经失败或结果不确定的业务请求不自动重放。Call 总 deadline 不重置，写入前再次检查是否已取消。内部 `outboundPeer` 已实现连接复用、替换和关闭等待，公开出站组装已实现，入站 Open 已实现。详见 [按需建连方案](RFC-CLUSTER-ON-DEMAND-CONNECT.md)。
+- outbound 通道断开后按需恢复：没有请求时不后台拨号，下一条尚未发送的请求至多触发一次有限 Dial。失败只结束当前请求，后续请求可再次尝试；已经失败或结果不确定的业务请求不自动重放。Call 总 deadline 不重置，写入前再次检查是否已取消。内部 `outboundPeer` 已实现连接复用、替换和关闭等待，公开出站组装已实现，入站 Open 已实现。详见 [按需建连方案](design/CLUSTER.md)。
 - 出站 Send/Call 不要求本地 NodeID 或 open 监听；open 只负责接受新入站连接，节点配置只负责目标地址解析。不强制交换 NodeID；Call 回复沿原连接返回，不是反向业务调用。
 - 删除 `LocalNode` 与入站 `from NodeID`：出站只按目标路由，入站只按连接管理。`Complete(remoteNode, response)` 中的节点来自出站连接绑定的目标，用于共享 PendingCall 匹配，不是入站来源身份。双方相互主动调用使用各自的出站连接，回复各沿原连接返回。
 - `Transport` 只要求 `Send(to, envelope)` 能力；内存替身的 `Register/Unregister` 与具体实现的 `Close` 不属于发送器的依赖接口。生命周期仍由外层 owner 负责。内存往返测试的 writer 直接绑定调用方 completion，不把回复模拟成反向 Send 或要求调用方注册。
-- 认证与可寻址 NodeID 分离，可信内网可关闭认证；具体认证协议另行裁决，不要求调用方注册节点或监听。详见 [出站调用、监听与节点身份](RFC-CLUSTER-CONNECTION-IDENTITY.md)。公开 Open 已实现，生产认证尚未实现。
+- 认证与可寻址 NodeID 分离，可信内网可关闭认证；具体认证协议另行裁决，不要求调用方注册节点或监听。详见 [出站调用、监听与节点身份](design/CLUSTER.md)。公开 Open 已实现，生产认证尚未实现。
 - 对同一 Node 的“重复连接胜负”不单独建模：outbound 由唯一 NodeSender 保证唯一；inbound agent 按连接独立存在，响应关联保持在原连接内。
 
 ## 7. ServiceContext
@@ -853,7 +630,7 @@ func (client *BattleClient) StartBattle(
 
 文件滚动已实现：当前文件 gsr.log，固定 100 MiB，下一条会超限时先滚动，不拆记录；保留 10 个历史文件（.1 最新，.10 最旧），超过后删除最旧的受管理文件。现有单写入者负责滚动，不增加任务、不重置 seq；第一版不按日期切分、不压缩，不暴露大小和保留数量配置。各进程由启动参数选择不同配置，显式传入独占的相对日志目录；Logger.New 将其相对当前工作目录解析并固定，应用应在启动时创建 Logger。日志组件不读取命令行、不推断节点名。文件模式创建缺失目录，初始化失败直接报错；重启追加当前文件。运行中写入或滚动失败后拒绝新日志、累计已接纳未输出记录、停止继续写入和滚动，Err() 和 Close 返回首次错误，不自动重试/转终端/退出进程。
 
-统一 FIFO 日志服务已实现：logging.New(logging.Config{Directory: "./log/battle-01"}) 选择文件输出；Directory 为空时使用 Writer，两者同时设置报错，都未设置则默认 stdout。Capacity 默认 1024。Info/Error 在调用处采集时间/位置并快照字段，WithService 返回仅有 Info/Error 的 ServiceLogger，来源不可由业务改绑。Runtime.Config.Logger 与 ClusterConfig.Logger 注入同一个入口，框架同步入主日志队列，Diagnostics 仍作观测，不再转发为主日志。满载返回 ErrQueueFull 并计数，成功入队不等待写盘；文件和借用 Writer 均在首次输出故障后停止写入和接纳。Close(ctx) 正常排空、失败时统计残留，并有限等待；关闭内部文件，不关闭借用 Writer。Logger 由应用最后关闭，不进入普通 Service 生命周期。Cluster 已在源头实现同连接同类坏帧首条保留、抑制计数与关闭汇总，详见 [日志方案](RFC-LOGGING.md)。
+统一 FIFO 日志服务已实现：logging.New(logging.Config{Directory: "./log/battle-01"}) 选择文件输出；Directory 为空时使用 Writer，两者同时设置报错，都未设置则默认 stdout。Capacity 默认 1024。Info/Error 在调用处采集时间/位置并快照字段，WithService 返回仅有 Info/Error 的 ServiceLogger，来源不可由业务改绑。Runtime.Config.Logger 与 ClusterConfig.Logger 注入同一个入口，框架同步入主日志队列，Diagnostics 仍作观测，不再转发为主日志。满载返回 ErrQueueFull 并计数，成功入队不等待写盘；文件和借用 Writer 均在首次输出故障后停止写入和接纳。Close(ctx) 正常排空、失败时统计残留，并有限等待；关闭内部文件，不关闭借用 Writer。Logger 由应用最后关闭，不进入普通 Service 生命周期。Cluster 已在源头实现同连接同类坏帧首条保留、抑制计数与关闭汇总，详见 [日志方案](design/LOGGING.md)。
 
 错误分为三类，但继续使用标准 Go `error` 和稳定 error type/sentinel 表达：
 
@@ -1053,11 +830,11 @@ func (r *Runtime) Inspect() RuntimeInspection
 
 `RuntimeMetricsSnapshot` 至少包含 admission rejected、Handler error、panic、Call timeout、Timer 创建/取消/触发/投递失败和 Stop timeout 计数。计数是 Runtime 生命周期内单调累计值，Inspect 不会重置它们。
 
-已实现 `Runtime.Diagnostics() <-chan Diagnostic` 和 `Runtime.DroppedDiagnosticCount() uint64`，供宿主观察故障；Runtime 直接写共享 Logger，不要求宿主转发诊断为日志。每 Runtime 固定 256 条非阻塞队列，满载丢弃新事件并计数，只有资源释放、进入 Closed 时关闭；Stop/Close 超时不提前关闭。事件仅含 ServiceID、Source、Command、Session、Class、Code、Message 和 Stack 值快照；Message 最多 4 KiB、真实 Handler panic 的 Stack 最多 16 KiB，不保留业务引用，也不进入 Reply。Inspect 继续只提供状态与计数。此诊断流只覆盖 Handler，详见 [Runtime 诊断契约](RFC-RUNTIME-DIAGNOSTICS.md)。
+已实现 `Runtime.Diagnostics() <-chan Diagnostic` 和 `Runtime.DroppedDiagnosticCount() uint64`，供宿主观察故障；Runtime 直接写共享 Logger，不要求宿主转发诊断为日志。每 Runtime 固定 256 条非阻塞队列，满载丢弃新事件并计数，只有资源释放、进入 Closed 时关闭；Stop/Close 超时不提前关闭。事件仅含 ServiceID、Source、Command、Session、Class、Code、Message 和 Stack 值快照；Message 最多 4 KiB、真实 Handler panic 的 Stack 最多 16 KiB，不保留业务引用，也不进入 Reply。Inspect 继续只提供状态与计数。此诊断流只覆盖 Handler，详见 [Runtime 诊断契约](design/RUNTIME-DIAGNOSTICS.md)。
 
 ## 11. Core 不变量测试
 
-实现 Runtime 前先用测试锁死：
+以下不变量由测试保护，覆盖入口见 [验证矩阵](validation/COVERAGE.md)：
 
 - 同一个 Service 的 Handler 永不并发，不同 Service 可以并发。
 - 每个 Running Service 只有一个 Runtime-owned runner；Call 阻塞一个 Service 时不会阻塞其它 Service。
@@ -1082,7 +859,7 @@ func (r *Runtime) Inspect() RuntimeInspection
 - Service 停止和重建后，旧 ServiceID 不能命中新 Service。
 - 异步结果只能通过 Command 返回 Mailbox；领域测试负责证明旧 Revision 不会覆盖新状态。
 - Local 与 Cluster Send/Call 的请求/响应语义一致；Core Message 和 ClusterEnvelope 是不同结构，本地路径不经过 Cluster 编码，ClusterEnvelope 以显式 frame kind 区分请求、响应和错误。
-- Cluster 已知节点断连时必须返回 Runtime Error，不得静默接受；无法确定远端是否执行的写操作由 Call、RequestID 和幂等策略处理。
+- Cluster admission 前的路由/队列/停止错误同步返回；接纳后的连接失败按 Send 诊断或 Call 结果处理，不追溯修改 Send 成功值。不确定是否执行的写操作由业务幂等策略处理。
 - Domain Error 经本地或 Cluster Call 后保持相同 Class/Code，typed client 的 `errors.Is` 判断不依赖 Message 文本。
 
 ## 12. API 评审清单

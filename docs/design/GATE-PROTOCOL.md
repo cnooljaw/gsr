@@ -8,9 +8,9 @@
 
 Skynet 的 `lualib/snax/gateserver.lua` 通过 socketdriver 消息及 Lua coroutine 管理监听、连接与数据事件；GSR 借鉴职责分离，不照搬 TCP netpack 和 C/Lua 调度。Go I/O 任务必须有明确 owner 管理容量、取消、关闭和等待。
 
-旧 BSPacket 参考 `../baison_middle/protocol/packet.go` 和 `../nbgame_core/transport/newnet/protocols/cpacket.go`。最新选择替代此前固定 12 字节头、DES 及 0x40/0x80 模式设计。当前只推进新客户端、新协议；旧协议识别、分流、代理及兼容均无当前需求，不设计、不实现、不预留接口，等用户明确提出后再裁决。此前讨论的 tag 分流不构成新协议新增 tag 的已确认要求。
+Gate 只收发不透明字节；下文 Envelope 与 ErrorResponse 属于 Protobuf。Sproto 使用自己的 package(type/session) 和 Dispatcher，接入见 [客户端协议指南](../guides/CLIENT-PROTOCOLS.md)。不提供旧头或 DES 兼容。
 
-## 已确认：线上消息形状
+## Protobuf 消息模型
 
 一条完整 WebSocket 二进制消息对应一个应用包，不把 WebSocket 物理分片当作应用消息，不另加长度头。
 
@@ -115,7 +115,7 @@ enum MsgId {
 
 `Envelope.msg_id` 保持 `uint32`，枚举只提供常量。Agent 的协议分发器根据生成目录选择 Protobuf 类型，并校验方向、消息种类和 request_id；Gate 不解析业务 payload。协议目录由 `.proto` 生成，业务 Handler 仍手动增量注册，二者不要求同时实现。客户端 msg_id 与不同 Service 可复用的内部 `CommandID` 是两套编号。
 
-## 已确认：统一 Gate 与固定安全模式
+## 统一 Gate 与固定安全模式
 
 - 只有一个 `gate.GateService` 实现和应用入口 `self.Node().CreateGate(ctx, gsr.GateConfig{...})`，不保留独立 DebugGate/ProdGate 包或兼容别名。
 - `gate.SecurityModeMAC` 为零值默认模式：固定 33 字节 X25519 握手后，上行使用 `seq | 业务消息字节 | MAC`，下行只使用业务消息字节。握手或 MAC 失败直接关闭，不降级。现有 Protobuf 示例的业务消息为 Envelope。
@@ -135,7 +135,7 @@ TypeScript CLI 默认使用 Plain；`--secure` 使用固定握手和认证上行
 
 连接实现与私有辅助逻辑位于 `gate/`；协议目录、分发、通用 `.proto`、生成类型和生成工具位于同级 `protocol/`，生产代码互不依赖。跨语言认证夹具仍由 Gate 持有。业务 Agent 组合二者，具体协议实现将业务消息编码为字节后交给 ClientSession；Gate 不解释 Envelope 或 Sproto package。示例只保留 Echo 业务协议、Agent、启动入口和 TypeScript 客户端。统一实现不代表已完成密码协议审计或部署容量验收。
 
-## 已确认：业务回复、通用错误与推送
+## 业务回复、通用错误与推送
 
 | 情况 | msg_id | request_id | payload |
 | --- | --- | --- | --- |
@@ -171,7 +171,7 @@ message ErrorResponse {
 - 程序分支依赖稳定 code，不比较 message；不得直接透传内部 error 文本或堆栈。
 - 错误语义已经确认：业务拒绝使用业务 Response，无法取得正常结果时使用 ErrorResponse 并复用原 request_id；通用 `ErrorCode` 只表达无效请求、未支持消息和内部失败，业务响应自己的业务码由业务协议定义，GSR 不建立跨业务领域码表。固定二进制握手格式和阶段门禁由 Gate 定义，业务消息编号和 payload 由业务协议定义，Agent 负责按 msg_id 处理。
 
-## 已确认：C/S request_id 与 seq
+## C/S request_id 与 seq
 
 - Envelope 中 request_id 使用 uint32；0 表示通知或服务端主动推送，非零表示客户端 Request。成功或失败响应原样带回请求 request_id。
 - 每连接从 1 单调分配，不回绕、不复用；超时移除等待但不回收编号，迟到响应丢弃。耗尽时通过正常重连建立新的编号空间，不自动重放旧请求。
@@ -180,11 +180,11 @@ message ErrorResponse {
 - seq 是独立的 uint64 连接序号，所有上行业务包均消耗，包括 request_id=0 的通知。单连接从 1 单调递增，不回绕；到达最大值后客户端关闭并重新握手，Gateway 接受 seq > lastSeq。这个规则额外拒绝同连接重复旧包。
 - seq 在线上使用 8 字节大端序。Laya/TypeScript 实现不得用普通 number 表示完整 uint64，应采用 BigInt 或等效无损表示；uint32 request_id 可以精确表示。
 
-## 生产 Gate 的连接认证与接收边界
+## 连接认证与接收边界
 
 目标是让连接 A 录制的已认证上行包，不能拿到另一条连接 B 直接复用；seq 额外拒绝同连接的重复旧包。不承诺阻止控制客户端、提取密钥后重新计算 MAC 或重新构造业务请求，也不等于登录鉴权或业务幂等。
 
-已确认方向及实施约束：
+接收边界：
 
 - 每连接由客户端和服务端分别使用 CSPRNG 生成一对新的 X25519 临时密钥。私钥为 32 字节，仅在本端内存中保存；公钥为原始 32 字节，分别放入握手请求和响应。私钥、shared secret 和 macKey 不发送、不写日志，连接结束后废弃；不按账号或跨连接复用。
 - 双方分别计算 `X25519(client_private_key, server_public_key)` 和 `X25519(server_private_key, client_public_key)`，结果必须一致；拒绝全零 shared secret。不要手工修改私钥位或自行实现曲线运算，交给标准 X25519 实现处理。
@@ -192,17 +192,17 @@ message ErrorResponse {
 - 同连接串行执行：检查最小长度 → 读取大端 seq → 使用原始 Envelope 字节校验 MAC → 检查 seq 大于 lastSeq 并立即更新 → 将原始 Envelope 字节投递给 Agent。Agent 负责 Protobuf 解码以及校验 Envelope 结构、msg_id、方向、request_id 和 payload。认证失败不能推进 lastSeq；认证成功但消息未知或不合法时也消费该 seq。投递失败不能回退，序号接纳不代表业务执行成功。
 - 协商前只接受固定 33 字节的 `version(1) | client_public_key(32)`；服务端只回复固定 33 字节的 `version(1) | server_public_key(32)`。完成后 Gate 只接受带 seq/MAC 的业务上行，拒绝重复握手、错误方向和无 MAC 降级。MAC 校验通过后，Agent 根据 Envelope 的 msg_id 选择业务处理逻辑并解码 payload；未知 msg_id 不因“未知编号”本身关闭连接。
 - 握手失败直接关闭连接，不进入 Agent，也不发送业务 ErrorResponse；握手成功后双方才启用派生的 macKey。
-- 必须设置消息大小、握手等待和接纳容量上限；具体初始值与零值语义见“已确认：Gate 容量与关闭顺序”，Protobuf 不意味着无限消息大小。
+- 必须设置消息大小、握手等待和接纳容量上限；具体初始值与零值语义见“Gate 容量与关闭顺序”，Protobuf 不意味着无限消息大小。
 
 当前实现位于 `gate/`：Gate 在 HTTP/WebSocket Handler 前限制已接纳 TCP 连接数；HTTP 请求头和普通 keep-alive 空闲连接有 5 秒超时，避免未升级连接长期占用名额。`TLSConfig` 非空时启动直连 WSS Listener，为 nil 时启动普通 HTTP WebSocket Listener。首个二进制 WebSocket 消息必须是固定 33 字节握手，完成 X25519 握手后，逐帧校验 MAC 和递增 seq，再将原始 Envelope 字节直接交给目标 Agent 的 `Runtime.DeliverClientMessage`。Agent 的响应通过每连接有界队列进入唯一 WebSocket 写循环。生产 Gate 从 Runtime 借用同一 Logger 并绑定自身 ServiceID；同一连接同一错误类别只记录首条，关闭时补充抑制数量，不记录密钥、MAC 或原始载荷。MAC 与 Plain 使用同一 Gate 实现，监听的模式固定，不根据首包降级。端到端测试覆盖直连 TLS、Ingress 终止 TLS 后的普通 WebSocket、握手与业务帧往返、错误 MAC 拒绝、首帧超时、握手前连接上限与断开后名额回收、Mailbox/出站队列满载、基础慢客户端背压、短时多连接并发及 Runtime 关闭回收；这不替代密码协议审查或慢客户端长时压力验收。
 
-已确认的 TLS 部署边界：TLS 是部署能力，不是 Gate 对所有部署的强制要求。K8s Ingress/LB 已终止 TLS 时，以及可信内网部署时，`TLSConfig` 可以为 nil，Gate 监听 HTTP/WS；公网直连时部署方必须提供 `TLSConfig`，由 Gate 监听 HTTPS/WSS。Gate 无法仅凭监听地址判断是否暴露公网，部署配置必须保证这一要求，不能把 `0.0.0.0` 等同于公网直连。Cluster/业务协议不因此改变。
+TLS 部署边界：TLS 是部署能力，不是 Gate 对所有部署的强制要求。K8s Ingress/LB 已终止 TLS 时，以及可信内网部署时，`TLSConfig` 可以为 nil，Gate 监听 HTTP/WS；公网直连时部署方必须提供 `TLSConfig`，由 Gate 监听 HTTPS/WSS。Gate 无法仅凭监听地址判断是否暴露公网，部署配置必须保证这一要求，不能把 `0.0.0.0` 等同于公网直连。Cluster/业务协议不因此改变。
 
 只有在 Gate 自己终止 TLS 时，Gate 才克隆并约束 `tls.Config`：最低 TLS 1.2，只协商 HTTP/1.1，拒绝可替换整份连接级配置并绕过约束的 `GetConfigForClient`；允许 `GetCertificate` 动态选证书。一次证书选择返回错误或 panic 只终止当前 TLS 握手，不应阻断后续健康连接；Gate 日志不转录回调的原始错误或 panic 文本。不在 Gate 内新增统一证书管理、TLS 模式或公网暴露判断。Ingress/LB 的 TLS 版本与证书由部署方管理，Ingress 到 Pod 的链路必须位于可信网络边界，不可信时由部署方另行配置 mTLS。
 
 Gate 两种模式的 WebSocket 升级均允许任意 `Origin`，不使用域名白名单，也不把 `Origin` 当作客户端身份或权限依据；原生客户端、小程序和 Web 客户端使用同一接入语义。直连或 Ingress 的 WSS、X25519、HMAC 和 seq 分别保护传输、连接密钥、上行帧完整性及顺序，但不等于玩家登录鉴权。业务 Agent 必须显式校验 token 后才赋予玩家权限；当前 Echo 示例尚未实现这项业务鉴权。若将来让浏览器自动携带的 Cookie 直接赋予连接权限，必须重新审查跨站 WebSocket 劫持风险，不能用上行 MAC 替代身份校验。
 
-已确认的密码参数：
+密码参数：
 
 ```text
 salt_input = ASCII("gsr/wss/hkdf-salt/v1")
@@ -223,7 +223,7 @@ macKey = HKDF-Expand-SHA256(prk, info, 32)
 
 依据：[X25519](https://www.rfc-editor.org/rfc/rfc7748.html)、[HKDF](https://www.rfc-editor.org/rfc/rfc5869.html)、[HMAC](https://www.rfc-editor.org/rfc/rfc2104.html)。固定 33 字节握手格式和组合参数已固定，并由服务端握手测试覆盖；这不等于组合协议已通过独立安全审计。
 
-## 已确认：跨语言固定向量
+## 跨语言固定向量
 
 Go 与 TypeScript 必须使用同一组独立生成的测试向量验证客户端上行认证，不以“两个实现互相算出相同结果”代替参考结果。固定向量只用于测试，里面的私钥是公开的测试常量，不得被生产连接复用。
 
@@ -268,7 +268,7 @@ Go 端通过 `protocol.NewRegistry(businessCatalogs...)` 合并业务生成目�
 - 生成源文件纳入版本控制，便于克隆后直接运行；改动 `.proto` 后通过单条生成命令更新两侧产物，并验证工作树没有遗漏的生成差异。
 - 固定向量验证仍使用已记录的原始字节，不依赖 Protobuf-ES 和 Go 生成器重新编码成相同字节；这样 MAC 契约仍以原始输入字节为准。
 
-## 已确认：WebSocket 关闭码与错误归属
+## WebSocket 关闭码与错误归属
 
 Gate 只使用标准 WebSocket 关闭码，不新增当前客户端必须理解的私有 4000–4999 关闭码。关闭原因是简短、稳定的通用标记，不暴露密钥、MAC、内部错误文本、堆栈或未认证载荷；具体错误写入服务端结构化日志。关闭控制帧的原因文本还必须满足 WebSocket 控制帧长度限制。
 
@@ -295,7 +295,7 @@ Gate 只使用标准 WebSocket 关闭码，不新增当前客户端必须理解�
 
 在 HTTP/WebSocket 升级前，`net/http` 的 TLS 握手、Accept 和内部 Handler 错误尚无 `ClientSession`，无法使用连接 ID 与连接级去重。Gate 两种模式共用 `http.Server.ErrorLog` 的安全分类入口：配置 Runtime Logger 时写入同一有界日志队列，未配置时仅向 Go 标准日志输出类别（默认目标为标准错误输出）；不转录可能包含未认证输入或 panic 文本的原始行。此阶段的日志不保证每条都成功落盘，也不伪造已认证的客户端身份。
 
-## 已确认：Gate、Agent 与业务 Service
+## Gate、Agent 与业务 Service
 
 客户端 ↔ WebSocket Gate ↔ Agent Service ↔ 业务 Service。
 
@@ -322,7 +322,7 @@ Gate 只使用标准 WebSocket 关闭码，不新增当前客户端必须理解�
 - 正常断开时 Gate 停止接纳新消息、使客户端会话能力失效并只通知 Agent 一次；Agent 完成自己的清理后退出。Gate 不等待或强杀阻塞的 Agent，Agent 退出也不关闭 Runtime 或其它 Agent。
 - Core Message、ServiceID、Cluster wire 不变；客户端 Envelope、seq、macKey 不进入 Core 或 Cluster 协议。
 
-## 已确认：Gate 容量与关闭顺序
+## Gate 容量与关闭顺序
 
 Gate 只设置四类资源上限：最大连接数、握手最长等待、单条 Envelope 最大帧大小和每连接出站队列容量。入站不再增加另一套无界 Gate 队列，已绑定 Agent 的消息直接受其 Runtime Mailbox 容量约束；Mailbox 满载时 Gate 停止当前连接的入站接纳并关闭连接，不无限等待或缓存。
 
@@ -361,74 +361,25 @@ Gate 不等待或强杀 Agent Handler。单独停止 Gate 时，Gate 在自己�
 
 断开通知通过 Gate 的受控 Infrastructure Call 投递，使 Gate 能确认 Agent Mailbox 是否接纳。正常运行时若 Mailbox 满载，Gate 保留连接映射并由当前连接处理协程按固定间隔重试；该协程在通知接纳前继续占用 `MaxConnections` 名额，使待处理数量有界。Gate 开始停机后，连接处理协程停止重试并退出，剩余映射由 `OnStop` 使用自己的有界上下文补发；这样 `OnStop` 等待 I/O 协程退出时不会被断开通知反向阻塞。Runtime 或目标 Service 停止也终止重试。Plain 模式同样使用 Call，而不是仅确认断开事件进入 Gate Mailbox 的 Send。
 
-## 下一步与验收
+## 验证与部署边界
 
-Envelope 的 msg_id、request_id(uint32)、payload 三个字段，请求/响应/通知/推送独立编号，通用与业务专用 `.proto` 分开定义；每个 MsgId 通过 option 显式声明 payload、方向和消息种类，协议目录由代码生成，业务在构造时提供按实现进度维护的显式 Handler 表。固定 33 字节二进制握手、大端 seq 和原始字节 MAC 验证顺序、固定 HKDF 参数、统一 Gate 的 MAC/Plain 模式、WebSocket 关闭码和 Gate/Agent/业务错误归属，以及“一连接一个业务定义的 AgentService、Runtime 内部消息类型区分客户端消息与普通 Core Command、Service 可选择实现 ClientMessageHandler、业务协议通过 protocol.Dispatcher 组合接入”的边界已确认。Runtime 的单向投递 API 与缺少客户端处理能力时的 admission 拒绝已实现；联调示例包含通用 Envelope 与 Echo 业务 `.proto`、Go/TypeScript 生成类型、强类型 Echo Handler 和 CLI 闭环。跨语言认证固定向量已由 Go 与 TypeScript 共用夹具验证。Echo 示例通过 `gsr.Run` 与 MainService，经 `self.Node().CreateGate` 启动对应 Gate 和业务 Agent，不扩展 Core。生产 Gate 的直连 WSS 与 Ingress 终止 TLS 后的 HTTP WebSocket 纵向切片、共享 Logger 接线和可调时长的慢连接压力测试已落地；目标部署的容量与其它失败组合仍待验证。一次讨论一个问题，未确认前不新增公开 API 或通用安全插件框架。
+已有测试按职责覆盖以下行为，不在本文逐个重复测试实现：
 
-联调示例位于 `examples/websocket-gate/`：Go Gate（Plain/MAC 模式）、连接 Echo Agent、TypeScript 命令行客户端和 request/response 往返已经落地；生成协议目录、逐步注册强类型 Handler、通用协议错误回复、业务拒绝 Response 以及 Notify→Push 往返也已接入。Echo `.proto` 只属于示例业务协议，不扩展 GSR Core。固定向量已作为独立跨语言测试夹具落地，不由示例运行路径加载或掩盖后续生产 Gate 的安全审查。
+| 边界 | 已覆盖行为 |
+| --- | --- |
+| 安全与容量 | Go/TS 固定向量、非法/超时握手、seq 不回绕、重复包、坏 MAC、帧长、连接与出站容量 |
+| 协议 | Request/Response、Notify/Push、未知或未实现消息、错误方向/载荷/关联编号、无法关联消息丢弃、内部 Call 超时与迟到响应 |
+| 隔离 | 单/多慢客户端、坏握手与坏 MAC 并发期间健康连接继续处理、Agent 构造 panic/启动失败后恢复 |
+| 生命周期 | 断开后会话失效、Agent/Gate 并发关闭、在握手与活动连接阶段停机、端口释放、关闭错误保留 |
 
-已增加显式开关的 `GSR_GATE_STRESS=1` 混合连接压力验收，可通过 `GSR_GATE_STRESS_SECONDS` 调整时长，记录持续发送、Agent 处理、Mailbox 满载和连接拒绝计数；测试等待队列排空并要求成功写入数与 Agent 处理数一致、Mailbox 满载和连接拒绝均为零。同一开关下的 `TestMACGateLongSlowClientBackpressure` 可用 `GSR_GATE_SLOW_CLIENT_SECONDS` 验证慢客户端持续不读时的有界出站队列和快速拒绝；`TestMACGateMultipleSlowClientsDoNotBlockHealthyRequests` 进一步组合四条慢连接与一条健康连接，验证背压期间健康请求持续完成，五条连接断开后各自 Agent 都收到通知。`TestMACGateFailurePhaseStress` 可用 `GSR_GATE_FAILURE_ATTEMPTS` 重复坏 TLS 首包、坏应用握手和坏 MAC，确认失败帧未进入 Agent、故障连接回收后健康连接仍可请求/响应；坏 TLS 首包本身不计入应用层 `RejectedConnections`，若同时触发 TCP 容量拒绝仍会计数。已完成一次 16 连接、2 分钟的混合样本和一次四慢一健康、5 秒的背压样本；这些测试只提供可重复证据，不把单次机器结果当作容量结论，仍需按目标部署继续观察更长时长和故障组合。既有认证测试覆盖跨连接旧包、同连接重复序号、MAC 篡改和认证失败不推进序号；新增 Go/TypeScript 测试覆盖 `uint64` 序号上限不回绕，协议分发测试覆盖最大 `uint32 request_id` 原样回传。未知 `msg_id` 由协议/Agent 测试覆盖；C/S `request_id` 的编号分配与耗尽由客户端管理，当前示例只使用固定编号，不包含并发分配器验收。测试不替代密码协议审查。
+真实链路见 [WebSocket 示例](../../examples/websocket-gate/README.md)，总体覆盖和已有执行基线见 [验证矩阵](../validation/COVERAGE.md)。
 
-`TestMACGateKeepsConnectionAfterUnknownMessage` 已补充合法认证帧携带未知 `msg_id` 的真实 Gate 验收：Agent 回传原 `request_id` 的通用 `ErrorResponse`，连接不关闭，后续有效请求仍可完成。Agent 内部 Core Call 的超时与迟到回复已有独立验收；`TestMACGateKeepsConnectionAfterClientRequestTimeout` 另以业务 Agent 延迟首个请求，验证客户端结束该请求的等待后忽略迟到响应，仍可在同一连接完成下一请求。业务专属超时数值不由 Gate 定义；多连接背压已有可重复短时样本，更长时长和目标部署容量仍需实测。
+专项压力默认不启用，从仓库根目录选择场景：
 
-`TestMACGateReturnsUnsupportedForUnimplementedRequest` 覆盖协议目录已定义但 Agent 尚未注册 Handler 的 Request：连续请求均返回保留原 `request_id` 的 `UNSUPPORTED_MESSAGE`，连接保持可用。
+```sh
+GSR_GATE_STRESS=1 GSR_GATE_STRESS_SECONDS=120 go test ./gate -run '^TestMACGateMixedConnectionStress$' -v -timeout=3m
+GSR_GATE_STRESS=1 GSR_GATE_SLOW_CLIENT_SECONDS=5 go test ./gate -run '^TestMACGateLongSlowClientBackpressure$' -v -timeout=1m
+GSR_GATE_STRESS=1 GSR_GATE_FAILURE_ATTEMPTS=8 go test ./gate -run '^TestMACGateFailurePhaseStress$' -v -timeout=1m
+```
 
-`TestMACGateKeepsConnectionAfterUnknownNotification` 进一步覆盖 `request_id == 0` 的未知通知：Agent 不生成 `ErrorResponse`，连接继续保留并可处理后续请求。
-
-`TestDefinedNotificationWithoutHandlerDoesNotRespond` 验证协议目录已定义、但业务尚未注册 Handler 的 Notify 不生成无法关联的响应。
-
-`TestResponseRejectsPayloadTypeMismatch` 验证 Handler 为 Response 提供错误的 Protobuf 类型时不发送错误载荷，改为返回关联的安全通用错误。
-
-`TestNotificationCannotPushResponseMessage` 验证 Notify Handler 不能把 Response 编号作为主动 Push 输出。
-
-`TestErrorResponseSendFailurePreservesHandlerError` 验证通用错误响应发送失败时，Handler 原始错误仍保留在返回错误中供 Runtime 诊断。
-
-`TestMACGateDeliversNotificationPush` 覆盖已注册通知的生产链路：客户端发送零 `request_id` 的 `EchoNotify`，Agent 通过协议上下文发出零 `request_id` 的 `EchoPush`，Gate 原样写回客户端。
-
-`TestMACGateRejectsNotificationWithRequestID` 覆盖已注册 Notify 携带非零 `request_id` 的生产链路：协议层返回 `INVALID_REQUEST`，并在通用错误响应中保留原编号。
-
-`TestMACGateRejectsRequestWithoutRequestID` 覆盖已注册 Request 缺少 `request_id` 的生产链路：不发送无法关联的错误响应，连接仍可处理后续合法请求。
-
-`TestMACGateKeepsConnectionAfterMalformedEnvelope` 覆盖认证成功但无法解码 Protobuf Envelope 的链路：Agent 丢弃无法关联的消息，连接仍可处理后续合法请求。
-
-`TestMACGateReturnsErrorForInvalidPayload` 覆盖已知 `msg_id` 携带非法 Protobuf payload 的链路：Agent 返回 `INVALID_REQUEST` 的通用错误，连接保持可用并能继续处理合法请求。
-
-`TestMACGateReturnsErrorForWrongDirection` 覆盖客户端反向发送服务端 Push 编号的链路：Agent 返回 `INVALID_REQUEST`，不把方向错误当作 WebSocket 坏帧，连接仍可继续处理合法请求。
-
-`TestMACGateConcurrentBadMACDoesNotBlockHealthyConnection` 覆盖 8 条坏 MAC 连接并发失败期间健康连接继续完成 16 次请求/响应，并确认坏帧未进入 Agent。
-
-`TestMACGateConcurrentBadHandshakeDoesNotBlockHealthyConnection` 覆盖 8 条低阶 X25519 公钥握手并发失败期间，健康连接继续完成 8 次请求/响应；无效握手不创建 Agent，也不触发 Mailbox 满载。
-
-`TestMACGateHandshakeTimeoutClosesConnection` 覆盖未完成应用握手期间仍占用唯一连接名额、超限连接被拒绝，以及等待超时关闭后名额释放并允许新客户端完成请求/响应。
-
-`TestMACGateRecoversFromAgentConstructorPanic` 覆盖 Agent 构造器 panic：当前连接收到内部错误关闭，后续连接仍能创建 Agent 并完成请求/响应。
-
-`TestMACGateRecoversFromAgentStartFailure` 覆盖 Agent 的 `OnStart` 返回错误：Runtime 调用该实例的 `OnStop` 清理，Gate 拒绝当前连接后仍可接受新连接。
-
-`TestMACGateListenFailureLeavesRuntimeAvailable` 覆盖 Gate 监听地址被占用时的启动失败：Runtime 保持可用，释放地址后可以在同一 Runtime 上创建并启动新的 Gate。
-
-`TestMACGateRuntimeCloseReleasesActiveClient` 验证关闭活动连接、等待 I/O goroutine、使 `ClientSession` 后续写回返回 `ErrClientSessionClosed`，并在 `Runtime.Close()` 后立即重绑同一监听地址确认端口释放。
-
-`TestMACGateRuntimeStopReleasesListener` 验证单独调用 `Runtime.Stop()` 即释放 Gate 监听地址，随后调用 `Runtime.Close()` 可以完成最终释放。
-
-`TestMACGateRuntimeStopClosesPendingHandshake` 验证应用握手尚未完成时 `Runtime.Stop()` 会主动关闭连接并等待 I/O goroutine 退出，不等待配置的握手超时，也不创建 Agent。
-
-`TestMACGateRuntimeStopClosesAllPendingHandshakes` 覆盖 8 条并发等待应用握手的连接：`Runtime.Stop()` 关闭全部连接并等待处理 goroutine 退出，不创建 Agent。
-
-`TestMACGateRuntimeStopClosesAllActiveClients` 覆盖 8 条已认证活动连接：`Runtime.Stop()` 关闭全部连接，每个 `ClientSession` 后续写回均返回 `ErrClientSessionClosed`。
-
-`TestMACGateAgentAndRuntimeStopCloseSessionIdempotently` 验证 Agent 的 `OnStop` 与 Gate 停止都会关闭同一 `ClientSession` 时，Runtime 停止和重复关闭均正常完成。
-
-`TestMACGateAgentStopAfterClientDisconnectKeepsServing` 验证客户端先断开后，Agent 的 `OnStop` 再关闭会话不会产生停止错误；随后新客户端仍能完成认证、请求投递和响应写回。
-
-`TestMACGateClientDisconnectOverlapsRuntimeStop` 并发触发客户端断开与 `Runtime.Stop()`，验证双方关闭同一会话后停止成功、Agent 的 `OnStop` 仅执行一次且会话拒绝后续写回。
-
-`TestMACGateStopReportsClientCloseFailure` 与 `TestPlainGateStopReportsClientCloseFailure` 为两条连接分别注入 Close 帧写错误和 socket 关闭错误，验证Gate 的 MAC 与 Plain 模式停机都会尝试关闭全部客户端连接，并通过 `errors.Is` 保留四类关闭错误。
-
-`TestMACGateReturnsErrorAfterAgentCallTimeout` 覆盖 Agent 内部 Core Call 超时：客户端收到原 `request_id` 的 `INTERNAL`，目标 Service 之后完成的迟到内部回复不会再生成第二条客户端响应，超时归 Agent/Runtime 而不是 Gate。该测试锁定内部调用的错误归属，不定义客户端业务请求的超时数值或重试策略。
-
-`TestMACGateRejectsLateAgentResponseAfterDisconnect` 已锁定断开后的迟到写回：Gate 先使 `ClientSession` 失效，再通知 Agent；Agent 后续写回得到 `ErrClientSessionClosed`，不会重新进入出站队列。
-
-## Sproto 开发切片
-
-v1.0.2 按 [ADR 0013](adr/0013-client-protocol-boundaries.md) 新增独立 protocol/sproto 和原生 package(type/session) 分发，复用上述安全模式、字节投递与生命周期。上文 Protobuf 的 Envelope、MessageRoute 与 ErrorResponse 规则仅属于 Protobuf，Sproto 不借用它们；接口及错误契约见 [双协议指南](SPROTO-INTEGRATION.md)。新增 API 随 GSR v1.0.2 发布。
+混合压力检查成功写入数与 Agent 处理数相等、Mailbox 满载和连接拒绝为零；慢客户端场景检查出站有界与健康连接隔离。已有 16 连接两分钟混合样本及四慢一健康五秒样本，仅证明对应本机条件。目标部署的长期容量、更完整故障组合及独立密码协议审查仍需完成；客户端并发 request_id 分配器未由固定编号 Echo 验收。

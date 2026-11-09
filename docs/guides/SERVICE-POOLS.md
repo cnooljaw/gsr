@@ -1,8 +1,8 @@
 # 有界 Service 池
 
-当前开发能力，尚未发布；不属于 v1.0.2 标签已有 API。设计裁决见 [ADR 0014](adr/0014-bounded-service-pools.md)。
+当前开发能力，尚未发布；不属于 v1.0.2 标签已有 API。设计裁决见 [ADR 0014](../adr/0014-bounded-service-pools.md)。
 
-可直接运行 `go run ./examples/service-pool` 查看两个独立调用者通过普通 Call 使用同一池名的完整流程，见 [服务池示例](../examples/service-pool/README.md)。
+可直接运行 `go run ./examples/service-pool` 查看两个独立调用者通过普通 Call 使用同一池名的完整流程，见 [服务池示例](../../examples/service-pool/README.md)。
 
 ## 创建与调用
 
@@ -51,6 +51,6 @@ result, err := self.Cluster().Call(ctx, "settlement", "settlement-write", settle
 - Call 超时只结束等待，已排队或正在执行的请求可能继续执行，不重放、不补执行者；实例实际结束前不会被框架视作新的空闲执行能力。结果不确定性、事务、幂等、业务顺序与重试归业务。
 - 来源保持原调用路径语义：本地业务为调用方 ServiceID，HTTP/Cluster 入站为零；不借池伪装业务身份。
 
-## 验证归属
+## 验证
 
-池测试只保护新增路由与生命周期组合：多个调用者进入不同成员、独立容量、超时不重放、名称保留/冲突、无效工厂、创建失败/取消回滚和成员退出。既有双节点测试增加命名池轮询结果和零来源验证，复用原网络夹具；底层 PendingCall、Mailbox 串行性、codec 和完整关闭矩阵继续由原测试保护。
+框架行为与示例接线的验证范围统一见 [验证矩阵](../validation/COVERAGE.md)。

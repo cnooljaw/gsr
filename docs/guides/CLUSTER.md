@@ -29,7 +29,7 @@ tail -f log/battle-01/gsr.log
 tail -f log/caller-01/gsr.log
 ```
 
-`Send admission` 的空错误表示本地接纳，`Call result` 才包含远端回复或错误。两个进程用 Ctrl+C 有序退出。配置、信号、停机和恢复说明见 [双节点示例](../examples/twonode/README.md)。现成示例只演示 `uint64` 操作编号，不是全部参数类型的演示程序。
+`Send admission` 的空错误表示本地接纳，`Call result` 才包含远端回复或错误。两个进程用 Ctrl+C 有序退出。配置、信号、停机和恢复说明见 [双节点示例](../../examples/twonode/README.md)。现成示例只演示 `uint64` 操作编号，不是全部参数类型的演示程序。
 
 ## 2. 接收端注册，调用端按名访问
 
@@ -238,29 +238,8 @@ meta := map[string]any{"active": true}
 | Call 等待超时或连接断开 | 处理调用错误；不要据此推断远端一定未执行，不自动重试有副作用的操作 |
 | Send 入队后的网络失败 | 进入调用端基础设施诊断；Send 已返回的 nil 不会变成异步业务回复 |
 
-Cluster 配置 `MaxCallWait` 默认 5 秒，调用方 context 只能缩短。等待期间当前 Service 不处理下一条消息；回复由 Runtime 自动完成，业务不手工 Reply。业务在 B 节点得到的 Core Source 是零，不能用它当跨节点玩家或 Service 身份；需要业务身份时显式携带并校验业务字段。Source 的完整边界见 [API 契约](API-DESIGN.md)。
+Cluster 配置 `MaxCallWait` 默认 5 秒，调用方 context 只能缩短。等待期间当前 Service 不处理下一条消息；回复由 Runtime 自动完成，业务不手工 Reply。业务在 B 节点得到的 Core Source 是零，不能用它当跨节点玩家或 Service 身份；需要业务身份时显式携带并校验业务字段。Source 的完整边界见 [API 契约](../API-DESIGN.md)。
 
-## 7. 当前测试覆盖到哪里
+## 7. 验证与限制
 
-GSR 1.0 已实现上述参数集合。原有 Codec 测试覆盖字符串、整数、浮点数、字节串、混合列表、嵌套 map、非法类型以及深度/payload 限制；原有真实 TCP 往返用例主要是 `"hello" + int32(3)`。本教程切片在这些现有测试中补充了集合和边界参数，没有改动生产实现。
-
-| 验证层级 | 用例 | 覆盖范围 |
-| --- | --- | --- |
-| 默认 Codec | [TestValueCodecRoundTripsSupportedValues](../cluster/value_codec_test.go) | 标量、Unicode/空字符串、64 位整数极值、类型化切片、定长数组、字节数组、typed map、嵌套集合、nil/空集合 |
-| 错误与输入限制 | [ValueCodec 拒绝与限制用例](../cluster/value_codec_test.go) | 不支持的值、非有限浮点、深度与 payload 上限、坏载荷与过大 map 数量 |
-| 真实 TCP + Core Service | [TestTCPClusterRoundTrip](../cluster/tcp_integration_test.go) | 多位置参数、无参数、独立列表参数、标量混合、64 位整数极值、字节串/数组/map/嵌套集合、nil/空集合的请求和结果往返，以及领域错误 |
-| 应用 Dispatcher | [Dispatcher 测试](../dispatcher_test.go) | 强类型绑定、参数数量/类型错误、nil 绑定、非法 variadic Handler 和返回值/error 行为 |
-| 应用启动与命名路由 | [Run 测试](../run_test.go) | 同进程两节点的来源绑定、名称隔离、Service 重建与停止；不重复全部 Codec 参数矩阵 |
-| 双进程 | [双节点恢复测试](../examples/twonode/process_test.go) | 独立进程的正常停机/强杀与重启恢复，示例业务参数为 `uint64` |
-
-真实 TCP 的参数矩阵使用现有 Core Echo 测试 Service，按原样回传解码后的 Args；它不代表每种业务 Handler 都已验收，也没有把所有参数组合重复到应用层和双进程层。
-
-从仓库根目录运行参数专项验证：
-
-```sh
-go test ./cluster -run '^(TestValueCodecRoundTripsSupportedValues|TestValueCodecRejectsUnsupportedValues|TestValueCodecEnforcesDepthAndPayloadLimits|TestTCPClusterRoundTrip)$' -v -timeout=2m
-```
-
-2026-10-12 本轮 `go test -race ./cluster -timeout=2m` 已通过。第 5 节的 Service 和调用代码也已与双节点启动结构一起编译，在两个独立进程间通过真实 TCP 得到上述输出，并有序退出；这是教程示例的实际演练，没有新增一套重复的持久测试夹具。
-
-需要独立进程恢复演练时，再使用双节点 README 中的显式门禁。上述验证不替代业务 schema 校验、目标部署容量或跨机器故障验收。
+测试覆盖值编码、集合规范化、参数绑定、真实 TCP Send/Call、名称与来源、连接恢复及关闭；入口与证据统一见 [验证矩阵](../validation/COVERAGE.md)。本指南中的本地示例和远程示例使用不同参数边界，不能把本地 Go struct/指针的传递能力视为跨进程支持。

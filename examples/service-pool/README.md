@@ -19,7 +19,7 @@ MainService 创建名为 `workers` 的池，配置两个独立成员、每成员
 
 调用者通过 Command 将结果交给 MainService 收集，这是本例的协调方式；实际业务调用者可直接消费 Call 返回值。结果收齐后 MainService Exit，并在 OnStop 通知宿主结束演示。两秒宿主预算只保护有限示例，业务应自行设置请求和资源的超时。
 
-代码按本地消息设计，返回普通 Go struct；扩展为 Cluster 调用时需按 Cluster 支持的编码类型定义边界参数与结果。事务、幂等、业务顺序和共享数据库连接池的并发安全由业务决定。池采用轮询单次选址，满载不自动改投或重试；完整语义见 [使用指南](../../docs/SERVICE-POOLS.md)。
+代码按本地消息设计，返回普通 Go struct；扩展为 Cluster 调用时需按 Cluster 支持的编码类型定义边界参数与结果。事务、幂等、业务顺序和共享数据库连接池的并发安全由业务决定。池采用轮询单次选址，满载不自动改投或重试；完整语义见 [使用指南](../../docs/guides/SERVICE-POOLS.md)。
 
 ```sh
 go test -race ./examples/service-pool -timeout=2m

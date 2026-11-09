@@ -19,4 +19,4 @@ Request Handler 的签名为 `func(gsr.CommandContext, sproto.Context, *c2s.Echo
 - 打包帧默认最多 1 MiB；编解码默认最多 8 MiB、深度 64、全结构字段与集合元素合计 100000，可通过 Config 显式设置有限预算。
 - 业务失败由该协议自己的 Response 表达。坏包、未知协议、Handler error 或遗漏响应由 HandleFrame 返回错误；协议不持有 Close，Agent 负责关闭连接并记录诊断，使客户端结束等待。不编码 Protobuf ErrorResponse，不透传内部错误作为业务回复。
 
-`Envelope`、Protobuf request_id 和 Core/Cluster Session 的语义保持独立。源码与 Go/TS 联调见 [WebSocket Echo](../../examples/websocket-gate/README.md)及 [接入计划](../../docs/SPROTO-INTEGRATION.md)。
+`Envelope`、Protobuf request_id 和 Core/Cluster Session 的语义保持独立。源码与 Go/TS 联调见 [WebSocket Echo](../../examples/websocket-gate/README.md)及 [接入计划](../../docs/guides/CLIENT-PROTOCOLS.md)。

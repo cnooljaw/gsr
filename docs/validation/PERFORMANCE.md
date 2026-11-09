@@ -1,15 +1,19 @@
-# 本地规模基线：2026-09-15
+# 历史性能测量
 
-测量代码版本：`78b58a0`。本轮只运行已有测试和 benchmark，没有修改调度、Timer 或消息实现。
+历史测量涵盖 2026-09-15 至 2026-10-01；各节标明代码、环境与计时边界。初始代码为 `78b58a0`，这些结果不代表当前服务池版本的性能，尤其名称查找锁路径已有变化。
 
-## 环境与口径
+数据按测量对象组织；日期与提交用于限定样本，不是执行进度。不同章节的单次样本不能直接计算性能提升。
+
+## 1. 环境、规模与基础调用
+
+### 环境与口径
 
 - Go 1.23.3，darwin/arm64；Go benchmark 报告 CPU 为 Apple M2，运行后缀为 `-8`。
 - 普通开发机的小样本测量，没有隔离其它进程负载，不使用 race 结果评价性能。
-- 保留 Go 构建缓存。benchmark 命令实际执行，不将缓存测试输出视为本轮测量。
-- 未采集 RSS、CPU 利用率、GC 暂停或 p95/p99，不给出生产容量承诺。
+- 保留 Go 构建缓存。benchmark 命令实际执行，不将缓存测试输出视为该样本测量。
+- 初始空闲规模/固定次数基准未采集 RSS、CPU、GC 或 p95/p99；后续章节的新增指标各自说明口径，不给出生产容量承诺。
 
-## 空闲规模测试
+### 空闲规模测试
 
 | 场景 | 创建/登记耗时 | 关闭耗时 | goroutine 增量 |
 | --- | ---: | ---: | ---: |
@@ -21,7 +25,7 @@ Service 使用空 Handler、MailboxCapacity=1；创建耗时包含 Runtime 初�
 
 Service 测试打印的 HeapAlloc 分别为 1,427,376 和 11,646,200 字节。这是采样时整个测试进程的 Go 堆用量，包含测试夹具及前序活动影响，不是单个 Runtime 的独占内存，也不是总进程内存；不能直接除以 Service 数量得出每 Service 内存成本。
 
-## 固定次数 benchmark
+### 固定次数 benchmark
 
 | 基准 | 迭代数 | ns/op | B/op | allocs/op |
 | --- | ---: | ---: | ---: | ---: |
@@ -38,9 +42,9 @@ Service 测试打印的 HeapAlloc 分别为 1,427,376 和 11,646,200 字节。�
 - SendHotService 只计时宿主 Runtime.Send 接纳，runner 同时消费，关闭不计时。MailboxCapacity=b.N+1，本次为 10,001；不代表默认队列容量、满载背压或端到端完成吞吐。
 - CallRoundTrip 包含宿主 Send 触发 caller、Service 内本地 Call 往返，以及测试 channel 通知，不是纯 Call 内部成本，也不是跨节点 Call 延迟。
 - B/op 是计时阶段内 Go 堆分配统计，不是常驻内存，也不完整体现 goroutine 栈和操作系统资源。
-- 3 次迭代仅作量级记录；本轮没有统计显著性分析，不据此宣称性能提升或回退。
+- 3 次迭代仅作量级记录；该样本没有统计显著性分析，不据此宣称性能提升或回退。
 
-## 复现命令
+### 复现命令
 
 ```sh
 go test ./runtime -run '^TestRuntimeScale(1000Services|10000Services|10000Timers)ReportsBaseline$' -bench '^BenchmarkRuntimeCreate(Services1000|Services10000|Timers10000)$' -benchtime=3x -benchmem -v -timeout=2m
@@ -49,15 +53,23 @@ go test ./runtime -run '^$' -bench '^BenchmarkRuntime(SendHotService|CallRoundTr
 
 固定消息次数避免现有 Send 基准的 MailboxCapacity 随自动校准次数增长到不必要的规模。这里不修改现有基准行为；未来若测真实背压，需另设固定容量的场景。
 
-## 当前结论与下一项
+### 本地 Call 基准复核与下一阶段入口
 
-在这台机器、这些空闲/空 Handler 场景下，10,000 规模的创建与关闭可以完成，未见初始化耗时上的明显阻塞；不能据此认定 10,000 个活跃业务 Service 的容量已经验收。
+2026-09-15 在 `2d13014` 运行已有 BenchmarkRuntimeCallRoundTrip，固定 10,000 次，结果为 1,496 ns/op、584 B/op、10 allocs/op。命令为：
 
-当前每个 Running Service 一个 runner、每个 Timer 一个等待 goroutine 的数量成本仍然存在。下一项有意义的测量应是固定 Mailbox 容量下的持续热点负载，分别观察接纳成功、队列满、实际处理数量和端到端延迟；再测 Timer 集中到期与日志开启后的影响。没有这些数据前，不据本轮小样本改 Scheduler 或引入集中 Timer loop，也不设未经业务确认的性能门槛。
+```sh
+go test ./runtime -run '^$' -bench '^BenchmarkRuntimeCallRoundTrip$' -benchtime=10000x -benchmem -timeout=1m
+```
 
-## 固定容量热点突发：2026-09-15 补充
+这只是本页早期同一基准的复核，不是新增行为覆盖，也不据 1,515 与 1,496 ns/op 的小样本差异宣称性能提升。计时包括宿主 Send、caller Handler 中的本地 Call、空目标 Handler 自动回复与测试 channel 通知；无日志、无网络、无业务计算。循环等待本次通知才发下一条，属于串行闭环，不是外部定速输入。MailboxCapacity=b.N+1，本次为 10,001，不能代替默认有界队列的背压验收。
 
-测量使用 `5e3aeb9` 的生产实现，加上本轮新增的 [热点测试](../runtime/hot_load_test.go)，未改变 Mailbox 或 Scheduler。环境与上文一致，未启用 race 的首轮输出如下：
+代表性业务负载需要明确 Send/Call 构成、Handler 成本、日志频率、持续时长与延迟/拒绝率门槛；现有混合 Send 样本见 [专项测量](MIXED-LOAD.md)。
+
+## 2. Send 与 Timer 突发
+
+### 固定容量热点突发：2026-09-15 补充
+
+测量使用 `5e3aeb9` 的生产实现，以及 [热点测试](../../runtime/hot_load_test.go)，未改变 Mailbox 或 Scheduler。环境与上文一致，未启用 race 的首轮输出如下：
 
 | Mailbox 容量 | 发送尝试 | 接纳成功 | 满载拒绝 | Handler 处理 | 发送阶段耗时 | 到达延迟 p50 / p95 / p99 / 最大 |
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
@@ -84,9 +96,9 @@ GSR_LOAD_TEST=1 go test -race ./runtime -run '^TestRuntimeHotMailboxLoad$' -time
 
 race 只验证夹具和运行链并发安全，不能将其耗时与上表比较。重复观测时应记录运行条件和全部样本，不挑选“最好的一次”。下一步仍需按目标业务节奏确定持续输入速率、Handler 成本与时长，再测稳态容量和尾延迟；不把固定突发测试包装成生产验收。
 
-## Timer 集中到期：2026-09-15 补充
+### Timer 集中到期：2026-09-15 补充
 
-测量使用 `180f697` 的生产实现，加上 [Timer 集中到期测试](../runtime/timer_burst_test.go)。在同一个 Service 的 OnStart 中登记 10,000 个 Timer，全部 Running/arm 后推进一次 fake clock，使它们共享的 deadline 到期。未启用 race 的首轮记录如下：
+测量使用 `180f697` 的生产实现，加上 [Timer 集中到期测试](../../runtime/timer_burst_test.go)。在同一个 Service 的 OnStart 中登记 10,000 个 Timer，全部 Running/arm 后推进一次 fake clock，使它们共享的 deadline 到期。未启用 race 的首轮记录如下：
 
 | Mailbox 容量 | 到期 | 接纳 | 满载拒绝 | Handler 处理 | 观察到全部投递完成 | 到达 p50 / p95 / p99 / 最大 |
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
@@ -111,38 +123,11 @@ GSR_LOAD_TEST=1 go test ./runtime -run '^TestRuntimeTimerBurstLoad$' -v -timeout
 GSR_LOAD_TEST=1 go test -race ./runtime -run '^TestRuntimeTimerBurstLoad$' -timeout=2m
 ```
 
-## 日志输出成本：2026-09-15 补充
+## 3. 定速输入与日志对照
 
-生产代码版本 `4d1aec0`，新增 [日志批量测试及基准](../logging/load_test.go)。同一 Apple M2 / Go 1.23.3 环境，固定每批 10,000 次 Info，单发送者、容量 1024，记录固定消息和两个小字段；每批重新创建 Logger，并将关闭排空计入计时。禁用模式使用 nil Logger，不创建后台写入者。
+### 暂定 10,000 条/秒输入：2026-09-15 补充
 
-| 模式 | 批次数 | 每批耗时 | 平均每次尝试 | 每批接纳 / 丢弃 / 禁用 | B/op（每批） | allocs/op（每批） |
-| --- | ---: | ---: | ---: | --- | ---: | ---: |
-| disabled | 3 | 0.184 ms | 18.43 ns | 0 / 0 / 10,000 | 78,224 | 9,748 |
-| io.Discard | 3 | 18.596 ms | 1,860 ns | 10,000 / 0 / 0 | 12,035,389 | 139,789 |
-| file | 3 | 21.928 ms | 2,193 ns | 10,000 / 0 / 0 | 12,037,693 | 139,804 |
-
-基准分开累计禁用、接纳和满载丢弃；Close 错误、WriteFailureCount 非零或计数不一致直接使测量失败，不把输出故障算作正常高吞吐。普通 TestLoggingBatchAccounting 用小批次验证文件行数等于接纳数，禁用不算接纳。
-
-解释边界：
-
-- io.Discard 仍执行调用处时间/位置采集、字段快照、JSON 编码、排队和后台消费，仅省去实际 I/O；不是禁用日志。
-- file 使用临时目录和正常文件写入，不 fsync，不能等同于可靠落盘延迟。每个 benchmark 子项独占目录，批次追加同一个文件；本次数据量不足以触发 100 MiB 滚动。
-- ns/attempt 是整批生命周期总时间除以尝试次数，不是单次 Info 的延迟分位数。若未来出现丢弃，必须结合接纳数量理解，不可直接换算为日志写入吞吐。
-- disabled 仍有调用侧字段构造及装箱成本；nil 入口不代表参数表达式不会执行，不据此新增 lazy callback 或另一套日志 API。
-- B/op 和 allocs/op 是每 10,000 次尝试的批次统计，不是每条日志。当前 JSON 快照存在明确分配成本；真实业务场景需要先测对象大小和日志频率，再决定是否值得优化。
-- 本次没有丢弃，只能说明此单发送者短批次没有观察到满载。没有测试多个 Service 同时记录、慢盘、日志滚动或 SLS 采集，更不能将两种输出的耗时差解释为纯磁盘成本。
-
-复现：
-
-```sh
-go test ./logging -run '^TestLoggingBatchAccounting$' -bench '^BenchmarkLoggingBatch$' -benchtime=3x -benchmem -v -timeout=2m
-```
-
-普通全仓测试覆盖计数夹具；benchmark 仅显式运行。本轮不改变 Logger 实现、默认容量或输出契约。
-
-## 暂定 10,000 条/秒输入：2026-09-15 补充
-
-用户暂定单进程 10,000 条消息/秒作为后续测量目标。生产版本 `737cd6b`，新增 [定速测试](../runtime/paced_load_test.go)，不改 Runtime。此时还没有业务 Handler 计算成本、消息分布、日志频率或延迟/拒绝率验收线。
+用户暂定单进程 10,000 条消息/秒作为后续测量目标。生产版本 `737cd6b`，新增 [定速测试](../../runtime/paced_load_test.go)，不改 Runtime。此时还没有业务 Handler 计算成本、消息分布、日志频率或延迟/拒绝率验收线。
 
 先采用单热点 Service 的最小场景：默认 Mailbox 容量 1024，单宿主发送者每 10ms 发送 100 条，共 1,000 批；Handler 只写采样结果、不记录日志。计数守恒和消息唯一性是测试断言，速率与延迟是观测结果，不预设未经裁决的性能门槛。
 
@@ -158,7 +143,7 @@ go test ./logging -run '^TestLoggingBatchAccounting$' -bench '^BenchmarkLoggingB
 | 到达 p50 / p95 / p99 | 16.875 / 49.625 / 189.083 μs |
 | 到达最大值 | 8.790 ms |
 
-生成器使用 Go ticker，可能受调度延迟和丢 tick 影响，不按累计欠额追赶补发；目标速率不能替代实际速率。本轮实际速率约为目标的 98.6%，只证明该实际输入下空 Handler 的运行链完成了全部消息，不能宣称严格达到 10,000 条/秒。
+生成器使用 Go ticker，可能受调度延迟和丢 tick 影响，不按累计欠额追赶补发；目标速率不能替代实际速率。该样本实际速率约为目标的 98.6%，只证明该实际输入下空 Handler 的运行链完成了全部消息，不能宣称严格达到 10,000 条/秒。
 
 每批是 100 条短突发，不是完全均匀的 100μs 间隔。延迟从每条 Send 前取时间戳到 Handler 观察，包含接纳和排队，不包含真实业务处理、数据库或网络。10 秒不是长期稳定性测试；单 Service 的热点压力也不代表 10,000 个活跃 Service 的整体资源成本。最大延迟明显高于 p99，应保留该数据，不用平均值掩盖调度抖动。
 
@@ -167,9 +152,9 @@ GSR_LOAD_TEST=1 go test ./runtime -run '^TestRuntimePaced10000Load$' -v -timeout
 GSR_LOAD_TEST=1 go test -race ./runtime -run '^TestRuntimePaced10000Load$' -timeout=1m
 ```
 
-默认跳过，显式负载开关启用；生成与等待处理共享 20 秒预算。成功接纳消息全部观察完才关闭 Runtime。race 用于检查同步，不用于容量比较。后续应增加业务成本和日志频率，并另行确定长时间及尾延迟验收线，不据本轮结果优化或更换 Scheduler。
+默认跳过，显式负载开关启用；生成与等待处理共享 20 秒预算。成功接纳消息全部观察完才关闭 Runtime。race 用于检查同步，不用于容量比较；业务成本、时长与尾延迟仍须单独确定。
 
-## 定速场景逐条文件日志对照：2026-09-15 补充
+### 定速场景逐条文件日志对照：2026-09-15 补充
 
 生产版本 `682b534`，扩展相同定速测试为 logging_disabled / file_per_message 两个顺序子项。每条已接纳业务消息在 Handler 中记录一条小字段 Info，Runtime 和业务共享 Logger；Mailbox 与日志队列均为默认 1024。记录到达 Handler 的延迟，同时记录执行日志调用后、写入测试采样 channel 前的观察延迟，均不代表日志已经落盘。
 
@@ -194,9 +179,9 @@ GSR_LOAD_TEST=1 go test -race ./runtime -run '^TestRuntimePaced10000Load$' -time
 
 容量结论：**本次两个子项都未达到暂定输入目标，文件模式还观察到业务接纳和日志丢弃，不是容量验收通过。** 测试 PASS 只表示行为与计数符合契约。关闭日志的最大延迟也超过半秒，且两项顺序运行、实际输入速率不同，尚不能分离主机负载/调度抖动、测试夹具与日志开销，不能把两列差值全部解释成日志的因果影响。
 
-本轮不重跑挑选更好的数值、不增大队列掩盖丢弃，也不据此改生产实现。下一步需要在负载可控的环境确认生成器实际输入和调度情况；逐条日志只是压力假设，不是用户已确定的业务日志频率。若容量验收要求每条业务消息都有不可丢日志，还需另行明确可靠性与背压语义，当前 Logger 是有界、非阻塞、可丢弃的诊断出口。
+逐条日志是压力假设，不是业务日志频率承诺；输入与调度需结合下一组观测解释。若容量验收要求每条业务消息都有不可丢日志，还需另行明确可靠性与背压语义，当前 Logger 是有界、非阻塞、可丢弃的诊断出口。
 
-## 输入生成器观测补充：2026-09-15
+### 输入生成器观测补充：2026-09-15
 
 生产代码版本 `c761ff7`，只在定速测试中增加观测，没有改变输入批次、队列容量、Logger 或 Scheduler。此次重跑的目的在于取得先前缺失的发送者唤醒、批次耗时和 GC 数据，不删除或覆盖上一节较差样本。
 
@@ -223,50 +208,11 @@ GSR_LOAD_TEST=1 go test -race ./runtime -run '^TestRuntimePaced10000Load$' -time
 - 根据相邻收到的 tick 时间戳，以 10ms 为间隔四舍五入估算跳过的间隔数；不计初始或最后未收到的 tick，不称为精确丢 tick 计数，更不是业务丢消息。
 - 批次耗时从开始执行 100 次 Send 到该批结束，包含调用和发送者被暂停的时间，不是纯 CPU 时间。
 - MemStats 在输入计时外采集前后值，GC 与 TotalAlloc 是该测试进程输入阶段的聚合数据，包含业务框架和测量夹具；不覆盖后续排空、文件扫描，也不能逐次对应某个延迟尖峰。
-- 新增观测本身有小额时间与分配开销，本轮不做采样前后性能提升百分比比较。
+- 新增观测本身有小额时间与分配开销，该样本不做采样前后性能提升百分比比较。
 
-结论：本轮接近暂定输入目标且无丢弃，上一节的严重抖动未复现。由于没有改变生产实现，不能宣称优化了性能，也不能倒推出上轮必然是磁盘、GC 或主机调度问题。当前 GC 暂停聚合值不支持将本轮全部尖峰简单解释为 stop-the-world，但不排除并发 GC、锁竞争或其它因素。若较差样本再次出现，需要同轮 trace/profile 才能进一步归因；一次较好观测仍不是生产容量或稳定性验收。
+结论：该样本接近暂定输入目标且无丢弃，上一节的严重抖动未复现。由于没有改变生产实现，不能宣称优化了性能，也不能倒推出先前样本必然是磁盘、GC 或主机调度问题。当前 GC 暂停聚合值不支持将该样本全部尖峰简单解释为 stop-the-world，但不排除并发 GC、锁竞争或其它因素。若较差样本再次出现，需要同轮 trace/profile 才能进一步归因；一次较好观测仍不是生产容量或稳定性验收。
 
-## 定速抖动的同轮 trace 采集
-
-直接使用 Go 自带的 `go test -trace`，不增加生产观测开关或测试配置层。默认测试不采集 trace；需要诊断时，从仓库根目录选择一个子项运行，避免把两个场景混在同一份轨迹里：
-
-```sh
-trace_dir=$(mktemp -d "${TMPDIR:-/tmp}/gsr-paced-trace.XXXXXX")
-GSR_LOAD_TEST=1 go test ./runtime \
-  -run '^TestRuntimePaced10000Load$/^file_per_message$' \
-  -trace="$trace_dir/file.trace" -o "$trace_dir/runtime.test" \
-  -v -timeout=1m
-go tool trace -http=127.0.0.1:6060 "$trace_dir/file.trace"
-```
-
-最后一条命令启动本机查看器，检查后用 Ctrl+C 退出。关闭日志对照项将子项名替换成 `logging_disabled`，另建临时目录保留独立样本。`-o` 将测试二进制也放入临时目录，避免污染工作树；trace 文件需要保留到分析完成，不能依赖临时目录长期保存。
-
-排查时保留同一轮完整测试输出、trace、提交号、Go 版本及主机负载情况：
-
-1. 先检查实际输入速率、拒绝/丢弃计数与生成器唤醒、批次指标，不把测试 PASS 等同于容量 PASS。
-2. 在轨迹中查看测试发送者、Service runner 和 Logger writer 的运行与等待区间，区分 runnable 等待调度、channel/锁等待、系统调用及 GC 暂停。正常 ticker 等待和空闲 writer 等待不是瓶颈。
-3. 必须在同一时间区间看到证据才能归因；目前聚合分位数没有逐条消息的 trace 标记，不声称能精确定位每个业务样本。没有异常的轨迹不能解释之前未采集的异常。
-4. trace 本身增加开销，这轮只用于诊断，不与未采集的基线直接计算性能变化。先做这一项，不同时叠加 race、CPU 和锁 profile；需要额外证据时再单独采集。
-
-2026-09-15 已以 `41a8564` 验证文件日志子项的采集，并用 `go tool trace -d=1` 完整解析轨迹。测试接纳/处理 100,000 条，输出 100,000 行日志，拒绝与丢弃均为零；实际输入约 9,999 条/秒，到达 p99 约 601μs、最大约 7.36ms。此为诊断入口验证，未复现先前严重抖动，不新增生产容量结论。没有修改 Go 代码，因此本切片不重复执行全仓测试与 race。
-
-## 多生产者文件日志突发：2026-09-15
-
-生产版本 `075602e`，新增 TestLoggerConcurrentFileLoad；8 个测试生产者共享一个 Logger 和临时日志目录，分别绑定不同 Service 标识，每个连续尝试 12,500 条小字段 Info。使用默认队列容量 1024，不限速、不重试、不增容。它测量并发日志入口，不创建真实 Service，也不是每秒 10,000 条的定速业务场景。
-
-首轮非 race 结果：100,000 次尝试，97,097 条接纳并写入，2,903 条队列满载丢弃；生产者输入阶段 199.055ms，输入结束后关闭排空 2.608ms。文件扫描在计时之外；测试夹具的接纳表写入包含在输入阶段。短突发完成时间不能直接外推持续吞吐，临时文件仍是缓存写入，不覆盖 fsync、滚动或慢盘。
-
-测试逐条解码实际文件，检查序号连续递增、来源及操作编号有效、每条接纳日志恰好出现一次、被拒日志不出现、没有遗漏，并核对文件行数 + 丢弃数 = 尝试数、DroppedCount 一致、WriteFailureCount 为零。跨生产者先后以 Logger 入队序号为准，不要求按生产者编号或调用时间排序。允许满载是当前契约，测试 PASS 不是零丢日志承诺。
-
-```sh
-GSR_LOAD_TEST=1 go test ./logging -run '^TestLoggerConcurrentFileLoad$' -v -timeout=2m
-GSR_LOAD_TEST=1 go test -race ./logging -run '^TestLoggerConcurrentFileLoad$' -timeout=2m
-```
-
-默认跳过此压力项；已有小规模并发顺序测试仍属于默认门禁。本切片没有修改生产日志代码。
-
-## 多 Service 定速共享日志：2026-09-15
+### 多 Service 定速共享日志：2026-09-15
 
 生产版本 `b5eb9cf`，新增 TestRuntimePacedMultiServiceLoad，复用定速夹具但创建 8 个真实 Service，各有自己的 runner 和默认容量 1024 的 Mailbox，共享默认容量 1024 的文件 Logger。单宿主发送者每 10ms 投入 100 条，按操作编号轮流选择目标；目标是**总量** 10,000 条/秒，不是每个 Service 一万条。Handler 每条记一行日志，无额外业务计算，不覆盖 Service 内 Send/Call。
 
@@ -294,21 +240,83 @@ GSR_LOAD_TEST=1 go test ./runtime -run '^TestRuntimePacedMultiServiceLoad$' -v -
 GSR_LOAD_TEST=1 go test -race ./runtime -run '^TestRuntimePaced' -timeout=2m
 ```
 
-本轮证明这个短时实际输入下多个 runner 能共享日志且计数守恒，不代表严格达到目标、长期稳定性或真实业务容量验收。8 个 Mailbox 的总容量高于单热点场景，不用两轮结果直接证明并行加速；GC/分配仍包含测试采样成本。本切片只改测试，不改生产代码或 API。
+该样本证明这个短时实际输入下多个 runner 能共享日志且计数守恒，不代表严格达到目标、长期稳定性或真实业务容量验收。8 个 Mailbox 的总容量高于单热点场景，不用两轮结果直接证明并行加速；GC/分配仍包含测试采样成本。
 
-## 本地 Call 基准复核与下一阶段入口
+## 4. 日志入口基准
 
-2026-09-15 在 `2d13014` 运行已有 BenchmarkRuntimeCallRoundTrip，固定 10,000 次，结果为 1,496 ns/op、584 B/op、10 allocs/op。命令为：
+### 日志输出成本：2026-09-15 补充
+
+生产代码版本 `4d1aec0`，新增 [日志批量测试及基准](../../logging/load_test.go)。同一 Apple M2 / Go 1.23.3 环境，固定每批 10,000 次 Info，单发送者、容量 1024，记录固定消息和两个小字段；每批重新创建 Logger，并将关闭排空计入计时。禁用模式使用 nil Logger，不创建后台写入者。
+
+| 模式 | 批次数 | 每批耗时 | 平均每次尝试 | 每批接纳 / 丢弃 / 禁用 | B/op（每批） | allocs/op（每批） |
+| --- | ---: | ---: | ---: | --- | ---: | ---: |
+| disabled | 3 | 0.184 ms | 18.43 ns | 0 / 0 / 10,000 | 78,224 | 9,748 |
+| io.Discard | 3 | 18.596 ms | 1,860 ns | 10,000 / 0 / 0 | 12,035,389 | 139,789 |
+| file | 3 | 21.928 ms | 2,193 ns | 10,000 / 0 / 0 | 12,037,693 | 139,804 |
+
+基准分开累计禁用、接纳和满载丢弃；Close 错误、WriteFailureCount 非零或计数不一致直接使测量失败，不把输出故障算作正常高吞吐。普通 TestLoggingBatchAccounting 用小批次验证文件行数等于接纳数，禁用不算接纳。
+
+解释边界：
+
+- io.Discard 仍执行调用处时间/位置采集、字段快照、JSON 编码、排队和后台消费，仅省去实际 I/O；不是禁用日志。
+- file 使用临时目录和正常文件写入，不 fsync，不能等同于可靠落盘延迟。每个 benchmark 子项独占目录，批次追加同一个文件；本次数据量不足以触发 100 MiB 滚动。
+- ns/attempt 是整批生命周期总时间除以尝试次数，不是单次 Info 的延迟分位数。若未来出现丢弃，必须结合接纳数量理解，不可直接换算为日志写入吞吐。
+- disabled 仍有调用侧字段构造及装箱成本；nil 入口不代表参数表达式不会执行，不据此新增 lazy callback 或另一套日志 API。
+- B/op 和 allocs/op 是每 10,000 次尝试的批次统计，不是每条日志。当前 JSON 快照存在明确分配成本；真实业务场景需要先测对象大小和日志频率，再决定是否值得优化。
+- 本次没有丢弃，只能说明此单发送者短批次没有观察到满载。没有测试多个 Service 同时记录、慢盘、日志滚动或 SLS 采集，更不能将两种输出的耗时差解释为纯磁盘成本。
+
+复现：
 
 ```sh
-go test ./runtime -run '^$' -bench '^BenchmarkRuntimeCallRoundTrip$' -benchtime=10000x -benchmem -timeout=1m
+go test ./logging -run '^TestLoggingBatchAccounting$' -bench '^BenchmarkLoggingBatch$' -benchtime=3x -benchmem -v -timeout=2m
 ```
 
-这只是本页早期同一基准的复核，不是新增行为覆盖，也不据 1,515 与 1,496 ns/op 的小样本差异宣称性能提升。计时包括宿主 Send、caller Handler 中的本地 Call、空目标 Handler 自动回复与测试 channel 通知；无日志、无网络、无业务计算。循环等待本次通知才发下一条，属于串行闭环，不是外部定速输入。MailboxCapacity=b.N+1，本次为 10,001，不能代替默认有界队列的背压验收。
+benchmark 需显式运行；计数夹具由普通测试覆盖。
 
-下一阶段不继续用同类空 Handler 样本推导生产容量。先由应用确定暂定 10,000 条/秒是哪些操作的总量，以及本地 Send、本地 Call、跨节点 Send/Call 的构成；未裁决前不假设比例或将四种操作视为等价。随后再确定 Handler 业务成本、日志频率、持续时长及延迟/拒绝率门槛，建立代表性场景。当前数据只用于基础机制与量级参考。
+### 多生产者文件日志突发：2026-09-15
 
-## 应用层 Dispatcher 小基准：2026-09-30
+生产版本 `075602e`，新增 TestLoggerConcurrentFileLoad；8 个测试生产者共享一个 Logger 和临时日志目录，分别绑定不同 Service 标识，每个连续尝试 12,500 条小字段 Info。使用默认队列容量 1024，不限速、不重试、不增容。它测量并发日志入口，不创建真实 Service，也不是每秒 10,000 条的定速业务场景。
+
+首轮非 race 结果：100,000 次尝试，97,097 条接纳并写入，2,903 条队列满载丢弃；生产者输入阶段 199.055ms，输入结束后关闭排空 2.608ms。文件扫描在计时之外；测试夹具的接纳表写入包含在输入阶段。短突发完成时间不能直接外推持续吞吐，临时文件仍是缓存写入，不覆盖 fsync、滚动或慢盘。
+
+测试逐条解码实际文件，检查序号连续递增、来源及操作编号有效、每条接纳日志恰好出现一次、被拒日志不出现、没有遗漏，并核对文件行数 + 丢弃数 = 尝试数、DroppedCount 一致、WriteFailureCount 为零。跨生产者先后以 Logger 入队序号为准，不要求按生产者编号或调用时间排序。允许满载是当前契约，测试 PASS 不是零丢日志承诺。
+
+```sh
+GSR_LOAD_TEST=1 go test ./logging -run '^TestLoggerConcurrentFileLoad$' -v -timeout=2m
+GSR_LOAD_TEST=1 go test -race ./logging -run '^TestLoggerConcurrentFileLoad$' -timeout=2m
+```
+
+默认跳过此压力项；已有小规模并发顺序测试仍属于默认门禁。本切片没有修改生产日志代码。
+
+## 5. trace 诊断方法
+
+### 定速抖动的同轮 trace 采集
+
+直接使用 Go 自带的 `go test -trace`，不增加生产观测开关或测试配置层。默认测试不采集 trace；需要诊断时，从仓库根目录选择一个子项运行，避免把两个场景混在同一份轨迹里：
+
+```sh
+trace_dir=$(mktemp -d "${TMPDIR:-/tmp}/gsr-paced-trace.XXXXXX")
+GSR_LOAD_TEST=1 go test ./runtime \
+  -run '^TestRuntimePaced10000Load$/^file_per_message$' \
+  -trace="$trace_dir/file.trace" -o "$trace_dir/runtime.test" \
+  -v -timeout=1m
+go tool trace -http=127.0.0.1:6060 "$trace_dir/file.trace"
+```
+
+最后一条命令启动本机查看器，检查后用 Ctrl+C 退出。关闭日志对照项将子项名替换成 `logging_disabled`，另建临时目录保留独立样本。`-o` 将测试二进制也放入临时目录，避免污染工作树；trace 文件需要保留到分析完成，不能依赖临时目录长期保存。
+
+排查时保留同一轮完整测试输出、trace、提交号、Go 版本及主机负载情况：
+
+1. 先检查实际输入速率、拒绝/丢弃计数与生成器唤醒、批次指标，不把测试 PASS 等同于容量 PASS。
+2. 在轨迹中查看测试发送者、Service runner 和 Logger writer 的运行与等待区间，区分 runnable 等待调度、channel/锁等待、系统调用及 GC 暂停。正常 ticker 等待和空闲 writer 等待不是瓶颈。
+3. 必须在同一时间区间看到证据才能归因；目前聚合分位数没有逐条消息的 trace 标记，不声称能精确定位每个业务样本。没有异常的轨迹不能解释之前未采集的异常。
+4. trace 本身增加开销，这轮只用于诊断，不与未采集的基线直接计算性能变化。先做这一项，不同时叠加 race、CPU 和锁 profile；需要额外证据时再单独采集。
+
+2026-09-15 已以 `41a8564` 验证文件日志子项的采集，并用 `go tool trace -d=1` 完整解析轨迹。测试接纳/处理 100,000 条，输出 100,000 行日志，拒绝与丢弃均为零；实际输入约 9,999 条/秒，到达 p99 约 601μs、最大约 7.36ms。此为诊断入口验证，未复现先前严重抖动，不新增生产容量结论。
+
+## 6. 应用分发与名称查找
+
+### 应用层 Dispatcher 小基准：2026-09-30
 
 本次应用层 `gsr.Dispatcher` 切片，Go 1.24.13、darwin/arm64、Apple M2：已构造命令表，一个 `int` 参数、一个 `int` 返回值、无业务计算和 Runtime/网络路径。运行 `go test . -run '^$' -bench '^BenchmarkDispatcher$' -benchmem -benchtime=2s`，单次结果为 699.6 ns/op、152 B/op、6 allocs/op。构造阶段反射校验不计入；运行阶段包含命令查找、参数绑定和 `reflect.Call`。这是小样本量级，不与本页 Go 1.23.3 的完整 Send/Call 基准直接比较，也不证明生产 Handler 延迟或容量。真实压测若证实个别热点 Command 受反射影响，其 Service 可手写该命令的快速分支，其余命令继续交给 Dispatcher。
 
@@ -321,7 +329,7 @@ go test ./runtime -run '^$' -bench '^BenchmarkRuntimeCallRoundTrip$' -benchtime=
 
 复现命令：`go test . -run '^$' -bench '^BenchmarkDispatcher($|HotOverride$)' -benchmem -benchtime=2s`。手写分支在这种极轻的单条消息基准中明显便宜，但未包含 Mailbox、runner、业务计算、I/O、日志或 GC 全局开销，也不能据此要求所有 Service 放弃默认 Dispatcher。是否为真实热点手写分支，仍须先在代表性负载中证明分发占比，再用相同负载确认端到端收益。
 
-## 应用名称查找小基准：2026-10-01
+### 应用名称查找小基准：2026-10-01
 
 在 `6a299c7` 基础上新增 `BenchmarkServiceNameResolve`；Go 1.24.13、darwin/arm64、Apple M2。预先注册名称后，只计量应用名称表的查找，不包含 Send/Call、Mailbox、网络或 Handler。单次运行结果：
 
@@ -332,4 +340,4 @@ go test ./runtime -run '^$' -bench '^BenchmarkRuntimeCallRoundTrip$' -benchtime=
 | 10,000 | 串行 | 28.18 | 0 | 0 |
 | 10,000 | 并行 | 86.59 | 0 | 0 |
 
-复现命令：`go test . -run '^$' -bench '^BenchmarkServiceNameResolve$' -benchtime=500ms -benchmem -count=1`。并行项使用 Go benchmark 的 `RunParallel`，不是端到端并发 Service 负载。当前量级不支持为了查找再增加缓存或额外索引；如将来真实负载显示名称锁成为热点，应先用 profile 确认。
+复现命令：`go test . -run '^$' -bench '^BenchmarkServiceNameResolve$' -benchtime=500ms -benchmem `。并行项使用 Go benchmark 的 `RunParallel`，不是端到端并发 Service 负载。这些数值只属于所列历史实现；当前名称锁包含池路由，需用当前代码重新测量才能判断成本。

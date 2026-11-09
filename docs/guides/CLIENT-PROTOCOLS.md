@@ -1,6 +1,15 @@
 # Protobuf / Sproto 接入指南
 
-Gate只处理不透明字节、连接和认证，Agent选择业务协议。Protobuf和Sproto保留各自模型，不增加公共Envelope或万能Codec。架构边界见 [ADR 0013](adr/0013-client-protocol-boundaries.md)。
+Gate只处理不透明字节、连接和认证，Agent选择业务协议。Protobuf和Sproto保留各自模型，不增加公共Envelope或万能Codec。架构边界见 [ADR 0013](../adr/0013-client-protocol-boundaries.md)。
+
+## 选择协议与接线
+
+| 协议 | GSR 包与模型 | 接入入口 |
+| --- | --- | --- |
+| Protobuf | `protocol`：Envelope、生成 Registry、Request/Response 与 Notify/Push | [协议包说明](../../protocol/README.md) |
+| Sproto | `protocol/sproto`：原生 package(type/session)、C2S/S2C schema、独立 Dispatcher | [Sproto 包说明](../../protocol/sproto/README.md) |
+
+MainService 创建 Gate，NewAgent 为每连接返回一个独立业务 Agent。Agent 组合 ClientSession 和所选 Dispatcher，在 HandleClientMessage 内分发；普通 Command 仍经显式 Handle。两类消息共用该 Agent 的串行执行，连接与安全模式由 Gate 管理。完整可运行链见 [WebSocket 示例](../../examples/websocket-gate/README.md)。
 
 ## 依赖与职责
 
@@ -8,11 +17,11 @@ Go通过 `github.com/cnooljaw/gosproto v1.0.1` 正式依赖接入，不在GSR维
 
 `protocol/sproto` 负责GSR Dispatcher、Context、业务错误与字节发送窄接口。Agent组合Gate连接与Dispatcher；连接归Gate，协议层不拥有网络生命周期。
 
-TypeScript单文件权威源码、官方兼容测试、通用Go/TS/PB基准和优化文档已迁至 [cnooljaw/gosproto](https://github.com/cnooljaw/gosproto)。本地工作目录为同级gosproto；根README和 `benchmarks/README.md` 是维护入口。GSR只保留Node客户端示例及消费副本。独立仓库迁移已本地提交为 `ae956fe`，本示例消费副本已记录该提交，后续协议库工作从独立项目继续。
+TypeScript单文件权威源码、官方兼容测试、通用Go/TS/PB基准和优化文档已迁至 [cnooljaw/gosproto](https://github.com/cnooljaw/gosproto)。根 README 和 `benchmarks/README.md` 是维护入口。GSR只保留Node客户端示例及消费副本。消费副本的具体来源以其指纹文件为准。
 
-## Echo 接线
+## Sproto 支持边界
 
-完整实现见 [Sproto包](../protocol/sproto/README.md) 和 [WebSocket示例](../examples/websocket-gate/README.md#sproto-联调)。MainService创建Gate，Agent持有客户端连接和Sproto Dispatcher；MainService退出不停止Gate或Agent。SecurityMode独立选择MAC/Plain。
+完整实现见 [Sproto包](../../protocol/sproto/README.md) 和 [WebSocket示例](../../examples/websocket-gate/README.md#sproto-联调)。MainService创建Gate，Agent持有客户端连接和Sproto Dispatcher；MainService退出不停止Gate或Agent。SecurityMode独立选择MAC/Plain。
 
 接入支持Request/Response、Notify/Push、session关联及业务错误；服务端主动请求客户端并等待Response不在首版Dispatcher范围。
 

@@ -15,7 +15,7 @@
 2. `CONTEXT.md`：稳定术语及其准确含义。
 3. `docs/API-DESIGN.md`：公开 API、Runtime 边界和 Skynet 风格原则。
 4. `docs/adr/`：难以逆转的设计裁决及其取舍。
-5. `docs/GO-CODE-STYLE.md`：Go 编码规则与评审标准。
+5. `docs/development/GO-CODE-STYLE.md`：Go 编码规则与评审标准。
 6. 测试：已经落地的行为契约。
 7. 实现：在文档未覆盖处提供当前行为证据，但不能替代设计裁决。
 
@@ -33,9 +33,9 @@
 - 修改范围必须能够追溯到当前任务；不顺手重构无关代码。
 - 框架内部组件之间必须成立的不变量由构造器建立并保证，不要求业务调用方手工组装关联后再由运行时检查；业务仍负责输入、资源所有权和生命周期契约。
 - Gate 负责有界、顺序、失败可观察地收发不透明字节消息，Protocol 负责消息编解码、校验和分发，业务 Agent 是二者的组合点。`gate/` 与 `protocol/` 同级且生产代码互不依赖；Gate 不导入 Protobuf、不解释 Envelope，连接能力只提供 `Send([]byte)` / `Close()`。Protocol 只依赖字节发送窄接口，不拥有连接。Send 成功只代表本地接纳，不保证送达、业务执行或执行一次；Gate 接纳时复制字节快照。详见 API 文档的“Gate 与 Protocol 边界”。
-- Gate 的 SecurityMode 只控制握手与传输认证，业务协议由 Agent 选择；Protobuf 与 Sproto 保留独立模型，不增加公共 Envelope 或万能协议接口。见 [ADR 0013](docs/adr/0013-client-protocol-boundaries.md)及 [Sproto 接入计划](docs/SPROTO-INTEGRATION.md)。
+- Gate 的 SecurityMode 只控制握手与传输认证，业务协议由 Agent 选择；Protobuf 与 Sproto 保留独立模型，不增加公共 Envelope 或万能协议接口。见 [ADR 0013](docs/adr/0013-client-protocol-boundaries.md)及 [客户端协议接入](docs/guides/CLIENT-PROTOCOLS.md)。
 - 公开 API 或架构边界发生变化时，同步更新 `docs/API-DESIGN.md`。
-- 新增或修改 Go 代码必须遵守 `docs/GO-CODE-STYLE.md`。
+- 新增或修改 Go 代码必须遵守 `docs/development/GO-CODE-STYLE.md`。
 - Sproto编解码权威实现、通用Go/TS/PB基准和性能文档在独立 `gosproto` 仓库维护；本仓只保留接入层、网络集成及带来源指纹的TS副本。副本通过 `examples/websocket-gate/scripts/sync-sproto.mjs` 同步，不在vendor内独立优化；浏览器/Laya/Cocos兼容性仍为待办。
 - 形成稳定的新设计结论时写入相关文档；较大的取舍可新增 ADR 或 RFC，不把 `AGENTS.md` 扩写成架构百科。
 - 默认不为旧参考项目提供兼容层、迁移别名或废弃 API，除非用户明确提出兼容需求。
@@ -114,4 +114,4 @@
 - 只有用户明确说“commit/提交”后，Agent 才能整理本次任务所属文件、暂存、复核暂存 diff 并创建提交。若存在归属不明或用户自己的改动，先停下确认，不替用户决定。
 - 用户只说“审查/审核/看看 diff”不等于授权提交；“提交”默认指本地 `git commit`，推送远端必须另行明确说明。
 - 创建提交前必须至少检查 `git status --short`、`git diff --check` 和 `git diff --cached --check`；提交后汇报提交 hash、提交内容和工作树状态。
-- 具体命令和角色边界见 [`docs/DEVELOPMENT-WORKFLOW.md`](docs/DEVELOPMENT-WORKFLOW.md)。
+- 具体命令和角色边界见 [`docs/development/WORKFLOW.md`](docs/development/WORKFLOW.md)。

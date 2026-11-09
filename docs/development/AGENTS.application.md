@@ -14,7 +14,7 @@
 - `docs/ARCHITECTURE.md`：状态 owner、Service 划分、节点与资源职责。
 - `docs/GSR-INTEGRATION.md`：依赖版本、已采用的 GSR 能力、配置和部署约束。
 - `docs/PROTOCOL.md`：Command、客户端消息、参数、返回值与错误代码。
-- `docs/GO-CODE-STYLE.md`：本项目采用的 Go 编码规范。
+- `docs/development/GO-CODE-STYLE.md`：本项目采用的 Go 编码规范。
 - 文档尚不存在时，按当前功能建立必要契约，不用假定的设计填充完整架构。
 
 GSR 参考契约按依赖版本阅读；以下链接固定到 v1.0.2 标签。使用 v1.0.0 时不照搬新版入口：

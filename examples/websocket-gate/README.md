@@ -177,7 +177,7 @@ SPROTODUMP_DIR=/path/to/sprotodump npm run generate:sproto
 
 生成文件已包含在示例中，普通运行不需要 Lua。脚本规范模块导入、来源路径和工具添加的协议名前缀，并剔除 gosproto v0.3.0 已移除的 MethodName 方法绑定字段，不另建 generator。TS 加载同一份 schema；参考源码来源、许可证与本地修正见 `client/src/vendor/`。当前 TS 客户端面向扁平 Echo schema，支持安全整数、字符串、session 与 Push，限制 pending/报文/字符串；它不是包含 map、double 或 BigInt 的通用客户端 SDK。
 
-阅读 [`sproto_agent.go`](cmd/debugserver/sproto_agent.go) 及 [Sproto Dispatcher](../../protocol/sproto/README.md)。Go 编码器完整支持范围和官方对照证据见 [双协议指南](../../docs/SPROTO-INTEGRATION.md)。
+阅读 [`sproto_agent.go`](cmd/debugserver/sproto_agent.go) 及 [Sproto Dispatcher](../../protocol/sproto/README.md)。Go 编码器完整支持范围和官方对照证据见 [双协议指南](../../docs/guides/CLIENT-PROTOCOLS.md)。
 
 ## 编解码实现与 Benchmark
 

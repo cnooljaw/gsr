@@ -1,62 +1,56 @@
 # GSR 文档
 
-本目录记录 `gsr` 当前设计。项目按新实现推进，兄弟目录中的旧工程和 Skynet 源码只用于比较与学习，不构成本项目的兼容契约。
+GSR 是 Go 游戏服务器 Service Runtime。已发布版本为 **v1.0.2**；当前工作树另外提供尚未发布的有界 Service 池。固定依赖接入时使用对应标签的文档，不能把开发分支 API 当成已发布能力。
 
-当前版本为 GSR 1.0.2，处于正式内部发布阶段。版本变化与迁移见 [1.0.2 发布说明](RELEASE-1.0.2.md)，最初的接入范围见 [1.0 内部发布说明](RELEASE-1.0.md)。初次接入也可从根目录 [README](../README.md) 开始。
+## 1. 运行与接入
 
-v1.0.1 入口已按 [ADR 0012](adr/0012-node-capabilities-and-service-logging.md) 调整，与 v1.0.0 源码不兼容；旧版代码和文档保留在原标签。
+建议按以下顺序阅读：
 
-## 阅读顺序
+1. [项目简介与快速开始](../README.md)：运行最小 Counter 示例。
+2. [独立业务项目开发指南](guides/APPLICATION.md)：依赖版本、项目结构、MainService 和状态归属。
+3. [Cluster 调用指南](guides/CLUSTER.md)：双节点、参数编码、返回值与错误。
+4. [客户端协议接入](guides/CLIENT-PROTOCOLS.md)：Protobuf / Sproto、Agent 和 TS 副本同步。
+5. [Service 池](guides/SERVICE-POOLS.md)：固定并行成员、普通 Call、容量与失败语义；尚未发布。
 
-客户端接入见 [WebSocket Gate、客户端协议与 Agent](RFC-WEBSOCKET-GATE.md)：WSS、固定 33 字节二进制握手、Protobuf Envelope（msg_id、uint32 request_id、payload）、X25519/HKDF 上行 MAC，以及请求/响应/通知/推送独立编号；首版不实现旧头兼容或 DES。生产 Gate 的完整验收仍按 RFC 的失败矩阵和压力计划推进。
+| 场景 | 可运行示例 |
+| --- | --- |
+| 本地 Send/Call、名称与退出 | [Counter](../examples/counter/README.md) |
+| 跨节点调用、停机与恢复 | [双节点](../examples/twonode/README.md) |
+| 多调用者访问同一服务池 | [Service 池](../examples/service-pool/README.md) |
+| WebSocket、协议与连接 Agent | [WebSocket Echo](../examples/websocket-gate/README.md) |
+| HTTP 管理入口 / 出站调用 | [入站](../examples/http-inbound/README.md)、[出站](../examples/http-outbound/README.md) |
+| 外部数据资源 | [Redis](../examples/redis-user-cache/README.md)、[MySQL](../examples/mysql-product/README.md) |
 
-默认业务入口是 `gsr.Run + MainService`：宿主管运行与停机，MainService 用 `self` 创建、命名和调用其它 Service。具体裁决见 [ADR 0011：以 Service 为中心的应用入口与统一 Command](adr/0011-service-first-application-api.md) 和 [双节点示例](../examples/twonode/README.md)：gsr.Run 启动 MainService，业务通过 self.Cluster() 通信，不需要 Host。
+## 2. 理解契约与设计
 
-初次运行先看 [最小 CounterService 示例](../examples/counter/README.md)，只涉及本地 Service、Send、Call 和关闭。
+先查 [术语](../CONTEXT.md) 和 [API 契约](API-DESIGN.md)，再按问题查看具体设计：
 
-在另一个仓库开发业务时，从 [独立业务项目开发指南](APPLICATION-DEVELOPMENT.md) 和 [业务项目 AGENTS.md 模板](templates/AGENTS.application.md) 开始，固定 GSR 依赖版本并明确业务状态、协议和资源 owner。
+- [Cluster](design/CLUSTER.md)：组装、连接归属、背压、关闭及诊断。
+- [Gate 与客户端协议](design/GATE-PROTOCOL.md)：字节边界、握手、认证、协议分发与连接生命周期。
+- [日志](design/LOGGING.md)：共享 FIFO、快照、有界队列、文件滚动和失败状态。
+- [Runtime 诊断](design/RUNTIME-DIAGNOSTICS.md)：Handler 事件、截断、丢弃与关闭。
+- [Skynet 对照](design/SKYNET-COMPARISON.md)：概念及运行机制差异。
+- [设计裁决索引](adr/README.md)：已接受的取舍及后续替代关系。
 
-1. [项目术语](../CONTEXT.md)：ServiceID、NodeID、Message、ClusterEnvelope、Session、Source 和 Revision 的准确含义。
-2. [API 设计规范](API-DESIGN.md)：Runtime 边界、消息管道、Cluster API 和 Skynet 风格。
-3. [ADR 0001](adr/0001-local-service-id-and-cluster-routing.md)：Runtime 局部 ServiceID、Cluster 路由及 Source 绑定的裁决。
-4. [ADR 0002](adr/0002-message-ownership-and-call-semantics.md)：未编码参数所有权、同步 Call 与 Reply completion 的裁决。
-5. [ADR 0003](adr/0003-bounded-admission-and-send-contract.md)：有界 Mailbox/队列与 Send 接受语义的裁决。
-6. [ADR 0004](adr/0004-service-runner-lifecycle-and-timer.md)：per-Service runner、动态创建、停止策略与 Timer 的裁决。
-7. [ADR 0005](adr/0005-cluster-wire-and-connections.md)：Cluster wire、codec、NodeSender、入站连接 owner 和重连策略的裁决。
-8. [ADR 0006](adr/0006-runtime-ids-and-reply-errors.md)：uint64 运行期 ID 与结构化 Reply error 的裁决。
-9. [ADR 0007](adr/0007-command-context-call-and-timeout-stop.md)：CommandContext、Call 最大等待时间、启动期自身消息和无法强杀任务的裁决。
-10. [ADR 0008](adr/0008-runtime-component-lifecycle.md)：Runtime 组件生命周期、启动回滚与 Core/Cluster 关闭顺序的裁决。
-11. [ADR 0009](adr/0009-controlled-redirect-and-source.md)：受控 Redirect/Relay、Source 来源和 Call 代理边界的裁决。
-12. [GSR 与 Skynet 概念对照表](SKYNET-COMPARISON.md)：本项目术语、Skynet 对应机制及有意不照搬的边界。
-13. [实现路线图](IMPLEMENTATION-PLAN.md)：Core、Cluster、参考实现使用方式、纵向切片和每阶段验证范围。
-14. [开发、审查与提交工作流](DEVELOPMENT-WORKFLOW.md)：单人单分支下的修改、测试、diff 审查和提交授权边界。
-15. [Go 编码规范](GO-CODE-STYLE.md)：代码结构、错误、并发、接口、配置和评审门禁。
-16. [统一 FIFO 日志服务](RFC-LOGGING.md)：记录处采集时间位置、共享队列顺序、终端和滚动文件输出、故障与最后关闭；外部 SLS 采集待部署验证。
-17. [当前阶段验证清单](VALIDATION-STATUS.md)：已覆盖运行链、测试证据、当前验证结果与尚未验收的范围。
-18. [最小双进程示例](../examples/twonode/README.md)：独立配置与日志目录、Send/Call、停机与恢复演练。
-19. [本地规模基线](PERFORMANCE-BASELINE.md)：10,000 Service/Timer 与 Send/Call 测量结果、复现命令及口径限制。
-20. [GSR 1.0 内部发布说明](RELEASE-1.0.md)：版本、代码基线、发布范围、接入边界和发布前验证结果。
-21. [Cluster 节点间调用教程](CLUSTER-CALL-TUTORIAL.md)：双节点启动、Send/Call、参数与返回值类型、集合规范化、错误及测试覆盖。
-22. [独立业务项目开发指南](APPLICATION-DEVELOPMENT.md)：依赖版本、项目布局、可运行 Service 骨架、所有权/生命周期、接入与验证，以及 AGENTS.md 模板。
-23. [ADR 0012：节点组装与 Service 日志入口](adr/0012-node-capabilities-and-service-logging.md)：作用范围、资源归属、窄日志能力及配置边界。
-24. [GSR 1.0.1 发布说明](RELEASE-1.0.1.md)：相对 v1.0.0 的六项变化、API 迁移与发布验证。
-25. [ADR 0013：客户端协议与 Gate 安全模式](adr/0013-client-protocol-boundaries.md)：安全模式命名、Agent 选择协议与两个协议实现的独立边界。
-26. [Protobuf / Sproto 接入指南](SPROTO-INTEGRATION.md)：独立修复库、Dispatcher、Go/TS Echo、支持范围与历史兼容证据。
-27. [TS → Go Sproto 优化经验](https://github.com/cnooljaw/gosproto/blob/v1.0.0/docs/SPROTO-OPTIMIZATION-LESSONS.md)：TS 阶段收尾、有效做法、失败候选、测量陷阱和 Go 验证矩阵。
-28. [gosproto 后续性能方案](https://github.com/cnooljaw/gosproto/blob/v1.0.0/docs/RFC-GOSPROTO-PERFORMANCE.md)：已完成切片、当前 Go 基线与基于新 profile 的增量实施入口。
+## 3. 修改与验证
 
-29. [GSR 1.0.2 发布说明](RELEASE-1.0.2.md)：安全模式命名迁移、独立 Sproto 接入、正式依赖与工作区清理。
+- [开发工作流](development/WORKFLOW.md)：修改、验证、审查、提交和临时资料归属。
+- [Go 编码规范](development/GO-CODE-STYLE.md)：代码与评审规则，以及按风险选择验证。
+- [业务项目 AGENTS.md 模板](development/AGENTS.application.md)：在独立业务仓库使用。
+- [验证覆盖](validation/COVERAGE.md)：测试入口、最近验证基线及尚未验收范围。
+- [性能测量](validation/PERFORMANCE.md)、[混合 Send 负载](validation/MIXED-LOAD.md)：历史环境、数据、复现方式和结论限制。
+- [后续工作](ROADMAP.md)：当前缺口与按需求推进的能力。
 
-30. [ADR 0014：有界 Service 池](adr/0014-bounded-service-pools.md)：当前开发能力，逻辑入口、独立串行实例及有界并行。
-31. [Service 池使用指南](SERVICE-POOLS.md)：创建固定并行实例、Call 接线、容量与生命周期限制。
+## 4. 版本与迁移
 
-后续出现需要长期保留的重大架构取舍时，新增 ADR 或 RFC，并从这里建立索引。
+发布说明记录发布当时的能力与验证，当前契约以上述文档为准。
 
-本地旧实验、构建产物和工具缓存的盘点、清理结果及后续输出约定见 [工作区清理记录](WORKSPACE-CLEANUP.md)。
+| 版本 | 主要内容 |
+| --- | --- |
+| [v1.0.2](releases/v1.0.2.md) | Gate SecurityMode 命名、独立 Sproto 接入与正式依赖 |
+| [v1.0.1](releases/v1.0.1.md) | Node 组装、来源绑定的 Cluster 与窄日志入口 |
+| [v1.0.0](releases/v1.0.0.md) | 首次内部发布及接入边界 |
 
-## 示例选择
+## 文档维护
 
-- 普通业务：先看 Counter，再看双节点、WebSocket Echo、Redis/MySQL Service 示例。统一使用 `gsr.Run + MainService` 和当前 Service 的 `self` 能力。
-- 有界并行：见 [Service 池示例](../examples/service-pool/README.md)，多个调用者通过普通 Call 访问同一名称，每个成员保持串行。
-- HTTP 管理入口：先看 [HTTP 示例](../examples/http-inbound/README.md) 中的 MainService 和 `HTTPIngress` 接线，再看底层测试夹具。
-- 基础设施验证：显式 Runtime、ClusterClient、Transport 等组装只用于理解或测试框架边界，不是业务启动必经步骤。
+指南回答如何接入，API 定义行为，设计文档解释机制，ADR 保留重要取舍。示例 README 记录运行步骤；验证文档只保留覆盖范围、可复现证据与限制。执行流水、临时审批故障、逐轮提交状态和已完成任务清单不作为长期文档维护；历史版本可从 Git 标签和提交查看。

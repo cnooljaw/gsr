@@ -2,11 +2,11 @@
 
 状态：公开签名、事件字段、上限与关闭规则均已获用户确认，Handler 诊断切片已实现。
 
-## 当前问题与范围
+## 范围
 
-原 recordHandlerError 只累加 HandlerErrors/Panics，未保存消息关联信息和错误原因；Handler recovery 未采集 stack。本切片已补 Handler 的 Send/Call 错误与真实 panic 诊断，不同时扩展 OnStart/OnStop、Timer 或 admission 事件类别。其它诊断缺口保留后续处理，不能宣称本轮覆盖全部 Runtime 故障。
+事件流覆盖 Handler 的 Send/Call 错误与真实 panic，不覆盖所有 OnStart/OnStop、Timer 或 admission 故障。
 
-Inspect 继续提供状态和计数快照；事件流提供逐次故障观测。Core 不拥有日志文件、订阅系统或消费任务。按最新统一日志裁决，Config.Logger 可借用 logging.Logger，在错误边界直接入主日志队列，不经 Diagnostics 转发；日志写入者由应用最后关闭。
+Inspect 继续提供状态和计数快照；事件流提供逐次故障观测。Core 不拥有日志文件、订阅系统或消费任务。按统一日志契约，Config.Logger 可借用 logging.Logger，在错误边界直接入主日志队列，不经 Diagnostics 转发；日志写入者由应用最后关闭。
 
 ## Skynet 依据
 
@@ -14,7 +14,7 @@ Inspect 继续提供状态和计数快照；事件流提供逐次故障观测。
 
 GSR 借鉴“故障发生处保留来源、原因和堆栈”，使用 Go recovery 采集当前 goroutine 的 stack；不复制 Lua 协程机制，不让宿主日志函数在 Service runner 内执行。
 
-## 已确认的最小公开契约
+## 事件契约
 
 ```go
 func (runtime *Runtime) Diagnostics() <-chan Diagnostic
@@ -43,7 +43,7 @@ type Diagnostic struct {
 
 选择文本快照而不是 Err error，是为了避免诊断队列长期持有业务对象或让日志消费者并发访问可变自定义 error。代价是诊断消费者不能 errors.As 原始 error；程序分类使用 Class/Code，Call 返回值的既有错误规则不改变。
 
-## 已确认的投递与生命周期
+## 投递与生命周期
 
 - 每个 Runtime 固定一个容量 256 的队列，不新增 Config 字段。满载丢弃新事件并累加 DroppedDiagnosticCount，不等待消费者。
 - 每次 Handler 非 nil error 或真实 panic 最多投递一条事件；保留原计数规则，不因事件丢弃而少计数。Send 不增加返回路径，Call 不改变回复或 Service 停止语义。
@@ -56,4 +56,4 @@ type Diagnostic struct {
 
 覆盖 Send/Call 的关联字段、普通错误与 typed-nil 错误、Handler 和 Is/As/Unwrap 分类 panic 的本地 stack 与安全 Reply 分离、其它 Service 继续运行、后续消息行为、无消费者与队列满载、文本快照及截断，以及 Stop/Close 超时后的晚到事件、最终关闭、重复关闭与并发安全。
 
-不新增 DiagnosticSink 接口、callback、全局 logger、事件路由器或转发 goroutine。后续 Cluster 诊断简化与此切片分开处理。
+不新增 DiagnosticSink 接口、callback、全局 logger、事件路由器或转发 goroutine。Cluster 使用自己的事件类型，见 [Cluster 诊断](CLUSTER.md#6-诊断与日志)。

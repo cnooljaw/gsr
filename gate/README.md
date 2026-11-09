@@ -2,7 +2,7 @@
 
 `gate` 是 Core 之外的统一 WebSocket 接入能力，只收发不透明字节，不依赖 Protocol 或 Protobuf。默认 `SecurityModeMAC` 使用固定 33 字节 X25519 握手、seq 和 MAC；显式 `SecurityModePlain` 直接传输字节消息，仅绑定回环/私有 IP。监听模式固定，不猜首帧或降级。
 
-配置使用 `SecurityMode: gate.SecurityModeMAC` 或 `SecurityMode: gate.SecurityModePlain`。此命名区分传输安全与业务协议：前者控制握手和后续认证，后者由 NewAgent 创建的具体 Agent 选择。原 Protocol/ProtocolMAC/ProtocolPlain 已改名，不提供别名；此调整尚未发布，v1.0.1 用户按标签文档使用旧名。双协议接入进度见 [Sproto 指南](../docs/SPROTO-INTEGRATION.md)。
+配置使用 `SecurityMode: gate.SecurityModeMAC` 或 `SecurityMode: gate.SecurityModePlain`。此命名区分传输安全与业务协议：前者控制握手和后续认证，后者由 NewAgent 创建的具体 Agent 选择。原 Protocol/ProtocolMAC/ProtocolPlain 已改名，不提供别名；此调整尚未发布，v1.0.1 用户按标签文档使用旧名。双协议接入进度见 [Sproto 指南](../docs/guides/CLIENT-PROTOCOLS.md)。
 
 应用在 `gsr.Run` 的 MainService 中通过 `self.Node().CreateGate` 启动 Gate。Gate 为每条连接创建业务 Agent；读循环剥离安全封装后，通过 `Runtime.DeliverClientMessage` 将字节快照直接投递到 Agent Mailbox。Agent 持有 `ClientSession`，通过 `Send([]byte)` 写回或 `Close()` 关闭连接，不接触 socket 或连接表。
 
