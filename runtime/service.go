@@ -115,12 +115,12 @@ type serviceInstance struct {
 	onStopCompleted      bool
 }
 
-func newServiceInstance(runtime *Runtime, id ServiceID, service Service) *serviceInstance {
+func newServiceInstance(runtime *Runtime, id ServiceID, service Service, capacity int) *serviceInstance {
 	instance := &serviceInstance{
 		runtime: runtime,
 		id:      id,
 		service: service,
-		mailbox: newMailbox(runtime.config.MailboxCapacity),
+		mailbox: newMailbox(capacity),
 		done:    make(chan struct{}),
 		state:   serviceStarting,
 	}

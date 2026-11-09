@@ -415,6 +415,19 @@ func TestRunNodesCommunicateWithoutSingleton(t *testing.T) {
 	var serverNode *Node
 	server := &probeService{start: func(ctx context.Context, self ServiceContext) error {
 		serverNode = self.Node()
+		member := int64(0)
+		if err := self.Node().CreateServicePool(ctx, "workers", ServicePoolConfig{Size: 2, MailboxCapacity: 1, NewService: func() Service {
+			member++
+			ordinal := member
+			return &probeService{handle: func(current CommandContext) (any, error) {
+				if current.Source() != 0 {
+					return nil, errors.New("remote pool source must remain zero")
+				}
+				return ordinal, nil
+			}}
+		}}); err != nil {
+			return err
+		}
 		id, err := self.CreateService(ctx, &probeService{handle: func(current CommandContext) (any, error) {
 			if current.Source() != 0 {
 				return nil, errors.New("remote source must remain zero")
@@ -493,6 +506,14 @@ func TestRunNodesCommunicateWithoutSingleton(t *testing.T) {
 		// 同名发布只影响本节点，不能覆盖服务端的 echo。
 		if err := self.Node().RegisterService("echo", self.Self()); err != nil {
 			return err
+		}
+		first, err := self.Cluster().Call(ctx, "server", "workers", 1)
+		if err != nil {
+			return err
+		}
+		second, err := self.Cluster().Call(ctx, "server", "workers", 1)
+		if err != nil || first != int64(1) || second != int64(2) {
+			return fmt.Errorf("remote pool results: %v %v %v", first, second, err)
 		}
 		value, err := self.Cluster().Call(ctx, "server", "echo", 1)
 		if err != nil {

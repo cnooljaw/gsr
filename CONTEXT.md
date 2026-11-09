@@ -8,7 +8,9 @@ v1.0.2 按 [ADR 0013](docs/adr/0013-client-protocol-boundaries.md) 将 Gate 模�
 
 ## Glossary
 
-- **Node 能力**：self.Node() 提供 RegisterService/OpenCluster/ClusterListenAddress/OpenHTTP/CreateGate，保存节点运行状态，Run 管理生命周期，业务借用同一对象；同 Run 共享、不同 Run 隔离，不提供关闭、业务通信或内部组件访问，仅在当前回调使用。名称归目标 ServiceID，HTTP/Cluster 归运行环境，Gate 资源归独立 GateService。
+- **Service 池**：节点内名称绑定多个独立 ServiceID 的可选并行能力，当前开发中。各实例串行，名称路由轮询一次；队列有界、满载拒绝，不重放、不保证池整体顺序、不自动补员。状态归各实例，事务与业务顺序归调用方设计，见 [ADR 0014](docs/adr/0014-bounded-service-pools.md)。
+
+- **Node 能力**：self.Node() 提供 RegisterService/CreateServicePool/OpenCluster/ClusterListenAddress/OpenHTTP/CreateGate，保存节点运行状态，Run 管理生命周期，业务借用同一对象；同 Run 共享、不同 Run 隔离，不提供关闭、业务通信或内部组件访问，仅在当前回调使用。普通名称归目标 ServiceID，池名归成员组，HTTP/Cluster 归运行环境，Gate 资源归独立 GateService。
 - **应用配置**：gsr.RuntimeConfig 与 gsr.ClusterConfig 不暴露 Logger，Run 转换到底层配置并统一注入；底层基础设施配置仍可借用 Logger。
 
 - **Gate / 客户端协议边界**：Gate 只收发不透明字节并拥有连接、安全封装、有界队列和关闭；具体协议负责自身的编解码、校验和分发，只依赖字节发送窄接口。现有 protocol 包为 Protobuf 实现，其 Envelope/Registry/MessageRoute/Direction/Kind 不作为其它协议的公共模型；Sproto 使用自身的协议与 package(type/session)，实现位于 protocol/sproto，使用独立维护的 github.com/cnooljaw/gosproto v1.0.1。Gate 与协议实现互不依赖，业务 Agent 是组合点。ClientSession.Send 接纳时复制字节快照，成功只表示本地入队，不保证送达或执行一次。

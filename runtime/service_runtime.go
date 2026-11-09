@@ -164,6 +164,28 @@ func (scheduler *scheduler) runnerTracked(id ServiceID) bool {
 // CreateService 在 Runtime.Start 后接纳一个已构造的 Service 实例。
 // 即使 OnStart 失败，已分配的 ServiceID 也会被消耗且永不复用。
 func (runtime *Runtime) CreateService(ctx context.Context, service Service) (ServiceID, error) {
+	return runtime.CreateServiceWithConfig(ctx, service, ServiceConfig{})
+}
+
+// ServiceConfig 为基础设施创建的单个实例指定有界 Mailbox，零值沿用 Runtime 默认。
+type ServiceConfig struct {
+	// MailboxCapacity 只计等待消息，不包含当前 Handler；零值沿用 Runtime 默认。
+	MailboxCapacity int
+}
+
+// CreateServiceWithConfig 建立独立实例的队列容量，不改变 Runtime 默认配置或串行执行规则。
+// 这是基础设施组装入口；普通业务继续使用 ServiceContext.CreateService。
+func (runtime *Runtime) CreateServiceWithConfig(ctx context.Context, service Service, config ServiceConfig) (ServiceID, error) {
+	if runtime == nil {
+		return 0, ErrRuntimeClosed
+	}
+	if config.MailboxCapacity < 0 {
+		return 0, invalidConfig("MailboxCapacity must be nonnegative")
+	}
+	capacity := config.MailboxCapacity
+	if capacity == 0 {
+		capacity = runtime.config.MailboxCapacity
+	}
 	if serviceValueIsNil(service) {
 		return 0, ErrInvalidService
 	}
@@ -191,7 +213,7 @@ func (runtime *Runtime) CreateService(ctx context.Context, service Service) (Ser
 	if err != nil {
 		return 0, err
 	}
-	instance := newServiceInstance(runtime, id, service)
+	instance := newServiceInstance(runtime, id, service, capacity)
 
 	if startErr := invokeServiceHook(func() error {
 		return service.OnStart(ctx, instance.context)

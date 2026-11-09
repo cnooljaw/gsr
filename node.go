@@ -22,6 +22,7 @@ type Node struct {
 	nodeAddresses map[cluster.NodeID]string
 	mu            sync.RWMutex
 	names         map[cluster.ServiceName]runtime.ServiceID
+	pools         map[cluster.ServiceName]*servicePool
 	namesByID     map[runtime.ServiceID][]cluster.ServiceName
 	active        map[runtime.ServiceID]struct{}
 	listenAddress string
@@ -44,7 +45,7 @@ func (node *Node) RegisterService(name cluster.ServiceName, id runtime.ServiceID
 	if _, exists := node.active[id]; !exists {
 		return runtime.ErrServiceNotFound
 	}
-	if _, exists := node.names[name]; exists {
+	if _, exists := node.names[name]; exists || node.pools[name] != nil {
 		return ErrServiceNameRegistered
 	}
 	node.names[name] = id
@@ -89,12 +90,23 @@ func (node *Node) activateID(id runtime.ServiceID) {
 }
 
 func (node *Node) resolve(name cluster.ServiceName) (runtime.ServiceID, error) {
-	node.mu.RLock()
-	defer node.mu.RUnlock()
-	id, exists := node.names[name]
-	if !exists {
+	node.mu.Lock()
+	defer node.mu.Unlock()
+	if id, exists := node.names[name]; exists {
+		return id, nil
+	}
+	pool := node.pools[name]
+	if pool == nil {
 		return 0, runtime.ErrServiceNotFound
 	}
+	if !pool.ready {
+		return 0, runtime.ErrServiceStarting
+	}
+	if len(pool.members) == 0 {
+		return 0, runtime.ErrServiceNotFound
+	}
+	id := pool.members[pool.next]
+	pool.next = (pool.next + 1) % len(pool.members)
 	return id, nil
 }
 
@@ -103,7 +115,20 @@ func (node *Node) unregisterID(id runtime.ServiceID) {
 	defer node.mu.Unlock()
 	delete(node.active, id)
 	for _, name := range node.namesByID[id] {
-		delete(node.names, name)
+		if pool := node.pools[name]; pool != nil {
+			for i, member := range pool.members {
+				if member == id {
+					pool.members = append(pool.members[:i], pool.members[i+1:]...)
+					break
+				}
+			}
+			pool.next = 0
+			if pool.ready && len(pool.members) == 0 {
+				delete(node.pools, name)
+			}
+		} else {
+			delete(node.names, name)
+		}
 	}
 	delete(node.namesByID, id)
 }

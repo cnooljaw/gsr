@@ -1,6 +1,6 @@
 # GSR API 设计规范
 
-本文描述 v1.0.2 API。按 [ADR 0013](adr/0013-client-protocol-boundaries.md)，Gate 的 Protocol/ProtocolMAC/ProtocolPlain 和配置字段 Protocol 已改名为 SecurityMode/SecurityModeMAC/SecurityModePlain 与 SecurityMode，随 v1.0.2 发布；迁移与验证见 [发布说明](RELEASE-1.0.2.md)。v1.0.1 的节点入口迁移仍见 [上一版发布说明](RELEASE-1.0.1.md)。旧版契约以相应标签文档为准，标签不移动。
+已发布基线为 v1.0.2；本文另标注当前尚未发布的有界 Service 池能力。按 [ADR 0013](adr/0013-client-protocol-boundaries.md)，Gate 的 Protocol/ProtocolMAC/ProtocolPlain 和配置字段 Protocol 已改名为 SecurityMode/SecurityModeMAC/SecurityModePlain 与 SecurityMode，随 v1.0.2 发布；迁移与验证见 [发布说明](RELEASE-1.0.2.md)。v1.0.1 的节点入口迁移仍见 [上一版发布说明](RELEASE-1.0.1.md)。旧版契约以相应标签文档为准，标签不移动。
 
 应用组装通过 self.Node()：RegisterService 发布目标名称，OpenCluster 开放共享监听，OpenHTTP 打开节点 HTTP，CreateGate 创建独立 GateService，ClusterListenAddress 观测实际 Cluster 绑定地址。Node 保存节点运行状态，由 Run 管理生命周期，业务借用同一对象的公开能力，不提供 Close、业务通信或内部组件 getter，限当前回调使用。同一 Run 共享唯一 Node，不同 Run 隔离；内部字段和 close 不公开。MainService 可完成组装后退出，原有 owner 继续管理资源。
 
@@ -15,6 +15,7 @@ self.Cluster() 仅提供来源绑定的 Send/Call；self.Logger() 返回仅有 I
 ```go
 // 所属节点的组装与观测，限当前 Service 回调使用。
 func (node *Node) RegisterService(cluster.ServiceName, runtime.ServiceID) error
+func (node *Node) CreateServicePool(context.Context, cluster.ServiceName, ServicePoolConfig) error
 func (node *Node) OpenCluster(cluster.NodeID) error
 func (node *Node) ClusterListenAddress() string
 func (node *Node) OpenHTTP(string, func(*HTTPIngress) http.Handler) error
@@ -304,6 +305,16 @@ func (runtime *Runtime) DeliverClientMessage(target ServiceID, frame []byte) err
 ```
 
 第二条路径只对实现客户端处理接口的 Service 开放；普通 Service 无需实现客户端方法或准备占位 Handler。两条路径同步执行，任一 Handler 等待 Call 时，该 Service 都不会处理下一条消息。
+
+### 4.0 有界 Service 池（当前开发能力，尚未发布）
+
+`self.Node().CreateServicePool(ctx, name, gsr.ServicePoolConfig{Size: 4, MailboxCapacity: 32, NewService: func() gsr.Service { return newWorker(store) }})` 创建一个逻辑名称下的独立实例。工厂须返回非 nil 指针且不得复用有状态实例（零大小无状态对象允许同址），成员实现相同业务命令契约；共享依赖的并发安全由业务负责。Size 必须为正，MailboxCapacity 零值沿用 Runtime 默认，负值拒绝；并行上限 Size、总等待消息容量 Size × 每成员容量。
+
+本地 SendName/CallName、HTTPIngress 和 Cluster 名称入站在创建本地 Call 前轮询选定一个成员，再走现有 Mailbox/Reply 路径。单实例串行，池整体无顺序保证；Call 仍阻塞调用方。选定队列满返回 ErrMailboxFull，不扫描其它队列、不自动重放、不增加 goroutine 或延期回复。
+
+池创建完成才发布，重复名在工厂前拒绝；启动失败撤销名称并有界回滚已启动成员。创建者退出不影响池。成员 Exit/panic 后移除且不自动补员，最后一个成员退出释放名称；超时不等于执行结束。业务可并行性、事务和幂等不由池判断。使用示意见 [Service 池指南](SERVICE-POOLS.md)，裁决见 [ADR 0014](adr/0014-bounded-service-pools.md)。
+
+Core 的 `Runtime.CreateServiceWithConfig(ctx, service, runtime.ServiceConfig{MailboxCapacity: n})` 仅为基础设施覆盖实例 Mailbox 容量，默认 CreateService 保持原行为；`Runtime.StopServices(ctx, ids...)` 先关闭所有指定成员的接纳并完成相关 PendingCall，再在 ShutdownTimeout/调用方 context 范围内等待，取消等待不取消停止流程，不影响其它 Service，不强杀 Handler。它们不进入业务 ServiceContext，Core 不持有池或名称。
 
 ### 4.1 Args 的所有权
 

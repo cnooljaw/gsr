@@ -2,6 +2,14 @@
 
 当前发布基线为 GSR v1.0.2。Sproto 编解码、通用 Go/TS/PB 基准及性能研究归独立 gosproto 仓库，GSR 依赖其 v1.0.1 正式版本并保留接入层与集成验证。旧 tmp 实验已移出工作区，真实目录的全仓依赖整理与测试通过；迁移及清理细节见 [接入指南](SPROTO-INTEGRATION.md)和 [清理记录](WORKSPACE-CLEANUP.md)。
 
+## 有界 Service 池切片（2026-11-06）
+
+用户确认通用有界并行能力，新增 Node.CreateServicePool 和显式工厂配置，保持每成员串行及原 Call 自动回复；不加入结算业务、异步 Reply、重放、自动补员或额外调度 goroutine。Core 的窄基础设施入口支持实例 Mailbox 容量与批量局部停止，后者先通知所有目标再在共享有限预算内等待。
+
+新增池测试覆盖多调用方并行及 Source、满载、超时不重放、无效工厂、名称保留/冲突、启动失败/取消回滚、成员 panic/Exit；扩展已有双节点夹具验证 Cluster 命名池的轮询结果和零来源，不重复 codec/PendingCall 完整矩阵。扩展 Runtime 行为覆盖实例容量与批量停止时先拒绝全部目标、OnStop 不与 Handler 重叠及等待取消不撤销回收。
+
+新增测试先因缺少 API 编译失败，最小实现后相关用例通过；随后 `GSR_PROCESS_TEST=1 go test -race ./... -timeout=2m` 全部通过，含双进程恢复，Gate 约 35 秒、双节点约 18 秒。全仓 `go vet ./...` 通过。随后复核补充零大小无状态 Service 同址的 Go 语义兼容，新增增量用例并通过根包 race；最终根包和 Runtime vet 通过。当前能力尚未发布，未修改版本号或提交；使用见 [Service 池指南](SERVICE-POOLS.md)。
+
 ## v1.0.2 发布验收（2026-10-23）
 
 `GSR_PROCESS_TEST=1 go test -race ./... -timeout=2m` 与 `go vet ./...` 通过，包含双进程正常停机和强杀后恢复；Gate 约 35 秒、双节点约 18 秒。WebSocket 示例 `npm run test:sproto:integration` 四项通过、零跳过；复用同次构建运行 `node --test client/dist/auth_vectors.test.js client/dist/secure_auth.test.js`，五项认证测试通过、零跳过。

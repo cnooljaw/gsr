@@ -47,6 +47,9 @@ v1.0.1 入口已按 [ADR 0012](adr/0012-node-capabilities-and-service-logging.md
 
 29. [GSR 1.0.2 发布说明](RELEASE-1.0.2.md)：安全模式命名迁移、独立 Sproto 接入、正式依赖与工作区清理。
 
+30. [ADR 0014：有界 Service 池](adr/0014-bounded-service-pools.md)：当前开发能力，逻辑入口、独立串行实例及有界并行。
+31. [Service 池使用指南](SERVICE-POOLS.md)：创建固定并行实例、Call 接线、容量与生命周期限制。
+
 后续出现需要长期保留的重大架构取舍时，新增 ADR 或 RFC，并从这里建立索引。
 
 本地旧实验、构建产物和工具缓存的盘点、清理结果及后续输出约定见 [工作区清理记录](WORKSPACE-CLEANUP.md)。
