@@ -12,10 +12,10 @@ v1.0.2 将 Gate 模式命名为 SecurityMode，以区分握手/传输认证与�
 
 ```sh
 go run ./examples/counter
-```
+```◊
 
 输出：
-
+◊
 ```text
 count = 5
 count = 0
