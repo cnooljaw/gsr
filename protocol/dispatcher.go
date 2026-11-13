@@ -17,12 +17,14 @@ type Dispatcher[Scope any] struct {
 	writer         *clientWriter
 	errorMessageID uint32
 	handlers       map[uint32]reflect.Value
+	errorPolicy    func(Scope, uint32, error) ErrorAction
+	closer         terminalSender
 }
 
 // NewDispatcher 绑定协议目录和连接写回能力，并复制、校验 msg_id 到强类型 Handler 的表。
 // Handler 必须是 func(Scope, Context, *具体Protobuf消息) error；编号与参数类型须匹配目录。
 // 构造后 Handler 表只读；协议已定义但尚未实现的消息可以不绑定。
-func NewDispatcher[Scope any](registry *Registry, sender ClientSender, handlers map[uint32]any) (*Dispatcher[Scope], error) {
+func NewDispatcher[Scope any](registry *Registry, sender ClientSender, handlers map[uint32]any, options ...DispatcherOption[Scope]) (*Dispatcher[Scope], error) {
 	if registry == nil {
 		return nil, errors.New("protocol: registry is required")
 	}
@@ -48,17 +50,26 @@ func NewDispatcher[Scope any](registry *Registry, sender ClientSender, handlers 
 		}
 		compiled[msgID] = binding
 	}
-	return &Dispatcher[Scope]{
+	dispatcher := &Dispatcher[Scope]{
 		registry:       registry,
 		writer:         &clientWriter{registry: registry, sender: sender},
 		errorMessageID: errorEntry.ID,
 		handlers:       compiled,
-	}, nil
+	}
+	for _, option := range options {
+		if option == nil {
+			return nil, errors.New("protocol: nil dispatcher option")
+		}
+		if err := option(dispatcher); err != nil {
+			return nil, err
+		}
+	}
+	return dispatcher, nil
 }
 
 // MustDispatcher 用于程序员定义的静态协议接线；构造错误时 panic。
-func MustDispatcher[Scope any](registry *Registry, sender ClientSender, handlers map[uint32]any) *Dispatcher[Scope] {
-	dispatcher, err := NewDispatcher[Scope](registry, sender, handlers)
+func MustDispatcher[Scope any](registry *Registry, sender ClientSender, handlers map[uint32]any, options ...DispatcherOption[Scope]) *Dispatcher[Scope] {
+	dispatcher, err := NewDispatcher[Scope](registry, sender, handlers, options...)
 	if err != nil {
 		panic(err)
 	}
@@ -97,7 +108,7 @@ func (dispatcher *Dispatcher[Scope]) HandleFrame(self Scope, frame []byte) error
 	}
 	var envelope commonv1.Envelope
 	if err := proto.Unmarshal(frame, &envelope); err != nil {
-		return fmt.Errorf("protocol: decode Envelope: %w", err)
+		return dispatcher.fail(self, 0, 0, fmt.Errorf("protocol: decode Envelope: %w", err))
 	}
 	return dispatcher.handleEnvelope(self, &envelope)
 }
@@ -105,11 +116,11 @@ func (dispatcher *Dispatcher[Scope]) HandleFrame(self Scope, frame []byte) error
 func (dispatcher *Dispatcher[Scope]) handleEnvelope(self Scope, envelope *commonv1.Envelope) error {
 	message, err := dispatcher.registry.Decode(envelope.GetMsgId(), envelope.GetRequestId(), envelope.GetPayload())
 	if err != nil {
-		return dispatcher.fail(envelope.GetRequestId(), err)
+		return dispatcher.fail(self, envelope.GetMsgId(), envelope.GetRequestId(), err)
 	}
 	handler, exists := dispatcher.handlers[envelope.GetMsgId()]
 	if !exists {
-		return dispatcher.fail(envelope.GetRequestId(), fmt.Errorf("%w: msg_id %d", ErrHandlerNotRegistered, envelope.GetMsgId()))
+		return dispatcher.fail(self, envelope.GetMsgId(), envelope.GetRequestId(), fmt.Errorf("%w: msg_id %d", ErrHandlerNotRegistered, envelope.GetMsgId()))
 	}
 
 	responded := false
@@ -127,27 +138,15 @@ func (dispatcher *Dispatcher[Scope]) handleEnvelope(self Scope, envelope *common
 	if !results[0].IsNil() {
 		err := results[0].Interface().(error)
 		if !responded {
-			return dispatcher.fail(envelope.GetRequestId(), err)
+			return dispatcher.fail(self, envelope.GetMsgId(), envelope.GetRequestId(), err)
 		}
 		return err
 	}
 	// Decode 已保证 Request 的编号非零、Notify 的编号为零，无需再次查询消息目录。
 	if envelope.GetRequestId() != 0 && !responded {
-		return dispatcher.fail(envelope.GetRequestId(), ErrResponseRequired)
+		return dispatcher.fail(self, envelope.GetMsgId(), envelope.GetRequestId(), ErrResponseRequired)
 	}
 	return nil
-}
-
-func (dispatcher *Dispatcher[Scope]) fail(requestID uint32, cause error) error {
-	if requestID == 0 {
-		return cause
-	}
-	errorCode, message := errorResponseFor(cause)
-	response := &commonv1.ErrorResponse{Code: errorCode, Message: message}
-	if err := dispatcher.writer.sendResponse(requestID, dispatcher.errorMessageID, response); err != nil {
-		return errors.Join(cause, fmt.Errorf("protocol: send ErrorResponse: %w", err))
-	}
-	return cause
 }
 
 func errorResponseFor(err error) (commonv1.ErrorCode, string) {

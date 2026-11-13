@@ -72,6 +72,8 @@ type Config struct {
 	MaxConnections int
 	// HandshakeTimeout 仅在 MAC 模式限制首个握手帧等待，零值使用 5 秒；Plain 不执行握手。
 	HandshakeTimeout time.Duration
+	// SendAndCloseTimeout 是末帧接纳到关闭的总预算，零为一秒，负值无效。
+	SendAndCloseTimeout time.Duration
 	// MaxFrameBytes 限制单条 WebSocket 二进制消息；零值使用 4 MiB。
 	MaxFrameBytes int
 	// MaxOutboundQueueBytes 限制每个连接的出站队列总字节数，必须至少容纳一个队列条目开销。
@@ -140,10 +142,13 @@ func NewGateService(local *runtime.Runtime, config Config) (*GateService, error)
 	if config.HandshakeTimeout == 0 {
 		config.HandshakeTimeout = defaultHandshakeTimeout
 	}
+	if config.SendAndCloseTimeout == 0 {
+		config.SendAndCloseTimeout = time.Second
+	}
 	if config.MaxFrameBytes == 0 {
 		config.MaxFrameBytes = defaultMaxFrameBytes
 	}
-	if config.MaxConnections <= 0 || config.HandshakeTimeout < 0 || config.MaxFrameBytes <= 0 ||
+	if config.MaxConnections <= 0 || config.SendAndCloseTimeout < 0 || config.HandshakeTimeout < 0 || config.MaxFrameBytes <= 0 ||
 		config.MaxOutboundQueueBytes < queueEntryOverhead {
 		return nil, fmt.Errorf("%w: connection, handshake, frame, or outbound queue limit is invalid", ErrInvalidConfig)
 	}
@@ -376,6 +381,7 @@ func (gate *GateService) ServeHTTP(writer http.ResponseWriter, request *http.Req
 		return
 	}
 	clientConn = newClientConnection(connection, gate.config.MaxFrameBytes, gate.config.MaxOutboundQueueBytes, &gate.counters, gate.nextConnection.Add(1))
+	clientConn.sendAndCloseTimeout = gate.config.SendAndCloseTimeout
 	if !gate.trackConnection(clientConn) {
 		clientConn.closeWith(websocket.CloseGoingAway, "going_away", time.Now().Add(closeFrameWait))
 		return
@@ -427,6 +433,10 @@ func (gate *GateService) ServeHTTP(writer http.ResponseWriter, request *http.Req
 			}
 			return
 		}
+		if clientConn.outbound.isClosing() {
+			<-clientConn.outbound.Done()
+			return
+		}
 		if messageType != websocket.BinaryMessage {
 			gate.logConnectionFailure(clientConn, "unsupported_data", websocket.CloseUnsupportedData, errors.New("non-binary WebSocket message"))
 			clientConn.closeWith(websocket.CloseUnsupportedData, "unsupported_data", time.Now().Add(closeFrameWait))
@@ -438,7 +448,7 @@ func (gate *GateService) ServeHTTP(writer http.ResponseWriter, request *http.Req
 			err = gate.deliverFrame(agentID, clientConn, frame)
 		}
 		if err != nil {
-			if errors.Is(err, errGateStopping) {
+			if errors.Is(err, errGateStopping) || errors.Is(err, ErrClientSessionClosed) {
 				<-clientConn.outbound.Done()
 			}
 			return
@@ -450,8 +460,29 @@ func (gate *GateService) startClientWriter(clientConn *clientConnection) {
 	gate.ioWorkers.Add(1)
 	go func() {
 		defer gate.ioWorkers.Done()
-		if err := clientConn.writeLoop(); err != nil {
-			gate.logConnectionFailure(clientConn, "write", websocket.CloseGoingAway, err)
+		err := clientConn.writeLoop()
+		clientConn.outbound.mu.Lock()
+		draining := clientConn.outbound.drainDone != nil
+		completed := clientConn.outbound.drainWritten
+		clientConn.outbound.mu.Unlock()
+		category := "write"
+		if draining {
+			category = "send_and_close_write"
+			if errors.Is(err, ErrSendAndCloseTimeout) {
+				category = "send_and_close_timeout"
+			} else if errors.Is(err, errOutboundQueueFull) || errors.Is(err, errOutboundFrameTooLarge) {
+				category = "send_and_close_admission"
+			}
+		}
+		if err != nil {
+			gate.logConnectionFailure(clientConn, category, websocket.CloseGoingAway, err)
+		} else if draining && completed {
+			gate.mu.RLock()
+			logger := gate.logger
+			gate.mu.RUnlock()
+			if logger != nil {
+				_ = logger.Info("Gate send and close completed", "connection", clientConn.connectionID, "phase", "send_and_close")
+			}
 		}
 	}()
 }
@@ -546,7 +577,10 @@ func (gate *GateService) deliverAuthenticatedFrame(
 }
 
 func (gate *GateService) deliverFrame(agentID runtime.ServiceID, clientConn *clientConnection, frame []byte) error {
-	if err := gate.deliverClientMessage(agentID, frame); err != nil {
+	if err := clientConn.outbound.admitInbound(func() error { return gate.deliverClientMessage(agentID, frame) }); err != nil {
+		if errors.Is(err, ErrClientSessionClosed) {
+			return err
+		}
 		if errors.Is(err, errGateStopping) {
 			return err
 		}

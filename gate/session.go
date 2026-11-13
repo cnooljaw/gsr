@@ -14,6 +14,7 @@ type clientConnection struct {
 	connection           *websocket.Conn
 	outbound             *outboundQueue
 	connectionID         uint64
+	sendAndCloseTimeout  time.Duration
 	counters             *gateCounters
 	diagnosticMu         sync.Mutex
 	diagnosticSeen       map[string]struct{}
@@ -28,6 +29,7 @@ func newClientConnection(connection *websocket.Conn, maxFrame, maxQueue int, cou
 		connection:           connection,
 		outbound:             newOutbound(connection, maxFrame, maxQueue),
 		connectionID:         connectionID,
+		sendAndCloseTimeout:  time.Second,
 		counters:             counters,
 		diagnosticSeen:       make(map[string]struct{}),
 		diagnosticSuppressed: make(map[string]uint64),
@@ -68,7 +70,15 @@ func (client *clientConnection) takeSuppressedDiagnostics() map[string]uint64 {
 
 // Send 接纳不透明字节消息，不解析 Protobuf，也不直接写入 WebSocket。
 func (client *clientConnection) Send(frame []byte) error {
-	err := client.outbound.Send(frame)
+	return client.sendResult(client.outbound.Send(frame))
+}
+
+// SendAndClose 在同一接纳边界封闭收发，不等待网络写入；关闭预算由 Gate 管理。
+func (client *clientConnection) SendAndClose(frame []byte) error {
+	return client.sendResult(client.outbound.sendAndClose(frame, client.sendAndCloseTimeout))
+}
+
+func (client *clientConnection) sendResult(err error) error {
 	switch {
 	case errors.Is(err, errOutboundFrameTooLarge):
 		client.counters.frameTooLarge.Add(1)

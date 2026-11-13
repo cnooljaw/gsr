@@ -64,7 +64,7 @@
 
 - **Gate / SecurityMode**：Gate 拥有连接、握手、安全封装、有界字节收发与关闭；MAC 为默认模式，Plain 显式用于可信回环/私网。安全模式不选择业务协议，TLS 独立配置。
 - **Agent Service**：每连接一个普通业务 Service，组合 ClientSession 与具体协议 Dispatcher；客户端消息和普通 Command 共用该 Service 的串行 runner。Agent 只拥有连接私有轻量状态，权威房间/玩家状态归独立 owner。
-- **ClientSession**：绑定单连接的 Send([]byte)/Close 能力，不暴露 net.Conn 或 Gate 内部表。接纳时复制字节快照，不保证送达。
+- **ClientSession**：绑定单连接的 Send([]byte)/SendAndClose([]byte)/Close 能力，不暴露 net.Conn 或 Gate 内部表。接纳时复制字节快照，不保证送达。
 - **Gate→Agent 投递**：Runtime.DeliverClientMessage 复制不透明字节后进入 Mailbox，Source/Session/CommandID 为零；目标须显式实现 ClientMessageHandler。消息类别不靠 Source 猜测。
 - **Protocol**：Protobuf 位于 protocol，Sproto 位于 protocol/sproto，各自维护模型并只依赖字节发送窄接口；Gate 与 Protocol 互不依赖，Agent 为组合点。gosproto 是独立编解码权威库。
 - **协议 Handler 上下文**：当前 Agent 的 Service 上下文与协议响应/推送上下文职责分开，只在当前同步 Handler 使用；不保存或异步调用。
@@ -74,6 +74,8 @@
 - **C/S seq / 临时密钥**：MAC 模式每连接交换 X25519 公钥，以固定 HKDF 参数派生上行 macKey；uint64 seq 大端递增不回绕，认证成功即消费，不代表业务执行成功。
 - **Gate 容量与关闭**：限制连接、握手时间、帧长和按字节计的出站队列，入站受 Agent Mailbox 约束；关闭使会话失效、关闭 socket、通知 Agent 并等待自身 I/O，不等待或强杀 Agent。
 - **C/S 关闭码与日志**：标准 WebSocket 关闭码表达传输/安全结果，协议错误归 Agent、领域拒绝归业务。Gate 不记录密钥或原始载荷；具体映射见 [Gate 设计](docs/design/GATE-PROTOCOL.md)。
+
+- **SendAndClose（v1.0.4）**：Gate 原子接纳最后字节帧、封闭新消息并按 FIFO 有界写出后关闭的能力；成功不是送达保证。协议错误策略选择是否使用它，业务拥有 closing 与断线清理。见 [ADR 0015](docs/adr/0015-send-and-close.md)。
 
 ## 日志
 

@@ -3,7 +3,7 @@
 ## 项目定位与依赖
 
 - 本仓库是基于 GSR 的 Go 业务项目，负责业务规则、协议、持久化和部署。
-- GSR 模块为 `github.com/cnooljaw/gsr`；本模板对应 v1.0.3 API（ADR 0012、0013、0014）；实际依赖以本仓库 `go.mod` 为准，升级时同步本文件与接入文档。
+- GSR 模块为 `github.com/cnooljaw/gsr`；本模板对应 v1.0.4 API（ADR 0012、0013、0014、0015）；实际依赖以本仓库 `go.mod` 为准，升级时同步本文件与接入文档。
 - GSR 是框架依赖；不在业务任务中修改 module cache、vendor 或相邻框架仓库。框架缺陷先记录版本和最小复现，按明确授权单独修复、验证和升级。
 - 先完成最小可验证的业务纵向切片，不提前建设没有调用者的通用框架。
 
@@ -17,12 +17,12 @@
 - `docs/development/GO-CODE-STYLE.md`：本项目采用的 Go 编码规范。
 - 文档尚不存在时，按当前功能建立必要契约，不用假定的设计填充完整架构。
 
-GSR 参考契约按依赖版本阅读；以下链接固定到 v1.0.3 标签。使用 v1.0.0 时不照搬新版入口：
+GSR 参考契约按依赖版本阅读；以下链接固定到 v1.0.4 标签。使用 v1.0.0 时不照搬新版入口：
 
-- [API 契约](https://github.com/cnooljaw/gsr/blob/v1.0.3/docs/API-DESIGN.md)
-- [稳定术语](https://github.com/cnooljaw/gsr/blob/v1.0.3/CONTEXT.md)
-- [Go 规范](https://github.com/cnooljaw/gsr/blob/v1.0.3/docs/development/GO-CODE-STYLE.md)
-- [发布范围](https://github.com/cnooljaw/gsr/blob/v1.0.3/docs/releases/v1.0.3.md)
+- [API 契约](https://github.com/cnooljaw/gsr/blob/v1.0.4/docs/API-DESIGN.md)
+- [稳定术语](https://github.com/cnooljaw/gsr/blob/v1.0.4/CONTEXT.md)
+- [Go 规范](https://github.com/cnooljaw/gsr/blob/v1.0.4/docs/development/GO-CODE-STYLE.md)
+- [发布范围](https://github.com/cnooljaw/gsr/blob/v1.0.4/docs/releases/v1.0.4.md)
 
 本项目业务契约与所依赖的 GSR API 契约同时成立。代码、测试与文档冲突时先确认预期，不静默改接口或运行语义；协议、所有权、生命周期的重要变化先说明方案与代价，由用户裁决，再更新文档和测试。普通局部实现细节不逐项请求裁决。
 

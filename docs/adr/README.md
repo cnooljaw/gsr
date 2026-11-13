@@ -25,3 +25,4 @@ ADR 保留重要决定、参考依据和代价；按编号标识，不因目录�
 | [0012](0012-node-capabilities-and-service-logging.md) | Node 组装、来源绑定 Cluster、窄日志能力与唯一节点对象 |
 | [0013](0013-client-protocol-boundaries.md) | SecurityMode 与业务协议分离，独立 Sproto 编解码职责 |
 | [0014](0014-bounded-service-pools.md) | 通用有界 Service 池；自 v1.0.3 提供 |
+| [0015](0015-send-and-close.md) | 有界发送后关闭与协议错误策略；自 v1.0.4 提供 |

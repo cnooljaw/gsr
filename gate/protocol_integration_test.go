@@ -3,6 +3,7 @@ package gate
 import (
 	"context"
 	"errors"
+	"fmt"
 	"sync"
 	"testing"
 	"time"
@@ -17,6 +18,8 @@ import (
 
 // protocolGateAgent 将真实协议分发器接入生产 Gate 测试，验证未知消息不会破坏连接。
 type protocolGateAgent struct {
+	terminalEcho           bool
+	closing                bool
 	client                 ClientSession
 	protocolDispatcher     *protocol.Dispatcher[runtime.CommandContext]
 	disconnected           chan struct{}
@@ -146,7 +149,14 @@ func (agent *protocolGateAgent) OnStart(_ context.Context, _ runtime.ServiceCont
 	if !agent.omitEchoRequestHandler {
 		handlers[uint32(echopb.MsgId_C2S_ECHO_REQUEST)] = agent.onEcho
 	}
-	dispatcher, err := protocol.NewDispatcher[runtime.CommandContext](registry, agent.client, handlers)
+	var options []protocol.DispatcherOption[runtime.CommandContext]
+	if agent.terminalEcho {
+		options = append(options, protocol.WithErrorPolicy(func(_ runtime.CommandContext, _ uint32, _ error) protocol.ErrorAction {
+			agent.closing = true
+			return protocol.ReplyErrorAndClose
+		}))
+	}
+	dispatcher, err := protocol.NewDispatcher[runtime.CommandContext](registry, agent.client, handlers, options...)
 	if err != nil {
 		return err
 	}
@@ -164,6 +174,9 @@ func (agent *protocolGateAgent) Handle(commandContext runtime.CommandContext, co
 }
 
 func (agent *protocolGateAgent) HandleClientMessage(self runtime.CommandContext, frame []byte) error {
+	if agent.closing {
+		return nil
+	}
 	if agent.protocolDispatcher == nil {
 		return errors.New("protocol Gate Agent dispatcher is not initialized")
 	}
@@ -171,6 +184,9 @@ func (agent *protocolGateAgent) HandleClientMessage(self runtime.CommandContext,
 }
 
 func (agent *protocolGateAgent) onEcho(_ runtime.CommandContext, context protocol.Context, request *echopb.EchoRequest) error {
+	if agent.terminalEcho {
+		return errors.New("private backend failure")
+	}
 	if agent.panicOnEcho {
 		panic("protocol Handler failed")
 	}
@@ -1136,5 +1152,60 @@ func TestMACGateReturnsErrorForWrongDirection(t *testing.T) {
 	}
 	if err := local.Stop(context.Background()); err != nil {
 		t.Fatalf("Runtime.Stop() error = %v", err)
+	}
+}
+
+// 验证 MAC/Plain 的真实协议适配只回一份安全错误，之后断线并沿原 Command 通知 Agent 退出。
+func TestGateProtocolSendAndClose(t *testing.T) {
+	for _, mode := range []SecurityMode{SecurityModeMAC, SecurityModePlain} {
+		t.Run(fmt.Sprint(mode), func(t *testing.T) {
+			agents := make(chan *protocolGateAgent, 1)
+			_, gate := startConfiguredProductionGateWithTLS(t, runtime.Config{MailboxCapacity: 8, ShutdownTimeout: time.Second}, 1, time.Second, 1024, 4096, nil, func(client ClientSession) runtime.Service {
+				agent := &protocolGateAgent{client: client, terminalEcho: true, disconnected: make(chan struct{})}
+				agents <- agent
+				return agent
+			}, mode)
+			connection := dialTestGate(t, gate)
+			defer connection.Close()
+			var key [clientMACKeySize]byte
+			if mode == SecurityModeMAC {
+				key = authenticateTestClient(t, connection)
+			}
+			frame, err := proto.Marshal(&commonv1.Envelope{MsgId: 1001, RequestId: 81})
+			if err != nil {
+				t.Fatal(err)
+			}
+			if mode == SecurityModeMAC {
+				frame = makeAuthenticatedTestFrame(t, key[:], 1, frame)
+			}
+			if err := connection.WriteMessage(websocket.BinaryMessage, frame); err != nil {
+				t.Fatal(err)
+			}
+			agent := <-agents
+			connection.SetReadDeadline(time.Now().Add(time.Second))
+			_, reply, err := connection.ReadMessage()
+			if err != nil {
+				t.Fatal(err)
+			}
+			var envelope commonv1.Envelope
+			if err := proto.Unmarshal(reply, &envelope); err != nil {
+				t.Fatal(err)
+			}
+			var failure commonv1.ErrorResponse
+			if err := proto.Unmarshal(envelope.Payload, &failure); err != nil {
+				t.Fatal(err)
+			}
+			if envelope.MsgId != 9001 || envelope.RequestId != 81 || failure.Message != "request could not be processed" {
+				t.Fatal(&envelope, &failure)
+			}
+			if _, _, err := connection.ReadMessage(); !websocket.IsCloseError(err, websocket.CloseNormalClosure) {
+				t.Fatal(err)
+			}
+			select {
+			case <-agent.disconnected:
+			case <-time.After(time.Second):
+				t.Fatal("missing existing disconnect notification")
+			}
+		})
 	}
 }

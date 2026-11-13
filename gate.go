@@ -23,6 +23,8 @@ type GateConfig struct {
 	MaxConnections int
 	// HandshakeTimeout 仅在 MAC 模式限制首帧握手等待；零值使用 5 秒，Plain 不执行握手。
 	HandshakeTimeout time.Duration
+	// SendAndCloseTimeout 是发送末帧后关闭的总预算；零使用一秒，负值拒绝。
+	SendAndCloseTimeout time.Duration
 	// MaxFrameBytes 限制完整 WebSocket 消息大小；零值使用 4 MiB。
 	MaxFrameBytes int
 	// MaxOutboundQueueBytes 限制每条连接的出站队列字节数。
@@ -43,6 +45,7 @@ func (node *Node) CreateGate(ctx context.Context, config GateConfig) (string, er
 		TLSConfig:             config.TLSConfig,
 		MaxConnections:        config.MaxConnections,
 		HandshakeTimeout:      config.HandshakeTimeout,
+		SendAndCloseTimeout:   config.SendAndCloseTimeout,
 		MaxFrameBytes:         config.MaxFrameBytes,
 		MaxOutboundQueueBytes: config.MaxOutboundQueueBytes,
 		NewAgent: func(client gate.ClientSession) runtime.Service {

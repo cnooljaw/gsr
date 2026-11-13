@@ -4553,6 +4553,8 @@ func (listener *closeErrorTestListener) Accept() (net.Conn, error) {
 }
 
 type closeErrorTestConn struct {
+	beforeWrite func() error
+	afterClose  func()
 	net.Conn
 	closeErr              error
 	closeCount            *atomic.Int32
@@ -4568,7 +4570,13 @@ type closeErrorTestConn struct {
 func (connection *closeErrorTestConn) Write(data []byte) (int, error) {
 	connection.mu.Lock()
 	writeErr := connection.writeErr
+	hook := connection.beforeWrite
 	connection.mu.Unlock()
+	if hook != nil {
+		if err := hook(); err != nil {
+			return 0, err
+		}
+	}
 	if writeErr != nil {
 		return 0, writeErr
 	}
@@ -4625,6 +4633,12 @@ func (connection *closeErrorTestConn) failReadDeadlineOnCall(call int, err error
 func (connection *closeErrorTestConn) Close() error {
 	connection.once.Do(func() {
 		_ = connection.Conn.Close()
+		connection.mu.Lock()
+		hook := connection.afterClose
+		connection.mu.Unlock()
+		if hook != nil {
+			hook()
+		}
 		if connection.closeCount != nil {
 			connection.closeCount.Add(1)
 		}

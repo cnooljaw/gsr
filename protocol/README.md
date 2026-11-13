@@ -93,3 +93,5 @@ go test ./protocol -run '^$' -bench '^BenchmarkDispatcherHandleFrame$' -benchmem
 | RequestResponse：解码、反射 Handler 分发、响应编码与写回调用 | 787.3 | 424 | 13 |
 
 解码基线不是语义完整的手写热点实现；与 NotifyDispatch 的差值包含 Context、查表和反射等成本，不能全部归因于 `reflect.Call`。这些数据不包含 Gate、MAC、Mailbox、socket I/O 或业务 Service Call，也不是整机容量验收。默认保留显式 Handler 表；只有真实业务 profile 确认分发成为热点后，再讨论局部优化，不据此增加新的注册框架或 Fast Handler API。
+
+v1.0.4 自动错误响应与关闭策略见 [业务规范](../docs/guides/SEND-AND-CLOSE.md)。未配置策略的 Send-only 接线保持原行为。

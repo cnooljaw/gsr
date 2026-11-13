@@ -41,14 +41,22 @@ func (writer *clientWriter) push(msgID uint32, message proto.Message) error {
 }
 
 func (writer *clientWriter) sendResponse(requestID, msgID uint32, message proto.Message) error {
-	if requestID == 0 {
-		return ErrMissingRequestID
-	}
-	payload, err := writer.registry.encodeServerMessage(msgID, catalog.Response, message)
+	frame, err := writer.encodeResponse(requestID, msgID, message)
 	if err != nil {
 		return err
 	}
-	return writer.send(&commonv1.Envelope{
+	return writer.sender.Send(frame)
+}
+
+func (writer *clientWriter) encodeResponse(requestID, msgID uint32, message proto.Message) ([]byte, error) {
+	if requestID == 0 {
+		return nil, ErrMissingRequestID
+	}
+	payload, err := writer.registry.encodeServerMessage(msgID, catalog.Response, message)
+	if err != nil {
+		return nil, err
+	}
+	return proto.Marshal(&commonv1.Envelope{
 		MsgId:     msgID,
 		RequestId: requestID,
 		Payload:   payload,

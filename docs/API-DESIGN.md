@@ -1,6 +1,6 @@
 # GSR API 设计规范
 
-本文定义当前代码的公开行为与 Runtime 边界。已发布基线为 v1.0.3，包含有界 Service 池。版本差异和迁移统一见 [发布说明](releases/v1.0.3.md)，接入顺序见 [文档索引](README.md)。
+本文定义当前代码的公开行为与 Runtime 边界。已发布基线为 v1.0.4，包含有界 Service 池与发送后关闭能力。版本差异和迁移统一见 [发布说明](releases/v1.0.4.md)，接入顺序见 [文档索引](README.md)。
 
 应用组装通过 self.Node()：RegisterService 发布目标名称，CreateServicePool 创建命名池，OpenCluster 开放共享监听，OpenHTTP 打开节点 HTTP，CreateGate 创建独立 GateService，ClusterListenAddress 观测实际 Cluster 绑定地址。Node 保存节点运行状态，由 Run 管理生命周期，业务借用同一对象的公开能力，不提供 Close、业务通信或内部组件 getter，限当前回调使用。同一 Run 共享唯一 Node，不同 Run 隔离；内部字段和 close 不公开。MainService 可完成组装后退出，原有 owner 继续管理资源。
 
@@ -50,6 +50,12 @@ Sproto 接线使用 `sproto.NewDispatcher[gsr.CommandContext](sproto.Config{C2S:
 `Context.Session/Response/Push` 仅在当前同步 Handler 使用，Response 按当前定义匹配类型并保留原 session，最多成功接纳一次；Notify 不接受 Response。普通 Command 中使用 `Dispatcher.Push`，不保存旧 Context。需要响应的客户端请求必须使用正 int32 session，Notify/Push 不带 session；与 Core/Cluster ID 分配无关。S2C 首版只接受不带 Response 的 Push，不提供服务端请求客户端的等待机制。
 
 `Config.MaxPackedBytes` 默认 1 MiB；`Config.Limits` 使用修复库的有限默认值（解包/编码 8 MiB、深度 64、字段及集合元素合计 100000），可显式配置。协议只借用 Send，不拥有 Close；HandleFrame 对坏包、未知协议、Handler error 和遗漏 Response 返回错误，由 Agent 记录诊断并关闭连接，使客户端结束等待。业务拒绝通过协议自己的 Response 表达，Echo 使用 code/message，不增加公共错误 schema，也不透传内部错误。
+
+### 有界发送后关闭（v1.0.4）
+
+`ClientSession.SendAndClose(frame)` 原子接纳唯一末帧并封闭连接接纳，保留此前 FIFO；nil 仅表示本地接纳，不能保证客户端收到。满载/超大帧返回原错误并封闭、异步关闭连接。普通 Close 可中止；重复 Send/SendAndClose 返回 ErrClientSessionClosed。`GateConfig.SendAndCloseTimeout` 零为一秒、负数拒绝，总预算含正在写出的旧帧与最终关闭，停机可以提前终止。
+
+Protobuf `WithErrorPolicy` 在未响应的自动错误路径选择 ReplyError 或 ReplyErrorAndClose；默认行为保持原样，显式策略要求发送方具备关闭能力。无法可靠关联请求时只关闭；已成功响应不追加回错。Gate 不解释业务失败，业务仍负责封闭排队请求和断线清理。具体裁决见 [ADR 0015](adr/0015-send-and-close.md)，业务接入见 [发送后关闭规范](guides/SEND-AND-CLOSE.md)。
 
 ## 默认业务入口与阅读边界
 

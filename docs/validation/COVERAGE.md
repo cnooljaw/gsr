@@ -1,6 +1,6 @@
 # 验证覆盖与边界
 
-发布基线为 **GSR v1.0.3**，包含有界 Service 池。本页记录覆盖范围、已有验证证据与复现入口；发布说明保留各版本当时的验收，不维护逐轮执行流水。
+发布基线为 **GSR v1.0.4**，包含有界 Service 池和发送后关闭能力。本页记录覆盖范围、已有验证证据与复现入口；发布说明保留各版本当时的验收，不维护逐轮执行流水。
 
 ## 测试覆盖
 
@@ -11,6 +11,7 @@
 | Service 池 | 多调用者并行、成员队列、来源、超时不重放、名称预留、无效工厂、失败/取消回滚、成员退出 | [池测试](../../service_pool_test.go)、[Runtime 配置与回收](../../runtime/service_config_test.go)、[可运行示例](../../examples/service-pool/) |
 | Cluster | 统一编码、帧限制、Session/连接归属、入站有界 Call、按需恢复、不重放、Quiesce/Close、诊断与抑制 | [cluster](../../cluster/)、[双节点测试](../../examples/twonode/) |
 | Gate | Plain/MAC、TLS/握手/seq、容量与慢客户端、Agent 投递、断开通知、迟到写回、重复关闭 | [gate](../../gate/) |
+| 发送后关闭 | 末帧 FIFO/快照、失败关闭、并发接纳、阻塞旧写总预算、MAC/Plain 唯一安全响应与原断线通知、策略能力检查 | [Gate 用例](../../gate/send_close_test.go)、[协议策略](../../protocol/error_policy_test.go)、[真实协议接线](../../gate/protocol_integration_test.go) |
 | Protocol | Protobuf / Sproto 各自的分发、参数与协议校验、响应/推送、会话和业务错误 | [protocol](../../protocol/)、[Sproto](../../protocol/sproto/) |
 | Go ↔ TS | 认证固定向量、Protobuf Echo、Sproto Plain/MAC 真实链路与边界 | [WebSocket 示例](../../examples/websocket-gate/README.md) |
 | 外部资源 | HTTP、Redis/MySQL Service 的业务接线与替身测试；真实环境单独启用 | [示例索引](../README.md#1-运行与接入) |
@@ -23,6 +24,7 @@
 
 | 基线 | 已通过的检查 | 限制 |
 | --- | --- | --- |
+| v1.0.4，2026-11-13 | 全仓 race（含发送后关闭、协议策略与双进程恢复）、vet、Sproto Go↔TS 四项、TS 认证五项 | [发布验收](../releases/v1.0.4.md#发布验证)；业务迁移与领域回归需由业务项目另验 |
 | v1.0.3，2026-11-09 | 全仓 race（含服务池、示例与双进程恢复）、vet、Sproto Go↔TS 四项、TS 认证五项 | 发布验证详情见 [v1.0.3](../releases/v1.0.3.md#发布验证)；不替代专项负载与真实外部资源验收 |
 | v1.0.2，2026-10-23 | 全仓 race（含双进程恢复）、vet、Sproto Go↔TS 四项、TS 认证五项 | 见 [发布验收](../releases/v1.0.2.md#发布验证)；未重跑完整负载或真实 MySQL |
 | Service 池，2026-11-06 | `GSR_PROCESS_TEST=1 go test -race ./... -timeout=2m`、`go vet ./...`；零大小成员增量后根包 race 与根包/Runtime vet | 全仓结果在零大小增量前取得；完整发布验收见 v1.0.3 |

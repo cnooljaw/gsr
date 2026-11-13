@@ -1,6 +1,6 @@
 # GSR 文档
 
-GSR 是 Go 游戏服务器 Service Runtime。已发布版本为 **v1.0.3**，包含有界 Service 池。固定依赖接入时使用对应标签的文档，不能把开发分支 API 当成已发布能力。
+GSR 是 Go 游戏服务器 Service Runtime。已发布版本为 **v1.0.4**，包含有界 Service 池和发送后关闭能力。固定依赖接入时使用对应标签的文档，不能把开发分支 API 当成已发布能力。
 
 ## 1. 运行与接入
 
@@ -20,6 +20,8 @@ GSR 是 Go 游戏服务器 Service Runtime。已发布版本为 **v1.0.3**，包
 | WebSocket、协议与连接 Agent | [WebSocket Echo](../examples/websocket-gate/README.md) |
 | HTTP 管理入口 / 出站调用 | [入站](../examples/http-inbound/README.md)、[出站](../examples/http-outbound/README.md) |
 | 外部数据资源 | [Redis](../examples/redis-user-cache/README.md)、[MySQL](../examples/mysql-product/README.md) |
+
+发送错误后断线的接入规则见 [发送后关闭业务规范](guides/SEND-AND-CLOSE.md)（自 v1.0.4 提供）。
 
 ## 2. 理解契约与设计
 
@@ -47,6 +49,7 @@ GSR 是 Go 游戏服务器 Service Runtime。已发布版本为 **v1.0.3**，包
 
 | 版本 | 主要内容 |
 | --- | --- |
+| [v1.0.4](releases/v1.0.4.md) | 有界 SendAndClose、Protobuf 错误策略与业务接入规范 |
 | [v1.0.3](releases/v1.0.3.md) | 有界 Service 池、可运行示例与文档重组 |
 | [v1.0.2](releases/v1.0.2.md) | Gate SecurityMode 命名、独立 Sproto 接入与正式依赖 |
 | [v1.0.1](releases/v1.0.1.md) | Node 组装、来源绑定的 Cluster 与窄日志入口 |

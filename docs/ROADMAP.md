@@ -1,6 +1,6 @@
 # 后续工作与范围
 
-已发布能力与迁移见 [发布说明](releases/v1.0.3.md)，当前契约见 [API](API-DESIGN.md)，测试证据见 [验证覆盖](validation/COVERAGE.md)。这里仅记录尚未完成的范围，不重复已完成的实施步骤。
+已发布能力与迁移见 [发布说明](releases/v1.0.4.md)，当前契约见 [API](API-DESIGN.md)，测试证据见 [验证覆盖](validation/COVERAGE.md)。这里仅记录尚未完成的范围，不重复已完成的实施步骤。
 
 ## 接入前按场景验证
 
